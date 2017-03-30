@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity", "Bhbk.L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Sts", "Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj", "{BAC11465-74BA-43BC-BE7A-E4996BFF1BD0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Admin", "Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj", "{5AD78C4E-2C4B-4D9B-B89F-0234224EB2DF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Cli.Identity", "Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj", "{572004C3-F64C-4028-B499-1FA670DDE230}"
 EndProject
 Global
@@ -30,6 +32,10 @@ Global
 		{BAC11465-74BA-43BC-BE7A-E4996BFF1BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAC11465-74BA-43BC-BE7A-E4996BFF1BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAC11465-74BA-43BC-BE7A-E4996BFF1BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AD78C4E-2C4B-4D9B-B89F-0234224EB2DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD78C4E-2C4B-4D9B-B89F-0234224EB2DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD78C4E-2C4B-4D9B-B89F-0234224EB2DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD78C4E-2C4B-4D9B-B89F-0234224EB2DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{572004C3-F64C-4028-B499-1FA670DDE230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{572004C3-F64C-4028-B499-1FA670DDE230}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{572004C3-F64C-4028-B499-1FA670DDE230}.Release|Any CPU.ActiveCfg = Release|Any CPU

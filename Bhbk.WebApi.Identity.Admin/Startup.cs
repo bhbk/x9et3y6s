@@ -1,15 +1,12 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
-using Bhbk.Lib.Identity.Repository;
+using Bhbk.Lib.Identity.Infrastructure;
 using Elmah.Contrib.WebApi;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
-using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.OAuth;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.Jwt;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
@@ -27,26 +24,23 @@ using System.Web.Http.ExceptionHandling;
 
 //https://tools.ietf.org/html/rfc6749
 
-[assembly: OwinStartup(typeof(Bhbk.WebApi.Identity.Sts.Startup))]
-namespace Bhbk.WebApi.Identity.Sts
+[assembly: OwinStartup(typeof(Bhbk.WebApi.Identity.Admin.Startup))]
+namespace Bhbk.WebApi.Identity.Admin
 {
     public class Startup
-    {
-        private OAuthAuthorizationServerOptions _oauthServerOptions { get; set; }
-        private OAuthBearerAuthenticationOptions _oauthBearerOptions { get; set; }
-
+    {        
         public void Configuration(IAppBuilder app)
         {
             HttpConfiguration config = new HttpConfiguration();
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
 
             ConfigureWebApi(config);
-            ConfigureOAuthAuthorization(app);
+            ConfigureOAuthTokenConsumption(app);
 
             app.UseWebApi(config);
         }
 
-        public void ConfigureWebApi(HttpConfiguration config)
+        private void ConfigureWebApi(HttpConfiguration config)
         {
             config.Services.Add(typeof(IExceptionLogger), new ElmahExceptionLogger());
             config.MapHttpAttributeRoutes();
@@ -55,35 +49,26 @@ namespace Bhbk.WebApi.Identity.Sts
             format.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
-        public void ConfigureOAuthAuthorization(IAppBuilder app)
+        private void ConfigureOAuthTokenConsumption(IAppBuilder app)
         {
             var issuer = "Bhbk";
 
             try
             {
+                var audiences = new UnitOfWork().AudienceRepository.Get(x => x.Name.StartsWith("Bhbk.WebApi.") || x.Name.StartsWith("Bhbk.WebUi."));
+
                 app.CreatePerOwinContext<IUnitOfWork>(UnitOfWork.Create);
 
-                _oauthServerOptions = new OAuthAuthorizationServerOptions()
-                {
-#if DEBUG
-                    AllowInsecureHttp = true,
-                    ApplicationCanDisplayErrors = true,
-#else
-                    AllowInsecureHttp = false,
-                    ApplicationCanDisplayErrors = false,
-#endif
-                    AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
-                    TokenEndpointPath = new PathString("/oauth/v1/token"),
-
-                    Provider = new Provider.CustomAuthorizationServer(),
-                    AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer),
-                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
-
-                    RefreshTokenProvider = new Provider.CustomRefreshToken(),
-                    //RefreshTokenFormat = new Provider.CustomSecureDataFormat(issuer),
-                };
-
-                app.UseOAuthAuthorizationServer(_oauthServerOptions);
+                app.UseJwtBearerAuthentication(
+                    new JwtBearerAuthenticationOptions
+                    {
+                        AuthenticationMode = AuthenticationMode.Active,
+                        AllowedAudiences = audiences.Select(x => x.Id.ToString().ToLower()),
+                        IssuerSecurityTokenProviders = new IIssuerSecurityTokenProvider[]
+                        {
+                            new SymmetricKeyIssuerSecurityTokenProvider(issuer, audiences.Select(v => TextEncodings.Base64Url.Decode(v.AudienceKey)))
+                        }
+                    });
             }
             catch (Exception ex)
             {
