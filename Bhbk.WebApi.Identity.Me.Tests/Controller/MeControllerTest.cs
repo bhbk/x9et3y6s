@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.WebApi.Identity.Me.Controller;
 using FluentAssertions;
+using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
     [TestClass]
     public class MeControllerTest : BaseControllerTest
     {
+        private TestServer _owin;
+
+        public MeControllerTest()
+        {
+            //_owin = TestServer.Create<BaseControllerTest>();
+        }
+
         [TestMethod]
         public async Task Api_Me_ChangePassword_Fail()
         {

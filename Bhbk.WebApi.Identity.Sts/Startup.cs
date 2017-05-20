@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth;
+using Microsoft.Practices.Unity;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using System;
@@ -35,6 +36,30 @@ namespace Bhbk.WebApi.Identity.Sts
         private OAuthAuthorizationServerOptions _oauthServerOptions { get; set; }
         private OAuthBearerAuthenticationOptions _oauthBearerOptions { get; set; }
 
+        private readonly ConcurrentDictionary<string, string> _codes =
+                new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+
+        //http://www.vannevel.net/2015/03/21/how-to-unit-test-your-owin-configured-oauth2-implementation/
+        public virtual HttpConfiguration ConfigureDependencyInjection()
+        {
+            HttpConfiguration config = new HttpConfiguration();
+            UnityContainer container = new UnityContainer();
+            CustomIdentityDbContext context = new CustomIdentityDbContext();
+
+            container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserLogin, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppAudience, Guid>, AudienceRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppClient, Guid>, ClientRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppRealm, Guid>, RealmRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppRole, Guid>, RoleRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppUser, Guid>, UserRepository>(new TransientLifetimeManager());
+            container.RegisterType<IUnitOfWork, UnitOfWork>(new TransientLifetimeManager());
+            container.RegisterInstance(context);
+            container.RegisterInstance(new UnitOfWork(context));
+            config.DependencyResolver = new CustomDependencyResolver(container);
+
+            return config;
+        }
+
         public void Configuration(IAppBuilder app)
         {
             HttpConfiguration config = new HttpConfiguration();
@@ -61,6 +86,9 @@ namespace Bhbk.WebApi.Identity.Sts
 
             try
             {
+                var injectConfig = ConfigureDependencyInjection();
+                var injectUoW = (IUnitOfWork)injectConfig.DependencyResolver.GetService(typeof(IUnitOfWork));
+                
                 app.CreatePerOwinContext<IUnitOfWork>(UnitOfWork.Create);
 
                 _oauthServerOptions = new OAuthAuthorizationServerOptions()
@@ -75,12 +103,16 @@ namespace Bhbk.WebApi.Identity.Sts
                     AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
                     TokenEndpointPath = new PathString("/oauth/v1/token"),
 
-                    Provider = new Provider.CustomAuthorizationServer(),
-                    AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer),
+                    Provider = new Provider.CustomAuthorizationServer(injectUoW),
+                    AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
                     AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
 
-                    RefreshTokenProvider = new Provider.CustomRefreshToken(),
-                    //RefreshTokenFormat = new Provider.CustomSecureDataFormat(issuer),
+                    AuthorizationCodeProvider = new Provider.CustomAuthorizationCode(injectUoW),
+                    AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
+                    AuthorizationCodeExpireTimeSpan = TimeSpan.FromDays(7),
+
+                    RefreshTokenProvider = new Provider.CustomRefreshToken(injectUoW),
+                    //RefreshTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
                 };
 
                 app.UseOAuthAuthorizationServer(_oauthServerOptions);
@@ -88,6 +120,22 @@ namespace Bhbk.WebApi.Identity.Sts
             catch (Exception ex)
             {
                 Elmah.ErrorSignal.FromCurrentContext().Raise(ex);
+            }
+        }
+
+        private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)
+        {
+            context.SetToken(Guid.NewGuid().ToString("n") + Guid.NewGuid().ToString("n"));
+            _codes[context.Token] = context.SerializeTicket();
+        }
+
+        private void ReceiveAuthenticationCode(AuthenticationTokenReceiveContext context)
+        {
+            string value;
+
+            if (_codes.TryRemove(context.Token, out value))
+            {
+                context.DeserializeTicket(value);
             }
         }
     }

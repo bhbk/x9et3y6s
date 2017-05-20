@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
+using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
     [TestClass]
     public class RealmControllerTest : BaseControllerTest
     {
+        private TestServer _owin;
+
+        public RealmControllerTest()
+        {
+            //_owin = TestServer.Create<BaseControllerTest>();
+        }
+
         [TestMethod]
         public void Api_Realm_GetAll_Success()
         {

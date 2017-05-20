@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
+using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
     [TestClass]
     public class ClaimControllerTest : BaseControllerTest
     {
+        private TestServer _owin;
+
+        public ClaimControllerTest()
+        {
+            //_owin = TestServer.Create<BaseControllerTest>();
+        }
+
         [TestMethod]
         public async Task Api_Claim_GetAll_Success()
         {

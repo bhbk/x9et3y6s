@@ -11,7 +11,12 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 {
     public class CustomRefreshToken : IAuthenticationTokenProvider
     {
-        public CustomRefreshToken() { }
+        private IUnitOfWork _uow;
+
+        public CustomRefreshToken(IUnitOfWork uow)
+        {
+            _uow = uow;
+        }
 
         public void Create(AuthenticationTokenCreateContext context)
         {
@@ -22,6 +27,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
         {
             if (context == null)
                 throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
 
             Guid clientID;
             AppClient client;
@@ -32,13 +39,13 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (!Guid.TryParse(clientValue, out clientID))
             {
                 //check if guid used for client. resolve guid from name if not.
-                client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
                 if (client == null)
                     throw new ArgumentNullException();
             }
             else
-                client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
 
             Guid audienceID;
             AppAudience audience;
@@ -49,13 +56,13 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (!Guid.TryParse(audienceValue, out audienceID))
             {
                 //check if guid used for client. resolve guid from name if not.
-                audience = context.OwinContext.GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
                 if (audience == null)
                     throw new ArgumentNullException();
             }
             else
-                audience = context.OwinContext.GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
 
             string emailValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrUserID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrUserID] : null;
@@ -63,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (emailValue == null)
                 throw new ArgumentNullException();
 
-            var user = await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.FindByEmailAsync(emailValue);
+            var user = await _uow.CustomUserManager.FindByEmailAsync(emailValue);
             var tokenID = Guid.NewGuid();
 
             AppUserToken token = new AppUserToken()
@@ -80,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             token.ProtectedTicket = context.SerializeTicket();
 
-            var result = await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.AddRefreshTokenAsync(token);
+            var result = await _uow.CustomUserManager.AddRefreshTokenAsync(token);
 
             if (result.Succeeded)
                 context.SetToken(tokenID.ToString());
@@ -95,15 +102,17 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
         {
             if (context == null)
                 throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
 
-            var valid = await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.FindRefreshTokenAsync(context.Token);
+            var valid = await _uow.CustomUserManager.FindRefreshTokenAsync(context.Token);
 
             if (valid != null)
             {
                 context.DeserializeTicket(valid.ProtectedTicket);
 
                 if (valid.IssuedUtc >= DateTime.UtcNow || valid.ExpiresUtc <= DateTime.UtcNow)
-                    await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.RemoveRefreshTokenAsync(context.Token);
+                    await _uow.CustomUserManager.RemoveRefreshTokenAsync(context.Token);
             }
         }
     }

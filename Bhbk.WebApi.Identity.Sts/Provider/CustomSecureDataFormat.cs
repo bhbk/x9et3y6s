@@ -7,24 +7,18 @@ using System.IdentityModel.Tokens;
 using System.Linq;
 using Thinktecture.IdentityModel.Tokens;
 using BaseLib = Bhbk.Lib.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.DataHandler.Encoder;
-using System;
-using System.IdentityModel.Tokens;
-using System.Linq;
-using System.Web;
-using Thinktecture.IdentityModel.Tokens;
 
 namespace Bhbk.WebApi.Identity.Sts.Provider
 {
     public class CustomSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
     {
+        private IUnitOfWork _uow;
         private string _issuer;
 
-        public CustomSecureDataFormat(string issuer)
+        public CustomSecureDataFormat(string issuer, IUnitOfWork uow)
         {
             _issuer = issuer;
+            _uow = uow;
         }
 
         public string Protect(AuthenticationTicket ticket)
@@ -43,10 +37,10 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
             else if (Guid.TryParse(audienceValue, out audienceID))
-                audience = HttpContext.Current.GetOwinContext().GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
 
             else
-                audience = HttpContext.Current.GetOwinContext().GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);

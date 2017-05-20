@@ -1,9 +1,13 @@
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Repository;
 using Elmah.Contrib.WebApi;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.Jwt;
+using Microsoft.Practices.Unity;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using System;
@@ -28,7 +32,28 @@ using System.Web.Http.ExceptionHandling;
 namespace Bhbk.WebApi.Identity.Admin
 {
     public class Startup
-    {        
+    {
+        //http://www.vannevel.net/2015/03/21/how-to-unit-test-your-owin-configured-oauth2-implementation/
+        public virtual HttpConfiguration ConfigureDependencyInjection()
+        {
+            HttpConfiguration config = new HttpConfiguration();
+            UnityContainer container = new UnityContainer();
+            CustomIdentityDbContext context = new CustomIdentityDbContext();
+
+            container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserLogin, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppAudience, Guid>, AudienceRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppClient, Guid>, ClientRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppRealm, Guid>, RealmRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppRole, Guid>, RoleRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppUser, Guid>, UserRepository>(new TransientLifetimeManager());
+            container.RegisterType<IUnitOfWork, UnitOfWork>(new TransientLifetimeManager());
+            container.RegisterInstance(context);
+            container.RegisterInstance(new UnitOfWork(context));
+            config.DependencyResolver = new CustomDependencyResolver(container);
+
+            return config;
+        }
+        
         public void Configuration(IAppBuilder app)
         {
             HttpConfiguration config = new HttpConfiguration();
@@ -55,7 +80,9 @@ namespace Bhbk.WebApi.Identity.Admin
 
             try
             {
-                var audiences = new UnitOfWork().AudienceRepository.Get(x => x.Name.StartsWith("Bhbk.WebApi.") || x.Name.StartsWith("Bhbk.WebUi."));
+                var injectConfig = ConfigureDependencyInjection();
+                var injectUoW = (IUnitOfWork)injectConfig.DependencyResolver.GetService(typeof(IUnitOfWork));
+                var audiences = injectUoW.AudienceRepository.Get(v => v.Name.StartsWith("Bhbk.WebApi.") || v.Name.StartsWith("Bhbk.WebUi."));
 
                 app.CreatePerOwinContext<IUnitOfWork>(UnitOfWork.Create);
 

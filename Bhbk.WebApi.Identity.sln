@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Me.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Admin.Tests", "Bhbk.WebApi.Identity.Admin.Tests\Bhbk.WebApi.Identity.Admin.Tests.csproj", "{1DD609CA-BA5A-413A-8990-E0D6E14535AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Sts.Tests", "Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj", "{2033698A-3124-4E1B-B4CB-FD83074E2353}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{1DD609CA-BA5A-413A-8990-E0D6E14535AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DD609CA-BA5A-413A-8990-E0D6E14535AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DD609CA-BA5A-413A-8990-E0D6E14535AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

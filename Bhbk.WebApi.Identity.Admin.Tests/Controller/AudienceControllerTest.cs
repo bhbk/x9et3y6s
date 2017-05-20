@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
+using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
     [TestClass]
     public class AudienceControllerTest : BaseControllerTest
     {
+        private TestServer _owin;
+
+        public AudienceControllerTest()
+        {
+            //_owin = TestServer.Create<BaseControllerTest>();
+        }
+
         [TestMethod]
         public void Api_Audience_GetAll_Success()
         {

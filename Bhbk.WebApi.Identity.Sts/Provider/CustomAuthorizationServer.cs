@@ -15,7 +15,48 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 {
     public class CustomAuthorizationServer : OAuthAuthorizationServerProvider
     {
-        public CustomAuthorizationServer() { }
+        private IUnitOfWork _uow;
+
+        public CustomAuthorizationServer(IUnitOfWork uow)
+        {
+            _uow = uow;
+        }
+
+        public override Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context)
+        {
+            //https://msdn.microsoft.com/en-us/library/microsoft.owin.security.oauth.oauthauthorizationserverprovider.authorizeendpoint(v=vs.113).aspx
+
+            if (context == null)
+                throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
+
+            return Task.FromResult<object>(null);
+        }
+
+        public override Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
+        {
+            //https://msdn.microsoft.com/en-us/library/microsoft.owin.security.oauth.oauthauthorizationserverprovider.authorizationendpointresponse(v=vs.113).aspx
+            
+            if (context == null)
+                throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
+
+            return Task.FromResult<object>(null);
+        }
+
+        public override Task GrantAuthorizationCode(OAuthGrantAuthorizationCodeContext context)
+        {
+            //https://msdn.microsoft.com/en-us/library/microsoft.owin.security.oauth.oauthauthorizationserverprovider.grantauthorizationcode(v=vs.113).aspx
+
+            if (context == null)
+                throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
+
+            return Task.FromResult<object>(null);
+        }
 
         public override Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
         {
@@ -23,6 +64,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             if (context == null)
                 throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
 
             Guid clientID;
             AppClient client;
@@ -33,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (!Guid.TryParse(clientValue, out clientID))
             {
                 //check if guid used for client. resolve guid from name if not.
-                client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
                 if (client == null)
                 {
@@ -42,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 }
             }
             else
-                client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
 
             Guid audienceID;
             AppAudience audience;
@@ -53,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (!Guid.TryParse(audienceValue, out audienceID))
             {
                 //check if guid used for client. resolve guid from name if not.
-                audience = context.OwinContext.GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
                 if (audience == null)
                 {
@@ -62,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 }
             }
             else
-                audience = context.OwinContext.GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
 
             var claims = new ClaimsIdentity(context.Ticket.Identity);
             var ticket = new AuthenticationTicket(claims, context.Ticket.Properties);
@@ -77,6 +120,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             if (context == null)
                 throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
 
             var data = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
 
@@ -87,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 return;
             }
 
-            var user = await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.FindByEmailAsync(context.UserName);
+            var user = await _uow.CustomUserManager.FindByEmailAsync(context.UserName);
 
             //check that user exists...
             if (user == null)
@@ -96,9 +141,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 return;
             }
             //check that password is valid...
-            else if (!await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.CheckPasswordAsync(user, context.Password))
+            else if (!await _uow.CustomUserManager.CheckPasswordAsync(user, context.Password))
             {
-                await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.AccessFailedAsync(user.Id);
+                await _uow.CustomUserManager.AccessFailedAsync(user.Id);
 
                 context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
                 return;
@@ -110,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             //check if guid used for client. resolve guid from name if not.
             if (!Guid.TryParse(clientValue, out clientID))
             {
-                var client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
+                var client = _uow.ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
 
                 if (client != null)
                     clientID = client.Id;
@@ -118,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             if (clientID == null)
             {
-                await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.AccessFailedAsync(user.Id);
+                await _uow.CustomUserManager.AccessFailedAsync(user.Id);
 
                 context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", clientValue));
                 return;
@@ -130,7 +175,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             //check if guid used for audience. resolve guid from name if not.
             if (!Guid.TryParse(audienceValue, out audienceID))
             {
-                var audience = context.OwinContext.GetUserManager<IUnitOfWork>().AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                var audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
                 if (audience != null)
                     audienceID = audience.Id;
@@ -138,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             if (audienceID == null)
             {
-                await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.AccessFailedAsync(user.Id);
+                await _uow.CustomUserManager.AccessFailedAsync(user.Id);
 
                 context.SetError("invalid_audience_id", string.Format("Invalid audience '{0}'", audienceValue));
                 return;
@@ -151,15 +196,28 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                     { BaseLib.Statics.AttrUserID, user.Email }
                 });
 
-            ClaimsIdentity claims = await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.CreateIdentityAsync(user, "JWT");
+            ClaimsIdentity claims = await _uow.CustomUserManager.CreateIdentityAsync(user, "JWT");
             claims.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
 
             AuthenticationTicket ticket = new AuthenticationTicket(claims, attrs);
 
-            await context.OwinContext.GetUserManager<IUnitOfWork>().CustomUserManager.ResetAccessFailedCountAsync(user.Id);
+            await _uow.CustomUserManager.ResetAccessFailedCountAsync(user.Id);
 
             context.Validated(ticket);
+        }
+
+        public override Task TokenEndpoint(OAuthTokenEndpointContext context)
+        {
+            //https://msdn.microsoft.com/en-us/library/microsoft.owin.security.oauth.oauthauthorizationserverprovider.tokenendpoint(v=vs.113).aspx
+
+            if (context == null)
+                throw new ArgumentNullException();
+
+            foreach (KeyValuePair<string, string> property in context.Properties.Dictionary)
+                context.AdditionalResponseParameters.Add(property.Key, property.Value);
+
+            return Task.FromResult<object>(null);
         }
 
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
@@ -168,6 +226,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             if (context == null)
                 throw new ArgumentNullException();
+            else
+                context.OwinContext.Set<IUnitOfWork>(_uow);
 
             string contextID;
             string contextSecret;
@@ -187,13 +247,13 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (!Guid.TryParse(context.ClientId, out clientID))
             {
                 //check if guid used for client. resolve guid from name if not.
-                client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
 
                 if (client == null)
                     context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", context.ClientId));
             }
             else
-                client = context.OwinContext.GetUserManager<IUnitOfWork>().ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
 
             if (client == null)
             {
@@ -202,6 +262,18 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             }
 
             context.Validated();
+            return Task.FromResult<object>(null);
+        }
+
+        public override Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
+        {
+            Uri expectedUri = new Uri(context.Request.Uri, "/");
+
+            if (expectedUri.AbsoluteUri == context.RedirectUri)
+                context.Validated();
+            else
+                context.Validated();
+
             return Task.FromResult<object>(null);
         }
     }

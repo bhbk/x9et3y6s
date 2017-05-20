@@ -8,7 +8,7 @@ using System;
 using System.Data.Entity.Core.EntityClient;
 using System.Web.Http;
 
-namespace Bhbk.WebApi.Identity.Me.Tests.Controller
+namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
 {
     public class BaseControllerTest : Startup
     {
