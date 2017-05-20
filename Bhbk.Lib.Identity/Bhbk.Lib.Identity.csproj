@@ -142,22 +142,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helper\SeedDefaultsHelper.cs" />
+    <Compile Include="Helper\DataSeedHelper.cs" />
     <Compile Include="Helper\EntrophyHelper.cs" />
     <Compile Include="Helper\FormatHelper.cs" />
-    <Compile Include="Helper\SeedTestsHelper.cs" />
     <Compile Include="Helper\ValidationHelper.cs" />
     <Compile Include="Infrastructure\CustomIdentityFactory.cs" />
     <Compile Include="Infrastructure\CustomPasswordValidator.cs" />
     <Compile Include="Infrastructure\CustomDataProtection.cs" />
     <Compile Include="Infrastructure\CustomDependencyResolver.cs" />
+    <Compile Include="Manager\CustomProviderManager.cs" />
     <Compile Include="Model\AppAudience.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\AppClient.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\AppRealm.cs">
+    <Compile Include="Model\AppProvider.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\AppRole.cs">
@@ -169,7 +169,7 @@
     <Compile Include="Model\AppUserClaim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\AppUserLogin.cs">
+    <Compile Include="Model\AppUserProvider.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\AppUserRole.cs">
@@ -179,11 +179,11 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\CustomAppClient.cs" />
-    <Compile Include="Model\CustomAppRealm.cs" />
+    <Compile Include="Model\CustomAppProvider.cs" />
     <Compile Include="Model\CustomAppRole.cs" />
     <Compile Include="Model\CustomAppUser.cs" />
     <Compile Include="Model\CustomAppUserClaim.cs" />
-    <Compile Include="Model\CustomAppUserLogin.cs" />
+    <Compile Include="Model\CustomAppUserProvider.cs" />
     <Compile Include="Model\CustomAppUserRole.cs" />
     <Compile Include="Model\CustomAppAudience.cs" />
     <Compile Include="Model\CustomAppUserToken.cs" />
@@ -202,18 +202,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Model\sysdiagrams.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Repository\ClientRepository.cs" />
     <Compile Include="Repository\GenericRepository.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Infrastructure\CustomIdentityDbContext.cs" />
     <Compile Include="Statics.cs" />
     <Compile Include="Manager\CustomRoleManager.cs" />
+    <Compile Include="Store\CustomProviderStore.cs" />
     <Compile Include="Store\CustomRoleStore.cs" />
     <Compile Include="Manager\CustomUserManager.cs" />
     <Compile Include="Store\CustomUserStore.cs" />
     <Compile Include="Repository\IGenericRepository.cs" />
     <Compile Include="Repository\AudienceRepository.cs" />
-    <Compile Include="Repository\RealmRepository.cs" />
+    <Compile Include="Repository\ProviderRepository.cs" />
     <Compile Include="Repository\RoleRepository.cs" />
     <Compile Include="Repository\UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Store
@@ -17,6 +18,9 @@ namespace Bhbk.Lib.Identity.Store
         public CustomRoleStore(CustomIdentityDbContext context)
             : base(context)
         {
+            if (context == null)
+                throw new ArgumentNullException();
+
             _context = context;
         }
 
@@ -37,6 +41,16 @@ namespace Bhbk.Lib.Identity.Store
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
+        }
+
+        public bool IsValidRole(AppRole role)
+        {
+            var result = _context.Roles.Where(x => x.Id == role.Id || x.Name == role.Name).SingleOrDefault();
+
+            if (result == null)
+                return false;
+            else
+                return true;
         }
 
         public override Task UpdateAsync(AppRole role)

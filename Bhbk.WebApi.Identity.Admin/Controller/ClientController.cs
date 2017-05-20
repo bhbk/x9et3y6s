@@ -16,36 +16,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         public ClientController(IUnitOfWork uow)
             : base(uow) { }
 
-        [Route("v1"), HttpGet]
-        public IHttpActionResult GetClients()
-        {
-            return Ok(UoW.ClientRepository.Get().Select(x => ModelFactory.Create(x)));
-        }
-
-        [Route("v1/{clientID}"), HttpGet]
-        public async Task<IHttpActionResult> GetClient(Guid clientID)
-        {
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
-
-            if (foundClient == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
-
-            else
-                return Ok(ModelFactory.Create(foundClient));
-        }
-
-        [Route("v1/{clientID}/audiences"), HttpGet]
-        public async Task<IHttpActionResult> GetAudiencesInClient(Guid clientID)
-        {
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
-
-            if (foundClient == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
-
-            else
-                return Ok(UoW.AudienceRepository.Get(x => x.ClientId == foundClient.Id).Select(x => ModelFactory.Create(x)));
-        }
-
         [Route("v1"), HttpPost]
         //[Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateClient(ClientModel.Binding.Create model)
@@ -73,6 +43,57 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             }
             else
                 return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);
+        }
+
+        [Route("v1/{clientID}"), HttpDelete]
+        //[Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IHttpActionResult> DeleteClient(Guid clientID)
+        {
+            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
+
+            if (foundClient == null)
+                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+
+            else if (foundClient.Immutable)
+                return BadRequest(BaseLib.Statics.MsgClientImmutable);
+
+            else
+            {
+                UoW.ClientRepository.Delete(foundClient);
+                await UoW.SaveAsync();
+
+                return Ok();
+            }
+        }
+
+        [Route("v1/{clientID}/audiences"), HttpGet]
+        public async Task<IHttpActionResult> GetAudiencesInClient(Guid clientID)
+        {
+            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
+
+            if (foundClient == null)
+                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+
+            else
+                return Ok(UoW.AudienceRepository.Get(x => x.ClientId == foundClient.Id).Select(x => ModelFactory.Create(x)));
+        }
+
+        [Route("v1/{clientID}"), HttpGet]
+        public async Task<IHttpActionResult> GetClient(Guid clientID)
+        {
+            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
+
+            if (foundClient == null)
+                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+
+            else
+                return Ok(ModelFactory.Create(foundClient));
+        }
+
+        [Route("v1"), HttpGet]
+        public IHttpActionResult GetClients()
+        {
+            return Ok(UoW.ClientRepository.Get().Select(x => ModelFactory.Create(x)));
         }
 
         [Route("v1/{clientID}"), HttpPut]
@@ -104,27 +125,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 await UoW.SaveAsync();
 
                 return Ok(ModelFactory.Create(foundClient));
-            }
-        }
-
-        [Route("v1/{clientID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> DeleteClient(Guid clientID)
-        {
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
-
-            if (foundClient == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
-
-            else if (foundClient.Immutable)
-                return BadRequest(BaseLib.Statics.MsgClientImmutable);
-
-            else
-            {
-                UoW.ClientRepository.Delete(foundClient);
-                await UoW.SaveAsync();
-
-                return Ok();
             }
         }
     }

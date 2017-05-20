@@ -2,47 +2,46 @@
 using Bhbk.Lib.Identity.Model;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Lib.Identity.Helper
 {
-    public class SeedDefaultsHelper
+    public class DataSeedHelper
     {
-        private CustomIdentityDbContext _context;
         private UnitOfWork _uow;
         private AppClient _client;
         private AppAudience _audience;
-        private AppRealm _realm;
+        private AppProvider _provider;
         private AppRole _role;
         private AppUser _user;
 
-        public SeedDefaultsHelper(CustomIdentityDbContext context)
+        public DataSeedHelper(UnitOfWork uow)
         {
-            if (context == null)
+            if (uow == null)
                 throw new ArgumentNullException();
 
-            this._context = context;
-            this._uow = new UnitOfWork(_context);
+            this._uow = uow;
         }
 
         public async void CreateDefaultData()
         {
-            var foundRealm = _uow.RealmRepository.Get(x => x.Name == Statics.ApiDefaultRealm).SingleOrDefault();
+            var foundProvider = _uow.ProviderRepository.Get(x => x.Name == Statics.ApiDefaultProvider).SingleOrDefault();
 
-            if (foundRealm == null)
+            if (foundProvider == null)
             {
-                _realm = new AppRealm()
+                _provider = new AppProvider()
                 {
                     Id = Guid.NewGuid(),
-                    Name = Statics.ApiDefaultRealm,
+                    Name = Statics.ApiDefaultProvider,
                     Created = DateTime.Now,
                     Enabled = true,
                     Immutable = false
                 };
 
-                _uow.RealmRepository.Create(_realm);
-                await _uow.RealmRepository.SaveAsync();
-                foundRealm = _uow.RealmRepository.Get(x => x.Name == _realm.Name).Single();
+                _uow.ProviderRepository.Create(_provider);
+                await _uow.ProviderRepository.SaveAsync();
+                foundProvider = _uow.ProviderRepository.Get(x => x.Name == _provider.Name).Single();
             }
 
             var foundClient = _uow.ClientRepository.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
@@ -103,8 +102,7 @@ namespace Bhbk.Lib.Identity.Helper
                     AccessFailedCount = 0,
                     AccessSuccessCount = 0,
                     TwoFactorEnabled = false,
-                    Immutable = false,
-                    RealmId = foundRealm.Id
+                    Immutable = false
                 };
 
                 await _uow.CustomUserManager.CreateAsync(_user, BaseLib.Statics.ApiUnitTestsPassword);
@@ -147,6 +145,9 @@ namespace Bhbk.Lib.Identity.Helper
                 foundRoleForViewer = _uow.RoleRepository.Get(x => x.Name == _role.Name).Single();
             }
 
+            if (!_uow.CustomUserManager.IsInProviderAsync(foundUser.Id, foundProvider.Name).Result)
+                await _uow.CustomUserManager.AddToProviderAsync(foundUser.Id, foundProvider.Name);
+
             if (!_uow.CustomUserManager.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Name).Result)
                 await _uow.CustomUserManager.AddToRoleAsync(foundUser.Id, foundRoleForAdmin.Name);
 
@@ -154,20 +155,111 @@ namespace Bhbk.Lib.Identity.Helper
                 await _uow.CustomUserManager.AddToRoleAsync(foundUser.Id, foundRoleForViewer.Name);
         }
 
+        public async void CreateTestData()
+        {
+            for (int i = 0; i < 1; i++)
+                _uow.ProviderRepository.Create(new AppProvider
+                {
+                    Id = Guid.NewGuid(),
+                    //Name = BaseLib.Statics.ApiDefaultProvider + "-" + EntrophyHelper.GenerateRandomBase64(4),
+                    Name = BaseLib.Statics.ApiDefaultProvider,
+                    Created = DateTime.Now,
+                    Enabled = true,
+                    Immutable = false
+                });
+
+            _uow.ProviderRepository.Save();
+
+            Guid providerID = _uow.ProviderRepository.Get().First().Id;
+
+            for (int i = 0; i < 1; i++)
+                _uow.ClientRepository.Create(new AppClient
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Client-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4),
+                    Created = DateTime.Now,
+                    Enabled = true,
+                    Immutable = false
+                });
+
+            _uow.ClientRepository.Save();
+
+            Guid clientID = _uow.ClientRepository.Get().First().Id;
+
+            for (int i = 0; i < 1; i++)
+                _uow.AudienceRepository.Create(new AppAudience
+                {
+                    Id = Guid.NewGuid(),
+                    ClientId = clientID,
+                    Name = "Audience-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4),
+                    AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
+                    AudienceType = AudienceType.ThinClient.ToString(),
+                    Created = DateTime.Now,
+                    Enabled = true,
+                    Immutable = false
+                });
+
+            _uow.AudienceRepository.Save();
+
+            Guid audienceID = _uow.AudienceRepository.Get().First().Id;
+
+            for (int i = 0; i < 3; i++)
+                await _uow.CustomRoleManager.CreateAsync(new AppRole
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Role-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4),
+                    Enabled = true,
+                    Immutable = false,
+                    AudienceId = audienceID
+                });
+
+            for (int i = 0; i < 3; i++)
+            {
+                string email = "unit-test@" + EntrophyHelper.GenerateRandomBase64(4) + ".net";
+
+                await _uow.CustomUserManager.CreateAsync(new AppUser
+                {
+                    Id = Guid.NewGuid(),
+                    Email = email,
+                    EmailConfirmed = true,
+                    FirstName = "FirstName",
+                    LastName = "LastName",
+                    LockoutEnabled = false,
+                    LockoutEndDateUtc = DateTime.Now.AddDays(30),
+                    TwoFactorEnabled = false,
+                    Immutable = false
+                }, BaseLib.Statics.ApiUnitTestsPassword);
+
+            }
+
+            foreach (var user in _uow.UserRepository.Get().ToList())
+            {
+                await _uow.CustomUserManager.AddToProviderAsync(user.Id, _uow.ProviderRepository.Get().First().Name);
+
+                await _uow.CustomUserManager.AddClaimAsync(user.Id, new Claim("ClaimType-UnitTest", "ClaimValue-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4)));
+
+                foreach (var role in _uow.RoleRepository.Get().ToList())
+                    await _uow.CustomUserManager.AddToRoleAsync(user.Id, role.Name);
+            }
+        }
+
         public async void DestroyDefaultData()
         {
             foreach (var user in _uow.UserRepository.Get())
                 await _uow.CustomUserManager.DeleteAsync(user);
 
-            foreach (var realm in _uow.RealmRepository.Get())
-                _uow.RealmRepository.Delete(realm);
-
-            await _uow.RealmRepository.SaveAsync();
+            foreach (var role in _uow.RoleRepository.Get())
+                await _uow.CustomRoleManager.DeleteAsync(role);
 
             foreach (var audience in _uow.AudienceRepository.Get())
                 _uow.AudienceRepository.Delete(audience);
 
             await _uow.AudienceRepository.SaveAsync();
+
+            foreach (var provider in _uow.ProviderRepository.Get())
+                _uow.ProviderRepository.Delete(provider);
+
+            await _uow.ProviderRepository.SaveAsync();
 
             foreach (var client in _uow.ClientRepository.Get())
                 _uow.ClientRepository.Delete(client);
@@ -192,20 +284,20 @@ namespace Bhbk.Lib.Identity.Helper
             if (role != null)
                 await _uow.CustomRoleManager.DeleteAsync(role);
 
-            var realm = _uow.RealmRepository.Get(x => x.Name == Statics.ApiDefaultRealm).SingleOrDefault();
-
-            if (realm != null)
-            {
-                _uow.RealmRepository.Delete(realm);
-                await _uow.RealmRepository.SaveAsync();
-            }
-
             var audience = _uow.AudienceRepository.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
 
             if (audience != null)
             {
                 _uow.AudienceRepository.Delete(audience);
                 await _uow.AudienceRepository.SaveAsync();
+            }
+
+            var provider = _uow.ProviderRepository.Get(x => x.Name == Statics.ApiDefaultProvider).SingleOrDefault();
+
+            if (provider != null)
+            {
+                _uow.ProviderRepository.Delete(provider);
+                await _uow.ProviderRepository.SaveAsync();
             }
 
             var client = _uow.ClientRepository.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();

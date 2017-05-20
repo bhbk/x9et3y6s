@@ -5,24 +5,24 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="2cd1c4fb7ecc44069d39fd4893690427" Name="Diagram1">
-        <EntityTypeShape EntityType="IdentityModel.AppAudience" Width="1.5" PointX="3.75" PointY="0.75" />
-        <EntityTypeShape EntityType="IdentityModel.AppClient" Width="1.5" PointX="1.5" PointY="1.875" />
-        <EntityTypeShape EntityType="IdentityModel.AppRealm" Width="1.5" PointX="0.75" PointY="7.25" />
-        <EntityTypeShape EntityType="IdentityModel.AppUser" Width="1.5" PointX="3" PointY="5.5" />
-        <EntityTypeShape EntityType="IdentityModel.AppUserClaim" Width="1.5" PointX="5.25" PointY="11.875" />
-        <EntityTypeShape EntityType="IdentityModel.AppUserLogin" Width="1.5" PointX="5.25" PointY="15.75" />
-        <EntityTypeShape EntityType="IdentityModel.AppUserRole" Width="1.5" PointX="8.25" PointY="7.375" />
-        <EntityTypeShape EntityType="IdentityModel.AppUserToken" Width="1.5" PointX="5.25" PointY="7.25" />
+        <EntityTypeShape EntityType="IdentityModel.AppAudience" Width="1.5" PointX="1.5" PointY="20.5" />
+        <EntityTypeShape EntityType="IdentityModel.AppClient" Width="1.5" PointX="1.5" PointY="25" />
+        <EntityTypeShape EntityType="IdentityModel.AppProvider" Width="1.5" PointX="0.75" PointY="12" />
+        <EntityTypeShape EntityType="IdentityModel.AppRole" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="IdentityModel.AppUser" Width="1.5" PointX="0.75" PointY="5.375" />
+        <EntityTypeShape EntityType="IdentityModel.AppUserClaim" Width="1.5" PointX="3" PointY="16" />
+        <EntityTypeShape EntityType="IdentityModel.AppUserProvider" Width="1.5" PointX="3" PointY="7" />
+        <EntityTypeShape EntityType="IdentityModel.AppUserRole" Width="1.5" PointX="3" PointY="4.125" />
+        <EntityTypeShape EntityType="IdentityModel.AppUserToken" Width="1.5" PointX="6" PointY="7" />
         <AssociationConnector Association="IdentityModel.FK_AppAudience_ClientID" />
+        <AssociationConnector Association="IdentityModel.FK_AppRole_AudienceID" />
         <AssociationConnector Association="IdentityModel.FK_AppUserToken_AudienceID" />
-        <AssociationConnector Association="IdentityModel.FK_AppUser_RealmID" />
+        <AssociationConnector Association="IdentityModel.FK_AppUserProvider_ProviderID" />
+        <AssociationConnector Association="IdentityModel.FK_AppUserRole_RoleID" />
         <AssociationConnector Association="IdentityModel.FK_AppUserClaim_UserID" />
-        <AssociationConnector Association="IdentityModel.FK_AppUserLogin_UserID" />
+        <AssociationConnector Association="IdentityModel.FK_AppUserProvider_UserID" />
         <AssociationConnector Association="IdentityModel.FK_AppUserRole_UserID" />
         <AssociationConnector Association="IdentityModel.FK_AppUserToken_UserID" />
-        <EntityTypeShape EntityType="IdentityModel.AppRole" Width="1.5" PointX="6" PointY="1" />
-        <AssociationConnector Association="IdentityModel.FK_AppRole_AudienceID" />
-        <AssociationConnector Association="IdentityModel.FK_AppUserRole_RoleID" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

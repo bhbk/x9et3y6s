@@ -27,12 +27,13 @@ namespace Bhbk.Lib.Identity.Model
     
         public virtual DbSet<AppAudience> AppAudience { get; set; }
         public virtual DbSet<AppClient> AppClient { get; set; }
-        public virtual DbSet<AppRealm> AppRealm { get; set; }
+        public virtual DbSet<AppProvider> AppProvider { get; set; }
+        public virtual DbSet<AppRole> AppRole { get; set; }
         public virtual DbSet<AppUser> AppUser { get; set; }
         public virtual DbSet<AppUserClaim> AppUserClaim { get; set; }
-        public virtual DbSet<AppUserLogin> AppUserLogin { get; set; }
+        public virtual DbSet<AppUserProvider> AppUserProvider { get; set; }
         public virtual DbSet<AppUserRole> AppUserRole { get; set; }
         public virtual DbSet<AppUserToken> AppUserToken { get; set; }
-        public virtual DbSet<AppRole> AppRole { get; set; }
+        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
     }
 }

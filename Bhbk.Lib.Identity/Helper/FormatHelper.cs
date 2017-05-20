@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.IdentityModel.Tokens;
 
 namespace Bhbk.Lib.Identity.Helper

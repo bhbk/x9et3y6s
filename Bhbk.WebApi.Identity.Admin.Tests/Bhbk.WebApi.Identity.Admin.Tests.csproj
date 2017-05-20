@@ -155,7 +155,7 @@
     <Compile Include="Controller\UserControllerTest.cs" />
     <Compile Include="Controller\AudienceControllerTest.cs" />
     <Compile Include="Controller\BaseControllerTest.cs" />
-    <Compile Include="Controller\RealmControllerTest.cs" />
+    <Compile Include="Controller\ProviderControllerTest.cs" />
     <Compile Include="Controller\ClaimControllerTest.cs" />
     <Compile Include="Controller\RoleControllerTest.cs" />
     <Compile Include="Controller\DiagnosticControllerTest.cs" />

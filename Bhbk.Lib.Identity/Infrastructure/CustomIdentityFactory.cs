@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
@@ -50,19 +51,15 @@ namespace Bhbk.Lib.Identity.Infrastructure
             };
         }
 
-        public RealmModel.Return.Realm Create(AppRealm realm)
+        public ProviderModel.Return.Provider Create(AppProvider provider)
         {
-            _uow.RealmRepository.Attach(realm);
-            _uow.RealmRepository.LoadCollection(realm, "Users");
-
-            return new RealmModel.Return.Realm
+            return new ProviderModel.Return.Provider
             {
-                Id = realm.Id,
-                Name = realm.Name,
-                Enabled = realm.Enabled,
-                Created = realm.Created,
-                Immutable = realm.Immutable,
-                Users = realm.Users.Select(x => x.Email).ToList()
+                Id = provider.Id,
+                Name = provider.Name,
+                Enabled = provider.Enabled,
+                Created = provider.Created,
+                Immutable = provider.Immutable
             };
         }
 
@@ -89,7 +86,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
             return new UserModel.Return.User
             {
                 Id = user.Id,
-                RealmId = user.RealmId,
                 Email = user.Email,
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumber = user.PhoneNumber,
@@ -109,16 +105,16 @@ namespace Bhbk.Lib.Identity.Infrastructure
             };
         }
 
-        public UserClaimModel.Return.Claim Create(AppUserClaim role)
+        public UserClaimModel.Return.Claim Create(AppUserClaim claim)
         {
             return new UserClaimModel.Return.Claim
             {
-                Id = role.Id,
-                UserId = role.UserId,
-                ClaimType = role.ClaimType,
-                ClaimValue = role.ClaimType,
-                Created = role.Created,
-                Immutable = role.Immutable
+                Id = claim.Id,
+                UserId = claim.UserId,
+                ClaimType = claim.ClaimType,
+                ClaimValue = claim.ClaimType,
+                Created = claim.Created,
+                Immutable = claim.Immutable
             };
         }
     }
@@ -206,11 +202,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
         }
     }
 
-    public class RealmModel
+    public class ProviderModel
     {
         public class Return
         {
-            public class Realm
+            public class Provider
             {
                 public Guid Id { get; set; }
                 public string Name { get; set; }
@@ -297,7 +293,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 public bool LockoutEnabled { get; set; }
                 public bool TwoFactorEnabled { get; set; }
                 public bool Immutable { get; set; }
-                public Guid RealmId { get; set; }
             }
 
             public class Update
@@ -311,7 +306,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 public Nullable<DateTime> LockoutEndDateUtc { get; set; }
                 public bool TwoFactorEnabled { get; set; }
                 public bool Immutable { get; set; }
-                public Guid RealmId { get; set; }
             }
 
             public class ChangePassword
@@ -349,7 +343,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 public int AccessSuccessCount { get; set; }
                 public bool TwoFactorEnabled { get; set; }
                 public bool Immutable { get; set; }
-                public Guid RealmId { get; set; }
                 public IList<AppUserClaim> Claims { get; set; }
                 public IList<AppUserRole> Roles { get; set; }
             }

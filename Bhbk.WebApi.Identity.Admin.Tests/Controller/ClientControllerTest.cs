@@ -22,41 +22,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public void Api_Client_GetAll_Success()
-        {
-            var controller = new ClientController(UoW);
-            var result = controller.GetClients() as OkNegotiatedContentResult<IEnumerable<ClientModel.Return.Client>>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<ClientModel.Return.Client>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.ClientRepository.Get().Count());
-        }
-
-        [TestMethod]
-        public async Task Api_Client_Get_Success()
-        {
-            var controller = new ClientController(UoW);
-            var client = UoW.ClientRepository.Get().First();
-            var result = await controller.GetClient(client.Id) as OkNegotiatedContentResult<ClientModel.Return.Client>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(ClientModel.Return.Client));
-            result.Content.Id.Should().Be(client.Id);
-        }
-
-        [TestMethod]
-        public async Task Api_Client_GetAudienceList_Success()
-        {
-            var controller = new ClientController(UoW);
-            var client = UoW.ClientRepository.Get().First();
-            var result = await controller.GetAudiencesInClient(client.Id) as OkNegotiatedContentResult<IEnumerable<AudienceModel.Return.Audience>>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<AudienceModel.Return.Audience>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.AudienceRepository.Get().Count());
-        }
-
-        [TestMethod]
         public async Task Api_Client_Create_Success()
         {
             string name = "Client-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
@@ -72,6 +37,54 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
             result.Should().NotBeNull();
             result.Content.Should().BeAssignableTo(typeof(ClientModel.Return.Client));
             result.Content.Name.Should().Be(model.Name);
+        }
+
+        [TestMethod]
+        public async Task Api_Client_Delete_Success()
+        {
+            var controller = new ClientController(UoW);
+            var client = UoW.ClientRepository.Get().First();
+
+            var result = await controller.DeleteClient(client.Id) as OkResult;
+            var check = UoW.RoleRepository.Find(client.Id);
+
+            result.Should().NotBeNull();
+            check.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task Api_Client_Get_Success()
+        {
+            var controller = new ClientController(UoW);
+            var client = UoW.ClientRepository.Get().First();
+            var result = await controller.GetClient(client.Id) as OkNegotiatedContentResult<ClientModel.Return.Client>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(ClientModel.Return.Client));
+            result.Content.Id.Should().Be(client.Id);
+        }
+
+        [TestMethod]
+        public void Api_Client_GetAll_Success()
+        {
+            var controller = new ClientController(UoW);
+            var result = controller.GetClients() as OkNegotiatedContentResult<IEnumerable<ClientModel.Return.Client>>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(IEnumerable<ClientModel.Return.Client>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.ClientRepository.Get().Count());
+        }
+
+        [TestMethod]
+        public async Task Api_Client_GetAudienceList_Success()
+        {
+            var controller = new ClientController(UoW);
+            var client = UoW.ClientRepository.Get().First();
+            var result = await controller.GetAudiencesInClient(client.Id) as OkNegotiatedContentResult<IEnumerable<AudienceModel.Return.Audience>>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(IEnumerable<AudienceModel.Return.Audience>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.AudienceRepository.Get().Count());
         }
 
         [TestMethod]
@@ -92,19 +105,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
             result.Should().NotBeNull();
             result.Content.Should().BeAssignableTo(typeof(ClientModel.Return.Client));
             result.Content.Name.Should().Be(model.Name);
-        }
-
-        [TestMethod]
-        public async Task Api_Client_Delete_Success()
-        {
-            var controller = new ClientController(UoW);
-            var client = UoW.ClientRepository.Get().First();
-
-            var result = await controller.DeleteClient(client.Id) as OkResult;
-            var check = UoW.RoleRepository.Find(client.Id);
-
-            result.Should().NotBeNull();
-            check.Should().BeNull();
         }
     }
 }

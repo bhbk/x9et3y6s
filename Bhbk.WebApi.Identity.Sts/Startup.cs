@@ -46,10 +46,10 @@ namespace Bhbk.WebApi.Identity.Sts
             UnityContainer container = new UnityContainer();
             CustomIdentityDbContext context = new CustomIdentityDbContext();
 
-            container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserLogin, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
+            container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserProvider, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
             container.RegisterType<IGenericRepository<AppAudience, Guid>, AudienceRepository>(new TransientLifetimeManager());
             container.RegisterType<IGenericRepository<AppClient, Guid>, ClientRepository>(new TransientLifetimeManager());
-            container.RegisterType<IGenericRepository<AppRealm, Guid>, RealmRepository>(new TransientLifetimeManager());
+            container.RegisterType<IGenericRepository<AppProvider, Guid>, ProviderRepository>(new TransientLifetimeManager());
             container.RegisterType<IGenericRepository<AppRole, Guid>, RoleRepository>(new TransientLifetimeManager());
             container.RegisterType<IGenericRepository<AppUser, Guid>, UserRepository>(new TransientLifetimeManager());
             container.RegisterType<IUnitOfWork, UnitOfWork>(new TransientLifetimeManager());

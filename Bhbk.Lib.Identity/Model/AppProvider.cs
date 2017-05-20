@@ -12,12 +12,12 @@ namespace Bhbk.Lib.Identity.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class AppRealm
+    public partial class AppProvider
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AppRealm()
+        public AppProvider()
         {
-            this.Users = new HashSet<AppUser>();
+            this.Providers = new HashSet<AppUserProvider>();
         }
     
         public System.Guid Id { get; set; }
@@ -29,6 +29,6 @@ namespace Bhbk.Lib.Identity.Model
         public bool Immutable { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUser> Users { get; set; }
+        public virtual ICollection<AppUserProvider> Providers { get; set; }
     }
 }

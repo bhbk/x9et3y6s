@@ -24,7 +24,8 @@ namespace Bhbk.Cli.Identity.Cmds
             try
             {
                 Statics.context = new CustomIdentityDbContext();
-                SeedDefaultsHelper kaboom = new SeedDefaultsHelper(Statics.context);
+                Statics.uow = new UnitOfWork(Statics.context);
+                DataSeedHelper kaboom = new DataSeedHelper(Statics.uow);
 
                 if (CreateDefault)
                 {

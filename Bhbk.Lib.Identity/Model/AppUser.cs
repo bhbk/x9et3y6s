@@ -18,13 +18,12 @@ namespace Bhbk.Lib.Identity.Model
         public AppUser()
         {
             this.Claims = new HashSet<AppUserClaim>();
-            this.Logins = new HashSet<AppUserLogin>();
+            this.Providers = new HashSet<AppUserProvider>();
             this.Roles = new HashSet<AppUserRole>();
             this.Tokens = new HashSet<AppUserToken>();
         }
     
         public System.Guid Id { get; set; }
-        public System.Guid RealmId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public bool EmailConfirmed { get; set; }
@@ -45,11 +44,10 @@ namespace Bhbk.Lib.Identity.Model
         public bool TwoFactorEnabled { get; set; }
         public bool Immutable { get; set; }
     
-        public virtual AppRealm Realms { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserClaim> Claims { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserLogin> Logins { get; set; }
+        public virtual ICollection<AppUserProvider> Providers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserRole> Roles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

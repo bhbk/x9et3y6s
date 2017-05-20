@@ -17,6 +17,9 @@ namespace Bhbk.Lib.Identity.Manager
         public CustomUserManager(CustomUserStore store)
             : base(store)
         {
+            if (store == null)
+                throw new ArgumentNullException();
+
             _store = store;
         }
 
@@ -24,7 +27,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 result.LastLoginFailure = DateTime.Now;
                 result.AccessFailedCount++;
@@ -40,7 +43,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 _store.AddClaimAsync(result, claim);
                 return Task.FromResult(IdentityResult.Success);
@@ -56,9 +59,22 @@ namespace Bhbk.Lib.Identity.Manager
 
         public Task<IdentityResult> AddRefreshTokenAsync(AppUserToken token)
         {
-            if (IsValidUser(token.UserId))
+            if (_store.IsValidUser(token.UserId))
             {
                 _store.AddRefreshTokenAsync(token);
+                return Task.FromResult(IdentityResult.Success);
+            }
+            else
+                throw new ArgumentNullException();
+        }
+
+        public Task<IdentityResult> AddToProviderAsync(Guid userId, string provider)
+        {
+            AppUser result;
+
+            if (_store.IsValidUser(userId, out result))
+            {
+                _store.AddToProviderAsync(result, provider);
                 return Task.FromResult(IdentityResult.Success);
             }
             else
@@ -69,7 +85,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 _store.AddToRoleAsync(result, role);
                 return Task.FromResult(IdentityResult.Success);
@@ -80,7 +96,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> AddToRolesAsync(Guid userId, params string[] roles)
         {
-            if (IsValidUser(userId))
+            if (_store.IsValidUser(userId))
             {
                 foreach (string role in roles)
                     AddToRoleAsync(userId, role);
@@ -95,7 +111,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 var check = CheckPasswordAsync(result, currentPassword);
 
@@ -118,7 +134,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<bool> CheckPasswordAsync(AppUser user, string password)
         {
-            if (IsValidUser(user))
+            if (_store.IsValidUser(user))
             {
                 var hash = _store.GetPasswordHashAsync(user).Result;
 
@@ -133,7 +149,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> CreateAsync(AppUser user)
         {
-            if (!IsValidUser(user))
+            if (!_store.IsValidUser(user))
             {
                 _store.CreateAsync(user);
                 return Task.FromResult(IdentityResult.Success);
@@ -144,7 +160,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> CreateAsync(AppUser user, string password)
         {
-            if (!IsValidUser(user))
+            if (!_store.IsValidUser(user))
             {
                 var hash = PasswordHasher.HashPassword(password);
                 var stamp = Helper.EntrophyHelper.GenerateRandomBase64(32);
@@ -173,7 +189,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> DeleteAsync(AppUser user)
         {
-            if (IsValidUser(user))
+            if (_store.IsValidUser(user))
             {
                 _store.DeleteAsync(user);
                 return Task.FromResult(IdentityResult.Success);
@@ -206,8 +222,18 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
                 return _store.GetClaimsAsync(result);
+            else
+                throw new ArgumentNullException();
+        }
+
+        public Task<IList<string>> GetProvidersAsync(Guid userId)
+        {
+            AppUser result;
+
+            if (_store.IsValidUser(userId, out result))
+                return _store.GetProvidersAsync(result);
             else
                 throw new ArgumentNullException();
         }
@@ -216,7 +242,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
                 return _store.GetRolesAsync(result);
             else
                 throw new ArgumentNullException();
@@ -227,11 +253,21 @@ namespace Bhbk.Lib.Identity.Manager
             throw new NotImplementedException();
         }
 
+        public Task<bool> IsInProviderAsync(Guid userId, string role)
+        {
+            AppUser result;
+
+            if (_store.IsValidUser(userId, out result))
+                return _store.IsInProviderAsync(result, role);
+            else
+                throw new ArgumentNullException();
+        }
+
         public override Task<bool> IsInRoleAsync(Guid userId, string role)
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
                 return _store.IsInRoleAsync(result, role);
             else
                 throw new ArgumentNullException();
@@ -241,9 +277,22 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 _store.RemoveClaimAsync(result, claim);
+                return Task.FromResult(IdentityResult.Success);
+            }
+            else
+                throw new ArgumentNullException();
+        }
+
+        public Task<IdentityResult> RemoveFromProviderAsync(Guid userId, string provider)
+        {
+            AppUser result;
+
+            if (_store.IsValidUser(userId, out result))
+            {
+                _store.RemoveFromProviderAsync(result, provider);
                 return Task.FromResult(IdentityResult.Success);
             }
             else
@@ -254,7 +303,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 _store.RemoveFromRoleAsync(result, role);
                 return Task.FromResult(IdentityResult.Success);
@@ -265,7 +314,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> RemoveFromRolesAsync(Guid userId, params string[] roles)
         {
-            if (IsValidUser(userId))
+            if (_store.IsValidUser(userId))
             {
                 foreach (string role in roles)
                     RemoveFromRoleAsync(userId, role);
@@ -286,7 +335,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 _store.ResetAccessFailedCountAsync(result);
                 return Task.FromResult(IdentityResult.Success);
@@ -299,7 +348,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppUser result;
 
-            if (IsValidUser(userId, out result))
+            if (_store.IsValidUser(userId, out result))
             {
                 var hash = PasswordHasher.HashPassword(password);
                 var entrophy = Helper.EntrophyHelper.GenerateRandomBase64(32);
@@ -315,43 +364,13 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> UpdateAsync(AppUser user)
         {
-            if (IsValidUser(user))
+            if (_store.IsValidUser(user))
             {
                 _store.UpdateAsync(user);
                 return Task.FromResult(IdentityResult.Success);
             }
             else
                 throw new ArgumentNullException();
-        }
-
-        private bool IsValidUser(AppUser user)
-        {
-            var result = _store.Users.Where(x => x.Id == user.Id || x.UserName == user.UserName).SingleOrDefault();
-
-            if (result == null)
-                return false;
-            else
-                return true;
-        }
-
-        private bool IsValidUser(Guid user)
-        {
-            var result = _store.Users.Where(x => x.Id == user).SingleOrDefault();
-
-            if (result == null)
-                return false;
-            else
-                return true;
-        }
-
-        private bool IsValidUser(Guid user, out AppUser result)
-        {
-            result = _store.Users.Where(x => x.Id == user).SingleOrDefault();
-
-            if (result == null)
-                return false;
-            else
-                return true;
         }
     }
 }

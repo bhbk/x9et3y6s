@@ -13,11 +13,12 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         private bool _disposed = false;
         private CustomIdentityDbContext _context;
+        private CustomProviderManager _providerMgmt;
         private CustomRoleManager _roleMgmt;
         private CustomUserManager _userMgmt;
         private IGenericRepository<AppAudience, Guid> _audienceRepo;
         private IGenericRepository<AppClient, Guid> _clientRepo;
-        private IGenericRepository<AppRealm, Guid> _realmRepo;
+        private IGenericRepository<AppProvider, Guid> _providerRepo;
         private IGenericRepository<AppRole, Guid> _roleRepo;
         private IGenericRepository<AppUser, Guid> _userRepo;
 
@@ -26,12 +27,13 @@ namespace Bhbk.Lib.Identity.Infrastructure
         {
             _audienceRepo = new AudienceRepository(_context);
             _clientRepo = new ClientRepository(_context);
-            _realmRepo = new RealmRepository(_context);
+            _providerRepo = new ProviderRepository(_context);
             _roleRepo = new RoleRepository(_context);
             _userRepo = new UserRepository(_context);
 
-            _userMgmt = new CustomUserManager(new CustomUserStore(_context));
+            _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
             _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
+            _userMgmt = new CustomUserManager(new CustomUserStore(_context));
         }
 
         public UnitOfWork(CustomIdentityDbContext context)
@@ -40,10 +42,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             _audienceRepo = new AudienceRepository(_context);
             _clientRepo = new ClientRepository(_context);
-            _realmRepo = new RealmRepository(_context);
+            _providerRepo = new ProviderRepository(_context);
             _roleRepo = new RoleRepository(_context);
             _userRepo = new UserRepository(_context);
 
+            _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
             _userMgmt = new CustomUserManager(new CustomUserStore(_context));
             _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
         }
@@ -95,14 +98,14 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public IGenericRepository<AppRealm, Guid> RealmRepository
+        public IGenericRepository<AppProvider, Guid> ProviderRepository
         {
             get
             {
-                if (this._realmRepo == null)
-                    this._realmRepo = new RealmRepository(_context);
+                if (this._providerRepo == null)
+                    this._providerRepo = new ProviderRepository(_context);
 
-                return this._realmRepo;
+                return this._providerRepo;
             }
         }
 
@@ -125,6 +128,28 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     this._userRepo = new UserRepository(_context);
 
                 return this._userRepo;
+            }
+        }
+
+        public CustomProviderManager CustomProviderManager
+        {
+            get
+            {
+                if (_providerMgmt == null)
+                    _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
+
+                return _providerMgmt;
+            }
+        }
+
+        public CustomRoleManager CustomRoleManager
+        {
+            get
+            {
+                if (_roleMgmt == null)
+                    _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
+
+                return _roleMgmt;
             }
         }
 
@@ -151,17 +176,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 }
 
                 return _userMgmt;
-            }
-        }
-
-        public CustomRoleManager CustomRoleManager
-        {
-            get
-            {
-                if (_roleMgmt == null)
-                    _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
-
-                return _roleMgmt;
             }
         }
 

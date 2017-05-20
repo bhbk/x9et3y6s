@@ -14,13 +14,16 @@ namespace Bhbk.Lib.Identity.Store
 {
     //https://docs.microsoft.com/en-us/aspnet/identity/overview/extensibility/overview-of-custom-storage-providers-for-aspnet-identity
     //https://msdn.microsoft.com/en-us/library/dn613259(v=vs.108).aspx
-    public class CustomUserStore : UserStore<AppUser, AppRole, Guid, AppUserLogin, AppUserRole, AppUserClaim>
+    public class CustomUserStore : UserStore<AppUser, AppRole, Guid, AppUserProvider, AppUserRole, AppUserClaim>
     {
         private CustomIdentityDbContext _context;
 
         public CustomUserStore(CustomIdentityDbContext context)
             : base(context)
         {
+            if (context == null)
+                throw new ArgumentNullException();
+
             _context = context;
         }
 
@@ -51,6 +54,31 @@ namespace Bhbk.Lib.Identity.Store
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
+        }
+
+        public Task AddToProviderAsync(AppUser user, string providerName)
+        {
+            var provider = _context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault();
+
+            if (provider == null)
+                throw new ArgumentNullException();
+
+            else
+            {
+                AppUserProvider result = new AppUserProvider()
+                {
+                    ProviderId = provider.Id,
+                    UserId = user.Id,
+                    Enabled = true,
+                    Created = DateTime.Now,
+                    Immutable = false
+                };
+
+                _context.AppUserProvider.Add(result);
+                _context.SaveChanges();
+
+                return Task.FromResult(IdentityResult.Success);
+            }
         }
 
         public override Task AddToRoleAsync(AppUser user, string roleName)
@@ -133,6 +161,23 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(_context.Users.Where(x => x.Id == user.Id).Single().PasswordHash);
         }
 
+        public Task<IList<string>> GetProvidersAsync(AppUser user)
+        {
+            IList<string> result = new List<string>();
+            var providers = _context.AppUserProvider.Where(x => x.UserId == user.Id).ToList();
+
+            if (providers == null)
+                throw new InvalidOperationException();
+
+            else
+            {
+                foreach (AppUserProvider provider in providers)
+                    result.Add(_context.AppProvider.Where(x => x.Id == provider.ProviderId).Select(r => r.Name).Single());
+
+                return Task.FromResult(result);
+            }
+        }
+
         public override Task<IList<string>> GetRolesAsync(AppUser user)
         {
             IList<string> result = new List<string>();
@@ -160,6 +205,20 @@ namespace Bhbk.Lib.Identity.Store
             throw new NotImplementedException();
         }
 
+        public Task<bool> IsInProviderAsync(AppUser user, string providerName)
+        {
+            var provider = _context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault();
+
+            if (provider == null)
+                throw new ArgumentNullException();
+
+            else if (_context.AppUserProvider.Any(x => x.UserId == user.Id && x.ProviderId == provider.Id))
+                return Task.FromResult(true);
+
+            else
+                return Task.FromResult(false);
+        }
+
         public override Task<bool> IsInRoleAsync(AppUser user, string roleName)
         {
             var role = _context.Roles.Where(x => x.Name == roleName).SingleOrDefault();
@@ -174,6 +233,36 @@ namespace Bhbk.Lib.Identity.Store
                 return Task.FromResult(false);
         }
 
+        public bool IsValidUser(AppUser user)
+        {
+            var result = _context.Users.Where(x => x.Id == user.Id || x.UserName == user.UserName).SingleOrDefault();
+
+            if (result == null)
+                return false;
+            else
+                return true;
+        }
+
+        public bool IsValidUser(Guid user)
+        {
+            var result = _context.Users.Where(x => x.Id == user).SingleOrDefault();
+
+            if (result == null)
+                return false;
+            else
+                return true;
+        }
+
+        public bool IsValidUser(Guid user, out AppUser result)
+        {
+            result = _context.Users.Where(x => x.Id == user).SingleOrDefault();
+
+            if (result == null)
+                return false;
+            else
+                return true;
+        }
+
         public override Task RemoveClaimAsync(AppUser user, Claim claim)
         {
             var result = _context.AppUserClaim.Where(x => x.UserId == user.Id
@@ -186,6 +275,24 @@ namespace Bhbk.Lib.Identity.Store
             else
             {
                 _context.AppUserClaim.Remove(result);
+                _context.SaveChanges();
+
+                return Task.FromResult(IdentityResult.Success);
+            }
+        }
+
+        public Task RemoveFromProviderAsync(AppUser user, string providerName)
+        {
+            var provider = _context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault();
+
+            if (provider == null)
+                throw new ArgumentNullException();
+
+            else
+            {
+                var result = _context.AppUserProvider.Where(x => x.UserId == user.Id && x.ProviderId == provider.Id).Single();
+
+                _context.AppUserProvider.Remove(result);
                 _context.SaveChanges();
 
                 return Task.FromResult(IdentityResult.Success);

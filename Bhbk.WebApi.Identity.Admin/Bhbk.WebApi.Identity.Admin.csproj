@@ -191,7 +191,7 @@
     <Compile Include="Controller\AudienceController.cs" />
     <Compile Include="Controller\ClaimController.cs" />
     <Compile Include="Controller\DiagnosticController.cs" />
-    <Compile Include="Controller\RealmController.cs" />
+    <Compile Include="Controller\ProviderController.cs" />
     <Compile Include="Controller\RoleController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />

@@ -25,91 +25,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public void Api_User_GetAll_Success()
-        {
-            var controller = new UserController(UoW);
-            var result = controller.GetUsers() as OkNegotiatedContentResult<IEnumerable<UserModel.Return.User>>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<UserModel.Return.User>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.UserRepository.Get().Count());
-        }
-
-        [TestMethod]
-        public async Task Api_User_Get_Success()
-        {
-            var controller = new UserController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var result = await controller.GetUser(user.Id) as OkNegotiatedContentResult<UserModel.Return.User>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
-            result.Content.Id.Should().Be(user.Id);
-        }
-
-        [TestMethod]
-        public async Task Api_User_GetByName_Success()
-        {
-            var controller = new UserController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var result = await controller.GetUserByName(user.UserName) as OkNegotiatedContentResult<UserModel.Return.User>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
-            result.Content.Id.Should().Be(user.Id);
-        }
-
-        [TestMethod]
-        public async Task Api_User_GetRoleList_Success()
-        {
-            var controller = new UserController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var result = await controller.GetRolesForUser(user.Id) as OkNegotiatedContentResult<IList<string>>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IList<string>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.RoleRepository.Get().Count());
-        }
-
-        [TestMethod]
         public async Task Api_User_Create_Success()
         {
             var controller = new UserController(UoW);
-            var realm = UoW.RealmRepository.Get().First();
             var model = new UserModel.Binding.Create()
             {
                 Email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net",
                 FirstName = "FirstName",
-                LastName = "LastName",
-                RealmId = realm.Id
+                LastName = "LastName"
             };
             var result = await controller.CreateUser(model) as OkNegotiatedContentResult<UserModel.Return.User>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
-            result.Content.Email.Should().Be(model.Email);
-        }
-
-        [TestMethod]
-        public async Task Api_User_Update_Success()
-        {
-            string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new UserController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var model = new UserModel.Binding.Update()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                EmailConfirmed = true,
-                FirstName = "FirstName",
-                LastName = "LastName",
-                LockoutEnabled = false,
-                LockoutEndDateUtc = DateTime.Now.AddDays(30),
-                TwoFactorEnabled = false,
-                Immutable = false,
-                RealmId = UoW.RealmRepository.Get().First().Id
-            };
-            var result = await controller.UpdateUser(model.Id, model) as OkNegotiatedContentResult<UserModel.Return.User>;
 
             result.Should().NotBeNull();
             result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
@@ -152,6 +77,65 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
+        public async Task Api_User_Get_Success()
+        {
+            var controller = new UserController(UoW);
+            var user = UoW.UserRepository.Get().First();
+            var result = await controller.GetUser(user.Id) as OkNegotiatedContentResult<UserModel.Return.User>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
+            result.Content.Id.Should().Be(user.Id);
+        }
+
+        [TestMethod]
+        public void Api_User_GetAll_Success()
+        {
+            var controller = new UserController(UoW);
+            var result = controller.GetUsers() as OkNegotiatedContentResult<IEnumerable<UserModel.Return.User>>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(IEnumerable<UserModel.Return.User>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.UserRepository.Get().Count());
+        }
+
+        [TestMethod]
+        public async Task Api_User_GetByName_Success()
+        {
+            var controller = new UserController(UoW);
+            var user = UoW.UserRepository.Get().First();
+            var result = await controller.GetUserByName(user.UserName) as OkNegotiatedContentResult<UserModel.Return.User>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
+            result.Content.Id.Should().Be(user.Id);
+        }
+
+        [TestMethod]
+        public async Task Api_User_GetProviderList_Success()
+        {
+            var controller = new UserController(UoW);
+            var user = UoW.UserRepository.Get().First();
+            var result = await controller.GetUserProviders(user.Id) as OkNegotiatedContentResult<IEnumerable<ProviderModel.Return.Provider>>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(IEnumerable<ProviderModel.Return.Provider>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.ProviderRepository.Get().Count());
+        }
+
+        [TestMethod]
+        public async Task Api_User_GetRoleList_Success()
+        {
+            var controller = new UserController(UoW);
+            var user = UoW.UserRepository.Get().First();
+            var result = await controller.GetUserRoles(user.Id) as OkNegotiatedContentResult<IList<string>>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(IList<string>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.RoleRepository.Get().Count());
+        }
+
+        [TestMethod]
         public async Task Api_User_SetPassword_Fail()
         {
             var controller = new UserController(UoW);
@@ -183,6 +167,31 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
             result.Should().NotBeNull();
             check.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task Api_User_Update_Success()
+        {
+            string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new UserController(UoW);
+            var user = UoW.UserRepository.Get().First();
+            var model = new UserModel.Binding.Update()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                EmailConfirmed = true,
+                FirstName = "FirstName",
+                LastName = "LastName",
+                LockoutEnabled = false,
+                LockoutEndDateUtc = DateTime.Now.AddDays(30),
+                TwoFactorEnabled = false,
+                Immutable = false
+            };
+            var result = await controller.UpdateUser(model.Id, model) as OkNegotiatedContentResult<UserModel.Return.User>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(UserModel.Return.User));
+            result.Content.Email.Should().Be(model.Email);
         }
     }
 }

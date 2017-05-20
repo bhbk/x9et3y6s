@@ -12,14 +12,15 @@ namespace Bhbk.Lib.Identity.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class AppUserRole
+    public partial class AppUserProvider
     {
+        public System.Guid ProviderId { get; set; }
         public System.Guid UserId { get; set; }
-        public System.Guid RoleId { get; set; }
+        public bool Enabled { get; set; }
         public System.DateTime Created { get; set; }
         public bool Immutable { get; set; }
     
-        public virtual AppRole Roles { get; set; }
+        public virtual AppProvider Providers { get; set; }
         public virtual AppUser Users { get; set; }
     }
 }

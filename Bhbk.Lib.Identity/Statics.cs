@@ -22,11 +22,11 @@ namespace Bhbk.Lib.Identity
         public const String ApiDefaultAdmin = "root@local";
         public static readonly Int16 ApiDefaultPassMinLength = Int16.Parse(ConfigurationManager.AppSettings["DefaultPassMinLength"]);
         public static readonly Int16 ApiDefaultTokenExpire = Int16.Parse(ConfigurationManager.AppSettings["DefaultTokenExpire"]);
-        public const String ApiDefaultRealm = "local";
+        public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
+        public const String ApiDefaultClient = "Bhbk";
+        public const String ApiDefaultProvider = "local";
         public const String ApiDefaultRoleForAdmin = "(Built-In) Administrators";
         public const String ApiDefaultRoleForViewer = "(Built-In) Viewers";
-        public const String ApiDefaultClient = "Bhbk";
-        public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
         public const String ApiUnitTestsPassword = "3uetw7W$mswU";
         public const String ApiUnitTestsPasswordNew = "mv7wd3dks&k3";
         #endregion
@@ -40,17 +40,16 @@ namespace Bhbk.Lib.Identity
         public const String MsgClientImmutable = "Client is immutable";
         public const String MsgClientInvalid = "Client is invalid";
         public const String MsgClientNotExist = "Client does not exist";
+        public const String MsgProviderAlreadyExists = "Provider already exists";
+        public const String MsgProviderImmutable = "Provider is immutable";
+        public const String MsgProviderInvalid = "Provider invalid";
+        public const String MsgProviderNotExist = "Provider does not exist";
         public const String MsgRoleAlreadyExists = "Role already exists";
         public const String MsgRoleImmutable = "Role is immutable";
         public const String MsgRoleInvalid = "Role invalid";
         public const String MsgRoleNotAdded = "Role was not added";
         public const String MsgRoleNotExist = "Role does not exist";
         public const String MsgRoleNotRemoved = "Role was not removed";
-        public const String MsgRealmAlreadyExists = "Realm already exists";
-        public const String MsgRealmImmutable = "Realm is immutable";
-        public const String MsgRealmInvalid = "Realm invalid";
-        public const String MsgRealmNotExist = "Realm does not exist";
-        public const String MsgTokenInvalid = "Token is invalid";
         public const String MsgUserAlreadyExists = "User already exists";
         public const String MsgUserImmutable = "User is immutable";
         public const String MsgUserInvalid = "User is invalid, locked or disabled";
@@ -59,6 +58,7 @@ namespace Bhbk.Lib.Identity
         public const String MsgUserInvalidNewPasswordConfirm = "User new password does not match confirm new password";
         public const String MsgUserNoAccess = "User has no access";
         public const String MsgUserNotExist = "User does not exist";
+        public const String MsgUserTokenInvalid = "User token is invalid";
         #endregion
     }
 }

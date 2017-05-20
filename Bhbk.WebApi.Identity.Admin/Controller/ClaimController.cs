@@ -18,6 +18,58 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         public ClaimController(IUnitOfWork uow)
             : base(uow) { }
 
+        [Route("v1/{userID}"), HttpPut]
+        //[Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimModel.Binding.Create model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+
+            if (foundUser == null)
+                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            else
+            {
+                var newClaim = new AppUserClaim()
+                {
+                    UserId = foundUser.Id,
+                    ClaimType = model.ClaimType,
+                    ClaimValue = model.ClaimValue,
+                    ClaimValueType = model.ClaimValueType,
+                    Issuer = model.Issuer,
+                    OriginalIssuer = model.OriginalIssuer
+                };
+                await UoW.CustomUserManager.AddClaimAsync(foundUser.Id, new Claim(model.ClaimType, model.ClaimValue));
+
+                return Ok(ModelFactory.Create(newClaim));
+            }
+        }
+
+        [Route("v1/{userID}"), HttpPut]
+        //[Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IHttpActionResult> DeleteClaim(Guid userID, Guid claimID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+
+            if (foundUser == null)
+                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            else
+            {
+                var foundClaim = foundUser.Claims.Where(x => x.Id == claimID).Single();
+
+                await UoW.CustomUserManager.RemoveClaimAsync(foundUser.Id,
+                    new Claim(foundClaim.ClaimType, foundClaim.ClaimValue));
+
+                return Ok();
+            }
+        }
+
         [Route("v1"), HttpGet]
         public async Task<IHttpActionResult> GetClaims()
         {
@@ -68,35 +120,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{userID}"), HttpPut]
         //[Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimModel.Binding.Create model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
-
-            if (foundUser == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
-
-            else
-            {
-                var newClaim = new AppUserClaim()
-                {
-                    UserId = foundUser.Id,
-                    ClaimType = model.ClaimType,
-                    ClaimValue = model.ClaimValue,
-                    ClaimValueType = model.ClaimValueType,
-                    Issuer = model.Issuer,
-                    OriginalIssuer = model.OriginalIssuer
-                };
-                await UoW.CustomUserManager.AddClaimAsync(foundUser.Id, new Claim(model.ClaimType, model.ClaimValue));
-
-                return Ok(ModelFactory.Create(newClaim));
-            }
-        }
-
-        [Route("v1/{userID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateClaims(Guid userID, IDictionary<string, string> claims)
         {
             if (!ModelState.IsValid)
@@ -116,29 +139,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
                 foreach (var claim in claims)
                     await UoW.CustomUserManager.AddClaimAsync(userID, new Claim(claim.Key, claim.Value));
-
-                return Ok();
-            }
-        }
-
-        [Route("v1/{userID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> DeleteClaim(Guid userID, Guid claimID)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
-
-            if (foundUser == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
-
-            else
-            {
-                var foundClaim = foundUser.Claims.Where(x => x.Id == claimID).Single();
-
-                await UoW.CustomUserManager.RemoveClaimAsync(foundUser.Id,
-                    new Claim(foundClaim.ClaimType, foundClaim.ClaimValue));
 
                 return Ok();
             }

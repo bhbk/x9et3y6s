@@ -52,9 +52,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="SqlDatabaseSetup.cs" />
-    <Compile Include="SqlDatabaseTest.cs">
-      <SubType>Designer</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -65,11 +62,6 @@
       <Project>{7de9c0d2-6924-4b0d-9c95-c326c82250da}</Project>
       <Name>Bhbk.Lib.Identity</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SqlDatabaseTest.resx">
-      <DependentUpon>SqlDatabaseTest.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

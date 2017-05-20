@@ -17,8 +17,8 @@ namespace Bhbk.Lib.Identity.Model
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public AppAudience()
         {
-            this.Tokens = new HashSet<AppUserToken>();
             this.Roles = new HashSet<AppRole>();
+            this.Tokens = new HashSet<AppUserToken>();
         }
     
         public System.Guid Id { get; set; }
@@ -34,8 +34,8 @@ namespace Bhbk.Lib.Identity.Model
     
         public virtual AppClient Clients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserToken> Tokens { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppRole> Roles { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AppUserToken> Tokens { get; set; }
     }
 }

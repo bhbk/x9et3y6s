@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             else
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
-            var data = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
+            var form = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
 
             //check that username has valid format...
             if (!FormatHelper.ValidateUsernameFormat(context.UserName))
@@ -140,17 +140,29 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
                 return;
             }
-            //check that password is valid...
-            else if (!await _uow.CustomUserManager.CheckPasswordAsync(user, context.Password))
-            {
-                await _uow.CustomUserManager.AccessFailedAsync(user.Id);
 
-                context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
+            var providers = await _uow.CustomUserManager.GetProvidersAsync(user.Id);
+
+            //check that user has a provider to auth against...
+            if (providers.Contains(BaseLib.Statics.ApiDefaultProvider))
+            {
+                //check that password is valid...
+                if (!await _uow.CustomUserManager.CheckPasswordAsync(user, context.Password))
+                {
+                    await _uow.CustomUserManager.AccessFailedAsync(user.Id);
+
+                    context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
+                    return;
+                }
+            }
+            else
+            {
+                context.SetError("invalid_provider_id", string.Format("Invalid provider for '{0}'", context.UserName));
                 return;
             }
 
             Guid clientID;
-            string clientValue = data.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientID).Value[0];
+            string clientValue = form.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientID).Value[0];
 
             //check if guid used for client. resolve guid from name if not.
             if (!Guid.TryParse(clientValue, out clientID))
@@ -170,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             }
 
             Guid audienceID;
-            string audienceValue = data.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceID).Value[0];
+            string audienceValue = form.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceID).Value[0];
 
             //check if guid used for audience. resolve guid from name if not.
             if (!Guid.TryParse(audienceValue, out audienceID))

@@ -12,11 +12,12 @@ namespace Bhbk.Lib.Identity.Infrastructure
         void Save();
         Task SaveAsync();
         CustomIdentityDbContext CustomContext { get; set; }
-        CustomUserManager CustomUserManager { get; }
+        CustomProviderManager CustomProviderManager { get; }
         CustomRoleManager CustomRoleManager { get; }
+        CustomUserManager CustomUserManager { get; }
         IGenericRepository<AppAudience, Guid> AudienceRepository { get; }
         IGenericRepository<AppClient, Guid> ClientRepository { get; }
-        IGenericRepository<AppRealm, Guid> RealmRepository { get; }
+        IGenericRepository<AppProvider, Guid> ProviderRepository { get; }
         IGenericRepository<AppRole, Guid> RoleRepository { get; }
         IGenericRepository<AppUser, Guid> UserRepository { get; }
     }

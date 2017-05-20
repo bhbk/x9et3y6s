@@ -23,27 +23,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Claim_GetAll_Success()
-        {
-            var controller = new ClaimController(UoW);
-            var result = await controller.GetClaims() as IHttpActionResult;
-
-            result.Should().NotBeNull();
-        }
-
-        [TestMethod]
-        public async Task Api_Claim_Get_Success()
-        {
-            var controller = new ClaimController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IEnumerable<UserClaimModel.Return.Claim>>;
-
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<UserClaimModel.Return.Claim>));
-            result.Content.Count().ShouldBeEquivalentTo(user.Claims.Count());
-        }
-
-        [TestMethod]
         public async Task Api_Claim_Create_Success()
         {
             var controller = new ClaimController(UoW);
@@ -73,6 +52,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
             result.Should().NotBeNull();
             check.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Api_Claim_Get_Success()
+        {
+            var controller = new ClaimController(UoW);
+            var user = UoW.UserRepository.Get().First();
+            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IEnumerable<UserClaimModel.Return.Claim>>;
+
+            result.Should().NotBeNull();
+            result.Content.Should().BeAssignableTo(typeof(IEnumerable<UserClaimModel.Return.Claim>));
+            result.Content.Count().ShouldBeEquivalentTo(user.Claims.Count());
+        }
+
+        [TestMethod]
+        public async Task Api_Claim_GetAll_Success()
+        {
+            var controller = new ClaimController(UoW);
+            var result = await controller.GetClaims() as IHttpActionResult;
+
+            result.Should().NotBeNull();
         }
     }
 }

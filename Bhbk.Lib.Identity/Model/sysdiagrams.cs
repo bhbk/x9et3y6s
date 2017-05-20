@@ -12,12 +12,12 @@ namespace Bhbk.Lib.Identity.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class AppUserLogin
+    public partial class sysdiagrams
     {
-        public string LoginProvider { get; set; }
-        public string ProviderKey { get; set; }
-        public System.Guid UserId { get; set; }
-    
-        public virtual AppUser Users { get; set; }
+        public string name { get; set; }
+        public int principal_id { get; set; }
+        public int diagram_id { get; set; }
+        public Nullable<int> version { get; set; }
+        public byte[] definition { get; set; }
     }
 }
