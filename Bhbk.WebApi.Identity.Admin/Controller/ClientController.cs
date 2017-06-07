@@ -17,7 +17,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateClient(ClientModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{clientID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteClient(Guid clientID)
         {
             var foundClient = await UoW.ClientRepository.FindAsync(clientID);
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{clientID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateClient(Guid clientID, ClientModel.Binding.Update model)
         {
             if (!ModelState.IsValid)

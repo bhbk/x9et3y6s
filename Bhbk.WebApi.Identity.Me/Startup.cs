@@ -15,6 +15,7 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
+using BaseLib = Bhbk.Lib.Identity;
 
 //http://bitoftech.net/2015/01/21/asp-net-identity-2-with-asp-net-web-api-2-accounts-management/
 //http://bitoftech.net/2015/02/03/asp-net-identity-2-accounts-confirmation-password-user-policy-configuration/
@@ -82,7 +83,8 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 var injectConfig = ConfigureDependencyInjection();
                 var injectUoW = (IUnitOfWork)injectConfig.DependencyResolver.GetService(typeof(IUnitOfWork));
-                var audiences = injectUoW.AudienceRepository.Get(x => x.Name.StartsWith("Bhbk.WebApi.") || x.Name.StartsWith("Bhbk.WebUi."));
+                var audiences = injectUoW.AudienceRepository.Get(x => x.Name.StartsWith(BaseLib.Statics.ApiUnitTestsAudience) 
+                    || x.Name.StartsWith("Bhbk.WebApi.") || x.Name.StartsWith("Bhbk.WebUi."));
 
                 app.CreatePerOwinContext<IUnitOfWork>(UnitOfWork.Create);
 

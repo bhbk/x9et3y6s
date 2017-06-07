@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     [TestClass]
     public class AudienceControllerTest : BaseControllerTest
@@ -18,13 +18,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public AudienceControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_Audience_Create_Success()
+        public async Task Api_Admin_Audience_Create_Success()
         {
-            string name = "Audience-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsAudience + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new AudienceController(UoW);
             var model = new AudienceModel.Binding.Create()
             {
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Audience_Delete_Success()
+        public async Task Api_Admin_Audience_Delete_Success()
         {
             var controller = new AudienceController(UoW);
             var audience = UoW.AudienceRepository.Get().First();
@@ -54,19 +54,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Audience_Get_Success()
+        public async Task Api_Admin_Audience_Get_Success()
         {
             var controller = new AudienceController(UoW);
-            var audience = UoW.AudienceRepository.Get().First();
-            var result = await controller.GetAudience(audience.Id) as OkNegotiatedContentResult<AudienceModel.Return.Audience>;
+            var audience = BaseControllerTest.UoW.AudienceRepository.Get().First();
+            var user = BaseControllerTest.UoW.UserRepository.Get().First();
+            controller.SetUser(user.Id);
 
+            var result = await controller.GetAudience(audience.Id) as OkNegotiatedContentResult<AudienceModel.Return.Audience>;
             result.Should().NotBeNull();
             result.Content.Should().BeAssignableTo(typeof(AudienceModel.Return.Audience));
             result.Content.Id.Should().Be(audience.Id);
+
+            //var get = _owin.HttpClient.GetAsync("/audience/v1/" + audience.Id.ToString()).Result;
+            //get.IsSuccessStatusCode.Should().BeTrue();
+            //var result = await get.Content.ReadAsAsync<AudienceModel.Return.Audience>();
+            //result.Should().BeAssignableTo(typeof(AudienceModel.Return.Audience));
+            //result.Id.Should().Be(audience.Id);
         }
 
         [TestMethod]
-        public void Api_Audience_GetAll_Success()
+        public void Api_Admin_Audience_GetAll_Success()
         {
             var controller = new AudienceController(UoW);
             var result = controller.GetAudiences() as OkNegotiatedContentResult<IEnumerable<AudienceModel.Return.Audience>>;
@@ -77,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Audience_GetRoleList_Success()
+        public async Task Api_Admin_Audience_GetRoleList_Success()
         {
             var controller = new AudienceController(UoW);
             var audience = UoW.AudienceRepository.Get().First();
@@ -89,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Audience_GetKey_Success()
+        public async Task Api_Admin_Audience_GetKey_Success()
         {
             var controller = new AudienceController(UoW);
             var audience = UoW.AudienceRepository.Get().First();
@@ -101,9 +109,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Audience_Update_Success()
+        public async Task Api_Admin_Audience_Update_Success()
         {
-            string name = "Audience-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsAudience + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new AudienceController(UoW);
             var audience = UoW.AudienceRepository.Get().First();
             var model = new AudienceModel.Binding.Update()

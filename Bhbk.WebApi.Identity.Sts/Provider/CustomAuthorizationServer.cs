@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
         public override Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
         {
             //https://msdn.microsoft.com/en-us/library/microsoft.owin.security.oauth.oauthauthorizationserverprovider.authorizationendpointresponse(v=vs.113).aspx
-            
+
             if (context == null)
                 throw new ArgumentNullException();
             else
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             var providers = await _uow.CustomUserManager.GetProvidersAsync(user.Id);
 
             //check that user has a provider to auth against...
-            if (providers.Contains(BaseLib.Statics.ApiDefaultProvider))
+            if (providers.Contains(BaseLib.Statics.ApiDefaultProvider) || providers.Where(x => x.StartsWith(BaseLib.Statics.ApiUnitTestsProvider)).Any())
             {
                 //check that password is valid...
                 if (!await _uow.CustomUserManager.CheckPasswordAsync(user, context.Password))
@@ -200,7 +200,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 context.SetError("invalid_audience_id", string.Format("Invalid audience '{0}'", audienceValue));
                 return;
             }
-            
+
             var attrs = new AuthenticationProperties(new Dictionary<string, string>
                 {
                     { BaseLib.Statics.AttrClientID, clientID.ToString().ToLower() },

@@ -70,5 +70,16 @@ namespace Bhbk.Lib.Identity.Manager
             else
                 throw new ArgumentNullException();
         }
+
+        public Task<IdentityResult> UpdateAsync(AppProvider provider)
+        {
+            if (_store.IsValidProvider(provider))
+            {
+                _store.UpdateAsync(provider);
+                return Task.FromResult(IdentityResult.Success);
+            }
+            else
+                throw new ArgumentNullException();
+        }
     }
 }

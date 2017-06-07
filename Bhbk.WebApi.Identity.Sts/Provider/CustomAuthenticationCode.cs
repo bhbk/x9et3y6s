@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.Infrastructure;
 using System;
 using System.Collections.Concurrent;

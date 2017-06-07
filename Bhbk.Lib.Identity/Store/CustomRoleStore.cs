@@ -27,7 +27,6 @@ namespace Bhbk.Lib.Identity.Store
         public override Task CreateAsync(AppRole role)
         {
             role.Created = DateTime.Now;
-            role.Immutable = false;
 
             _context.Roles.Add(role);
             _context.SaveChanges();
@@ -56,7 +55,6 @@ namespace Bhbk.Lib.Identity.Store
         public override Task UpdateAsync(AppRole role)
         {
             role.LastUpdated = DateTime.Now;
-            role.Immutable = false;
 
             _context.Entry(role).State = EntityState.Modified;
             _context.SaveChanges();

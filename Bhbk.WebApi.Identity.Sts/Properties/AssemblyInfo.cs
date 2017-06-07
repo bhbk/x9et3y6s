@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Bhbk.WebApi.Core.Sts")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("STS end-points for Identity")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Bhbk")]
 [assembly: AssemblyProduct("Bhbk.WebApi.Core.Sts")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]

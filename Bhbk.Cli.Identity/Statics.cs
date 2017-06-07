@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using System;
-using System.Configuration;
 
 namespace Bhbk.Cli.Identity
 {
@@ -15,7 +14,5 @@ namespace Bhbk.Cli.Identity
     {
         internal static CustomIdentityDbContext context;
         internal static UnitOfWork uow;
-
-        internal static readonly bool ConfDebug = Boolean.Parse(ConfigurationManager.AppSettings["Debug"]);
     }
 }

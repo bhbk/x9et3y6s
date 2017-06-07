@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     [TestClass]
     public class UserControllerTest : BaseControllerTest
@@ -21,16 +21,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public UserControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_User_Create_Success()
+        public async Task Api_Admin_User_Create_Success()
         {
             var controller = new UserController(UoW);
             var model = new UserModel.Binding.Create()
             {
-                Email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net",
+                Email = BaseLib.Statics.ApiUnitTestsUserEmail + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net",
                 FirstName = "FirstName",
                 LastName = "LastName"
             };
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_Delete_Success()
+        public async Task Api_Admin_User_Delete_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_DeleteToken_Success()
+        public async Task Api_Admin_User_DeleteToken_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_Get_Success()
+        public async Task Api_Admin_User_Get_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public void Api_User_GetAll_Success()
+        public void Api_Admin_User_GetAll_Success()
         {
             var controller = new UserController(UoW);
             var result = controller.GetUsers() as OkNegotiatedContentResult<IEnumerable<UserModel.Return.User>>;
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_GetByName_Success()
+        public async Task Api_Admin_User_GetByName_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_GetProviderList_Success()
+        public async Task Api_Admin_User_GetProviderList_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_GetRoleList_Success()
+        public async Task Api_Admin_User_GetRoleList_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_SetPassword_Fail()
+        public async Task Api_Admin_User_SetPassword_Fail()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_SetPassword_Success()
+        public async Task Api_Admin_User_SetPassword_Success()
         {
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -170,9 +170,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_User_Update_Success()
+        public async Task Api_Admin_User_Update_Success()
         {
-            string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
+            string email = BaseLib.Statics.ApiUnitTestsUserEmail + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
             var model = new UserModel.Binding.Update()

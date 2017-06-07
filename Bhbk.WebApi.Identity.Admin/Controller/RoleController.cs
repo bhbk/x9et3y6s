@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1/{roleID}/add/{userID}"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> AddRoleToUser(Guid roleID, Guid userID)
         {
             if (!ModelState.IsValid)
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateRole(RoleModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -60,10 +60,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 var newRole = new AppRole
                 {
                     Id = Guid.NewGuid(),
+                    AudienceId = model.AudienceId,
                     Name = model.Name,
                     Description = model.Description,
-                    Immutable = false,
-                    AudienceId = model.AudienceId
+                    Immutable = false
                 };
 
                 IdentityResult result = await UoW.CustomRoleManager.CreateAsync(newRole);
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteRole(Guid roleID)
         {
             var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> RemoveRoleFromUser(Guid roleID, Guid userID)
         {
             if (!ModelState.IsValid)
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateRole(Guid roleID, RoleModel.Binding.Update model)
         {
             if (!ModelState.IsValid)
@@ -184,6 +184,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 foundRole.Name = model.Name;
                 foundRole.Description = model.Description;
                 foundRole.AudienceId = model.AudienceId;
+                foundRole.Immutable = false;
 
                 IdentityResult result = await UoW.CustomRoleManager.UpdateAsync(foundRole);
 

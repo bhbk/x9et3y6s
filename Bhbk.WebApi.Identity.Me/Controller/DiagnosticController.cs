@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using System.Reflection;
 using System.Web.Http;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Me.Controller
 {
@@ -13,7 +14,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             : base(uow) { }
 
         [Route("v1/version"), HttpGet]
-        public IHttpActionResult GetVersion()
+        public async Task<IHttpActionResult> GetVersion()
         {
             return Ok(Assembly.GetAssembly(typeof(DiagnosticController)).GetName().Version.ToString());
         }

@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1/{providerID}/add/{userID}"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> AddProviderToUser(Guid providerID, Guid userID)
         {
             if (!ModelState.IsValid)
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateProvider(ProviderModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{providerID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteProvider(Guid providerID)
         {
             var foundProvider = await UoW.ProviderRepository.FindAsync(providerID);
@@ -100,12 +100,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             }
         }
 
-        [Route("v1"), HttpGet]
-        public IHttpActionResult GetProviders()
-        {
-            return Ok(UoW.ProviderRepository.Get().Select(x => ModelFactory.Create(x)));
-        }
-
         [Route("v1/{providerID}"), HttpGet]
         public async Task<IHttpActionResult> GetProvider(Guid providerID)
         {
@@ -116,6 +110,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
                 return Ok(ModelFactory.Create(foundProvider));
+        }
+
+        [Route("v1"), HttpGet]
+        public IHttpActionResult GetProviders()
+        {
+            return Ok(UoW.ProviderRepository.Get().Select(x => ModelFactory.Create(x)));
         }
 
         [Route("v1/{providerID}/users"), HttpGet]
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> RemoveProviderFromUser(Guid providerID, Guid userID)
         {
             if (!ModelState.IsValid)
@@ -168,7 +168,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{providerID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateProvider(Guid providerID, ProviderModel.Binding.Update model)
         {
             if (!ModelState.IsValid)
@@ -192,10 +192,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 foundProvider.Enabled = model.Enabled;
                 foundProvider.Immutable = false;
 
-                UoW.ProviderRepository.Update(foundProvider);
-                await UoW.SaveAsync();
+                IdentityResult result = await UoW.CustomProviderManager.UpdateAsync(foundProvider);
 
-                return Ok(ModelFactory.Create(foundProvider));
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok(ModelFactory.Create(foundProvider));
             }
         }
     }

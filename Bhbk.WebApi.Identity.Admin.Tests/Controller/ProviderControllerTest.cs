@@ -6,13 +6,12 @@ using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     [TestClass]
     public class ProviderControllerTest : BaseControllerTest
@@ -21,18 +20,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public ProviderControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_Provider_AddToUser_Success()
+        public async Task Api_Admin_Provider_AddToUser_Success()
         {
             var controller = new ProviderController(UoW);
             var user = UoW.UserRepository.Get().First();
             var model = new AppProvider()
             {
                 Id = Guid.NewGuid(),
-                Name = "Provider-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                Name = BaseLib.Statics.ApiUnitTestsProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Immutable = false
             };
             var provider = UoW.CustomProviderManager.CreateAsync(model);
@@ -44,9 +43,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Provider_Create_Success()
+        public async Task Api_Admin_Provider_Create_Success()
         {
-            string name = "Provider-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ProviderController(UoW);
             var model = new ProviderModel.Binding.Create()
             {
@@ -62,14 +61,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Provider_RemoveFromUser_Success()
+        public async Task Api_Admin_Provider_RemoveFromUser_Success()
         {
             var controller = new ProviderController(UoW);
             var user = UoW.UserRepository.Get().First();
             var model = new AppProvider()
             {
                 Id = Guid.NewGuid(),
-                Name = "Role-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                Name = BaseLib.Statics.ApiUnitTestsProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
             };
@@ -83,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Provider_Get_Success()
+        public async Task Api_Admin_Provider_Get_Success()
         {
             var controller = new ProviderController(UoW);
             var provider = UoW.ProviderRepository.Get().First();
@@ -95,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public void Api_Provider_GetAll_Success()
+        public void Api_Admin_Provider_GetAll_Success()
         {
             var controller = new ProviderController(UoW);
             var result = controller.GetProviders() as OkNegotiatedContentResult<IEnumerable<ProviderModel.Return.Provider>>;
@@ -106,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Provider_GetUserList_Success()
+        public async Task Api_Admin_Provider_GetUserList_Success()
         {
             var controller = new ProviderController(UoW);
             var provider = UoW.ProviderRepository.Get().First();
@@ -118,9 +117,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Provider_Update_Success()
+        public async Task Api_Admin_Provider_Update_Success()
         {
-            string name = "Provider-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ProviderController(UoW);
             var provider = UoW.ProviderRepository.Get().First();
             var model = new ProviderModel.Binding.Update()
@@ -138,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Provider_Delete_Success()
+        public async Task Api_Admin_Provider_Delete_Success()
         {
             var controller = new ProviderController(UoW);
             var provider = UoW.ProviderRepository.Get().First();

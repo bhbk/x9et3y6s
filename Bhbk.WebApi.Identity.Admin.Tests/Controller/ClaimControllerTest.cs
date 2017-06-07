@@ -10,7 +10,7 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     [TestClass]
     public class ClaimControllerTest : BaseControllerTest
@@ -19,19 +19,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public ClaimControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_Claim_Create_Success()
+        public async Task Api_Admin_Claim_Create_Success()
         {
             var controller = new ClaimController(UoW);
             var user = UoW.UserRepository.Get().First();
             var claim = new UserClaimModel.Binding.Create()
             {
                 UserId = user.Id,
-                ClaimType = "Claim-UnitTest-Type",
-                ClaimValue = "Claim-UnitTest-Type-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                ClaimType = BaseLib.Statics.ApiUnitTestsClaimType,
+                ClaimValue = BaseLib.Statics.ApiUnitTestsClaimValue + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Immutable = false
             };
             var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<UserClaimModel.Return.Claim>;
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Claim_Delete_Success()
+        public async Task Api_Admin_Claim_Delete_Success()
         {
             var controller = new ClaimController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Claim_Get_Success()
+        public async Task Api_Admin_Claim_Get_Success()
         {
             var controller = new ClaimController(UoW);
             var user = UoW.UserRepository.Get().First();
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Claim_GetAll_Success()
+        public async Task Api_Admin_Claim_GetAll_Success()
         {
             var controller = new ClaimController(UoW);
             var result = await controller.GetClaims() as IHttpActionResult;

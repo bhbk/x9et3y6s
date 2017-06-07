@@ -36,7 +36,9 @@ namespace Bhbk.Cli.Identity.Cmds
                     {
                         Console.WriteLine();
                         Console.WriteLine("Hash Value: " + hashvalue);
+
                         Clipboard.SetText(hashvalue);
+
                         Console.WriteLine();
                         Console.WriteLine("The hash value has been copied to the clipboard.");
                     }

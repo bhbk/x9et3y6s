@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.Infrastructure;

@@ -34,6 +34,5 @@ namespace Bhbk.Lib.Identity.Model
         public virtual DbSet<AppUserProvider> AppUserProvider { get; set; }
         public virtual DbSet<AppUserRole> AppUserRole { get; set; }
         public virtual DbSet<AppUserToken> AppUserToken { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
     }
 }

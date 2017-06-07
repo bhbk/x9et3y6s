@@ -109,7 +109,6 @@ namespace Bhbk.Lib.Identity.Store
         {
             user.UserName = user.Email;
             user.Created = DateTime.Now;
-            user.Immutable = false;
 
             _context.Users.Add(user);
             _context.SaveChanges();
@@ -366,7 +365,6 @@ namespace Bhbk.Lib.Identity.Store
         {
             user.UserName = user.Email;
             user.LastUpdated = DateTime.Now;
-            user.Immutable = false;
 
             _context.Entry(user).State = EntityState.Modified;
             _context.SaveChanges();

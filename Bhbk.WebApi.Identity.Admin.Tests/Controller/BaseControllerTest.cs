@@ -8,7 +8,7 @@ using System;
 using System.Data.Entity.Core.EntityClient;
 using System.Web.Http;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     public class BaseControllerTest : Startup
     {
@@ -28,6 +28,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
             Seeds.CreateTestData();
         }
+
         public override HttpConfiguration ConfigureDependencyInjection()
         {
             UnityContainer container = new UnityContainer();

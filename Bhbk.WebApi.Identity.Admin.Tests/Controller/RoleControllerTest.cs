@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     [TestClass]
     public class RoleControllerTest : BaseControllerTest
@@ -20,18 +20,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public RoleControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_Role_AddToUser_Success()
+        public async Task Api_Admin_Role_AddToUser_Success()
         {
             var controller = new RoleController(UoW);
             var user = UoW.UserRepository.Get().First();
             var model = new AppRole()
             {
                 Id = Guid.NewGuid(),
-                Name = "Role-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                Name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Immutable = false,
                 AudienceId = UoW.AudienceRepository.Get().First().Id
             };
@@ -43,9 +43,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Role_Create_Success()
+        public async Task Api_Admin_Role_Create_Success()
         {
-            string name = "Role-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new RoleController(UoW);
             var model = new RoleModel.Binding.Create()
             {
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Role_Delete_Success()
+        public async Task Api_Admin_Role_Delete_Success()
         {
             var controller = new RoleController(UoW);
             var role = UoW.RoleRepository.Get().First();
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Role_Get_Success()
+        public async Task Api_Admin_Role_Get_Success()
         {
             var controller = new RoleController(UoW);
             var role = UoW.RoleRepository.Get().First();
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public void Api_Role_GetAll_Success()
+        public void Api_Admin_Role_GetAll_Success()
         {
             var controller = new RoleController(UoW);
             var result = controller.GetRoles() as OkNegotiatedContentResult<IEnumerable<RoleModel.Return.Role>>;
@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Role_GetUserList_Success()
+        public async Task Api_Admin_Role_GetUserList_Success()
         {
             var controller = new RoleController(UoW);
             var role = UoW.RoleRepository.Get().First();
@@ -107,14 +107,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Role_RemoveFromUser_Success()
+        public async Task Api_Admin_Role_RemoveFromUser_Success()
         {
             var controller = new RoleController(UoW);
             var user = UoW.UserRepository.Get().First();
             var model = new AppRole()
             {
                 Id = Guid.NewGuid(),
-                Name = "Role-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                Name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Immutable = false,
                 AudienceId = UoW.AudienceRepository.Get().First().Id
             };
@@ -127,9 +127,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Role_Update_Success()
+        public async Task Api_Admin_Role_Update_Success()
         {
-            string name = "Role-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new RoleController(UoW);
             var role = UoW.RoleRepository.Get().First();
             var model = new RoleModel.Binding.Update()

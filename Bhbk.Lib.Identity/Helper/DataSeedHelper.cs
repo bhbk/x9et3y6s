@@ -39,8 +39,7 @@ namespace Bhbk.Lib.Identity.Helper
                     Immutable = false
                 };
 
-                _uow.ProviderRepository.Create(_provider);
-                await _uow.ProviderRepository.SaveAsync();
+                await _uow.CustomProviderManager.CreateAsync(_provider);
                 foundProvider = _uow.ProviderRepository.Get(x => x.Name == _provider.Name).Single();
             }
 
@@ -161,8 +160,7 @@ namespace Bhbk.Lib.Identity.Helper
                 _uow.ProviderRepository.Create(new AppProvider
                 {
                     Id = Guid.NewGuid(),
-                    //Name = BaseLib.Statics.ApiDefaultProvider + "-" + EntrophyHelper.GenerateRandomBase64(4),
-                    Name = BaseLib.Statics.ApiDefaultProvider,
+                    Name = BaseLib.Statics.ApiUnitTestsProvider + EntrophyHelper.GenerateRandomBase64(4),
                     Created = DateTime.Now,
                     Enabled = true,
                     Immutable = false
@@ -176,7 +174,7 @@ namespace Bhbk.Lib.Identity.Helper
                 _uow.ClientRepository.Create(new AppClient
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Client-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4),
+                    Name = BaseLib.Statics.ApiUnitTestsClient + EntrophyHelper.GenerateRandomBase64(4),
                     Created = DateTime.Now,
                     Enabled = true,
                     Immutable = false
@@ -191,7 +189,7 @@ namespace Bhbk.Lib.Identity.Helper
                 {
                     Id = Guid.NewGuid(),
                     ClientId = clientID,
-                    Name = "Audience-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4),
+                    Name = BaseLib.Statics.ApiUnitTestsAudience + EntrophyHelper.GenerateRandomBase64(4),
                     AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                     AudienceType = AudienceType.ThinClient.ToString(),
                     Created = DateTime.Now,
@@ -207,7 +205,7 @@ namespace Bhbk.Lib.Identity.Helper
                 await _uow.CustomRoleManager.CreateAsync(new AppRole
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Role-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4),
+                    Name = BaseLib.Statics.ApiUnitTestsRole + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
                     Immutable = false,
                     AudienceId = audienceID
@@ -236,7 +234,9 @@ namespace Bhbk.Lib.Identity.Helper
             {
                 await _uow.CustomUserManager.AddToProviderAsync(user.Id, _uow.ProviderRepository.Get().First().Name);
 
-                await _uow.CustomUserManager.AddClaimAsync(user.Id, new Claim("ClaimType-UnitTest", "ClaimValue-UnitTest-" + EntrophyHelper.GenerateRandomBase64(4)));
+                await _uow.CustomUserManager.AddClaimAsync(user.Id,
+                    new Claim(BaseLib.Statics.ApiUnitTestsClaimType,
+                        BaseLib.Statics.ApiUnitTestsClaimValue + EntrophyHelper.GenerateRandomBase64(4)));
 
                 foreach (var role in _uow.RoleRepository.Get().ToList())
                     await _uow.CustomUserManager.AddToRoleAsync(user.Id, role.Name);

@@ -8,15 +8,14 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Me.Controller
 {
     [RoutePrefix("user")]
-    public class MeController : BaseController
+    public class UserController : BaseController
     {
-        public MeController() { }
+        public UserController() { }
 
-        public MeController(IUnitOfWork uow)
+        public UserController(IUnitOfWork uow)
             : base(uow) { }
 
         [Route("v1/{userID}/change-password"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> ChangePassword(Guid userID, UserModel.Binding.ChangePassword model)
         {
             if (!ModelState.IsValid)
@@ -26,6 +25,9 @@ namespace Bhbk.WebApi.Identity.Me.Controller
 
             if (foundUser == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            else if (GetUserGUID() != userID)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidNewPasswordConfirm);
@@ -46,7 +48,6 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateMe(Guid userID, UserModel.Binding.Update model)
         {
             if (!ModelState.IsValid)
@@ -59,6 +60,9 @@ namespace Bhbk.WebApi.Identity.Me.Controller
 
             if (foundUser == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            else if (GetUserGUID() != userID)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else
             {

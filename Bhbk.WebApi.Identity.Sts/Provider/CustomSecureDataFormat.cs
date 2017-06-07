@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Model;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (audienceValue == null)
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
-            else if (Guid.TryParse(audienceValue, out audienceID))
+            if (Guid.TryParse(audienceValue, out audienceID))
                 audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
 
             else
@@ -61,7 +62,52 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
         public AuthenticationTicket Unprotect(string text)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentNullException();
+
+            Guid audienceID;
+            AppAudience audience;
+            SecurityToken token;
+
+            var jwt = JObject.Parse(text);
+            var audienceValue = (string)jwt[BaseLib.Statics.AttrAudienceID];
+
+            if (audienceValue == null)
+                throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
+
+            if (Guid.TryParse(audienceValue, out audienceID))
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+
+            else
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+
+            if (audience == null)
+                throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
+
+            else
+            {
+                var keyByteArray = TextEncodings.Base64Url.Decode(audience.AudienceKey);
+                var signingKey = new HmacSigningCredentials(keyByteArray);
+
+                var details = new TokenValidationParameters
+                {
+                    IssuerSigningKey = signingKey.SigningKey,
+                    RequireSignedTokens = true,
+                    RequireExpirationTime = true,
+                    ValidAudience = audience.Id.ToString(),
+                    ValidIssuer = _issuer,
+                    ValidateAudience = true,
+                    ValidateIssuer = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true
+                };
+
+                var handler = new JwtSecurityTokenHandler();
+                var principal = handler.ValidateToken(text, details, out token);
+                var identity = principal.Identities;
+
+                return new AuthenticationTicket(identity.First(), new AuthenticationProperties());
+            }
         }
     }
 }

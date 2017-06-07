@@ -20,6 +20,7 @@ test:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
   - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
   - msbuild /t:build /p:Configuration=Release /verbosity:quiet
+  - mstest /testcontainer:"Bhbk.Lib.Identity.Tests\bin\Release\Bhbk.Lib.Identity.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Admin.Tests\bin\Release\Bhbk.WebApi.Identity.Admin.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Me.Tests\bin\Release\Bhbk.WebApi.Identity.Me.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Sts.Tests\bin\Release\Bhbk.WebApi.Identity.Sts.Tests.dll"
@@ -31,5 +32,5 @@ deploy:
   script:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
   - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
-  - msbuild /t:build /p:Configuration=Release /verbosity:quiet /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare=..\
+  - msbuild /t:build /p:Configuration=Release /verbosity:quiet /p:RunOctoPack=true /p:OctoPackEnforceAddingFiles=true /p:OctoPackPublishPackageToFileShare=..\
   - nuget push *.nupkg -ApiKey %NUGET_FEED_KEY% -Source %NUGET_FEED_URL% -Verbosity detailed -NonInteractive

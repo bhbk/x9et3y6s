@@ -2,7 +2,8 @@
 
 namespace Bhbk.Lib.Identity.Model
 {
-    public class CustomAppClient
+    public partial class CustomAppClient
     {
+
     }
 }

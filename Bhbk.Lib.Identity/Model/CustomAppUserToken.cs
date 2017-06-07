@@ -5,5 +5,6 @@ namespace Bhbk.Lib.Identity.Model
 {
     public class CustomAppUserToken
     {
+
     }
 }

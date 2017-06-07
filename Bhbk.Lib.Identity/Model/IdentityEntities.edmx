@@ -129,16 +129,6 @@
           <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="ExpiresUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="principal_id" Type="int" Nullable="false" />
-          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="version" Type="int" />
-          <Property Name="definition" Type="varbinary(max)" />
-        </EntityType>
         <Association Name="FK_AppAudience_ClientID">
           <End Role="AppClient" Type="Self.AppClient" Multiplicity="1" />
           <End Role="AppAudience" Type="Self.AppAudience" Multiplicity="*" />
@@ -271,7 +261,6 @@
           <EntitySet Name="AppUserProvider" EntityType="Self.AppUserProvider" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppUserRole" EntityType="Self.AppUserRole" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppUserToken" EntityType="Self.AppUserToken" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_AppAudience_ClientID" Association="Self.FK_AppAudience_ClientID">
             <End Role="AppClient" EntitySet="AppClient" />
             <End Role="AppAudience" EntitySet="AppAudience" />
@@ -323,7 +312,6 @@
           <EntitySet Name="AppUserProvider" EntityType="IdentityModel.AppUserProvider" />
           <EntitySet Name="AppUserRole" EntityType="IdentityModel.AppUserRole" />
           <EntitySet Name="AppUserToken" EntityType="IdentityModel.AppUserToken" />
-          <EntitySet Name="sysdiagrams" EntityType="IdentityModel.sysdiagrams" />
           <AssociationSet Name="FK_AppAudience_ClientID" Association="IdentityModel.FK_AppAudience_ClientID">
             <End Role="AppClient" EntitySet="AppClient" />
             <End Role="AppAudience" EntitySet="AppAudience" />
@@ -502,16 +490,6 @@
           <Property Name="ExpiresUtc" Type="DateTime" Nullable="false" Precision="7" />
           <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppUserToken_AudienceID" FromRole="AppUserToken" ToRole="AppAudience" />
           <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserToken_UserID" FromRole="AppUserToken" ToRole="AppUser" />
-        </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="principal_id" Type="Int32" Nullable="false" />
-          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <Association Name="FK_AppAudience_ClientID">
           <End Type="IdentityModel.AppClient" Role="AppClient" Multiplicity="1" />
@@ -769,17 +747,6 @@
                 <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="IdentityModel.sysdiagrams">
-              <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="definition" ColumnName="definition" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

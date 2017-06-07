@@ -4,13 +4,11 @@ using Bhbk.Lib.Identity.Repository;
 using Elmah.Contrib.WebApi;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
-using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Practices.Unity;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
@@ -35,9 +33,6 @@ namespace Bhbk.WebApi.Identity.Sts
     {
         private OAuthAuthorizationServerOptions _oauthServerOptions { get; set; }
         private OAuthBearerAuthenticationOptions _oauthBearerOptions { get; set; }
-
-        private readonly ConcurrentDictionary<string, string> _codes =
-                new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
         //http://www.vannevel.net/2015/03/21/how-to-unit-test-your-owin-configured-oauth2-implementation/
         public virtual HttpConfiguration ConfigureDependencyInjection()
@@ -97,19 +92,18 @@ namespace Bhbk.WebApi.Identity.Sts
                     AllowInsecureHttp = true,
                     ApplicationCanDisplayErrors = true,
 #else
-                    AllowInsecureHttp = false,
-                    ApplicationCanDisplayErrors = false,
+                    AllowInsecureHttp = true,
+                    ApplicationCanDisplayErrors = true,
 #endif
                     AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
-                    TokenEndpointPath = new PathString("/oauth/v1/token"),
-
-                    Provider = new Provider.CustomAuthorizationServer(injectUoW),
-                    AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
-                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
-
                     AuthorizationCodeProvider = new Provider.CustomAuthorizationCode(injectUoW),
-                    AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
                     AuthorizationCodeExpireTimeSpan = TimeSpan.FromDays(7),
+                    AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
+
+                    TokenEndpointPath = new PathString("/oauth/v1/token"),
+                    Provider = new Provider.CustomAuthorizationServer(injectUoW),
+                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
+                    AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
 
                     RefreshTokenProvider = new Provider.CustomRefreshToken(injectUoW),
                     //RefreshTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
@@ -120,22 +114,6 @@ namespace Bhbk.WebApi.Identity.Sts
             catch (Exception ex)
             {
                 Elmah.ErrorSignal.FromCurrentContext().Raise(ex);
-            }
-        }
-
-        private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)
-        {
-            context.SetToken(Guid.NewGuid().ToString("n") + Guid.NewGuid().ToString("n"));
-            _codes[context.Token] = context.SerializeTicket();
-        }
-
-        private void ReceiveAuthenticationCode(AuthenticationTokenReceiveContext context)
-        {
-            string value;
-
-            if (_codes.TryRemove(context.Token, out value))
-            {
-                context.DeserializeTicket(value);
             }
         }
     }

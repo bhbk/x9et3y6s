@@ -13,6 +13,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         private bool _disposed = false;
         private CustomIdentityDbContext _context;
+        private CustomConfigManager _configMgmt;
         private CustomProviderManager _providerMgmt;
         private CustomRoleManager _roleMgmt;
         private CustomUserManager _userMgmt;
@@ -25,30 +26,31 @@ namespace Bhbk.Lib.Identity.Infrastructure
         public UnitOfWork()
             : this(new CustomIdentityDbContext())
         {
+            _configMgmt = new CustomConfigManager(new CustomConfigStore());
+            _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
+            _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
+            _userMgmt = new CustomUserManager(new CustomUserStore(_context));
+
             _audienceRepo = new AudienceRepository(_context);
             _clientRepo = new ClientRepository(_context);
             _providerRepo = new ProviderRepository(_context);
             _roleRepo = new RoleRepository(_context);
             _userRepo = new UserRepository(_context);
-
-            _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
-            _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
-            _userMgmt = new CustomUserManager(new CustomUserStore(_context));
         }
 
         public UnitOfWork(CustomIdentityDbContext context)
         {
             _context = context;
+            _configMgmt = new CustomConfigManager(new CustomConfigStore());
+            _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
+            _userMgmt = new CustomUserManager(new CustomUserStore(_context));
+            _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
 
             _audienceRepo = new AudienceRepository(_context);
             _clientRepo = new ClientRepository(_context);
             _providerRepo = new ProviderRepository(_context);
             _roleRepo = new RoleRepository(_context);
             _userRepo = new UserRepository(_context);
-
-            _providerMgmt = new CustomProviderManager(new CustomProviderStore(_context));
-            _userMgmt = new CustomUserManager(new CustomUserStore(_context));
-            _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
         }
 
         public CustomIdentityDbContext CustomContext
@@ -57,7 +59,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
             {
                 if (this._context == null)
                     this._context = new CustomIdentityDbContext();
-                
+
                 return this._context;
             }
             set
@@ -131,6 +133,17 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
+        public CustomConfigManager CustomConfigManager
+        {
+            get
+            {
+                if (_configMgmt == null)
+                    _configMgmt = new CustomConfigManager(new CustomConfigStore());
+
+                return _configMgmt;
+            }
+        }
+
         public CustomProviderManager CustomProviderManager
         {
             get
@@ -163,15 +176,15 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
                     //create custom token provider...
                     _userMgmt.UserTokenProvider =
-                        new DataProtectorTokenProvider<AppUser, Guid>(new CustomDataProtection().Create("UserToken"))
+                        new DataProtectorTokenProvider<AppUser, Guid>(new CustomDataProtection().Create("AppUserToken"))
                         {
-                            TokenLifespan = TimeSpan.FromHours(Statics.ApiDefaultTokenExpire)
+                            TokenLifespan = TimeSpan.FromHours(_configMgmt.Config.DefaultTokenExpire)
                         };
 
                     //create custom password validator...
                     _userMgmt.PasswordValidator = new CustomPasswordValidator
                     {
-                        RequiredLength = Statics.ApiDefaultPassMinLength
+                        RequiredLength = _configMgmt.Config.DefaultPassMinLength
                     };
                 }
 

@@ -1,11 +1,11 @@
-﻿using Bhbk.WebApi.Identity.Admin.Controller;
+﻿using Bhbk.WebApi.Identity.Me.Controller;
 using FluentAssertions;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using System.Web.Http.Results;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
+namespace Bhbk.WebApi.Identity.Me.Tests.Controller
 {
     [TestClass]
     public class DiagnosticControllerTest : BaseControllerTest
@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Admin_Diagnostic_GetVersion_Success()
+        public async Task Api_Me_Diagnostic_GetVersion_Success()
         {
             var controller = new DiagnosticController(UoW);
             var result = await controller.GetVersion() as OkNegotiatedContentResult<string>;

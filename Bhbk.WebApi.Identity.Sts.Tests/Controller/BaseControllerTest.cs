@@ -17,6 +17,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         protected static UnitOfWork UoW;
         protected static DataSeedHelper Seeds;
         protected static HttpConfiguration HttpConfig;
+        protected static TestingHelper Sts;
 
         public BaseControllerTest()
         {
@@ -25,6 +26,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
             UoW = new UnitOfWork(Context);
             Seeds = new DataSeedHelper(UoW);
             HttpConfig = new HttpConfiguration();
+            Sts = new TestingHelper();
 
             Seeds.CreateTestData();
         }

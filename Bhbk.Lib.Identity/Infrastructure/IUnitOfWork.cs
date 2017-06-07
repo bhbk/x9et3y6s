@@ -12,6 +12,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         void Save();
         Task SaveAsync();
         CustomIdentityDbContext CustomContext { get; set; }
+        CustomConfigManager CustomConfigManager { get; }
         CustomProviderManager CustomProviderManager { get; }
         CustomRoleManager CustomRoleManager { get; }
         CustomUserManager CustomUserManager { get; }

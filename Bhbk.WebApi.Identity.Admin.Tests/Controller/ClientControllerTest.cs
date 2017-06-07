@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Admin.Tests
+namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {
     [TestClass]
     public class ClientControllerTest : BaseControllerTest
@@ -18,13 +18,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public ClientControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_Client_Create_Success()
+        public async Task Api_Admin_Client_Create_Success()
         {
-            string name = "Client-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsClient + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ClientController(UoW);
             var model = new ClientModel.Binding.Create()
             {
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Client_Delete_Success()
+        public async Task Api_Admin_Client_Delete_Success()
         {
             var controller = new ClientController(UoW);
             var client = UoW.ClientRepository.Get().First();
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Client_Get_Success()
+        public async Task Api_Admin_Client_Get_Success()
         {
             var controller = new ClientController(UoW);
             var client = UoW.ClientRepository.Get().First();
@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public void Api_Client_GetAll_Success()
+        public void Api_Admin_Client_GetAll_Success()
         {
             var controller = new ClientController(UoW);
             var result = controller.GetClients() as OkNegotiatedContentResult<IEnumerable<ClientModel.Return.Client>>;
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Client_GetAudienceList_Success()
+        public async Task Api_Admin_Client_GetAudienceList_Success()
         {
             var controller = new ClientController(UoW);
             var client = UoW.ClientRepository.Get().First();
@@ -88,9 +88,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         }
 
         [TestMethod]
-        public async Task Api_Client_Update_Success()
+        public async Task Api_Admin_Client_Update_Success()
         {
-            string name = "Client-UnitTest-" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestsClient + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ClientController(UoW);
             var client = UoW.ClientRepository.Get().First();
             var model = new ClientModel.Binding.Update()

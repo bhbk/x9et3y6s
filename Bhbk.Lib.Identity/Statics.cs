@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Configuration;
-using System.Text.RegularExpressions;
 
 namespace Bhbk.Lib.Identity
 {
@@ -20,8 +18,7 @@ namespace Bhbk.Lib.Identity
 
         #region Configuration Settings
         public const String ApiDefaultAdmin = "root@local";
-        public static readonly Int16 ApiDefaultPassMinLength = Int16.Parse(ConfigurationManager.AppSettings["DefaultPassMinLength"]);
-        public static readonly Int16 ApiDefaultTokenExpire = Int16.Parse(ConfigurationManager.AppSettings["DefaultTokenExpire"]);
+        public const String ApiDefaultConfiguration = "Global.config";
         public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
         public const String ApiDefaultClient = "Bhbk";
         public const String ApiDefaultProvider = "local";
@@ -29,6 +26,17 @@ namespace Bhbk.Lib.Identity
         public const String ApiDefaultRoleForViewer = "(Built-In) Viewers";
         public const String ApiUnitTestsPassword = "3uetw7W$mswU";
         public const String ApiUnitTestsPasswordNew = "mv7wd3dks&k3";
+        #endregion
+
+        #region Configuration Settings (Unit Tests)
+        public const String ApiUnitTestsAudience = "Audience-UnitTests-";
+        public const String ApiUnitTestsClient = "Client-UnitTests-";
+        public const String ApiUnitTestsProvider = "Provider-UnitTests-";
+        public const String ApiUnitTestsRole = "Role-UnitTests-";
+        public const String ApiUnitTestsUserDisplayName = "User-UnitTests-";
+        public const String ApiUnitTestsUserEmail = "unit-tests@";
+        public const String ApiUnitTestsClaimType = "ClaimType-UnitTests-";
+        public const String ApiUnitTestsClaimValue = "ClaimValue-UnitTests-";
         #endregion
 
         #region Message Settings

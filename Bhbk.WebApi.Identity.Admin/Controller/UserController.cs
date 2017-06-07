@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateUser(UserModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/delete-token/{audienceID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteToken(Guid userID, Guid audienceID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteUser(Guid userID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -173,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/set-password"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> SetPassword(Guid userID, UserModel.Binding.SetPassword model)
         {
             if (!ModelState.IsValid)
@@ -200,7 +200,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateUser(Guid userID, UserModel.Binding.Update model)
         {
             if (!ModelState.IsValid)
@@ -225,6 +225,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 foundUser.LastName = model.LastName;
                 foundUser.LockoutEnabled = model.LockoutEnabled;
                 foundUser.LockoutEndDateUtc = model.LockoutEndDateUtc.HasValue ? model.LockoutEndDateUtc.Value.ToUniversalTime() : model.LockoutEndDateUtc;
+                foundUser.Immutable = false;
 
                 IdentityResult result = await UoW.CustomUserManager.UpdateAsync(foundUser);
 

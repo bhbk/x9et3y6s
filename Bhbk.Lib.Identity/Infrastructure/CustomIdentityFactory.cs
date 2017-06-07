@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
@@ -162,6 +162,16 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 public bool Immutable { get; set; }
             }
         }
+    }
+
+    public class ConfigModel
+    {
+        public bool Debug { get; set; }
+        public UInt16 DefaultPassMinLength { get; set; }
+        public UInt16 DefaultTokenExpire { get; set; }
+        public string IdentityAdminBaseUrl { get; set; }
+        public string IdentityMeBaseUrl { get; set; }
+        public string IdentityStsBaseUrl { get; set; }
     }
 
     public class ClientModel

@@ -2,7 +2,9 @@
 using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,7 +25,6 @@ namespace Bhbk.Lib.Identity.Store
         public Task CreateAsync(AppProvider provider)
         {
             provider.Created = DateTime.Now;
-            provider.Immutable = false;
 
             _context.AppProvider.Add(provider);
             _context.SaveChanges();
@@ -108,6 +109,16 @@ namespace Bhbk.Lib.Identity.Store
                 return false;
             else
                 return true;
+        }
+
+        public Task UpdateAsync(AppProvider provider)
+        {
+            provider.LastUpdated = DateTime.Now;
+
+            _context.Entry(provider).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Task.FromResult(IdentityResult.Success);
         }
     }
 }

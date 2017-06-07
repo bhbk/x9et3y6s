@@ -12,21 +12,24 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Me.Tests.Controller
 {
     [TestClass]
-    public class MeControllerTest : BaseControllerTest
+    public class UserControllerTest : BaseControllerTest
     {
         private TestServer _owin;
 
-        public MeControllerTest()
+        public UserControllerTest()
         {
-            //_owin = TestServer.Create<BaseControllerTest>();
+            _owin = TestServer.Create<BaseControllerTest>();
         }
 
         [TestMethod]
-        public async Task Api_Me_ChangePassword_Fail()
+        public async Task Api_Me_User_ChangePassword_Fail()
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new MeController(UoW);
+            var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
+
+            controller.SetUser(user.Id);
+
             var model = new UserModel.Binding.ChangePassword()
             {
                 CurrentPassword = EntrophyHelper.GenerateRandomBase64(16),
@@ -41,18 +44,24 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Me_ChangePassword_Success()
+        public async Task Api_Me_User_ChangePassword_Success()
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new MeController(UoW);
+            var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
+
+            controller.SetUser(user.Id);
+
             var model = new UserModel.Binding.ChangePassword()
             {
                 CurrentPassword = BaseLib.Statics.ApiUnitTestsPassword,
                 NewPassword = BaseLib.Statics.ApiUnitTestsPasswordNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestsPasswordNew
             };
-            var result = await controller.ChangePassword(user.Id, model) as OkResult;
+            //var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            //var result = await _owin.HttpClient.PutAsync("/user/v1/" + user.Id.ToString() + "/change-password", content);
+
+            var result = await controller.ChangePassword(user.Id, model) as OkResult;            
             var check = await UoW.CustomUserManager.CheckPasswordAsync(user, model.NewPassword);
 
             result.Should().NotBeNull();
@@ -60,10 +69,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Me_Update_Success()
+        public async Task Api_Me_User_Update_Success()
         {
-            var controller = new MeController(UoW);
+            var controller = new UserController(UoW);
             var user = UoW.UserRepository.Get().First();
+
+            controller.SetUser(user.Id);
+
             var model = new UserModel.Binding.Update()
             {
                 Id = user.Id,

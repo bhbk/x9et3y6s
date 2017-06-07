@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		.gitlab-ci.yml = .gitlab-ci.yml
-		Bhbk.Lib.Identity\Bhbk.Lib.Identity.nuspec = Bhbk.Lib.Identity\Bhbk.Lib.Identity.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Me", "Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj", "{BC4E9EA2-1A85-4ADA-8A60-64B2BA555D91}"
@@ -28,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Admin.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.Sts.Tests", "Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj", "{2033698A-3124-4E1B-B4CB-FD83074E2353}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity.Tests", "Bhbk.Lib.Identity.Tests\Bhbk.Lib.Identity.Tests.csproj", "{6D68B1B9-CACF-4CAA-9CF5-DBB63A6402B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity.Tests", "Bhbk.Lib.Identity.Tests\Bhbk.Lib.Identity.Tests.csproj", "{EF1673D1-6B2B-4208-B50A-5EEF1DCF52F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,10 +71,10 @@ Global
 		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2033698A-3124-4E1B-B4CB-FD83074E2353}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D68B1B9-CACF-4CAA-9CF5-DBB63A6402B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D68B1B9-CACF-4CAA-9CF5-DBB63A6402B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D68B1B9-CACF-4CAA-9CF5-DBB63A6402B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D68B1B9-CACF-4CAA-9CF5-DBB63A6402B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF1673D1-6B2B-4208-B50A-5EEF1DCF52F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF1673D1-6B2B-4208-B50A-5EEF1DCF52F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF1673D1-6B2B-4208-B50A-5EEF1DCF52F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF1673D1-6B2B-4208-B50A-5EEF1DCF52F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

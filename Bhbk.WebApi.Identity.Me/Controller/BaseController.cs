@@ -2,13 +2,16 @@
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
+using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Web.Http;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controller
 {
-    //[Authorize]
-    [AllowAnonymous]
+    [Authorize]
     public class BaseController : ApiController
     {
         private CustomModelFactory _mf = null;
@@ -59,6 +62,25 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             }
 
             return null;
+        }
+
+        protected Guid GetUserGUID()
+        {
+            var claims = User.Identity as ClaimsIdentity;
+            return Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+        }
+
+        public void SetUser(Guid guid)
+        {
+            var user = UoW.CustomUserManager.FindById(guid);
+            var roles = UoW.CustomUserManager.GetRolesAsync(user.Id);
+            var id = new GenericIdentity(BaseLib.Statics.ApiUnitTestsUserDisplayName + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4));
+
+            id.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            id.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
+            id.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
+
+            User = new ClaimsPrincipal(new GenericPrincipal(id, roles.Result.ToArray()));
         }
     }
 }

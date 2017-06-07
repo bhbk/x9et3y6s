@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateAudience(AudienceModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{audienceID}"), HttpDelete]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteAudience(Guid audienceID)
         {
             var foundAudience = await UoW.AudienceRepository.FindAsync(audienceID);
@@ -116,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{audienceID}"), HttpPut]
-        //[Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateAudience(Guid audienceID, AudienceModel.Binding.Update model)
         {
             if (!ModelState.IsValid)
@@ -140,6 +140,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 foundAudience.Enabled = model.Enabled;
                 foundAudience.Immutable = false;
 
+                UoW.AudienceRepository.Update(foundAudience);
                 await UoW.SaveAsync();
 
                 return Ok(ModelFactory.Create(foundAudience));

@@ -32,7 +32,9 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
+
                     kaboom.CreateDefaultData();
+
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
                 }
@@ -41,7 +43,9 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
+
                     kaboom.DestroyDefaultData();
+
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
                 }
@@ -50,7 +54,9 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
+
                     kaboom.DestroyAllData();
+
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();
                 }
