@@ -168,7 +168,9 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         public bool Debug { get; set; }
         public UInt16 DefaultPassMinLength { get; set; }
-        public UInt16 DefaultTokenExpire { get; set; }
+        public Double DefaultAuthorizationCodeExpire { get; set; }
+        public Double DefaultTokenExpire { get; set; }
+        public Double DefaultRefreshTokenExpire { get; set; }
         public string IdentityAdminBaseUrl { get; set; }
         public string IdentityMeBaseUrl { get; set; }
         public string IdentityStsBaseUrl { get; set; }

@@ -124,9 +124,9 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task<AppUserToken> FindRefreshTokenAsync(string tokenId)
+        public Task<AppUserToken> FindRefreshTokenAsync(string ticketId)
         {
-            return Task.FromResult(_context.AppUserToken.Where(x => x.Id.ToString() == tokenId).SingleOrDefault());
+            return Task.FromResult(_context.AppUserToken.Where(x => x.ProtectedTicket == ticketId).SingleOrDefault());
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user)
@@ -232,7 +232,7 @@ namespace Bhbk.Lib.Identity.Store
                 return Task.FromResult(false);
         }
 
-        public bool IsValidUser(AppUser user)
+        public bool IsUserValid(AppUser user)
         {
             var result = _context.Users.Where(x => x.Id == user.Id || x.UserName == user.UserName).SingleOrDefault();
 
@@ -242,7 +242,7 @@ namespace Bhbk.Lib.Identity.Store
                 return true;
         }
 
-        public bool IsValidUser(Guid user)
+        public bool IsUserValid(Guid user)
         {
             var result = _context.Users.Where(x => x.Id == user).SingleOrDefault();
 
@@ -252,7 +252,7 @@ namespace Bhbk.Lib.Identity.Store
                 return true;
         }
 
-        public bool IsValidUser(Guid user, out AppUser result)
+        public bool IsUserValid(Guid user, out AppUser result)
         {
             result = _context.Users.Where(x => x.Id == user).SingleOrDefault();
 

@@ -21,12 +21,29 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Sts_AccessToken_Auth_Fail()
+        public async Task Api_Sts_AccessToken_Auth_Fail_InvalidPassword()
         {
             var user = BaseControllerTest.UoW.UserRepository.Get().First();
             var audience = BaseControllerTest.UoW.AudienceRepository.Get().First();
             var client = BaseControllerTest.UoW.ClientRepository.Get().First();
             var result = Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, EntrophyHelper.GenerateRandomBase64(8)).Result;
+
+            result.Should().NotBeNull();
+            result.IsSuccessStatusCode.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_AccessToken_Auth_Fail_Locked()
+        {
+            var user = BaseControllerTest.UoW.UserRepository.Get().First();
+            var audience = BaseControllerTest.UoW.AudienceRepository.Get().First();
+            var client = BaseControllerTest.UoW.ClientRepository.Get().First();
+
+            user.LockoutEnabled = true;
+            user.LockoutEndDateUtc = DateTime.UtcNow.AddMinutes(60);
+            BaseControllerTest.UoW.CustomUserManager.UpdateAsync(user).Wait();
+
+            var result = Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestsPassword).Result;
 
             result.Should().NotBeNull();
             result.IsSuccessStatusCode.Should().BeFalse();
@@ -63,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshToken_Auth_Fail()
+        public async Task Api_Sts_RefreshToken_Auth_Fail_InvalidToken()
         {
             var random = new Random();
             var user = BaseControllerTest.UoW.UserRepository.Get().First();
@@ -78,6 +95,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
             var result = Sts.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, EntrophyHelper.GenerateRandomBase64(8))).Result;
+
+            result.Should().NotBeNull();
+            result.IsSuccessStatusCode.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_RefreshToken_Auth_Fail_Locked()
+        {
+            var user = BaseControllerTest.UoW.UserRepository.Get().First();
+            var audience = BaseControllerTest.UoW.AudienceRepository.Get().First();
+            var client = BaseControllerTest.UoW.ClientRepository.Get().First();
+            var access = Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestsPassword).Result;
+
+            access.Should().NotBeNull();
+            access.IsSuccessStatusCode.Should().BeTrue();
+
+            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var refresh = (string)jwt["refresh_token"];
+
+            user.LockoutEnabled = true;
+            user.LockoutEndDateUtc = DateTime.UtcNow.AddMinutes(60);
+            BaseControllerTest.UoW.CustomUserManager.UpdateAsync(user).Wait();
+
+            var result = Sts.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh).Result;
 
             result.Should().NotBeNull();
             result.IsSuccessStatusCode.Should().BeFalse();

@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public Task<IdentityResult> CreateAsync(AppProvider provider)
         {
-            if (!_store.IsValidProvider(provider))
+            if (!_store.IsProviderValid(provider))
             {
                 _store.CreateAsync(provider);
                 return Task.FromResult(IdentityResult.Success);
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public Task<IdentityResult> DeleteAsync(AppProvider provider)
         {
-            if (_store.IsValidProvider(provider))
+            if (_store.IsProviderValid(provider))
             {
                 _store.DeleteAsync(provider);
                 return Task.FromResult(IdentityResult.Success);
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppProvider result;
 
-            if (_store.IsValidProvider(providerId, out result))
+            if (_store.IsProviderValid(providerId, out result))
                 return _store.GetUsersAsync(result);
             else
                 throw new ArgumentNullException();
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             AppProvider result;
 
-            if (_store.IsValidProvider(providerId, out result))
+            if (_store.IsProviderValid(providerId, out result))
                 return _store.IsInProviderAsync(result, user);
             else
                 throw new ArgumentNullException();
@@ -73,7 +73,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public Task<IdentityResult> UpdateAsync(AppProvider provider)
         {
-            if (_store.IsValidProvider(provider))
+            if (_store.IsProviderValid(provider))
             {
                 _store.UpdateAsync(provider);
                 return Task.FromResult(IdentityResult.Success);

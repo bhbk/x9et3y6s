@@ -141,6 +141,20 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 return;
             }
 
+            //check that user is confirmed...
+            else if (!user.EmailConfirmed)
+            {
+                context.SetError("invalid_user_id", string.Format("Unconfirmed user '{0}'", context.UserName));
+                return;
+            }
+
+            //check that user is not locked...
+            else if (await _uow.CustomUserManager.IsLockedOutAsync(user.Id))
+            {
+                context.SetError("invalid_user_id", string.Format("Locked user '{0}'", context.UserName));
+                return;
+            }
+
             var providers = await _uow.CustomUserManager.GetProvidersAsync(user.Id);
 
             //check that user has a provider to auth against...
@@ -205,7 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 {
                     { BaseLib.Statics.AttrClientID, clientID.ToString().ToLower() },
                     { BaseLib.Statics.AttrAudienceID, audienceID.ToString().ToLower() },
-                    { BaseLib.Statics.AttrUserID, user.Email }
+                    { BaseLib.Statics.AttrUserID, user.Id.ToString().ToLower() }
                 });
 
             ClaimsIdentity claims = await _uow.CustomUserManager.CreateIdentityAsync(user, "JWT");

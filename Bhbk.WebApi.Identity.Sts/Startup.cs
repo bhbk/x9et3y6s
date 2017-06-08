@@ -97,12 +97,12 @@ namespace Bhbk.WebApi.Identity.Sts
 #endif
                     AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
                     AuthorizationCodeProvider = new Provider.CustomAuthorizationCode(injectUoW),
-                    AuthorizationCodeExpireTimeSpan = TimeSpan.FromDays(7),
+                    AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.CustomConfigManager.Config.DefaultAuthorizationCodeExpire),
                     AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
 
                     TokenEndpointPath = new PathString("/oauth/v1/token"),
                     Provider = new Provider.CustomAuthorizationServer(injectUoW),
-                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
+                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.CustomConfigManager.Config.DefaultTokenExpire),
                     AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
 
                     RefreshTokenProvider = new Provider.CustomRefreshToken(injectUoW),

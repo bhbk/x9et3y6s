@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Store
                 return Task.FromResult(false);
         }
 
-        public bool IsValidProvider(AppProvider provider)
+        public bool IsProviderValid(AppProvider provider)
         {
             var result = _context.AppProvider.Where(x => x.Id == provider.Id || x.Name == provider.Name).SingleOrDefault();
 
@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.Store
                 return true;
         }
 
-        public bool IsValidProvider(Guid provider)
+        public bool IsProviderValid(Guid provider)
         {
             var result = _context.AppProvider.Where(x => x.Id == provider).SingleOrDefault();
 
@@ -101,7 +101,7 @@ namespace Bhbk.Lib.Identity.Store
                 return true;
         }
 
-        public bool IsValidProvider(Guid provider, out AppProvider result)
+        public bool IsProviderValid(Guid provider, out AppProvider result)
         {
             result = _context.AppProvider.Where(x => x.Id == provider).SingleOrDefault();
 

@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public bool IsValidRole(AppRole role)
+        public bool IsRoleValid(AppRole role)
         {
             var result = _context.Roles.Where(x => x.Id == role.Id || x.Name == role.Name).SingleOrDefault();
 

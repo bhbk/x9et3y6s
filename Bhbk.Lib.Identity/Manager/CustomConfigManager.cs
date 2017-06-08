@@ -46,7 +46,9 @@ namespace Bhbk.Lib.Identity.Manager
             output.Append(typeof(ConfigModel).Name + Environment.NewLine);
             output.Append("  Debug:" + _store.Config.Debug.ToString() + Environment.NewLine);
             output.Append("  DefaultPassMinLength:" + _store.Config.DefaultPassMinLength.ToString() + Environment.NewLine);
+            output.Append("  DefaultAuthorizationCodeExpire:" + _store.Config.DefaultAuthorizationCodeExpire.ToString() + Environment.NewLine);
             output.Append("  DefaultTokenExpire:" + _store.Config.DefaultTokenExpire.ToString() + Environment.NewLine);
+            output.Append("  DefaultRefreshTokenExpire:" + _store.Config.DefaultRefreshTokenExpire.ToString() + Environment.NewLine);
             output.Append("  IdentityAdminBaseUrl:" + _store.Config.IdentityAdminBaseUrl.ToString() + Environment.NewLine);
             output.Append("  IdentityMeBaseUrl:" + _store.Config.IdentityMeBaseUrl.ToString() + Environment.NewLine);
             output.Append("  IdentityStsBaseUrl:" + _store.Config.IdentityStsBaseUrl.ToString() + Environment.NewLine);

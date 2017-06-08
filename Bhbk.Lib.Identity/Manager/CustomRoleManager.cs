@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> CreateAsync(AppRole role)
         {
-            if (!_store.IsValidRole(role))
+            if (!_store.IsRoleValid(role))
             {
                 _store.CreateAsync(role);
                 return Task.FromResult(IdentityResult.Success);
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> DeleteAsync(AppRole role)
         {
-            if (_store.IsValidRole(role))
+            if (_store.IsRoleValid(role))
             {
                 _store.DeleteAsync(role);
                 return Task.FromResult(IdentityResult.Success);
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override Task<IdentityResult> UpdateAsync(AppRole role)
         {
-            if (_store.IsValidRole(role))
+            if (_store.IsRoleValid(role))
             {
                 _store.UpdateAsync(role);
                 return Task.FromResult(IdentityResult.Success);

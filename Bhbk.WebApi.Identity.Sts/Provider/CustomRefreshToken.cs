@@ -64,21 +64,39 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             else
                 audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
 
-            string emailValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrUserID)
+            Guid userID;
+            AppUser user;
+
+            string userValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrUserID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrUserID] : null;
 
-            if (emailValue == null)
-                throw new ArgumentNullException();
+            if (!Guid.TryParse(userValue, out userID))
+            {
+                //check if guid used for user. resolve guid from username if not.
+                user = _uow.UserRepository.Get(x => x.Email == userValue).SingleOrDefault();
 
-            var user = await _uow.CustomUserManager.FindByEmailAsync(emailValue);
-            var tokenID = Guid.NewGuid();
+                if (user == null)
+                    throw new ArgumentNullException();
+            }
+            else
+                user = _uow.UserRepository.Get(x => x.Id == userID).SingleOrDefault();
+
+            //check if user is confirmed...
+            if (!user.EmailConfirmed)
+                return;
+
+            //check if user is locked...
+            if (await _uow.CustomUserManager.IsLockedOutAsync(user.Id))
+                return;
+
+            Guid tokenID = Guid.NewGuid();
 
             AppUserToken token = new AppUserToken()
             {
                 Id = tokenID,
                 UserId = user.Id,
                 IssuedUtc = DateTime.UtcNow,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(Convert.ToDouble(60)),
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenExpire),
                 AudienceId = audience.Id
             };
 
@@ -90,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             var result = await _uow.CustomUserManager.AddRefreshTokenAsync(token);
 
             if (result.Succeeded)
-                context.SetToken(tokenID.ToString());
+                context.SetToken(token.ProtectedTicket);
         }
 
         public void Receive(AuthenticationTokenReceiveContext context)
@@ -107,13 +125,16 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             var valid = await _uow.CustomUserManager.FindRefreshTokenAsync(context.Token);
 
-            if (valid != null)
-            {
-                context.DeserializeTicket(valid.ProtectedTicket);
+            if (valid == null)
+                return;
 
-                if (valid.IssuedUtc >= DateTime.UtcNow || valid.ExpiresUtc <= DateTime.UtcNow)
-                    await _uow.CustomUserManager.RemoveRefreshTokenAsync(context.Token);
-            }
+            else if (await _uow.CustomUserManager.IsLockedOutAsync(valid.UserId))
+                return;
+
+            context.DeserializeTicket(valid.ProtectedTicket);
+
+            if (valid.IssuedUtc >= DateTime.UtcNow || valid.ExpiresUtc <= DateTime.UtcNow)
+                await _uow.CustomUserManager.RemoveRefreshTokenAsync(context.Token);
         }
     }
 }

@@ -178,7 +178,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     _userMgmt.UserTokenProvider =
                         new DataProtectorTokenProvider<AppUser, Guid>(new CustomDataProtection().Create("AppUserToken"))
                         {
-                            TokenLifespan = TimeSpan.FromHours(_configMgmt.Config.DefaultTokenExpire)
+                            TokenLifespan = TimeSpan.FromMinutes(_configMgmt.Config.DefaultTokenExpire)
                         };
 
                     //create custom password validator...
