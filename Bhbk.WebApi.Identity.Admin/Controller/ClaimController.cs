@@ -11,6 +11,7 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Admin.Controller
 {
     [RoutePrefix("claim")]
+    [Authorize(Roles = "(Built-In) Administrators")]
     public class ClaimController : BaseController
     {
         public ClaimController() { }
@@ -19,7 +20,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1/{userID}"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -48,7 +48,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteClaim(Guid userID, Guid claimID)
         {
             if (!ModelState.IsValid)
@@ -71,7 +70,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IHttpActionResult> GetClaims()
+        [Authorize]
+        public IHttpActionResult GetClaims()
         {
             var user = User.Identity as ClaimsIdentity;
 
@@ -86,6 +86,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetClaims(Guid userID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -119,7 +120,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateClaims(Guid userID, IDictionary<string, string> claims)
         {
             if (!ModelState.IsValid)

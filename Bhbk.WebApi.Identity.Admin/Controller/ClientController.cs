@@ -9,6 +9,7 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Admin.Controller
 {
     [RoutePrefix("client")]
+    [Authorize(Roles = "(Built-In) Administrators")]
     public class ClientController : BaseController
     {
         public ClientController() { }
@@ -17,7 +18,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateClient(ClientModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -46,7 +46,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{clientID}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteClient(Guid clientID)
         {
             var foundClient = await UoW.ClientRepository.FindAsync(clientID);
@@ -67,6 +66,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{clientID}/audiences"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetAudiencesInClient(Guid clientID)
         {
             var foundClient = await UoW.ClientRepository.FindAsync(clientID);
@@ -79,6 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{clientID}"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetClient(Guid clientID)
         {
             var foundClient = await UoW.ClientRepository.FindAsync(clientID);
@@ -91,13 +92,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpGet]
+        [Authorize]
         public IHttpActionResult GetClients()
         {
             return Ok(UoW.ClientRepository.Get().Select(x => ModelFactory.Create(x)));
         }
 
         [Route("v1/{clientID}"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateClient(Guid clientID, ClientModel.Binding.Update model)
         {
             if (!ModelState.IsValid)

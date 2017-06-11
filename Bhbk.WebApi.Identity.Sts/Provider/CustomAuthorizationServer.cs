@@ -67,45 +67,51 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             else
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
-            Guid clientID;
+            Guid clientID, audienceID;
             AppClient client;
+            AppAudience audience;
 
             string clientValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrClientID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrClientID] : null;
 
-            if (!Guid.TryParse(clientValue, out clientID))
-            {
-                //check if guid used for client. resolve guid from name if not.
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
-
-                if (client == null)
-                {
-                    context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", context.ClientId));
-                    return Task.FromResult<object>(null);
-                }
-            }
-            else
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
-
-            Guid audienceID;
-            AppAudience audience;
-
             string audienceValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrAudienceID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrAudienceID] : null;
 
-            if (!Guid.TryParse(audienceValue, out audienceID))
+            if (string.IsNullOrEmpty(clientValue))
             {
-                //check if guid used for client. resolve guid from name if not.
+                context.SetError("invalid_client_id", string.Format(BaseLib.Statics.MsgClientInvalid + " '{0}'", clientValue));
+                return Task.FromResult<object>(null);
+            }
+
+            if (string.IsNullOrEmpty(audienceValue))
+            {
+                context.SetError("invalid_audience_id", string.Format(BaseLib.Statics.MsgAudienceInvalid + " '{0}'", audienceValue));
+                return Task.FromResult<object>(null);
+            }
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(clientValue, out clientID))
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+            else
+                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+
+            if (client == null)
+            {
+                context.SetError("invalid_client_id", string.Format(BaseLib.Statics.MsgClientInvalid + " '{0}'", clientValue));
+                return Task.FromResult<object>(null);
+            }
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(audienceValue, out audienceID))
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+            else
                 audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
-                if (audience == null)
-                {
-                    context.SetError("invalid_audience_id", string.Format("Invalid audience '{0}'", context.ClientId));
-                    return Task.FromResult<object>(null);
-                }
+            if (audience == null)
+            {
+                context.SetError("invalid_audience_id", string.Format(BaseLib.Statics.MsgAudienceInvalid + " '{0}'", audienceValue));
+                return Task.FromResult<object>(null);
             }
-            else
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
 
             var claims = new ClaimsIdentity(context.Ticket.Identity);
             var ticket = new AuthenticationTicket(claims, context.Ticket.Properties);
@@ -123,12 +129,55 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             else
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
-            var form = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
+            Guid clientID, audienceID;
+            AppClient client;
+            AppAudience audience;
+
+            var postValues = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
+
+            string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientID).Value[0];
+            string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceID).Value[0];
+
+            if (string.IsNullOrEmpty(clientValue))
+            {
+                context.SetError("invalid_client_id", string.Format(BaseLib.Statics.MsgClientInvalid + " '{0}'", clientValue));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(audienceValue))
+            {
+                context.SetError("invalid_audience_id", string.Format(BaseLib.Statics.MsgAudienceInvalid + " '{0}'", audienceValue));
+                return;
+            }
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(clientValue, out clientID))
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+            else
+                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+
+            if (client == null)
+            {
+                context.SetError("invalid_client_id", string.Format(BaseLib.Statics.MsgClientInvalid + " '{0}'", clientValue));
+                return;
+            }
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(audienceValue, out audienceID))
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+            else
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+
+            if (audience == null)
+            {
+                context.SetError("invalid_audience_id", string.Format(BaseLib.Statics.MsgAudienceInvalid + " '{0}'", audienceValue));
+                return;
+            }
 
             //check that username has valid format...
             if (!FormatHelper.ValidateUsernameFormat(context.UserName))
             {
-                context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
+                context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserInvalid + " '{0}'", context.UserName));
                 return;
             }
 
@@ -137,21 +186,21 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             //check that user exists...
             if (user == null)
             {
-                context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
+                context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserNotExist + " '{0}'", context.UserName));
                 return;
             }
 
             //check that user is confirmed...
             else if (!user.EmailConfirmed)
             {
-                context.SetError("invalid_user_id", string.Format("Unconfirmed user '{0}'", context.UserName));
+                context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserUnconfirmed + " '{0}'", context.UserName));
                 return;
             }
 
             //check that user is not locked...
             else if (await _uow.CustomUserManager.IsLockedOutAsync(user.Id))
             {
-                context.SetError("invalid_user_id", string.Format("Locked user '{0}'", context.UserName));
+                context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserLocked + " '{0}'", context.UserName));
                 return;
             }
 
@@ -165,60 +214,20 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 {
                     await _uow.CustomUserManager.AccessFailedAsync(user.Id);
 
-                    context.SetError("invalid_user_id", string.Format("Invalid user '{0}'", context.UserName));
+                    context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserInvalid + " '{0}'", context.UserName));
                     return;
                 }
             }
             else
             {
-                context.SetError("invalid_provider_id", string.Format("Invalid provider for '{0}'", context.UserName));
-                return;
-            }
-
-            Guid clientID;
-            string clientValue = form.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientID).Value[0];
-
-            //check if guid used for client. resolve guid from name if not.
-            if (!Guid.TryParse(clientValue, out clientID))
-            {
-                var client = _uow.ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
-
-                if (client != null)
-                    clientID = client.Id;
-            }
-
-            if (clientID == null)
-            {
-                await _uow.CustomUserManager.AccessFailedAsync(user.Id);
-
-                context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", clientValue));
-                return;
-            }
-
-            Guid audienceID;
-            string audienceValue = form.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceID).Value[0];
-
-            //check if guid used for audience. resolve guid from name if not.
-            if (!Guid.TryParse(audienceValue, out audienceID))
-            {
-                var audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
-
-                if (audience != null)
-                    audienceID = audience.Id;
-            }
-
-            if (audienceID == null)
-            {
-                await _uow.CustomUserManager.AccessFailedAsync(user.Id);
-
-                context.SetError("invalid_audience_id", string.Format("Invalid audience '{0}'", audienceValue));
+                context.SetError("invalid_provider_id", string.Format(BaseLib.Statics.MsgProviderInvalid + " '{0}'", context.UserName));
                 return;
             }
 
             var attrs = new AuthenticationProperties(new Dictionary<string, string>
                 {
-                    { BaseLib.Statics.AttrClientID, clientID.ToString().ToLower() },
-                    { BaseLib.Statics.AttrAudienceID, audienceID.ToString().ToLower() },
+                    { BaseLib.Statics.AttrClientID, client.Id.ToString().ToLower() },
+                    { BaseLib.Statics.AttrAudienceID, audience.Id.ToString().ToLower() },
                     { BaseLib.Statics.AttrUserID, user.Id.ToString().ToLower() }
                 });
 
@@ -261,29 +270,24 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (!context.TryGetBasicCredentials(out contextID, out contextSecret))
                 context.TryGetFormCredentials(out contextID, out contextSecret);
 
-            if (context.ClientId == null)
-            {
-                context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", context.ClientId));
-                return Task.FromResult<object>(null);
-            }
-
             Guid clientID;
             AppClient client;
 
-            if (!Guid.TryParse(context.ClientId, out clientID))
+            if (string.IsNullOrEmpty(context.ClientId))
             {
-                //check if guid used for client. resolve guid from name if not.
-                client = _uow.ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
-
-                if (client == null)
-                    context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", context.ClientId));
+                context.SetError("invalid_client_id", BaseLib.Statics.MsgClientInvalid);
+                return Task.FromResult<object>(null);
             }
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(context.ClientId, out clientID))
+                client = _uow.ClientRepository.Get(x => x.Id.ToString() == context.ClientId && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
 
             if (client == null)
             {
-                context.SetError("invalid_client_id", string.Format("Invalid client '{0}'", context.ClientId));
+                context.SetError("invalid_client_id", string.Format(BaseLib.Statics.MsgClientInvalid + " '{0}'", context.ClientId));
                 return Task.FromResult<object>(null);
             }
 

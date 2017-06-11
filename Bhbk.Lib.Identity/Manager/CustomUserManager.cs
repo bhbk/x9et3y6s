@@ -213,9 +213,14 @@ namespace Bhbk.Lib.Identity.Manager
             return Task.FromResult(_store.Users.Where(x => x.UserName == userName).SingleOrDefault());
         }
 
-        public Task<AppUserToken> FindRefreshTokenAsync(string ticketId)
+        public Task<AppUserToken> FindRefreshTokenAsync(string ticket)
         {
-            return _store.FindRefreshTokenAsync(ticketId);
+            return _store.FindRefreshTokenAsync(ticket);
+        }
+
+        public Task<AppUserToken> FindRefreshTokenByIdAsync(Guid tokenId)
+        {
+            return _store.FindRefreshTokenByIdAsync(tokenId);
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(Guid userId)
@@ -356,9 +361,9 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> RemoveRefreshTokenAsync(string token)
+        public Task<IdentityResult> RemoveRefreshTokenByIdAsync(Guid tokenId)
         {
-            _store.RemoveRefreshTokenAsync(token);
+            _store.RemoveRefreshTokenByIdAsync(tokenId);
             return Task.FromResult(IdentityResult.Success);
         }
 

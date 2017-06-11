@@ -18,10 +18,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Sts_Diagnostic_GetVersion_Success()
+        public void Api_Sts_Diagnostic_GetVersion_Success()
         {
             var controller = new DiagnosticController(UoW);
-            var result = await controller.GetVersion() as OkNegotiatedContentResult<string>;
+            var result = controller.GetVersion() as OkNegotiatedContentResult<string>;
 
             result.Should().NotBeNull();
         }

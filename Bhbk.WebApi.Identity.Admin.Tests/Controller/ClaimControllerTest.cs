@@ -67,10 +67,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Admin_Claim_GetAll_Success()
+        public void Api_Admin_Claim_GetAll_Success()
         {
             var controller = new ClaimController(UoW);
-            var result = await controller.GetClaims() as IHttpActionResult;
+            var result = controller.GetClaims() as IHttpActionResult;
 
             result.Should().NotBeNull();
         }

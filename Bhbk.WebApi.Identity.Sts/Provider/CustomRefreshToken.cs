@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -30,56 +31,56 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             else
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
-            Guid clientID;
+            Guid clientID, audienceID, userID;
+            DateTime issue, expire;
             AppClient client;
+            AppAudience audience;
+            AppUser user;
 
             string clientValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrClientID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrClientID] : null;
 
-            if (!Guid.TryParse(clientValue, out clientID))
-            {
-                //check if guid used for client. resolve guid from name if not.
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
-
-                if (client == null)
-                    throw new ArgumentNullException();
-            }
-            else
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
-
-            Guid audienceID;
-            AppAudience audience;
-
             string audienceValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrAudienceID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrAudienceID] : null;
-
-            if (!Guid.TryParse(audienceValue, out audienceID))
-            {
-                //check if guid used for client. resolve guid from name if not.
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
-
-                if (audience == null)
-                    throw new ArgumentNullException();
-            }
-            else
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
-
-            Guid userID;
-            AppUser user;
 
             string userValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrUserID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrUserID] : null;
 
-            if (!Guid.TryParse(userValue, out userID))
-            {
-                //check if guid used for user. resolve guid from username if not.
+            if (string.IsNullOrEmpty(clientValue))
+                return;
+
+            if (string.IsNullOrEmpty(audienceValue))
+                return;
+
+            if (string.IsNullOrEmpty(userValue))
+                return;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(clientValue, out clientID))
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+            else
+                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+
+            if (client == null)
+                return;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(audienceValue, out audienceID))
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+            else
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+
+            if (audience == null)
+                return;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(userValue, out userID))
+                user = _uow.UserRepository.Get(x => x.Id == userID).SingleOrDefault();
+            else
                 user = _uow.UserRepository.Get(x => x.Email == userValue).SingleOrDefault();
 
-                if (user == null)
-                    throw new ArgumentNullException();
-            }
-            else
-                user = _uow.UserRepository.Get(x => x.Id == userID).SingleOrDefault();
+            if (user == null)
+                return;
 
             //check if user is confirmed...
             if (!user.EmailConfirmed)
@@ -91,13 +92,25 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             Guid tokenID = Guid.NewGuid();
 
+            if (_uow.CustomConfigManager.Config.UnitTestRefreshToken)
+            {
+                issue = _uow.CustomConfigManager.Config.UnitTestRefreshTokenFakeUtcNow;
+                expire = _uow.CustomConfigManager.Config.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenLife);
+            }
+            else
+            {
+                issue = DateTime.UtcNow;
+                expire = DateTime.UtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenLife);
+            }
+
             AppUserToken token = new AppUserToken()
             {
                 Id = tokenID,
+                ClientId = client.Id,
+                AudienceId = audience.Id,
                 UserId = user.Id,
-                IssuedUtc = DateTime.UtcNow,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenExpire),
-                AudienceId = audience.Id
+                IssuedUtc = issue,
+                ExpiresUtc = expire
             };
 
             context.Ticket.Properties.IssuedUtc = token.IssuedUtc;
@@ -123,18 +136,54 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             else
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
-            var valid = await _uow.CustomUserManager.FindRefreshTokenAsync(context.Token);
+            Guid clientID, audienceID;
+            AppClient client;
+            AppAudience audience;
 
-            if (valid == null)
+            var postValues = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
+
+            string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientID).Value[0];
+            string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceID).Value[0];
+
+            if (string.IsNullOrEmpty(clientValue))
                 return;
 
-            else if (await _uow.CustomUserManager.IsLockedOutAsync(valid.UserId))
+            if (string.IsNullOrEmpty(audienceValue))
                 return;
 
-            context.DeserializeTicket(valid.ProtectedTicket);
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(clientValue, out clientID))
+                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+            else
+                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
-            if (valid.IssuedUtc >= DateTime.UtcNow || valid.ExpiresUtc <= DateTime.UtcNow)
-                await _uow.CustomUserManager.RemoveRefreshTokenAsync(context.Token);
+            if (client == null)
+                return;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(audienceValue, out audienceID))
+                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+            else
+                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+
+            if (audience == null)
+                return;
+
+            var token = await _uow.CustomUserManager.FindRefreshTokenAsync(context.Token);
+
+            if (token == null)
+                return;
+
+            else if (await _uow.CustomUserManager.IsLockedOutAsync(token.UserId))
+                return;
+
+            var result = await _uow.CustomUserManager.RemoveRefreshTokenByIdAsync(token.Id);
+
+            if (!result.Succeeded)
+                throw new InvalidOperationException();
+
+            if (token.IssuedUtc <= DateTime.UtcNow && token.ExpiresUtc >= DateTime.UtcNow)
+                context.DeserializeTicket(token.ProtectedTicket);
         }
     }
 }

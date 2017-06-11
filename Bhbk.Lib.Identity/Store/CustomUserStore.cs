@@ -45,10 +45,10 @@ namespace Bhbk.Lib.Identity.Store
 
         public Task AddRefreshTokenAsync(AppUserToken token)
         {
-            var result = _context.AppUserToken.Where(x => x.UserId == token.UserId && x.AudienceId == token.AudienceId).SingleOrDefault();
+            var refresh = _context.AppUserToken.Where(x => x.ProtectedTicket == token.ProtectedTicket).SingleOrDefault();
 
-            if (result != null)
-                _context.AppUserToken.Remove(result);
+            if (refresh != null)
+                _context.AppUserToken.Remove(refresh);
 
             _context.AppUserToken.Add(token);
             _context.SaveChanges();
@@ -124,9 +124,14 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task<AppUserToken> FindRefreshTokenAsync(string ticketId)
+        public Task<AppUserToken> FindRefreshTokenAsync(string ticket)
         {
-            return Task.FromResult(_context.AppUserToken.Where(x => x.ProtectedTicket == ticketId).SingleOrDefault());
+            return Task.FromResult(_context.AppUserToken.Where(x => x.ProtectedTicket == ticket).SingleOrDefault());
+        }
+
+        public Task<AppUserToken> FindRefreshTokenByIdAsync(Guid tokenId)
+        {
+            return Task.FromResult(_context.AppUserToken.Where(x => x.Id == tokenId).SingleOrDefault());
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user)
@@ -316,13 +321,16 @@ namespace Bhbk.Lib.Identity.Store
             }
         }
 
-        public Task RemoveRefreshTokenAsync(string tokenId)
+        public Task RemoveRefreshTokenByIdAsync(Guid tokenId)
         {
-            var result = _context.AppUserToken.Where(x => x.Id.ToString() == tokenId).SingleOrDefault();
+            var token = _context.AppUserToken.Where(x => x.Id == tokenId).SingleOrDefault();
 
-            if (result != null)
+            if (token == null)
+                throw new ArgumentNullException();
+
+            else
             {
-                _context.AppUserToken.Remove(result);
+                _context.AppUserToken.Remove(token);
                 _context.SaveChanges();
             }
 

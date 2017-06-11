@@ -9,8 +9,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
     public interface IUnitOfWork : IDisposable
     {
-        void Save();
-        Task SaveAsync();
         CustomIdentityDbContext CustomContext { get; set; }
         CustomConfigManager CustomConfigManager { get; }
         CustomProviderManager CustomProviderManager { get; }
@@ -21,5 +19,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         IGenericRepository<AppProvider, Guid> ProviderRepository { get; }
         IGenericRepository<AppRole, Guid> RoleRepository { get; }
         IGenericRepository<AppUser, Guid> UserRepository { get; }
+        void Save();
+        Task SaveAsync();
     }
 }

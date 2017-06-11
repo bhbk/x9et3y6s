@@ -15,13 +15,15 @@ namespace Bhbk.Lib.Identity.Model
     public partial class AppUserToken
     {
         public System.Guid Id { get; set; }
-        public System.Guid UserId { get; set; }
+        public System.Guid ClientId { get; set; }
         public System.Guid AudienceId { get; set; }
+        public System.Guid UserId { get; set; }
         public string ProtectedTicket { get; set; }
         public System.DateTime IssuedUtc { get; set; }
         public System.DateTime ExpiresUtc { get; set; }
     
         public virtual AppAudience Audiences { get; set; }
+        public virtual AppClient Clients { get; set; }
         public virtual AppUser Users { get; set; }
     }
 }

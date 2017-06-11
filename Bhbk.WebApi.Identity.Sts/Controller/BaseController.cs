@@ -7,7 +7,7 @@ using System.Web.Http;
 
 namespace Bhbk.WebApi.Identity.Sts.Controller
 {
-    [Authorize]
+    [AllowAnonymous]
     public class BaseController : ApiController
     {
         private CustomModelFactory _mf = null;

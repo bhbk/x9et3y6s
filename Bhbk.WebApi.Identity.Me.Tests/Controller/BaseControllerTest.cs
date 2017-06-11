@@ -22,11 +22,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             _connection = Effort.EntityConnectionFactory.CreateTransient("name=IdentityEntities");
             Context = new CustomIdentityDbContext(_connection);
-            UoW = new UnitOfWork(Context);
-            Seeds = new DataSeedHelper(UoW);
-            HttpConfig = new HttpConfiguration();
 
+            UoW = new UnitOfWork(Context);
+            UoW.CustomConfigManager.Config.UnitTestRun = true;
+
+            Seeds = new DataSeedHelper(UoW);
             Seeds.CreateTestData();
+
+            HttpConfig = new HttpConfiguration();
         }
 
         public override HttpConfiguration ConfigureDependencyInjection()

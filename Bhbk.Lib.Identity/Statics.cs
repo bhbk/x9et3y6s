@@ -61,12 +61,12 @@ namespace Bhbk.Lib.Identity
         public const String MsgUserAlreadyExists = "User already exists";
         public const String MsgUserImmutable = "User is immutable";
         public const String MsgUserInvalid = "User is invalid, locked or disabled";
-        public const String MsgUserInvalidFormat = "User name has invalid format";
         public const String MsgUserInvalidCurrentPassword = "User current password incorrect";
         public const String MsgUserInvalidNewPasswordConfirm = "User new password does not match confirm new password";
-        public const String MsgUserNoAccess = "User has no access";
+        public const String MsgUserLocked = "User is locked";
         public const String MsgUserNotExist = "User does not exist";
         public const String MsgUserTokenInvalid = "User token is invalid";
+        public const String MsgUserUnconfirmed = "User is unconfirmed";
         #endregion
     }
 }

@@ -14,7 +14,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controller
             : base(uow) { }
 
         [Route("v1/version"), HttpGet]
-        public async Task<IHttpActionResult> GetVersion()
+        public IHttpActionResult GetVersion()
         {
             return Ok(Assembly.GetAssembly(typeof(DiagnosticController)).GetName().Version.ToString());
         }

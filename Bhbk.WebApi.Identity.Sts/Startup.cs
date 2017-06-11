@@ -89,20 +89,20 @@ namespace Bhbk.WebApi.Identity.Sts
                 _oauthServerOptions = new OAuthAuthorizationServerOptions()
                 {
 #if DEBUG
-                    AllowInsecureHttp = true,
                     ApplicationCanDisplayErrors = true,
 #else
-                    AllowInsecureHttp = true,
-                    ApplicationCanDisplayErrors = true,
+                    ApplicationCanDisplayErrors = false,
 #endif
+                    AllowInsecureHttp = injectUoW.CustomConfigManager.Config.UnitTestRun,
+
                     AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
                     AuthorizationCodeProvider = new Provider.CustomAuthorizationCode(injectUoW),
-                    AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.CustomConfigManager.Config.DefaultAuthorizationCodeExpire),
+                    AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.CustomConfigManager.Config.DefaultAuthorizationCodeLife),
                     AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
 
                     TokenEndpointPath = new PathString("/oauth/v1/token"),
                     Provider = new Provider.CustomAuthorizationServer(injectUoW),
-                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.CustomConfigManager.Config.DefaultTokenExpire),
+                    AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.CustomConfigManager.Config.DefaultAccessTokenLife),
                     AccessTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
 
                     RefreshTokenProvider = new Provider.CustomRefreshToken(injectUoW),

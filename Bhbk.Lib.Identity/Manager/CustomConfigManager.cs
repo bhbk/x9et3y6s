@@ -45,13 +45,18 @@ namespace Bhbk.Lib.Identity.Manager
 
             output.Append(typeof(ConfigModel).Name + Environment.NewLine);
             output.Append("  Debug:" + _store.Config.Debug.ToString() + Environment.NewLine);
-            output.Append("  DefaultPassMinLength:" + _store.Config.DefaultPassMinLength.ToString() + Environment.NewLine);
-            output.Append("  DefaultAuthorizationCodeExpire:" + _store.Config.DefaultAuthorizationCodeExpire.ToString() + Environment.NewLine);
-            output.Append("  DefaultTokenExpire:" + _store.Config.DefaultTokenExpire.ToString() + Environment.NewLine);
-            output.Append("  DefaultRefreshTokenExpire:" + _store.Config.DefaultRefreshTokenExpire.ToString() + Environment.NewLine);
+            output.Append("  DefaultPasswordLength:" + _store.Config.DefaultPasswordLength.ToString() + Environment.NewLine);
+            output.Append("  DefaultAuthorizationCodeLife:" + _store.Config.DefaultAuthorizationCodeLife.ToString() + Environment.NewLine);
+            output.Append("  DefaultAccessTokenLife:" + _store.Config.DefaultAccessTokenLife.ToString() + Environment.NewLine);
+            output.Append("  DefaultRefreshTokenLife:" + _store.Config.DefaultRefreshTokenLife.ToString() + Environment.NewLine);
             output.Append("  IdentityAdminBaseUrl:" + _store.Config.IdentityAdminBaseUrl.ToString() + Environment.NewLine);
             output.Append("  IdentityMeBaseUrl:" + _store.Config.IdentityMeBaseUrl.ToString() + Environment.NewLine);
             output.Append("  IdentityStsBaseUrl:" + _store.Config.IdentityStsBaseUrl.ToString() + Environment.NewLine);
+            output.Append("  UnitTestAccessToken:" + _store.Config.UnitTestAccessToken.ToString() + Environment.NewLine);
+            output.Append("  UnitTestAccessTokenFakeUtcNow:" + _store.Config.UnitTestAccessTokenFakeUtcNow.ToString() + Environment.NewLine);
+            output.Append("  UnitTestRefreshToken:" + _store.Config.UnitTestRefreshToken.ToString() + Environment.NewLine);
+            output.Append("  UnitTestRefreshTokenFakeUtcNow:" + _store.Config.UnitTestRefreshTokenFakeUtcNow.ToString() + Environment.NewLine);
+            output.Append("  UnitTestRun:" + _store.Config.UnitTestRun.ToString() + Environment.NewLine);
 
             return output.ToString();
         }

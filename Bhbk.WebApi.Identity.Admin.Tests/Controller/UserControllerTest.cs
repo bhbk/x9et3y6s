@@ -54,29 +54,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_DeleteToken_Success()
-        {
-            var controller = new UserController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var audience = UoW.AudienceRepository.Get().First();
-            var model = new AppUserToken()
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                ProtectedTicket = EntrophyHelper.GenerateRandomBase64(64),
-                IssuedUtc = DateTime.Now,
-                ExpiresUtc = DateTime.Now.AddDays(30),
-                AudienceId = audience.Id
-            };
-            var add = await UoW.CustomUserManager.AddRefreshTokenAsync(model);
-            var result = await controller.DeleteToken(user.Id, audience.Id) as OkResult;
-            var check = await UoW.CustomUserManager.FindRefreshTokenAsync(model.Id.ToString());
-
-            result.Should().NotBeNull();
-            check.Should().BeNull();
-        }
-
-        [TestMethod]
         public async Task Api_Admin_User_Get_Success()
         {
             var controller = new UserController(UoW);

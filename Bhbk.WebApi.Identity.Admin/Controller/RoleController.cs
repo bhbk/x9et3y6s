@@ -10,6 +10,7 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Admin.Controller
 {
     [RoutePrefix("role")]
+    [Authorize(Roles = "(Built-In) Administrators")]
     public class RoleController : BaseController
     {
         public RoleController() { }
@@ -18,7 +19,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1/{roleID}/add/{userID}"), HttpPost]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> AddRoleToUser(Guid roleID, Guid userID)
         {
             if (!ModelState.IsValid)
@@ -47,7 +47,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateRole(RoleModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -79,7 +78,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteRole(Guid roleID)
         {
             var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
@@ -103,12 +101,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpGet]
+        [Authorize]
         public IHttpActionResult GetRoles()
         {
             return Ok(UoW.CustomRoleManager.Roles.ToList().Select(x => ModelFactory.Create(x)));
         }
 
         [Route("v1/{roleID}"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetRole(Guid roleID)
         {
             var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
@@ -121,6 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}/users"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetRoleUsers(Guid roleID)
         {
             var foundRole = await UoW.RoleRepository.FindAsync(roleID);
@@ -133,7 +134,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> RemoveRoleFromUser(Guid roleID, Guid userID)
         {
             if (!ModelState.IsValid)
@@ -162,7 +162,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateRole(Guid roleID, RoleModel.Binding.Update model)
         {
             if (!ModelState.IsValid)

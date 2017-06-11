@@ -167,13 +167,18 @@ namespace Bhbk.Lib.Identity.Infrastructure
     public class ConfigModel
     {
         public bool Debug { get; set; }
-        public UInt16 DefaultPassMinLength { get; set; }
-        public Double DefaultAuthorizationCodeExpire { get; set; }
-        public Double DefaultTokenExpire { get; set; }
-        public Double DefaultRefreshTokenExpire { get; set; }
+        public UInt16 DefaultPasswordLength { get; set; }
+        public Double DefaultAccessTokenLife { get; set; }
+        public Double DefaultAuthorizationCodeLife { get; set; }
+        public Double DefaultRefreshTokenLife { get; set; }
         public string IdentityAdminBaseUrl { get; set; }
         public string IdentityMeBaseUrl { get; set; }
         public string IdentityStsBaseUrl { get; set; }
+        public bool UnitTestAccessToken { get; set; }
+        public DateTime UnitTestAccessTokenFakeUtcNow { get; set; }
+        public bool UnitTestRefreshToken { get; set; }
+        public DateTime UnitTestRefreshTokenFakeUtcNow { get; set; }
+        public bool UnitTestRun { get; set; }
     }
 
     public class ClientModel

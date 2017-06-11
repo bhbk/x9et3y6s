@@ -28,13 +28,18 @@ namespace Bhbk.Lib.Identity.Store
                 XmlNode node = doc.SelectSingleNode("/ConfigModel");
 
                 _config.Debug = Boolean.Parse(node.SelectSingleNode("Debug").InnerText);
-                _config.DefaultPassMinLength = UInt16.Parse(node.SelectSingleNode("DefaultPassMinLength").InnerText);
-                _config.DefaultAuthorizationCodeExpire = Double.Parse(node.SelectSingleNode("DefaultAuthorizationCodeExpire").InnerText);
-                _config.DefaultTokenExpire = Double.Parse(node.SelectSingleNode("DefaultTokenExpire").InnerText);
-                _config.DefaultRefreshTokenExpire = Double.Parse(node.SelectSingleNode("DefaultRefreshTokenExpire").InnerText);
+                _config.DefaultPasswordLength = UInt16.Parse(node.SelectSingleNode("DefaultPasswordLength").InnerText);
+                _config.DefaultAuthorizationCodeLife = Double.Parse(node.SelectSingleNode("DefaultAuthorizationCodeLife").InnerText);
+                _config.DefaultAccessTokenLife = Double.Parse(node.SelectSingleNode("DefaultAccessTokenLife").InnerText);
+                _config.DefaultRefreshTokenLife = Double.Parse(node.SelectSingleNode("DefaultRefreshTokenLife").InnerText);
                 _config.IdentityAdminBaseUrl = node.SelectSingleNode("IdentityAdminBaseUrl").InnerText;
                 _config.IdentityMeBaseUrl = node.SelectSingleNode("IdentityMeBaseUrl").InnerText;
                 _config.IdentityStsBaseUrl = node.SelectSingleNode("IdentityStsBaseUrl").InnerText;
+                _config.UnitTestAccessToken = false;
+                _config.UnitTestAccessTokenFakeUtcNow = DateTime.UtcNow;
+                _config.UnitTestRefreshToken = false;
+                _config.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
+                _config.UnitTestRun = false;
             }
             catch (Exception ex)
             {

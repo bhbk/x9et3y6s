@@ -207,6 +207,7 @@
   <ItemGroup>
     <Compile Include="Controller\BaseController.cs" />
     <Compile Include="Controller\DiagnosticController.cs" />
+    <Compile Include="Controller\OAuthController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\CustomAuthenticationCode.cs" />
     <Compile Include="Provider\CustomRefreshToken.cs" />

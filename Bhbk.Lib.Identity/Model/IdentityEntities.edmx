@@ -123,8 +123,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ClientId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ProtectedTicket" Type="varchar(max)" Nullable="false" />
           <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="ExpiresUtc" Type="datetime2" Precision="7" Nullable="false" />
@@ -224,9 +225,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_AppUserToken_AudienceID">
-          <End Role="AppAudience" Type="Self.AppAudience" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="AppAudience" Type="Self.AppAudience" Multiplicity="1" />
           <End Role="AppUserToken" Type="Self.AppUserToken" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AppAudience">
@@ -234,6 +233,18 @@
             </Principal>
             <Dependent Role="AppUserToken">
               <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AppUserToken_ClientID">
+          <End Role="AppClient" Type="Self.AppClient" Multiplicity="1" />
+          <End Role="AppUserToken" Type="Self.AppUserToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppClient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserToken">
+              <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -293,6 +304,10 @@
             <End Role="AppAudience" EntitySet="AppAudience" />
             <End Role="AppUserToken" EntitySet="AppUserToken" />
           </AssociationSet>
+          <AssociationSet Name="FK_AppUserToken_ClientID" Association="Self.FK_AppUserToken_ClientID">
+            <End Role="AppClient" EntitySet="AppClient" />
+            <End Role="AppUserToken" EntitySet="AppUserToken" />
+          </AssociationSet>
           <AssociationSet Name="FK_AppUserToken_UserID" Association="Self.FK_AppUserToken_UserID">
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserToken" EntitySet="AppUserToken" />
@@ -311,7 +326,6 @@
           <EntitySet Name="AppUserClaim" EntityType="IdentityModel.AppUserClaim" />
           <EntitySet Name="AppUserProvider" EntityType="IdentityModel.AppUserProvider" />
           <EntitySet Name="AppUserRole" EntityType="IdentityModel.AppUserRole" />
-          <EntitySet Name="AppUserToken" EntityType="IdentityModel.AppUserToken" />
           <AssociationSet Name="FK_AppAudience_ClientID" Association="IdentityModel.FK_AppAudience_ClientID">
             <End Role="AppClient" EntitySet="AppClient" />
             <End Role="AppAudience" EntitySet="AppAudience" />
@@ -319,10 +333,6 @@
           <AssociationSet Name="FK_AppRole_AudienceID" Association="IdentityModel.FK_AppRole_AudienceID">
             <End Role="AppAudience" EntitySet="AppAudience" />
             <End Role="AppRole" EntitySet="AppRole" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AppUserToken_AudienceID" Association="IdentityModel.FK_AppUserToken_AudienceID">
-            <End Role="AppAudience" EntitySet="AppAudience" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
           </AssociationSet>
           <AssociationSet Name="FK_AppUserProvider_ProviderID" Association="IdentityModel.FK_AppUserProvider_ProviderID">
             <End Role="AppProvider" EntitySet="AppProvider" />
@@ -343,6 +353,15 @@
           <AssociationSet Name="FK_AppUserRole_UserID" Association="IdentityModel.FK_AppUserRole_UserID">
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserRole" EntitySet="AppUserRole" />
+          </AssociationSet>
+          <EntitySet Name="AppUserToken" EntityType="IdentityModel.AppUserToken" />
+          <AssociationSet Name="FK_AppUserToken_AudienceID" Association="IdentityModel.FK_AppUserToken_AudienceID">
+            <End Role="AppAudience" EntitySet="AppAudience" />
+            <End Role="AppUserToken" EntitySet="AppUserToken" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AppUserToken_ClientID" Association="IdentityModel.FK_AppUserToken_ClientID">
+            <End Role="AppClient" EntitySet="AppClient" />
+            <End Role="AppUserToken" EntitySet="AppUserToken" />
           </AssociationSet>
           <AssociationSet Name="FK_AppUserToken_UserID" Association="IdentityModel.FK_AppUserToken_UserID">
             <End Role="AppUser" EntitySet="AppUser" />
@@ -379,6 +398,7 @@
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppAudience_ClientID" FromRole="AppClient" ToRole="AppAudience" />
+          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserToken_ClientID" FromRole="AppClient" ToRole="AppUserToken" />
         </EntityType>
         <EntityType Name="AppProvider">
           <Key>
@@ -478,19 +498,6 @@
           <NavigationProperty Name="Roles" Relationship="IdentityModel.FK_AppUserRole_RoleID" FromRole="AppUserRole" ToRole="AppRole" />
           <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserRole_UserID" FromRole="AppUserRole" ToRole="AppUser" />
         </EntityType>
-        <EntityType Name="AppUserToken">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
-          <Property Name="ProtectedTicket" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="ExpiresUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppUserToken_AudienceID" FromRole="AppUserToken" ToRole="AppAudience" />
-          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserToken_UserID" FromRole="AppUserToken" ToRole="AppUser" />
-        </EntityType>
         <Association Name="FK_AppAudience_ClientID">
           <End Type="IdentityModel.AppClient" Role="AppClient" Multiplicity="1" />
           <End Type="IdentityModel.AppAudience" Role="AppAudience" Multiplicity="*" />
@@ -511,20 +518,6 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="AppRole">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AppUserToken_AudienceID">
-          <End Type="IdentityModel.AppAudience" Role="AppAudience" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityModel.AppUserToken" Role="AppUserToken" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AppAudience">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AppUserToken">
               <PropertyRef Name="AudienceId" />
             </Dependent>
           </ReferentialConstraint>
@@ -596,6 +589,45 @@
             </Principal>
             <Dependent Role="AppUserRole">
               <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="AppUserToken">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ClientId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="ProtectedTicket" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ExpiresUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppUserToken_AudienceID" FromRole="AppUserToken" ToRole="AppAudience" />
+          <NavigationProperty Name="Clients" Relationship="IdentityModel.FK_AppUserToken_ClientID" FromRole="AppUserToken" ToRole="AppClient" />
+          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserToken_UserID" FromRole="AppUserToken" ToRole="AppUser" />
+        </EntityType>
+        <Association Name="FK_AppUserToken_AudienceID">
+          <End Type="IdentityModel.AppAudience" Role="AppAudience" Multiplicity="1" />
+          <End Type="IdentityModel.AppUserToken" Role="AppUserToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppAudience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserToken">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AppUserToken_ClientID">
+          <End Type="IdentityModel.AppClient" Role="AppClient" Multiplicity="1" />
+          <End Type="IdentityModel.AppUserToken" Role="AppUserToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppClient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserToken">
+              <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -744,8 +776,9 @@
                 <ScalarProperty Name="ExpiresUtc" ColumnName="ExpiresUtc" />
                 <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
                 <ScalarProperty Name="ProtectedTicket" ColumnName="ProtectedTicket" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

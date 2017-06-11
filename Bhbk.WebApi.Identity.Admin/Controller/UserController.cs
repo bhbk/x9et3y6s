@@ -11,6 +11,7 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Admin.Controller
 {
     [RoutePrefix("user")]
+    [Authorize(Roles = "(Built-In) Administrators")]
     public class UserController : BaseController
     {
         public UserController() { }
@@ -19,7 +20,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateUser(UserModel.Binding.Create model)
         {
             if (!ModelState.IsValid)
@@ -52,39 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
         }
 
-        [Route("v1/{userID}/delete-token/{audienceID}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> DeleteToken(Guid userID, Guid audienceID)
-        {
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
-
-            if (foundUser == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
-
-            var foundAudience = UoW.AudienceRepository.Get(x => x.Id == audienceID).SingleOrDefault();
-
-            if (foundAudience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
-
-            var foundToken = foundUser.Tokens.Where(x => x.AudienceId == audienceID).SingleOrDefault();
-
-            if (foundToken == null)
-                return BadRequest(BaseLib.Statics.MsgUserTokenInvalid);
-
-            else
-            {
-                IdentityResult result = await UoW.CustomUserManager.RemoveRefreshTokenAsync(foundToken.Id.ToString());
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok();
-            }
-        }
-
         [Route("v1/{userID}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteUser(Guid userID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -108,6 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetUser(Guid userID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -120,6 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{username}"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetUserByName(string username)
         {
             var foundUser = await UoW.CustomUserManager.FindByNameAsync(username);
@@ -132,6 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/providers"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetUserProviders(Guid userID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -152,6 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/roles"), HttpGet]
+        [Authorize]
         public async Task<IHttpActionResult> GetUserRoles(Guid userID)
         {
             var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
@@ -167,13 +139,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpGet]
+        [Authorize]
         public IHttpActionResult GetUsers()
         {
             return Ok(UoW.CustomUserManager.Users.ToList().Select(u => ModelFactory.Create(u)));
         }
 
         [Route("v1/{userID}/set-password"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> SetPassword(Guid userID, UserModel.Binding.SetPassword model)
         {
             if (!ModelState.IsValid)
@@ -200,7 +172,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateUser(Guid userID, UserModel.Binding.Update model)
         {
             if (!ModelState.IsValid)

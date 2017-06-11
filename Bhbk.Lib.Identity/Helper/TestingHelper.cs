@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Helper
                 + "&scope=" + "all"
                 + "&response_type=" + "code");
 
-            return owin.HttpClient.GetAsync("/oauth/v1/authorize" + content).Result;
+            return await owin.HttpClient.GetAsync("/oauth/v1/authorize" + content);
         }
 
         public async Task<HttpResponseMessage> GetAuthorizationCode(TestServer owin, string code, string redirectUri)
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Helper
                     new KeyValuePair<string, string>("redirect_uri", redirectUri),
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 });
-            return owin.HttpClient.PostAsync("/oauth/v1/token", content).Result;
+            return await owin.HttpClient.PostAsync("/oauth/v1/token", content);
         }
 
         public async Task<HttpResponseMessage> GetAccessToken(TestServer owin, string clientID, string audienceID, string user, string password)
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Helper
                     new KeyValuePair<string, string>("password", password),
                     new KeyValuePair<string, string>("grant_type", "password")
                 });
-            return owin.HttpClient.PostAsync("/oauth/v1/token", content).Result;
+            return await owin.HttpClient.PostAsync("/oauth/v1/token", content);
         }
 
         public async Task<HttpResponseMessage> GetClientCredentials(TestServer owin, string clientID, string secret)
@@ -60,7 +60,7 @@ namespace Bhbk.Lib.Identity.Helper
                     new KeyValuePair<string, string>("client_secret", secret),
                     new KeyValuePair<string, string>("grant_type", "client_credentials")
                 });
-            return owin.HttpClient.PostAsync("/oauth/v1/token", content).Result;
+            return await owin.HttpClient.PostAsync("/oauth/v1/token", content);
         }
 
         public async Task<HttpResponseMessage> GetRefreshToken(TestServer owin, string clientID, string audienceID, string token)
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Helper
                     new KeyValuePair<string, string>("refresh_token", token),
                     new KeyValuePair<string, string>("grant_type", "refresh_token")
                 });
-            return owin.HttpClient.PostAsync("/oauth/v1/token", content).Result;
+            return await owin.HttpClient.PostAsync("/oauth/v1/token", content);
         }
     }
 }

@@ -97,11 +97,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         }
 
         [TestMethod]
-        public async Task Api_Admin_Audience_GetKey_Success()
+        public void Api_Admin_Audience_GetKey_Success()
         {
             var controller = new AudienceController(UoW);
             var audience = UoW.AudienceRepository.Get().First();
-            var result = await controller.GetAudienceKey(audience.Name) as OkNegotiatedContentResult<string>;
+            var result = controller.GetAudienceKey(audience.Name) as OkNegotiatedContentResult<string>;
 
             result.Should().NotBeNull();
             result.Content.Should().BeAssignableTo(typeof(string));
