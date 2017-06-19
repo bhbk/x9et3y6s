@@ -19,8 +19,9 @@ namespace Bhbk.Lib.Identity.Model
         {
             this.Claims = new HashSet<AppUserClaim>();
             this.Providers = new HashSet<AppUserProvider>();
+            this.Tokens = new HashSet<AppUserRefreshToken>();
             this.Roles = new HashSet<AppUserRole>();
-            this.Tokens = new HashSet<AppUserToken>();
+            this.Nonces = new HashSet<AppUserNonceToken>();
         }
     
         public System.Guid Id { get; set; }
@@ -40,6 +41,7 @@ namespace Bhbk.Lib.Identity.Model
         public int AccessFailedCount { get; set; }
         public int AccessSuccessCount { get; set; }
         public string PasswordHash { get; set; }
+        public bool PasswordConfirmed { get; set; }
         public string SecurityStamp { get; set; }
         public bool TwoFactorEnabled { get; set; }
         public bool Immutable { get; set; }
@@ -49,8 +51,10 @@ namespace Bhbk.Lib.Identity.Model
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserProvider> Providers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AppUserRefreshToken> Tokens { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserRole> Roles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserToken> Tokens { get; set; }
+        public virtual ICollection<AppUserNonceToken> Nonces { get; set; }
     }
 }

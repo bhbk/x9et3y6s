@@ -1,7 +1,6 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using System.Reflection;
 using System.Web.Http;
-using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Sts.Controller
 {

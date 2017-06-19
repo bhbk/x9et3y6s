@@ -1,8 +1,9 @@
-﻿using Bhbk.Lib.Identity.Model;
+﻿using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Model;
 using Bhbk.Lib.Identity.Store;
 using Microsoft.AspNet.Identity;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Manager
@@ -10,68 +11,68 @@ namespace Bhbk.Lib.Identity.Manager
     //https://docs.microsoft.com/en-us/aspnet/identity/overview/extensibility/overview-of-custom-storage-providers-for-aspnet-identity
     public class CustomRoleManager : RoleManager<AppRole, Guid>
     {
-        private CustomRoleStore _store;
+        public CustomRoleStore LocalStore;
 
         public CustomRoleManager(CustomRoleStore store)
             : base(store)
         {
-            _store = store;
+            LocalStore = store;
         }
 
-        public override Task<IdentityResult> CreateAsync(AppRole role)
+        public Task<IdentityResult> CreateAsync(RoleModel.Model role)
         {
-            if (!_store.IsRoleValid(role))
+            if (!LocalStore.Exists(role.Id))
             {
-                _store.CreateAsync(role);
+                LocalStore.CreateAsync(role);
                 return Task.FromResult(IdentityResult.Success);
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public override Task<IdentityResult> DeleteAsync(AppRole role)
+        public Task<IdentityResult> DeleteAsync(Guid roleId)
         {
-            if (_store.IsRoleValid(role))
+            if (LocalStore.Exists(roleId))
             {
-                _store.DeleteAsync(role);
+                LocalStore.DeleteAsync(roleId);
                 return Task.FromResult(IdentityResult.Success);
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public override Task<IdentityResult> UpdateAsync(AppRole role)
+        public Task<RoleModel.Model> FindByIdAsync(Guid roleId)
         {
-            if (_store.IsRoleValid(role))
-            {
-                _store.UpdateAsync(role);
-                return Task.FromResult(IdentityResult.Success);
-            }
+            return LocalStore.FindByIdAsync(roleId);
+        }
+
+        public Task<RoleModel.Model> FindByNameAsync(string roleName)
+        {
+            return LocalStore.FindByNameAsync(roleName);
+        }
+
+        public Task<IList<RoleModel.Model>> GetListAsync()
+        {
+            return LocalStore.GetAllAsync();
+        }
+
+        public Task<IList<UserModel.Model>> GetUsersAsync(Guid roleId)
+        {
+            if (LocalStore.Exists(roleId))
+                return LocalStore.GetUsersAsync(roleId);
             else
                 throw new ArgumentNullException();
         }
 
-        public override Task<AppRole> FindByIdAsync(Guid roleId)
+        public Task<IdentityResult> UpdateAsync(RoleModel.Update role)
         {
-            return Task.FromResult(_store.Roles.Where(x => x.Id == roleId).SingleOrDefault());
-        }
-
-        public override Task<AppRole> FindByNameAsync(string roleName)
-        {
-            return Task.FromResult(_store.Roles.Where(x => x.Name == roleName).SingleOrDefault());
-        }
-
-        public override IQueryable<AppRole> Roles
-        {
-            get
+            if (LocalStore.Exists(role.Id))
             {
-                return _store.Roles.AsQueryable();
+                LocalStore.UpdateAsync(role);
+                return Task.FromResult(IdentityResult.Success);
             }
-        }
-
-        public override Task<bool> RoleExistsAsync(string roleName)
-        {
-            return Task.FromResult(_store.Roles.Any(x => x.Name == roleName));
+            else
+                throw new ArgumentNullException();
         }
     }
 }

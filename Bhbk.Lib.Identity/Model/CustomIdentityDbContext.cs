@@ -1,10 +1,9 @@
-using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Data.Common;
 using System.Data.Entity;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Model
 {
     //https://www.codeproject.com/Articles/798001/ASP-NET-Identity-Extending-Identity-Models-and-Usi
     public partial class CustomIdentityDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserProvider, AppUserRole, AppUserClaim>
@@ -30,7 +29,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         public virtual DbSet<AppUser> AppUser { get; set; }
         public virtual DbSet<AppUserClaim> AppUserClaim { get; set; }
         public virtual DbSet<AppUserProvider> AppUserProvider { get; set; }
+        public virtual DbSet<AppUserRefreshToken> AppUserRefreshToken { get; set; }
         public virtual DbSet<AppUserRole> AppUserRole { get; set; }
-        public virtual DbSet<AppUserToken> AppUserToken { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interface;
 using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -91,9 +91,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
             if (client == null)
             {
@@ -103,9 +103,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
             else
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
             {
@@ -152,9 +152,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
             if (client == null)
             {
@@ -164,9 +164,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
             else
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
             {
@@ -181,7 +181,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 return;
             }
 
-            var user = await _uow.CustomUserManager.FindByEmailAsync(context.UserName);
+            var user = await _uow.UserMgmt.FindByNameAsyncDeprecated(context.UserName);
 
             //check that user exists...
             if (user == null)
@@ -198,21 +198,21 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             }
 
             //check that user is not locked...
-            else if (await _uow.CustomUserManager.IsLockedOutAsync(user.Id))
+            else if (await _uow.UserMgmt.IsLockedOutAsync(user.Id))
             {
                 context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserLocked + " '{0}'", context.UserName));
                 return;
             }
 
-            var providers = await _uow.CustomUserManager.GetProvidersAsync(user.Id);
+            var providers = await _uow.UserMgmt.GetProvidersAsync(user.Id);
 
             //check that user has a provider to auth against...
-            if (providers.Contains(BaseLib.Statics.ApiDefaultProvider) || providers.Where(x => x.StartsWith(BaseLib.Statics.ApiUnitTestsProvider)).Any())
+            if (providers.Contains(BaseLib.Statics.ApiDefaultProvider) || providers.Where(x => x.StartsWith(BaseLib.Statics.ApiUnitTestProvider)).Any())
             {
                 //check that password is valid...
-                if (!await _uow.CustomUserManager.CheckPasswordAsync(user, context.Password))
+                if (!await _uow.UserMgmt.CheckPasswordAsync(user, context.Password))
                 {
-                    await _uow.CustomUserManager.AccessFailedAsync(user.Id);
+                    await _uow.UserMgmt.AccessFailedAsync(user.Id);
 
                     context.SetError("invalid_user_id", string.Format(BaseLib.Statics.MsgUserInvalid + " '{0}'", context.UserName));
                     return;
@@ -231,13 +231,16 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                     { BaseLib.Statics.AttrUserID, user.Id.ToString().ToLower() }
                 });
 
-            ClaimsIdentity claims = await _uow.CustomUserManager.CreateIdentityAsync(user, "JWT");
+            ClaimsIdentity claims = await _uow.UserMgmt.CreateIdentityAsync(user, "JWT");
+
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.AddClaim(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
             claims.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
 
             AuthenticationTicket ticket = new AuthenticationTicket(claims, attrs);
 
-            await _uow.CustomUserManager.ResetAccessFailedCountAsync(user.Id);
+            await _uow.UserMgmt.ResetAccessFailedCountAsync(user.Id);
 
             context.Validated(ticket);
         }
@@ -281,9 +284,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(context.ClientId, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id.ToString() == context.ClientId && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id.ToString() == context.ClientId && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == context.ClientId && x.Enabled).SingleOrDefault();
 
             if (client == null)
             {

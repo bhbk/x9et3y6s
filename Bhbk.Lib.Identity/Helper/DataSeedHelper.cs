@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -10,11 +9,11 @@ namespace Bhbk.Lib.Identity.Helper
     public class DataSeedHelper
     {
         private UnitOfWork _uow;
-        private AppClient _client;
-        private AppAudience _audience;
-        private AppProvider _provider;
-        private AppRole _role;
-        private AppUser _user;
+        private ClientModel.Model _client;
+        private AudienceModel.Model _audience;
+        private ProviderModel.Model _provider;
+        private RoleModel.Model _role;
+        private UserModel.Model _user;
 
         public DataSeedHelper(UnitOfWork uow)
         {
@@ -26,287 +25,245 @@ namespace Bhbk.Lib.Identity.Helper
 
         public async void CreateDefaultData()
         {
-            var foundProvider = _uow.ProviderRepository.Get(x => x.Name == Statics.ApiDefaultProvider).SingleOrDefault();
+            var foundProvider = _uow.ProviderMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultProvider).SingleOrDefault();
 
             if (foundProvider == null)
             {
-                _provider = new AppProvider()
+                _provider = _uow.Models.Create.DoIt(new ProviderModel.Create()
                 {
-                    Id = Guid.NewGuid(),
                     Name = Statics.ApiDefaultProvider,
-                    Created = DateTime.Now,
                     Enabled = true,
                     Immutable = false
-                };
+                });
 
-                await _uow.CustomProviderManager.CreateAsync(_provider);
-                foundProvider = _uow.ProviderRepository.Get(x => x.Name == _provider.Name).Single();
+                await _uow.ProviderMgmt.CreateAsync(_provider);
+                foundProvider = _uow.ProviderMgmt.LocalStore.Get(x => x.Id == _provider.Id).Single();
             }
 
-            var foundClient = _uow.ClientRepository.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
+            var foundClient = _uow.ClientMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
 
             if (foundClient == null)
             {
-                _client = new AppClient()
+                _client = _uow.Models.Create.DoIt(new ClientModel.Create()
                 {
-                    Id = Guid.NewGuid(),
                     Name = Statics.ApiDefaultClient,
-                    Created = DateTime.Now,
                     Enabled = true,
                     Immutable = false
-                };
+                });
 
-                _uow.ClientRepository.Create(_client);
-                await _uow.ClientRepository.SaveAsync();
-                foundClient = _uow.ClientRepository.Get(x => x.Name == Statics.ApiDefaultClient).Single();
+                await _uow.ClientMgmt.CreateAsync(_client);
+                foundClient = _uow.ClientMgmt.LocalStore.Get(x => x.Id == _client.Id).Single();
             }
 
-            var foundAudience = _uow.AudienceRepository.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
+            var foundAudience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
 
             if (foundAudience == null)
             {
-                _audience = new AppAudience()
+                _audience = _uow.Models.Create.DoIt(new AudienceModel.Create()
                 {
-                    Id = Guid.NewGuid(),
                     ClientId = foundClient.Id,
                     Name = Statics.ApiDefaultAudience,
-                    AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                     AudienceType = AudienceType.ThinClient.ToString(),
-                    Created = DateTime.Now,
+                    AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                     Enabled = true,
                     Immutable = false
-                };
+                });
 
-                _uow.AudienceRepository.Create(_audience);
-                await _uow.AudienceRepository.SaveAsync();
-                foundAudience = _uow.AudienceRepository.Get(x => x.Name == _audience.Name).Single();
+                await _uow.AudienceMgmt.CreateAsync(_audience);
+                foundAudience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == _audience.Id).Single();
             }
 
-            var foundUser = _uow.UserRepository.Get(x => x.UserName == Statics.ApiDefaultAdmin).SingleOrDefault();
+            var foundUser = _uow.UserMgmt.LocalStore.Get(x => x.UserName == Statics.ApiDefaultAdmin).SingleOrDefault();
 
             if (foundUser == null)
             {
-                _user = new AppUser()
+                _user = _uow.Models.Create.DoIt(new UserModel.Create()
                 {
-                    Id = Guid.NewGuid(),
-                    UserName = Statics.ApiDefaultAdmin,
                     Email = Statics.ApiDefaultAdmin,
-                    EmailConfirmed = true,
-                    FirstName = "Uber",
-                    LastName = "User",
-                    PhoneNumber = "+0123456789",
-                    PhoneNumberConfirmed = true,
-                    Created = DateTime.Now,
+                    PhoneNumber = Statics.ApiDefaultPhone,
+                    FirstName = "FirstName",
+                    LastName = "LastName",
                     LockoutEnabled = false,
-                    AccessFailedCount = 0,
-                    AccessSuccessCount = 0,
-                    TwoFactorEnabled = false,
                     Immutable = false
-                };
+                });
 
-                await _uow.CustomUserManager.CreateAsync(_user, BaseLib.Statics.ApiUnitTestsPassword);
-                foundUser = _uow.UserRepository.Get(x => x.UserName == _user.UserName).Single();
+                await _uow.UserMgmt.CreateAsync(_user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+                foundUser = _uow.UserMgmt.LocalStore.Get(x => x.Id == _user.Id).Single();
+
+                await _uow.UserMgmt.SetEmailConfirmedAsync(foundUser.Id, true);
+                await _uow.UserMgmt.SetPasswordConfirmedAsync(foundUser.Id, true);
+                await _uow.UserMgmt.SetPhoneNumberConfirmedAsync(foundUser.Id, true);
             }
 
-            var foundRoleForAdmin = _uow.RoleRepository.Get(x => x.Name == Statics.ApiDefaultRoleForAdmin).SingleOrDefault();
+            var foundRoleForAdmin = _uow.RoleMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultRoleForAdmin).SingleOrDefault();
 
             if (foundRoleForAdmin == null)
             {
-                _role = new AppRole()
+                _role = _uow.Models.Create.DoIt(new RoleModel.Create()
                 {
-                    Id = Guid.NewGuid(),
+                    AudienceId = foundAudience.Id,
                     Name = Statics.ApiDefaultRoleForAdmin,
-                    Created = DateTime.Now,
                     Enabled = true,
-                    Immutable = true,
-                    AudienceId = foundAudience.Id
-                };
+                    Immutable = true
+                });
 
-                await _uow.CustomRoleManager.CreateAsync(_role);
-                foundRoleForAdmin = _uow.RoleRepository.Get(x => x.Name == _role.Name).Single();
+                await _uow.RoleMgmt.CreateAsync(_role);
+                foundRoleForAdmin = _uow.RoleMgmt.LocalStore.Get(x => x.Id == _role.Id).SingleOrDefault();
             }
 
-            var foundRoleForViewer = _uow.RoleRepository.Get(x => x.Name == Statics.ApiDefaultRoleForViewer).SingleOrDefault();
+            var foundRoleForViewer = _uow.RoleMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultRoleForViewer).SingleOrDefault();
 
             if (foundRoleForViewer == null)
             {
-                _role = new AppRole()
+                _role = _uow.Models.Create.DoIt(new RoleModel.Create()
                 {
-                    Id = Guid.NewGuid(),
+                    AudienceId = foundAudience.Id,
                     Name = Statics.ApiDefaultRoleForViewer,
-                    Created = DateTime.Now,
                     Enabled = false,
-                    Immutable = true,
-                    AudienceId = foundAudience.Id
-                };
+                    Immutable = true
+                });
 
-                await _uow.CustomRoleManager.CreateAsync(_role);
-                foundRoleForViewer = _uow.RoleRepository.Get(x => x.Name == _role.Name).Single();
+                await _uow.RoleMgmt.CreateAsync(_role);
+                foundRoleForViewer = _uow.RoleMgmt.LocalStore.Get(x => x.Id == _role.Id).SingleOrDefault();
             }
 
-            if (!_uow.CustomUserManager.IsInProviderAsync(foundUser.Id, foundProvider.Name).Result)
-                await _uow.CustomUserManager.AddToProviderAsync(foundUser.Id, foundProvider.Name);
+            if (!_uow.UserMgmt.IsInProviderAsync(foundUser.Id, foundProvider.Name).Result)
+                await _uow.UserMgmt.AddToProviderAsync(foundUser.Id, foundProvider.Name);
 
-            if (!_uow.CustomUserManager.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Name).Result)
-                await _uow.CustomUserManager.AddToRoleAsync(foundUser.Id, foundRoleForAdmin.Name);
+            if (!_uow.UserMgmt.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Name).Result)
+                await _uow.UserMgmt.AddToRoleAsync(foundUser.Id, foundRoleForAdmin.Name);
 
-            if (!_uow.CustomUserManager.IsInRoleAsync(foundUser.Id, foundRoleForViewer.Name).Result)
-                await _uow.CustomUserManager.AddToRoleAsync(foundUser.Id, foundRoleForViewer.Name);
+            if (!_uow.UserMgmt.IsInRoleAsync(foundUser.Id, foundRoleForViewer.Name).Result)
+                await _uow.UserMgmt.AddToRoleAsync(foundUser.Id, foundRoleForViewer.Name);
         }
 
         public async void CreateTestData()
         {
             for (int i = 0; i < 1; i++)
-                _uow.ProviderRepository.Create(new AppProvider
+                await _uow.ProviderMgmt.CreateAsync(_uow.Models.Create.DoIt(new ProviderModel.Create()
                 {
-                    Id = Guid.NewGuid(),
-                    Name = BaseLib.Statics.ApiUnitTestsProvider + EntrophyHelper.GenerateRandomBase64(4),
-                    Created = DateTime.Now,
+                    Name = BaseLib.Statics.ApiUnitTestProvider + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
                     Immutable = false
-                });
+                }));
 
-            _uow.ProviderRepository.Save();
-
-            Guid providerID = _uow.ProviderRepository.Get().First().Id;
+            Guid providerID = _uow.ProviderMgmt.LocalStore.Get().First().Id;
 
             for (int i = 0; i < 1; i++)
-                _uow.ClientRepository.Create(new AppClient
+                await _uow.ClientMgmt.CreateAsync(_uow.Models.Create.DoIt(new ClientModel.Create
                 {
-                    Id = Guid.NewGuid(),
-                    Name = BaseLib.Statics.ApiUnitTestsClient + EntrophyHelper.GenerateRandomBase64(4),
-                    Created = DateTime.Now,
+                    Name = BaseLib.Statics.ApiUnitTestClient + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
                     Immutable = false
-                });
+                }));
 
-            _uow.ClientRepository.Save();
-
-            Guid clientID = _uow.ClientRepository.Get().First().Id;
+            Guid clientID = _uow.ClientMgmt.LocalStore.Get().First().Id;
 
             for (int i = 0; i < 1; i++)
-                _uow.AudienceRepository.Create(new AppAudience
+                await _uow.AudienceMgmt.CreateAsync(_uow.Models.Create.DoIt(new AudienceModel.Create
                 {
-                    Id = Guid.NewGuid(),
                     ClientId = clientID,
-                    Name = BaseLib.Statics.ApiUnitTestsAudience + EntrophyHelper.GenerateRandomBase64(4),
-                    AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
+                    Name = BaseLib.Statics.ApiUnitTestAudience + EntrophyHelper.GenerateRandomBase64(4),
                     AudienceType = AudienceType.ThinClient.ToString(),
-                    Created = DateTime.Now,
+                    AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                     Enabled = true,
                     Immutable = false
-                });
+                }));
 
-            _uow.AudienceRepository.Save();
-
-            Guid audienceID = _uow.AudienceRepository.Get().First().Id;
+            Guid audienceID = _uow.AudienceMgmt.LocalStore.Get().First().Id;
 
             for (int i = 0; i < 3; i++)
-                await _uow.CustomRoleManager.CreateAsync(new AppRole
+                await _uow.RoleMgmt.CreateAsync(_uow.Models.Create.DoIt(new RoleModel.Create
                 {
-                    Id = Guid.NewGuid(),
-                    Name = BaseLib.Statics.ApiUnitTestsRole + EntrophyHelper.GenerateRandomBase64(4),
+                    AudienceId = audienceID,
+                    Name = BaseLib.Statics.ApiUnitTestRole + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
-                    Immutable = false,
-                    AudienceId = audienceID
-                });
+                    Immutable = false
+                }));
 
             for (int i = 0; i < 3; i++)
             {
                 string email = "unit-test@" + EntrophyHelper.GenerateRandomBase64(4) + ".net";
 
-                await _uow.CustomUserManager.CreateAsync(new AppUser
+                await _uow.UserMgmt.CreateAsync(_uow.Models.Create.DoIt(new UserModel.Create
                 {
-                    Id = Guid.NewGuid(),
                     Email = email,
-                    EmailConfirmed = true,
+                    PhoneNumber = Statics.ApiDefaultPhone,
                     FirstName = "FirstName",
                     LastName = "LastName",
                     LockoutEnabled = false,
-                    LockoutEndDateUtc = DateTime.Now.AddDays(30),
-                    TwoFactorEnabled = false,
                     Immutable = false
-                }, BaseLib.Statics.ApiUnitTestsPassword);
+                }), BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
+                var user = _uow.UserMgmt.LocalStore.Get(x => x.Email == email).Single();
+
+                await _uow.UserMgmt.SetEmailConfirmedAsync(user.Id, true);
+                await _uow.UserMgmt.SetPasswordConfirmedAsync(user.Id, true);
+                await _uow.UserMgmt.SetPhoneNumberConfirmedAsync(user.Id, true);
             }
 
-            foreach (var user in _uow.UserRepository.Get().ToList())
+            foreach (var user in _uow.UserMgmt.LocalStore.Get().ToList())
             {
-                await _uow.CustomUserManager.AddToProviderAsync(user.Id, _uow.ProviderRepository.Get().First().Name);
+                await _uow.UserMgmt.AddToProviderAsync(user.Id, _uow.ProviderMgmt.LocalStore.Get().First().Name);
 
-                await _uow.CustomUserManager.AddClaimAsync(user.Id,
-                    new Claim(BaseLib.Statics.ApiUnitTestsClaimType,
-                        BaseLib.Statics.ApiUnitTestsClaimValue + EntrophyHelper.GenerateRandomBase64(4)));
+                await _uow.UserMgmt.AddClaimAsync(user.Id,
+                    new Claim(BaseLib.Statics.ApiUnitTestClaimType,
+                        BaseLib.Statics.ApiUnitTestClaimValue + EntrophyHelper.GenerateRandomBase64(4)));
 
-                foreach (var role in _uow.RoleRepository.Get().ToList())
-                    await _uow.CustomUserManager.AddToRoleAsync(user.Id, role.Name);
+                foreach (var role in _uow.RoleMgmt.LocalStore.Get().ToList())
+                    await _uow.UserMgmt.AddToRoleAsync(user.Id, role.Name);
             }
         }
 
         public async void DestroyDefaultData()
         {
-            foreach (var user in _uow.UserRepository.Get())
-                await _uow.CustomUserManager.DeleteAsync(user);
+            foreach (var user in _uow.UserMgmt.LocalStore.Get())
+                await _uow.UserMgmt.DeleteAsync(user);
 
-            foreach (var role in _uow.RoleRepository.Get())
-                await _uow.CustomRoleManager.DeleteAsync(role);
+            foreach (var role in _uow.RoleMgmt.LocalStore.Get())
+                await _uow.RoleMgmt.DeleteAsync(role);
 
-            foreach (var audience in _uow.AudienceRepository.Get())
-                _uow.AudienceRepository.Delete(audience);
+            foreach (var audience in _uow.AudienceMgmt.LocalStore.Get())
+                await _uow.AudienceMgmt.DeleteAsync(audience.Id);
 
-            await _uow.AudienceRepository.SaveAsync();
+            foreach (var provider in _uow.ProviderMgmt.LocalStore.Get())
+                await _uow.ProviderMgmt.DeleteAsync(provider.Id);
 
-            foreach (var provider in _uow.ProviderRepository.Get())
-                _uow.ProviderRepository.Delete(provider);
-
-            await _uow.ProviderRepository.SaveAsync();
-
-            foreach (var client in _uow.ClientRepository.Get())
-                _uow.ClientRepository.Delete(client);
-
-            await _uow.ClientRepository.SaveAsync();
+            foreach (var client in _uow.ClientMgmt.LocalStore.Get())
+                await _uow.ClientMgmt.DeleteAsync(client.Id);
         }
 
         public async void DestroyAllData()
         {
-            var user = await _uow.CustomUserManager.FindByNameAsync(Statics.ApiDefaultAdmin);
+            var user = await _uow.UserMgmt.FindByNameAsyncDeprecated(Statics.ApiDefaultAdmin);
 
             if (user != null)
             {
-                var userRoles = await _uow.CustomUserManager.GetRolesAsync(user.Id);
+                var userRoles = await _uow.UserMgmt.GetRolesAsync(user.Id);
 
-                await _uow.CustomUserManager.RemoveFromRolesAsync(user.Id, userRoles.ToArray());
-                await _uow.CustomUserManager.DeleteAsync(user);
+                await _uow.UserMgmt.RemoveFromRolesAsync(user.Id, userRoles.ToArray());
+                await _uow.UserMgmt.DeleteAsync(user);
             }
 
-            var role = await _uow.CustomRoleManager.FindByNameAsync(Statics.ApiDefaultRoleForAdmin);
+            var role = await _uow.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForAdmin);
 
             if (role != null)
-                await _uow.CustomRoleManager.DeleteAsync(role);
+                await _uow.RoleMgmt.DeleteAsync(role.Id);
 
-            var audience = _uow.AudienceRepository.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
+            var audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
 
             if (audience != null)
-            {
-                _uow.AudienceRepository.Delete(audience);
-                await _uow.AudienceRepository.SaveAsync();
-            }
+                await _uow.AudienceMgmt.DeleteAsync(audience.Id);
 
-            var provider = _uow.ProviderRepository.Get(x => x.Name == Statics.ApiDefaultProvider).SingleOrDefault();
+            var provider = _uow.ProviderMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultProvider).SingleOrDefault();
 
             if (provider != null)
-            {
-                _uow.ProviderRepository.Delete(provider);
-                await _uow.ProviderRepository.SaveAsync();
-            }
+                await _uow.ProviderMgmt.DeleteAsync(provider.Id);
 
-            var client = _uow.ClientRepository.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
+            var client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
 
             if (client != null)
-            {
-                _uow.ClientRepository.Delete(client);
-                await _uow.ClientRepository.SaveAsync();
-            }
+                await _uow.ClientMgmt.DeleteAsync(client.Id);
         }
     }
 }

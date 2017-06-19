@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Interface;
+using Microsoft.AspNet.Identity;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BaseLib = Bhbk.Lib.Identity;
@@ -18,28 +18,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        public async Task<IHttpActionResult> CreateClient(ClientModel.Binding.Create model)
+        public async Task<IHttpActionResult> CreateClient(ClientModel.Create model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundClient = UoW.ClientRepository.Get(x => x.Name == model.Name).SingleOrDefault();
+            var client = await UoW.ClientMgmt.FindByNameAsync(model.Name);
 
-            if (foundClient == null)
+            if (client == null)
             {
-                var client = new AppClient()
-                {
-                    Id = Guid.NewGuid(),
-                    Description = model.Description,
-                    Name = model.Name,
-                    Enabled = model.Enabled,
-                    Immutable = false
-                };
+                var create = UoW.Models.Create.DoIt(model);
+                var result = await UoW.ClientMgmt.CreateAsync(create);
 
-                UoW.ClientRepository.Create(client);
-                await UoW.SaveAsync();
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
 
-                return Ok(ModelFactory.Create(client));
+                else
+                    return Ok(create);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);
@@ -48,58 +43,61 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Route("v1/{clientID}"), HttpDelete]
         public async Task<IHttpActionResult> DeleteClient(Guid clientID)
         {
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
+            var client = await UoW.ClientMgmt.FindByIdAsync(clientID);
 
-            if (foundClient == null)
+            if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientNotExist);
 
-            else if (foundClient.Immutable)
+            else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);
 
             else
             {
-                UoW.ClientRepository.Delete(foundClient);
-                await UoW.SaveAsync();
+                var result = await UoW.ClientMgmt.DeleteAsync(clientID);
 
-                return Ok();
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok();
             }
-        }
-
-        [Route("v1/{clientID}/audiences"), HttpGet]
-        [Authorize]
-        public async Task<IHttpActionResult> GetAudiencesInClient(Guid clientID)
-        {
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
-
-            if (foundClient == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
-
-            else
-                return Ok(UoW.AudienceRepository.Get(x => x.ClientId == foundClient.Id).Select(x => ModelFactory.Create(x)));
         }
 
         [Route("v1/{clientID}"), HttpGet]
         [Authorize]
         public async Task<IHttpActionResult> GetClient(Guid clientID)
         {
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
+            var client = await UoW.ClientMgmt.FindByIdAsync(clientID);
 
-            if (foundClient == null)
+            if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientNotExist);
 
             else
-                return Ok(ModelFactory.Create(foundClient));
+                return Ok(client);
         }
 
         [Route("v1"), HttpGet]
         [Authorize]
-        public IHttpActionResult GetClients()
+        public async Task<IHttpActionResult> GetClientList()
         {
-            return Ok(UoW.ClientRepository.Get().Select(x => ModelFactory.Create(x)));
+            return Ok(await UoW.ClientMgmt.GetListAsync());
+        }
+
+        [Route("v1/{clientID}/audiences"), HttpGet]
+        [Authorize]
+        public async Task<IHttpActionResult> GetClientAudiences(Guid clientID)
+        {
+            var client = await UoW.ClientMgmt.FindByIdAsync(clientID);
+
+            if (client == null)
+                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+
+            else
+                return Ok(await UoW.ClientMgmt.GetAudiencesAsync(clientID));
         }
 
         [Route("v1/{clientID}"), HttpPut]
-        public async Task<IHttpActionResult> UpdateClient(Guid clientID, ClientModel.Binding.Update model)
+        public async Task<IHttpActionResult> UpdateClient(Guid clientID, ClientModel.Update model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -107,25 +105,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (clientID != model.Id)
                 return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
-            var foundClient = await UoW.ClientRepository.FindAsync(clientID);
+            var client = await UoW.ClientMgmt.FindByIdAsync(clientID);
 
-            if (foundClient == null)
+            if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientNotExist);
 
-            else if (foundClient.Immutable)
+            else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);
 
             else
             {
-                foundClient.Name = model.Name;
-                foundClient.Description = model.Description;
-                foundClient.Enabled = model.Enabled;
-                foundClient.Immutable = false;
+                client.Name = model.Name;
+                client.Description = model.Description;
+                client.Enabled = model.Enabled;
+                client.Immutable = false;
 
-                UoW.ClientRepository.Update(foundClient);
-                await UoW.SaveAsync();
+                IdentityResult result = await UoW.ClientMgmt.UpdateAsync(model);
 
-                return Ok(ModelFactory.Create(foundClient));
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok(client);
             }
         }
     }

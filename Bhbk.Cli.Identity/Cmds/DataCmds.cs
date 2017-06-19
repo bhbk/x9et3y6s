@@ -1,6 +1,7 @@
 ﻿using Bhbk.Cli.Identity.Helper;
 using Bhbk.Lib.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Model;
 using ManyConsole;
 using System;
 

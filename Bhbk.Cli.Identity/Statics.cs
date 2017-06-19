@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using System;
+using Bhbk.Lib.Identity.Model;
 
 namespace Bhbk.Cli.Identity
 {

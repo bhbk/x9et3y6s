@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,30 +20,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1/{userID}"), HttpPut]
-        public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimModel.Binding.Create model)
+        public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimModel.Create model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsyncDeprecated(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                var newClaim = new AppUserClaim()
-                {
-                    UserId = foundUser.Id,
-                    ClaimType = model.ClaimType,
-                    ClaimValue = model.ClaimValue,
-                    ClaimValueType = model.ClaimValueType,
-                    Issuer = model.Issuer,
-                    OriginalIssuer = model.OriginalIssuer
-                };
-                await UoW.CustomUserManager.AddClaimAsync(foundUser.Id, new Claim(model.ClaimType, model.ClaimValue));
+                var claim = UoW.Models.Create.DoIt(model);
+                await UoW.UserMgmt.AddClaimAsync(user.Id, new Claim(claim.ClaimType, claim.ClaimValue));
 
-                return Ok(ModelFactory.Create(newClaim));
+                return Ok(claim);
             }
         }
 
@@ -53,17 +45,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsyncDeprecated(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                var foundClaim = foundUser.Claims.Where(x => x.Id == claimID).Single();
+                var claim = user.Claims.Where(x => x.Id == claimID).Single();
 
-                await UoW.CustomUserManager.RemoveClaimAsync(foundUser.Id,
-                    new Claim(foundClaim.ClaimType, foundClaim.ClaimValue));
+                await UoW.UserMgmt.RemoveClaimAsync(user.Id,
+                    new Claim(claim.ClaimType, claim.ClaimValue));
 
                 return Ok();
             }
@@ -89,33 +81,34 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Authorize]
         public async Task<IHttpActionResult> GetClaims(Guid userID)
         {
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsyncDeprecated(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                var rslt = new List<AppUserClaim>();
-                var claims = await UoW.CustomUserManager.GetClaimsAsync(userID);
+                IList<UserClaimModel.Model> rslt = new List<UserClaimModel.Model>();
+                var claims = await UoW.UserMgmt.GetClaimsAsync(userID);
 
                 foreach (var claim in claims)
                 {
-                    var model = new AppUserClaim()
+                    var model = new UserClaimModel.Model()
                     {
-                        UserId = foundUser.Id,
+                        UserId = user.Id,
                         ClaimType = claim.Type,
                         ClaimValue = claim.Value,
                         ClaimValueType = claim.ValueType,
                         Issuer = claim.Issuer,
                         OriginalIssuer = claim.OriginalIssuer,
+                        Created = DateTime.Now,
                         Immutable = false
                     };
 
                     rslt.Add(model);
                 }
 
-                return Ok(rslt.ToList().Select(x => ModelFactory.Create(x)));
+                return Ok(rslt);
             }
         }
 
@@ -125,20 +118,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsyncDeprecated(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                var result = await UoW.CustomUserManager.CreateIdentityAsync(foundUser, "JWT");
+                var result = await UoW.UserMgmt.CreateIdentityAsync(user, "JWT");
 
                 foreach (var claim in result.Claims)
-                    await UoW.CustomUserManager.RemoveClaimAsync(userID, claim);
+                    await UoW.UserMgmt.RemoveClaimAsync(userID, claim);
 
                 foreach (var claim in claims)
-                    await UoW.CustomUserManager.AddClaimAsync(userID, new Claim(claim.Key, claim.Value));
+                    await UoW.UserMgmt.AddClaimAsync(userID, new Claim(claim.Key, claim.Value));
 
                 return Ok();
             }

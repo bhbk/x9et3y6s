@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Threading.Tasks;
@@ -19,14 +19,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controller
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> RevokeToken(Guid tokenID)
         {
-            var foundToken = await UoW.CustomUserManager.FindRefreshTokenByIdAsync(tokenID);
+            var foundToken = await UoW.UserMgmt.FindRefreshTokenByIdAsync(tokenID);
 
             if (foundToken == null)
-                return BadRequest(BaseLib.Statics.MsgUserTokenInvalid);
+                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.RemoveRefreshTokenByIdAsync(foundToken.Id);
+                IdentityResult result = await UoW.UserMgmt.RemoveRefreshTokenByIdAsync(foundToken.Id);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);

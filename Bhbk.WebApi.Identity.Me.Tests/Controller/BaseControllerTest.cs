@@ -1,7 +1,8 @@
 ﻿using Bhbk.Lib.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interface;
 using Bhbk.Lib.Identity.Model;
-using Bhbk.Lib.Identity.Repository;
+using Bhbk.Lib.Identity.Store;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Practices.Unity;
 using System;
@@ -24,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
             Context = new CustomIdentityDbContext(_connection);
 
             UoW = new UnitOfWork(Context);
-            UoW.CustomConfigManager.Config.UnitTestRun = true;
+            UoW.ConfigMgmt.Tweaks.UnitTestRun = true;
 
             Seeds = new DataSeedHelper(UoW);
             Seeds.CreateTestData();
@@ -37,11 +38,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
             UnityContainer container = new UnityContainer();
 
             container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserProvider, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
-            container.RegisterType<IGenericRepository<AppAudience, Guid>, AudienceRepository>(new TransientLifetimeManager());
-            container.RegisterType<IGenericRepository<AppClient, Guid>, ClientRepository>(new TransientLifetimeManager());
-            container.RegisterType<IGenericRepository<AppProvider, Guid>, ProviderRepository>(new TransientLifetimeManager());
-            container.RegisterType<IGenericRepository<AppRole, Guid>, RoleRepository>(new TransientLifetimeManager());
-            container.RegisterType<IGenericRepository<AppUser, Guid>, UserRepository>(new TransientLifetimeManager());
             container.RegisterType<IUnitOfWork, UnitOfWork>(new TransientLifetimeManager());
             container.RegisterInstance(Context);
             container.RegisterInstance(UoW);

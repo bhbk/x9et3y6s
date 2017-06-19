@@ -1,8 +1,7 @@
-﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+﻿using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interface;
+using Microsoft.AspNet.Identity;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BaseLib = Bhbk.Lib.Identity;
@@ -19,29 +18,25 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        public async Task<IHttpActionResult> CreateAudience(AudienceModel.Binding.Create model)
+        public async Task<IHttpActionResult> CreateAudience(AudienceModel.Create model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundAudience = UoW.AudienceRepository.Get(x => x.Name == model.Name).SingleOrDefault();
+            var audience = await UoW.AudienceMgmt.FindByNameAsync(model.Name);
 
-            if (foundAudience == null)
+            if (audience == null)
             {
-                var audience = new AppAudience()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = model.Name,
-                    AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
-                    AudienceType = BaseLib.AudienceType.ThinClient.ToString(),
-                    Enabled = model.Enabled,
-                    Immutable = false
-                };
+                model.Immutable = false;
 
-                UoW.AudienceRepository.Create(audience);
-                await UoW.SaveAsync();
+                var create = UoW.Models.Create.DoIt(model);
+                var result = await UoW.AudienceMgmt.CreateAsync(create);
 
-                return Ok(ModelFactory.Create(audience));
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok(create);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);
@@ -50,75 +45,74 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Route("v1/{audienceID}"), HttpDelete]
         public async Task<IHttpActionResult> DeleteAudience(Guid audienceID)
         {
-            var foundAudience = await UoW.AudienceRepository.FindAsync(audienceID);
+            var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
 
-            if (foundAudience == null)
+            if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
 
-            else if (foundAudience.Immutable)
+            else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
 
             else
             {
-                UoW.AudienceRepository.Delete(foundAudience);
-                await UoW.SaveAsync();
+                IdentityResult result = await UoW.AudienceMgmt.DeleteAsync(audienceID);
 
-                return Ok();
-            }
-        }
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
 
-        [Route("v1/{audienceID}/key"), HttpGet]
-        [AllowAnonymous]
-        public IHttpActionResult GetAudienceKey(string audienceID)
-        {
-            var foundAudience = UoW.AudienceRepository.Get(x => x.Id.ToString() == audienceID || x.Name == audienceID).SingleOrDefault();
-
-            if (foundAudience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
-
-            else
-                return Ok(foundAudience.AudienceKey);
-        }
-
-        [Route("v1/{audienceID}/roles"), HttpGet]
-        [Authorize]
-        public async Task<IHttpActionResult> GetAudienceRoles(Guid audienceID)
-        {
-            var foundAudience = await UoW.AudienceRepository.FindAsync(audienceID);
-
-            if (foundAudience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
-
-            else
-            {
-                UoW.AudienceRepository.LoadCollection(foundAudience, "Roles");
-
-                return Ok(foundAudience.Roles.Select(x => ModelFactory.Create(x)));
+                else
+                    return Ok();
             }
         }
 
         [Route("v1")]
         [Authorize]
-        public IHttpActionResult GetAudiences()
+        public async Task<IHttpActionResult> GetAudienceList()
         {
-            return Ok(UoW.AudienceRepository.Get().Select(x => ModelFactory.Create(x)));
+            return Ok(await UoW.AudienceMgmt.GetListAsync());
         }
 
         [Route("v1/{audienceID}"), HttpGet]
         [Authorize]
         public async Task<IHttpActionResult> GetAudience(Guid audienceID)
         {
-            var foundAudience = await UoW.AudienceRepository.FindAsync(audienceID);
+            var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
 
-            if (foundAudience == null)
+            if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
 
             else
-                return Ok(ModelFactory.Create(foundAudience));
+                return Ok(audience);
+        }
+
+        [Route("v1/{audienceID}/key"), HttpGet]
+        [AllowAnonymous]
+        public async Task<IHttpActionResult> GetAudienceKey(Guid audienceID)
+        {
+            var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
+
+            if (audience == null)
+                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
+
+            else
+                return Ok(audience.AudienceKey);
+        }
+
+        [Route("v1/{audienceID}/roles"), HttpGet]
+        [Authorize]
+        public async Task<IHttpActionResult> GetAudienceRoles(Guid audienceID)
+        {
+            var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
+
+            if (audience == null)
+                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
+
+            else
+                return Ok(await UoW.AudienceMgmt.GetRoleListAsync(audienceID));
         }
 
         [Route("v1/{audienceID}"), HttpPut]
-        public async Task<IHttpActionResult> UpdateAudience(Guid audienceID, AudienceModel.Binding.Update model)
+        public async Task<IHttpActionResult> UpdateAudience(Guid audienceID, AudienceModel.Update model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -126,25 +120,31 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (audienceID != model.Id)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
 
-            var foundAudience = await UoW.AudienceRepository.FindAsync(audienceID);
+            var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
 
-            if (foundAudience == null)
+            if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
 
-            else if (foundAudience.Immutable)
+            else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
 
             else
             {
-                foundAudience.Name = model.Name;
-                foundAudience.Description = model.Description;
-                foundAudience.Enabled = model.Enabled;
-                foundAudience.Immutable = false;
+                audience.ClientId = model.ClientId;
+                audience.Name = model.Name;
+                audience.Description = model.Description;
+                audience.AudienceType = model.AudienceType;
+                audience.AudienceKey = model.AudienceKey;
+                audience.Enabled = model.Enabled;
+                audience.Immutable = false;
 
-                UoW.AudienceRepository.Update(foundAudience);
-                await UoW.SaveAsync();
+                IdentityResult result = await UoW.AudienceMgmt.UpdateAsync(model);
 
-                return Ok(ModelFactory.Create(foundAudience));
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok(audience);
             }
         }
     }

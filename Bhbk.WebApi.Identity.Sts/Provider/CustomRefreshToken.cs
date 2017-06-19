@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.Infrastructure;
@@ -57,27 +57,27 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
             if (client == null)
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
             else
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = _uow.UserRepository.Get(x => x.Id == userID).SingleOrDefault();
+                user = _uow.UserMgmt.LocalStore.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = _uow.UserRepository.Get(x => x.Email == userValue).SingleOrDefault();
+                user = _uow.UserMgmt.LocalStore.Get(x => x.Email == userValue).SingleOrDefault();
 
             if (user == null)
                 return;
@@ -87,23 +87,23 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 return;
 
             //check if user is locked...
-            if (await _uow.CustomUserManager.IsLockedOutAsync(user.Id))
+            if (await _uow.UserMgmt.IsLockedOutAsync(user.Id))
                 return;
 
             Guid tokenID = Guid.NewGuid();
 
-            if (_uow.CustomConfigManager.Config.UnitTestRefreshToken)
+            if (_uow.ConfigMgmt.Tweaks.UnitTestRefreshToken)
             {
-                issue = _uow.CustomConfigManager.Config.UnitTestRefreshTokenFakeUtcNow;
-                expire = _uow.CustomConfigManager.Config.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenLife);
+                issue = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow;
+                expire = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
             else
             {
                 issue = DateTime.UtcNow;
-                expire = DateTime.UtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenLife);
+                expire = DateTime.UtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
 
-            AppUserToken token = new AppUserToken()
+            AppUserRefreshToken token = new AppUserRefreshToken()
             {
                 Id = tokenID,
                 ClientId = client.Id,
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             token.ProtectedTicket = context.SerializeTicket();
 
-            var result = await _uow.CustomUserManager.AddRefreshTokenAsync(token);
+            var result = await _uow.UserMgmt.AddRefreshTokenAsync(token);
 
             if (result.Succeeded)
                 context.SetToken(token.ProtectedTicket);
@@ -153,31 +153,31 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
             if (client == null)
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
             else
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
                 return;
 
-            var token = await _uow.CustomUserManager.FindRefreshTokenAsync(context.Token);
+            var token = await _uow.UserMgmt.FindRefreshTokenAsync(context.Token);
 
             if (token == null)
                 return;
 
-            else if (await _uow.CustomUserManager.IsLockedOutAsync(token.UserId))
+            else if (await _uow.UserMgmt.IsLockedOutAsync(token.UserId))
                 return;
 
-            var result = await _uow.CustomUserManager.RemoveRefreshTokenByIdAsync(token.Id);
+            var result = await _uow.UserMgmt.RemoveRefreshTokenByIdAsync(token.Id);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();

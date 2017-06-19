@@ -8,12 +8,12 @@ using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Lib.Identity.Manager
 {
-    public class CustomConfigManager
+    public class ConfigManager
     {
-        private CustomConfigStore _store;
+        private ConfigStore _store;
         private XmlTextReader _xml;
 
-        public ConfigModel Config
+        public ConfigModel Tweaks
         {
             get
             {
@@ -21,15 +21,15 @@ namespace Bhbk.Lib.Identity.Manager
             }
         }
 
-        public CustomConfigManager()
+        public ConfigManager()
         {
 
             _xml = new XmlTextReader(GetCurrentPath());
-            _store = new CustomConfigStore();
+            _store = new ConfigStore();
             _store.ReadXml(_xml);
         }
 
-        public CustomConfigManager(CustomConfigStore store)
+        public ConfigManager(ConfigStore store)
         {
             if (store == null)
                 throw new ArgumentNullException();
@@ -45,9 +45,11 @@ namespace Bhbk.Lib.Identity.Manager
 
             output.Append(typeof(ConfigModel).Name + Environment.NewLine);
             output.Append("  Debug:" + _store.Config.Debug.ToString() + Environment.NewLine);
-            output.Append("  DefaultPasswordLength:" + _store.Config.DefaultPasswordLength.ToString() + Environment.NewLine);
-            output.Append("  DefaultAuthorizationCodeLife:" + _store.Config.DefaultAuthorizationCodeLife.ToString() + Environment.NewLine);
+            output.Append("  DefaultAuthorizationCodeLife:" + _store.Config.DefaultAuhthorizationCodeLife.ToString() + Environment.NewLine);
+            output.Append("  DefaultAuthorizationCodeLength:" + _store.Config.DefaultAuhthorizationCodeLength.ToString() + Environment.NewLine);
             output.Append("  DefaultAccessTokenLife:" + _store.Config.DefaultAccessTokenLife.ToString() + Environment.NewLine);
+            output.Append("  DefaultFailedAccessAttempts:" + _store.Config.DefaultFailedAccessAttempts.ToString() + Environment.NewLine);
+            output.Append("  DefaultPasswordLength:" + _store.Config.DefaultPasswordLength.ToString() + Environment.NewLine);
             output.Append("  DefaultRefreshTokenLife:" + _store.Config.DefaultRefreshTokenLife.ToString() + Environment.NewLine);
             output.Append("  IdentityAdminBaseUrl:" + _store.Config.IdentityAdminBaseUrl.ToString() + Environment.NewLine);
             output.Append("  IdentityMeBaseUrl:" + _store.Config.IdentityMeBaseUrl.ToString() + Environment.NewLine);

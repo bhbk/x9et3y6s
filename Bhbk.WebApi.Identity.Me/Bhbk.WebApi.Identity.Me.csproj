@@ -186,7 +186,8 @@
   <ItemGroup>
     <Compile Include="Controller\DiagnosticController.cs" />
     <Compile Include="Controller\BaseController.cs" />
-    <Compile Include="Controller\UserController.cs" />
+    <Compile Include="Controller\ConfirmController.cs" />
+    <Compile Include="Controller\DetailController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

@@ -3,8 +3,11 @@ using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Store
@@ -14,6 +17,8 @@ namespace Bhbk.Lib.Identity.Store
     public class CustomRoleStore : RoleStore<AppRole, Guid, AppUserRole>
     {
         private CustomIdentityDbContext _context;
+        private DbSet<AppRole> _data;
+        private ModelFactory _factory;
 
         public CustomRoleStore(CustomIdentityDbContext context)
             : base(context)
@@ -22,41 +27,125 @@ namespace Bhbk.Lib.Identity.Store
                 throw new ArgumentNullException();
 
             _context = context;
+            _data = context.Set<AppRole>();
+            _factory = new ModelFactory(context);
         }
 
-        public override Task CreateAsync(AppRole role)
+        //TODO - change incoming model to RoleModel.Create
+        public Task CreateAsync(RoleModel.Model role)
         {
-            role.Created = DateTime.Now;
+            var model = _factory.Devolve.DoIt(role);
 
-            _context.Roles.Add(role);
+            _context.AppRole.Add(model);
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public override Task DeleteAsync(AppRole role)
+        public Task DeleteAsync(Guid roleId)
         {
-            _context.Roles.Remove(role);
+            var role = _context.AppRole.Where(x => x.Id == roleId).Single();
+
+            _context.AppRole.Remove(role);
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public bool IsRoleValid(AppRole role)
+        private Task<RoleModel.Model> FindInternal(AppRole role)
         {
-            var result = _context.Roles.Where(x => x.Id == role.Id || x.Name == role.Name).SingleOrDefault();
-
-            if (result == null)
-                return false;
+            if (role == null)
+                return Task.FromResult<RoleModel.Model>(null);
             else
-                return true;
+            {
+                var model = _factory.Evolve.DoIt(role);
+
+                return Task.FromResult(model);
+            }
         }
 
-        public override Task UpdateAsync(AppRole role)
+        public Task<RoleModel.Model> FindByIdAsync(Guid roleId)
         {
-            role.LastUpdated = DateTime.Now;
+            return FindInternal(_context.AppRole.Where(x => x.Id == roleId).SingleOrDefault());
+        }
 
-            _context.Entry(role).State = EntityState.Modified;
+        public Task<RoleModel.Model> FindByNameAsync(string roleName)
+        {
+            return FindInternal(_context.AppRole.Where(x => x.Name == roleName).SingleOrDefault());
+        }
+
+        public bool Exists(Guid roleId)
+        {
+            return _context.AppRole.Any(x => x.Id == roleId);
+        }
+
+        public IEnumerable<AppRole> Get(Expression<Func<AppRole, bool>> filter = null,
+            Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orderBy = null, string includes = "")
+        {
+            IQueryable<AppRole> query = _data;
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            foreach (var include in includes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                query = query.Include(include);
+
+            if (orderBy != null)
+                return orderBy(query).ToList();
+
+            else
+                return query.ToList();
+        }
+
+        public Task<IList<RoleModel.Model>> GetAllAsync()
+        {
+            IList<RoleModel.Model> result = new List<RoleModel.Model>();
+            var roles = _context.AppRole.ToList();
+
+            if (roles == null)
+                throw new InvalidOperationException();
+
+            else
+            {
+                foreach (AppRole role in roles)
+                    result.Add(_factory.Evolve.DoIt(role));
+
+                return Task.FromResult(result);
+            }
+        }
+
+        public Task<IList<UserModel.Model>> GetUsersAsync(Guid roleId)
+        {
+            IList<UserModel.Model> result = new List<UserModel.Model>();
+            var list = _context.AppUserRole.Where(x => x.RoleId == roleId).ToList();
+
+            if (list == null)
+                throw new InvalidOperationException();
+
+            else
+            {
+                foreach (AppUserRole entry in list)
+                {
+                    var user = _context.AppUser.Where(x => x.Id == entry.UserId).Single();
+
+                    result.Add(_factory.Evolve.DoIt(user));
+                }
+
+                return Task.FromResult(result);
+            }
+        }
+
+        public Task UpdateAsync(RoleModel.Update role)
+        {
+            var model = _context.AppRole.Where(x => x.Id == role.Id).Single();
+
+            model.Name = role.Name;
+            model.Description = role.Description;
+            model.Enabled = role.Enabled;
+            model.Immutable = role.Immutable;
+            model.LastUpdated = DateTime.Now;
+
+            _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);

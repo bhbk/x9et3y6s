@@ -26,18 +26,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Claim_Create_Success()
         {
             var controller = new ClaimController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var claim = new UserClaimModel.Binding.Create()
+            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var claim = new UserClaimModel.Create()
             {
                 UserId = user.Id,
-                ClaimType = BaseLib.Statics.ApiUnitTestsClaimType,
-                ClaimValue = BaseLib.Statics.ApiUnitTestsClaimValue + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                ClaimType = BaseLib.Statics.ApiUnitTestClaimType,
+                ClaimValue = BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Immutable = false
             };
-            var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<UserClaimModel.Return.Claim>;
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(UserClaimModel.Return.Claim));
+            var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<UserClaimModel.Model>;
+            result.Content.Should().BeAssignableTo(typeof(UserClaimModel.Model));
             result.Content.ClaimType.Should().BeEquivalentTo(claim.ClaimType);
         }
 
@@ -45,12 +44,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Claim_Delete_Success()
         {
             var controller = new ClaimController(UoW);
-            var user = UoW.UserRepository.Get().First();
+            var user = UoW.UserMgmt.LocalStore.Get().First();
             var claim = user.Claims.First();
-            var result = await controller.DeleteClaim(user.Id, claim.Id) as OkResult;
-            var check = UoW.UserRepository.Find(user.Id).Claims.Where(x => x.ClaimType == claim.ClaimType && x.ClaimValue == claim.ClaimValue).Any();
 
-            result.Should().NotBeNull();
+            var result = await controller.DeleteClaim(user.Id, claim.Id) as OkResult;
+            result.Should().BeAssignableTo(typeof(OkResult));
+
+            var check = user.Claims.Where(x => x.ClaimType == claim.ClaimType && x.ClaimValue == claim.ClaimValue).Any();
             check.Should().BeFalse();
         }
 
@@ -58,16 +58,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Claim_Get_Success()
         {
             var controller = new ClaimController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IEnumerable<UserClaimModel.Return.Claim>>;
+            var user = UoW.UserMgmt.LocalStore.Get().First();
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<UserClaimModel.Return.Claim>));
+            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IList<UserClaimModel.Model>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<UserClaimModel.Model>));
             result.Content.Count().ShouldBeEquivalentTo(user.Claims.Count());
         }
 
         [TestMethod]
-        public void Api_Admin_Claim_GetAll_Success()
+        public void Api_Admin_Claim_GetList_Success()
         {
             var controller = new ClaimController(UoW);
             var result = controller.GetClaims() as IHttpActionResult;

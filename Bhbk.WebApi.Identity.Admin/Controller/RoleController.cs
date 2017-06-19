@@ -1,8 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BaseLib = Bhbk.Lib.Identity;
@@ -24,19 +23,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
+            var role = await UoW.RoleMgmt.FindByIdAsync(roleID);
 
-            if (foundRole == null)
+            if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.AddToRoleAsync(foundUser.Id, foundRole.Name);
+                IdentityResult result = await UoW.UserMgmt.AddToRoleAsync(user.Id, role.Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -47,31 +46,25 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpPost]
-        public async Task<IHttpActionResult> CreateRole(RoleModel.Binding.Create model)
+        public async Task<IHttpActionResult> CreateRole(RoleModel.Create model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundRole = UoW.RoleRepository.Get(x => x.Name == model.Name).SingleOrDefault();
+            var role = await UoW.RoleMgmt.FindByNameAsync(model.Name);
 
-            if (foundRole == null)
+            if (role == null)
             {
-                var newRole = new AppRole
-                {
-                    Id = Guid.NewGuid(),
-                    AudienceId = model.AudienceId,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Immutable = false
-                };
+                model.Immutable = false;
 
-                IdentityResult result = await UoW.CustomRoleManager.CreateAsync(newRole);
+                var create = UoW.Models.Create.DoIt(model);
+                var result = await UoW.RoleMgmt.CreateAsync(create);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(ModelFactory.Create(newRole));
+                    return Ok(create);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgRoleAlreadyExists);
@@ -80,17 +73,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Route("v1/{roleID}"), HttpDelete]
         public async Task<IHttpActionResult> DeleteRole(Guid roleID)
         {
-            var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
+            var role = await UoW.RoleMgmt.FindByIdAsync(roleID);
 
-            if (foundRole == null)
+            if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            else if (foundRole.Immutable)
+            else if (role.Immutable)
                 return BadRequest(BaseLib.Statics.MsgRoleImmutable);
 
             else
             {
-                IdentityResult result = await UoW.CustomRoleManager.DeleteAsync(foundRole);
+                IdentityResult result = await UoW.RoleMgmt.DeleteAsync(roleID);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -102,35 +95,35 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1"), HttpGet]
         [Authorize]
-        public IHttpActionResult GetRoles()
+        public async Task<IHttpActionResult> GetRoleList()
         {
-            return Ok(UoW.CustomRoleManager.Roles.ToList().Select(x => ModelFactory.Create(x)));
+            return Ok(await UoW.RoleMgmt.GetListAsync());
         }
 
         [Route("v1/{roleID}"), HttpGet]
         [Authorize]
         public async Task<IHttpActionResult> GetRole(Guid roleID)
         {
-            var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
+            var role = await UoW.RoleMgmt.FindByIdAsync(roleID);
 
-            if (foundRole == null)
+            if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
             else
-                return Ok(ModelFactory.Create(foundRole));
+                return Ok(role);
         }
 
         [Route("v1/{roleID}/users"), HttpGet]
         [Authorize]
         public async Task<IHttpActionResult> GetRoleUsers(Guid roleID)
         {
-            var foundRole = await UoW.RoleRepository.FindAsync(roleID);
+            var role = await UoW.RoleMgmt.FindByIdAsync(roleID);
 
-            if (foundRole == null)
+            if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
             else
-                return Ok(foundRole.Roles.Where(x => x.RoleId == foundRole.Id).ToList().Select(y => ModelFactory.Create(y.Users)));
+                return Ok(await UoW.RoleMgmt.GetUsersAsync(roleID));
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
@@ -139,19 +132,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
+            var role = await UoW.RoleMgmt.FindByIdAsync(roleID);
 
-            if (foundRole == null)
+            if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.RemoveFromRoleAsync(userID, UoW.RoleRepository.Find(roleID).Name);
+                IdentityResult result = await UoW.UserMgmt.RemoveFromRoleAsync(userID, role.Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -162,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{roleID}"), HttpPut]
-        public async Task<IHttpActionResult> UpdateRole(Guid roleID, RoleModel.Binding.Update model)
+        public async Task<IHttpActionResult> UpdateRole(Guid roleID, RoleModel.Update model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -170,28 +163,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (roleID != model.Id)
                 return BadRequest(BaseLib.Statics.MsgRoleInvalid);
 
-            var foundRole = await UoW.CustomRoleManager.FindByIdAsync(roleID);
+            var role = await UoW.RoleMgmt.FindByIdAsync(roleID);
 
-            if (foundRole == null)
+            if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            else if (foundRole.Immutable)
+            else if (role.Immutable)
                 return BadRequest(BaseLib.Statics.MsgRoleImmutable);
 
             else
             {
-                foundRole.Name = model.Name;
-                foundRole.Description = model.Description;
-                foundRole.AudienceId = model.AudienceId;
-                foundRole.Immutable = false;
+                role.Name = model.Name;
+                role.Description = model.Description;
+                role.AudienceId = model.AudienceId;
+                role.Immutable = false;
 
-                IdentityResult result = await UoW.CustomRoleManager.UpdateAsync(foundRole);
+                IdentityResult result = await UoW.RoleMgmt.UpdateAsync(model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(ModelFactory.Create(foundRole));
+                    return Ok(role);
             }
         }
     }

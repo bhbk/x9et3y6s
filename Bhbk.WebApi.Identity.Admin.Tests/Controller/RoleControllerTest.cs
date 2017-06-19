@@ -1,10 +1,9 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,35 +26,37 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Role_AddToUser_Success()
         {
             var controller = new RoleController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var model = new AppRole()
+            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var model = UoW.Models.Create.DoIt(new RoleModel.Create()
             {
-                Id = Guid.NewGuid(),
-                Name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
-                Immutable = false,
-                AudienceId = UoW.AudienceRepository.Get().First().Id
-            };
-            var role = UoW.CustomRoleManager.CreateAsync(model);
-            var result = await controller.AddRoleToUser(model.Id, user.Id) as OkResult;
+                AudienceId = UoW.AudienceMgmt.LocalStore.Get().First().Id,
+                Name = BaseLib.Statics.ApiUnitTestRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                Enabled = true,
+                Immutable = false
+            });
+            var role = await UoW.RoleMgmt.CreateAsync(model);
+            role.Should().BeAssignableTo(typeof(IdentityResult));
+            role.Succeeded.Should().BeTrue();
 
-            result.Should().NotBeNull();
-            //result.ShouldBeEquivalentTo(HttpStatusCode.OK);
+            var result = await controller.AddRoleToUser(model.Id, user.Id) as OkResult;
+            result.Should().BeAssignableTo(typeof(OkResult));
         }
 
         [TestMethod]
         public async Task Api_Admin_Role_Create_Success()
         {
-            string name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new RoleController(UoW);
-            var model = new RoleModel.Binding.Create()
+            var model = new RoleModel.Create()
             {
+                AudienceId = UoW.AudienceMgmt.LocalStore.Get().First().Id,
                 Name = name,
-                AudienceId = UoW.AudienceRepository.Get().First().Id
+                Enabled = true,
+                Immutable = false
             };
-            var result = await controller.CreateRole(model) as OkNegotiatedContentResult<RoleModel.Return.Role>;
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(RoleModel.Return.Role));
+            var result = await controller.CreateRole(model) as OkNegotiatedContentResult<RoleModel.Model>;
+            result.Content.Should().BeAssignableTo(typeof(RoleModel.Model));
             result.Content.Name.Should().Be(model.Name);
         }
 
@@ -63,86 +64,88 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Role_Delete_Success()
         {
             var controller = new RoleController(UoW);
-            var role = UoW.RoleRepository.Get().First();
-            var result = await controller.DeleteRole(role.Id) as OkResult;
-            var check = UoW.RoleRepository.Find(role.Id);
+            var role = UoW.RoleMgmt.LocalStore.Get().First();
 
-            result.Should().NotBeNull();
-            check.Should().BeNull();
+            var result = await controller.DeleteRole(role.Id) as OkResult;
+            result.Should().BeAssignableTo(typeof(OkResult));
+
+            var check = UoW.RoleMgmt.LocalStore.Get(x => x.Id == role.Id).Any();
+            check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_Role_Get_Success()
         {
             var controller = new RoleController(UoW);
-            var role = UoW.RoleRepository.Get().First();
-            var result = await controller.GetRole(role.Id) as OkNegotiatedContentResult<RoleModel.Return.Role>;
+            var role = UoW.RoleMgmt.LocalStore.Get().First();
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(RoleModel.Return.Role));
+            var result = await controller.GetRole(role.Id) as OkNegotiatedContentResult<RoleModel.Model>;
+            result.Content.Should().BeAssignableTo(typeof(RoleModel.Model));
             result.Content.Id.Should().Be(role.Id);
         }
 
         [TestMethod]
-        public void Api_Admin_Role_GetAll_Success()
+        public async Task Api_Admin_Role_GetList_Success()
         {
             var controller = new RoleController(UoW);
-            var result = controller.GetRoles() as OkNegotiatedContentResult<IEnumerable<RoleModel.Return.Role>>;
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<RoleModel.Return.Role>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.RoleRepository.Get().Count());
+            var result = await controller.GetRoleList() as OkNegotiatedContentResult<IList<RoleModel.Model>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<RoleModel.Model>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.RoleMgmt.LocalStore.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Role_GetUserList_Success()
         {
             var controller = new RoleController(UoW);
-            var role = UoW.RoleRepository.Get().First();
-            var result = await controller.GetRoleUsers(role.Id) as OkNegotiatedContentResult<IEnumerable<UserModel.Return.User>>;
+            var role = UoW.RoleMgmt.LocalStore.Get().First();
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(IEnumerable<UserModel.Return.User>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.UserRepository.Get().Count());
+            var result = await controller.GetRoleUsers(role.Id) as OkNegotiatedContentResult<IList<UserModel.Model>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<UserModel.Model>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.UserMgmt.LocalStore.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Role_RemoveFromUser_Success()
         {
             var controller = new RoleController(UoW);
-            var user = UoW.UserRepository.Get().First();
-            var model = new AppRole()
+            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var model = UoW.Models.Create.DoIt(new RoleModel.Create()
             {
-                Id = Guid.NewGuid(),
-                Name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
-                Immutable = false,
-                AudienceId = UoW.AudienceRepository.Get().First().Id
-            };
-            var role = UoW.CustomRoleManager.CreateAsync(model);
-            var add = UoW.CustomUserManager.AddToRoleAsync(user.Id, model.Name);
-            var result = await controller.RemoveRoleFromUser(model.Id, user.Id) as OkResult;
+                AudienceId = UoW.AudienceMgmt.LocalStore.Get().First().Id,
+                Name = BaseLib.Statics.ApiUnitTestRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
+                Enabled = true,
+                Immutable = false
+            });
+            var role = await UoW.RoleMgmt.CreateAsync(model);
+            role.Should().BeAssignableTo(typeof(IdentityResult));
+            role.Succeeded.Should().BeTrue();
 
-            result.Should().NotBeNull();
-            //result.ShouldBeEquivalentTo(HttpStatusCode.OK);
+            var add = await UoW.UserMgmt.AddToRoleAsync(user.Id, model.Name);
+            add.Should().BeAssignableTo(typeof(IdentityResult));
+            add.Succeeded.Should().BeTrue();
+
+            var result = await controller.RemoveRoleFromUser(model.Id, user.Id) as OkResult;
+            result.Should().BeAssignableTo(typeof(OkResult));
         }
 
         [TestMethod]
         public async Task Api_Admin_Role_Update_Success()
         {
-            string name = BaseLib.Statics.ApiUnitTestsRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
+            string name = BaseLib.Statics.ApiUnitTestRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new RoleController(UoW);
-            var role = UoW.RoleRepository.Get().First();
-            var model = new RoleModel.Binding.Update()
+            var role = UoW.RoleMgmt.LocalStore.Get().First();
+            var model = new RoleModel.Update()
             {
                 Id = role.Id,
+                AudienceId = UoW.AudienceMgmt.LocalStore.Get().First().Id,
                 Name = name + "(Updated)",
-                Immutable = false,
-                AudienceId = UoW.AudienceRepository.Get().First().Id
+                Enabled = true,
+                Immutable = false
             };
-            var result = await controller.UpdateRole(model.Id, model) as OkNegotiatedContentResult<RoleModel.Return.Role>;
 
-            result.Should().NotBeNull();
-            result.Content.Should().BeAssignableTo(typeof(RoleModel.Return.Role));
+            var result = await controller.UpdateRole(model.Id, model) as OkNegotiatedContentResult<RoleModel.Model>;
+            result.Content.Should().BeAssignableTo(typeof(RoleModel.Model));
             result.Content.Name.Should().Be(model.Name);
         }
     }

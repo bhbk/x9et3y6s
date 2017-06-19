@@ -1,9 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BaseLib = Bhbk.Lib.Identity;
@@ -25,19 +23,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundProvider = await UoW.CustomProviderManager.FindByIdAsync(providerID);
+            var provider = await UoW.ProviderMgmt.FindByIdAsync(providerID);
 
-            if (foundProvider == null)
+            if (provider == null)
                 return BadRequest(BaseLib.Statics.MsgProviderNotExist);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.AddToProviderAsync(foundUser.Id, foundProvider.Name);
+                var result = await UoW.UserMgmt.AddToProviderAsync(user.Id, provider.Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -48,31 +46,25 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpPost]
-        public async Task<IHttpActionResult> CreateProvider(ProviderModel.Binding.Create model)
+        public async Task<IHttpActionResult> CreateProvider(ProviderModel.Create model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundProvider = UoW.ProviderRepository.Get(x => x.Name == model.Name).SingleOrDefault();
+            var provider = await UoW.ProviderMgmt.FindByNameAsync(model.Name);
 
-            if (foundProvider == null)
+            if (provider == null)
             {
-                var newProvider = new AppProvider()
-                {
-                    Id = Guid.NewGuid(),
-                    Description = model.Description,
-                    Name = model.Name,
-                    Enabled = model.Enabled,
-                    Immutable = false
-                };
+                model.Immutable = false;
 
-                IdentityResult result = await UoW.CustomProviderManager.CreateAsync(newProvider);
+                var create = UoW.Models.Create.DoIt(model);
+                var result = await UoW.ProviderMgmt.CreateAsync(create);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(ModelFactory.Create(newProvider));
+                    return Ok(create);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgProviderAlreadyExists);
@@ -81,20 +73,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Route("v1/{providerID}"), HttpDelete]
         public async Task<IHttpActionResult> DeleteProvider(Guid providerID)
         {
-            var foundProvider = await UoW.ProviderRepository.FindAsync(providerID);
+            var provider = await UoW.ProviderMgmt.FindByIdAsync(providerID);
 
-            if (foundProvider == null)
+            if (provider == null)
                 return BadRequest(BaseLib.Statics.MsgProviderNotExist);
 
-            else if (foundProvider.Immutable)
+            else if (provider.Immutable)
                 return BadRequest(BaseLib.Statics.MsgProviderImmutable);
 
             else
             {
-                UoW.ProviderRepository.Delete(foundProvider);
-                await UoW.SaveAsync();
+                IdentityResult result = await UoW.ProviderMgmt.DeleteAsync(providerID);
 
-                return Ok();
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok();
             }
         }
 
@@ -102,40 +97,32 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Authorize]
         public async Task<IHttpActionResult> GetProvider(Guid providerID)
         {
-            var foundProvider = await UoW.ProviderRepository.FindAsync(providerID);
+            var provider = await UoW.ProviderMgmt.FindByIdAsync(providerID);
 
-            if (foundProvider == null)
+            if (provider == null)
                 return BadRequest(BaseLib.Statics.MsgProviderNotExist);
 
             else
-                return Ok(ModelFactory.Create(foundProvider));
+                return Ok(provider);
         }
 
         [Route("v1"), HttpGet]
         [Authorize]
-        public IHttpActionResult GetProviders()
+        public async Task<IHttpActionResult> GetProviderList()
         {
-            return Ok(UoW.ProviderRepository.Get().Select(x => ModelFactory.Create(x)));
+            return Ok(await UoW.ProviderMgmt.GetListAsync());
         }
 
         [Route("v1/{providerID}/users"), HttpGet]
         public async Task<IHttpActionResult> GetProviderUsers(Guid providerID)
         {
-            var foundProvider = await UoW.ProviderRepository.FindAsync(providerID);
+            var provider = await UoW.ProviderMgmt.FindByIdAsync(providerID);
 
-            if (foundProvider == null)
+            if (provider == null)
                 return BadRequest(BaseLib.Statics.MsgProviderNotExist);
 
             else
-            {
-                var foundUsers = await UoW.CustomProviderManager.GetUsersAsync(providerID);
-                List<AppUser> result = new List<AppUser>();
-
-                foreach (string user in foundUsers)
-                    result.Add(UoW.UserRepository.Get(x => x.Email == user).Single());
-
-                return Ok(result.Select(x => ModelFactory.Create(x)));
-            }
+                return Ok(await UoW.ProviderMgmt.GetUsersListAsync(providerID));
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
@@ -144,19 +131,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundProvider = await UoW.CustomProviderManager.FindByIdAsync(providerID);
+            var provider = await UoW.ProviderMgmt.FindByIdAsync(providerID);
 
-            if (foundProvider == null)
+            if (provider == null)
                 return BadRequest(BaseLib.Statics.MsgProviderNotExist);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.RemoveFromProviderAsync(userID, UoW.ProviderRepository.Find(providerID).Name);
+                IdentityResult result = await UoW.UserMgmt.RemoveFromProviderAsync(userID, UoW.ProviderMgmt.LocalStore.Find(providerID).Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -167,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{providerID}"), HttpPut]
-        public async Task<IHttpActionResult> UpdateProvider(Guid providerID, ProviderModel.Binding.Update model)
+        public async Task<IHttpActionResult> UpdateProvider(Guid providerID, ProviderModel.Update model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -175,28 +162,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (providerID != model.Id)
                 return BadRequest(BaseLib.Statics.MsgProviderInvalid);
 
-            var foundProvider = await UoW.ProviderRepository.FindAsync(providerID);
+            var provider = await UoW.ProviderMgmt.FindByIdAsync(providerID);
 
-            if (foundProvider == null)
+            if (provider == null)
                 return BadRequest(BaseLib.Statics.MsgProviderNotExist);
 
-            else if (foundProvider.Immutable)
+            else if (provider.Immutable)
                 return BadRequest(BaseLib.Statics.MsgProviderImmutable);
 
             else
             {
-                foundProvider.Name = model.Name;
-                foundProvider.Description = model.Description;
-                foundProvider.Enabled = model.Enabled;
-                foundProvider.Immutable = false;
+                provider.Name = model.Name;
+                provider.Description = model.Description;
+                provider.Enabled = model.Enabled;
+                provider.Immutable = false;
 
-                IdentityResult result = await UoW.CustomProviderManager.UpdateAsync(foundProvider);
+                IdentityResult result = await UoW.ProviderMgmt.UpdateAsync(model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(ModelFactory.Create(foundProvider));
+                    return Ok(provider);
             }
         }
     }

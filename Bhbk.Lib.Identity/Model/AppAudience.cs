@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Model
         public AppAudience()
         {
             this.Roles = new HashSet<AppRole>();
-            this.Tokens = new HashSet<AppUserToken>();
+            this.Tokens = new HashSet<AppUserRefreshToken>();
         }
     
         public System.Guid Id { get; set; }
@@ -36,6 +36,6 @@ namespace Bhbk.Lib.Identity.Model
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppRole> Roles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserToken> Tokens { get; set; }
+        public virtual ICollection<AppUserRefreshToken> Tokens { get; set; }
     }
 }

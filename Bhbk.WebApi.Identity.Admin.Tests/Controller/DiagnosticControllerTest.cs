@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
 using System.Web.Http.Results;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
@@ -21,9 +20,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public void Api_Admin_Diagnostic_GetVersion_Success()
         {
             var controller = new DiagnosticController(UoW);
-            var result = controller.GetVersion() as OkNegotiatedContentResult<string>;
 
-            result.Should().NotBeNull();
+            var result = controller.GetVersion() as OkNegotiatedContentResult<string>;
+            result.Content.Should().BeAssignableTo(typeof(string));
         }
     }
 }

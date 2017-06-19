@@ -150,7 +150,8 @@
   <ItemGroup>
     <Compile Include="Controller\BaseControllerTest.cs" />
     <Compile Include="Controller\DiagnosticControllerTest.cs" />
-    <Compile Include="Controller\UserControllerTest.cs" />
+    <Compile Include="Controller\DetailControllerTest.cs" />
+    <Compile Include="Controller\ConfirmControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

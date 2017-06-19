@@ -21,9 +21,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         public void Api_Sts_Diagnostic_GetVersion_Success()
         {
             var controller = new DiagnosticController(UoW);
-            var result = controller.GetVersion() as OkNegotiatedContentResult<string>;
 
-            result.Should().NotBeNull();
+            var result = controller.GetVersion() as OkNegotiatedContentResult<string>;
+            result.Content.Should().BeAssignableTo(typeof(string));
         }
     }
 }

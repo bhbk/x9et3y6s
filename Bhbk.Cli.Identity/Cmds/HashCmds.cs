@@ -1,5 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Model;
 using ManyConsole;
 using System;
 using System.Windows.Forms;
@@ -28,9 +29,9 @@ namespace Bhbk.Cli.Identity.Cmds
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = PasswordHelper.GetStdin();
-                    var hashvalue = Statics.uow.CustomUserManager.PasswordHasher.HashPassword(cleartext);
+                    var hashvalue = Statics.uow.UserMgmt.PasswordHasher.HashPassword(cleartext);
 
-                    if (!Statics.uow.CustomUserManager.PasswordValidator.ValidateAsync(hashvalue).Wait(1000))
+                    if (!Statics.uow.UserMgmt.PasswordValidator.ValidateAsync(hashvalue).Wait(1000))
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

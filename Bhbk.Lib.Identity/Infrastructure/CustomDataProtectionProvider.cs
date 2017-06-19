@@ -3,19 +3,19 @@ using System.Web.Security;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    sealed class CustomDataProtection : IDataProtectionProvider
+    sealed class CustomDataProtectionProvider : IDataProtectionProvider
     {
         public IDataProtector Create(params string[] uses)
         {
-            return new MachineKeyDataProtector(uses);
+            return new CustomMachineKeyDataProtector(uses);
         }
     }
 
-    sealed class MachineKeyDataProtector : IDataProtector
+    sealed class CustomMachineKeyDataProtector : IDataProtector
     {
         private readonly string[] _uses;
 
-        public MachineKeyDataProtector(string[] uses)
+        public CustomMachineKeyDataProtector(string[] uses)
         {
             _uses = uses;
         }

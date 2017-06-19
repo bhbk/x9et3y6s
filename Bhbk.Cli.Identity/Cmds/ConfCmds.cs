@@ -1,7 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helper;
-using Bhbk.Lib.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Manager;
+using Bhbk.Lib.Identity.Model;
 using ManyConsole;
 using System;
 
@@ -31,7 +30,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(Statics.uow.CustomConfigManager.ToString());
+                    Console.Write(Statics.uow.ConfigMgmt.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

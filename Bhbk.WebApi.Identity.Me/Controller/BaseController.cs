@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
@@ -14,20 +14,12 @@ namespace Bhbk.WebApi.Identity.Me.Controller
     [Authorize]
     public class BaseController : ApiController
     {
-        private CustomModelFactory _mf = null;
         private IUnitOfWork _uow = null;
         protected IUnitOfWork UoW
         {
             get
             {
                 return _uow ?? Request.GetOwinContext().GetUserManager<IUnitOfWork>();
-            }
-        }
-        protected CustomModelFactory ModelFactory
-        {
-            get
-            {
-                return _mf ?? new CustomModelFactory(Request.GetOwinContext().GetUserManager<IUnitOfWork>());
             }
         }
 
@@ -38,8 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             if (uow == null)
                 throw new ArgumentNullException();
 
-            this._uow = uow;
-            this._mf = new CustomModelFactory(this._uow);
+            _uow = uow;
         }
 
         protected IHttpActionResult GetErrorResult(IdentityResult result)
@@ -72,15 +63,16 @@ namespace Bhbk.WebApi.Identity.Me.Controller
 
         public void SetUser(Guid guid)
         {
-            var user = UoW.CustomUserManager.FindById(guid);
-            var roles = UoW.CustomUserManager.GetRolesAsync(user.Id);
-            var id = new GenericIdentity(BaseLib.Statics.ApiUnitTestsUserDisplayName + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4));
+            var user = UoW.UserMgmt.FindByIdAsync(guid).Result;
+            var roles = UoW.UserMgmt.GetRolesAsync(user.Id).Result;
+            var claims = new GenericIdentity(BaseLib.Statics.ApiUnitTestUserDisplayName + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4));
 
-            id.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            id.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
-            id.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.AddClaim(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+            claims.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
+            claims.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
 
-            User = new ClaimsPrincipal(new GenericPrincipal(id, roles.Result.ToArray()));
+            User = new ClaimsPrincipal(new GenericPrincipal(claims, roles.ToArray()));
         }
     }
 }

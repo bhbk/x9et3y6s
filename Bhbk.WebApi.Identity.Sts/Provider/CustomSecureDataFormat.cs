@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using Bhbk.Lib.Identity.Model;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
@@ -46,18 +46,18 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
             if (client == null)
                 throw new ArgumentNullException(BaseLib.Statics.MsgClientInvalid);
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
             else
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
@@ -66,15 +66,15 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             var keyBytes = TextEncodings.Base64Url.Decode(symmetricKey);
             var signingKey = new HmacSigningCredentials(keyBytes);
 
-            if (_uow.CustomConfigManager.Config.UnitTestAccessToken)
+            if (_uow.ConfigMgmt.Tweaks.UnitTestAccessToken)
             {
-                issue = _uow.CustomConfigManager.Config.UnitTestAccessTokenFakeUtcNow;
-                expire = _uow.CustomConfigManager.Config.UnitTestAccessTokenFakeUtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultAccessTokenLife);
+                issue = _uow.ConfigMgmt.Tweaks.UnitTestAccessTokenFakeUtcNow;
+                expire = _uow.ConfigMgmt.Tweaks.UnitTestAccessTokenFakeUtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultAccessTokenLife);
             }
-            else if (_uow.CustomConfigManager.Config.UnitTestRefreshToken)
+            else if (_uow.ConfigMgmt.Tweaks.UnitTestRefreshToken)
             {
-                issue = _uow.CustomConfigManager.Config.UnitTestRefreshTokenFakeUtcNow;
-                expire = _uow.CustomConfigManager.Config.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.CustomConfigManager.Config.DefaultRefreshTokenLife);
+                issue = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow;
+                expire = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
             else
             {
@@ -110,18 +110,18 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientRepository.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
             else
-                client = _uow.ClientRepository.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
 
             if (client == null)
                 throw new ArgumentNullException(BaseLib.Statics.MsgClientInvalid);
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceRepository.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
             else
-                audience = _uow.AudienceRepository.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
 
             if (audience == null)
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);

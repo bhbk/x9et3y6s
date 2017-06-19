@@ -22,21 +22,26 @@ namespace Bhbk.Lib.Identity
         public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
         public const String ApiDefaultClient = "Bhbk";
         public const String ApiDefaultProvider = "local";
+        public const String ApiDefaultPhone = "12223334444";
         public const String ApiDefaultRoleForAdmin = "(Built-In) Administrators";
         public const String ApiDefaultRoleForViewer = "(Built-In) Viewers";
-        public const String ApiUnitTestsPassword = "3uetw7W$mswU";
-        public const String ApiUnitTestsPasswordNew = "mv7wd3dks&k3";
+        public const String ApiTokenConfirmEmail = "EmailConfirmation";
+        public const String ApiTokenConfirmPhone = "PhoneNumberConfirmation";
+        public const String ApiTokenConfirmTwoFactor = "TwoFactorConfirmation";
+        public const String ApiTokenResetPassword = "ResetPassword";
         #endregion
 
         #region Configuration Settings (Unit Tests)
-        public const String ApiUnitTestsAudience = "Audience-UnitTests-";
-        public const String ApiUnitTestsClient = "Client-UnitTests-";
-        public const String ApiUnitTestsProvider = "Provider-UnitTests-";
-        public const String ApiUnitTestsRole = "Role-UnitTests-";
-        public const String ApiUnitTestsUserDisplayName = "User-UnitTests-";
-        public const String ApiUnitTestsUserEmail = "unit-tests@";
-        public const String ApiUnitTestsClaimType = "ClaimType-UnitTests-";
-        public const String ApiUnitTestsClaimValue = "ClaimValue-UnitTests-";
+        public const String ApiUnitTestAudience = "Audience-UnitTests-";
+        public const String ApiUnitTestClient = "Client-UnitTests-";
+        public const String ApiUnitTestPasswordCurrent = "3uetw7W$mswU";
+        public const String ApiUnitTestPasswordNew = "mv7wd3dks&k3";
+        public const String ApiUnitTestProvider = "Provider-UnitTests-";
+        public const String ApiUnitTestRole = "Role-UnitTests-";
+        public const String ApiUnitTestUserDisplayName = "User-UnitTests-";
+        public const String ApiUnitTestUserEmail = "unit-tests@";
+        public const String ApiUnitTestClaimType = "ClaimType-UnitTests-";
+        public const String ApiUnitTestClaimValue = "ClaimValue-UnitTests-";
         #endregion
 
         #region Message Settings
@@ -61,11 +66,18 @@ namespace Bhbk.Lib.Identity
         public const String MsgUserAlreadyExists = "User already exists";
         public const String MsgUserImmutable = "User is immutable";
         public const String MsgUserInvalid = "User is invalid, locked or disabled";
+        public const String MsgUserInvalidCurrentEmail = "User current email incorrect";
         public const String MsgUserInvalidCurrentPassword = "User current password incorrect";
-        public const String MsgUserInvalidNewPasswordConfirm = "User new password does not match confirm new password";
+        public const String MsgUserInvalidCurrentPhone = "User current phone incorrect";
+        public const String MsgUserInvalidEmailConfirm = "User new email does not match confirm email";
+        public const String MsgUserInvalidPasswordConfirm = "User new password does not match confirm password";
+        public const String MsgUserInvalidPhoneConfirm = "User new phone does not match confirm phone";
         public const String MsgUserLocked = "User is locked";
         public const String MsgUserNotExist = "User does not exist";
-        public const String MsgUserTokenInvalid = "User token is invalid";
+        public const String MsgUserPasswordExists = "User already has password";
+        public const String MsgUserPasswordNotExists = "User does not have password";
+        public const String MsgUserInvalidToken = "User token is invalid";
+        public const String MsgUserTwoFactorAlreadyExists = "User two factor invalid";
         public const String MsgUserUnconfirmed = "User is unconfirmed";
         #endregion
     }

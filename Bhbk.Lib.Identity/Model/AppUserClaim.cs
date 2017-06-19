@@ -23,6 +23,7 @@ namespace Bhbk.Lib.Identity.Model
         public string OriginalIssuer { get; set; }
         public string Subject { get; set; }
         public System.DateTime Created { get; set; }
+        public Nullable<System.DateTime> LastUpdated { get; set; }
         public bool Immutable { get; set; }
     
         public virtual AppUser Users { get; set; }

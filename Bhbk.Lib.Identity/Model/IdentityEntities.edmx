@@ -78,6 +78,7 @@
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
           <Property Name="PasswordHash" Type="nvarchar" MaxLength="500" />
+          <Property Name="PasswordConfirmed" Type="bit" Nullable="false" />
           <Property Name="SecurityStamp" Type="nvarchar" MaxLength="500" />
           <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
@@ -95,7 +96,18 @@
           <Property Name="OriginalIssuer" Type="varchar(max)" />
           <Property Name="Subject" Type="varchar(max)" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AppUserNonceToken">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Code" Type="varchar(max)" Nullable="false" />
+          <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ExpiresUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="AppUserProvider">
           <Key>
@@ -108,17 +120,7 @@
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="AppUserRole">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Immutable" Type="bit" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AppUserToken">
+        <EntityType Name="AppUserRefreshToken">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -129,6 +131,16 @@
           <Property Name="ProtectedTicket" Type="varchar(max)" Nullable="false" />
           <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="ExpiresUtc" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AppUserRole">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_AppAudience_ClientID">
           <End Role="AppClient" Type="Self.AppClient" Multiplicity="1" />
@@ -168,6 +180,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_AppUserNonceToken_AppUser">
+          <End Role="AppUser" Type="Self.AppUser" Multiplicity="1" />
+          <End Role="AppUserNonceToken" Type="Self.AppUserNonceToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserNonceToken">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_AppUserProvider_ProviderID">
           <End Role="AppProvider" Type="Self.AppProvider" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -192,6 +216,44 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="AppUserProvider">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AppUserRefreshToken_AudienceID">
+          <End Role="AppAudience" Type="Self.AppAudience" Multiplicity="1" />
+          <End Role="AppUserRefreshToken" Type="Self.AppUserRefreshToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppAudience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserRefreshToken">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AppUserRefreshToken_ClientID">
+          <End Role="AppClient" Type="Self.AppClient" Multiplicity="1" />
+          <End Role="AppUserRefreshToken" Type="Self.AppUserRefreshToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppClient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserRefreshToken">
+              <PropertyRef Name="ClientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AppUserRefreshToken_UserID">
+          <End Role="AppUser" Type="Self.AppUser" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AppUserRefreshToken" Type="Self.AppUserRefreshToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserRefreshToken">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
@@ -224,44 +286,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_AppUserToken_AudienceID">
-          <End Role="AppAudience" Type="Self.AppAudience" Multiplicity="1" />
-          <End Role="AppUserToken" Type="Self.AppUserToken" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AppAudience">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AppUserToken">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AppUserToken_ClientID">
-          <End Role="AppClient" Type="Self.AppClient" Multiplicity="1" />
-          <End Role="AppUserToken" Type="Self.AppUserToken" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AppClient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AppUserToken">
-              <PropertyRef Name="ClientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AppUserToken_UserID">
-          <End Role="AppUser" Type="Self.AppUser" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AppUserToken" Type="Self.AppUserToken" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AppUser">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AppUserToken">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="IdentityModelStoreContainer">
           <EntitySet Name="AppAudience" EntityType="Self.AppAudience" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppClient" EntityType="Self.AppClient" Schema="dbo" store:Type="Tables" />
@@ -269,9 +293,10 @@
           <EntitySet Name="AppRole" EntityType="Self.AppRole" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppUser" EntityType="Self.AppUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppUserClaim" EntityType="Self.AppUserClaim" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AppUserNonceToken" EntityType="Self.AppUserNonceToken" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppUserProvider" EntityType="Self.AppUserProvider" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AppUserRefreshToken" EntityType="Self.AppUserRefreshToken" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AppUserRole" EntityType="Self.AppUserRole" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AppUserToken" EntityType="Self.AppUserToken" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_AppAudience_ClientID" Association="Self.FK_AppAudience_ClientID">
             <End Role="AppClient" EntitySet="AppClient" />
             <End Role="AppAudience" EntitySet="AppAudience" />
@@ -284,6 +309,10 @@
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserClaim" EntitySet="AppUserClaim" />
           </AssociationSet>
+          <AssociationSet Name="FK_AppUserNonceToken_AppUser" Association="Self.FK_AppUserNonceToken_AppUser">
+            <End Role="AppUser" EntitySet="AppUser" />
+            <End Role="AppUserNonceToken" EntitySet="AppUserNonceToken" />
+          </AssociationSet>
           <AssociationSet Name="FK_AppUserProvider_ProviderID" Association="Self.FK_AppUserProvider_ProviderID">
             <End Role="AppProvider" EntitySet="AppProvider" />
             <End Role="AppUserProvider" EntitySet="AppUserProvider" />
@@ -292,6 +321,18 @@
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserProvider" EntitySet="AppUserProvider" />
           </AssociationSet>
+          <AssociationSet Name="FK_AppUserRefreshToken_AudienceID" Association="Self.FK_AppUserRefreshToken_AudienceID">
+            <End Role="AppAudience" EntitySet="AppAudience" />
+            <End Role="AppUserRefreshToken" EntitySet="AppUserRefreshToken" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AppUserRefreshToken_ClientID" Association="Self.FK_AppUserRefreshToken_ClientID">
+            <End Role="AppClient" EntitySet="AppClient" />
+            <End Role="AppUserRefreshToken" EntitySet="AppUserRefreshToken" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AppUserRefreshToken_UserID" Association="Self.FK_AppUserRefreshToken_UserID">
+            <End Role="AppUser" EntitySet="AppUser" />
+            <End Role="AppUserRefreshToken" EntitySet="AppUserRefreshToken" />
+          </AssociationSet>
           <AssociationSet Name="FK_AppUserRole_RoleID" Association="Self.FK_AppUserRole_RoleID">
             <End Role="AppRole" EntitySet="AppRole" />
             <End Role="AppUserRole" EntitySet="AppUserRole" />
@@ -299,18 +340,6 @@
           <AssociationSet Name="FK_AppUserRole_UserID" Association="Self.FK_AppUserRole_UserID">
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserRole" EntitySet="AppUserRole" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AppUserToken_AudienceID" Association="Self.FK_AppUserToken_AudienceID">
-            <End Role="AppAudience" EntitySet="AppAudience" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AppUserToken_ClientID" Association="Self.FK_AppUserToken_ClientID">
-            <End Role="AppClient" EntitySet="AppClient" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AppUserToken_UserID" Association="Self.FK_AppUserToken_UserID">
-            <End Role="AppUser" EntitySet="AppUser" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -322,8 +351,6 @@
           <EntitySet Name="AppClient" EntityType="IdentityModel.AppClient" />
           <EntitySet Name="AppProvider" EntityType="IdentityModel.AppProvider" />
           <EntitySet Name="AppRole" EntityType="IdentityModel.AppRole" />
-          <EntitySet Name="AppUser" EntityType="IdentityModel.AppUser" />
-          <EntitySet Name="AppUserClaim" EntityType="IdentityModel.AppUserClaim" />
           <EntitySet Name="AppUserProvider" EntityType="IdentityModel.AppUserProvider" />
           <EntitySet Name="AppUserRole" EntityType="IdentityModel.AppUserRole" />
           <AssociationSet Name="FK_AppAudience_ClientID" Association="IdentityModel.FK_AppAudience_ClientID">
@@ -342,6 +369,17 @@
             <End Role="AppRole" EntitySet="AppRole" />
             <End Role="AppUserRole" EntitySet="AppUserRole" />
           </AssociationSet>
+          <EntitySet Name="AppUserRefreshToken" EntityType="IdentityModel.AppUserRefreshToken" />
+          <AssociationSet Name="FK_AppUserRefreshToken_AudienceID" Association="IdentityModel.FK_AppUserRefreshToken_AudienceID">
+            <End Role="AppAudience" EntitySet="AppAudience" />
+            <End Role="AppUserRefreshToken" EntitySet="AppUserRefreshToken" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AppUserRefreshToken_ClientID" Association="IdentityModel.FK_AppUserRefreshToken_ClientID">
+            <End Role="AppClient" EntitySet="AppClient" />
+            <End Role="AppUserRefreshToken" EntitySet="AppUserRefreshToken" />
+          </AssociationSet>
+          <EntitySet Name="AppUserClaim" EntityType="IdentityModel.AppUserClaim" />
+          <EntitySet Name="AppUser" EntityType="IdentityModel.AppUser" />
           <AssociationSet Name="FK_AppUserClaim_UserID" Association="IdentityModel.FK_AppUserClaim_UserID">
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserClaim" EntitySet="AppUserClaim" />
@@ -350,24 +388,20 @@
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserProvider" EntitySet="AppUserProvider" />
           </AssociationSet>
+          <AssociationSet Name="FK_AppUserRefreshToken_UserID" Association="IdentityModel.FK_AppUserRefreshToken_UserID">
+            <End Role="AppUser" EntitySet="AppUser" />
+            <End Role="AppUserRefreshToken" EntitySet="AppUserRefreshToken" />
+          </AssociationSet>
           <AssociationSet Name="FK_AppUserRole_UserID" Association="IdentityModel.FK_AppUserRole_UserID">
             <End Role="AppUser" EntitySet="AppUser" />
             <End Role="AppUserRole" EntitySet="AppUserRole" />
           </AssociationSet>
-          <EntitySet Name="AppUserToken" EntityType="IdentityModel.AppUserToken" />
-          <AssociationSet Name="FK_AppUserToken_AudienceID" Association="IdentityModel.FK_AppUserToken_AudienceID">
-            <End Role="AppAudience" EntitySet="AppAudience" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AppUserToken_ClientID" Association="IdentityModel.FK_AppUserToken_ClientID">
-            <End Role="AppClient" EntitySet="AppClient" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AppUserToken_UserID" Association="IdentityModel.FK_AppUserToken_UserID">
+          <EntitySet Name="AppUserNonceToken" EntityType="IdentityModel.AppUserNonceToken" />
+          <AssociationSet Name="FK_AppUserNonceToken_AppUser" Association="IdentityModel.FK_AppUserNonceToken_AppUser">
             <End Role="AppUser" EntitySet="AppUser" />
-            <End Role="AppUserToken" EntitySet="AppUserToken" />
+            <End Role="AppUserNonceToken" EntitySet="AppUserNonceToken" />
           </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="AppAudience">
           <Key>
             <PropertyRef Name="Id" />
@@ -384,7 +418,7 @@
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Clients" Relationship="IdentityModel.FK_AppAudience_ClientID" FromRole="AppAudience" ToRole="AppClient" />
           <NavigationProperty Name="Roles" Relationship="IdentityModel.FK_AppRole_AudienceID" FromRole="AppAudience" ToRole="AppRole" />
-          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserToken_AudienceID" FromRole="AppAudience" ToRole="AppUserToken" />
+          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserRefreshToken_AudienceID" FromRole="AppAudience" ToRole="AppUserRefreshToken" />
         </EntityType>
         <EntityType Name="AppClient">
           <Key>
@@ -398,7 +432,7 @@
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppAudience_ClientID" FromRole="AppClient" ToRole="AppAudience" />
-          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserToken_ClientID" FromRole="AppClient" ToRole="AppUserToken" />
+          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserRefreshToken_ClientID" FromRole="AppClient" ToRole="AppUserRefreshToken" />
         </EntityType>
         <EntityType Name="AppProvider">
           <Key>
@@ -427,51 +461,6 @@
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppRole_AudienceID" FromRole="AppRole" ToRole="AppAudience" />
           <NavigationProperty Name="Roles" Relationship="IdentityModel.FK_AppUserRole_RoleID" FromRole="AppRole" ToRole="AppUserRole" />
-        </EntityType>
-        <EntityType Name="AppUser">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="Email" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LastName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="PhoneNumber" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="PhoneNumberConfirmed" Type="Boolean" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
-          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
-          <Property Name="LastLoginSuccess" Type="DateTime" Precision="3" />
-          <Property Name="LastLoginFailure" Type="DateTime" Precision="3" />
-          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
-          <Property Name="PasswordHash" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="SecurityStamp" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Claims" Relationship="IdentityModel.FK_AppUserClaim_UserID" FromRole="AppUser" ToRole="AppUserClaim" />
-          <NavigationProperty Name="Providers" Relationship="IdentityModel.FK_AppUserProvider_UserID" FromRole="AppUser" ToRole="AppUserProvider" />
-          <NavigationProperty Name="Roles" Relationship="IdentityModel.FK_AppUserRole_UserID" FromRole="AppUser" ToRole="AppUserRole" />
-          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserToken_UserID" FromRole="AppUser" ToRole="AppUserToken" />
-        </EntityType>
-        <EntityType Name="AppUserClaim">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="ClaimType" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="ClaimValue" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="ClaimValueType" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Issuer" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="OriginalIssuer" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Subject" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserClaim_UserID" FromRole="AppUserClaim" ToRole="AppUser" />
         </EntityType>
         <EntityType Name="AppUserProvider">
           <Key>
@@ -550,6 +539,93 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="AppUserRefreshToken">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ClientId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="ProtectedTicket" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ExpiresUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppUserRefreshToken_AudienceID" FromRole="AppUserRefreshToken" ToRole="AppAudience" />
+          <NavigationProperty Name="Clients" Relationship="IdentityModel.FK_AppUserRefreshToken_ClientID" FromRole="AppUserRefreshToken" ToRole="AppClient" />
+          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserRefreshToken_UserID" FromRole="AppUserRefreshToken" ToRole="AppUser" />
+        </EntityType>
+        <Association Name="FK_AppUserRefreshToken_AudienceID">
+          <End Type="IdentityModel.AppAudience" Role="AppAudience" Multiplicity="1" />
+          <End Type="IdentityModel.AppUserRefreshToken" Role="AppUserRefreshToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppAudience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserRefreshToken">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AppUserRefreshToken_ClientID">
+          <End Type="IdentityModel.AppClient" Role="AppClient" Multiplicity="1" />
+          <End Type="IdentityModel.AppUserRefreshToken" Role="AppUserRefreshToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppClient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserRefreshToken">
+              <PropertyRef Name="ClientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="AppUserClaim">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="ClaimType" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ClaimValue" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ClaimValueType" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Issuer" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="OriginalIssuer" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Subject" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserClaim_UserID" FromRole="AppUserClaim" ToRole="AppUser" />
+        </EntityType>
+        <EntityType Name="AppUser">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumberConfirmed" Type="Boolean" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
+          <Property Name="LastLoginSuccess" Type="DateTime" Precision="3" />
+          <Property Name="LastLoginFailure" Type="DateTime" Precision="3" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Claims" Relationship="IdentityModel.FK_AppUserClaim_UserID" FromRole="AppUser" ToRole="AppUserClaim" />
+          <NavigationProperty Name="Providers" Relationship="IdentityModel.FK_AppUserProvider_UserID" FromRole="AppUser" ToRole="AppUserProvider" />
+          <NavigationProperty Name="Tokens" Relationship="IdentityModel.FK_AppUserRefreshToken_UserID" FromRole="AppUser" ToRole="AppUserRefreshToken" />
+          <NavigationProperty Name="Roles" Relationship="IdentityModel.FK_AppUserRole_UserID" FromRole="AppUser" ToRole="AppUserRole" />
+          <NavigationProperty Name="Nonces" Relationship="IdentityModel.FK_AppUserNonceToken_AppUser" FromRole="AppUser" ToRole="AppUserNonceToken" />
+        </EntityType>
         <Association Name="FK_AppUserClaim_UserID">
           <End Type="IdentityModel.AppUser" Role="AppUser" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -578,6 +654,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_AppUserRefreshToken_UserID">
+          <End Type="IdentityModel.AppUser" Role="AppUser" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="IdentityModel.AppUserRefreshToken" Role="AppUserRefreshToken" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AppUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppUserRefreshToken">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_AppUserRole_UserID">
           <End Type="IdentityModel.AppUser" Role="AppUser" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -592,55 +682,25 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="AppUserToken">
+        <EntityType Name="AppUserNonceToken">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ClientId" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
           <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="ProtectedTicket" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ExpiresUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Audiences" Relationship="IdentityModel.FK_AppUserToken_AudienceID" FromRole="AppUserToken" ToRole="AppAudience" />
-          <NavigationProperty Name="Clients" Relationship="IdentityModel.FK_AppUserToken_ClientID" FromRole="AppUserToken" ToRole="AppClient" />
-          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserToken_UserID" FromRole="AppUserToken" ToRole="AppUser" />
+          <NavigationProperty Name="Users" Relationship="IdentityModel.FK_AppUserNonceToken_AppUser" FromRole="AppUserNonceToken" ToRole="AppUser" />
         </EntityType>
-        <Association Name="FK_AppUserToken_AudienceID">
-          <End Type="IdentityModel.AppAudience" Role="AppAudience" Multiplicity="1" />
-          <End Type="IdentityModel.AppUserToken" Role="AppUserToken" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AppAudience">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AppUserToken">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AppUserToken_ClientID">
-          <End Type="IdentityModel.AppClient" Role="AppClient" Multiplicity="1" />
-          <End Type="IdentityModel.AppUserToken" Role="AppUserToken" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AppClient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AppUserToken">
-              <PropertyRef Name="ClientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AppUserToken_UserID">
-          <End Type="IdentityModel.AppUser" Role="AppUser" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityModel.AppUserToken" Role="AppUserToken" Multiplicity="*" />
+        <Association Name="FK_AppUserNonceToken_AppUser">
+          <End Type="IdentityModel.AppUser" Role="AppUser" Multiplicity="1" />
+          <End Type="IdentityModel.AppUserNonceToken" Role="AppUserNonceToken" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AppUser">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="AppUserToken">
+            <Dependent Role="AppUserNonceToken">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
@@ -707,48 +767,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="AppUser">
-            <EntityTypeMapping TypeName="IdentityModel.AppUser">
-              <MappingFragment StoreEntitySet="AppUser">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
-                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
-                <ScalarProperty Name="LockoutEndDateUtc" ColumnName="LockoutEndDateUtc" />
-                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AppUserClaim">
-            <EntityTypeMapping TypeName="IdentityModel.AppUserClaim">
-              <MappingFragment StoreEntitySet="AppUserClaim">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="Subject" ColumnName="Subject" />
-                <ScalarProperty Name="OriginalIssuer" ColumnName="OriginalIssuer" />
-                <ScalarProperty Name="Issuer" ColumnName="Issuer" />
-                <ScalarProperty Name="ClaimValueType" ColumnName="ClaimValueType" />
-                <ScalarProperty Name="ClaimValue" ColumnName="ClaimValue" />
-                <ScalarProperty Name="ClaimType" ColumnName="ClaimType" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="AppUserProvider">
             <EntityTypeMapping TypeName="IdentityModel.AppUserProvider">
               <MappingFragment StoreEntitySet="AppUserProvider">
@@ -770,15 +788,70 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="AppUserToken">
-            <EntityTypeMapping TypeName="IdentityModel.AppUserToken">
-              <MappingFragment StoreEntitySet="AppUserToken">
+          <EntitySetMapping Name="AppUserRefreshToken">
+            <EntityTypeMapping TypeName="IdentityModel.AppUserRefreshToken">
+              <MappingFragment StoreEntitySet="AppUserRefreshToken">
                 <ScalarProperty Name="ExpiresUtc" ColumnName="ExpiresUtc" />
                 <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
                 <ScalarProperty Name="ProtectedTicket" ColumnName="ProtectedTicket" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
                 <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AppUserClaim">
+            <EntityTypeMapping TypeName="IdentityModel.AppUserClaim">
+              <MappingFragment StoreEntitySet="AppUserClaim">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="OriginalIssuer" ColumnName="OriginalIssuer" />
+                <ScalarProperty Name="Issuer" ColumnName="Issuer" />
+                <ScalarProperty Name="ClaimValueType" ColumnName="ClaimValueType" />
+                <ScalarProperty Name="ClaimValue" ColumnName="ClaimValue" />
+                <ScalarProperty Name="ClaimType" ColumnName="ClaimType" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AppUser">
+            <EntityTypeMapping TypeName="IdentityModel.AppUser">
+              <MappingFragment StoreEntitySet="AppUser">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
+                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
+                <ScalarProperty Name="LockoutEndDateUtc" ColumnName="LockoutEndDateUtc" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AppUserNonceToken">
+            <EntityTypeMapping TypeName="IdentityModel.AppUserNonceToken">
+              <MappingFragment StoreEntitySet="AppUserNonceToken">
+                <ScalarProperty Name="ExpiresUtc" ColumnName="ExpiresUtc" />
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

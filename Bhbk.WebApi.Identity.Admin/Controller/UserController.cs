@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -20,33 +20,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
-        public async Task<IHttpActionResult> CreateUser(UserModel.Binding.Create model)
+        public async Task<IHttpActionResult> CreateUser(UserModel.Create model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var foundUser = await UoW.CustomUserManager.FindByNameAsync(model.Email);
+            var user = await UoW.UserMgmt.FindByNameAsyncDeprecated(model.Email);
 
-            if (foundUser == null)
+            if (user == null)
             {
-                var newUser = new AppUser()
-                {
-                    Id = Guid.NewGuid(),
-                    Email = model.Email,
-                    EmailConfirmed = model.EmailConfirmed,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    LockoutEnabled = model.LockoutEnabled,
-                    Immutable = false
-                };
-
-                IdentityResult result = await UoW.CustomUserManager.CreateAsync(newUser);
+                var create = UoW.Models.Create.DoIt(model);
+                var result = await UoW.UserMgmt.CreateAsync(create);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(ModelFactory.Create(newUser));
+                    return Ok(create);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
@@ -55,17 +45,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Route("v1/{userID}"), HttpDelete]
         public async Task<IHttpActionResult> DeleteUser(Guid userID)
         {
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            else if (foundUser.Immutable)
+            else if (user.Immutable)
                 return BadRequest(BaseLib.Statics.MsgUserImmutable);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.DeleteAsync(foundUser);
+                var result = await UoW.UserMgmt.DeleteAsync(user.Id);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -79,46 +69,59 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Authorize]
         public async Task<IHttpActionResult> GetUser(Guid userID)
         {
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
-                return Ok(ModelFactory.Create(foundUser));
+                return Ok(user);
         }
 
         [Route("v1/{username}"), HttpGet]
         [Authorize]
         public async Task<IHttpActionResult> GetUserByName(string username)
         {
-            var foundUser = await UoW.CustomUserManager.FindByNameAsync(username);
+            var user = await UoW.UserMgmt.FindByNameAsync(username);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
-                return Ok(ModelFactory.Create(foundUser));
+                return Ok(user);
         }
 
         [Route("v1/{userID}/providers"), HttpGet]
         [Authorize]
         public async Task<IHttpActionResult> GetUserProviders(Guid userID)
         {
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                var foundProviders = await UoW.CustomUserManager.GetProvidersAsync(userID);
-                List<AppProvider> result = new List<AppProvider>();
+                var list = await UoW.UserMgmt.GetProvidersAsync(userID);
+                IList<ProviderModel.Model> result = new List<ProviderModel.Model>();
 
-                foreach (string provider in foundProviders)
-                    result.Add(UoW.ProviderRepository.Get(x => x.Name == provider).Single());
+                foreach(string name in list)
+                {
+                    var provider = UoW.ProviderMgmt.LocalStore.Get(x => x.Name == name).Single();
 
-                return Ok(result.Select(x => ModelFactory.Create(x)));
+                    result.Add(new ProviderModel.Model()
+                    {
+                        Id = provider.Id,
+                        Name = provider.Name,
+                        Description = provider.Description,
+                        Enabled = provider.Enabled,
+                        Created = provider.Created,
+                        LastUpdated = provider.LastUpdated,
+                        Immutable = provider.Immutable
+                    });
+                }
+
+                return Ok(result);
             }
         }
 
@@ -126,42 +129,95 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         [Authorize]
         public async Task<IHttpActionResult> GetUserRoles(Guid userID)
         {
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                var result = await UoW.CustomUserManager.GetRolesAsync(foundUser.Id);
+                var result = await UoW.UserMgmt.GetRolesAsync(userID);
                 return Ok(result);
             }
         }
 
         [Route("v1"), HttpGet]
         [Authorize]
-        public IHttpActionResult GetUsers()
+        public async Task<IHttpActionResult> GetUserList()
         {
-            return Ok(UoW.CustomUserManager.Users.ToList().Select(u => ModelFactory.Create(u)));
+            return Ok(await UoW.UserMgmt.GetListAsync());
         }
 
-        [Route("v1/{userID}/set-password"), HttpPut]
-        public async Task<IHttpActionResult> SetPassword(Guid userID, UserModel.Binding.SetPassword model)
+        [Route("v1/{userID}/add-password"), HttpPut]
+        public async Task<IHttpActionResult> AddPassword(Guid userID, UserModel.AddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidNewPasswordConfirm);
+                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(userID);
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await UoW.CustomUserManager.SetPasswordAsync(foundUser.Id, model.NewPassword);
+                IdentityResult result = await UoW.UserMgmt.AddPasswordAsync(userID, model.NewPassword);
+
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok();
+            }
+        }
+
+        [Route("v1/{userID}/remove-password"), HttpPut]
+        public async Task<IHttpActionResult> RemovePassword(Guid userID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
+
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            else if (!await UoW.UserMgmt.HasPasswordAsync(user.Id))
+                return BadRequest(BaseLib.Statics.MsgUserPasswordNotExists);
+
+            else
+            {
+                IdentityResult result = await UoW.UserMgmt.RemovePasswordAsync(userID);
+
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
+
+                else
+                    return Ok();
+            }
+        }
+
+        [Route("v1/{userID}/reset-password"), HttpPut]
+        public async Task<IHttpActionResult> ResetPassword(Guid userID, UserModel.AddPassword model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await UoW.UserMgmt.FindByIdAsync(userID);
+
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            else if (model.NewPassword != model.NewPasswordConfirm)
+                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
+
+            else
+            {
+                string token = await UoW.UserMgmt.GeneratePasswordResetTokenAsync(userID);
+                IdentityResult result = await UoW.UserMgmt.ResetPasswordAsync(userID, token, model.NewPassword);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -172,7 +228,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
-        public async Task<IHttpActionResult> UpdateUser(Guid userID, UserModel.Binding.Update model)
+        public async Task<IHttpActionResult> UpdateUser(Guid userID, UserModel.Update model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -180,31 +236,30 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (userID != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var foundUser = await UoW.CustomUserManager.FindByIdAsync(model.Id);
+            var user = await UoW.UserMgmt.FindByIdAsync(model.Id);
 
-            if (foundUser == null)
+            if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            else if (foundUser.Immutable)
+            else if (user.Immutable)
                 return BadRequest(BaseLib.Statics.MsgUserImmutable);
 
             else
             {
-                foundUser.UserName = model.Email;
-                foundUser.Email = model.Email;
-                foundUser.FirstName = model.FirstName;
-                foundUser.LastName = model.LastName;
-                foundUser.LockoutEnabled = model.LockoutEnabled;
-                foundUser.LockoutEndDateUtc = model.LockoutEndDateUtc.HasValue ? model.LockoutEndDateUtc.Value.ToUniversalTime() : model.LockoutEndDateUtc;
-                foundUser.Immutable = false;
+                user.Email = model.Email;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.LockoutEnabled = model.LockoutEnabled;
+                user.LockoutEndDateUtc = model.LockoutEndDateUtc.HasValue ? model.LockoutEndDateUtc.Value.ToUniversalTime() : model.LockoutEndDateUtc;
+                user.Immutable = false;
 
-                IdentityResult result = await UoW.CustomUserManager.UpdateAsync(foundUser);
+                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.Models.Devolve.DoIt(user));
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(ModelFactory.Create(foundUser));
+                    return Ok(user);
             }
         }
     }

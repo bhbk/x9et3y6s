@@ -1,6 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace Bhbk.WebApi.Identity.Admin.Controller

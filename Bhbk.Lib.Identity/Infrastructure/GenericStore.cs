@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
+using Bhbk.Lib.Identity.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -6,26 +7,44 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repository
+namespace Bhbk.Lib.Identity.Infrastructure
 {
     //https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
-    public abstract class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey>, IDisposable
+    public abstract class GenericStore<TEntity, TKey> : IGenericStore<TEntity, TKey>, IDisposable
         where TEntity : class
     {
         private bool _disposed = false;
         protected CustomIdentityDbContext _context;
         protected DbSet<TEntity> _data;
 
-        public GenericRepository(CustomIdentityDbContext context)
+        public GenericStore(CustomIdentityDbContext context)
         {
             this._context = context;
             this._data = context.Set<TEntity>();
         }
 
-        public virtual IEnumerable<TEntity> Get(
-            Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includes = "")
+        public virtual void Attach(TEntity entity)
+        {
+            _data.Attach(entity);
+        }
+
+        public virtual bool Exists(TKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual TEntity Find(TKey id)
+        {
+            return _data.Find(id);
+        }
+
+        public virtual async Task<TEntity> FindAsync(TKey id)
+        {
+            return await _data.FindAsync(id);
+        }
+
+        public virtual IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includes = "")
         {
             IQueryable<TEntity> query = _data;
 
@@ -40,45 +59,6 @@ namespace Bhbk.Lib.Identity.Repository
 
             else
                 return query.ToList();
-        }
-
-        public virtual TEntity Find(TKey id)
-        {
-            return _data.Find(id);
-        }
-
-        public virtual async Task<TEntity> FindAsync(TKey id)
-        {
-            return await _data.FindAsync(id);
-        }
-
-        public virtual void Create(TEntity entity)
-        {
-            _data.Add(entity);
-        }
-
-        public virtual void Delete(object id)
-        {
-            TEntity entity = _data.Find(id);
-            Delete(entity);
-        }
-
-        public virtual void Delete(TEntity entity)
-        {
-            if (_context.Entry(entity).State == EntityState.Detached)
-                _data.Attach(entity);
-
-            _data.Remove(entity);
-        }
-
-        public virtual void Attach(TEntity entity)
-        {
-            _data.Attach(entity);
-        }
-
-        public virtual bool Exists(TKey key)
-        {
-            throw new NotImplementedException();
         }
 
         public virtual void LoadCollection(TEntity entity, string collection)
@@ -96,11 +76,6 @@ namespace Bhbk.Lib.Identity.Repository
         public virtual void Save()
         {
             _context.SaveChanges();
-        }
-
-        public virtual async Task SaveAsync()
-        {
-            await _context.SaveChangesAsync();
         }
 
         public virtual void Update(TEntity entity)

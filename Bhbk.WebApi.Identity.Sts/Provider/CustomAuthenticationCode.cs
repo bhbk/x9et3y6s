@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Interface;
 using Microsoft.Owin.Security.Infrastructure;
 using System;
 using System.Collections.Concurrent;
