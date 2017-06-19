@@ -107,10 +107,12 @@ namespace Bhbk.Lib.Identity.Store
             }
         }
 
-        public Task CreateAsync(UserModel.Model user)
+        public Task CreateAsync(UserModel.Create user)
         {
-            var model = _factory.Devolve.DoIt(user);
+            var create = _factory.Create.DoIt(user);
+            var model = _factory.Devolve.DoIt(create);
 
+            //TODO - figure out what to do with UserName requirement in Identity...
             model.UserName = user.Email;
 
             _context.AppUser.Add(model);
@@ -129,31 +131,32 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public bool Exists(Guid userId)
+        public bool Exists(Guid UserId)
         {
-            return _context.AppUser.Any(x => x.Id == userId);
+            return _context.AppUser.Any(x => x.Id == UserId);
         }
 
-        private Task<UserModel.Model> FindInternal(AppUser user)
+        public bool Exists(string UserEmail)
+        {
+            return _context.AppUser.Any(x => x.Email == UserEmail);
+        }
+
+        private Task<UserModel.Model> Find(AppUser user)
         {
             if (user == null)
                 return Task.FromResult<UserModel.Model>(null);
             else
-            {
-                var model = _factory.Evolve.DoIt(user);
-
-                return Task.FromResult(model);
-            }
+                return Task.FromResult(_factory.Evolve.DoIt(user));
         }
 
-        public Task<UserModel.Model> FindByIdAsync(Guid userId)
+        public Task<UserModel.Model> FindById(Guid userId)
         {
-            return FindInternal(_context.AppUser.Where(x => x.Id == userId).SingleOrDefault());
+            return Find(_context.AppUser.Where(x => x.Id == userId).SingleOrDefault());
         }
 
-        public Task<UserModel.Model> FindByNameAsync(string userName)
+        public Task<UserModel.Model> FindByName(string userName)
         {
-            return FindInternal(_context.AppUser.Where(x => x.Email == userName).SingleOrDefault());
+            return Find(_context.AppUser.Where(x => x.Email == userName).SingleOrDefault());
         }
 
         public IEnumerable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
@@ -415,6 +418,7 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
+        //TODO - change incoming model to UserModel.Update
         public override Task UpdateAsync(AppUser user)
         {
             var model = _context.AppUser.Where(x => x.Id == user.Id).Single();

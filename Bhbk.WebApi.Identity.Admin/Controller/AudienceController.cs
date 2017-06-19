@@ -22,21 +22,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            
             var audience = await UoW.AudienceMgmt.FindByNameAsync(model.Name);
 
             if (audience == null)
             {
                 model.Immutable = false;
-
-                var create = UoW.Models.Create.DoIt(model);
-                var result = await UoW.AudienceMgmt.CreateAsync(create);
+                
+                var result = await UoW.AudienceMgmt.CreateAsync(model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(create);
+                    return Ok(await UoW.AudienceMgmt.FindByNameAsync(model.Name));
             }
             else
                 return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);

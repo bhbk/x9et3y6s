@@ -25,10 +25,10 @@ namespace Bhbk.Lib.Identity.Store
             _factory = new ModelFactory(context);
         }
 
-        //TODO - change incoming model to AudienceModel.Create
-        public Task Create(AudienceModel.Model audience)
+        public Task Create(AudienceModel.Create audience)
         {
-            var model = _factory.Devolve.DoIt(audience);
+            var create = _factory.Create.DoIt(audience);
+            var model = _factory.Devolve.DoIt(create);
 
             _context.AppAudience.Add(model);
             _context.SaveChanges();
@@ -48,26 +48,22 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        private Task<AudienceModel.Model> FindInternal(AppAudience audience)
+        private Task<AudienceModel.Model> Find(AppAudience audience)
         {
             if (audience == null)
                 return Task.FromResult<AudienceModel.Model>(null);
             else
-            {
-                var model = _factory.Evolve.DoIt(audience);
-
-                return Task.FromResult(model);
-            }
+                return Task.FromResult(_factory.Evolve.DoIt(audience));
         }
 
         public Task<AudienceModel.Model> FindById(Guid audienceId)
         {
-            return FindInternal(_context.AppAudience.Where(x => x.Id == audienceId).SingleOrDefault());
+            return Find(_context.AppAudience.Where(x => x.Id == audienceId).SingleOrDefault());
         }
 
         public Task<AudienceModel.Model> FindByName(string audienceName)
         {
-            return FindInternal(_context.AppAudience.Where(x => x.Name == audienceName).SingleOrDefault());
+            return Find(_context.AppAudience.Where(x => x.Name == audienceName).SingleOrDefault());
         }
 
         public Task<IList<AudienceModel.Model>> GetAll()
@@ -107,6 +103,11 @@ namespace Bhbk.Lib.Identity.Store
         public override bool Exists(Guid audienceId)
         {
             return _context.AppAudience.Any(x => x.Id == audienceId);
+        }
+
+        public bool Exists(string audienceName)
+        {
+            return _context.AppAudience.Any(x => x.Name == audienceName);
         }
 
         public Task Update(AudienceModel.Update audience)

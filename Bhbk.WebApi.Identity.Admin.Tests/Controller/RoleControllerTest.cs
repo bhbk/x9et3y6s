@@ -27,18 +27,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new RoleController(UoW);
             var user = UoW.UserMgmt.LocalStore.Get().First();
-            var model = UoW.Models.Create.DoIt(new RoleModel.Create()
+            var model = new RoleModel.Create()
             {
                 AudienceId = UoW.AudienceMgmt.LocalStore.Get().First().Id,
                 Name = BaseLib.Statics.ApiUnitTestRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
-            });
-            var role = await UoW.RoleMgmt.CreateAsync(model);
-            role.Should().BeAssignableTo(typeof(IdentityResult));
-            role.Succeeded.Should().BeTrue();
+            };
+            var create = await UoW.RoleMgmt.CreateAsync(model);
+            create.Should().BeAssignableTo(typeof(IdentityResult));
+            create.Succeeded.Should().BeTrue();
 
-            var result = await controller.AddRoleToUser(model.Id, user.Id) as OkResult;
+            var role = await UoW.RoleMgmt.FindByNameAsync(model.Name);
+            role.Should().BeAssignableTo(typeof(RoleModel.Model));
+
+            var result = await controller.AddRoleToUser(role.Id, user.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
         }
 
@@ -110,22 +113,25 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new RoleController(UoW);
             var user = UoW.UserMgmt.LocalStore.Get().First();
-            var model = UoW.Models.Create.DoIt(new RoleModel.Create()
+            var model = new RoleModel.Create()
             {
                 AudienceId = UoW.AudienceMgmt.LocalStore.Get().First().Id,
                 Name = BaseLib.Statics.ApiUnitTestRole + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
-            });
-            var role = await UoW.RoleMgmt.CreateAsync(model);
-            role.Should().BeAssignableTo(typeof(IdentityResult));
-            role.Succeeded.Should().BeTrue();
+            };
+            var create = await UoW.RoleMgmt.CreateAsync(model);
+            create.Should().BeAssignableTo(typeof(IdentityResult));
+            create.Succeeded.Should().BeTrue();
+
+            var role = await UoW.RoleMgmt.FindByNameAsync(model.Name);
+            role.Should().BeAssignableTo(typeof(RoleModel.Model));
 
             var add = await UoW.UserMgmt.AddToRoleAsync(user.Id, model.Name);
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
-            var result = await controller.RemoveRoleFromUser(model.Id, user.Id) as OkResult;
+            var result = await controller.RemoveRoleFromUser(role.Id, user.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
         }
 

@@ -19,9 +19,9 @@ namespace Bhbk.Lib.Identity.Manager
             LocalStore = store;
         }
 
-        public async Task<IdentityResult> CreateAsync(ClientModel.Model client)
+        public async Task<IdentityResult> CreateAsync(ClientModel.Create client)
         {
-            if (!LocalStore.Exists(client.Id))
+            if (!LocalStore.Exists(client.Name))
             {
                 await LocalStore.Create(client);
                 return IdentityResult.Success;
@@ -30,46 +30,46 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> DeleteAsync(Guid clientId)
+        public async Task<IdentityResult> DeleteAsync(Guid clientId)
         {
             if (LocalStore.Exists(clientId))
             {
-                LocalStore.Delete(clientId);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.Delete(clientId);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<ClientModel.Model> FindByIdAsync(Guid clientId)
+        public async Task<ClientModel.Model> FindByIdAsync(Guid clientId)
         {
-            return LocalStore.FindById(clientId);
+            return await LocalStore.FindById(clientId);
         }
 
-        public Task<ClientModel.Model> FindByNameAsync(string clientName)
+        public async Task<ClientModel.Model> FindByNameAsync(string clientName)
         {
-            return LocalStore.FindByName(clientName);
+            return await LocalStore.FindByName(clientName);
         }
 
-        public Task<IList<ClientModel.Model>> GetListAsync()
+        public async Task<IList<ClientModel.Model>> GetListAsync()
         {
-            return LocalStore.GetAll();
+            return await LocalStore.GetAll();
         }
 
-        public Task<IList<AudienceModel.Model>> GetAudiencesAsync(Guid clientId)
+        public async Task<IList<AudienceModel.Model>> GetAudiencesAsync(Guid clientId)
         {
             if (LocalStore.Exists(clientId))
-                return LocalStore.GetAudiences(clientId);
+                return await LocalStore.GetAudiences(clientId);
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> UpdateAsync(ClientModel.Update client)
+        public async Task<IdentityResult> UpdateAsync(ClientModel.Update client)
         {
             if (LocalStore.Exists(client.Id))
             {
-                LocalStore.Update(client);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.Update(client);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();

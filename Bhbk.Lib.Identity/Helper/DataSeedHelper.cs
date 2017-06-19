@@ -9,11 +9,11 @@ namespace Bhbk.Lib.Identity.Helper
     public class DataSeedHelper
     {
         private UnitOfWork _uow;
-        private ClientModel.Model _client;
-        private AudienceModel.Model _audience;
-        private ProviderModel.Model _provider;
-        private RoleModel.Model _role;
-        private UserModel.Model _user;
+        private ClientModel.Create _client;
+        private AudienceModel.Create _audience;
+        private ProviderModel.Create _provider;
+        private RoleModel.Create _role;
+        private UserModel.Create _user;
 
         public DataSeedHelper(UnitOfWork uow)
         {
@@ -29,37 +29,37 @@ namespace Bhbk.Lib.Identity.Helper
 
             if (foundProvider == null)
             {
-                _provider = _uow.Models.Create.DoIt(new ProviderModel.Create()
+                _provider = new ProviderModel.Create()
                 {
                     Name = Statics.ApiDefaultProvider,
                     Enabled = true,
                     Immutable = false
-                });
+                };
 
                 await _uow.ProviderMgmt.CreateAsync(_provider);
-                foundProvider = _uow.ProviderMgmt.LocalStore.Get(x => x.Id == _provider.Id).Single();
+                foundProvider = _uow.ProviderMgmt.LocalStore.Get(x => x.Name == _provider.Name).Single();
             }
 
             var foundClient = _uow.ClientMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
 
             if (foundClient == null)
             {
-                _client = _uow.Models.Create.DoIt(new ClientModel.Create()
+                _client = new ClientModel.Create()
                 {
                     Name = Statics.ApiDefaultClient,
                     Enabled = true,
                     Immutable = false
-                });
+                };
 
                 await _uow.ClientMgmt.CreateAsync(_client);
-                foundClient = _uow.ClientMgmt.LocalStore.Get(x => x.Id == _client.Id).Single();
+                foundClient = _uow.ClientMgmt.LocalStore.Get(x => x.Name == _client.Name).Single();
             }
 
             var foundAudience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
 
             if (foundAudience == null)
             {
-                _audience = _uow.Models.Create.DoIt(new AudienceModel.Create()
+                _audience = new AudienceModel.Create()
                 {
                     ClientId = foundClient.Id,
                     Name = Statics.ApiDefaultAudience,
@@ -67,17 +67,17 @@ namespace Bhbk.Lib.Identity.Helper
                     AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                     Enabled = true,
                     Immutable = false
-                });
+                };
 
                 await _uow.AudienceMgmt.CreateAsync(_audience);
-                foundAudience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == _audience.Id).Single();
+                foundAudience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == _audience.Name).Single();
             }
 
             var foundUser = _uow.UserMgmt.LocalStore.Get(x => x.UserName == Statics.ApiDefaultAdmin).SingleOrDefault();
 
             if (foundUser == null)
             {
-                _user = _uow.Models.Create.DoIt(new UserModel.Create()
+                _user = new UserModel.Create()
                 {
                     Email = Statics.ApiDefaultAdmin,
                     PhoneNumber = Statics.ApiDefaultPhone,
@@ -85,10 +85,10 @@ namespace Bhbk.Lib.Identity.Helper
                     LastName = "LastName",
                     LockoutEnabled = false,
                     Immutable = false
-                });
+                };
 
                 await _uow.UserMgmt.CreateAsync(_user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
-                foundUser = _uow.UserMgmt.LocalStore.Get(x => x.Id == _user.Id).Single();
+                foundUser = _uow.UserMgmt.LocalStore.Get(x => x.Email == _user.Email).Single();
 
                 await _uow.UserMgmt.SetEmailConfirmedAsync(foundUser.Id, true);
                 await _uow.UserMgmt.SetPasswordConfirmedAsync(foundUser.Id, true);
@@ -99,32 +99,32 @@ namespace Bhbk.Lib.Identity.Helper
 
             if (foundRoleForAdmin == null)
             {
-                _role = _uow.Models.Create.DoIt(new RoleModel.Create()
+                _role = new RoleModel.Create()
                 {
                     AudienceId = foundAudience.Id,
                     Name = Statics.ApiDefaultRoleForAdmin,
                     Enabled = true,
                     Immutable = true
-                });
+                };
 
                 await _uow.RoleMgmt.CreateAsync(_role);
-                foundRoleForAdmin = _uow.RoleMgmt.LocalStore.Get(x => x.Id == _role.Id).SingleOrDefault();
+                foundRoleForAdmin = _uow.RoleMgmt.LocalStore.Get(x => x.Name == _role.Name).SingleOrDefault();
             }
 
             var foundRoleForViewer = _uow.RoleMgmt.LocalStore.Get(x => x.Name == Statics.ApiDefaultRoleForViewer).SingleOrDefault();
 
             if (foundRoleForViewer == null)
             {
-                _role = _uow.Models.Create.DoIt(new RoleModel.Create()
+                _role = new RoleModel.Create()
                 {
                     AudienceId = foundAudience.Id,
                     Name = Statics.ApiDefaultRoleForViewer,
                     Enabled = false,
                     Immutable = true
-                });
+                };
 
                 await _uow.RoleMgmt.CreateAsync(_role);
-                foundRoleForViewer = _uow.RoleMgmt.LocalStore.Get(x => x.Id == _role.Id).SingleOrDefault();
+                foundRoleForViewer = _uow.RoleMgmt.LocalStore.Get(x => x.Name == _role.Name).SingleOrDefault();
             }
 
             if (!_uow.UserMgmt.IsInProviderAsync(foundUser.Id, foundProvider.Name).Result)
@@ -140,27 +140,27 @@ namespace Bhbk.Lib.Identity.Helper
         public async void CreateTestData()
         {
             for (int i = 0; i < 1; i++)
-                await _uow.ProviderMgmt.CreateAsync(_uow.Models.Create.DoIt(new ProviderModel.Create()
+                await _uow.ProviderMgmt.CreateAsync(new ProviderModel.Create()
                 {
                     Name = BaseLib.Statics.ApiUnitTestProvider + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
                     Immutable = false
-                }));
+                });
 
             Guid providerID = _uow.ProviderMgmt.LocalStore.Get().First().Id;
 
             for (int i = 0; i < 1; i++)
-                await _uow.ClientMgmt.CreateAsync(_uow.Models.Create.DoIt(new ClientModel.Create
+                await _uow.ClientMgmt.CreateAsync(new ClientModel.Create
                 {
                     Name = BaseLib.Statics.ApiUnitTestClient + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
                     Immutable = false
-                }));
+                });
 
             Guid clientID = _uow.ClientMgmt.LocalStore.Get().First().Id;
 
             for (int i = 0; i < 1; i++)
-                await _uow.AudienceMgmt.CreateAsync(_uow.Models.Create.DoIt(new AudienceModel.Create
+                await _uow.AudienceMgmt.CreateAsync(new AudienceModel.Create
                 {
                     ClientId = clientID,
                     Name = BaseLib.Statics.ApiUnitTestAudience + EntrophyHelper.GenerateRandomBase64(4),
@@ -168,24 +168,24 @@ namespace Bhbk.Lib.Identity.Helper
                     AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                     Enabled = true,
                     Immutable = false
-                }));
+                });
 
             Guid audienceID = _uow.AudienceMgmt.LocalStore.Get().First().Id;
 
             for (int i = 0; i < 3; i++)
-                await _uow.RoleMgmt.CreateAsync(_uow.Models.Create.DoIt(new RoleModel.Create
+                await _uow.RoleMgmt.CreateAsync(new RoleModel.Create
                 {
                     AudienceId = audienceID,
                     Name = BaseLib.Statics.ApiUnitTestRole + EntrophyHelper.GenerateRandomBase64(4),
                     Enabled = true,
                     Immutable = false
-                }));
+                });
 
             for (int i = 0; i < 3; i++)
             {
                 string email = "unit-test@" + EntrophyHelper.GenerateRandomBase64(4) + ".net";
 
-                await _uow.UserMgmt.CreateAsync(_uow.Models.Create.DoIt(new UserModel.Create
+                await _uow.UserMgmt.CreateAsync(new UserModel.Create
                 {
                     Email = email,
                     PhoneNumber = Statics.ApiDefaultPhone,
@@ -193,7 +193,7 @@ namespace Bhbk.Lib.Identity.Helper
                     LastName = "LastName",
                     LockoutEnabled = false,
                     Immutable = false
-                }), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+                }, BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
                 var user = _uow.UserMgmt.LocalStore.Get(x => x.Email == email).Single();
 

@@ -57,14 +57,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             {
                 model.Immutable = false;
 
-                var create = UoW.Models.Create.DoIt(model);
-                var result = await UoW.RoleMgmt.CreateAsync(create);
+                var result = await UoW.RoleMgmt.CreateAsync(model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(create);
+                    return Ok(await UoW.RoleMgmt.FindByNameAsync(model.Name));
             }
             else
                 return BadRequest(BaseLib.Statics.MsgRoleAlreadyExists);

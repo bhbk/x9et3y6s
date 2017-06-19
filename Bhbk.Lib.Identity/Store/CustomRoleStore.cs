@@ -31,10 +31,10 @@ namespace Bhbk.Lib.Identity.Store
             _factory = new ModelFactory(context);
         }
 
-        //TODO - change incoming model to RoleModel.Create
-        public Task CreateAsync(RoleModel.Model role)
+        public Task CreateAsync(RoleModel.Create role)
         {
-            var model = _factory.Devolve.DoIt(role);
+            var create = _factory.Create.DoIt(role);
+            var model = _factory.Devolve.DoIt(create);
 
             _context.AppRole.Add(model);
             _context.SaveChanges();
@@ -52,31 +52,32 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        private Task<RoleModel.Model> FindInternal(AppRole role)
+        private Task<RoleModel.Model> Find(AppRole role)
         {
             if (role == null)
                 return Task.FromResult<RoleModel.Model>(null);
             else
-            {
-                var model = _factory.Evolve.DoIt(role);
-
-                return Task.FromResult(model);
-            }
+                return Task.FromResult(_factory.Evolve.DoIt(role));
         }
 
-        public Task<RoleModel.Model> FindByIdAsync(Guid roleId)
+        public Task<RoleModel.Model> FindById(Guid roleId)
         {
-            return FindInternal(_context.AppRole.Where(x => x.Id == roleId).SingleOrDefault());
+            return Find(_context.AppRole.Where(x => x.Id == roleId).SingleOrDefault());
         }
 
-        public Task<RoleModel.Model> FindByNameAsync(string roleName)
+        public Task<RoleModel.Model> FindByName(string roleName)
         {
-            return FindInternal(_context.AppRole.Where(x => x.Name == roleName).SingleOrDefault());
+            return Find(_context.AppRole.Where(x => x.Name == roleName).SingleOrDefault());
         }
 
         public bool Exists(Guid roleId)
         {
             return _context.AppRole.Any(x => x.Id == roleId);
+        }
+
+        public bool Exists(string roleName)
+        {
+            return _context.AppRole.Any(x => x.Name == roleName);
         }
 
         public IEnumerable<AppRole> Get(Expression<Func<AppRole, bool>> filter = null,

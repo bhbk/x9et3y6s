@@ -25,10 +25,10 @@ namespace Bhbk.Lib.Identity.Store
             _factory = new ModelFactory(context);
         }
 
-        //TODO - change incoming model to ClientModel.Create
-        public Task Create(ClientModel.Model client)
+        public Task Create(ClientModel.Create client)
         {
-            var model = _factory.Devolve.DoIt(client);
+            var create = _factory.Create.DoIt(client);
+            var model = _factory.Devolve.DoIt(create);
 
             _context.AppClient.Add(model);
             _context.SaveChanges();
@@ -50,26 +50,22 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        private Task<ClientModel.Model> FindInternal(AppClient client)
+        private Task<ClientModel.Model> Find(AppClient client)
         {
             if (client == null)
                 return Task.FromResult<ClientModel.Model>(null);
             else
-            {
-                var model = _factory.Evolve.DoIt(client);
-
-                return Task.FromResult(model);
-            }
+                return Task.FromResult(_factory.Evolve.DoIt(client));
         }
 
         public Task<ClientModel.Model> FindById(Guid clientId)
         {
-            return FindInternal(_context.AppClient.Where(x => x.Id == clientId).SingleOrDefault());
+            return Find(_context.AppClient.Where(x => x.Id == clientId).SingleOrDefault());
         }
 
         public Task<ClientModel.Model> FindByName(string clientName)
         {
-            return FindInternal(_context.AppClient.Where(x => x.Name == clientName).SingleOrDefault());
+            return Find(_context.AppClient.Where(x => x.Name == clientName).SingleOrDefault());
         }
 
         public Task<IList<ClientModel.Model>> GetAll()
@@ -109,6 +105,11 @@ namespace Bhbk.Lib.Identity.Store
         public override bool Exists(Guid clientId)
         {
             return _context.AppClient.Any(x => x.Id == clientId);
+        }
+
+        public bool Exists(string clientName)
+        {
+            return _context.AppClient.Any(x => x.Name == clientName);
         }
 
         public Task Update(ClientModel.Update client)

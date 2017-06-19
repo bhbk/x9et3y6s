@@ -27,14 +27,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             if (client == null)
             {
-                var create = UoW.Models.Create.DoIt(model);
-                var result = await UoW.ClientMgmt.CreateAsync(create);
+                var result = await UoW.ClientMgmt.CreateAsync(model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(create);
+                    return Ok(await UoW.ClientMgmt.FindByNameAsync(model.Name));
             }
             else
                 return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);

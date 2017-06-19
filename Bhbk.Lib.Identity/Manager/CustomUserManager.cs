@@ -244,9 +244,9 @@ namespace Bhbk.Lib.Identity.Manager
             }
         }
 
-        public async Task<IdentityResult> CreateAsync(UserModel.Model user)
+        public async Task<IdentityResult> CreateAsync(UserModel.Create user)
         {
-            var found = await FindByNameAsyncDeprecated(user.Email);
+            var found = await FindByNameAsync(user.Email);
 
             if (found != null)
                 throw new ArgumentNullException();
@@ -256,9 +256,9 @@ namespace Bhbk.Lib.Identity.Manager
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> CreateAsync(UserModel.Model user, string password)
+        public async Task<IdentityResult> CreateAsync(UserModel.Create user, string password)
         {
-            var found = await FindByNameAsyncDeprecated(user.Email);
+            var found = await FindByNameAsync(user.Email);
 
             if (found != null)
                 throw new ArgumentNullException();
@@ -273,7 +273,7 @@ namespace Bhbk.Lib.Identity.Manager
             return IdentityResult.Success;
         }
 
-        public override Task<ClaimsIdentity> CreateIdentityAsync(AppUser user, string authenticationType)
+        public override async Task<ClaimsIdentity> CreateIdentityAsync(AppUser user, string authenticationType)
         {
             IList<Claim> claimCollection = new List<Claim>
             {
@@ -282,7 +282,7 @@ namespace Bhbk.Lib.Identity.Manager
 
             var claimsIdentity = new ClaimsIdentity(claimCollection, authenticationType);
 
-            return Task.Run(() => claimsIdentity);
+            return await Task.Run(() => claimsIdentity);
         }
 
         //protected async Task<SecurityToken> CreateSecurityTokenAsync(Guid userId)
@@ -305,24 +305,24 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<UserModel.Model> FindByIdAsync(Guid userId)
         {
-            return await LocalStore.FindByIdAsync(userId);
+            return await LocalStore.FindById(userId);
         }
 
         [System.Obsolete]
         public async Task<AppUser> FindByIdAsyncDeprecated(Guid userId)
         {
-            return await Task.FromResult(LocalStore.Users.Where(x => x.Id == userId).SingleOrDefault());
+            return LocalStore.Users.Where(x => x.Id == userId).SingleOrDefault();
         }
 
         public async Task<UserModel.Model> FindByNameAsync(string userName)
         {
-            return await LocalStore.FindByNameAsync(userName);
+            return await LocalStore.FindByName(userName);
         }
 
         [System.Obsolete]
-        public Task<AppUser> FindByNameAsyncDeprecated(string userName)
+        public async Task<AppUser> FindByNameAsyncDeprecated(string userName)
         {
-            return Task.FromResult(LocalStore.Users.Where(x => x.UserName == userName).SingleOrDefault());
+            return LocalStore.Users.Where(x => x.UserName == userName).SingleOrDefault();
         }
 
         public async Task<AppUserRefreshToken> FindRefreshTokenAsync(string token)
@@ -355,9 +355,9 @@ namespace Bhbk.Lib.Identity.Manager
             return await LocalStore.GetEmailAsync(user);
         }
 
-        public Task<IList<UserModel.Model>> GetListAsync()
+        public async Task<IList<UserModel.Model>> GetListAsync()
         {
-            return LocalStore.GetAll();
+            return await LocalStore.GetAll();
         }
 
         public override async Task<string> GetPhoneNumberAsync(Guid userId)
@@ -370,7 +370,6 @@ namespace Bhbk.Lib.Identity.Manager
             return await LocalStore.GetPhoneNumberAsync(user);
         }
 
-        [System.Obsolete]
         public async Task<IList<string>> GetProvidersAsync(Guid userId)
         {
             var user = await FindByIdAsyncDeprecated(userId);
@@ -401,7 +400,7 @@ namespace Bhbk.Lib.Identity.Manager
             return await LocalStore.GetTwoFactorEnabledAsync(user);
         }
 
-        public async override Task<string> GenerateChangePhoneNumberTokenAsync(Guid userId, string phoneNumber)
+        public override async Task<string> GenerateChangePhoneNumberTokenAsync(Guid userId, string phoneNumber)
         {
             return await GenerateUserTokenAsync(Statics.ApiTokenConfirmPhone, userId);
         }
@@ -460,7 +459,6 @@ namespace Bhbk.Lib.Identity.Manager
             return await LocalStore.HasPasswordAsync(user);
         }
 
-        [System.Obsolete]
         public async Task<bool> IsInProviderAsync(Guid userId, string role)
         {
             var user = await FindByIdAsyncDeprecated(userId);
@@ -522,7 +520,6 @@ namespace Bhbk.Lib.Identity.Manager
             return IdentityResult.Success;
         }
 
-        [System.Obsolete]
         public async Task<IdentityResult> RemoveFromProviderAsync(Guid userId, string provider)
         {
             var user = await FindByIdAsyncDeprecated(userId);
@@ -560,7 +557,6 @@ namespace Bhbk.Lib.Identity.Manager
             return IdentityResult.Success;
         }
 
-        [System.Obsolete]
         public async Task<IdentityResult> RemoveRefreshTokenByIdAsync(Guid tokenId)
         {
             await LocalStore.RemoveRefreshTokenByIdAsync(tokenId);
@@ -736,11 +732,6 @@ namespace Bhbk.Lib.Identity.Manager
                 return true;
             else
                 return false;
-        }
-
-        public override async Task<bool> VerifyTwoFactorTokenAsync(Guid userId, string twoFactorProvider, string token)
-        {            
-            throw new NotImplementedException();
         }
 
         public override async Task<bool> VerifyUserTokenAsync(Guid userId, string purpose, string token)

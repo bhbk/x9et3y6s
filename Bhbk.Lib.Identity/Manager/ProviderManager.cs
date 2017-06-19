@@ -19,9 +19,9 @@ namespace Bhbk.Lib.Identity.Manager
             LocalStore = store;
         }
 
-        public async Task<IdentityResult> CreateAsync(ProviderModel.Model provider)
+        public async Task<IdentityResult> CreateAsync(ProviderModel.Create provider)
         {
-            if (!LocalStore.Exists(provider.Id))
+            if (!LocalStore.Exists(provider.Name))
             {
                 await LocalStore.Create(provider);
                 return IdentityResult.Success;
@@ -30,54 +30,54 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> DeleteAsync(Guid providerId)
+        public async Task<IdentityResult> DeleteAsync(Guid providerId)
         {
             if (LocalStore.Exists(providerId))
             {
-                LocalStore.Delete(providerId);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.Delete(providerId);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<ProviderModel.Model> FindByIdAsync(Guid providerId)
+        public async Task<ProviderModel.Model> FindByIdAsync(Guid providerId)
         {
-            return LocalStore.FindById(providerId);
+            return await LocalStore.FindById(providerId);
         }
 
-        public Task<ProviderModel.Model> FindByNameAsync(string providerName)
+        public async Task<ProviderModel.Model> FindByNameAsync(string providerName)
         {
-            return LocalStore.FindByName(providerName);
+            return await LocalStore.FindByName(providerName);
         }
 
-        public Task<IList<ProviderModel.Model>> GetListAsync()
+        public async Task<IList<ProviderModel.Model>> GetListAsync()
         {
-            return LocalStore.GetAll();
+            return await LocalStore.GetAll();
         }
 
-        public Task<IList<UserModel.Model>> GetUsersListAsync(Guid providerId)
+        public async Task<IList<UserModel.Model>> GetUsersListAsync(Guid providerId)
         {
             if (LocalStore.Exists(providerId))
-                return LocalStore.GetUsers(providerId);
+                return await LocalStore.GetUsers(providerId);
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<bool> IsInProviderAsync(Guid providerId, string user)
+        public async Task<bool> IsInProviderAsync(Guid providerId, string user)
         {
             if (LocalStore.Exists(providerId))
-                return LocalStore.IsInProvider(providerId, user);
+                return await LocalStore.IsRoleInProvider(providerId, user);
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> UpdateAsync(ProviderModel.Update provider)
+        public async Task<IdentityResult> UpdateAsync(ProviderModel.Update provider)
         {
             if (LocalStore.Exists(provider.Id))
             {
-                LocalStore.Update(provider);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.Update(provider);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();

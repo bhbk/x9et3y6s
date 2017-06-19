@@ -25,10 +25,10 @@ namespace Bhbk.Lib.Identity.Store
             _factory = new ModelFactory(context);
         }
 
-        //TODO - change incoming model to ProviderModel.Create
-        public Task Create(ProviderModel.Model provider)
+        public Task Create(ProviderModel.Create provider)
         {
-            var model = _factory.Devolve.DoIt(provider);
+            var create = _factory.Create.DoIt(provider);
+            var model = _factory.Devolve.DoIt(create);
 
             _context.AppProvider.Add(model);
             _context.SaveChanges();
@@ -46,26 +46,22 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        private Task<ProviderModel.Model> FindInternal(AppProvider provider)
+        private Task<ProviderModel.Model> Find(AppProvider provider)
         {
             if (provider == null)
                 return Task.FromResult<ProviderModel.Model>(null);
             else
-            {
-                var model = _factory.Evolve.DoIt(provider);
-
-                return Task.FromResult(model);
-            }
+                return Task.FromResult(_factory.Evolve.DoIt(provider));
         }
 
         public Task<ProviderModel.Model> FindById(Guid providerId)
         {
-            return FindInternal(_context.AppProvider.Where(x => x.Id == providerId).SingleOrDefault());
+            return Find(_context.AppProvider.Where(x => x.Id == providerId).SingleOrDefault());
         }
 
         public Task<ProviderModel.Model> FindByName(string providerName)
         {
-            return FindInternal(_context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault());
+            return Find(_context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault());
         }
 
         public Task<IList<ProviderModel.Model>> GetAll()
@@ -111,7 +107,12 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppProvider.Any(x => x.Id == providerId);
         }
 
-        public Task<bool> IsInProvider(Guid provider, string roleName)
+        public bool Exists(string providerName)
+        {
+            return _context.AppProvider.Any(x => x.Name == providerName);
+        }
+
+        public Task<bool> IsRoleInProvider(Guid provider, string roleName)
         {
             var user = _context.AppProvider.Where(x => x.Name == roleName).SingleOrDefault();
 

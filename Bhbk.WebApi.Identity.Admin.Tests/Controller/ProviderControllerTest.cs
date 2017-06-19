@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
@@ -26,19 +27,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ProviderController(UoW);
             var user = UoW.UserMgmt.LocalStore.Get().First();
-            var model = UoW.Models.Create.DoIt(new ProviderModel.Create()
+            var model = new ProviderModel.Create()
             {
                 Name = BaseLib.Statics.ApiUnitTestProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
-            });
+            };
+            var create = await UoW.ProviderMgmt.CreateAsync(model);
+            create.Should().BeAssignableTo(typeof(IdentityResult));
+            create.Succeeded.Should().BeTrue();
 
-            var provider = await UoW.ProviderMgmt.CreateAsync(model);
-            var result = await controller.AddProviderToUser(model.Id, user.Id) as OkResult;
+            var provider = await UoW.ProviderMgmt.FindByNameAsync(model.Name);
+            provider.Should().BeAssignableTo(typeof(ProviderModel.Model));
+
+            var result = await controller.AddProviderToUser(provider.Id, user.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
-
-            var check = user.Providers.Where(x => x.ProviderId == model.Id).Any();
-            check.Should().BeTrue();
         }
 
         [TestMethod]
@@ -52,7 +55,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
                 Enabled = true,
                 Immutable = false
             };
-
             var result = await controller.CreateProvider(model) as OkNegotiatedContentResult<ProviderModel.Model>;
             result.Content.Should().BeAssignableTo(typeof(ProviderModel.Model));
             result.Content.Name.Should().Be(model.Name);
@@ -63,20 +65,25 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ProviderController(UoW);
             var user = UoW.UserMgmt.LocalStore.Get().First();
-            var model = UoW.Models.Create.DoIt(new ProviderModel.Create()
+            var model = new ProviderModel.Create()
             {
                 Name = BaseLib.Statics.ApiUnitTestProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
-            });
+            };
             var create = await UoW.ProviderMgmt.CreateAsync(model);
-            var add = UoW.UserMgmt.AddToProviderAsync(user.Id, model.Name);
+            create.Should().BeAssignableTo(typeof(IdentityResult));
+            create.Succeeded.Should().BeTrue();
 
-            var result = await controller.RemoveProviderFromUser(model.Id, user.Id) as OkResult;
+            var provider = await UoW.ProviderMgmt.FindByNameAsync(model.Name);
+            provider.Should().BeAssignableTo(typeof(ProviderModel.Model));
+
+            var add = await UoW.UserMgmt.AddToProviderAsync(user.Id, provider.Name);
+            add.Should().BeAssignableTo(typeof(IdentityResult));
+            add.Succeeded.Should().BeTrue();
+
+            var result = await controller.RemoveProviderFromUser(provider.Id, user.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
-
-            var check = user.Providers.Where(x => x.ProviderId == model.Id).Any();
-            check.Should().BeFalse();
         }
 
         [TestMethod]

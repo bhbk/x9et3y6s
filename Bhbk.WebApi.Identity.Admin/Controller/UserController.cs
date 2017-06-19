@@ -25,18 +25,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgmt.FindByNameAsyncDeprecated(model.Email);
+            var user = await UoW.UserMgmt.FindByNameAsync(model.Email);
 
             if (user == null)
             {
-                var create = UoW.Models.Create.DoIt(model);
-                var result = await UoW.UserMgmt.CreateAsync(create);
+                var result = await UoW.UserMgmt.CreateAsync(model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(create);
+                    return Ok(await UoW.UserMgmt.FindByNameAsync(model.Email));
             }
             else
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);

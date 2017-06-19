@@ -19,57 +19,57 @@ namespace Bhbk.Lib.Identity.Manager
             LocalStore = store;
         }
 
-        public Task<IdentityResult> CreateAsync(RoleModel.Model role)
+        public async Task<IdentityResult> CreateAsync(RoleModel.Create role)
         {
-            if (!LocalStore.Exists(role.Id))
+            if (!LocalStore.Exists(role.Name))
             {
-                LocalStore.CreateAsync(role);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.CreateAsync(role);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> DeleteAsync(Guid roleId)
+        public async Task<IdentityResult> DeleteAsync(Guid roleId)
         {
             if (LocalStore.Exists(roleId))
             {
-                LocalStore.DeleteAsync(roleId);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.DeleteAsync(roleId);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<RoleModel.Model> FindByIdAsync(Guid roleId)
+        public async Task<RoleModel.Model> FindByIdAsync(Guid roleId)
         {
-            return LocalStore.FindByIdAsync(roleId);
+            return await LocalStore.FindById(roleId);
         }
 
-        public Task<RoleModel.Model> FindByNameAsync(string roleName)
+        public async Task<RoleModel.Model> FindByNameAsync(string roleName)
         {
-            return LocalStore.FindByNameAsync(roleName);
+            return await LocalStore.FindByName(roleName);
         }
 
-        public Task<IList<RoleModel.Model>> GetListAsync()
+        public async Task<IList<RoleModel.Model>> GetListAsync()
         {
-            return LocalStore.GetAllAsync();
+            return await LocalStore.GetAllAsync();
         }
 
-        public Task<IList<UserModel.Model>> GetUsersAsync(Guid roleId)
+        public async Task<IList<UserModel.Model>> GetUsersAsync(Guid roleId)
         {
             if (LocalStore.Exists(roleId))
-                return LocalStore.GetUsersAsync(roleId);
+                return await LocalStore.GetUsersAsync(roleId);
             else
                 throw new ArgumentNullException();
         }
 
-        public Task<IdentityResult> UpdateAsync(RoleModel.Update role)
+        public async Task<IdentityResult> UpdateAsync(RoleModel.Update role)
         {
             if (LocalStore.Exists(role.Id))
             {
-                LocalStore.UpdateAsync(role);
-                return Task.FromResult(IdentityResult.Success);
+                await LocalStore.UpdateAsync(role);
+                return IdentityResult.Success;
             }
             else
                 throw new ArgumentNullException();
