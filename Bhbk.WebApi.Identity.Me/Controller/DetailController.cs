@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             {
                 string token = await UoW.UserMgmt.GenerateEmailConfirmationTokenAsync(user.Id);
 
-                if (UoW.ConfigMgmt.Tweaks.UnitTestRun)
+                if (UoW.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             {
                 string token = await UoW.UserMgmt.GeneratePasswordResetTokenAsync(user.Id);
 
-                if (UoW.ConfigMgmt.Tweaks.UnitTestRun)
+                if (UoW.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             {
                 string token = await UoW.UserMgmt.GenerateChangePhoneNumberTokenAsync(user.Id, model.NewPhoneNumber);
 
-                if (UoW.ConfigMgmt.Tweaks.UnitTestRun)
+                if (UoW.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {

@@ -1,9 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interface;
-using Bhbk.Lib.Identity.Model;
-using Bhbk.Lib.Identity.Store;
 using Elmah.Contrib.WebApi;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Practices.Unity;
@@ -43,12 +40,9 @@ namespace Bhbk.WebApi.Identity.Sts
         {
             HttpConfiguration config = new HttpConfiguration();
             UnityContainer container = new UnityContainer();
-            CustomIdentityDbContext context = new CustomIdentityDbContext();
 
-            container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserProvider, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
             container.RegisterType<IUnitOfWork, UnitOfWork>(new TransientLifetimeManager());
-            container.RegisterInstance(context);
-            container.RegisterInstance(new UnitOfWork(context));
+            container.RegisterInstance(new UnitOfWork());
             config.DependencyResolver = new CustomDependencyResolver(container);
 
             return config;
@@ -82,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 var injectConfig = ConfigureDependencyInjection();
                 var injectUoW = (IUnitOfWork)injectConfig.DependencyResolver.GetService(typeof(IUnitOfWork));
-                
+
                 app.CreatePerOwinContext<IUnitOfWork>(UnitOfWork.Create);
 
                 _oauthServerOptions = new OAuthAuthorizationServerOptions()
@@ -92,12 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts
 #else
                     ApplicationCanDisplayErrors = false,
 #endif
-                    AllowInsecureHttp = injectUoW.ConfigMgmt.Tweaks.UnitTestRun,
-
-                    AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
-                    AuthorizationCodeProvider = new Provider.CustomAuthorizationCode(injectUoW),
-                    AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLife),
-                    AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
+                    AllowInsecureHttp = true ? injectUoW.ContextStatus == ContextType.UnitTest : false,
 
                     TokenEndpointPath = new PathString("/oauth/v1/token"),
                     Provider = new Provider.CustomAuthorizationServer(injectUoW),
@@ -106,6 +95,11 @@ namespace Bhbk.WebApi.Identity.Sts
 
                     RefreshTokenProvider = new Provider.CustomRefreshToken(injectUoW),
                     //RefreshTokenFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
+
+                    //AuthorizeEndpointPath = new PathString("/oauth/v1/authorize"),
+                    //AuthorizationCodeProvider = new Provider.CustomAuthorizationCode(injectUoW),
+                    //AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(injectUoW.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLife),
+                    //AuthorizationCodeFormat = new Provider.CustomSecureDataFormat(issuer, injectUoW),
                 };
 
                 app.UseOAuthAuthorizationServer(_oauthServerOptions);

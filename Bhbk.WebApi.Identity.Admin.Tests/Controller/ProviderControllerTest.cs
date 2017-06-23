@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ProviderController(UoW);
 
-            var result = await controller.GetProviderList() as OkNegotiatedContentResult<IList<ProviderModel.Model>>;
+            var result = await controller.GetProviders() as OkNegotiatedContentResult<IList<ProviderModel.Model>>;
             result.Content.Should().BeAssignableTo(typeof(IList<ProviderModel.Model>));
             result.Content.Count().ShouldBeEquivalentTo(UoW.ProviderMgmt.LocalStore.Get().Count());
         }

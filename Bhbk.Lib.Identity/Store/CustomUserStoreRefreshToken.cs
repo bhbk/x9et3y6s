@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Infrastructure;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Linq;
@@ -8,14 +9,17 @@ namespace Bhbk.Lib.Identity.Store
 {
     public partial class CustomUserStore : IUserSecurityStampStore<AppUser, Guid>
     {
-        public Task AddRefreshTokenAsync(AppUserRefreshToken token)
+        public Task AddRefreshTokenAsync(UserRefreshTokenModel.Create token)
         {
             var refresh = _context.AppUserRefreshToken.Where(x => x.ProtectedTicket == token.ProtectedTicket).SingleOrDefault();
 
             if (refresh != null)
                 _context.AppUserRefreshToken.Remove(refresh);
 
-            _context.AppUserRefreshToken.Add(token);
+            var add = _factory.Create.DoIt(token);
+            var model = _factory.Devolve.DoIt(add);
+
+            _context.AppUserRefreshToken.Add(model);
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);

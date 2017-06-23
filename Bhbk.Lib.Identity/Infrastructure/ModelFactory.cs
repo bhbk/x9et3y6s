@@ -109,6 +109,20 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     Immutable = claim.Immutable
                 };
             }
+
+            public UserRefreshTokenModel.Model DoIt(UserRefreshTokenModel.Create token)
+            {
+                return new UserRefreshTokenModel.Model
+                {
+                    Id = Guid.NewGuid(),
+                    ClientId = token.ClientId,
+                    AudienceId = token.AudienceId,
+                    UserId = token.UserId,
+                    ProtectedTicket = token.ProtectedTicket,
+                    IssuedUtc = token.IssuedUtc,
+                    ExpiresUtc = token.ExpiresUtc
+                };
+            }
         }
 
         public class BLToEF
@@ -217,6 +231,20 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     Immutable = claim.Immutable
                 };
             }
+
+            public AppUserRefreshToken DoIt(UserRefreshTokenModel.Model token)
+            {
+                return new AppUserRefreshToken
+                {
+                    Id = token.Id,
+                    ClientId = token.ClientId,
+                    AudienceId = token.AudienceId,
+                    UserId = token.UserId,
+                    ProtectedTicket = token.ProtectedTicket,
+                    IssuedUtc = token.IssuedUtc,
+                    ExpiresUtc = token.ExpiresUtc
+                };
+            }
         }
 
         public class EFToBL
@@ -237,7 +265,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     Created = audience.Created,
                     LastUpdated = audience.LastUpdated,
                     Immutable = audience.Immutable,
-                    //Roles = audience.Roles.ToList()
                 };
             }
 
@@ -269,6 +296,21 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 };
             }
 
+            public RoleModel.Model DoIt(AppRole role)
+            {
+                return new RoleModel.Model
+                {
+                    Id = role.Id,
+                    AudienceId = role.AudienceId,
+                    Name = role.Name,
+                    Description = role.Description,
+                    Enabled = role.Enabled,
+                    Created = role.Created,
+                    LastUpdated = role.LastUpdated,
+                    Immutable = role.Immutable
+                };
+            }
+
             public UserModel.Model DoIt(AppUser user)
             {
                 return new UserModel.Model
@@ -294,21 +336,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 };
             }
 
-            public RoleModel.Model DoIt(AppRole role)
-            {
-                return new RoleModel.Model
-                {
-                    Id = role.Id,
-                    AudienceId = role.AudienceId,
-                    Name = role.Name,
-                    Description = role.Description,
-                    Enabled = role.Enabled,
-                    Created = role.Created,
-                    LastUpdated = role.LastUpdated,
-                    Immutable = role.Immutable
-                };
-            }
-
             public UserClaimModel.Model DoIt(AppUserClaim claim)
             {
                 return new UserClaimModel.Model
@@ -324,6 +351,20 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     Created = claim.Created,
                     LastUpdated = claim.LastUpdated,
                     Immutable = claim.Immutable
+                };
+            }
+
+            public UserRefreshTokenModel.Model DoIt(AppUserRefreshToken token)
+            {
+                return new UserRefreshTokenModel.Model
+                {
+                    Id = token.Id,
+                    ClientId = token.ClientId,
+                    AudienceId = token.AudienceId,
+                    UserId = token.UserId,
+                    ProtectedTicket = token.ProtectedTicket,
+                    IssuedUtc = token.IssuedUtc,
+                    ExpiresUtc = token.ExpiresUtc
                 };
             }
         }
@@ -359,7 +400,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
             public DateTime Created { get; set; }
             public Nullable<DateTime> LastUpdated { get; set; }
             public bool Immutable { get; set; }
-            public IList<RoleModel.Model> Roles { get; set; }
+            //public IList<RoleModel.Model> Roles { get; set; }
         }
 
         public class Update
@@ -489,7 +530,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
         public DateTime UnitTestAccessTokenFakeUtcNow { get; set; }
         public bool UnitTestRefreshToken { get; set; }
         public DateTime UnitTestRefreshTokenFakeUtcNow { get; set; }
-        public bool UnitTestRun { get; set; }
     }
 
     public class UserModel
@@ -626,6 +666,30 @@ namespace Bhbk.Lib.Identity.Infrastructure
             public DateTime Created { get; set; }
             public Nullable<DateTime> LastUpdated { get; set; }
             public bool Immutable { get; set; }
+        }
+    }
+
+    public class UserRefreshTokenModel
+    {
+        public class Create
+        {
+            public Guid ClientId { get; set; }
+            public Guid AudienceId { get; set; }
+            public Guid UserId { get; set; }
+            public string ProtectedTicket { get; set; }
+            public DateTime IssuedUtc { get; set; }
+            public DateTime ExpiresUtc { get; set; }
+        }
+
+        public class Model
+        {
+            public Guid Id { get; set; }
+            public Guid ClientId { get; set; }
+            public Guid AudienceId { get; set; }
+            public Guid UserId { get; set; }
+            public string ProtectedTicket { get; set; }
+            public DateTime IssuedUtc { get; set; }
+            public DateTime ExpiresUtc { get; set; }
         }
     }
 }

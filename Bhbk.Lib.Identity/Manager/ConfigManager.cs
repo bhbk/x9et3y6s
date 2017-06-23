@@ -58,7 +58,6 @@ namespace Bhbk.Lib.Identity.Manager
             output.Append("  UnitTestAccessTokenFakeUtcNow:" + _store.Config.UnitTestAccessTokenFakeUtcNow.ToString() + Environment.NewLine);
             output.Append("  UnitTestRefreshToken:" + _store.Config.UnitTestRefreshToken.ToString() + Environment.NewLine);
             output.Append("  UnitTestRefreshTokenFakeUtcNow:" + _store.Config.UnitTestRefreshTokenFakeUtcNow.ToString() + Environment.NewLine);
-            output.Append("  UnitTestRun:" + _store.Config.UnitTestRun.ToString() + Environment.NewLine);
 
             return output.ToString();
         }

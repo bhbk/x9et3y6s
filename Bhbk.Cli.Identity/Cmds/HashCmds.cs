@@ -1,6 +1,5 @@
 ﻿using Bhbk.Cli.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
 using ManyConsole;
 using System;
 using System.Windows.Forms;
@@ -22,8 +21,7 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                Statics.context = new CustomIdentityDbContext();
-                Statics.uow = new UnitOfWork(Statics.context);
+                Statics.uow = new UnitOfWork();
 
                 if (Generate)
                 {

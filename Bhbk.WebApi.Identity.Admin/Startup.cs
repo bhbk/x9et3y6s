@@ -1,9 +1,6 @@
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interface;
-using Bhbk.Lib.Identity.Model;
-using Bhbk.Lib.Identity.Store;
 using Elmah.Contrib.WebApi;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
@@ -43,12 +40,9 @@ namespace Bhbk.WebApi.Identity.Admin
         {
             HttpConfiguration config = new HttpConfiguration();
             UnityContainer container = new UnityContainer();
-            CustomIdentityDbContext context = new CustomIdentityDbContext();
 
-            container.RegisterType<IdentityDbContext<AppUser, AppRole, Guid, AppUserProvider, AppUserRole, AppUserClaim>, CustomIdentityDbContext>(new TransientLifetimeManager());
             container.RegisterType<IUnitOfWork, UnitOfWork>(new TransientLifetimeManager());
-            container.RegisterInstance(context);
-            container.RegisterInstance(new UnitOfWork(context));
+            container.RegisterInstance(new UnitOfWork());
             config.DependencyResolver = new CustomDependencyResolver(container);
 
             return config;
@@ -89,12 +83,12 @@ namespace Bhbk.WebApi.Identity.Admin
 
                 app.UseJwtBearerAuthentication(
                     new JwtBearerAuthenticationOptions
-                    {
+                    {                         
                         AuthenticationMode = AuthenticationMode.Active,
                         AllowedAudiences = audiences.Select(x => x.Id.ToString().ToLower()),
                         IssuerSecurityTokenProviders = new IIssuerSecurityTokenProvider[]
                         {
-                            new SymmetricKeyIssuerSecurityTokenProvider(issuer, audiences.Select(v => TextEncodings.Base64Url.Decode(v.AudienceKey)))
+                            new SymmetricKeyIssuerSecurityTokenProvider(issuer, audiences.Select(x => TextEncodings.Base64Url.Decode(x.AudienceKey)))
                         }
                     });
             }

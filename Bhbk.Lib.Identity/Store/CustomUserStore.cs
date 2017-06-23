@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Store
         private CustomIdentityDbContext _context;
         private CustomIdentityValidator _validator;
         private DbSet<AppUser> _data;
-        private ModelFactory _factory;
+        public ModelFactory _factory;
 
         public CustomUserStore(CustomIdentityDbContext context)
             : base(context)
@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task AddToProviderAsync(AppUser user, string providerName)
+        public Task AddToProviderAsync(Guid userId, string providerName)
         {
             var provider = _context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault();
 
@@ -70,7 +70,7 @@ namespace Bhbk.Lib.Identity.Store
                 AppUserProvider result = new AppUserProvider()
                 {
                     ProviderId = provider.Id,
-                    UserId = user.Id,
+                    UserId = userId,
                     Enabled = true,
                     Created = DateTime.Now,
                     Immutable = false

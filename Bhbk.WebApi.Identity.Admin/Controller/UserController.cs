@@ -11,7 +11,6 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Admin.Controller
 {
     [RoutePrefix("user")]
-    [Authorize(Roles = "(Built-In) Administrators")]
     public class UserController : BaseController
     {
         public UserController() { }
@@ -20,6 +19,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateUser(UserModel.Create model)
         {
             if (!ModelState.IsValid)
@@ -42,6 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpDelete]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteUser(Guid userID)
         {
             var user = await UoW.UserMgmt.FindByIdAsync(userID);
@@ -65,7 +66,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpGet]
-        [Authorize]
         public async Task<IHttpActionResult> GetUser(Guid userID)
         {
             var user = await UoW.UserMgmt.FindByIdAsync(userID);
@@ -78,7 +78,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{username}"), HttpGet]
-        [Authorize]
         public async Task<IHttpActionResult> GetUserByName(string username)
         {
             var user = await UoW.UserMgmt.FindByNameAsync(username);
@@ -91,7 +90,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/providers"), HttpGet]
-        [Authorize]
         public async Task<IHttpActionResult> GetUserProviders(Guid userID)
         {
             var user = await UoW.UserMgmt.FindByIdAsync(userID);
@@ -125,7 +123,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/roles"), HttpGet]
-        [Authorize]
         public async Task<IHttpActionResult> GetUserRoles(Guid userID)
         {
             var user = await UoW.UserMgmt.FindByIdAsync(userID);
@@ -141,13 +138,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1"), HttpGet]
-        [Authorize]
-        public async Task<IHttpActionResult> GetUserList()
+        public async Task<IHttpActionResult> GetUsers()
         {
             return Ok(await UoW.UserMgmt.GetListAsync());
         }
 
         [Route("v1/{userID}/add-password"), HttpPut]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> AddPassword(Guid userID, UserModel.AddPassword model)
         {
             if (!ModelState.IsValid)
@@ -174,6 +171,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/remove-password"), HttpPut]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> RemovePassword(Guid userID)
         {
             if (!ModelState.IsValid)
@@ -200,6 +198,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}/reset-password"), HttpPut]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> ResetPassword(Guid userID, UserModel.AddPassword model)
         {
             if (!ModelState.IsValid)
@@ -227,6 +226,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{userID}"), HttpPut]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateUser(Guid userID, UserModel.Update model)
         {
             if (!ModelState.IsValid)

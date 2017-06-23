@@ -3,15 +3,17 @@ using Bhbk.Lib.Identity.Manager;
 using Bhbk.Lib.Identity.Model;
 using Bhbk.Lib.Identity.Store;
 using System;
+using System.Data.Entity.Core.EntityClient;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
     //https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
     public class UnitOfWork : IUnitOfWork
     {
-        private bool _disposed = false;
-        private ModelFactory _models;
+        private bool _disposed;
+        private ContextType _contextType;
         private CustomIdentityDbContext _context;
+        private ModelFactory _modelFactory;
         private AudienceManager _audienceMgmt;
         private ClientManager _clientMgmt;
         private ProviderManager _providerMgmt;
@@ -22,21 +24,39 @@ namespace Bhbk.Lib.Identity.Infrastructure
         public UnitOfWork()
             : this(new CustomIdentityDbContext())
         {
+            this._contextType = ContextType.Live;
+        }
+
+        public UnitOfWork(EntityConnection connection)
+            : this(new CustomIdentityDbContext(connection))
+        {
+            if (connection == null)
+                throw new ArgumentNullException();
+
+            this._contextType = ContextType.UnitTest;
+        }
+
+        private UnitOfWork(CustomIdentityDbContext context)
+        {
+            this._disposed = false;
+
+            if (context == null)
+                throw new ArgumentNullException();
+
+            this._context = context;
+
             CreateFactories();
             CreateManagers();
         }
 
-        public UnitOfWork(CustomIdentityDbContext context)
+        public static UnitOfWork Create()
         {
-            _context = context;
-
-            CreateFactories();
-            CreateManagers();
+            return new UnitOfWork();
         }
 
         private void CreateFactories()
         {
-            _models = new ModelFactory(this._context);
+            _modelFactory = new ModelFactory(this._context);
         }
 
         private void CreateManagers()
@@ -49,24 +69,22 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _userMgmt = new CustomUserManager(new CustomUserStore(this._context));
         }
 
-        public static UnitOfWork Create()
+        public ContextType ContextStatus
         {
-            return new UnitOfWork();
-        }
-
-        public static UnitOfWork Create(CustomIdentityDbContext context)
-        {
-            return new UnitOfWork(context);
+            get
+            {
+                return this._contextType;
+            }
         }
 
         public ModelFactory Models
         {
             get
             {
-                if (this._models == null)
-                    this._models = new ModelFactory(this._context);
+                if (this._modelFactory == null)
+                    this._modelFactory = new ModelFactory(this._context);
 
-                return this._models;
+                return this._modelFactory;
             }
         }
 
@@ -156,5 +174,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+    }
+
+    public enum ContextType
+    {
+        UnitTest,
+        Live
     }
 }

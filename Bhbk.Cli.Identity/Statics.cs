@@ -12,7 +12,6 @@ namespace Bhbk.Cli.Identity
 
     internal class Statics
     {
-        internal static CustomIdentityDbContext context;
         internal static UnitOfWork uow;
     }
 }

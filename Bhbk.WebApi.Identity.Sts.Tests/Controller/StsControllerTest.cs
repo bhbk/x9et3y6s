@@ -26,12 +26,28 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         }
 
         [TestMethod]
+        public async Task Api_Sts_AccessToken_Auth_Fail_AudienceDisabled()
+        {
+            var user = BaseControllerTest.UoW.UserMgmt.LocalStore.Get().First();
+            var client = BaseControllerTest.UoW.ClientMgmt.LocalStore.Get().First();
+            var audience = BaseControllerTest.UoW.AudienceMgmt.LocalStore.Get().First();
+
+            audience.Enabled = false;
+            BaseControllerTest.UoW.AudienceMgmt.LocalStore.Update(audience);
+            BaseControllerTest.UoW.AudienceMgmt.LocalStore.Save();
+
+            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.IsSuccessStatusCode.Should().BeFalse();
+        }
+
+        [TestMethod]
         public async Task Api_Sts_AccessToken_Auth_Fail_AudienceInvalid()
         {
             var user = BaseControllerTest.UoW.UserMgmt.LocalStore.Get().First();
             var client = BaseControllerTest.UoW.ClientMgmt.LocalStore.Get().First();
-            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
+            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.IsSuccessStatusCode.Should().BeFalse();
         }
@@ -41,8 +57,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         {
             var user = BaseControllerTest.UoW.UserMgmt.LocalStore.Get().First();
             var client = BaseControllerTest.UoW.ClientMgmt.LocalStore.Get().First();
-            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
+            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.IsSuccessStatusCode.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_AccessToken_Auth_Fail_ClientDisabled()
+        {
+            var user = BaseControllerTest.UoW.UserMgmt.LocalStore.Get().First();
+            var client = BaseControllerTest.UoW.ClientMgmt.LocalStore.Get().First();
+            var audience = BaseControllerTest.UoW.AudienceMgmt.LocalStore.Get().First();
+
+            client.Enabled = false;
+            BaseControllerTest.UoW.ClientMgmt.LocalStore.Update(client);
+            BaseControllerTest.UoW.ClientMgmt.LocalStore.Save();
+
+            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.IsSuccessStatusCode.Should().BeFalse();
         }
@@ -52,8 +84,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         {
             var user = BaseControllerTest.UoW.UserMgmt.LocalStore.Get().First();
             var audience = BaseControllerTest.UoW.AudienceMgmt.LocalStore.Get().First();
-            var result = await Sts.GetAccessToken(_owin, EntrophyHelper.GenerateRandomBase64(8), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
+            var result = await Sts.GetAccessToken(_owin, EntrophyHelper.GenerateRandomBase64(8), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.IsSuccessStatusCode.Should().BeFalse();
         }
@@ -63,8 +95,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         {
             var user = BaseControllerTest.UoW.UserMgmt.LocalStore.Get().First();
             var audience = BaseControllerTest.UoW.AudienceMgmt.LocalStore.Get().First();
-            var result = await Sts.GetAccessToken(_owin, string.Empty, audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
+            var result = await Sts.GetAccessToken(_owin, string.Empty, audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.IsSuccessStatusCode.Should().BeFalse();
         }
@@ -74,8 +106,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
         {
             var audience = BaseControllerTest.UoW.AudienceMgmt.LocalStore.Get().First();
             var client = BaseControllerTest.UoW.ClientMgmt.LocalStore.Get().First();
-            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), string.Empty);
 
+            var result = await Sts.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.IsSuccessStatusCode.Should().BeFalse();
         }

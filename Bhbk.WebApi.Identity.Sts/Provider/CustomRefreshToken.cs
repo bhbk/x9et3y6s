@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Interface;
-using Bhbk.Lib.Identity.Model;
+﻿using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.Infrastructure;
 using System;
@@ -33,51 +33,51 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             Guid clientID, audienceID, userID;
             DateTime issue, expire;
-            AppClient client;
-            AppAudience audience;
-            AppUser user;
+            ClientModel.Model client;
+            AudienceModel.Model audience;
+            UserModel.Model user;
 
             string clientValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrClientID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrClientID] : null;
 
-            string audienceValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrAudienceID)
-                ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrAudienceID] : null;
-
-            string userValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrUserID)
-                ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrUserID] : null;
-
             if (string.IsNullOrEmpty(clientValue))
                 return;
 
+            string audienceValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrAudienceID)
+                ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrAudienceID] : null;
+
             if (string.IsNullOrEmpty(audienceValue))
                 return;
+
+            string userValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrUserID)
+                ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrUserID] : null;
 
             if (string.IsNullOrEmpty(userValue))
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = await _uow.ClientMgmt.FindByIdAsync(clientID);
             else
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = await _uow.ClientMgmt.FindByNameAsync(clientValue);
 
-            if (client == null)
+            if (client == null || !client.Enabled)
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = await _uow.AudienceMgmt.FindByIdAsync(audienceID);
             else
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = await _uow.AudienceMgmt.FindByNameAsync(audienceValue);
 
-            if (audience == null)
+            if (audience == null || !audience.Enabled)
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = _uow.UserMgmt.LocalStore.Get(x => x.Id == userID).SingleOrDefault();
+                user = await _uow.UserMgmt.FindByIdAsync(userID);
             else
-                user = _uow.UserMgmt.LocalStore.Get(x => x.Email == userValue).SingleOrDefault();
+                user = await _uow.UserMgmt.FindByNameAsync(userValue);
 
             if (user == null)
                 return;
@@ -90,9 +90,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (await _uow.UserMgmt.IsLockedOutAsync(user.Id))
                 return;
 
-            Guid tokenID = Guid.NewGuid();
-
-            if (_uow.ConfigMgmt.Tweaks.UnitTestRefreshToken)
+            if (_uow.ContextStatus == ContextType.UnitTest
+                && _uow.ConfigMgmt.Tweaks.UnitTestRefreshToken)
             {
                 issue = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow;
                 expire = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
@@ -103,20 +102,18 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 expire = DateTime.UtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
 
-            AppUserRefreshToken token = new AppUserRefreshToken()
+            var token = new UserRefreshTokenModel.Create()
             {
-                Id = tokenID,
                 ClientId = client.Id,
                 AudienceId = audience.Id,
                 UserId = user.Id,
+                ProtectedTicket = context.SerializeTicket(),
                 IssuedUtc = issue,
                 ExpiresUtc = expire
             };
 
             context.Ticket.Properties.IssuedUtc = token.IssuedUtc;
             context.Ticket.Properties.ExpiresUtc = token.ExpiresUtc;
-
-            token.ProtectedTicket = context.SerializeTicket();
 
             var result = await _uow.UserMgmt.AddRefreshTokenAsync(token);
 
@@ -137,8 +134,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
             Guid clientID, audienceID;
-            AppClient client;
-            AppAudience audience;
+            ClientModel.Model client;
+            AudienceModel.Model audience;
 
             var postValues = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
 
@@ -153,20 +150,20 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = await _uow.ClientMgmt.FindByIdAsync(clientID);
             else
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = await _uow.ClientMgmt.FindByNameAsync(clientValue);
 
-            if (client == null)
+            if (client == null || !client.Enabled)
                 return;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = await _uow.AudienceMgmt.FindByIdAsync(audienceID);
             else
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = await _uow.AudienceMgmt.FindByNameAsync(audienceValue);
 
-            if (audience == null)
+            if (audience == null || !audience.Enabled)
                 return;
 
             var token = await _uow.UserMgmt.FindRefreshTokenAsync(context.Token);

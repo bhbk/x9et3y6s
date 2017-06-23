@@ -119,7 +119,7 @@ namespace Bhbk.Lib.Identity.Helper
                 {
                     AudienceId = foundAudience.Id,
                     Name = Statics.ApiDefaultRoleForViewer,
-                    Enabled = false,
+                    Enabled = true,
                     Immutable = true
                 };
 

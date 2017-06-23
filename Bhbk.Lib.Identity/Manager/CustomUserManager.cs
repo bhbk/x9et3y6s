@@ -102,28 +102,26 @@ namespace Bhbk.Lib.Identity.Manager
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> AddRefreshTokenAsync(AppUserRefreshToken token)
+        public async Task<IdentityResult> AddRefreshTokenAsync(UserRefreshTokenModel.Create token)
         {
-            var user = await FindByIdAsyncDeprecated(token.UserId);
-
-            if (user == null)
+            if (LocalStore.Exists(token.UserId))
+            {
+                await LocalStore.AddRefreshTokenAsync(token);
+                return IdentityResult.Success;
+            }
+            else
                 throw new ArgumentNullException();
-
-            await LocalStore.AddRefreshTokenAsync(token);
-
-            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> AddToProviderAsync(Guid userId, string provider)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
-
-            if (user == null)
+            if (LocalStore.Exists(userId))
+            {
+                await LocalStore.AddToProviderAsync(userId, provider);
+                return IdentityResult.Success;
+            }
+            else
                 throw new ArgumentNullException();
-
-            await LocalStore.AddToProviderAsync(user, provider);
-
-            return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> AddToRoleAsync(Guid userId, string role)
@@ -183,14 +181,17 @@ namespace Bhbk.Lib.Identity.Manager
             }
         }
 
-        public override async Task<bool> CheckPasswordAsync(AppUser user, string password)
+        public async Task<bool> CheckPasswordAsync(Guid userId, string password)
         {
-            var found = await FindByIdAsyncDeprecated(user.Id);
+            var user = await FindByIdAsync(userId);
 
-            if (found == null)
+            if (user == null)
                 throw new ArgumentNullException();
 
-            return await VerifyPasswordAsync(this.LocalStore, found, password);
+            //TODO - clean this up
+            var devolve = LocalStore._factory.Devolve.DoIt(user);
+
+            return await VerifyPasswordAsync(this.LocalStore, devolve, password);
         }
 
         public override async Task<IdentityResult> ConfirmEmailAsync(Guid userId, string token)
@@ -275,14 +276,18 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<ClaimsIdentity> CreateIdentityAsync(AppUser user, string authenticationType)
         {
-            IList<Claim> claimCollection = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, user.Email),
-            };
+            IList<Claim> claims = new List<Claim>();
 
-            var claimsIdentity = new ClaimsIdentity(claimCollection, authenticationType);
+            foreach (string role in await LocalStore.GetRolesAsync(user))
+                claims.Add(new Claim(ClaimTypes.Role, role));
 
-            return await Task.Run(() => claimsIdentity);
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
+            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
+
+            var result = new ClaimsIdentity(claims, authenticationType);
+
+            return await Task.Run(() => result);
         }
 
         //protected async Task<SecurityToken> CreateSecurityTokenAsync(Guid userId)

@@ -9,7 +9,6 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Admin.Controller
 {
     [RoutePrefix("audience")]
-    [Authorize(Roles = "(Built-In) Administrators")]
     public class AudienceController : BaseController
     {
         public AudienceController() { }
@@ -18,6 +17,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             : base(uow) { }
 
         [Route("v1"), HttpPost]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> CreateAudience(AudienceModel.Create model)
         {
             if (!ModelState.IsValid)
@@ -42,6 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{audienceID}"), HttpDelete]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> DeleteAudience(Guid audienceID)
         {
             var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
@@ -65,14 +66,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1")]
-        [Authorize]
-        public async Task<IHttpActionResult> GetAudienceList()
+        public async Task<IHttpActionResult> GetAudiences()
         {
             return Ok(await UoW.AudienceMgmt.GetListAsync());
         }
 
         [Route("v1/{audienceID}"), HttpGet]
-        [Authorize]
         public async Task<IHttpActionResult> GetAudience(Guid audienceID)
         {
             var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
@@ -84,21 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 return Ok(audience);
         }
 
-        [Route("v1/{audienceID}/key"), HttpGet]
-        [AllowAnonymous]
-        public async Task<IHttpActionResult> GetAudienceKey(Guid audienceID)
-        {
-            var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
-
-            if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
-
-            else
-                return Ok(audience.AudienceKey);
-        }
-
         [Route("v1/{audienceID}/roles"), HttpGet]
-        [Authorize]
         public async Task<IHttpActionResult> GetAudienceRoles(Guid audienceID)
         {
             var audience = await UoW.AudienceMgmt.FindByIdAsync(audienceID);
@@ -111,6 +96,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
         }
 
         [Route("v1/{audienceID}"), HttpPut]
+        [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IHttpActionResult> UpdateAudience(Guid audienceID, AudienceModel.Update model)
         {
             if (!ModelState.IsValid)

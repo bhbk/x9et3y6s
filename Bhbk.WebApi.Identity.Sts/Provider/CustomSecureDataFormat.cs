@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Interface;
-using Bhbk.Lib.Identity.Model;
+﻿using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interface;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Newtonsoft.Json.Linq;
@@ -27,51 +27,53 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (ticket == null)
                 throw new ArgumentNullException();
 
-            Guid clientID, audienceID;
-            DateTimeOffset? issue, expire;
-            AppClient client;
-            AppAudience audience;
-
             string clientValue = ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrClientID)
                 ? ticket.Properties.Dictionary[BaseLib.Statics.AttrClientID] : null;
-
-            string audienceValue = ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrAudienceID)
-                ? ticket.Properties.Dictionary[BaseLib.Statics.AttrAudienceID] : null;
 
             if (string.IsNullOrEmpty(clientValue))
                 throw new ArgumentNullException(BaseLib.Statics.MsgClientInvalid);
 
+            string audienceValue = ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrAudienceID)
+                ? ticket.Properties.Dictionary[BaseLib.Statics.AttrAudienceID] : null;
+
             if (string.IsNullOrEmpty(audienceValue))
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
+            Guid clientID, audienceID;
+            DateTimeOffset? issue, expire;
+            ClientModel.Model client;
+            AudienceModel.Model audience;
+
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.FindByIdAsync(clientID).Result;
             else
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.FindByNameAsync(clientValue).Result;
 
-            if (client == null)
+            if (client == null || !client.Enabled)
                 throw new ArgumentNullException(BaseLib.Statics.MsgClientInvalid);
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.FindByIdAsync(audienceID).Result;
             else
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.FindByNameAsync(audienceValue).Result;
 
-            if (audience == null)
+            if (audience == null || !audience.Enabled)
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
             string symmetricKey = audience.AudienceKey;
             var keyBytes = TextEncodings.Base64Url.Decode(symmetricKey);
             var signingKey = new HmacSigningCredentials(keyBytes);
 
-            if (_uow.ConfigMgmt.Tweaks.UnitTestAccessToken)
+            if (_uow.ContextStatus == ContextType.UnitTest
+                && _uow.ConfigMgmt.Tweaks.UnitTestAccessToken)
             {
                 issue = _uow.ConfigMgmt.Tweaks.UnitTestAccessTokenFakeUtcNow;
                 expire = _uow.ConfigMgmt.Tweaks.UnitTestAccessTokenFakeUtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultAccessTokenLife);
             }
-            else if (_uow.ConfigMgmt.Tweaks.UnitTestRefreshToken)
+            else if (_uow.ContextStatus == ContextType.UnitTest
+                && _uow.ConfigMgmt.Tweaks.UnitTestRefreshToken)
             {
                 issue = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow;
                 expire = _uow.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
@@ -93,11 +95,6 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentNullException();
 
-            Guid clientID, audienceID;
-            AppClient client;
-            AppAudience audience;
-            SecurityToken token;
-
             var jwt = JObject.Parse(text);
             var clientValue = (string)jwt[BaseLib.Statics.AttrClientID];
             var audienceValue = (string)jwt[BaseLib.Statics.AttrAudienceID];
@@ -108,22 +105,27 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (string.IsNullOrEmpty(audienceValue))
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
+            Guid clientID, audienceID;
+            ClientModel.Model client;
+            AudienceModel.Model audience;
+            SecurityToken token;
+
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Id == clientID && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.FindByIdAsync(clientID).Result;
             else
-                client = _uow.ClientMgmt.LocalStore.Get(x => x.Name == clientValue && x.Enabled).SingleOrDefault();
+                client = _uow.ClientMgmt.FindByNameAsync(clientValue).Result;
 
-            if (client == null)
+            if (client == null || !client.Enabled)
                 throw new ArgumentNullException(BaseLib.Statics.MsgClientInvalid);
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Id == audienceID && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.FindByIdAsync(audienceID).Result;
             else
-                audience = _uow.AudienceMgmt.LocalStore.Get(x => x.Name == audienceValue && x.Enabled).SingleOrDefault();
+                audience = _uow.AudienceMgmt.FindByNameAsync(audienceValue).Result;
 
-            if (audience == null)
+            if (audience == null || !audience.Enabled)
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
             var keyByteArray = TextEncodings.Base64Url.Decode(audience.AudienceKey);

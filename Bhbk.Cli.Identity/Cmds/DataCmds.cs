@@ -1,7 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helper;
 using Bhbk.Lib.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
 using ManyConsole;
 using System;
 
@@ -24,8 +23,7 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                Statics.context = new CustomIdentityDbContext();
-                Statics.uow = new UnitOfWork(Statics.context);
+                Statics.uow = new UnitOfWork();
                 DataSeedHelper kaboom = new DataSeedHelper(Statics.uow);
 
                 if (CreateDefault)

@@ -41,7 +41,6 @@ namespace Bhbk.Lib.Identity.Store
                 _context.UnitTestAccessTokenFakeUtcNow = DateTime.UtcNow;
                 _context.UnitTestRefreshToken = false;
                 _context.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
-                _context.UnitTestRun = false;
             }
             catch (Exception ex)
             {

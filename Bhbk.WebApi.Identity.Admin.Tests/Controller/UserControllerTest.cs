@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new UserController(UoW);
 
-            var result = await controller.GetUserList() as OkNegotiatedContentResult<IList<UserModel.Model>>;
+            var result = await controller.GetUsers() as OkNegotiatedContentResult<IList<UserModel.Model>>;
             result.Content.Should().BeAssignableTo(typeof(IList<UserModel.Model>));
             result.Content.Count().ShouldBeEquivalentTo(UoW.UserMgmt.LocalStore.Get().Count());
         }

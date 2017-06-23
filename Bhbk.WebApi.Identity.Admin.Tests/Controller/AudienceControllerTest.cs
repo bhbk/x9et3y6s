@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new AudienceController(UoW);
 
-            var result = await controller.GetAudienceList() as OkNegotiatedContentResult<IList<AudienceModel.Model>>;
+            var result = await controller.GetAudiences() as OkNegotiatedContentResult<IList<AudienceModel.Model>>;
             result.Content.Should().BeAssignableTo(typeof(IList<AudienceModel.Model>));
             result.Content.Count().ShouldBeEquivalentTo(UoW.AudienceMgmt.LocalStore.Get().Count());
         }
@@ -87,17 +87,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
             var result = await controller.GetAudienceRoles(audience.Id) as OkNegotiatedContentResult<IList<RoleModel.Model>>;
             result.Content.Should().BeAssignableTo(typeof(IList<RoleModel.Model>));
             result.Content.Count().ShouldBeEquivalentTo(UoW.RoleMgmt.LocalStore.Get().Count());
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_Audience_GetKey_Success()
-        {
-            var controller = new AudienceController(UoW);
-            var audience = UoW.AudienceMgmt.LocalStore.Get().First();
-
-            var result = await controller.GetAudienceKey(audience.Id) as OkNegotiatedContentResult<string>;
-            result.Content.Should().BeAssignableTo(typeof(string));
-            result.Content.ShouldBeEquivalentTo(audience.AudienceKey);
         }
 
         [TestMethod]

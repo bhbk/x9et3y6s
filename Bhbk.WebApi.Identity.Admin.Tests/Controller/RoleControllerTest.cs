@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new RoleController(UoW);
 
-            var result = await controller.GetRoleList() as OkNegotiatedContentResult<IList<RoleModel.Model>>;
+            var result = await controller.GetRoles() as OkNegotiatedContentResult<IList<RoleModel.Model>>;
             result.Content.Should().BeAssignableTo(typeof(IList<RoleModel.Model>));
             result.Content.Count().ShouldBeEquivalentTo(UoW.RoleMgmt.LocalStore.Get().Count());
         }
