@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using System;
 using System.Xml;
 

@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 var injectConfig = ConfigureDependencyInjection();
                 var injectUoW = (IUnitOfWork)injectConfig.DependencyResolver.GetService(typeof(IUnitOfWork));
-                var audiences = injectUoW.AudienceMgmt.LocalStore.Get(x => x.Name.StartsWith(BaseLib.Statics.ApiUnitTestAudience) 
+                var audiences = injectUoW.AudienceMgmt.Store.Get(x => x.Name.StartsWith(BaseLib.Statics.ApiUnitTestAudience) 
                     || x.Name.StartsWith("Bhbk.WebApi.") || x.Name.StartsWith("Bhbk.WebUi."));
 
                 app.CreatePerOwinContext<IUnitOfWork>(UnitOfWork.Create);

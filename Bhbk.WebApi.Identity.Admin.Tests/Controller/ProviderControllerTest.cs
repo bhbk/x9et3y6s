@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
 using Microsoft.AspNet.Identity;
@@ -26,19 +26,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Provider_AddToUser_Success()
         {
             var controller = new ProviderController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
-            var model = new ProviderModel.Create()
+            var user = UoW.UserMgmt.Store.Get().First();
+            var model = new ProviderCreate()
             {
                 Name = BaseLib.Statics.ApiUnitTestProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
             };
-            var create = await UoW.ProviderMgmt.CreateAsync(model);
-            create.Should().BeAssignableTo(typeof(IdentityResult));
-            create.Succeeded.Should().BeTrue();
+            var create = await UoW.ProviderMgmt.CreateAsync(UoW.ProviderMgmt.Store.Mf.Create.DoIt(model));
+            create.Should().BeAssignableTo(typeof(ProviderModel));
 
             var provider = await UoW.ProviderMgmt.FindByNameAsync(model.Name);
-            provider.Should().BeAssignableTo(typeof(ProviderModel.Model));
+            provider.Should().BeAssignableTo(typeof(ProviderModel));
 
             var result = await controller.AddProviderToUser(provider.Id, user.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
@@ -49,14 +48,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             string name = BaseLib.Statics.ApiUnitTestProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ProviderController(UoW);
-            var model = new ProviderModel.Create()
+            var model = new ProviderCreate()
             {
                 Name = name,
                 Enabled = true,
                 Immutable = false
             };
-            var result = await controller.CreateProvider(model) as OkNegotiatedContentResult<ProviderModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(ProviderModel.Model));
+            var result = await controller.CreateProvider(model) as OkNegotiatedContentResult<ProviderModel>;
+            result.Content.Should().BeAssignableTo(typeof(ProviderModel));
             result.Content.Name.Should().Be(model.Name);
         }
 
@@ -64,19 +63,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Provider_RemoveFromUser_Success()
         {
             var controller = new ProviderController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
-            var model = new ProviderModel.Create()
+            var user = UoW.UserMgmt.Store.Get().First();
+            var model = new ProviderCreate()
             {
                 Name = BaseLib.Statics.ApiUnitTestProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
                 Enabled = true,
                 Immutable = false
             };
-            var create = await UoW.ProviderMgmt.CreateAsync(model);
-            create.Should().BeAssignableTo(typeof(IdentityResult));
-            create.Succeeded.Should().BeTrue();
+            var create = await UoW.ProviderMgmt.CreateAsync(UoW.ProviderMgmt.Store.Mf.Create.DoIt(model));
+            create.Should().BeAssignableTo(typeof(ProviderModel));
 
             var provider = await UoW.ProviderMgmt.FindByNameAsync(model.Name);
-            provider.Should().BeAssignableTo(typeof(ProviderModel.Model));
+            provider.Should().BeAssignableTo(typeof(ProviderModel));
 
             var add = await UoW.UserMgmt.AddToProviderAsync(user.Id, provider.Name);
             add.Should().BeAssignableTo(typeof(IdentityResult));
@@ -90,10 +88,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Provider_Get_Success()
         {
             var controller = new ProviderController(UoW);
-            var provider = UoW.ProviderMgmt.LocalStore.Get().First();
+            var provider = UoW.ProviderMgmt.Store.Get().First();
 
-            var result = await controller.GetProvider(provider.Id) as OkNegotiatedContentResult<ProviderModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(ProviderModel.Model));
+            var result = await controller.GetProvider(provider.Id) as OkNegotiatedContentResult<ProviderModel>;
+            result.Content.Should().BeAssignableTo(typeof(ProviderModel));
             result.Content.Id.Should().Be(provider.Id);
         }
 
@@ -102,20 +100,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ProviderController(UoW);
 
-            var result = await controller.GetProviders() as OkNegotiatedContentResult<IList<ProviderModel.Model>>;
-            result.Content.Should().BeAssignableTo(typeof(IList<ProviderModel.Model>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.ProviderMgmt.LocalStore.Get().Count());
+            var result = await controller.GetProviders() as OkNegotiatedContentResult<IList<ProviderModel>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<ProviderModel>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.ProviderMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Provider_GetUserList_Success()
         {
             var controller = new ProviderController(UoW);
-            var provider = UoW.ProviderMgmt.LocalStore.Get().First();
+            var provider = UoW.ProviderMgmt.Store.Get().First();
 
-            var result = await controller.GetProviderUsers(provider.Id) as OkNegotiatedContentResult<IList<UserModel.Model>>;
-            result.Content.Should().BeAssignableTo(typeof(IList<UserModel.Model>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.UserMgmt.LocalStore.Get().Count());
+            var result = await controller.GetProviderUsers(provider.Id) as OkNegotiatedContentResult<IList<UserModel>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<UserModel>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.UserMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -123,8 +121,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             string name = BaseLib.Statics.ApiUnitTestProvider + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ProviderController(UoW);
-            var provider = UoW.ProviderMgmt.LocalStore.Get().First();
-            var model = new ProviderModel.Update()
+            var provider = UoW.ProviderMgmt.Store.Get().First();
+            var model = new ProviderUpdate()
             {
                 Id = provider.Id,
                 Name = name + "(Updated)",
@@ -132,8 +130,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
                 Immutable = false
             };
 
-            var result = await controller.UpdateProvider(provider.Id, model) as OkNegotiatedContentResult<ProviderModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(ProviderModel.Model));
+            var result = await controller.UpdateProvider(provider.Id, model) as OkNegotiatedContentResult<ProviderModel>;
+            result.Content.Should().BeAssignableTo(typeof(ProviderModel));
             result.Content.Name.Should().Be(model.Name);
         }
 
@@ -141,12 +139,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Provider_Delete_Success()
         {
             var controller = new ProviderController(UoW);
-            var provider = UoW.ProviderMgmt.LocalStore.Get().First();
+            var provider = UoW.ProviderMgmt.Store.Get().First();
 
             var result = await controller.DeleteProvider(provider.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
 
-            var check = UoW.ProviderMgmt.LocalStore.Get(x => x.Id == provider.Id).Any();
+            var check = UoW.ProviderMgmt.Store.Get(x => x.Id == provider.Id).Any();
             check.Should().BeFalse();
         }
     }

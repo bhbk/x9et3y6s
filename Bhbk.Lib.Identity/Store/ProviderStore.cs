@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Model;
-using Microsoft.AspNet.Identity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,8 +12,7 @@ namespace Bhbk.Lib.Identity.Store
 {
     public class ProviderStore : GenericStore<AppProvider, Guid>
     {
-        private CustomIdentityDbContext _context;
-        private ModelFactory _factory;
+        public ModelFactory Mf;
 
         public ProviderStore(CustomIdentityDbContext context)
             : base(context)
@@ -22,84 +21,26 @@ namespace Bhbk.Lib.Identity.Store
                 throw new ArgumentNullException();
 
             _context = context;
-            _factory = new ModelFactory(context);
+            Mf = new ModelFactory(context);
         }
 
-        public Task Create(ProviderModel.Create provider)
+        public override AppProvider Create(AppProvider provider)
         {
-            var create = _factory.Create.DoIt(provider);
-            var model = _factory.Devolve.DoIt(create);
-
-            _context.AppProvider.Add(model);
+            var result = _context.AppProvider.Add(provider);
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
+            return result;
         }
 
-        public Task Delete(Guid providerId)
+        public override bool Delete(Guid providerId)
         {
             var provider = _context.AppProvider.Where(x => x.Id == providerId).Single();
 
             _context.AppProvider.Remove(provider);
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
-        }
-
-        private Task<ProviderModel.Model> Find(AppProvider provider)
-        {
-            if (provider == null)
-                return Task.FromResult<ProviderModel.Model>(null);
-            else
-                return Task.FromResult(_factory.Evolve.DoIt(provider));
-        }
-
-        public Task<ProviderModel.Model> FindById(Guid providerId)
-        {
-            return Find(_context.AppProvider.Where(x => x.Id == providerId).SingleOrDefault());
-        }
-
-        public Task<ProviderModel.Model> FindByName(string providerName)
-        {
-            return Find(_context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault());
-        }
-
-        public Task<IList<ProviderModel.Model>> GetAll()
-        {
-            IList<ProviderModel.Model> result = new List<ProviderModel.Model>();
-            var providers = _context.AppProvider.ToList();
-
-            if (providers == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppProvider provider in providers)
-                    result.Add(_factory.Evolve.DoIt(provider));
-
-                return Task.FromResult(result);
-            }
-        }
-
-        public Task<IList<UserModel.Model>> GetUsers(Guid providerId)
-        {
-            IList<UserModel.Model> result = new List<UserModel.Model>();
-            var list = _context.AppUserProvider.Where(x => x.ProviderId == providerId).ToList();
-
-            if (list == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppUserProvider entry in list)
-                {
-                    var user = _context.AppUser.Where(x => x.Id == entry.UserId).Single();
-
-                    result.Add(_factory.Evolve.DoIt(user));
-                }
-
-                return Task.FromResult(result);
-            }
+            return true;
+            //return Exists(providerId);
         }
 
         public override bool Exists(Guid providerId)
@@ -112,21 +53,58 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppProvider.Any(x => x.Name == providerName);
         }
 
-        public Task<bool> IsRoleInProvider(Guid provider, string roleName)
+        private Task<ProviderModel> Find(AppProvider provider)
         {
-            var user = _context.AppProvider.Where(x => x.Name == roleName).SingleOrDefault();
-
-            if (user == null)
-                throw new ArgumentNullException();
-
-            else if (_context.AppUserProvider.Any(x => x.ProviderId == provider && x.UserId == user.Id))
-                return Task.FromResult(true);
-
+            if (provider == null)
+                return Task.FromResult<ProviderModel>(null);
             else
-                return Task.FromResult(false);
+                return Task.FromResult(Mf.Evolve.DoIt(provider));
         }
 
-        public Task Update(ProviderModel.Update provider)
+        public AppProvider FindById(Guid providerId)
+        {
+            return _context.AppProvider.Where(x => x.Id == providerId).SingleOrDefault();
+        }
+
+        public AppProvider FindByName(string providerName)
+        {
+            return _context.AppProvider.Where(x => x.Name == providerName).SingleOrDefault();
+        }
+
+        public IList<AppProvider> GetAll()
+        {
+            return _context.AppProvider.ToList();
+        }
+
+        public IList<AppUser> GetUsers(Guid providerId)
+        {
+            IList<AppUser> result = new List<AppUser>();
+            var list = _context.AppUserProvider.Where(x => x.ProviderId == providerId).ToList();
+
+            if (list == null)
+                throw new InvalidOperationException();
+
+            foreach (AppUserProvider entry in list)
+                result.Add(_context.AppUser.Where(x => x.Id == entry.UserId).Single());
+
+            return result;
+        }
+
+        public bool IsRoleInProvider(Guid provider, string roleName)
+        {
+            var role = _context.AppProvider.Where(x => x.Name == roleName).SingleOrDefault();
+
+            if (role == null)
+                throw new ArgumentNullException();
+
+            else if (_context.AppUserProvider.Any(x => x.ProviderId == provider && x.UserId == role.Id))
+                return true;
+
+            else
+                return false;
+        }
+
+        public AppProvider Update(AppProvider provider)
         {
             var model = _context.AppProvider.Find(provider.Id);
 
@@ -139,7 +117,7 @@ namespace Bhbk.Lib.Identity.Store
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
+            return model;
         }
     }
 }

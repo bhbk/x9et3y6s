@@ -13,7 +13,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private bool _disposed;
         private ContextType _contextType;
         private CustomIdentityDbContext _context;
-        private ModelFactory _modelFactory;
         private AudienceManager _audienceMgmt;
         private ClientManager _clientMgmt;
         private ProviderManager _providerMgmt;
@@ -45,18 +44,12 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             this._context = context;
 
-            CreateFactories();
             CreateManagers();
         }
 
         public static UnitOfWork Create()
         {
             return new UnitOfWork();
-        }
-
-        private void CreateFactories()
-        {
-            _modelFactory = new ModelFactory(this._context);
         }
 
         private void CreateManagers()
@@ -74,17 +67,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
             get
             {
                 return this._contextType;
-            }
-        }
-
-        public ModelFactory Models
-        {
-            get
-            {
-                if (this._modelFactory == null)
-                    this._modelFactory = new ModelFactory(this._context);
-
-                return this._modelFactory;
             }
         }
 
@@ -174,11 +156,5 @@ namespace Bhbk.Lib.Identity.Infrastructure
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-    }
-
-    public enum ContextType
-    {
-        UnitTest,
-        Live
     }
 }

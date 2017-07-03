@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
@@ -28,19 +27,34 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _data.Attach(entity);
         }
 
+        public virtual TEntity Create(TEntity entity)
+        {
+            return _data.Add(entity);
+        }
+
+        public virtual bool Delete(TKey key)
+        {
+            var entity = _data.Find(key);
+
+            if (_context.Entry(entity).State == EntityState.Detached)
+                _data.Attach(entity);
+
+            _data.Remove(entity);
+
+            return Exists(key);
+        }
+
         public virtual bool Exists(TKey key)
         {
-            throw new NotImplementedException();
+            if (_data.Find(key) == null)
+                return false;
+            else
+                return true;
         }
 
-        public virtual TEntity Find(TKey id)
+        public virtual TEntity FindById(TKey id)
         {
             return _data.Find(id);
-        }
-
-        public virtual async Task<TEntity> FindAsync(TKey id)
-        {
-            return await _data.FindAsync(id);
         }
 
         public virtual IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
@@ -78,21 +92,27 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _context.SaveChanges();
         }
 
-        public virtual void Update(TEntity entity)
+        public virtual TEntity Update(TEntity entity)
         {
             _data.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
+
+            return entity;
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!this._disposed)
+            if (_disposed)
+                return;
+
+            if (disposing)
             {
-                if (disposing)
-                    _context.Dispose();
+                //free any managed objects here...
+                _context.Dispose();
             }
 
-            this._disposed = true;
+            //free any unmanaged objects here...
+            _disposed = true;
         }
 
         public void Dispose()

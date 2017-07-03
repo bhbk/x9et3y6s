@@ -1,6 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
-using Microsoft.AspNet.Identity;
 using System;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -18,7 +17,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateClient(ClientModel.Create model)
+        public async Task<IHttpActionResult> CreateClient(ClientCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -27,13 +26,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             if (client == null)
             {
-                var result = await UoW.ClientMgmt.CreateAsync(model);
+                var create = UoW.ClientMgmt.Store.Mf.Create.DoIt(model);
+                var result = await UoW.ClientMgmt.CreateAsync(create);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(await UoW.ClientMgmt.FindByNameAsync(model.Name));
+                return Ok(result);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);
@@ -51,16 +47,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);
 
+            if (!await UoW.ClientMgmt.DeleteAsync(clientID))
+                return InternalServerError();
+
             else
-            {
-                var result = await UoW.ClientMgmt.DeleteAsync(clientID);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok();
-            }
+                return Ok();
         }
 
         [Route("v1/{clientID}"), HttpGet]
@@ -95,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{clientID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> UpdateClient(Guid clientID, ClientModel.Update model)
+        public async Task<IHttpActionResult> UpdateClient(Guid clientID, ClientUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -113,18 +104,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                client.Name = model.Name;
-                client.Description = model.Description;
-                client.Enabled = model.Enabled;
-                client.Immutable = false;
+                var update = UoW.ClientMgmt.Store.Mf.Update.DoIt(model);
+                var result = await UoW.ClientMgmt.UpdateAsync(update);
 
-                IdentityResult result = await UoW.ClientMgmt.UpdateAsync(model);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(client);
+                return Ok(result);
             }
         }
     }

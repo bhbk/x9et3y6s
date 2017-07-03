@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateUser(UserModel.Create model)
+        public async Task<IHttpActionResult> CreateUser(UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -29,7 +29,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             if (user == null)
             {
-                var result = await UoW.UserMgmt.CreateAsync(model);
+                var create = UoW.UserMgmt.Store.Mf.Create.DoIt(model);
+                var result = await UoW.UserMgmt.CreateAsync(create);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -100,13 +101,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else
             {
                 var list = await UoW.UserMgmt.GetProvidersAsync(userID);
-                IList<ProviderModel.Model> result = new List<ProviderModel.Model>();
+                IList<ProviderModel> result = new List<ProviderModel>();
 
                 foreach(string name in list)
                 {
-                    var provider = UoW.ProviderMgmt.LocalStore.Get(x => x.Name == name).Single();
+                    var provider = UoW.ProviderMgmt.Store.Get(x => x.Name == name).Single();
 
-                    result.Add(new ProviderModel.Model()
+                    result.Add(new ProviderModel()
                     {
                         Id = provider.Id,
                         Name = provider.Name,
@@ -145,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{userID}/add-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> AddPassword(Guid userID, UserModel.AddPassword model)
+        public async Task<IHttpActionResult> AddPassword(Guid userID, UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -199,7 +200,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{userID}/reset-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> ResetPassword(Guid userID, UserModel.AddPassword model)
+        public async Task<IHttpActionResult> ResetPassword(Guid userID, UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -227,7 +228,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{userID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> UpdateUser(Guid userID, UserModel.Update model)
+        public async Task<IHttpActionResult> UpdateUser(Guid userID, UserUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -252,7 +253,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 user.LockoutEndDateUtc = model.LockoutEndDateUtc.HasValue ? model.LockoutEndDateUtc.Value.ToUniversalTime() : model.LockoutEndDateUtc;
                 user.Immutable = false;
 
-                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.Models.Devolve.DoIt(user));
+                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.UserMgmt.Store.Mf.Devolve.DoIt(user));
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);

@@ -1,19 +1,16 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Model;
-using Microsoft.AspNet.Identity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Store
 {
     public class ClientStore : GenericStore<AppClient, Guid>
     {
-        private CustomIdentityDbContext _context;
-        private ModelFactory _factory;
+        public ModelFactory Mf;
 
         public ClientStore(CustomIdentityDbContext context)
             : base(context)
@@ -22,21 +19,18 @@ namespace Bhbk.Lib.Identity.Store
                 throw new ArgumentNullException();
 
             _context = context;
-            _factory = new ModelFactory(context);
+            Mf = new ModelFactory(context);
         }
 
-        public Task Create(ClientModel.Create client)
+        public override AppClient Create(AppClient client)
         {
-            var create = _factory.Create.DoIt(client);
-            var model = _factory.Devolve.DoIt(create);
-
-            _context.AppClient.Add(model);
+            var result = _context.AppClient.Add(client);
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
+            return result;
         }
 
-        public Task Delete(Guid clientId)
+        public override bool Delete(Guid clientId)
         {
             var client = _context.AppClient.Where(x => x.Id == clientId).Single();
             var audiences = _context.AppAudience.Where(x => x.ClientId == clientId);
@@ -47,59 +41,8 @@ namespace Bhbk.Lib.Identity.Store
             _context.AppClient.Remove(client);
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
-        }
-
-        private Task<ClientModel.Model> Find(AppClient client)
-        {
-            if (client == null)
-                return Task.FromResult<ClientModel.Model>(null);
-            else
-                return Task.FromResult(_factory.Evolve.DoIt(client));
-        }
-
-        public Task<ClientModel.Model> FindById(Guid clientId)
-        {
-            return Find(_context.AppClient.Where(x => x.Id == clientId).SingleOrDefault());
-        }
-
-        public Task<ClientModel.Model> FindByName(string clientName)
-        {
-            return Find(_context.AppClient.Where(x => x.Name == clientName).SingleOrDefault());
-        }
-
-        public Task<IList<ClientModel.Model>> GetAll()
-        {
-            IList<ClientModel.Model> result = new List<ClientModel.Model>();
-            var clients = _context.AppClient.ToList();
-
-            if (clients == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppClient client in clients)
-                    result.Add(_factory.Evolve.DoIt(client));
-
-                return Task.FromResult(result);
-            }
-        }
-
-        public Task<IList<AudienceModel.Model>> GetAudiences(Guid clientId)
-        {
-            IList<AudienceModel.Model> result = new List<AudienceModel.Model>();
-            var audiences = _context.AppAudience.Where(x => x.ClientId == clientId).ToList();
-
-            if (audiences == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppAudience audience in audiences)
-                    result.Add(_factory.Evolve.DoIt(audience));
-
-                return Task.FromResult(result);
-            }
+            return true;
+            //return Exists(clientId);
         }
 
         public override bool Exists(Guid clientId)
@@ -112,7 +55,27 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppClient.Any(x => x.Name == clientName);
         }
 
-        public Task Update(ClientModel.Update client)
+        public AppClient FindById(Guid clientId)
+        {
+            return _context.AppClient.Where(x => x.Id == clientId).SingleOrDefault();
+        }
+
+        public AppClient FindByName(string clientName)
+        {
+            return _context.AppClient.Where(x => x.Name == clientName).SingleOrDefault();
+        }
+
+        public IList<AppClient> GetAll()
+        {
+            return _context.AppClient.ToList();
+        }
+
+        public IList<AppAudience> GetAudiences(Guid clientId)
+        {
+            return _context.AppAudience.Where(x => x.ClientId == clientId).ToList();
+        }
+
+        public override AppClient Update(AppClient client)
         {
             var model = _context.AppClient.Where(x => x.Id == client.Id).Single();
 
@@ -125,7 +88,7 @@ namespace Bhbk.Lib.Identity.Store
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
+            return model;
         }
     }
 }

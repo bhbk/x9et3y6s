@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
 using Microsoft.Owin.Testing;
@@ -26,15 +26,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ClientController(UoW);
-            var model = new ClientModel.Create()
+            var model = new ClientCreate()
             {
                 Name = name,
                 Enabled = true,
                 Immutable = false
             };
 
-            var result = await controller.CreateClient(model) as OkNegotiatedContentResult<ClientModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(ClientModel.Model));
+            var result = await controller.CreateClient(model) as OkNegotiatedContentResult<ClientModel>;
+            result.Content.Should().BeAssignableTo(typeof(ClientModel));
             result.Content.Name.Should().Be(model.Name);
         }
 
@@ -42,12 +42,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Client_Delete_Success()
         {
             var controller = new ClientController(UoW);
-            var client = UoW.ClientMgmt.LocalStore.Get().First();
+            var client = UoW.ClientMgmt.Store.Get().First();
 
             var result = await controller.DeleteClient(client.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
 
-            var check = UoW.ClientMgmt.LocalStore.Get(x => x.Id == client.Id).Any();
+            var check = UoW.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
             check.Should().BeFalse();
         }
 
@@ -55,10 +55,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Client_Get_Success()
         {
             var controller = new ClientController(UoW);
-            var client = UoW.ClientMgmt.LocalStore.Get().First();
+            var client = UoW.ClientMgmt.Store.Get().First();
 
-            var result = await controller.GetClient(client.Id) as OkNegotiatedContentResult<ClientModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(ClientModel.Model));
+            var result = await controller.GetClient(client.Id) as OkNegotiatedContentResult<ClientModel>;
+            result.Content.Should().BeAssignableTo(typeof(ClientModel));
             result.Content.Id.Should().Be(client.Id);
         }
 
@@ -67,20 +67,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ClientController(UoW);
 
-            var result = await controller.GetClients() as OkNegotiatedContentResult<IList<ClientModel.Model>>;
-            result.Content.Should().BeAssignableTo(typeof(IList<ClientModel.Model>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.ClientMgmt.LocalStore.Get().Count());
+            var result = await controller.GetClients() as OkNegotiatedContentResult<IList<ClientModel>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<ClientModel>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.ClientMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Client_GetAudienceList_Success()
         {
             var controller = new ClientController(UoW);
-            var client = UoW.ClientMgmt.LocalStore.Get().First();
+            var client = UoW.ClientMgmt.Store.Get().First();
 
-            var result = await controller.GetClientAudiences(client.Id) as OkNegotiatedContentResult<IList<AudienceModel.Model>>;
-            result.Content.Should().BeAssignableTo(typeof(IList<AudienceModel.Model>));
-            result.Content.Count().ShouldBeEquivalentTo(UoW.AudienceMgmt.LocalStore.Get().Count());
+            var result = await controller.GetClientAudiences(client.Id) as OkNegotiatedContentResult<IList<AudienceModel>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<AudienceModel>));
+            result.Content.Count().ShouldBeEquivalentTo(UoW.AudienceMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -88,8 +88,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4);
             var controller = new ClientController(UoW);
-            var client = UoW.ClientMgmt.LocalStore.Get().First();
-            var model = new ClientModel.Update()
+            var client = UoW.ClientMgmt.Store.Get().First();
+            var model = new ClientUpdate()
             {
                 Id = client.Id,
                 Name = name + "(Updated)",
@@ -97,8 +97,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
                 Immutable = false
             };
 
-            var result = await controller.UpdateClient(model.Id, model) as OkNegotiatedContentResult<ClientModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(ClientModel.Model));
+            var result = await controller.UpdateClient(model.Id, model) as OkNegotiatedContentResult<ClientModel>;
+            result.Content.Should().BeAssignableTo(typeof(ClientModel));
             result.Content.Name.Should().Be(model.Name);
         }
     }

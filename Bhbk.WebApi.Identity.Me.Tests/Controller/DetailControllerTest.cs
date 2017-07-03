@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helper;
 using Bhbk.WebApi.Identity.Me.Controller;
 using FluentAssertions;
 using Microsoft.AspNet.Identity;
@@ -27,11 +27,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangeEmail()
+            var model = new UserChangeEmail()
             {
                 Id = user.Id,
                 CurrentEmail = BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
@@ -52,11 +52,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangeEmail()
+            var model = new UserChangeEmail()
             {
                 Id = user.Id,
                 CurrentEmail = user.Email,
@@ -76,11 +76,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Detail_AskChangePassword_Fail()
         {
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePassword()
+            var model = new UserChangePassword()
             {
                 Id = user.Id,
                 CurrentPassword = EntrophyHelper.GenerateRandomBase64(16),
@@ -96,11 +96,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Detail_AskChangePassword_Success()
         {
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePassword()
+            var model = new UserChangePassword()
             {
                 Id = user.Id,
                 CurrentPassword = BaseLib.Statics.ApiUnitTestPasswordCurrent,
@@ -117,11 +117,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string phone = "01112223333";
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePhone()
+            var model = new UserChangePhone()
             {
                 Id = user.Id,
                 CurrentPhoneNumber = phone,
@@ -138,11 +138,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string phone = "01112223333";
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePhone()
+            var model = new UserChangePhone()
             {
                 Id = user.Id,
                 CurrentPhoneNumber = user.PhoneNumber,
@@ -158,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Detail_TwoFactor_Success()
         {
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -174,19 +174,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Detail_Update_Success()
         {
             var controller = new DetailController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.Update()
+            var model = new UserUpdate()
             {
                 Id = user.Id,
                 FirstName = user.FirstName + "(Updated)",
                 LastName = user.LastName + "(Updated)"
             };
 
-            var result = await controller.UpdateDetail(model) as OkNegotiatedContentResult<UserModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(UserModel.Model));
+            var result = await controller.UpdateDetail(model) as OkNegotiatedContentResult<UserModel>;
+            result.Content.Should().BeAssignableTo(typeof(UserModel));
             result.Content.FirstName.ShouldBeEquivalentTo(model.FirstName);
             result.Content.LastName.ShouldBeEquivalentTo(model.LastName);
         }

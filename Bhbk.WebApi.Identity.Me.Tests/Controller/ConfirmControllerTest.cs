@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
+using Bhbk.Lib.Identity.Factory;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controller
 {
@@ -18,11 +19,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangeEmail()
+            var model = new UserChangeEmail()
             {
                 Id = user.Id,
                 CurrentEmail = user.Email,
@@ -43,11 +44,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangeEmail()
+            var model = new UserChangeEmail()
             {
                 Id = user.Id,
                 CurrentEmail = user.Email,
@@ -66,11 +67,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_ChangePassword_Fail()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePassword()
+            var model = new UserChangePassword()
             {
                 Id = user.Id,
                 CurrentPassword = EntrophyHelper.GenerateRandomBase64(16),
@@ -93,11 +94,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_ChangePassword_Success()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePassword()
+            var model = new UserChangePassword()
             {
                 Id = user.Id,
                 CurrentPassword = BaseLib.Statics.ApiUnitTestPasswordCurrent,
@@ -119,11 +120,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_ChangePhone_Fail()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePhone()
+            var model = new UserChangePhone()
             {
                 Id = user.Id,
                 CurrentPhoneNumber = user.PhoneNumber,
@@ -144,11 +145,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string phone = "32221110000";
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var model = new UserModel.ChangePhone()
+            var model = new UserChangePhone()
             {
                 Id = user.Id,
                 CurrentPhoneNumber = user.PhoneNumber,
@@ -168,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -185,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         {
             string email = "unit-test@" + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4) + ".net";
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -200,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_SetPassword_Fail()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -216,7 +217,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_SetPassword_Success()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -231,7 +232,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_SetPhoneNumber_Fail()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -247,7 +248,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
         public async Task Api_Me_Confirm_SetPhoneNumber_Success()
         {
             var controller = new ConfirmController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 

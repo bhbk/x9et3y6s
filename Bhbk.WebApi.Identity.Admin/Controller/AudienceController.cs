@@ -1,6 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
-using Microsoft.AspNet.Identity;
 using System;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -18,7 +17,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateAudience(AudienceModel.Create model)
+        public async Task<IHttpActionResult> CreateAudience(AudienceCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -27,15 +26,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             if (audience == null)
             {
-                model.Immutable = false;
-                
-                var result = await UoW.AudienceMgmt.CreateAsync(model);
+                var create = UoW.AudienceMgmt.Store.Mf.Create.DoIt(model);
+                var result = await UoW.AudienceMgmt.CreateAsync(create);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(await UoW.AudienceMgmt.FindByNameAsync(model.Name));
+                return Ok(result);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);
@@ -53,16 +47,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
 
+            if (!await UoW.AudienceMgmt.DeleteAsync(audienceID))
+                return InternalServerError();
+
             else
-            {
-                IdentityResult result = await UoW.AudienceMgmt.DeleteAsync(audienceID);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok();
-            }
+                return Ok();
         }
 
         [Route("v1")]
@@ -97,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{audienceID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> UpdateAudience(Guid audienceID, AudienceModel.Update model)
+        public async Task<IHttpActionResult> UpdateAudience(Guid audienceID, AudienceUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -115,21 +104,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                audience.ClientId = model.ClientId;
-                audience.Name = model.Name;
-                audience.Description = model.Description;
-                audience.AudienceType = model.AudienceType;
-                audience.AudienceKey = model.AudienceKey;
-                audience.Enabled = model.Enabled;
-                audience.Immutable = false;
+                var update = UoW.AudienceMgmt.Store.Mf.Update.DoIt(model);
+                var result = await UoW.AudienceMgmt.UpdateAsync(update);
 
-                IdentityResult result = await UoW.AudienceMgmt.UpdateAsync(model);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(audience);
+                return Ok(result);
             }
         }
     }

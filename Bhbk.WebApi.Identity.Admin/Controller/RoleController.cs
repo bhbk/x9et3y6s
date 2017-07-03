@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateRole(RoleModel.Create model)
+        public async Task<IHttpActionResult> CreateRole(RoleCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,9 +56,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             if (role == null)
             {
-                model.Immutable = false;
-
-                var result = await UoW.RoleMgmt.CreateAsync(model);
+                var create = UoW.RoleMgmt.Store.Mf.Create.DoIt(model);
+                IdentityResult result = await UoW.RoleMgmt.CreateAsync(create);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -121,7 +120,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
             else
-                return Ok(await UoW.RoleMgmt.GetUsersAsync(roleID));
+                return Ok(await UoW.RoleMgmt.GetUsersListAsync(roleID));
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
@@ -155,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{roleID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> UpdateRole(Guid roleID, RoleModel.Update model)
+        public async Task<IHttpActionResult> UpdateRole(Guid roleID, RoleUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -173,18 +172,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                role.Name = model.Name;
-                role.Description = model.Description;
-                role.AudienceId = model.AudienceId;
-                role.Immutable = false;
-
-                IdentityResult result = await UoW.RoleMgmt.UpdateAsync(model);
+                var update = UoW.RoleMgmt.Store.Mf.Update.DoIt(model);
+                IdentityResult result = await UoW.RoleMgmt.UpdateAsync(update);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(role);
+                    return Ok(update);
             }
         }
     }

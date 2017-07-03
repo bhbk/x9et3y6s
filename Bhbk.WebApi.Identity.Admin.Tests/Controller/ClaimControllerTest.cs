@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
 using Microsoft.Owin.Testing;
@@ -26,8 +26,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Claim_Create_Success()
         {
             var controller = new ClaimController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
-            var claim = new UserClaimModel.Create()
+            var user = UoW.UserMgmt.Store.Get().First();
+            var claim = new UserClaimCreate()
             {
                 UserId = user.Id,
                 ClaimType = BaseLib.Statics.ApiUnitTestClaimType,
@@ -35,8 +35,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
                 Immutable = false
             };
 
-            var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<UserClaimModel.Model>;
-            result.Content.Should().BeAssignableTo(typeof(UserClaimModel.Model));
+            var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<UserClaimModel>;
+            result.Content.Should().BeAssignableTo(typeof(UserClaimModel));
             result.Content.ClaimType.Should().BeEquivalentTo(claim.ClaimType);
         }
 
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Claim_Delete_Success()
         {
             var controller = new ClaimController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
             var claim = user.Claims.First();
 
             var result = await controller.DeleteClaim(user.Id, claim.Id) as OkResult;
@@ -58,10 +58,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         public async Task Api_Admin_Claim_Get_Success()
         {
             var controller = new ClaimController(UoW);
-            var user = UoW.UserMgmt.LocalStore.Get().First();
+            var user = UoW.UserMgmt.Store.Get().First();
 
-            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IList<UserClaimModel.Model>>;
-            result.Content.Should().BeAssignableTo(typeof(IList<UserClaimModel.Model>));
+            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IList<UserClaimModel>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<UserClaimModel>));
             result.Content.Count().ShouldBeEquivalentTo(user.Claims.Count());
         }
 

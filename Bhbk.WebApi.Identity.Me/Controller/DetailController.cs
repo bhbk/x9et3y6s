@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             : base(uow) { }
 
         [Route("v1/change-email"), HttpPut]
-        public async Task<IHttpActionResult> AskChangeEmail(UserModel.ChangeEmail model)
+        public async Task<IHttpActionResult> AskChangeEmail(UserChangeEmail model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1/change-password"), HttpPut]
-        public async Task<IHttpActionResult> AskChangePassword(UserModel.ChangePassword model)
+        public async Task<IHttpActionResult> AskChangePassword(UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1/change-phone"), HttpPut]
-        public async Task<IHttpActionResult> AskChangePhone(UserModel.ChangePhone model)
+        public async Task<IHttpActionResult> AskChangePhone(UserChangePhone model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1"), HttpPut]
-        public async Task<IHttpActionResult> UpdateDetail(UserModel.Update model)
+        public async Task<IHttpActionResult> UpdateDetail(UserUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
 
-                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.Models.Devolve.DoIt(user));
+                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.UserMgmt.Store.Mf.Devolve.DoIt(user));
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);

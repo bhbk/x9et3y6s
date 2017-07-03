@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{userID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimModel.Create model)
+        public async Task<IHttpActionResult> CreateClaim(Guid userID, UserClaimCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                var claim = UoW.Models.Create.DoIt(model);
+                var claim = UoW.UserMgmt.Store.Mf.Create.DoIt(model);
                 await UoW.UserMgmt.AddClaimAsync(user.Id, new Claim(claim.ClaimType, claim.ClaimValue));
 
                 return Ok(claim);
@@ -87,12 +87,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                IList<UserClaimModel.Model> rslt = new List<UserClaimModel.Model>();
+                IList<UserClaimModel> rslt = new List<UserClaimModel>();
                 var claims = await UoW.UserMgmt.GetClaimsAsync(userID);
 
                 foreach (var claim in claims)
                 {
-                    var model = new UserClaimModel.Model()
+                    var model = new UserClaimModel()
                     {
                         UserId = user.Id,
                         ClaimType = claim.Type,

@@ -29,6 +29,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controller
             this._uow = uow;
         }
 
+        [System.Obsolete]
         protected IHttpActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)

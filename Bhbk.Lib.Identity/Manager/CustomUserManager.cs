@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Model;
 using Bhbk.Lib.Identity.Store;
 using Microsoft.AspNet.Identity;
@@ -15,7 +16,7 @@ namespace Bhbk.Lib.Identity.Manager
     public partial class CustomUserManager : UserManager<AppUser, Guid>
     {
         private ConfigManager _config;
-        public CustomUserStore LocalStore;
+        public CustomUserStore Store;
         public DataProtectorTokenProvider<AppUser, Guid> DataProtectorTokenProvider;
         public CustomPasswordValidator PasswordValidator;
         public CustomUserTokenProvider UserTokenProvider;
@@ -27,10 +28,10 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new ArgumentNullException();
 
             _config = new ConfigManager();
-            LocalStore = store;
+            Store = store;
 
             string[] uses = { Statics.ApiTokenConfirmEmail, Statics.ApiTokenResetPassword, Statics.ApiTokenConfirmPhone, Statics.ApiTokenConfirmTwoFactor };
-            
+
             //create token protection provider...
             DataProtectorTokenProvider =
                 new DataProtectorTokenProvider<AppUser, Guid>(new CustomDataProtectionProvider().Create(uses))
@@ -52,7 +53,7 @@ namespace Bhbk.Lib.Identity.Manager
                     OtpTokenSize = _config.Tweaks.DefaultAuhthorizationCodeLength,
                     OtpTokenTimespan = _config.Tweaks.DefaultAuhthorizationCodeLife
                 };
-            
+
             MaxFailedAccessAttemptsBeforeLockout = _config.Tweaks.DefaultFailedAccessAttempts;
             UserLockoutEnabledByDefault = true;
         }
@@ -77,7 +78,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.AddClaimAsync(user, claim);
+            await Store.AddClaimAsync(user, claim);
 
             return IdentityResult.Success;
         }
@@ -89,12 +90,12 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            var hash = await LocalStore.GetPasswordHashAsync(user);
+            var hash = await Store.GetPasswordHashAsync(user);
 
             if (hash != null)
                 throw new InvalidOperationException();
 
-            var result = await UpdatePassword(this.LocalStore, user, password);
+            var result = await UpdatePassword(this.Store, user, password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
@@ -102,11 +103,11 @@ namespace Bhbk.Lib.Identity.Manager
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> AddRefreshTokenAsync(UserRefreshTokenModel.Create token)
+        public async Task<IdentityResult> AddRefreshTokenAsync(UserRefreshTokenModel token)
         {
-            if (LocalStore.Exists(token.UserId))
+            if (Store.Exists(token.UserId))
             {
-                await LocalStore.AddRefreshTokenAsync(token);
+                await Store.AddRefreshTokenAsync(Store.Mf.Devolve.DoIt(token));
                 return IdentityResult.Success;
             }
             else
@@ -115,9 +116,9 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> AddToProviderAsync(Guid userId, string provider)
         {
-            if (LocalStore.Exists(userId))
+            if (Store.Exists(userId))
             {
-                await LocalStore.AddToProviderAsync(userId, provider);
+                await Store.AddToProviderAsync(userId, provider);
                 return IdentityResult.Success;
             }
             else
@@ -131,7 +132,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.AddToRoleAsync(user, role);
+            await Store.AddToRoleAsync(user, role);
 
             return IdentityResult.Success;
         }
@@ -160,7 +161,7 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new InvalidOperationException();
 
             else
-                return await UpdatePassword(this.LocalStore, user, newPassword);
+                return await UpdatePassword(this.Store, user, newPassword);
         }
 
         public override async Task<IdentityResult> ChangePhoneNumberAsync(Guid userId, string phoneNumber, string token)
@@ -189,9 +190,9 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new ArgumentNullException();
 
             //TODO - clean this up
-            var devolve = LocalStore._factory.Devolve.DoIt(user);
+            var devolve = Store.Mf.Devolve.DoIt(user);
 
-            return await VerifyPasswordAsync(this.LocalStore, devolve, password);
+            return await VerifyPasswordAsync(this.Store, devolve, password);
         }
 
         public override async Task<IdentityResult> ConfirmEmailAsync(Guid userId, string token)
@@ -205,7 +206,7 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new InvalidOperationException();
             else
             {
-                await LocalStore.SetEmailConfirmedAsync(user, true);
+                await Store.SetEmailConfirmedAsync(user, true);
 
                 return IdentityResult.Success;
             }
@@ -222,7 +223,7 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new InvalidOperationException();
             else
             {
-                await LocalStore.SetPasswordConfirmedAsync(user, true);
+                await Store.SetPasswordConfirmedAsync(user, true);
 
                 return IdentityResult.Success;
             }
@@ -239,37 +240,39 @@ namespace Bhbk.Lib.Identity.Manager
                 throw new InvalidOperationException();
             else
             {
-                await LocalStore.SetPhoneNumberConfirmedAsync(user, true);
+                await Store.SetPhoneNumberConfirmedAsync(user, true);
 
                 return IdentityResult.Success;
             }
         }
 
-        public async Task<IdentityResult> CreateAsync(UserModel.Create user)
+        public async Task<IdentityResult> CreateAsync(UserModel user)
         {
             var found = await FindByNameAsync(user.Email);
 
             if (found != null)
                 throw new ArgumentNullException();
 
-            await LocalStore.CreateAsync(user);
+            var model = Store.Mf.Devolve.DoIt(user);
+            await Store.CreateAsync(model);
 
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> CreateAsync(UserModel.Create user, string password)
+        public async Task<IdentityResult> CreateAsync(UserModel user, string password)
         {
             var found = await FindByNameAsync(user.Email);
 
             if (found != null)
                 throw new ArgumentNullException();
 
-            await LocalStore.CreateAsync(user);
+            var model = Store.Mf.Devolve.DoIt(user);
+            await Store.CreateAsync(model);
 
             //TODO - delete this sillyness...
             var foundUser = FindByNameAsyncDeprecated(user.Email).Result;
 
-            await UpdatePassword(LocalStore, foundUser, password);
+            await UpdatePassword(Store, foundUser, password);
 
             return IdentityResult.Success;
         }
@@ -278,7 +281,7 @@ namespace Bhbk.Lib.Identity.Manager
         {
             IList<Claim> claims = new List<Claim>();
 
-            foreach (string role in await LocalStore.GetRolesAsync(user))
+            foreach (string role in await Store.GetRolesAsync(user))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
@@ -303,41 +306,51 @@ namespace Bhbk.Lib.Identity.Manager
             if (found == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.DeleteAsync(user);
+            await Store.DeleteAsync(user);
 
             return IdentityResult.Success;
         }
 
-        public async Task<UserModel.Model> FindByIdAsync(Guid userId)
+        public async Task<UserModel> FindByIdAsync(Guid userId)
         {
-            return await LocalStore.FindById(userId);
+            var model = Store.FindById(userId);
+
+            if (model == null)
+                return null;
+
+            return Store.Mf.Evolve.DoIt(model);
+        }
+
+        public async Task<UserModel> FindByNameAsync(string userName)
+        {
+            var model = Store.FindByName(userName);
+
+            if (model == null)
+                return null;
+
+            return Store.Mf.Evolve.DoIt(model);
         }
 
         [System.Obsolete]
         public async Task<AppUser> FindByIdAsyncDeprecated(Guid userId)
         {
-            return LocalStore.Users.Where(x => x.Id == userId).SingleOrDefault();
-        }
-
-        public async Task<UserModel.Model> FindByNameAsync(string userName)
-        {
-            return await LocalStore.FindByName(userName);
+            return Store.Users.Where(x => x.Id == userId).SingleOrDefault();
         }
 
         [System.Obsolete]
         public async Task<AppUser> FindByNameAsyncDeprecated(string userName)
         {
-            return LocalStore.Users.Where(x => x.UserName == userName).SingleOrDefault();
+            return Store.Users.Where(x => x.UserName == userName).SingleOrDefault();
         }
 
         public async Task<AppUserRefreshToken> FindRefreshTokenAsync(string token)
         {
-            return await LocalStore.FindRefreshTokenAsync(token);
+            return await Store.FindRefreshTokenAsync(token);
         }
 
         public async Task<AppUserRefreshToken> FindRefreshTokenByIdAsync(Guid tokenId)
         {
-            return await LocalStore.FindRefreshTokenByIdAsync(tokenId);
+            return await Store.FindRefreshTokenByIdAsync(tokenId);
         }
 
         public override async Task<IList<Claim>> GetClaimsAsync(Guid userId)
@@ -347,7 +360,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetClaimsAsync(user);
+            return await Store.GetClaimsAsync(user);
         }
 
         public override async Task<string> GetEmailAsync(Guid userId)
@@ -357,12 +370,18 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetEmailAsync(user);
+            return await Store.GetEmailAsync(user);
         }
 
-        public async Task<IList<UserModel.Model>> GetListAsync()
+        public async Task<IList<UserModel>> GetListAsync()
         {
-            return await LocalStore.GetAll();
+            IList<UserModel> result = new List<UserModel>();
+            var users = Store.GetAll();
+
+            foreach (AppUser user in users)
+                result.Add(Store.Mf.Evolve.DoIt(user));
+
+            return result;
         }
 
         public override async Task<string> GetPhoneNumberAsync(Guid userId)
@@ -372,7 +391,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetPhoneNumberAsync(user);
+            return await Store.GetPhoneNumberAsync(user);
         }
 
         public async Task<IList<string>> GetProvidersAsync(Guid userId)
@@ -382,7 +401,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetProvidersAsync(user);
+            return await Store.GetProvidersAsync(user);
         }
 
         public override async Task<IList<string>> GetRolesAsync(Guid userId)
@@ -392,7 +411,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetRolesAsync(user);
+            return await Store.GetRolesAsync(user);
         }
 
         public override async Task<bool> GetTwoFactorEnabledAsync(Guid userId)
@@ -402,7 +421,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetTwoFactorEnabledAsync(user);
+            return await Store.GetTwoFactorEnabledAsync(user);
         }
 
         public override async Task<string> GenerateChangePhoneNumberTokenAsync(Guid userId, string phoneNumber)
@@ -451,7 +470,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.GetSecurityStampAsync(user);
+            return await Store.GetSecurityStampAsync(user);
         }
 
         public override async Task<bool> HasPasswordAsync(Guid userId)
@@ -461,7 +480,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.HasPasswordAsync(user);
+            return await Store.HasPasswordAsync(user);
         }
 
         public async Task<bool> IsInProviderAsync(Guid userId, string role)
@@ -471,7 +490,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.IsInProviderAsync(user, role);
+            return await Store.IsInProviderAsync(user, role);
         }
 
         public override async Task<bool> IsInRoleAsync(Guid userId, string role)
@@ -481,7 +500,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            return await LocalStore.IsInRoleAsync(user, role);
+            return await Store.IsInRoleAsync(user, role);
         }
 
         public override async Task<bool> IsLockedOutAsync(Guid userId)
@@ -520,7 +539,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.RemoveClaimAsync(user, claim);
+            await Store.RemoveClaimAsync(user, claim);
 
             return IdentityResult.Success;
         }
@@ -532,7 +551,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.RemoveFromProviderAsync(user, provider);
+            await Store.RemoveFromProviderAsync(user, provider);
 
             return IdentityResult.Success;
         }
@@ -544,7 +563,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.RemoveFromRoleAsync(user, role);
+            await Store.RemoveFromRoleAsync(user, role);
 
             return IdentityResult.Success;
         }
@@ -564,7 +583,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> RemoveRefreshTokenByIdAsync(Guid tokenId)
         {
-            await LocalStore.RemoveRefreshTokenByIdAsync(tokenId);
+            await Store.RemoveRefreshTokenByIdAsync(tokenId);
 
             return IdentityResult.Success;
         }
@@ -576,7 +595,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.ResetAccessFailedCountAsync(user);
+            await Store.ResetAccessFailedCountAsync(user);
 
             return IdentityResult.Success;
         }
@@ -591,8 +610,8 @@ namespace Bhbk.Lib.Identity.Manager
             if (!await HasPasswordAsync(userId))
                 throw new InvalidOperationException();
 
-            await LocalStore.SetPasswordHashAsync(user, null);
-            await LocalStore.SetSecurityStampAsync(user, null);
+            await Store.SetPasswordHashAsync(user, null);
+            await Store.SetSecurityStampAsync(user, null);
 
             return IdentityResult.Success;
         }
@@ -607,7 +626,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (!await VerifyUserTokenAsync(userId, Statics.ApiTokenResetPassword, token))
                 throw new InvalidOperationException();
 
-            var result = await UpdatePassword(this.LocalStore, user, newPassword);
+            var result = await UpdatePassword(this.Store, user, newPassword);
 
             if (result.Succeeded)
                 return await UpdateAsync(user);
@@ -622,7 +641,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.SetEmailConfirmedAsync(user, confirmed);
+            await Store.SetEmailConfirmedAsync(user, confirmed);
 
             return IdentityResult.Success;
         }
@@ -634,7 +653,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.SetPasswordConfirmedAsync(user, confirmed);
+            await Store.SetPasswordConfirmedAsync(user, confirmed);
 
             return IdentityResult.Success;
         }
@@ -646,7 +665,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.SetPhoneNumberConfirmedAsync(user, confirmed);
+            await Store.SetPhoneNumberConfirmedAsync(user, confirmed);
 
             return IdentityResult.Success;
         }
@@ -658,7 +677,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.SetTwoFactorEnabledAsync(user, enabled);
+            await Store.SetTwoFactorEnabledAsync(user, enabled);
 
             return IdentityResult.Success;
         }
@@ -670,12 +689,12 @@ namespace Bhbk.Lib.Identity.Manager
             if (found == null)
                 throw new ArgumentNullException();
 
-            var result = await LocalStore.UserValidator.ValidateAsync(user);
+            var result = await Store.UserValidator.ValidateAsync(user);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
 
-            await LocalStore.UpdateAsync(user);
+            await Store.UpdateAsync(user);
 
             return IdentityResult.Success;
         }
@@ -708,7 +727,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (user == null)
                 throw new ArgumentNullException();
 
-            await LocalStore.SetSecurityStampAsync(user, GenerateSecurityStamp());
+            await Store.SetSecurityStampAsync(user, GenerateSecurityStamp());
 
             return IdentityResult.Success;
         }

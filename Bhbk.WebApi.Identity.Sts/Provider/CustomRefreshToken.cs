@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.Infrastructure;
@@ -33,9 +33,9 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             Guid clientID, audienceID, userID;
             DateTime issue, expire;
-            ClientModel.Model client;
-            AudienceModel.Model audience;
-            UserModel.Model user;
+            ClientModel client;
+            AudienceModel audience;
+            UserModel user;
 
             string clientValue = context.Ticket.Properties.Dictionary.ContainsKey(BaseLib.Statics.AttrClientID)
                 ? context.Ticket.Properties.Dictionary[BaseLib.Statics.AttrClientID] : null;
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 expire = DateTime.UtcNow.AddMinutes(_uow.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
 
-            var token = new UserRefreshTokenModel.Create()
+            var token = new UserRefreshTokenCreate()
             {
                 ClientId = client.Id,
                 AudienceId = audience.Id,
@@ -115,7 +115,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             context.Ticket.Properties.IssuedUtc = token.IssuedUtc;
             context.Ticket.Properties.ExpiresUtc = token.ExpiresUtc;
 
-            var result = await _uow.UserMgmt.AddRefreshTokenAsync(token);
+            var create = _uow.UserMgmt.Store.Mf.Create.DoIt(token);
+            var result = await _uow.UserMgmt.AddRefreshTokenAsync(create);
 
             if (result.Succeeded)
                 context.SetToken(token.ProtectedTicket);
@@ -134,8 +135,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 context.OwinContext.Set<IUnitOfWork>(_uow);
 
             Guid clientID, audienceID;
-            ClientModel.Model client;
-            AudienceModel.Model audience;
+            ClientModel client;
+            AudienceModel audience;
 
             var postValues = await context.Request.ReadFormAsync() as IEnumerable<KeyValuePair<string, string[]>>;
 

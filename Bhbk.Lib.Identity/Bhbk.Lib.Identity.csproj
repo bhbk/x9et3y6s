@@ -165,6 +165,15 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Factory\AudienceModels.cs" />
+    <Compile Include="Factory\ClientModels.cs" />
+    <Compile Include="Factory\ConfigModels.cs" />
+    <Compile Include="Factory\ModelFactory.cs" />
+    <Compile Include="Factory\ProviderModels.cs" />
+    <Compile Include="Factory\RoleModels.cs" />
+    <Compile Include="Factory\UserClaimModels.cs" />
+    <Compile Include="Factory\UserModels.cs" />
+    <Compile Include="Factory\UserRefreshTokenModels.cs" />
     <Compile Include="Infrastructure\CustomUserTokenProvider.cs" />
     <Compile Include="Interface\IGenericManager.cs" />
     <Compile Include="Manager\AudienceManager.cs" />
@@ -186,7 +195,6 @@
     <Compile Include="Helper\FormatHelper.cs" />
     <Compile Include="Helper\TestingHelper.cs" />
     <Compile Include="Manager\ConfigManager.cs" />
-    <Compile Include="Infrastructure\ModelFactory.cs" />
     <Compile Include="Infrastructure\CustomPasswordValidator.cs" />
     <Compile Include="Infrastructure\CustomDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\CustomDependencyResolver.cs" />

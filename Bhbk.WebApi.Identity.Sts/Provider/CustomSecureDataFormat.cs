@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
@@ -41,8 +41,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
 
             Guid clientID, audienceID;
             DateTimeOffset? issue, expire;
-            ClientModel.Model client;
-            AudienceModel.Model audience;
+            ClientModel client;
+            AudienceModel audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -106,8 +106,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 throw new ArgumentNullException(BaseLib.Statics.MsgAudienceInvalid);
 
             Guid clientID, audienceID;
-            ClientModel.Model client;
-            AudienceModel.Model audience;
+            ClientModel client;
+            AudienceModel audience;
             SecurityToken token;
 
             //check if identifier is guid. resolve to guid if not.

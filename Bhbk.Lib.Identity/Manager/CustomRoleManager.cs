@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Model;
 using Bhbk.Lib.Identity.Store;
 using Microsoft.AspNet.Identity;
@@ -11,19 +11,21 @@ namespace Bhbk.Lib.Identity.Manager
     //https://docs.microsoft.com/en-us/aspnet/identity/overview/extensibility/overview-of-custom-storage-providers-for-aspnet-identity
     public class CustomRoleManager : RoleManager<AppRole, Guid>
     {
-        public CustomRoleStore LocalStore;
+        public CustomRoleStore Store;
 
         public CustomRoleManager(CustomRoleStore store)
             : base(store)
         {
-            LocalStore = store;
+            Store = store;
         }
 
-        public async Task<IdentityResult> CreateAsync(RoleModel.Create role)
+        public async Task<IdentityResult> CreateAsync(RoleModel role)
         {
-            if (!LocalStore.Exists(role.Name))
+            var model = Store.Mf.Devolve.DoIt(role);
+
+            if (!Store.Exists(model.Name))
             {
-                await LocalStore.CreateAsync(role);
+                await Store.CreateAsync(model);
                 return IdentityResult.Success;
             }
             else
@@ -32,43 +34,69 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> DeleteAsync(Guid roleId)
         {
-            if (LocalStore.Exists(roleId))
+            var model = Store.FindById(roleId);
+
+            if (model == null)
+                throw new ArgumentNullException();
+            else
             {
-                await LocalStore.DeleteAsync(roleId);
+                await Store.DeleteAsync(model);
                 return IdentityResult.Success;
             }
-            else
+        }
+
+        public async Task<RoleModel> FindByIdAsync(Guid roleId)
+        {
+            var model = Store.FindById(roleId);
+
+            if (model == null)
+                return null;
+
+            return Store.Mf.Evolve.DoIt(model);
+        }
+
+        public async Task<RoleModel> FindByNameAsync(string roleName)
+        {
+            var model = Store.FindByName(roleName);
+
+            if (model == null)
+                return null;
+
+            return Store.Mf.Evolve.DoIt(model);
+        }
+
+        public async Task<IList<RoleModel>> GetListAsync()
+        {
+            IList<RoleModel> result = new List<RoleModel>();
+            var roles = Store.GetAll();
+
+            foreach (AppRole role in roles)
+                result.Add(Store.Mf.Evolve.DoIt(role));
+
+            return result;
+        }
+
+        public async Task<IList<UserModel>> GetUsersListAsync(Guid roleId)
+        {
+            IList<UserModel> result = new List<UserModel>();
+            var list = Store.GetUsersAsync(roleId);
+
+            if (list == null)
                 throw new ArgumentNullException();
+
+            foreach (AppUser entry in list)
+                result.Add(Store.Mf.Evolve.DoIt(entry));
+
+            return result;
         }
 
-        public async Task<RoleModel.Model> FindByIdAsync(Guid roleId)
+        public async Task<IdentityResult> UpdateAsync(RoleModel role)
         {
-            return await LocalStore.FindById(roleId);
-        }
+            var model = Store.Mf.Devolve.DoIt(role);
 
-        public async Task<RoleModel.Model> FindByNameAsync(string roleName)
-        {
-            return await LocalStore.FindByName(roleName);
-        }
-
-        public async Task<IList<RoleModel.Model>> GetListAsync()
-        {
-            return await LocalStore.GetAllAsync();
-        }
-
-        public async Task<IList<UserModel.Model>> GetUsersAsync(Guid roleId)
-        {
-            if (LocalStore.Exists(roleId))
-                return await LocalStore.GetUsersAsync(roleId);
-            else
-                throw new ArgumentNullException();
-        }
-
-        public async Task<IdentityResult> UpdateAsync(RoleModel.Update role)
-        {
-            if (LocalStore.Exists(role.Id))
+            if (Store.Exists(model.Id))
             {
-                await LocalStore.UpdateAsync(role);
+                await Store.UpdateAsync(model);
                 return IdentityResult.Success;
             }
             else

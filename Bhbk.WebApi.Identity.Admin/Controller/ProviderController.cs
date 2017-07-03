@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> CreateProvider(ProviderModel.Create model)
+        public async Task<IHttpActionResult> CreateProvider(ProviderCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,15 +56,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             if (provider == null)
             {
-                model.Immutable = false;
+                var create = UoW.UserMgmt.Store.Mf.Create.DoIt(model);
+                var result = await UoW.ProviderMgmt.CreateAsync(create);
 
-                var result = await UoW.ProviderMgmt.CreateAsync(model);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(await UoW.ProviderMgmt.FindByNameAsync(model.Name));
+                return Ok(result);
             }
             else
                 return BadRequest(BaseLib.Statics.MsgProviderAlreadyExists);
@@ -82,16 +77,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             else if (provider.Immutable)
                 return BadRequest(BaseLib.Statics.MsgProviderImmutable);
 
+            if (!await UoW.ProviderMgmt.DeleteAsync(providerID))
+                return InternalServerError();
+
             else
-            {
-                IdentityResult result = await UoW.ProviderMgmt.DeleteAsync(providerID);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok();
-            }
+                return Ok();
         }
 
         [Route("v1/{providerID}"), HttpGet]
@@ -143,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                IdentityResult result = await UoW.UserMgmt.RemoveFromProviderAsync(userID, UoW.ProviderMgmt.LocalStore.Find(providerID).Name);
+                IdentityResult result = await UoW.UserMgmt.RemoveFromProviderAsync(userID, UoW.ProviderMgmt.Store.FindById(providerID).Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -155,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
         [Route("v1/{providerID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IHttpActionResult> UpdateProvider(Guid providerID, ProviderModel.Update model)
+        public async Task<IHttpActionResult> UpdateProvider(Guid providerID, ProviderUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -173,18 +163,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                provider.Name = model.Name;
-                provider.Description = model.Description;
-                provider.Enabled = model.Enabled;
-                provider.Immutable = false;
+                var update = UoW.ProviderMgmt.Store.Mf.Update.DoIt(model);
+                var result = await UoW.ProviderMgmt.UpdateAsync(update);
 
-                IdentityResult result = await UoW.ProviderMgmt.UpdateAsync(model);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(provider);
+                return Ok(result);
             }
         }
     }

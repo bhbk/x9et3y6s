@@ -33,6 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
             _uow = uow;
         }
 
+        [System.Obsolete]
         protected IHttpActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)

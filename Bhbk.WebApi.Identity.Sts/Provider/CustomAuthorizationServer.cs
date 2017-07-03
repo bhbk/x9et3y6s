@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helper;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -86,8 +86,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             }
 
             Guid clientID, audienceID;
-            ClientModel.Model client;
-            AudienceModel.Model audience;
+            ClientModel client;
+            AudienceModel audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -147,8 +147,8 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             }
 
             Guid clientID, audienceID;
-            ClientModel.Model client;
-            AudienceModel.Model audience;
+            ClientModel client;
+            AudienceModel audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -210,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
             if (providers.Contains(BaseLib.Statics.ApiDefaultProvider) || providers.Where(x => x.StartsWith(BaseLib.Statics.ApiUnitTestProvider)).Any())
             {
                 //check that password is valid...
-                if (!await _uow.UserMgmt.CheckPasswordAsync(_uow.Models.Devolve.DoIt(user), context.Password))
+                if (!await _uow.UserMgmt.CheckPasswordAsync(_uow.UserMgmt.Store.Mf.Devolve.DoIt(user), context.Password))
                 {
                     await _uow.UserMgmt.AccessFailedAsync(user.Id);
 
@@ -231,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                     { BaseLib.Statics.AttrUserID, user.Id.ToString().ToLower() }
                 });
 
-            ClaimsIdentity claims = await _uow.UserMgmt.CreateIdentityAsync(_uow.Models.Devolve.DoIt(user), "JWT");
+            ClaimsIdentity claims = await _uow.UserMgmt.CreateIdentityAsync(_uow.UserMgmt.Store.Mf.Devolve.DoIt(user), "JWT");
 
             claims.AddClaim(new Claim(ClaimTypes.Email, user.Email));
             claims.AddClaim(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
@@ -272,7 +272,7 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 context.TryGetFormCredentials(out contextID, out contextSecret);
 
             Guid clientID;
-            ClientModel.Model client;
+            ClientModel client;
 
             if (string.IsNullOrEmpty(context.ClientId))
             {

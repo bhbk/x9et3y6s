@@ -1,75 +1,108 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Interface;
+using Bhbk.Lib.Identity.Model;
 using Bhbk.Lib.Identity.Store;
-using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Manager
 {
-    public class ClientManager
+    public class ClientManager : IGenericManager<ClientModel, Guid>
     {
-        public ClientStore LocalStore;
+        public ClientStore Store;
 
         public ClientManager(ClientStore store)
         {
             if (store == null)
                 throw new ArgumentNullException();
 
-            LocalStore = store;
+            Store = store;
         }
 
-        public async Task<IdentityResult> CreateAsync(ClientModel.Create client)
+        public async Task<ClientModel> CreateAsync(ClientModel model)
         {
-            if (!LocalStore.Exists(client.Name))
+            var client = Store.Mf.Devolve.DoIt(model);
+
+            if (!Store.Exists(client.Name))
             {
-                await LocalStore.Create(client);
-                return IdentityResult.Success;
+                var result = Store.Create(client);
+                return Store.Mf.Evolve.DoIt(result);
             }
             else
                 throw new ArgumentNullException();
         }
 
-        public async Task<IdentityResult> DeleteAsync(Guid clientId)
+        public async Task<bool> DeleteAsync(Guid clientId)
         {
-            if (LocalStore.Exists(clientId))
+            if (Store.Exists(clientId))
+                return Store.Delete(clientId);
+            else
+                throw new ArgumentNullException();
+        }
+
+        public async Task<ClientModel> FindByIdAsync(Guid clientId)
+        {
+            var client = Store.FindById(clientId);
+
+            if (client == null)
+                return null;
+
+            return Store.Mf.Evolve.DoIt(client);
+        }
+
+        public async Task<ClientModel> FindByNameAsync(string clientName)
+        {
+            var client = Store.FindByName(clientName);
+
+            if (client == null)
+                return null;
+
+            return Store.Mf.Evolve.DoIt(client);
+        }
+
+        public async Task<IList<ClientModel>> GetListAsync()
+        {
+            IList<ClientModel> result = new List<ClientModel>();
+            var clients = Store.GetAll();
+
+            if (clients == null)
+                throw new InvalidOperationException();
+
+            else
             {
-                await LocalStore.Delete(clientId);
-                return IdentityResult.Success;
+                foreach (AppClient client in clients)
+                    result.Add(Store.Mf.Evolve.DoIt(client));
+
+                return result;
             }
+        }
+
+        public async Task<IList<AudienceModel>> GetAudiencesAsync(Guid clientId)
+        {
+            IList<AudienceModel> result = new List<AudienceModel>();
+            var audiences = Store.GetAudiences(clientId);
+
+            if (audiences == null)
+                throw new InvalidOperationException();
+
             else
-                throw new ArgumentNullException();
-        }
-
-        public async Task<ClientModel.Model> FindByIdAsync(Guid clientId)
-        {
-            return await LocalStore.FindById(clientId);
-        }
-
-        public async Task<ClientModel.Model> FindByNameAsync(string clientName)
-        {
-            return await LocalStore.FindByName(clientName);
-        }
-
-        public async Task<IList<ClientModel.Model>> GetListAsync()
-        {
-            return await LocalStore.GetAll();
-        }
-
-        public async Task<IList<AudienceModel.Model>> GetAudiencesAsync(Guid clientId)
-        {
-            if (LocalStore.Exists(clientId))
-                return await LocalStore.GetAudiences(clientId);
-            else
-                throw new ArgumentNullException();
-        }
-
-        public async Task<IdentityResult> UpdateAsync(ClientModel.Update client)
-        {
-            if (LocalStore.Exists(client.Id))
             {
-                await LocalStore.Update(client);
-                return IdentityResult.Success;
+                foreach (AppAudience audience in audiences)
+                    result.Add(Store.Mf.Evolve.DoIt(audience));
+
+                return result;
+            }
+        }
+
+        public async Task<ClientModel> UpdateAsync(ClientModel model)
+        {
+            var client = Store.Mf.Devolve.DoIt(model);
+
+            if (Store.Exists(client.Id))
+            {
+                var result = Store.Update(client);
+                return Store.Mf.Evolve.DoIt(result);
             }
             else
                 throw new ArgumentNullException();

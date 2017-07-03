@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Manager;
+﻿using Bhbk.Lib.Identity.Manager;
 using System;
 
 namespace Bhbk.Lib.Identity.Interface
@@ -8,7 +7,6 @@ namespace Bhbk.Lib.Identity.Interface
     public interface IUnitOfWork : IDisposable
     {
         ContextType ContextStatus { get; }
-        ModelFactory Models { get; }
         AudienceManager AudienceMgmt { get; }
         ClientManager ClientMgmt { get; }
         ConfigManager ConfigMgmt { get; }
@@ -16,5 +14,11 @@ namespace Bhbk.Lib.Identity.Interface
         CustomRoleManager RoleMgmt { get; }
         CustomUserManager UserMgmt { get; }
         void Save();
+    }
+
+    public enum ContextType
+    {
+        UnitTest,
+        Live
     }
 }

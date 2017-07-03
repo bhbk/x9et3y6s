@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
 using System;
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1/change-email/{token}"), HttpPut]
-        public async Task<IHttpActionResult> ConfirmEmailChange(UserModel.ChangeEmail model, string token)
+        public async Task<IHttpActionResult> ConfirmEmailChange(UserChangeEmail model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1/change-password/{token}"), HttpPut]
-        public async Task<IHttpActionResult> ConfirmPasswordChange(UserModel.ChangePassword model, string token)
+        public async Task<IHttpActionResult> ConfirmPasswordChange(UserChangePassword model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
         }
 
         [Route("v1/change-phone/{token}"), HttpPut]
-        public async Task<IHttpActionResult> ConfirmPhoneChange(UserModel.ChangePhone model, string token)
+        public async Task<IHttpActionResult> ConfirmPhoneChange(UserChangePhone model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

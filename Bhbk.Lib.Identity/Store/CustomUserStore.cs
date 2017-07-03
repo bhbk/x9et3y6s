@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Model;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -20,7 +21,7 @@ namespace Bhbk.Lib.Identity.Store
         private CustomIdentityDbContext _context;
         private CustomIdentityValidator _validator;
         private DbSet<AppUser> _data;
-        public ModelFactory _factory;
+        public ModelFactory Mf;
 
         public CustomUserStore(CustomIdentityDbContext context)
             : base(context)
@@ -30,8 +31,8 @@ namespace Bhbk.Lib.Identity.Store
 
             _context = context;
             _data = _context.Set<AppUser>();
-            _factory = new ModelFactory(_context);
             _validator = new CustomIdentityValidator(_context);
+            Mf = new ModelFactory(_context);
         }
 
         public IIdentityValidator<AppUser> UserValidator
@@ -107,15 +108,12 @@ namespace Bhbk.Lib.Identity.Store
             }
         }
 
-        public Task CreateAsync(UserModel.Create user)
+        public override Task CreateAsync(AppUser user)
         {
-            var create = _factory.Create.DoIt(user);
-            var model = _factory.Devolve.DoIt(create);
-
             //TODO - figure out what to do with UserName requirement in Identity...
-            model.UserName = user.Email;
+            user.UserName = user.Email;
 
-            _context.AppUser.Add(model);
+            _context.AppUser.Add(user);
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
@@ -141,22 +139,14 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppUser.Any(x => x.Email == UserEmail);
         }
 
-        private Task<UserModel.Model> Find(AppUser user)
+        public AppUser FindById(Guid userId)
         {
-            if (user == null)
-                return Task.FromResult<UserModel.Model>(null);
-            else
-                return Task.FromResult(_factory.Evolve.DoIt(user));
+            return _context.AppUser.Where(x => x.Id == userId).SingleOrDefault();
         }
 
-        public Task<UserModel.Model> FindById(Guid userId)
+        public AppUser FindByName(string userName)
         {
-            return Find(_context.AppUser.Where(x => x.Id == userId).SingleOrDefault());
-        }
-
-        public Task<UserModel.Model> FindByName(string userName)
-        {
-            return Find(_context.AppUser.Where(x => x.Email == userName).SingleOrDefault());
+            return _context.AppUser.Where(x => x.Email == userName).SingleOrDefault();
         }
 
         public IEnumerable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
@@ -177,21 +167,9 @@ namespace Bhbk.Lib.Identity.Store
                 return query.ToList();
         }
 
-        public Task<IList<UserModel.Model>> GetAll()
+        public IList<AppUser> GetAll()
         {
-            IList<UserModel.Model> result = new List<UserModel.Model>();
-            var users = _context.AppUser.ToList();
-
-            if (users == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppUser user in users)
-                    result.Add(_factory.Evolve.DoIt(user));
-
-                return Task.FromResult(result);
-            }
+            return _context.AppUser.ToList();
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user)
@@ -418,7 +396,7 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        //TODO - change incoming model to UserModel.Update
+        //TODO - change incoming model to UserUpdate
         public override Task UpdateAsync(AppUser user)
         {
             var model = _context.AppUser.Where(x => x.Id == user.Id).Single();

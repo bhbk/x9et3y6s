@@ -1,19 +1,16 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Model;
-using Microsoft.AspNet.Identity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Store
 {
     public class AudienceStore : GenericStore<AppAudience, Guid>
     {
-        private CustomIdentityDbContext _context;
-        private ModelFactory _factory;
+        public ModelFactory Mf;
 
         public AudienceStore(CustomIdentityDbContext context)
             : base(context)
@@ -22,21 +19,18 @@ namespace Bhbk.Lib.Identity.Store
                 throw new ArgumentNullException();
 
             _context = context;
-            _factory = new ModelFactory(context);
+            Mf = new ModelFactory(context);
         }
 
-        public Task Create(AudienceModel.Create audience)
+        public override AppAudience Create(AppAudience audience)
         {
-            var create = _factory.Create.DoIt(audience);
-            var model = _factory.Devolve.DoIt(create);
-
-            _context.AppAudience.Add(model);
+            var result = _context.AppAudience.Add(audience);
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
+            return result;
         }
 
-        public Task Delete(Guid audienceId)
+        public override bool Delete(Guid audienceId)
         {
             var audience = _context.AppAudience.Where(x => x.Id == audienceId).Single();
             var roles = _context.AppRole.Where(x => x.AudienceId == audienceId);
@@ -45,59 +39,8 @@ namespace Bhbk.Lib.Identity.Store
             _context.AppAudience.Remove(audience);
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
-        }
-
-        private Task<AudienceModel.Model> Find(AppAudience audience)
-        {
-            if (audience == null)
-                return Task.FromResult<AudienceModel.Model>(null);
-            else
-                return Task.FromResult(_factory.Evolve.DoIt(audience));
-        }
-
-        public Task<AudienceModel.Model> FindById(Guid audienceId)
-        {
-            return Find(_context.AppAudience.Where(x => x.Id == audienceId).SingleOrDefault());
-        }
-
-        public Task<AudienceModel.Model> FindByName(string audienceName)
-        {
-            return Find(_context.AppAudience.Where(x => x.Name == audienceName).SingleOrDefault());
-        }
-
-        public Task<IList<AudienceModel.Model>> GetAll()
-        {
-            IList<AudienceModel.Model> result = new List<AudienceModel.Model>();
-            var audiences = _context.AppAudience.ToList();
-
-            if (audiences == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppAudience audience in audiences)
-                    result.Add(_factory.Evolve.DoIt(audience));
-
-                return Task.FromResult(result);
-            }
-        }
-
-        public Task<IList<RoleModel.Model>> GetRoles(Guid audienceId)
-        {
-            IList<RoleModel.Model> result = new List<RoleModel.Model>();
-            var roles = _context.AppRole.Where(x => x.AudienceId == audienceId).ToList();
-
-            if (roles == null)
-                throw new InvalidOperationException();
-
-            else
-            {
-                foreach (AppRole role in roles)
-                    result.Add(_factory.Evolve.DoIt(role));
-
-                return Task.FromResult(result);
-            }
+            return true;
+            //return Exists(audienceId);
         }
 
         public override bool Exists(Guid audienceId)
@@ -110,7 +53,27 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppAudience.Any(x => x.Name == audienceName);
         }
 
-        public Task Update(AudienceModel.Update audience)
+        public override AppAudience FindById(Guid audienceId)
+        {
+            return _context.AppAudience.Where(x => x.Id == audienceId).SingleOrDefault();
+        }
+
+        public AppAudience FindByName(string audienceName)
+        {
+            return _context.AppAudience.Where(x => x.Name == audienceName).SingleOrDefault();
+        }
+
+        public IList<AppAudience> GetAll()
+        {
+            return _context.AppAudience.ToList();
+        }
+
+        public IList<AppRole> GetRoles(Guid audienceId)
+        {
+            return _context.AppRole.Where(x => x.AudienceId == audienceId).ToList();
+        }
+
+        public AppAudience Update(AppAudience audience)
         {
             var model = _context.AppAudience.Where(x => x.Id == audience.Id).Single();
 
@@ -126,7 +89,7 @@ namespace Bhbk.Lib.Identity.Store
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return Task.FromResult(IdentityResult.Success);
+            return model;
         }
     }
 }
