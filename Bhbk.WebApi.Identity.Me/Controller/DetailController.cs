@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interface;
 using Microsoft.AspNet.Identity;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BaseLib = Bhbk.Lib.Identity;
@@ -58,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgmt.FindByIdAsyncDeprecated(GetUserGUID());
+            var user = await UoW.UserMgmt.FindByIdAsync(GetUserGUID());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -66,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await UoW.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserMgmt.CheckPasswordAsync(user.Id, model.CurrentPassword))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -120,6 +121,14 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             }
         }
 
+        [Route("v1/claims"), HttpGet]
+        public IHttpActionResult GetClaims()
+        {
+            var user = User.Identity as ClaimsIdentity;
+
+            return Ok(user.Claims);
+        }
+
         [Route("v1/two-factor/{status}"), HttpPut]
         public async Task<IHttpActionResult> SetTwoFactor(bool status)
         {
@@ -138,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
 
             else
             {
-                var result = await UoW.UserMgmt.SetTwoFactorEnabledAsync(user.Id, status);
+                IdentityResult result = await UoW.UserMgmt.SetTwoFactorEnabledAsync(user.Id, status);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -164,16 +173,18 @@ namespace Bhbk.WebApi.Identity.Me.Controller
 
             else
             {
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
+                model.LockoutEnabled = user.LockoutEnabled;
+                model.LockoutEndDateUtc = user.LockoutEndDateUtc.HasValue ? user.LockoutEndDateUtc.Value.ToUniversalTime() : user.LockoutEndDateUtc;
 
-                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.UserMgmt.Store.Mf.Devolve.DoIt(user));
+                var update = UoW.UserMgmt.Store.Mf.Update.DoIt(model);
+                var devolve = UoW.UserMgmt.Store.Mf.Devolve.DoIt(update);
+                IdentityResult result = await UoW.UserMgmt.UpdateAsync(devolve);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(user);
+                    return Ok(update);
             }
         }
     }

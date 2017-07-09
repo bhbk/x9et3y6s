@@ -73,7 +73,7 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppRole.Where(x => x.AudienceId == audienceId).ToList();
         }
 
-        public AppAudience Update(AppAudience audience)
+        public override AppAudience Update(AppAudience audience)
         {
             var model = _context.AppAudience.Where(x => x.Id == audience.Id).Single();
 

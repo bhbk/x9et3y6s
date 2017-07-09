@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Store
 
         public override Task AddClaimAsync(AppUser user, Claim claim)
         {
-            var newClaim = new AppUserClaim()
+            var model = new AppUserClaim()
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
@@ -53,7 +53,7 @@ namespace Bhbk.Lib.Identity.Store
                 ClaimValue = claim.Value
             };
 
-            _context.AppUserClaim.Add(newClaim);
+            _context.AppUserClaim.Add(model);
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
@@ -66,22 +66,19 @@ namespace Bhbk.Lib.Identity.Store
             if (provider == null)
                 throw new ArgumentNullException();
 
-            else
+            AppUserProvider result = new AppUserProvider()
             {
-                AppUserProvider result = new AppUserProvider()
-                {
-                    ProviderId = provider.Id,
-                    UserId = userId,
-                    Enabled = true,
-                    Created = DateTime.Now,
-                    Immutable = false
-                };
+                ProviderId = provider.Id,
+                UserId = userId,
+                Enabled = true,
+                Created = DateTime.Now,
+                Immutable = false
+            };
 
-                _context.AppUserProvider.Add(result);
-                _context.SaveChanges();
+            _context.AppUserProvider.Add(result);
+            _context.SaveChanges();
 
-                return Task.FromResult(IdentityResult.Success);
-            }
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task AddToRoleAsync(AppUser user, string roleName)
@@ -91,21 +88,18 @@ namespace Bhbk.Lib.Identity.Store
             if (role == null)
                 throw new ArgumentNullException();
 
-            else
+            AppUserRole result = new AppUserRole()
             {
-                AppUserRole result = new AppUserRole()
-                {
-                    UserId = user.Id,
-                    RoleId = role.Id,
-                    Created = DateTime.Now,
-                    Immutable = false
-                };
+                UserId = user.Id,
+                RoleId = role.Id,
+                Created = DateTime.Now,
+                Immutable = false
+            };
 
-                _context.AppUserRole.Add(result);
-                _context.SaveChanges();
+            _context.AppUserRole.Add(result);
+            _context.SaveChanges();
 
-                return Task.FromResult(IdentityResult.Success);
-            }
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task CreateAsync(AppUser user)
@@ -138,7 +132,7 @@ namespace Bhbk.Lib.Identity.Store
         {
             return _context.AppUser.Any(x => x.Email == UserEmail);
         }
-
+        
         public AppUser FindById(Guid userId)
         {
             return _context.AppUser.Where(x => x.Id == userId).SingleOrDefault();
@@ -180,22 +174,24 @@ namespace Bhbk.Lib.Identity.Store
             if (claims == null)
                 throw new InvalidOperationException();
 
-            else
+            foreach (var claim in claims)
             {
-                foreach (var claim in claims)
-                {
-                    var model = new Claim(claim.ClaimType,
-                        claim.ClaimValue,
-                        claim.ClaimValueType,
-                        claim.Issuer,
-                        claim.OriginalIssuer,
-                        new ClaimsIdentity(claim.Subject));
+                var model = new Claim(claim.ClaimType,
+                    claim.ClaimValue,
+                    claim.ClaimValueType,
+                    claim.Issuer,
+                    claim.OriginalIssuer,
+                    new ClaimsIdentity(claim.Subject));
 
-                    result.Add(model);
-                }
-
-                return Task.FromResult(result);
+                result.Add(model);
             }
+
+            return Task.FromResult(result);
+        }
+
+        public IList<AppUserClaim> GetClaimsAsync(Guid userId)
+        {
+            return _context.AppUserClaim.Where(x => x.UserId == userId).ToList();
         }
 
         public override Task<string> GetEmailAsync(AppUser user)
@@ -216,13 +212,10 @@ namespace Bhbk.Lib.Identity.Store
             if (providers == null)
                 throw new InvalidOperationException();
 
-            else
-            {
-                foreach (AppUserProvider provider in providers)
-                    result.Add(_context.AppProvider.Where(x => x.Id == provider.ProviderId).Select(r => r.Name).Single());
+            foreach (AppUserProvider provider in providers)
+                result.Add(_context.AppProvider.Where(x => x.Id == provider.ProviderId).Select(r => r.Name).Single());
 
-                return Task.FromResult(result);
-            }
+            return Task.FromResult(result);
         }
 
         public override Task<IList<string>> GetRolesAsync(AppUser user)
@@ -233,13 +226,10 @@ namespace Bhbk.Lib.Identity.Store
             if (roles == null)
                 throw new InvalidOperationException();
 
-            else
-            {
-                foreach (AppUserRole role in roles)
-                    result.Add(_context.Roles.Where(x => x.Id == role.RoleId).Select(r => r.Name).Single());
+            foreach (AppUserRole role in roles)
+                result.Add(_context.Roles.Where(x => x.Id == role.RoleId).Select(r => r.Name).Single());
 
-                return Task.FromResult(result);
-            }
+            return Task.FromResult(result);
         }
 
         public override Task<bool> GetTwoFactorEnabledAsync(AppUser user)
@@ -284,13 +274,10 @@ namespace Bhbk.Lib.Identity.Store
             if (result == null)
                 throw new ArgumentNullException();
 
-            else
-            {
-                _context.AppUserClaim.Remove(result);
-                _context.SaveChanges();
+            _context.AppUserClaim.Remove(result);
+            _context.SaveChanges();
 
-                return Task.FromResult(IdentityResult.Success);
-            }
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public Task RemoveFromProviderAsync(AppUser user, string providerName)
@@ -300,15 +287,12 @@ namespace Bhbk.Lib.Identity.Store
             if (provider == null)
                 throw new ArgumentNullException();
 
-            else
-            {
-                var result = _context.AppUserProvider.Where(x => x.UserId == user.Id && x.ProviderId == provider.Id).Single();
+            var result = _context.AppUserProvider.Where(x => x.UserId == user.Id && x.ProviderId == provider.Id).Single();
 
-                _context.AppUserProvider.Remove(result);
-                _context.SaveChanges();
+            _context.AppUserProvider.Remove(result);
+            _context.SaveChanges();
 
-                return Task.FromResult(IdentityResult.Success);
-            }
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task RemoveFromRoleAsync(AppUser user, string roleName)
@@ -318,15 +302,12 @@ namespace Bhbk.Lib.Identity.Store
             if (role == null)
                 throw new ArgumentNullException();
 
-            else
-            {
-                var result = _context.AppUserRole.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
+            var result = _context.AppUserRole.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
-                _context.AppUserRole.Remove(result);
-                _context.SaveChanges();
+            _context.AppUserRole.Remove(result);
+            _context.SaveChanges();
 
-                return Task.FromResult(IdentityResult.Success);
-            }
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task ResetAccessFailedCountAsync(AppUser user)
@@ -396,12 +377,16 @@ namespace Bhbk.Lib.Identity.Store
             return Task.FromResult(IdentityResult.Success);
         }
 
-        //TODO - change incoming model to UserUpdate
         public override Task UpdateAsync(AppUser user)
         {
             var model = _context.AppUser.Where(x => x.Id == user.Id).Single();
 
             model.UserName = user.Email;
+            model.FirstName = user.FirstName;
+            model.LastName = user.LastName;
+            model.LockoutEnabled = user.LockoutEnabled;
+            model.LockoutEndDateUtc = user.LockoutEndDateUtc;
+            model.Immutable = user.Immutable;
             model.LastUpdated = DateTime.Now;
 
             _context.Entry(model).State = EntityState.Modified;

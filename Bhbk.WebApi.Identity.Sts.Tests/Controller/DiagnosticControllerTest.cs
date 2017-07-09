@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
 using System.Web.Http.Results;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controller

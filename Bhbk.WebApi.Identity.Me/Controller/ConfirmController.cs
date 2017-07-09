@@ -132,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgmt.FindByIdAsyncDeprecated(GetUserGUID());
+            var user = await UoW.UserMgmt.FindByIdAsync(GetUserGUID());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -143,7 +143,7 @@ namespace Bhbk.WebApi.Identity.Me.Controller
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            else if (!await UoW.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserMgmt.CheckPasswordAsync(user.Id, model.CurrentPassword))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
 
             else if (!await UoW.UserMgmt.VerifyUserTokenAsync(user.Id, BaseLib.Statics.ApiTokenResetPassword, token))

@@ -246,20 +246,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controller
 
             else
             {
-                user.Email = model.Email;
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
                 user.LockoutEnabled = model.LockoutEnabled;
                 user.LockoutEndDateUtc = model.LockoutEndDateUtc.HasValue ? model.LockoutEndDateUtc.Value.ToUniversalTime() : model.LockoutEndDateUtc;
-                user.Immutable = false;
 
-                IdentityResult result = await UoW.UserMgmt.UpdateAsync(UoW.UserMgmt.Store.Mf.Devolve.DoIt(user));
+                var update = UoW.UserMgmt.Store.Mf.Update.DoIt(model);
+                var devolve = UoW.UserMgmt.Store.Mf.Devolve.DoIt(update);
+                IdentityResult result = await UoW.UserMgmt.UpdateAsync(devolve);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(user);
+                    return Ok(update);
             }
         }
     }

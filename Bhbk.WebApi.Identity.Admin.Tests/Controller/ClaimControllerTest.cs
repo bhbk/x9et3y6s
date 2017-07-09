@@ -1,12 +1,12 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.WebApi.Identity.Admin.Controller;
+﻿using Bhbk.WebApi.Identity.Admin.Controller;
 using FluentAssertions;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web.Http;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -27,17 +27,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ClaimController(UoW);
             var user = UoW.UserMgmt.Store.Get().First();
-            var claim = new UserClaimCreate()
-            {
-                UserId = user.Id,
-                ClaimType = BaseLib.Statics.ApiUnitTestClaimType,
-                ClaimValue = BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4),
-                Immutable = false
-            };
+            var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType,
+                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4));
 
-            var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<UserClaimModel>;
-            result.Content.Should().BeAssignableTo(typeof(UserClaimModel));
-            result.Content.ClaimType.Should().BeEquivalentTo(claim.ClaimType);
+            var result = await controller.CreateClaim(user.Id, claim) as OkNegotiatedContentResult<Claim>;
+            result.Content.Should().BeAssignableTo(typeof(Claim));
+            result.Content.Type.Should().BeEquivalentTo(claim.Type);
+            result.Content.Value.Should().BeEquivalentTo(claim.Value);
         }
 
         [TestMethod]
@@ -45,12 +41,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
         {
             var controller = new ClaimController(UoW);
             var user = UoW.UserMgmt.Store.Get().First();
-            var claim = user.Claims.First();
+            var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, 
+                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4));
 
-            var result = await controller.DeleteClaim(user.Id, claim.Id) as OkResult;
+            var add = await UoW.UserMgmt.AddClaimAsync(user.Id, claim);
+            add.Should().BeAssignableTo(typeof(IdentityResult));
+            add.Succeeded.Should().BeTrue();
+
+            var find = user.Claims.Where(x => x.ClaimType == claim.Type && x.ClaimValue == claim.Value).Single();
+            var delete = UoW.UserMgmt.Store.Mf.Evolve.DoIt(find);
+            var result = await controller.DeleteClaim(user.Id, delete) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));
 
-            var check = user.Claims.Where(x => x.ClaimType == claim.ClaimType && x.ClaimValue == claim.ClaimValue).Any();
+            var check = user.Claims.Where(x => x.ClaimType == claim.Type && x.ClaimValue == claim.Value).Any();
             check.Should().BeFalse();
         }
 
@@ -60,18 +63,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
             var controller = new ClaimController(UoW);
             var user = UoW.UserMgmt.Store.Get().First();
 
-            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IList<UserClaimModel>>;
-            result.Content.Should().BeAssignableTo(typeof(IList<UserClaimModel>));
+            var result = await controller.GetClaims(user.Id) as OkNegotiatedContentResult<IList<Claim>>;
+            result.Content.Should().BeAssignableTo(typeof(IList<Claim>));
             result.Content.Count().ShouldBeEquivalentTo(user.Claims.Count());
-        }
-
-        [TestMethod]
-        public void Api_Admin_Claim_GetList_Success()
-        {
-            var controller = new ClaimController(UoW);
-            var result = controller.GetClaims() as IHttpActionResult;
-
-            result.Should().NotBeNull();
         }
     }
 }

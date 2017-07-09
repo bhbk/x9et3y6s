@@ -5,9 +5,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Web.Http;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controller
 {
@@ -64,16 +62,10 @@ namespace Bhbk.WebApi.Identity.Me.Controller
 
         public void SetUser(Guid guid)
         {
-            var user = UoW.UserMgmt.FindByIdAsync(guid).Result;
-            var roles = UoW.UserMgmt.GetRolesAsync(user.Id).Result;
-            var claims = new GenericIdentity(BaseLib.Statics.ApiUnitTestUserDisplayName + BaseLib.Helper.EntrophyHelper.GenerateRandomBase64(4));
+            var user = UoW.UserMgmt.Store.FindById(guid);
+            var claims = UoW.UserMgmt.CreateIdentityAsync(user, "JWT").Result;
 
-            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            claims.AddClaim(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
-            claims.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
-            claims.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
-
-            User = new ClaimsPrincipal(new GenericPrincipal(claims, roles.ToArray()));
+            User = new ClaimsPrincipal(claims);
         }
     }
 }

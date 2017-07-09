@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Factory
 {
@@ -72,20 +73,16 @@ namespace Bhbk.Lib.Identity.Factory
         public bool PasswordConfirmed { get; set; }
         public bool TwoFactorEnabled { get; set; }
         public bool Immutable { get; set; }
-        public IList<UserClaimModel> Claims { get; set; }
+        public IList<Claim> Claims { get; set; }
         public IList<RoleModel> Roles { get; set; }
     }
 
     public class UserUpdate
     {
         public Guid Id { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public bool LockoutEnabled { get; set; }
         public Nullable<DateTime> LockoutEndDateUtc { get; set; }
-        public bool TwoFactorEnabled { get; set; }
-        public bool Immutable { get; set; }
     }
 }

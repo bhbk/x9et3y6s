@@ -24,21 +24,20 @@ namespace Bhbk.Lib.Identity.Manager
         {
             var client = Store.Mf.Devolve.DoIt(model);
 
-            if (!Store.Exists(client.Name))
-            {
-                var result = Store.Create(client);
-                return Store.Mf.Evolve.DoIt(result);
-            }
-            else
-                throw new ArgumentNullException();
+            if (Store.Exists(client.Name))
+                throw new InvalidOperationException();
+
+            var result = Store.Create(client);
+
+            return Store.Mf.Evolve.DoIt(result);
         }
 
         public async Task<bool> DeleteAsync(Guid clientId)
         {
-            if (Store.Exists(clientId))
-                return Store.Delete(clientId);
-            else
-                throw new ArgumentNullException();
+            if (!Store.Exists(clientId))
+                throw new InvalidOperationException();
+
+            return Store.Delete(clientId);
         }
 
         public async Task<ClientModel> FindByIdAsync(Guid clientId)
@@ -69,13 +68,10 @@ namespace Bhbk.Lib.Identity.Manager
             if (clients == null)
                 throw new InvalidOperationException();
 
-            else
-            {
-                foreach (AppClient client in clients)
-                    result.Add(Store.Mf.Evolve.DoIt(client));
+            foreach (AppClient client in clients)
+                result.Add(Store.Mf.Evolve.DoIt(client));
 
-                return result;
-            }
+            return result;
         }
 
         public async Task<IList<AudienceModel>> GetAudiencesAsync(Guid clientId)
@@ -86,26 +82,22 @@ namespace Bhbk.Lib.Identity.Manager
             if (audiences == null)
                 throw new InvalidOperationException();
 
-            else
-            {
-                foreach (AppAudience audience in audiences)
-                    result.Add(Store.Mf.Evolve.DoIt(audience));
+            foreach (AppAudience audience in audiences)
+                result.Add(Store.Mf.Evolve.DoIt(audience));
 
-                return result;
-            }
+            return result;
         }
 
         public async Task<ClientModel> UpdateAsync(ClientModel model)
         {
             var client = Store.Mf.Devolve.DoIt(model);
 
-            if (Store.Exists(client.Id))
-            {
-                var result = Store.Update(client);
-                return Store.Mf.Evolve.DoIt(result);
-            }
-            else
-                throw new ArgumentNullException();
+            if (!Store.Exists(client.Id))
+                throw new InvalidOperationException();
+
+            var result = Store.Update(client);
+
+            return Store.Mf.Evolve.DoIt(result);
         }
     }
 }

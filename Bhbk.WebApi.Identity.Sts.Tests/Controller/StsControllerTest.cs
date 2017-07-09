@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Model;
 using Bhbk.WebApi.Identity.Sts.Controller;
 using FluentAssertions;
 using Microsoft.AspNet.Identity;

@@ -236,14 +236,14 @@ namespace Bhbk.Lib.Identity.Helper
 
         public async void DestroyAllData()
         {
-            var user = await _uow.UserMgmt.FindByNameAsyncDeprecated(Statics.ApiDefaultAdmin);
+            var user = await _uow.UserMgmt.FindByNameAsync(Statics.ApiDefaultAdmin);
 
             if (user != null)
             {
                 var userRoles = await _uow.UserMgmt.GetRolesAsync(user.Id);
 
                 await _uow.UserMgmt.RemoveFromRolesAsync(user.Id, userRoles.ToArray());
-                await _uow.UserMgmt.DeleteAsync(user);
+                await _uow.UserMgmt.DeleteAsync(user.Id);
             }
 
             var role = await _uow.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForAdmin);

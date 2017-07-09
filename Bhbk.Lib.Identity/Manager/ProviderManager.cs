@@ -24,21 +24,20 @@ namespace Bhbk.Lib.Identity.Manager
         {
             var provider = Store.Mf.Devolve.DoIt(model);
 
-            if (!Store.Exists(provider.Name))
-            {
-                var result = Store.Create(provider);
-                return Store.Mf.Evolve.DoIt(result);
-            }
-            else
-                throw new ArgumentNullException();
+            if (Store.Exists(provider.Name))
+                throw new InvalidOperationException();
+
+            var result = Store.Create(provider);
+
+            return Store.Mf.Evolve.DoIt(result);
         }
 
         public async Task<bool> DeleteAsync(Guid clientId)
         {
-            if (Store.Exists(clientId))
-                return Store.Delete(clientId);
-            else
-                throw new ArgumentNullException();
+            if (!Store.Exists(clientId))
+                throw new InvalidOperationException();
+
+            return Store.Delete(clientId);
         }
 
         public async Task<ProviderModel> FindByIdAsync(Guid providerId)
@@ -95,13 +94,12 @@ namespace Bhbk.Lib.Identity.Manager
         {
             var provider = Store.Mf.Devolve.DoIt(model);
 
-            if (Store.Exists(provider.Id))
-            {
-                var result = Store.Update(provider);
-                return Store.Mf.Evolve.DoIt(result);
-            }
-            else
-                throw new ArgumentNullException();
+            if (!Store.Exists(provider.Id))
+                throw new InvalidOperationException();
+
+            var result = Store.Update(provider);
+
+            return Store.Mf.Evolve.DoIt(result);
         }
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -60,7 +59,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> AccessFailedAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -73,7 +72,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> AddClaimAsync(Guid userId, Claim claim)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -85,7 +84,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> AddPasswordAsync(Guid userId, string password)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -99,35 +98,33 @@ namespace Bhbk.Lib.Identity.Manager
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
-
+            
             return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> AddRefreshTokenAsync(UserRefreshTokenModel token)
         {
-            if (Store.Exists(token.UserId))
-            {
-                await Store.AddRefreshTokenAsync(Store.Mf.Devolve.DoIt(token));
-                return IdentityResult.Success;
-            }
-            else
+            if (!Store.Exists(token.UserId))
                 throw new ArgumentNullException();
+
+            await Store.AddRefreshTokenAsync(Store.Mf.Devolve.DoIt(token));
+
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> AddToProviderAsync(Guid userId, string provider)
         {
-            if (Store.Exists(userId))
-            {
-                await Store.AddToProviderAsync(userId, provider);
-                return IdentityResult.Success;
-            }
-            else
+            if (!Store.Exists(userId))
                 throw new ArgumentNullException();
+
+            await Store.AddToProviderAsync(userId, provider);
+
+            return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> AddToRoleAsync(Guid userId, string role)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -139,7 +136,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> AddToRolesAsync(Guid userId, params string[] roles)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -152,7 +149,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -160,26 +157,23 @@ namespace Bhbk.Lib.Identity.Manager
             else if (!await CheckPasswordAsync(user, currentPassword))
                 throw new InvalidOperationException();
 
-            else
-                return await UpdatePassword(this.Store, user, newPassword);
+            return await UpdatePassword(this.Store, user, newPassword);
         }
 
         public override async Task<IdentityResult> ChangePhoneNumberAsync(Guid userId, string phoneNumber, string token)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
 
             if (!await VerifyUserTokenAsync(userId, Statics.ApiTokenConfirmPhone, token))
                 throw new InvalidOperationException();
-            else
-            {
-                user.PhoneNumber = phoneNumber;
-                user.PhoneNumberConfirmed = true;
 
-                return await UpdateAsync(user);
-            }
+            user.PhoneNumber = phoneNumber;
+            user.PhoneNumberConfirmed = true;
+
+            return await UpdateAsync(user);
         }
 
         public async Task<bool> CheckPasswordAsync(Guid userId, string password)
@@ -197,61 +191,53 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> ConfirmEmailAsync(Guid userId, string token)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
 
             if (!await VerifyUserTokenAsync(userId, Statics.ApiTokenConfirmEmail, token))
                 throw new InvalidOperationException();
-            else
-            {
-                await Store.SetEmailConfirmedAsync(user, true);
 
-                return IdentityResult.Success;
-            }
+            await Store.SetEmailConfirmedAsync(user, true);
+
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> ConfirmPasswordAsync(Guid userId, string token)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
 
             if (!await VerifyUserTokenAsync(userId, Statics.ApiTokenConfirmEmail, token))
                 throw new InvalidOperationException();
-            else
-            {
-                await Store.SetPasswordConfirmedAsync(user, true);
 
-                return IdentityResult.Success;
-            }
+            await Store.SetPasswordConfirmedAsync(user, true);
+
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> ConfirmPhoneNumberAsync(Guid userId, string token)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
 
             if (!await VerifyUserTokenAsync(userId, Statics.ApiTokenConfirmEmail, token))
                 throw new InvalidOperationException();
-            else
-            {
-                await Store.SetPhoneNumberConfirmedAsync(user, true);
 
-                return IdentityResult.Success;
-            }
+            await Store.SetPhoneNumberConfirmedAsync(user, true);
+
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> CreateAsync(UserModel user)
         {
-            var found = await FindByNameAsync(user.Email);
-
-            if (found != null)
-                throw new ArgumentNullException();
+            if (Store.Exists(user.Id))
+                throw new InvalidOperationException();
 
             var model = Store.Mf.Devolve.DoIt(user);
             await Store.CreateAsync(model);
@@ -261,18 +247,16 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> CreateAsync(UserModel user, string password)
         {
-            var found = await FindByNameAsync(user.Email);
-
-            if (found != null)
-                throw new ArgumentNullException();
+            if (Store.Exists(user.Id))
+                throw new InvalidOperationException();
 
             var model = Store.Mf.Devolve.DoIt(user);
             await Store.CreateAsync(model);
 
             //TODO - delete this sillyness...
-            var foundUser = FindByNameAsyncDeprecated(user.Email).Result;
+            var found = Store.FindByName(user.Email);
 
-            await UpdatePassword(Store, foundUser, password);
+            await UpdatePassword(Store, found, password);
 
             return IdentityResult.Success;
         }
@@ -284,7 +268,12 @@ namespace Bhbk.Lib.Identity.Manager
             foreach (string role in await Store.GetRolesAsync(user))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
+            foreach (Claim claim in await Store.GetClaimsAsync(user))
+                claims.Add(claim);
+
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
@@ -301,7 +290,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> DeleteAsync(Guid user)
         {
-            var found = await FindByIdAsyncDeprecated(user);
+            var found = Store.FindById(user);
 
             if (found == null)
                 throw new ArgumentNullException();
@@ -331,18 +320,6 @@ namespace Bhbk.Lib.Identity.Manager
             return Store.Mf.Evolve.DoIt(model);
         }
 
-        [System.Obsolete]
-        public async Task<AppUser> FindByIdAsyncDeprecated(Guid userId)
-        {
-            return Store.Users.Where(x => x.Id == userId).SingleOrDefault();
-        }
-
-        [System.Obsolete]
-        public async Task<AppUser> FindByNameAsyncDeprecated(string userName)
-        {
-            return Store.Users.Where(x => x.UserName == userName).SingleOrDefault();
-        }
-
         public async Task<AppUserRefreshToken> FindRefreshTokenAsync(string token)
         {
             return await Store.FindRefreshTokenAsync(token);
@@ -353,9 +330,24 @@ namespace Bhbk.Lib.Identity.Manager
             return await Store.FindRefreshTokenByIdAsync(tokenId);
         }
 
+        //public async Task<UserClaimModel> GetClaimAsync(Guid userId, Guid claimId)
+        //{
+        //    var user = Store.FindById(userId);
+
+        //    if (user == null)
+        //        throw new InvalidOperationException();
+
+        //    var claim = Store.GetClaimAsync(userId, claimId);
+
+        //    if (claim == null)
+        //        throw new InvalidOperationException();
+
+        //    return Store.Mf.Evolve.DoIt(claim);
+        //}
+
         public override async Task<IList<Claim>> GetClaimsAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -365,7 +357,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<string> GetEmailAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -386,7 +378,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<string> GetPhoneNumberAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -396,7 +388,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IList<string>> GetProvidersAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -406,7 +398,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IList<string>> GetRolesAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -416,7 +408,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<bool> GetTwoFactorEnabledAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -449,7 +441,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (UserTokenProvider == null)
                 throw new NotSupportedException();
 
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -465,7 +457,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<string> GetSecurityStampAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -475,7 +467,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<bool> HasPasswordAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -485,7 +477,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<bool> IsInProviderAsync(Guid userId, string role)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -495,7 +487,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<bool> IsInRoleAsync(Guid userId, string role)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -505,7 +497,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<bool> IsLockedOutAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -532,9 +524,9 @@ namespace Bhbk.Lib.Identity.Manager
             }
         }
 
-        public override async Task<IdentityResult> RemoveClaimAsync(Guid userId, Claim claim)
+        public async Task<IdentityResult> RemoveClaimAsync(Guid userId, Claim claim)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -546,7 +538,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> RemoveFromProviderAsync(Guid userId, string provider)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -558,7 +550,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> RemoveFromRoleAsync(Guid userId, string role)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -570,7 +562,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> RemoveFromRolesAsync(Guid userId, params string[] roles)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -590,7 +582,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> ResetAccessFailedCountAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -602,7 +594,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> RemovePasswordAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -618,7 +610,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> ResetPasswordAsync(Guid userId, string token, string newPassword)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -636,7 +628,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> SetEmailConfirmedAsync(Guid userId, bool confirmed)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -648,7 +640,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> SetPasswordConfirmedAsync(Guid userId, bool confirmed)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -660,7 +652,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public async Task<IdentityResult> SetPhoneNumberConfirmedAsync(Guid userId, bool confirmed)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -672,7 +664,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> SetTwoFactorEnabledAsync(Guid userId, bool enabled)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -684,7 +676,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> UpdateAsync(AppUser user)
         {
-            var found = await FindByIdAsyncDeprecated(user.Id);
+            var found = Store.FindById(user.Id);
 
             if (found == null)
                 throw new ArgumentNullException();
@@ -722,7 +714,7 @@ namespace Bhbk.Lib.Identity.Manager
 
         public override async Task<IdentityResult> UpdateSecurityStampAsync(Guid userId)
         {
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -737,7 +729,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (UserTokenProvider == null)
                 throw new NotSupportedException();
 
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -763,7 +755,7 @@ namespace Bhbk.Lib.Identity.Manager
             if (UserTokenProvider == null)
                 throw new NotSupportedException();
 
-            var user = await FindByIdAsyncDeprecated(userId);
+            var user = Store.FindById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();

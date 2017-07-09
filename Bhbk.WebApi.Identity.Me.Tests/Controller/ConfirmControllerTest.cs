@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helper;
-using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helper;
 using Bhbk.WebApi.Identity.Me.Controller;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
-using Bhbk.Lib.Identity.Factory;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controller
 {

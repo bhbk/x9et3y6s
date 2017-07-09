@@ -243,19 +243,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
             var model = new UserUpdate()
             {
                 Id = user.Id,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                FirstName = "FirstName",
-                LastName = "LastName",
+                FirstName = user.FirstName + "(Updated)",
+                LastName = user.LastName + "(Updated)",
                 LockoutEnabled = false,
-                LockoutEndDateUtc = DateTime.Now.AddDays(30),
-                TwoFactorEnabled = false,
-                Immutable = false
+                LockoutEndDateUtc = DateTime.Now.AddDays(30)
             };
 
             var result = await controller.UpdateUser(model.Id, model) as OkNegotiatedContentResult<UserModel>;
             result.Content.Should().BeAssignableTo(typeof(UserModel));
-            result.Content.Email.Should().Be(model.Email);
+            result.Content.FirstName.Should().Be(model.FirstName);
+            result.Content.LastName.Should().Be(model.LastName);
         }
     }
 }

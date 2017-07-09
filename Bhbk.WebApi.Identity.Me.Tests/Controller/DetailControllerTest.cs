@@ -5,7 +5,9 @@ using FluentAssertions;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http.Results;
 using BaseLib = Bhbk.Lib.Identity;
@@ -152,6 +154,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controller
 
             var result = await controller.AskChangePhone(model) as OkNegotiatedContentResult<string>;
             result.Content.Should().BeAssignableTo(typeof(string));
+        }
+
+        [TestMethod]
+        public void Api_Me_Detail_GetClaimList_Success()
+        {
+            var controller = new DetailController(UoW);
+            var user = UoW.UserMgmt.Store.Get().First();
+
+            controller.SetUser(user.Id);
+
+            var result = controller.GetClaims() as OkNegotiatedContentResult<IEnumerable<Claim>>;
+            result.Content.Should().BeAssignableTo(typeof(IEnumerable<Claim>));
         }
 
         [TestMethod]

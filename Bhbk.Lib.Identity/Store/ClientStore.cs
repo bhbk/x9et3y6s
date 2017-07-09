@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Store
             return _context.AppClient.Any(x => x.Name == clientName);
         }
 
-        public AppClient FindById(Guid clientId)
+        public override AppClient FindById(Guid clientId)
         {
             return _context.AppClient.Where(x => x.Id == clientId).SingleOrDefault();
         }

@@ -1,12 +1,13 @@
 ﻿using Bhbk.Lib.Identity.Model;
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Factory
 {
     public class ModelFactory
     {
-        private CustomIdentityDbContext _context;
+        internal static CustomIdentityDbContext _context;
         public Born Create;
         public BLToEF Devolve;
         public EFToBL Evolve;
@@ -93,19 +94,6 @@ namespace Bhbk.Lib.Identity.Factory
                     LastName = user.LastName,
                     Created = DateTime.Now,
                     LockoutEnabled = user.LockoutEnabled,
-                    Immutable = false
-                };
-            }
-
-            public UserClaimModel DoIt(UserClaimCreate claim)
-            {
-                return new UserClaimModel
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = claim.UserId,
-                    ClaimType = claim.ClaimType,
-                    ClaimValue = claim.ClaimType,
-                    Created = DateTime.Now,
                     Immutable = false
                 };
             }
@@ -215,21 +203,17 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public AppUserClaim DoIt(UserClaimModel claim)
+            public AppUserClaim DoIt(Guid userId, Guid claimId, Claim claim)
             {
                 return new AppUserClaim
                 {
-                    Id = claim.Id,
-                    UserId = claim.UserId,
-                    ClaimType = claim.ClaimType,
-                    ClaimValue = claim.ClaimType,
-                    ClaimValueType = claim.ClaimValueType,
+                    Id = claimId,
+                    UserId = userId,
+                    ClaimType = claim.Type,
+                    ClaimValue = claim.Value,
+                    ClaimValueType = claim.ValueType,
                     Issuer = claim.Issuer,
-                    OriginalIssuer = claim.OriginalIssuer,
-                    Subject = claim.Subject,
-                    Created = claim.Created,
-                    LastUpdated = claim.LastUpdated,
-                    Immutable = claim.Immutable
+                    OriginalIssuer = claim.OriginalIssuer
                 };
             }
 
@@ -338,22 +322,14 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public UserClaimModel DoIt(AppUserClaim claim)
+            public Claim DoIt(AppUserClaim claim)
             {
-                return new UserClaimModel
-                {
-                    Id = claim.Id,
-                    UserId = claim.UserId,
-                    ClaimType = claim.ClaimType,
-                    ClaimValue = claim.ClaimType,
-                    ClaimValueType = claim.ClaimValueType,
-                    Issuer = claim.Issuer,
-                    OriginalIssuer = claim.OriginalIssuer,
-                    Subject = claim.Subject,
-                    Created = claim.Created,
-                    LastUpdated = claim.LastUpdated,
-                    Immutable = claim.Immutable
-                };
+                return new Claim(claim.ClaimType,
+                    claim.ClaimValue,
+                    claim.ClaimValueType,
+                    claim.Issuer,
+                    claim.OriginalIssuer,
+                    new ClaimsIdentity(claim.Subject));
             }
 
             public UserRefreshTokenModel DoIt(AppUserRefreshToken token)
@@ -429,27 +405,28 @@ namespace Bhbk.Lib.Identity.Factory
 
             public UserModel DoIt(UserUpdate user)
             {
+                var current = _context.AppUser.Where(x => x.Id == user.Id).Single();
+
                 return new UserModel
                 {
                     Id = user.Id,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
+                    Email = current.Email,
+                    EmailConfirmed = current.EmailConfirmed,
+                    PhoneNumber = current.PhoneNumber,
+                    PhoneNumberConfirmed = current.PhoneNumberConfirmed,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    LockoutEnabled = user.LockoutEnabled,
-                    Immutable = user.Immutable
-                };
-            }
-
-            public UserClaimModel DoIt(UserClaimUpdate claim)
-            {
-                return new UserClaimModel
-                {
-                    Id = claim.Id,
-                    UserId = claim.UserId,
-                    ClaimType = claim.ClaimType,
-                    ClaimValue = claim.ClaimType,
-                    Immutable = claim.Immutable
+                    Created = current.Created,
+                    LastUpdated = current.LastUpdated,
+                    LockoutEnabled = current.LockoutEnabled,
+                    LockoutEndDateUtc = current.LockoutEndDateUtc,
+                    LastLoginFailure = current.LastLoginFailure,
+                    LastLoginSuccess = current.LastLoginSuccess,
+                    AccessFailedCount = current.AccessFailedCount,
+                    AccessSuccessCount = current.AccessSuccessCount,
+                    PasswordConfirmed = current.PasswordConfirmed,
+                    TwoFactorEnabled = current.TwoFactorEnabled,
+                    Immutable = current.Immutable,
                 };
             }
         }

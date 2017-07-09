@@ -23,13 +23,12 @@ namespace Bhbk.Lib.Identity.Manager
         {
             var model = Store.Mf.Devolve.DoIt(role);
 
-            if (!Store.Exists(model.Name))
-            {
-                await Store.CreateAsync(model);
-                return IdentityResult.Success;
-            }
-            else
-                throw new ArgumentNullException();
+            if (Store.Exists(model.Name))
+                throw new InvalidOperationException();
+
+            await Store.CreateAsync(model);
+
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> DeleteAsync(Guid roleId)
@@ -38,11 +37,10 @@ namespace Bhbk.Lib.Identity.Manager
 
             if (model == null)
                 throw new ArgumentNullException();
-            else
-            {
-                await Store.DeleteAsync(model);
-                return IdentityResult.Success;
-            }
+
+            await Store.DeleteAsync(model);
+        
+            return IdentityResult.Success;
         }
 
         public async Task<RoleModel> FindByIdAsync(Guid roleId)
@@ -94,13 +92,12 @@ namespace Bhbk.Lib.Identity.Manager
         {
             var model = Store.Mf.Devolve.DoIt(role);
 
-            if (Store.Exists(model.Id))
-            {
-                await Store.UpdateAsync(model);
-                return IdentityResult.Success;
-            }
-            else
-                throw new ArgumentNullException();
+            if (!Store.Exists(model.Id))
+                throw new InvalidOperationException();
+
+            await Store.UpdateAsync(model);
+
+            return IdentityResult.Success;
         }
     }
 }

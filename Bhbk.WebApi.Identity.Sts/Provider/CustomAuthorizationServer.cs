@@ -232,10 +232,6 @@ namespace Bhbk.WebApi.Identity.Sts.Provider
                 });
 
             ClaimsIdentity claims = await _uow.UserMgmt.CreateIdentityAsync(_uow.UserMgmt.Store.Mf.Devolve.DoIt(user), "JWT");
-
-            claims.AddClaim(new Claim(ClaimTypes.Email, user.Email));
-            claims.AddClaim(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
-
             AuthenticationTicket ticket = new AuthenticationTicket(claims, attrs);
 
             await _uow.UserMgmt.ResetAccessFailedCountAsync(user.Id);
