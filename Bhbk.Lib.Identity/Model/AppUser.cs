@@ -17,11 +17,11 @@ namespace Bhbk.Lib.Identity.Model
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public AppUser()
         {
-            this.Claims = new HashSet<AppUserClaim>();
             this.Providers = new HashSet<AppUserProvider>();
-            this.Tokens = new HashSet<AppUserRefreshToken>();
+            this.RefreshTokens = new HashSet<AppUserRefreshToken>();
             this.Roles = new HashSet<AppUserRole>();
-            this.Nonces = new HashSet<AppUserNonceToken>();
+            this.Tokens = new HashSet<AppUserToken>();
+            this.Claims = new HashSet<AppUserClaim>();
         }
     
         public System.Guid Id { get; set; }
@@ -47,14 +47,14 @@ namespace Bhbk.Lib.Identity.Model
         public bool Immutable { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserClaim> Claims { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserProvider> Providers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserRefreshToken> Tokens { get; set; }
+        public virtual ICollection<AppUserRefreshToken> RefreshTokens { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserRole> Roles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AppUserNonceToken> Nonces { get; set; }
+        public virtual ICollection<AppUserToken> Tokens { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AppUserClaim> Claims { get; set; }
     }
 }

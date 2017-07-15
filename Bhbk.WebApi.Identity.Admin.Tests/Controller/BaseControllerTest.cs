@@ -1,8 +1,9 @@
 ﻿using Bhbk.Lib.Identity.Helper;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interface;
-using Microsoft.Practices.Unity;
 using System.Web.Http;
+using Unity;
+using Unity.Lifetime;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controller
 {

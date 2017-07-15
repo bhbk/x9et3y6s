@@ -18,6 +18,7 @@ namespace Bhbk.Lib.Identity.Model
         public AppRole()
         {
             this.Roles = new HashSet<AppUserRole>();
+            this.Claims = new HashSet<AppRoleClaim>();
         }
     
         public System.Guid Id { get; set; }
@@ -32,5 +33,7 @@ namespace Bhbk.Lib.Identity.Model
         public virtual AppAudience Audiences { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AppUserRole> Roles { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AppRoleClaim> Claims { get; set; }
     }
 }

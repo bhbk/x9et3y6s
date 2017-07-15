@@ -178,10 +178,7 @@ namespace Bhbk.Lib.Identity.Store
             {
                 var model = new Claim(claim.ClaimType,
                     claim.ClaimValue,
-                    claim.ClaimValueType,
-                    claim.Issuer,
-                    claim.OriginalIssuer,
-                    new ClaimsIdentity(claim.Subject));
+                    claim.ClaimValueType);
 
                 result.Add(model);
             }

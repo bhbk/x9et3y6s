@@ -5,7 +5,6 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.Jwt;
-using Microsoft.Practices.Unity;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using System;
@@ -13,6 +12,8 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
+using Unity;
+using Unity.Lifetime;
 using BaseLib = Bhbk.Lib.Identity;
 
 //https://tools.ietf.org/html/rfc6749

@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Users\bhbk\Source\code.ochap.net\bhbk.webapi.identity\Bhbk.Lib.Identity\Model\IdentityEntities.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Users\bhbk\source\repos\code.ochap.net\bhbk.webapi.identity\Bhbk.Lib.Identity\Model\IdentityEntities.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

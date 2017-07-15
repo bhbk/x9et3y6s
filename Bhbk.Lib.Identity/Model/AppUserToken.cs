@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class AppUserNonceToken
+    public partial class AppUserToken
     {
         public System.Guid Id { get; set; }
         public System.Guid UserId { get; set; }

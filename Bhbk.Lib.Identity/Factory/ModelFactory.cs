@@ -211,9 +211,7 @@ namespace Bhbk.Lib.Identity.Factory
                     UserId = userId,
                     ClaimType = claim.Type,
                     ClaimValue = claim.Value,
-                    ClaimValueType = claim.ValueType,
-                    Issuer = claim.Issuer,
-                    OriginalIssuer = claim.OriginalIssuer
+                    ClaimValueType = claim.ValueType
                 };
             }
 
@@ -326,10 +324,7 @@ namespace Bhbk.Lib.Identity.Factory
             {
                 return new Claim(claim.ClaimType,
                     claim.ClaimValue,
-                    claim.ClaimValueType,
-                    claim.Issuer,
-                    claim.OriginalIssuer,
-                    new ClaimsIdentity(claim.Subject));
+                    claim.ClaimValueType);
             }
 
             public UserRefreshTokenModel DoIt(AppUserRefreshToken token)

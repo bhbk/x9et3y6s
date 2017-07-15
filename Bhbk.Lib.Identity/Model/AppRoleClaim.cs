@@ -12,17 +12,17 @@ namespace Bhbk.Lib.Identity.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class AppUserClaim
+    public partial class AppRoleClaim
     {
         public System.Guid Id { get; set; }
-        public System.Guid UserId { get; set; }
+        public System.Guid RoleId { get; set; }
         public string ClaimType { get; set; }
         public string ClaimValue { get; set; }
-        public string ClaimValueType { get; set; }
+        public string ClaimTypeValue { get; set; }
         public System.DateTime Created { get; set; }
         public Nullable<System.DateTime> LastUpdated { get; set; }
         public bool Immutable { get; set; }
     
-        public virtual AppUser Users { get; set; }
+        public virtual AppRole Roles { get; set; }
     }
 }

@@ -194,7 +194,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controller
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
-            var token = user.Tokens.Where(x => x.ProtectedTicket == refresh).Single();
+            var token = user.RefreshTokens.Where(x => x.ProtectedTicket == refresh).Single();
 
             var result = await controller.RevokeToken(token.Id) as OkResult;
             result.Should().BeAssignableTo(typeof(OkResult));

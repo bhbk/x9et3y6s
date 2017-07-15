@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.Interface;
 using Elmah.Contrib.WebApi;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
-using Microsoft.Practices.Unity;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using System;
@@ -11,6 +10,8 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
+using Unity;
+using Unity.Lifetime;
 
 //https://tools.ietf.org/html/rfc6749
 
