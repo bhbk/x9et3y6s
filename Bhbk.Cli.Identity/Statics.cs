@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Model;
+using Bhbk.Lib.Identity.Models;
 
 namespace Bhbk.Cli.Identity
 {
@@ -12,6 +12,6 @@ namespace Bhbk.Cli.Identity
 
     internal class Statics
     {
-        internal static UnitOfWork uow;
+        internal static CustomIdentityContext Context;
     }
 }

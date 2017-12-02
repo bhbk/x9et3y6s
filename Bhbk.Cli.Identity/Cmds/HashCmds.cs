@@ -1,8 +1,12 @@
-﻿using Bhbk.Cli.Identity.Helper;
+﻿using Bhbk.Cli.Identity.Helpers;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Models;
 using ManyConsole;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
-using System.Windows.Forms;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
@@ -21,25 +25,28 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                Statics.uow = new UnitOfWork();
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(FileHelper.FindFileInDefaultPaths("appsettings.json").DirectoryName)
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+
+                var builder = new DbContextOptionsBuilder<AppDbContext>()
+                    .UseSqlServer(config["ConnectionStrings:IdentityEntities"]);
+
+                Statics.Context = new CustomIdentityContext(builder);
 
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = PasswordHelper.GetStdin();
-                    var hashvalue = Statics.uow.UserMgmt.PasswordHasher.HashPassword(cleartext);
+                    var hashvalue = Statics.Context.UserMgmt.PasswordHasher.HashPassword(null, cleartext);
 
-                    if (!Statics.uow.UserMgmt.PasswordValidator.ValidateAsync(hashvalue).Wait(1000))
+                    if (Statics.Context.UserMgmt.PasswordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {
                         Console.WriteLine();
                         Console.WriteLine("Hash Value: " + hashvalue);
-
-                        Clipboard.SetText(hashvalue);
-
-                        Console.WriteLine();
-                        Console.WriteLine("The hash value has been copied to the clipboard.");
                     }
                 }
 

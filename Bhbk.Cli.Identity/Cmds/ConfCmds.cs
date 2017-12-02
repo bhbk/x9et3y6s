@@ -1,6 +1,10 @@
-﻿using Bhbk.Cli.Identity.Helper;
+﻿using Bhbk.Cli.Identity.Helpers;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Models;
 using ManyConsole;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Bhbk.Cli.Identity.Cmds
@@ -20,15 +24,23 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                Statics.uow = new UnitOfWork();
-                
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(FileHelper.FindFileInDefaultPaths("appsettings.json").DirectoryName)
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+
+                var builder = new DbContextOptionsBuilder<AppDbContext>()
+                    .UseSqlServer(config["ConnectionStrings:IdentityEntities"]);
+
+                Statics.Context = new CustomIdentityContext(builder);
+
                 if (ReadConfig)
                 {
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(Statics.uow.ConfigMgmt.ToString());
+                    Console.Write(Statics.Context.ConfigMgmt.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

@@ -4,27 +4,42 @@ namespace Bhbk.Lib.Identity
 {
     public enum AudienceType
     {
-        ThinClient,
-        ThickClient
+        thin_client,
+        thick_client
+    }
+
+    public enum GrantType
+    {
+        client_credentials,
+        authorization_code,
+        refresh_token,
+        access_token
     }
 
     public class Statics
     {
         #region Attribute Settings
-        public const String AttrClientID = "client_id";
-        public const String AttrAudienceID = "audience_id";
-        public const String AttrUserID = "user_id";
+        public const String AttrAudienceIDV1 = "audience_id";
+        public const String AttrAudienceIDV2 = "audience";
+        public const String AttrClientIDV1 = "client_id";
+        public const String AttrClientIDV2 = "client";
+        public const String AttrGrantTypeIDV1 = "grant_type";
+        public const String AttrGrantTypeIDV2 = "grant_type";
+        public const String AttrPasswordIDV1 = "password";
+        public const String AttrPasswordIDV2 = "password";
+        public const String AttrUserIDV1 = "username";
+        public const String AttrUserIDV2 = "username";
         #endregion
 
         #region Configuration Settings
-        public const String ApiDefaultAdmin = "root@local";
-        public const String ApiDefaultConfiguration = "Global.config";
         public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
         public const String ApiDefaultClient = "Bhbk";
-        public const String ApiDefaultProvider = "local";
+        public const String ApiDefaultConfig = "Global.config";
         public const String ApiDefaultPhone = "12223334444";
+        public const String ApiDefaultLogin = "local";
         public const String ApiDefaultRoleForAdmin = "(Built-In) Administrators";
         public const String ApiDefaultRoleForViewer = "(Built-In) Viewers";
+        public const String ApiDefaultUserAdmin = "root@local";
         public const String ApiTokenConfirmEmail = "EmailConfirmation";
         public const String ApiTokenConfirmPhone = "PhoneNumberConfirmation";
         public const String ApiTokenConfirmTwoFactor = "TwoFactorConfirmation";
@@ -36,10 +51,10 @@ namespace Bhbk.Lib.Identity
         public const String ApiUnitTestClient = "Client-UnitTests-";
         public const String ApiUnitTestPasswordCurrent = "3uetw7W$mswU";
         public const String ApiUnitTestPasswordNew = "mv7wd3dks&k3";
-        public const String ApiUnitTestProvider = "Provider-UnitTests-";
         public const String ApiUnitTestRole = "Role-UnitTests-";
         public const String ApiUnitTestUserDisplayName = "User-UnitTests-";
         public const String ApiUnitTestUserEmail = "unit-tests@";
+        public const String ApiUnitTestLogin = "Login-UnitTests-";
         public const String ApiUnitTestClaimType = "ClaimType-UnitTests-";
         public const String ApiUnitTestClaimValue = "ClaimValue-UnitTests-";
         #endregion
@@ -53,10 +68,11 @@ namespace Bhbk.Lib.Identity
         public const String MsgClientImmutable = "Client is immutable";
         public const String MsgClientInvalid = "Client is invalid";
         public const String MsgClientNotExist = "Client does not exist";
-        public const String MsgProviderAlreadyExists = "Provider already exists";
-        public const String MsgProviderImmutable = "Provider is immutable";
-        public const String MsgProviderInvalid = "Provider invalid";
-        public const String MsgProviderNotExist = "Provider does not exist";
+        public const String MsgGrantTypeInvalid = "Grant type is invalid";
+        public const String MsgLoginAlreadyExists = "Login already exists";
+        public const String MsgLoginImmutable = "Login is immutable";
+        public const String MsgLoginInvalid = "Login invalid";
+        public const String MsgLoginNotExist = "Login does not exist";
         public const String MsgRoleAlreadyExists = "Role already exists";
         public const String MsgRoleImmutable = "Role is immutable";
         public const String MsgRoleInvalid = "Role invalid";

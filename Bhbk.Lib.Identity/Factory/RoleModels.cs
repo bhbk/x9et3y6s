@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Model;
+﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
 

@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Model;
-using Microsoft.AspNet.Identity;
+﻿using Bhbk.Lib.Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using OtpNet;
 using System;
 using System.Text;
@@ -12,12 +12,17 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://github.com/kspearrin/Otp.NET
 
     //https://tools.ietf.org/html/rfc6238
-    public class CustomUserTokenProvider : TotpSecurityStampBasedTokenProvider<AppUser, Guid>, IUserTokenProvider<AppUser, Guid>
+    public class CustomUserTokenProvider : TotpSecurityStampBasedTokenProvider<AppUser>
     {
         public int OtpTokenTimespan;
         public int OtpTokenSize;
+        
+        public override Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<AppUser> manager, AppUser user)
+        {
+            throw new NotImplementedException();
+        }
 
-        public override Task<string> GenerateAsync(string purpose, UserManager<AppUser, Guid> manager, AppUser user)
+        public override Task<string> GenerateAsync(string purpose, UserManager<AppUser> manager, AppUser user)
         {
             if (manager == null)
                 throw new ArgumentNullException();
@@ -37,23 +42,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 throw new ArgumentNullException();
         }
 
-        public override Task<bool> IsValidProviderForUserAsync(UserManager<AppUser, Guid> manager, AppUser user)
-        {
-            if (manager == null)
-                throw new ArgumentNullException();
-
-            return Task.FromResult<bool>(manager.SupportsUserPassword);
-        }
-
-        public override Task NotifyAsync(string token, UserManager<AppUser, Guid> manager, AppUser user)
-        {
-            if (manager == null)
-                throw new ArgumentNullException();
-
-            return Task.FromResult<int>(0);
-        }
-
-        public override Task<bool> ValidateAsync(string purpose, string token, UserManager<AppUser, Guid> manager, AppUser user)
+        public override Task<bool> ValidateAsync(string purpose, string token, UserManager<AppUser> manager, AppUser user)
         {
             if (manager == null)
                 throw new ArgumentNullException();

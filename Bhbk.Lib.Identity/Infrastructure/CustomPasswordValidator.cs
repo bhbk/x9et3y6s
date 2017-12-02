@@ -1,50 +1,53 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using Bhbk.Lib.Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public sealed class CustomPasswordValidator : PasswordValidator
+    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.ipasswordvalidator-1?view=aspnetcore-2.0
+    public sealed class CustomPasswordValidator : IPasswordValidator<AppUser>
     {
         private readonly Regex _number = new Regex(@"[0-9]+");
         private readonly Regex _lower = new Regex(@"[a-z]+");
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
 
-        public override async Task<IdentityResult> ValidateAsync(string password)
+        public Task<IdentityResult> ValidateAsync(UserManager<AppUser> manager, AppUser user, string password)
         {
-            List<string> error = new List<string>();
+            List<IdentityError> errors = new List<IdentityError>();
+
             int match = 0;
 
             if (_number.IsMatch(password))
             {
-                error.Add("Missing a number");
+                errors.Add(new IdentityError() { Code = null, Description = "Missing a number" });
                 match++;
             }
 
             if (_lower.IsMatch(password))
             {
-                error.Add("Missing a lowercase letter");
+                errors.Add(new IdentityError() { Code = null, Description = "Missing a lowercase letter" });
                 match++;
             }
 
             if (_upper.IsMatch(password))
             {
-                error.Add("Missing a upppercase letter");
+                errors.Add(new IdentityError() { Code = null, Description = "Missing a uppercase letter" });
                 match++;
             }
 
             if (_special.IsMatch(password))
             {
-                error.Add("Missing a special character");
+                errors.Add(new IdentityError() { Code = null, Description = "Missing a special character" });
                 match++;
             }
 
             if (match < 3)
-                return new IdentityResult(error);
+                return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
             else
-                return await Task.FromResult(IdentityResult.Success);
+                return Task.FromResult(IdentityResult.Success);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Factory
         public DateTime Created { get; set; }
         public Nullable<DateTime> LastUpdated { get; set; }
         public bool LockoutEnabled { get; set; }
-        public Nullable<DateTime> LockoutEndDateUtc { get; set; }
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
         public Nullable<DateTime> LastLoginFailure { get; set; }
         public Nullable<DateTime> LastLoginSuccess { get; set; }
         public int AccessFailedCount { get; set; }
@@ -83,6 +83,6 @@ namespace Bhbk.Lib.Identity.Factory
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public bool LockoutEnabled { get; set; }
-        public Nullable<DateTime> LockoutEndDateUtc { get; set; }
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
     }
 }

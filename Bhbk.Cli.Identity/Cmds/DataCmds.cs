@@ -1,7 +1,10 @@
-﻿using Bhbk.Cli.Identity.Helper;
-using Bhbk.Lib.Identity.Helper;
+﻿using Bhbk.Cli.Identity.Helpers;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Models;
 using ManyConsole;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Bhbk.Cli.Identity.Cmds
@@ -23,8 +26,16 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                Statics.uow = new UnitOfWork();
-                DataSeedHelper kaboom = new DataSeedHelper(Statics.uow);
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(FileHelper.FindFileInDefaultPaths("appsettings.json").DirectoryName)
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+
+                var builder = new DbContextOptionsBuilder<AppDbContext>()
+                    .UseSqlServer(config["ConnectionStrings:IdentityEntities"]);
+
+                Statics.Context = new CustomIdentityContext(builder);
+                DataHelper seed = new DataHelper(Statics.Context);
 
                 if (CreateDefault)
                 {
@@ -32,7 +43,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    kaboom.CreateDefaultData();
+                    seed.DefaultDataCreate();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -43,7 +54,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    kaboom.DestroyDefaultData();
+                    seed.DefaultDataDestroy();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -54,7 +65,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    kaboom.DestroyAllData();
+                    seed.CompleteDestroy();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

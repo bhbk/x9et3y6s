@@ -1,0 +1,1 @@
+Scaffold-DbContext -Verbose -Connection "Data Source=DC1SQL1; Initial Catalog=BhbkIdentityTest; User ID=Sql.BhbkIdentityTest; Password=Password01!;" -Provider Microsoft.EntityFrameworkCore.SqlServer -Context AppDbContext -StartupProject Bhbk.Cli.Identity -Project Bhbk.Lib.Identity -OutputDir Models -Force

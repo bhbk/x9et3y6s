@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Model;
+﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -7,13 +7,13 @@ namespace Bhbk.Lib.Identity.Factory
 {
     public class ModelFactory
     {
-        internal static CustomIdentityDbContext _context;
+        internal static AppDbContext _context;
         public Born Create;
         public BLToEF Devolve;
         public EFToBL Evolve;
         public Change Update;
 
-        public ModelFactory(CustomIdentityDbContext context)
+        public ModelFactory(AppDbContext context)
         {
             _context = context;
 
@@ -56,16 +56,12 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public ProviderModel DoIt(ProviderCreate provider)
+            public LoginModel DoIt(LoginCreate login)
             {
-                return new ProviderModel
+                return new LoginModel
                 {
                     Id = Guid.NewGuid(),
-                    Name = provider.Name,
-                    Description = provider.Description,
-                    Enabled = provider.Enabled,
-                    Created = DateTime.Now,
-                    Immutable = false
+                    LoginProvider = login.LoginProvider
                 };
             }
 
@@ -78,6 +74,22 @@ namespace Bhbk.Lib.Identity.Factory
                     Name = role.Name,
                     Description = role.Description,
                     Enabled = role.Enabled,
+                    Created = DateTime.Now,
+                    Immutable = false
+                };
+            }
+
+            public UserLoginModel DoIt(UserLoginCreate login)
+            {
+                return new UserLoginModel
+                {
+                    UserId = login.UserId,
+                    LoginId = login.LoginId,
+                    LoginProvider = login.LoginProvider,
+                    ProviderDisplayName = login.ProviderDisplayName,
+                    ProviderDescription = login.ProviderDescription,
+                    ProviderKey = login.ProviderKey,
+                    Enabled = login.Enabled,
                     Created = DateTime.Now,
                     Immutable = false
                 };
@@ -98,9 +110,9 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public UserRefreshTokenModel DoIt(UserRefreshTokenCreate token)
+            public UserRefreshModel DoIt(UserRefreshCreate token)
             {
-                return new UserRefreshTokenModel
+                return new UserRefreshModel
                 {
                     Id = Guid.NewGuid(),
                     ClientId = token.ClientId,
@@ -148,17 +160,12 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public AppProvider DoIt(ProviderModel provider)
+            public AppLogin DoIt(LoginModel login)
             {
-                return new AppProvider
+                return new AppLogin
                 {
-                    Id = provider.Id,
-                    Name = provider.Name,
-                    Description = provider.Description,
-                    Enabled = provider.Enabled,
-                    Created = provider.Created,
-                    LastUpdated = provider.LastUpdated,
-                    Immutable = provider.Immutable
+                    Id = login.Id,
+                    LoginProvider = login.LoginProvider
                 };
             }
 
@@ -185,6 +192,8 @@ namespace Bhbk.Lib.Identity.Factory
                     UserName = user.Email,
                     Email = user.Email,
                     EmailConfirmed = user.EmailConfirmed,
+                    NormalizedUserName = user.Email.ToLower(),
+                    NormalizedEmail = user.Email.ToLower(),
                     PhoneNumber = user.PhoneNumber,
                     PhoneNumberConfirmed = user.PhoneNumberConfirmed,
                     FirstName = user.FirstName,
@@ -192,7 +201,7 @@ namespace Bhbk.Lib.Identity.Factory
                     Created = user.Created,
                     LastUpdated = user.LastUpdated,
                     LockoutEnabled = user.LockoutEnabled,
-                    LockoutEndDateUtc = user.LockoutEndDateUtc,
+                    LockoutEnd = user.LockoutEnd,
                     LastLoginFailure = user.LastLoginFailure,
                     LastLoginSuccess = user.LastLoginSuccess,
                     AccessFailedCount = user.AccessFailedCount,
@@ -207,7 +216,7 @@ namespace Bhbk.Lib.Identity.Factory
             {
                 return new AppUserClaim
                 {
-                    Id = claimId,
+                    //Id = claimId,
                     UserId = userId,
                     ClaimType = claim.Type,
                     ClaimValue = claim.Value,
@@ -215,9 +224,26 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public AppUserRefreshToken DoIt(UserRefreshTokenModel token)
+            public AppUserLogin DoIt(UserLoginModel login)
             {
-                return new AppUserRefreshToken
+                return new AppUserLogin
+                {
+                    UserId = login.UserId,
+                    LoginId = login.LoginId,
+                    LoginProvider = login.LoginProvider,
+                    ProviderDisplayName = login.LoginProvider,
+                    ProviderDescription = login.ProviderDescription,
+                    ProviderKey = login.ProviderKey,
+                    Enabled = login.Enabled,
+                    Created = login.Created,
+                    LastUpdated = login.LastUpdated,
+                    Immutable = login.Immutable
+                };
+            }
+
+            public AppUserRefresh DoIt(UserRefreshModel token)
+            {
+                return new AppUserRefresh
                 {
                     Id = token.Id,
                     ClientId = token.ClientId,
@@ -266,17 +292,12 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public ProviderModel DoIt(AppProvider provider)
+            public LoginModel DoIt(AppLogin login)
             {
-                return new ProviderModel
+                return new LoginModel
                 {
-                    Id = provider.Id,
-                    Name = provider.Name,
-                    Description = provider.Description,
-                    Enabled = provider.Enabled,
-                    Created = provider.Created,
-                    LastUpdated = provider.LastUpdated,
-                    Immutable = provider.Immutable
+                    Id = login.Id,
+                    LoginProvider = login.LoginProvider
                 };
             }
 
@@ -309,7 +330,7 @@ namespace Bhbk.Lib.Identity.Factory
                     Created = user.Created,
                     LastUpdated = user.LastUpdated,
                     LockoutEnabled = user.LockoutEnabled,
-                    LockoutEndDateUtc = user.LockoutEndDateUtc,
+                    LockoutEnd = user.LockoutEnd,
                     LastLoginFailure = user.LastLoginFailure,
                     LastLoginSuccess = user.LastLoginSuccess,
                     AccessFailedCount = user.AccessFailedCount,
@@ -327,9 +348,26 @@ namespace Bhbk.Lib.Identity.Factory
                     claim.ClaimValueType);
             }
 
-            public UserRefreshTokenModel DoIt(AppUserRefreshToken token)
+            public UserLoginModel DoIt(AppUserLogin login)
             {
-                return new UserRefreshTokenModel
+                return new UserLoginModel
+                {
+                    UserId = login.UserId,
+                    LoginId = login.LoginId,
+                    LoginProvider = login.LoginProvider,
+                    ProviderDisplayName = login.ProviderDisplayName,
+                    ProviderDescription = login.ProviderDescription,
+                    ProviderKey = login.ProviderKey,
+                    Enabled = login.Enabled,
+                    Created = login.Created,
+                    LastUpdated = login.LastUpdated,
+                    Immutable = login.Immutable
+                };
+            }
+
+            public UserRefreshModel DoIt(AppUserRefresh token)
+            {
+                return new UserRefreshModel
                 {
                     Id = token.Id,
                     ClientId = token.ClientId,
@@ -373,15 +411,12 @@ namespace Bhbk.Lib.Identity.Factory
                 };
             }
 
-            public ProviderModel DoIt(ProviderUpdate provider)
+            public LoginModel DoIt(LoginUpdate login)
             {
-                return new ProviderModel
+                return new LoginModel
                 {
-                    Id = provider.Id,
-                    Name = provider.Name,
-                    Description = provider.Description,
-                    Enabled = provider.Enabled,
-                    Immutable = provider.Immutable
+                    Id = login.Id,
+                    LoginProvider = login.LoginProvider
                 };
             }
 
@@ -395,6 +430,21 @@ namespace Bhbk.Lib.Identity.Factory
                     Description = role.Description,
                     Enabled = role.Enabled,
                     Immutable = role.Immutable
+                };
+            }
+
+            public UserLoginModel DoIt(UserLoginUpdate login)
+            {
+                return new UserLoginModel
+                {
+                    LoginId = login.LoginId,
+                    UserId = login.UserId,
+                    LoginProvider = login.LoginProvider,
+                    ProviderDisplayName = login.ProviderDisplayName,
+                    ProviderDescription = login.ProviderDescription,
+                    ProviderKey = login.ProviderKey,
+                    Enabled = login.Enabled,
+                    Immutable = login.Immutable
                 };
             }
 
@@ -414,7 +464,7 @@ namespace Bhbk.Lib.Identity.Factory
                     Created = current.Created,
                     LastUpdated = current.LastUpdated,
                     LockoutEnabled = current.LockoutEnabled,
-                    LockoutEndDateUtc = current.LockoutEndDateUtc,
+                    LockoutEnd = current.LockoutEnd,
                     LastLoginFailure = current.LastLoginFailure,
                     LastLoginSuccess = current.LastLoginSuccess,
                     AccessFailedCount = current.AccessFailedCount,
