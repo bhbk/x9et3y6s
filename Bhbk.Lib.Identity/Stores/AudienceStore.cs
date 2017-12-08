@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +11,6 @@ namespace Bhbk.Lib.Identity.Stores
     public class AudienceStore : IGenericStore<AppAudience, Guid>
     {
         private AppDbContext _context;
-        public ModelFactory Mf;
 
         public AudienceStore(AppDbContext context)
         {
@@ -20,8 +18,6 @@ namespace Bhbk.Lib.Identity.Stores
                 throw new ArgumentNullException();
 
             _context = context;
-
-            Mf = new ModelFactory(context);
         }
 
         public void Attach(AppAudience entity)
@@ -115,21 +111,21 @@ namespace Bhbk.Lib.Identity.Stores
 
         public AppAudience Update(AppAudience entity)
         {
-            var model = _context.AppAudience.Where(x => x.Id == entity.Id).Single();
+            var audience = _context.AppAudience.Where(x => x.Id == entity.Id).Single();
 
-            model.ClientId = entity.ClientId;
-            model.Name = entity.Name;
-            model.Description = entity.Description;
-            model.AudienceType = entity.AudienceType;
-            model.AudienceKey = entity.AudienceKey;
-            model.Enabled = entity.Enabled;
-            model.Immutable = entity.Immutable;
-            model.LastUpdated = DateTime.Now;
+            audience.ClientId = entity.ClientId;
+            audience.Name = entity.Name;
+            audience.Description = entity.Description;
+            audience.AudienceType = entity.AudienceType;
+            audience.AudienceKey = entity.AudienceKey;
+            audience.Enabled = entity.Enabled;
+            audience.Immutable = entity.Immutable;
+            audience.LastUpdated = DateTime.Now;
 
-            _context.Entry(model).State = EntityState.Modified;
+            _context.Entry(audience).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return model;
+            return audience;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
@@ -23,7 +22,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -34,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (user.Email != model.CurrentEmail)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
 
-            else if (await Context.UserMgmt.GetEmailAsync(user.Id) != user.Email)
+            else if (await Context.UserMgmt.GetEmailAsync(user) != user.Email)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
 
             else if (model.NewEmail != model.NewEmailConfirm)
@@ -42,14 +41,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                string token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user.Id);
+                string token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
 
                 if (Context.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
-                    //await context.UserMgmt.SendEmailAsync(user.Id, "Confirmation Email", "Confirmatil Email Body " + token);
-                    return Ok();
+                    //await Context.UserMgmt.SendEmailAsync(user.Id, "Confirmation Email", "Confirmatil Email Body " + token);
+                    return NoContent();
                 }
             }
         }
@@ -60,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -68,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await Context.UserMgmt.CheckPasswordAsync(user.Id, model.CurrentPassword))
+            else if (!await Context.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -76,14 +75,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                string token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user.Id);
+                string token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
 
                 if (Context.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
-                    //await Bubble.UserMgmt.SendEmailAsync(user.Id, "Confirmation Email", "Confirmation Email Body " + token);
-                    return Ok();
+                    //await Context.UserMgmt.SendEmailAsync(user.Id, "Confirmation Email", "Confirmation Email Body " + token);
+                    return NoContent();
                 }
             }
         }
@@ -94,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -102,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (await Context.UserMgmt.GetPhoneNumberAsync(user.Id) != model.CurrentPhoneNumber)
+            else if (await Context.UserMgmt.GetPhoneNumberAsync(user) != model.CurrentPhoneNumber)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPhone);
 
             else if (model.NewPhoneNumber != model.NewPhoneNumberConfirm)
@@ -110,14 +109,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                string token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user.Id, model.NewPhoneNumber);
+                string token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.NewPhoneNumber);
 
                 if (Context.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
-                    //await Bubble.UserMgmt.SendSmsAsync(user.Id, "Confirmation Code" + token);
-                    return Ok();
+                    //await Context.UserMgmt.SendSmsAsync(user.Id, "Confirmation Code" + token);
+                    return NoContent();
                 }
             }
         }
@@ -136,25 +135,25 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            bool current = await Context.UserMgmt.GetTwoFactorEnabledAsync(user.Id);
+            bool current = await Context.UserMgmt.GetTwoFactorEnabledAsync(user);
 
             if (current == status)
                 return BadRequest(BaseLib.Statics.MsgUserTwoFactorAlreadyExists);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.SetTwoFactorEnabledAsync(user.Id, status);
+                var result = await Context.UserMgmt.SetTwoFactorEnabledAsync(user, status);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
@@ -164,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -174,18 +173,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                model.LockoutEnabled = user.LockoutEnabled;
-                model.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
-
-                var update = Context.UserMgmt.Store.Mf.Update.DoIt(model);
-                var devolve = Context.UserMgmt.Store.Mf.Devolve.DoIt(update);
-                IdentityResult result = await Context.UserMgmt.UpdateAsync(devolve);
+                var update = new UserFactory<UserUpdate>(model);
+                var result = await Context.UserMgmt.UpdateAsync(update.Devolve());
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(update);
+                    return Ok(update.Evolve());
             }
         }
     }

@@ -5,14 +5,14 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 
+//https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.totpsecuritystampbasedtokenprovider-1
+
 namespace Bhbk.Lib.Identity.Infrastructure
 {
     //https://www.stevejgordon.co.uk/asp-net-core-identity-token-providers
     //https://blog.kraken.com/post/291/the-importance-of-two-factor-authentication/
-    //https://github.com/kspearrin/Otp.NET
 
-    //https://tools.ietf.org/html/rfc6238
-    public class CustomUserTokenProvider : TotpSecurityStampBasedTokenProvider<AppUser>
+    public class CustomTotpTokenProvider : TotpSecurityStampBasedTokenProvider<AppUser>
     {
         public int OtpTokenTimespan;
         public int OtpTokenSize;

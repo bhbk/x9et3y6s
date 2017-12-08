@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.CreateAudience(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<AudienceModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<AudienceResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }
@@ -57,8 +57,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new AudienceController(Context);
             var audience = Context.AudienceMgmt.Store.Get().First();
 
-            var result = await controller.DeleteAudience(audience.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.DeleteAudience(audience.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = Context.AudienceMgmt.Store.Get(x => x.Id == audience.Id).Any();
             check.Should().BeFalse();
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetAudience(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<AudienceModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<AudienceResult>().Subject;
 
             data.Id.Should().Be(audience.Id);
         }
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetAudiences() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<AudienceModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
             data.Count().Should().Equals(Context.AudienceMgmt.Store.Get().Count());
         }
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetAudienceRoles(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<RoleModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
             data.Count().Should().Equals(Context.RoleMgmt.Store.Get().Count());
         }
@@ -130,9 +130,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Enabled = true
             };
 
-            var result = await controller.UpdateAudience(model.Id, model) as OkObjectResult;
+            var result = await controller.UpdateAudience(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<AudienceModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<AudienceResult>().Subject;
 
             data.Name.Should().Equals(model.Name);
         }

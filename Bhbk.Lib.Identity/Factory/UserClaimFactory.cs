@@ -1,8 +1,49 @@
-﻿using System;
+﻿using Bhbk.Lib.Identity.Models;
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Factory
 {
+    public class UserClaimFactory<T> : AppUserClaim
+    {
+        public UserClaimFactory(AppUserClaim claim)
+        {
+            this.UserId = claim.UserId;
+            this.ClaimType = claim.ClaimType;
+            this.ClaimValue = claim.ClaimValue;
+            this.ClaimValueType = claim.ClaimValueType;
+        }
+
+        public UserClaimFactory(UserClaimCreate claim)
+        {
+
+        }
+
+        public UserClaimFactory(UserClaimUpdate claim)
+        {
+
+        }
+
+        public AppUserClaim Devolve()
+        {
+            return new AppUserClaim
+            {
+                UserId = this.UserId,
+                ClaimType = this.ClaimType,
+                ClaimValue = this.ClaimValue,
+                ClaimValueType = this.ClaimValueType
+            };
+        }
+
+        public Claim Evolve()
+        {
+            return new Claim(this.ClaimType,
+                this.ClaimValue,
+                this.ClaimValueType);
+        }
+    }
+
     public class UserClaimCreate
     {
         public Guid UserId { get; set; }
@@ -16,7 +57,7 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class UserClaimModel
+    public class UserClaimResult
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

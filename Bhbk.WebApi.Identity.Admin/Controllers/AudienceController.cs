@@ -1,10 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -27,15 +29,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             
             var audience = await Context.AudienceMgmt.FindByNameAsync(model.Name);
 
-            if (audience == null)
-            {
-                var create = Context.AudienceMgmt.Store.Mf.Create.DoIt(model);
-                var result = await Context.AudienceMgmt.CreateAsync(create);
-
-                return Ok(result);
-            }
-            else
+            if (audience != null)
                 return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);
+
+            var create = new AudienceFactory<AudienceCreate>(model);
+            var result = await Context.AudienceMgmt.CreateAsync(create.Devolve());
+
+            return Ok(create.Evolve());
         }
 
         [Route("v1/{audienceID}"), HttpDelete]
@@ -54,13 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             else
-                return Ok();
-        }
-
-        [Route("v1")]
-        public async Task<IActionResult> GetAudiences()
-        {
-            return Ok(await Context.AudienceMgmt.GetListAsync());
+                return NoContent();
         }
 
         [Route("v1/{audienceID}"), HttpGet]
@@ -71,8 +65,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
 
-            else
-                return Ok(audience);
+            var result = new AudienceFactory<AppAudience>(audience);
+
+            return Ok(result.Evolve());
+        }
+
+        [Route("v1")]
+        public async Task<IActionResult> GetAudiences()
+        {
+            IList<AudienceResult> result = new List<AudienceResult>();
+            var users = await Context.AudienceMgmt.GetListAsync();
+
+            foreach (AppAudience entry in users)
+                result.Add(new AudienceFactory<AppAudience>(entry).Evolve());
+
+            return Ok(result);
         }
 
         [Route("v1/{audienceID}/roles"), HttpGet]
@@ -83,21 +90,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
 
-            else
-                return Ok(await Context.AudienceMgmt.GetRoleListAsync(audienceID));
+            IList<RoleResult> result = new List<RoleResult>();
+            var roles = await Context.AudienceMgmt.GetRoleListAsync(audienceID);
+
+            foreach (AppRole entry in roles)
+                result.Add(new RoleFactory<AppRole>(entry).Evolve());
+
+            return Ok(result);
         }
 
-        [Route("v1/{audienceID}"), HttpPut]
+        [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateAudience(Guid audienceID, AudienceUpdate model)
+        public async Task<IActionResult> UpdateAudience(AudienceUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            else if (audienceID != model.Id)
-                return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
-
-            var audience = await Context.AudienceMgmt.FindByIdAsync(audienceID);
+            var audience = await Context.AudienceMgmt.FindByIdAsync(model.Id);
 
             if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceNotExist);
@@ -107,10 +116,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = Context.AudienceMgmt.Store.Mf.Update.DoIt(model);
-                var result = await Context.AudienceMgmt.UpdateAsync(update);
+                var update = new AudienceFactory<AudienceUpdate>(model);
+                var result = await Context.AudienceMgmt.UpdateAsync(update.Devolve());
 
-                return Ok(result);
+                return Ok(update.Evolve());
             }
         }
     }

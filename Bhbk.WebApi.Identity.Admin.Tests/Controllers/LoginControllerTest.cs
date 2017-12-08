@@ -37,20 +37,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             {
                 LoginProvider = BaseLib.Statics.ApiUnitTestLogin + EntrophyHelper.GenerateRandomBase64(4)
             };
-            var create = Context.LoginMgmt.Store.Mf.Create.DoIt(login);
-            var add = await Context.LoginMgmt.CreateAsync(create);
+            var add = await Context.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
             var model = new UserLoginCreate()
             {
                 UserId = user.Id,
                 LoginId = add.Id,
                 LoginProvider = login.LoginProvider,
                 ProviderDisplayName = login.LoginProvider,
+                ProviderKey = BaseLib.Statics.ApiUnitTestLoginName,
                 Enabled = true,
                 Immutable = false
             };
 
-            var result = await controller.AddLoginToUser(model.LoginId, model.UserId, model) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.AddLoginToUser(model.LoginId, model.UserId, model) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.CreateLogin(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<LoginModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<LoginResult>().Subject;
 
             data.LoginProvider.Should().Be(model.LoginProvider);
         }
@@ -81,28 +81,30 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var controller = new LoginController(Context);
             var user = Context.UserMgmt.Store.Get().First();
-            var login = Context.LoginMgmt.Store.Mf.Create.DoIt(
+            var login = new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
                     LoginProvider = BaseLib.Statics.ApiUnitTestLogin + EntrophyHelper.GenerateRandomBase64(4)
-                });
+                }).Devolve();
             var add = await Context.LoginMgmt.CreateAsync(login);
             var model = new UserLoginCreate()
             {
                 UserId = user.Id,
                 LoginId = add.Id,
-                LoginProvider = add.LoginProvider,
-                ProviderDisplayName = add.LoginProvider,
+                LoginProvider = login.LoginProvider,
+                ProviderDisplayName = login.LoginProvider,
+                ProviderKey = BaseLib.Statics.ApiUnitTestLoginKey,
                 Enabled = true,
                 Immutable = false
             };
 
-            var blah = await Context.UserMgmt.AddLoginAsync(user.Id, Context.UserMgmt.Store.Mf.Create.DoIt(model));
+            var blah = await Context.UserMgmt.AddLoginAsync(user, 
+                new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
             blah.Should().BeAssignableTo(typeof(IdentityResult));
             blah.Succeeded.Should().BeTrue();
 
-            var result = await controller.RemoveLoginFromUser(model.LoginId, model.UserId) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.RemoveLoginFromUser(model.LoginId, model.UserId) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -116,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetLogin(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<LoginModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<LoginResult>().Subject;
 
             data.Id.Should().Be(login.Id);
         }
@@ -131,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetLogins() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<LoginModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<LoginResult>>().Subject;
 
             data.Count().Should().Equals(Context.LoginMgmt.Store.Get().Count());
         }
@@ -147,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetLoginUsers(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<UserModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
             data.Count().Should().Equals(Context.UserMgmt.Store.Get().Count());
         }
@@ -163,12 +165,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new LoginUpdate()
             {
                 Id = login.Id,
-                LoginProvider = BaseLib.Statics.ApiUnitTestLogin + "(Updated)"
+                LoginProvider = login.LoginProvider + "(Updated)"
             };
 
-            var result = await controller.UpdateLogin(login.Id, model) as OkObjectResult;
+            var result = await controller.UpdateLogin(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<LoginModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<LoginResult>().Subject;
 
             data.LoginProvider.Should().Be(model.LoginProvider);
         }
@@ -182,8 +184,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new LoginController(Context);
             var login = Context.LoginMgmt.Store.Get().First();
 
-            var result = await controller.DeleteLogin(login.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.DeleteLogin(login.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = Context.LoginMgmt.Store.Get(x => x.Id == login.Id).Any();
             check.Should().BeFalse();

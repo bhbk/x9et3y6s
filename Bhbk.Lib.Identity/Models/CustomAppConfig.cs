@@ -2,7 +2,7 @@
 
 namespace Bhbk.Lib.Identity.Factory
 {
-    public class ConfigModel
+    public class AppConfig
     {
         public bool Debug { get; set; }
         public Double DefaultAccessTokenLife { get; set; }

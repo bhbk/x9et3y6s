@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -57,7 +58,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = false
                 };
 
-                await _context.ClientMgmt.CreateAsync(_context.ClientMgmt.Store.Mf.Create.DoIt(client));
+                await _context.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(client).Devolve());
                 foundClient = _context.ClientMgmt.Store.Get(x => x.Name == client.Name).Single();
             }
 
@@ -75,7 +76,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = false
                 };
 
-                await _context.AudienceMgmt.CreateAsync(_context.AudienceMgmt.Store.Mf.Create.DoIt(audience));
+                await _context.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
                 foundAudience = _context.AudienceMgmt.Store.Get(x => x.Name == audience.Name).Single();
             }
 
@@ -93,12 +94,12 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = false
                 };
 
-                await _context.UserMgmt.CreateAsync(_context.UserMgmt.Store.Mf.Create.DoIt(user), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+                await _context.UserMgmt.CreateAsync(new UserFactory<UserCreate>(user).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
                 foundUser = _context.UserMgmt.Store.Get(x => x.Email == user.Email).Single();
 
-                await _context.UserMgmt.SetEmailConfirmedAsync(foundUser.Id, true);
-                await _context.UserMgmt.SetPasswordConfirmedAsync(foundUser.Id, true);
-                await _context.UserMgmt.SetPhoneNumberConfirmedAsync(foundUser.Id, true);
+                await _context.UserMgmt.SetEmailConfirmedAsync(foundUser, true);
+                await _context.UserMgmt.SetPasswordConfirmedAsync(foundUser, true);
+                await _context.UserMgmt.SetPhoneNumberConfirmedAsync(foundUser, true);
             }
 
             var foundRoleForAdmin = _context.RoleMgmt.Store.Get(x => x.Name == Statics.ApiDefaultRoleForAdmin).SingleOrDefault();
@@ -113,7 +114,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = true
                 };
 
-                await _context.RoleMgmt.CreateAsync(_context.RoleMgmt.Store.Mf.Create.DoIt(role));
+                await _context.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(role).Devolve());
                 foundRoleForAdmin = _context.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
             }
 
@@ -129,7 +130,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = true
                 };
 
-                await _context.RoleMgmt.CreateAsync(_context.RoleMgmt.Store.Mf.Create.DoIt(role));
+                await _context.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(role).Devolve());
                 foundRoleForViewer = _context.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
             }
 
@@ -142,29 +143,19 @@ namespace Bhbk.Lib.Identity.Helpers
                     LoginProvider = Statics.ApiDefaultLogin
                 };
 
-                await _context.LoginMgmt.CreateAsync(_context.LoginMgmt.Store.Mf.Create.DoIt(login));
+                await _context.LoginMgmt.CreateAsync(new LoginFactory<AppLogin>(login).Devolve());
                 foundLogin = _context.LoginMgmt.Store.Get(x => x.LoginProvider == login.LoginProvider).SingleOrDefault();
             }
 
-            if (!_context.UserMgmt.IsInLoginAsync(foundUser.Id, Statics.ApiDefaultLogin).Result)
-                await _context.UserMgmt.AddLoginAsync(foundUser.Id, _context.UserMgmt.Store.Mf.Create.DoIt(
-                    new UserLoginCreate()
-                    {
-                        UserId = foundUser.Id,
-                        LoginId = foundLogin.Id,
-                        LoginProvider = Statics.ApiDefaultLogin,
-                        ProviderDisplayName = Statics.ApiDefaultLogin,
-                        ProviderDescription = "built-in",
-                        ProviderKey = "built-in",
-                        Enabled = true,
-                        Immutable = false
-                    }));
+            if (!_context.UserMgmt.IsInLoginAsync(foundUser, Statics.ApiDefaultLogin).Result)
+                await _context.UserMgmt.AddLoginAsync(foundUser, 
+                    new UserLoginInfo(Statics.ApiDefaultLogin, Statics.ApiDefaultLoginKey, Statics.ApiDefaultLoginName));
 
-            if (!await _context.UserMgmt.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Name))
-                await _context.UserMgmt.AddToRoleAsync(foundUser.Id, foundRoleForAdmin.Name);
+            if (!await _context.UserMgmt.IsInRoleAsync(foundUser, foundRoleForAdmin.Name))
+                await _context.UserMgmt.AddToRoleAsync(foundUser, foundRoleForAdmin.Name);
 
-            if (!await _context.UserMgmt.IsInRoleAsync(foundUser.Id, foundRoleForViewer.Name))
-                await _context.UserMgmt.AddToRoleAsync(foundUser.Id, foundRoleForViewer.Name);
+            if (!await _context.UserMgmt.IsInRoleAsync(foundUser, foundRoleForViewer.Name))
+                await _context.UserMgmt.AddToRoleAsync(foundUser, foundRoleForViewer.Name);
         }
 
         public async void DefaultDataDestroy()
@@ -173,10 +164,10 @@ namespace Bhbk.Lib.Identity.Helpers
 
             if (user != null)
             {
-                var roles = await _context.UserMgmt.GetRolesAsync(user.Id);
+                var roles = await _context.UserMgmt.GetRolesAsync(user);
 
-                await _context.UserMgmt.RemoveFromRolesAsync(user.Id, roles.ToArray());
-                await _context.UserMgmt.DeleteAsync(user.Id);
+                await _context.UserMgmt.RemoveFromRolesAsync(user, roles.ToArray());
+                await _context.UserMgmt.DeleteAsync(user);
             }
 
             var login = _context.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiDefaultLogin).SingleOrDefault();
@@ -187,7 +178,7 @@ namespace Bhbk.Lib.Identity.Helpers
             var role = await _context.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForAdmin);
 
             if (role != null)
-                await _context.RoleMgmt.DeleteAsync(role.Id);
+                await _context.RoleMgmt.DeleteAsync(role);
 
             var audience = _context.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
 
@@ -207,20 +198,20 @@ namespace Bhbk.Lib.Identity.Helpers
 
             for (int i = 0; i < 1; i++)
             {
-                await _context.ClientMgmt.CreateAsync(_context.ClientMgmt.Store.Mf.Create.DoIt(
+                await _context.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
                     new ClientCreate()
                     {
                         Name = BaseLib.Statics.ApiUnitTestClient + EntrophyHelper.GenerateRandomBase64(4),
                         Enabled = true,
                         Immutable = false
-                    }));
+                    }).Devolve());
             }
 
             client = _context.ClientMgmt.Store.Get().First();
 
             for (int i = 0; i < 1; i++)
             {
-                await _context.AudienceMgmt.CreateAsync(_context.AudienceMgmt.Store.Mf.Create.DoIt(
+                await _context.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
                     new AudienceCreate()
                     {
                         ClientId = client.Id,
@@ -229,28 +220,28 @@ namespace Bhbk.Lib.Identity.Helpers
                         AudienceKey = EntrophyHelper.GenerateRandomBase64(32),
                         Enabled = true,
                         Immutable = false
-                    }));
+                    }).Devolve());
             }
 
             audience = _context.AudienceMgmt.Store.Get().First();
 
             for (int i = 0; i < 3; i++)
             {
-                await _context.RoleMgmt.CreateAsync(_context.RoleMgmt.Store.Mf.Create.DoIt(
+                await _context.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(
                     new RoleCreate()
                     {
                         AudienceId = audience.Id,
                         Name = BaseLib.Statics.ApiUnitTestRole + EntrophyHelper.GenerateRandomBase64(4),
                         Enabled = true,
                         Immutable = false
-                    }));
+                    }).Devolve());
             }
 
             for (int i = 0; i < 1; i++)
             {
                 string email = "unit-test@" + EntrophyHelper.GenerateRandomBase64(4) + ".net";
 
-                await _context.UserMgmt.CreateAsync(_context.UserMgmt.Store.Mf.Create.DoIt(
+                await _context.UserMgmt.CreateAsync(new UserFactory<UserCreate>(
                     new UserCreate()
                     {
                         Email = email,
@@ -259,52 +250,41 @@ namespace Bhbk.Lib.Identity.Helpers
                         LastName = "LastName",
                         LockoutEnabled = false,
                         Immutable = false
-                    }), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+                    }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
                 var user = _context.UserMgmt.Store.Get(x => x.Email == email).Single();
 
-                await _context.UserMgmt.SetEmailConfirmedAsync(user.Id, true);
-                await _context.UserMgmt.SetPasswordConfirmedAsync(user.Id, true);
-                await _context.UserMgmt.SetPhoneNumberConfirmedAsync(user.Id, true);
+                await _context.UserMgmt.SetEmailConfirmedAsync(user, true);
+                await _context.UserMgmt.SetPasswordConfirmedAsync(user, true);
+                await _context.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
             }
 
             for (int i = 0; i < 1; i++)
             {
-                await _context.LoginMgmt.CreateAsync(_context.LoginMgmt.Store.Mf.Create.DoIt(
+                await _context.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                     new LoginCreate()
                     {
                         LoginProvider = BaseLib.Statics.ApiUnitTestLogin + EntrophyHelper.GenerateRandomBase64(4)
-                    }));
+                    }).Devolve());
             }
 
             var login = _context.LoginMgmt.Store.Get().First();
 
             foreach (var user in _context.UserMgmt.Store.Get())
             {
-                await _context.UserMgmt.AddClaimAsync(user.Id,
+                await _context.UserMgmt.AddClaimAsync(user,
                     new Claim(BaseLib.Statics.ApiUnitTestClaimType,
                         BaseLib.Statics.ApiUnitTestClaimValue + EntrophyHelper.GenerateRandomBase64(4)));
 
                 foreach (var role in _context.RoleMgmt.Store.Get())
                 {
                     if (!await _context.UserMgmt.IsInRoleAsync(user, role.Name))
-                        await _context.UserMgmt.AddToRoleAsync(user.Id, role.Name);
+                        await _context.UserMgmt.AddToRoleAsync(user, role.Name);
                 }
 
-                if (!await _context.UserMgmt.IsInLoginAsync(user.Id, login.LoginProvider))
+                if (!await _context.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
                 {
-                    await _context.UserMgmt.AddLoginAsync(user.Id, _context.UserMgmt.Store.Mf.Create.DoIt(
-                        new UserLoginCreate()
-                        {
-                            UserId = user.Id,
-                            LoginId = login.Id,
-                            LoginProvider = login.LoginProvider,
-                            ProviderDisplayName = login.LoginProvider,
-                            ProviderDescription = "unit-test",
-                            ProviderKey = "unit-test",
-                            Enabled = true,
-                            Immutable = false
-                        }));
+                    await _context.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "built-in"));
                 }
             }
         }

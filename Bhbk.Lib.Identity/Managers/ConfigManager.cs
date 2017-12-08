@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Managers
     {
         private ConfigStore _store;
 
-        public ConfigModel Tweaks
+        public AppConfig Tweaks
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Managers
         {
             StringBuilder output = new StringBuilder();
 
-            output.Append(typeof(ConfigModel).Name + Environment.NewLine);
+            output.Append(typeof(AppConfig).Name + Environment.NewLine);
             output.Append("  Debug:" + _store.Config.Debug.ToString() + Environment.NewLine);
             output.Append("  DefaultAuthorizationCodeLife:" + _store.Config.DefaultAuhthorizationCodeLife.ToString() + Environment.NewLine);
             output.Append("  DefaultAuthorizationCodeLength:" + _store.Config.DefaultAuhthorizationCodeLength.ToString() + Environment.NewLine);

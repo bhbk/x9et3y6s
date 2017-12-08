@@ -1,14 +1,13 @@
 ﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -41,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -55,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -69,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -87,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -101,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, EntrophyHelper.GenerateRandomBase64(8), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -115,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, string.Empty, audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -129,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -148,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -162,7 +161,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), string.Empty, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -177,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, EntrophyHelper.GenerateRandomBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -202,33 +201,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshTokenV1_Revoke_Success()
-        {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
-
-            var controller = new OAuthController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
-            var audience = Context.AudienceMgmt.Store.Get().First();
-            var user = Context.UserMgmt.Store.Get().First();
-
-            var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
-
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
-            var refresh = (string)jwt["refresh_token"];
-            var token = user.AppUserRefresh.Where(x => x.ProtectedTicket == refresh).Single();
-
-            var result = await controller.RevokeToken(token.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
-
-            var check = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh);
-            check.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            check.IsSuccessStatusCode.Should().BeFalse();
-        }
-
-        [TestMethod]
         public async Task Api_Sts_RefreshTokenV1_Use_Fail_AudienceInvalid()
         {
             TestData.CompleteDestroy();
@@ -240,14 +212,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), EntrophyHelper.GenerateRandomBase64(8), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -262,14 +234,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), string.Empty, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -284,14 +256,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
 
             var result = await StsV2.GetRefreshToken(_owin, EntrophyHelper.GenerateRandomBase64(8), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -306,14 +278,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
 
             var result = await StsV2.GetRefreshToken(_owin, string.Empty, audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -331,7 +303,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             Context.ConfigMgmt.Tweaks.UnitTestRefreshToken = false;
             Context.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
@@ -341,7 +313,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -359,7 +331,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             Context.ConfigMgmt.Tweaks.UnitTestRefreshToken = false;
             Context.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
@@ -369,7 +341,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -385,7 +357,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
@@ -393,7 +365,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, EntrophyHelper.GenerateRandomBase64(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -408,14 +380,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -430,7 +402,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
@@ -441,7 +413,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -456,7 +428,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
@@ -470,7 +442,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeFalse();
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
@@ -485,14 +457,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.IsSuccessStatusCode.Should().BeTrue();
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
             var refresh = (string)jwt["refresh_token"];
 
             var result = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.IsSuccessStatusCode.Should().BeTrue();
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }

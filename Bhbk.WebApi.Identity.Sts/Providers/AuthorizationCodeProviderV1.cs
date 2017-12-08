@@ -1,11 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.WebApi.Identity.Sts.OAuthProviders
+namespace Bhbk.WebApi.Identity.Sts.Providers
 {
+    public static class ExtendAuthorizationCodeProviderV1
+    {
+        public static IApplicationBuilder UseAuthorizationCodeProviderV1(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<AuthorizationCodeProviderV1>();
+        }
+    }
+
     public class AuthorizationCodeProviderV1
     {
         private readonly RequestDelegate _next;
@@ -23,26 +33,14 @@ namespace Bhbk.WebApi.Identity.Sts.OAuthProviders
 
         public Task Invoke(HttpContext context)
         {
-            // exit if path does not match
-            if (!context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal))
-                return _next(context);
-
-            // exit if not POST method
-            if (!context.Request.Method.Equals("POST"))
-                return _next(context);
-
-            // exit if not application/x-www-form-urlencoded
-            if (!context.Request.HasFormContentType)
-                return _next(context);
-
-            // exit if not include required keys
+            //check for correct parameters
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
                 || !context.Request.Form.ContainsKey("redirect_uri")
                 || !context.Request.Form.ContainsKey("code"))
             {
-                context.Response.StatusCode = 400;
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_values", _serializer));
             }

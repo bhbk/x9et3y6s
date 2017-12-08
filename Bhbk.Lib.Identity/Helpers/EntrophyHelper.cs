@@ -10,14 +10,14 @@ namespace Bhbk.Lib.Identity.Helpers
         {
             byte[] byteValue = new byte[length];
             RNGCryptoServiceProvider.Create().GetBytes(byteValue);
-            
+
             return Base64UrlTextEncoder.Encode(byteValue);
         }
 
         public static string GenerateSHA256(string input)
         {
             HashAlgorithm algo = new SHA256CryptoServiceProvider();
-            
+
             byte[] byteValue = System.Text.Encoding.UTF8.GetBytes(input);
             byte[] byteHash = algo.ComputeHash(byteValue);
 

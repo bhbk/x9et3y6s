@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Managers
 {
-    public class AudienceManager : IGenericManager<AudienceModel, Guid>
+    public class AudienceManager : IGenericManager<AppAudience, Guid>
     {
         public AudienceStore Store;
 
@@ -20,16 +20,12 @@ namespace Bhbk.Lib.Identity.Managers
             Store = store;
         }
 
-        public async Task<AudienceModel> CreateAsync(AudienceModel model)
+        public async Task<AppAudience> CreateAsync(AppAudience audience)
         {
-            var audience = Store.Mf.Devolve.DoIt(model);
-
             if (Store.Exists(audience.Name))
                 throw new InvalidOperationException();
 
-            var result = Store.Create(audience);
-
-            return Store.Mf.Evolve.DoIt(result);
+            return Store.Create(audience);
         }
 
         public async Task<bool> DeleteAsync(Guid audienceId)
@@ -40,64 +36,53 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.Delete(audienceId);
         }
 
-        public async Task<AudienceModel> FindByIdAsync(Guid audienceId)
+        public async Task<AppAudience> FindByIdAsync(Guid audienceId)
         {
             var audience = Store.FindById(audienceId);
 
             if (audience == null)
                 return null;
 
-            return Store.Mf.Evolve.DoIt(audience);
+            return audience;
         }
 
-        public async Task<AudienceModel> FindByNameAsync(string audienceName)
+        public async Task<AppAudience> FindByNameAsync(string audienceName)
         {
             var audience = Store.FindByName(audienceName);
 
             if (audience == null)
                 return null;
 
-            return Store.Mf.Evolve.DoIt(audience);
+            return audience;
         }
 
-        public async Task<IList<AudienceModel>> GetListAsync()
+        public async Task<IList<AppAudience>> GetListAsync()
         {
-            IList<AudienceModel> result = new List<AudienceModel>();
-            var audiences = Store.GetAll();
-
-            if (audiences == null)
-                return null;
-
-            foreach (AppAudience audience in audiences)
-                result.Add(Store.Mf.Evolve.DoIt(audience));
-
-            return result;
+            return Store.GetAll();
         }
 
-        public async Task<IList<RoleModel>> GetRoleListAsync(Guid audienceId)
+        public async Task<IList<AppRole>> GetRoleListAsync(Guid audienceId)
         {
-            IList<RoleModel> result = new List<RoleModel>();
+            IList<AppRole> result = new List<AppRole>();
             var roles = Store.GetRoles(audienceId);
 
             if (roles == null)
                 throw new InvalidOperationException();
 
             foreach (AppRole role in roles)
-                result.Add(Store.Mf.Evolve.DoIt(role));
+                result.Add(role);
 
             return result;
         }
 
-        public async Task<AudienceModel> UpdateAsync(AudienceModel model)
+        public async Task<AppAudience> UpdateAsync(AppAudience audience)
         {
-            var audience = Store.Mf.Devolve.DoIt(model);
-
-            if (!Store.Exists(model.Id))
+            if (!Store.Exists(audience.Id))
                 throw new InvalidOperationException();
 
             var result = Store.Update(audience);
 
-            return Store.Mf.Evolve.DoIt(result);
+            return result;
         }
     }
 }

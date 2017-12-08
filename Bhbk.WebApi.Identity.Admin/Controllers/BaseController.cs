@@ -59,9 +59,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
         }
 
-        public void SetUser(Guid guid)
+        public void SetUser(Guid userID)
         {
-            var user = Context.UserMgmt.Store.FindById(guid);
+            var user = Context.UserMgmt.Store.FindByIdAsync(userID.ToString()).Result;
             var claims = Context.UserMgmt.CreateIdentityAsync(user, "JWT").Result;
 
             ControllerContext.HttpContext = new DefaultHttpContext();

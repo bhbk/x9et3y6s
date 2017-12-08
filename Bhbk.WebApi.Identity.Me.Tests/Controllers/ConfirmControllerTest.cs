@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewEmailConfirm = email
             };
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailChange(model,
@@ -71,11 +71,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewEmailConfirm = email
             };
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmEmailChange(model, token) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ConfirmEmailChange(model, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordChange(model,
@@ -127,11 +127,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPasswordChange(model, token) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ConfirmPasswordChange(model, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPhoneNumberConfirm = string.Empty
             };
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user.Id, model.CurrentPhoneNumber);
+            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneChange(model,
@@ -184,11 +184,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPhoneNumberConfirm = phone
             };
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user.Id, model.CurrentPhoneNumber);
+            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPhoneChange(model, token) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ConfirmPhoneChange(model, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -203,7 +203,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmail(user.Id,
@@ -223,11 +223,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmEmail(user.Id, token) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ConfirmEmail(user.Id, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -241,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPassword(user.Id,
@@ -260,11 +260,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user.Id);
+            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPassword(user.Id, token) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ConfirmPassword(user.Id, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -278,7 +278,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user.Id, user.PhoneNumber);
+            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhone(user.Id,
@@ -297,11 +297,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user.Id, user.PhoneNumber);
+            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPhone(user.Id, token) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ConfirmPhone(user.Id, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
     }
 }

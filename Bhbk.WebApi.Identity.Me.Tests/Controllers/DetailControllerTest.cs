@@ -206,12 +206,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var status = await Context.UserMgmt.SetTwoFactorEnabledAsync(user.Id, false);
+            var status = await Context.UserMgmt.SetTwoFactorEnabledAsync(user, false);
             status.Should().BeAssignableTo(typeof(IdentityResult));
             status.Succeeded.Should().BeTrue();
 
-            var result = await controller.SetTwoFactor(true) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.SetTwoFactor(true) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -234,9 +234,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var result = await controller.UpdateDetail(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
             data.FirstName.Should().Be(model.FirstName);
+            data.LastName.Should().Be(model.LastName);
         }
     }
 }

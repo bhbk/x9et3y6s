@@ -7,7 +7,7 @@ using System;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
-    [AllowAnonymous]
+    [Authorize]
     public class BaseController : Controller
     {
         private IIdentityContext _conext;

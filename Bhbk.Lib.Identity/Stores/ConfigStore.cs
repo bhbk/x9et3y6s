@@ -1,17 +1,15 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Microsoft.Extensions.Configuration;
 using Bhbk.Lib.Identity.Helpers;
+using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
-using System.Reflection;
 
 namespace Bhbk.Lib.Identity.Stores
 {
     public class ConfigStore
     {
-        private ConfigModel _context { get; set; }
+        private AppConfig _context { get; set; }
 
-        public ConfigModel Config
+        public AppConfig Config
         {
             get
             {
@@ -26,7 +24,7 @@ namespace Bhbk.Lib.Identity.Stores
                 .AddJsonFile("globalsettings.json")
                 .Build();
 
-            _context = new ConfigModel();
+            _context = new AppConfig();
 
             try
             {

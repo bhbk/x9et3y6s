@@ -1,10 +1,8 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {

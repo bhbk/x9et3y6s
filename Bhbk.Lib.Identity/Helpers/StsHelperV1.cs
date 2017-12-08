@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     new KeyValuePair<string, string>("password", password),
                     new KeyValuePair<string, string>(Statics.AttrGrantTypeIDV1, "password")
                 });
-            return await owin.CreateClient().PostAsync("/oauth/v1/token", content);
+            return await owin.CreateClient().PostAsync("/oauth/v1/access", content);
         }
 
         public async Task<HttpResponseMessage> GetRefreshToken(TestServer owin, string client, string audience, string refresh)
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     new KeyValuePair<string, string>("refresh_token", refresh),
                     new KeyValuePair<string, string>(Statics.AttrGrantTypeIDV1, "refresh_token")
                 });
-            return await owin.CreateClient().PostAsync("/oauth/v1/token", content);
+            return await owin.CreateClient().PostAsync("/oauth/v1/refresh", content);
         }
     }
 }

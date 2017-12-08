@@ -1,4 +1,6 @@
 ﻿using Bhbk.WebApi.Identity.Admin.Controllers;
+using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -53,14 +55,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType,
                 BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4));
 
-            var add = await Context.UserMgmt.AddClaimAsync(user.Id, claim);
+            var add = await Context.UserMgmt.AddClaimAsync(user, claim);
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
-            var find = user.AppUserClaim.Where(x => x.ClaimType == claim.Type && x.ClaimValue == claim.Value).Single();
-            var delete = Context.UserMgmt.Store.Mf.Evolve.DoIt(find);
-            var result = await controller.DeleteClaim(user.Id, delete) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.DeleteClaim(user.Id, claim) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = user.AppUserClaim.Where(x => x.ClaimType == claim.Type && x.ClaimValue == claim.Value).Any();
             check.Should().BeFalse();

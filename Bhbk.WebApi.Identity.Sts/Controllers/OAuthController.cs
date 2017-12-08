@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -17,25 +16,45 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public OAuthController(IIdentityContext context)
             : base(context) { }
 
-        [Route("v1/refresh/{tokenID}/revoke"), HttpDelete]
+        [Route("v1/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeToken(Guid tokenID)
+        public async Task<IActionResult> RevokeToken(Guid userID, Guid tokenID)
         {
-            var token = await Context.UserMgmt.FindRefreshTokenByIdAsync(tokenID);
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            var token = await Context.UserMgmt.FindRefreshTokenByIdAsync(tokenID.ToString());
 
             if (token == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
+            var result = await Context.UserMgmt.RemoveRefreshTokenAsync(user, token);
+
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
             else
-            {
-                IdentityResult result = await Context.UserMgmt.RemoveRefreshTokenAsync(token.ClientId, token.AudienceId, token.UserId);
+                return NoContent();
+        }
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+        [Route("v1/refresh/{userID}/revoke"), HttpDelete]
+        [Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IActionResult> RevokeTokens(Guid userID)
+        {
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
 
-                else
-                    return Ok();
-            }
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+
+            var result = await Context.UserMgmt.RemoveRefreshTokensAsync(user);
+
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
+            else
+                return NoContent();
         }
     }
 }

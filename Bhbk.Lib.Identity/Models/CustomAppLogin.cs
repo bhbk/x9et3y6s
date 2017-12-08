@@ -4,5 +4,6 @@ namespace Bhbk.Lib.Identity.Models
 {
     public partial class AppLogin
     {
+
     }
 }

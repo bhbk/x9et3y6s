@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -14,12 +15,12 @@ namespace Bhbk.Lib.Identity.Helpers
     public class JwtHelperV2
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            GenerateAccessToken(HttpContext context, ClientModel client, AudienceModel audience, UserModel user)
+            GenerateAccessToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
         {
             var ioc = context.RequestServices.GetService<IIdentityContext>();
             DateTime issueDate, expireDate;
 
-            ClaimsIdentity claims = ioc.UserMgmt.CreateIdentityAsync(ioc.UserMgmt.Store.Mf.Devolve.DoIt(user), "JWT").Result;
+            ClaimsIdentity claims = await ioc.UserMgmt.CreateIdentityAsync(user, "JWT");
 
             ClaimsPrincipal identity = new ClaimsPrincipal();
             identity.AddIdentity(claims);
@@ -45,7 +46,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 claims: identity.Claims,
                 notBefore: issueDate,
                 expires: expireDate,
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                 );
 
             var result = new JwtSecurityTokenHandler().WriteToken(access);
@@ -54,7 +55,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<string>
-            GenerateRefreshToken(HttpContext context, ClientModel client, AudienceModel audience, UserModel user)
+            GenerateRefreshToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
         {
             var ioc = context.RequestServices.GetService<IIdentityContext>();
             DateTime issueDate, expireDate;
@@ -70,12 +71,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
 
-            var remove = ioc.UserMgmt.RemoveRefreshTokenAsync(client.Id, audience.Id, user.Id).Result;
-
-            if (!remove.Succeeded)
-                throw new InvalidOperationException();
-
-            var result = new UserRefreshCreate()
+            var refresh = new UserRefreshCreate()
             {
                 ClientId = client.Id,
                 AudienceId = audience.Id,
@@ -85,13 +81,12 @@ namespace Bhbk.Lib.Identity.Helpers
                 ExpiresUtc = expireDate
             };
 
-            var create = ioc.UserMgmt.Store.Mf.Create.DoIt(result);
-            var add = ioc.UserMgmt.AddRefreshTokenAsync(create).Result;
+            var result = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(refresh).Devolve());
 
-            if (!add.Succeeded)
+            if (!result.Succeeded)
                 throw new InvalidOperationException();
 
-            return result.ProtectedTicket;
+            return refresh.ProtectedTicket;
         }
 
         public static bool IsValidJwtFormat(string token)

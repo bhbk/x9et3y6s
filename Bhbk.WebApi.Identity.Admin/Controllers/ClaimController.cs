@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -25,14 +24,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID);
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.AddClaimAsync(user.Id, model);
+                var result = await Context.UserMgmt.AddClaimAsync(user, model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -49,32 +48,32 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID);
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
             
             else
             {
-                IdentityResult result = await Context.UserMgmt.RemoveClaimAsync(userID, claim);
+                var result = await Context.UserMgmt.RemoveClaimAsync(user, claim);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
         [Route("v1/{userID}"), HttpGet]
         public async Task<IActionResult> GetClaims(Guid userID)
         {
-            var user = await Context.UserMgmt.FindByIdAsync(userID);
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            return Ok(await Context.UserMgmt.GetClaimsAsync(userID));
+            return Ok(await Context.UserMgmt.GetClaimsAsync(user));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -39,15 +40,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Enabled = true,
                 Immutable = false
             };
-            var create = await Context.RoleMgmt.CreateAsync(Context.RoleMgmt.Store.Mf.Create.DoIt(model));
+            var create = await Context.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
             create.Should().BeAssignableTo(typeof(IdentityResult));
             create.Succeeded.Should().BeTrue();
 
             var role = await Context.RoleMgmt.FindByNameAsync(model.Name);
-            role.Should().BeAssignableTo(typeof(RoleModel));
+            role.Should().BeAssignableTo(typeof(AppRole));
 
-            var result = await controller.AddRoleToUser(role.Id, user.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.AddRoleToUser(role.Id, user.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -68,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.CreateRole(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<RoleModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<RoleResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }
@@ -82,8 +83,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new RoleController(Context);
             var role = Context.RoleMgmt.Store.Get().First();
 
-            var result = await controller.DeleteRole(role.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.DeleteRole(role.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = Context.RoleMgmt.Store.Get(x => x.Id == role.Id).Any();
             check.Should().BeFalse();
@@ -100,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetRole(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<RoleModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<RoleResult>().Subject;
 
             data.Id.Should().Be(role.Id);
         }
@@ -115,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetRoles() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<RoleModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
             data.Count().Should().Equals(Context.RoleMgmt.Store.Get().Count());
         }
@@ -131,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetRoleUsers(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<UserModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
             data.Count().Should().Equals(Context.UserMgmt.Store.Get().Count());
         }
@@ -151,19 +152,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Enabled = true,
                 Immutable = false
             };
-            var create = await Context.RoleMgmt.CreateAsync(Context.RoleMgmt.Store.Mf.Create.DoIt(model));
+            var create = await Context.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
             create.Should().BeAssignableTo(typeof(IdentityResult));
             create.Succeeded.Should().BeTrue();
 
             var role = await Context.RoleMgmt.FindByNameAsync(model.Name);
-            role.Should().BeAssignableTo(typeof(RoleModel));
+            role.Should().BeAssignableTo(typeof(AppRole));
 
-            var add = await Context.UserMgmt.AddToRoleAsync(user.Id, model.Name);
+            var add = await Context.UserMgmt.AddToRoleAsync(user, model.Name);
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
-            var result = await controller.RemoveRoleFromUser(role.Id, user.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.RemoveRoleFromUser(role.Id, user.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -184,9 +185,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Immutable = false
             };
 
-            var result = await controller.UpdateRole(model.Id, model) as OkObjectResult;
+            var result = await controller.UpdateRole(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<RoleModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<RoleResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }

@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +11,6 @@ namespace Bhbk.Lib.Identity.Stores
     public class ClientStore : IGenericStore<AppClient, Guid>
     {
         private AppDbContext _context;
-        public ModelFactory Mf;
 
         public ClientStore(AppDbContext context)
         {
@@ -20,8 +18,6 @@ namespace Bhbk.Lib.Identity.Stores
                 throw new ArgumentNullException();
 
             _context = context;
-
-            Mf = new ModelFactory(context);
         }
 
         public void Attach(AppClient entity)

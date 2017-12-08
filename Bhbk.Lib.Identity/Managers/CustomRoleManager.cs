@@ -3,15 +3,16 @@ using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
+
+//https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
 
 namespace Bhbk.Lib.Identity.Managers
 {
-    //https://docs.microsoft.com/en-us/aspnet/identity/overview/extensibility/overview-of-custom-storage-providers-for-aspnet-identity
-    public class CustomRoleManager : RoleManager<AppRole>
+    public partial class CustomRoleManager : RoleManager<AppRole>
     {
         public CustomRoleStore Store;
 
@@ -25,83 +26,69 @@ namespace Bhbk.Lib.Identity.Managers
             Store = store;
         }
 
-        public async Task<IdentityResult> CreateAsync(RoleModel role)
+        public override async Task<IdentityResult> CreateAsync(AppRole role)
         {
-            var model = Store.Mf.Devolve.DoIt(role);
-
-            if (Store.Exists(model.Name))
+            if (Store.Exists(role.Name))
                 throw new InvalidOperationException();
 
-            await Store.CreateAsync(model);
+            await Store.CreateAsync(role);
 
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> DeleteAsync(Guid roleId)
+        public override async Task<IdentityResult> DeleteAsync(AppRole role)
         {
-            var model = Store.FindById(roleId);
+            if (!Store.Exists(role.Id))
+                throw new InvalidOperationException();
 
-            if (model == null)
-                throw new ArgumentNullException();
+            await Store.DeleteAsync(role);
 
-            await Store.DeleteAsync(model);
-        
             return IdentityResult.Success;
         }
 
-        public async Task<RoleModel> FindByIdAsync(Guid roleId)
+        public override async Task<AppRole> FindByIdAsync(string roleId)
         {
-            var model = Store.FindById(roleId);
+            Guid result;
 
-            if (model == null)
-                return null;
+            if (!Guid.TryParse(roleId, out result))
+                throw new ArgumentException();
 
-            return Store.Mf.Evolve.DoIt(model);
+            return await Store.FindByIdAsync(result.ToString());
         }
 
-        public async Task<RoleModel> FindByNameAsync(string roleName)
+        public override async Task<AppRole> FindByNameAsync(string roleName)
         {
-            var model = Store.FindByName(roleName);
-
-            if (model == null)
-                return null;
-
-            return Store.Mf.Evolve.DoIt(model);
+            return await Store.FindByNameAsync(roleName);
         }
 
-        public async Task<IList<RoleModel>> GetListAsync()
+        public async Task<IList<AppRole>> GetListAsync()
         {
-            IList<RoleModel> result = new List<RoleModel>();
-            var roles = Store.GetAll();
-
-            foreach (AppRole role in roles)
-                result.Add(Store.Mf.Evolve.DoIt(role));
-
-            return result;
+            return Store.GetAll();
         }
 
-        public async Task<IList<UserModel>> GetUsersListAsync(Guid roleId)
+        public async Task<IList<AppUser>> GetUsersListAsync(AppRole role)
         {
-            IList<UserModel> result = new List<UserModel>();
-            var list = Store.GetUsersAsync(roleId);
+            if (!Store.Exists(role.Id))
+                throw new InvalidOperationException();
+
+            IList<AppUser> result = new List<AppUser>();
+            var list = Store.GetUsersAsync(role);
 
             if (list == null)
                 throw new ArgumentNullException();
 
             foreach (AppUser entry in list)
-                result.Add(Store.Mf.Evolve.DoIt(entry));
+                result.Add(new UserFactory<AppUser>(entry).Devolve());
 
             return result;
         }
 
-        public async Task<IdentityResult> UpdateAsync(RoleModel role)
+        public override async Task<IdentityResult> UpdateAsync(AppRole role)
         {
-            var model = Store.Mf.Devolve.DoIt(role);
-
-            if (!Store.Exists(model.Id))
+            if (!Store.Exists(role.Id))
                 throw new InvalidOperationException();
 
-            await Store.UpdateAsync(model);
+            await Store.UpdateAsync(role);
 
             return IdentityResult.Success;
         }

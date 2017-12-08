@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+//http://www.dotnetcurry.com/aspnet-core/1420/integration-testing-aspnet-core
+
 namespace Bhbk.WebApi.Identity.Sts.Tests
 {
-    //https://joonasw.net/view/aspnet-core-di-deep-dive
-    //http://www.dotnetcurry.com/aspnet-core/1420/integration-testing-aspnet-core
     public class StartupTest : Startup
     {
         protected static IIdentityContext Context;

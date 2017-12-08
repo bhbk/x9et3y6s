@@ -1,10 +1,11 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -25,25 +26,25 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = await Context.RoleMgmt.FindByIdAsync(roleID);
+            var role = await Context.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID);
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.AddToRoleAsync(user.Id, role.Name);
+                var result = await Context.UserMgmt.AddToRoleAsync(user, role.Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
@@ -56,26 +57,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var role = await Context.RoleMgmt.FindByNameAsync(model.Name);
 
-            if (role == null)
-            {
-                var create = Context.RoleMgmt.Store.Mf.Create.DoIt(model);
-                IdentityResult result = await Context.RoleMgmt.CreateAsync(create);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return Ok(await Context.RoleMgmt.FindByNameAsync(model.Name));
-            }
-            else
+            if (role != null)
                 return BadRequest(BaseLib.Statics.MsgRoleAlreadyExists);
+
+            var create = new RoleFactory<RoleCreate>(model);
+            var result = await Context.RoleMgmt.CreateAsync(create.Devolve());
+
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
+            else
+                return Ok(create.Evolve());
         }
 
         [Route("v1/{roleID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteRole(Guid roleID)
         {
-            var role = await Context.RoleMgmt.FindByIdAsync(roleID);
+            var role = await Context.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
@@ -85,44 +84,56 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                IdentityResult result = await Context.RoleMgmt.DeleteAsync(roleID);
+                var result = await Context.RoleMgmt.DeleteAsync(role);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetRoles()
         {
-            return Ok(await Context.RoleMgmt.GetListAsync());
+            IList<RoleResult> result = new List<RoleResult>();
+            var users = await Context.RoleMgmt.GetListAsync();
+
+            foreach (AppRole entry in users)
+                result.Add(new RoleFactory<AppRole>(entry).Evolve());
+
+            return Ok(result);
         }
 
         [Route("v1/{roleID}"), HttpGet]
         public async Task<IActionResult> GetRole(Guid roleID)
         {
-            var role = await Context.RoleMgmt.FindByIdAsync(roleID);
+            var role = await Context.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            else
-                return Ok(role);
+            var result = new RoleFactory<AppRole>(role);
+
+            return Ok(result.Evolve());
         }
 
         [Route("v1/{roleID}/users"), HttpGet]
         public async Task<IActionResult> GetRoleUsers(Guid roleID)
         {
-            var role = await Context.RoleMgmt.FindByIdAsync(roleID);
+            var role = await Context.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            else
-                return Ok(await Context.RoleMgmt.GetUsersListAsync(roleID));
+            IList<UserResult> result = new List<UserResult>();
+            var users = await Context.RoleMgmt.GetUsersListAsync(role);
+
+            foreach (AppUser entry in users)
+                result.Add(new UserFactory<AppUser>(entry).Evolve());
+
+            return Ok(result);
         }
 
         [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
@@ -132,39 +143,36 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = await Context.RoleMgmt.FindByIdAsync(roleID);
+            var role = await Context.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID);
+            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.RemoveFromRoleAsync(userID, role.Name);
+                var result = await Context.UserMgmt.RemoveFromRoleAsync(user, role.Name);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
-        [Route("v1/{roleID}"), HttpPut]
+        [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateRole(Guid roleID, RoleUpdate model)
+        public async Task<IActionResult> UpdateRole(RoleUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            else if (roleID != model.Id)
-                return BadRequest(BaseLib.Statics.MsgRoleInvalid);
-
-            var role = await Context.RoleMgmt.FindByIdAsync(roleID);
+            var role = await Context.RoleMgmt.FindByIdAsync(model.Id.ToString());
 
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
@@ -174,14 +182,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = Context.RoleMgmt.Store.Mf.Update.DoIt(model);
-                IdentityResult result = await Context.RoleMgmt.UpdateAsync(update);
+                var update = new RoleFactory<RoleUpdate>(model);
+                var result = await Context.RoleMgmt.UpdateAsync(update.Devolve());
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(update);
+                    return Ok(update.Evolve());
             }
         }
     }

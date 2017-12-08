@@ -5,7 +5,8 @@ namespace Bhbk.Lib.Identity
     public enum AudienceType
     {
         thin_client,
-        thick_client
+        thick_client,
+        webapi
     }
 
     public enum GrantType
@@ -37,6 +38,8 @@ namespace Bhbk.Lib.Identity
         public const String ApiDefaultConfig = "Global.config";
         public const String ApiDefaultPhone = "12223334444";
         public const String ApiDefaultLogin = "local";
+        public const String ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
+        public const String ApiDefaultLoginName = "built-in";
         public const String ApiDefaultRoleForAdmin = "(Built-In) Administrators";
         public const String ApiDefaultRoleForViewer = "(Built-In) Viewers";
         public const String ApiDefaultUserAdmin = "root@local";
@@ -55,6 +58,8 @@ namespace Bhbk.Lib.Identity
         public const String ApiUnitTestUserDisplayName = "User-UnitTests-";
         public const String ApiUnitTestUserEmail = "unit-tests@";
         public const String ApiUnitTestLogin = "Login-UnitTests-";
+        public const String ApiUnitTestLoginKey = "Login-UnitTests-sxW8wlsw1Z04heUckw";
+        public const String ApiUnitTestLoginName = "Login-UnitTests-";
         public const String ApiUnitTestClaimType = "ClaimType-UnitTests-";
         public const String ApiUnitTestClaimValue = "ClaimValue-UnitTests-";
         #endregion

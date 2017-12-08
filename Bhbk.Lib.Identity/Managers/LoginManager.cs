@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Managers
 {
-    public class LoginManager : IGenericManager<LoginModel, Guid>
+    public class LoginManager : IGenericManager<AppLogin, Guid>
     {
         public LoginStore Store;
 
@@ -20,16 +20,14 @@ namespace Bhbk.Lib.Identity.Managers
             Store = store;
         }
 
-        public async Task<LoginModel> CreateAsync(LoginModel model)
+        public async Task<AppLogin> CreateAsync(AppLogin login)
         {
-            var login = Store.Mf.Devolve.DoIt(model);
-
             if (Store.Exists(login.LoginProvider))
                 throw new InvalidOperationException();
 
             var result = Store.Create(login);
 
-            return Store.Mf.Evolve.DoIt(result);
+            return login;
         }
 
         public async Task<bool> DeleteAsync(Guid loginId)
@@ -40,58 +38,50 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.Delete(loginId);
         }
 
-        public async Task<LoginModel> FindByIdAsync(Guid loginId)
+        public async Task<AppLogin> FindByIdAsync(Guid loginId)
         {
             var login = Store.FindById(loginId);
 
             if (login == null)
                 return null;
 
-            return Store.Mf.Evolve.DoIt(login);
+            return login;
         }
 
-        public async Task<LoginModel> FindByNameAsync(string loginName)
+        public async Task<AppLogin> FindByNameAsync(string loginName)
         {
             var login = Store.FindByName(loginName);
 
             if (login == null)
                 return null;
 
-            return Store.Mf.Evolve.DoIt(login);
+            return login;
         }
 
-        public async Task<IList<LoginModel>> GetListAsync()
+        public async Task<IList<AppLogin>> GetListAsync()
         {
-            IList<LoginModel> result = new List<LoginModel>();
-            var logins = Store.GetAll();
-
-            foreach (AppLogin login in logins)
-                result.Add(Store.Mf.Evolve.DoIt(login));
-
-            return result;
+            return Store.GetAll();
         }
 
-        public async Task<IList<UserModel>> GetUsersListAsync(Guid loginId)
+        public async Task<IList<AppUser>> GetUsersListAsync(Guid loginId)
         {
-            IList<UserModel> result = new List<UserModel>();
+            IList<AppUser> result = new List<AppUser>();
             var list = Store.GetUsers(loginId);
 
             foreach (AppUser entry in list)
-                result.Add(Store.Mf.Evolve.DoIt(entry));
+                result.Add(entry);
 
             return result;
         }
 
-        public async Task<LoginModel> UpdateAsync(LoginModel model)
+        public async Task<AppLogin> UpdateAsync(AppLogin login)
         {
-            var login = Store.Mf.Devolve.DoIt(model);
-
             if (!Store.Exists(login.Id))
                 throw new InvalidOperationException();
 
             var result = Store.Update(login);
 
-            return Store.Mf.Evolve.DoIt(result);
+            return result;
         }
     }
 }

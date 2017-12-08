@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.CreateClient(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }
@@ -54,8 +54,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new ClientController(Context);
             var client = Context.ClientMgmt.Store.Get().First();
 
-            var result = await controller.DeleteClient(client.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.DeleteClient(client.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = Context.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
             check.Should().BeFalse();
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetClient(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
             data.Id.Should().Be(client.Id);
         }
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetClients() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<ClientModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<ClientResult>>().Subject;
 
             data.Count().Should().Equals(Context.ClientMgmt.Store.Get().Count());
         }
@@ -103,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetClientAudiences(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<AudienceModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
             data.Count().Should().Equals(Context.AudienceMgmt.Store.Get().Count());
         }
@@ -125,9 +125,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Immutable = false
             };
 
-            var result = await controller.UpdateClient(model.Id, model) as OkObjectResult;
+            var result = await controller.UpdateClient(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }

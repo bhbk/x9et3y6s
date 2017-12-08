@@ -1,10 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -27,15 +29,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var client = await Context.ClientMgmt.FindByNameAsync(model.Name);
 
-            if (client == null)
-            {
-                var create = Context.ClientMgmt.Store.Mf.Create.DoIt(model);
-                var result = await Context.ClientMgmt.CreateAsync(create);
-
-                return Ok(result);
-            }
-            else
+            if (client != null)
                 return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);
+
+            var create = new ClientFactory<ClientCreate>(model);
+            var result = await Context.ClientMgmt.CreateAsync(create.Devolve());
+
+            return Ok(create.Evolve());
         }
 
         [Route("v1/{clientID}"), HttpDelete]
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             else
-                return Ok();
+                return NoContent();
         }
 
         [Route("v1/{clientID}"), HttpGet]
@@ -65,14 +65,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientNotExist);
 
-            else
-                return Ok(client);
+            var result = new ClientFactory<AppAudience>(client);
+
+            return Ok(result.Evolve());
         }
 
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetClients()
         {
-            return Ok(await Context.ClientMgmt.GetListAsync());
+            IList<ClientResult> result = new List<ClientResult>();
+            var users = await Context.ClientMgmt.GetListAsync();
+
+            foreach (AppClient entry in users)
+                result.Add(new ClientFactory<AppClient>(entry).Evolve());
+
+            return Ok(result);
         }
 
         [Route("v1/{clientID}/audiences"), HttpGet]
@@ -83,21 +90,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientNotExist);
 
-            else
-                return Ok(await Context.ClientMgmt.GetAudiencesAsync(clientID));
+            IList<AudienceResult> result = new List<AudienceResult>();
+            var audiences = await Context.ClientMgmt.GetAudiencesAsync(clientID);
+
+            foreach (AppAudience entry in audiences)
+                result.Add(new AudienceFactory<AppAudience>(entry).Evolve());
+
+            return Ok(result);
         }
 
-        [Route("v1/{clientID}"), HttpPut]
+        [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateClient(Guid clientID, ClientUpdate model)
+        public async Task<IActionResult> UpdateClient(ClientUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            else if (clientID != model.Id)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
-
-            var client = await Context.ClientMgmt.FindByIdAsync(clientID);
+            var client = await Context.ClientMgmt.FindByIdAsync(model.Id);
 
             if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientNotExist);
@@ -107,10 +116,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = Context.ClientMgmt.Store.Mf.Update.DoIt(model);
-                var result = await Context.ClientMgmt.UpdateAsync(update);
+                var update = new ClientFactory<ClientUpdate>(model);
+                var result = await Context.ClientMgmt.UpdateAsync(update.Devolve());
 
-                return Ok(result);
+                return Ok(update.Evolve());
             }
         }
     }

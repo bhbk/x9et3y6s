@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.CreateUser(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
             data.Email.Should().Be(model.Email);
         }
@@ -74,8 +74,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(Context);
             var user = Context.UserMgmt.Store.Get().First();
 
-            var result = await controller.DeleteUser(user.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.DeleteUser(user.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = Context.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
             check.Should().BeFalse();
@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetUser(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
             data.Id.Should().Be(user.Id);
         }
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetUsers() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<UserModel>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
             data.Count().Should().Equals(Context.UserMgmt.Store.Get().Count());
         }
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetUserByName(user.UserName) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
             data.Id.Should().Be(user.Id);
         }
@@ -169,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(Context);
             var user = Context.UserMgmt.Store.Get().First();
 
-            var remove = await Context.UserMgmt.RemovePasswordAsync(user.Id);
+            var remove = await Context.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
@@ -182,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var result = await controller.AddPassword(user.Id, model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.HasPasswordAsync(user.Id);
+            var check = await Context.UserMgmt.HasPasswordAsync(user);
             check.Should().BeFalse();
         }
 
@@ -195,7 +195,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(Context);
             var user = Context.UserMgmt.Store.Get().First();
 
-            var remove = await Context.UserMgmt.RemovePasswordAsync(user.Id);
+            var remove = await Context.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
@@ -205,8 +205,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var result = await controller.AddPassword(user.Id, model) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.AddPassword(user.Id, model) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
@@ -221,14 +221,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(Context);
             var user = Context.UserMgmt.Store.Get().First();
 
-            var remove = await Context.UserMgmt.RemovePasswordAsync(user.Id);
+            var remove = await Context.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
             var result = await controller.RemovePassword(user.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.HasPasswordAsync(user.Id);
+            var check = await Context.UserMgmt.HasPasswordAsync(user);
             check.Should().BeFalse();
         }
 
@@ -241,10 +241,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(Context);
             var user = Context.UserMgmt.Store.Get().First();
 
-            var result = await controller.RemovePassword(user.Id) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.RemovePassword(user.Id) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = await Context.UserMgmt.HasPasswordAsync(user.Id);
+            var check = await Context.UserMgmt.HasPasswordAsync(user);
             check.Should().BeFalse();
         }
 
@@ -265,7 +265,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var result = await controller.ResetPassword(user.Id, model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.CheckPasswordAsync(user.Id, model.NewPassword);
+            var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeFalse();
         }
 
@@ -283,8 +283,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var result = await controller.ResetPassword(user.Id, model) as OkResult;
-            result.Should().BeAssignableTo(typeof(OkResult));
+            var result = await controller.ResetPassword(user.Id, model) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
@@ -308,9 +308,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LockoutEnd = DateTime.Now.AddDays(30)
             };
 
-            var result = await controller.UpdateUser(model.Id, model) as OkObjectResult;
+            var result = await controller.UpdateUser(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
             data.FirstName.Should().Be(model.FirstName);
             data.LastName.Should().Be(model.LastName);

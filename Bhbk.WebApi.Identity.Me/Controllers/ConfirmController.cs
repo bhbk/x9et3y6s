@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -25,23 +24,23 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userId);
+            var user = await Context.UserMgmt.FindByIdAsync(userId.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user.Id, BaseLib.Statics.ApiTokenConfirmEmail, token))
+            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenConfirmEmail, token))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.SetEmailConfirmedAsync(user.Id, true);
+                var result = await Context.UserMgmt.SetEmailConfirmedAsync(user, true);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
@@ -52,23 +51,23 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userId);
+            var user = await Context.UserMgmt.FindByIdAsync(userId.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user.Id, BaseLib.Statics.ApiTokenResetPassword, token))
+            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenResetPassword, token))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.SetPasswordConfirmedAsync(user.Id, true);
+                var result = await Context.UserMgmt.SetPasswordConfirmedAsync(user, true);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
@@ -79,33 +78,34 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userId);
+            var user = await Context.UserMgmt.FindByIdAsync(userId.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
 
-            else if (!await Context.UserMgmt.VerifyChangePhoneNumberTokenAsync(user.Id, token, user.PhoneNumber))
+            else if (!await Context.UserMgmt.VerifyChangePhoneNumberTokenAsync(user, token, user.PhoneNumber))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.SetPhoneNumberConfirmedAsync(user.Id, true);
+                var result = await Context.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
         [Route("v1/change-email/{token}"), HttpPut]
+        [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmailChange(UserChangeEmail model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -113,28 +113,29 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user.Id, BaseLib.Statics.ApiTokenConfirmEmail, token))
+            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenConfirmEmail, token))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.ConfirmEmailAsync(user.Id, token);
+                var result = await Context.UserMgmt.ConfirmEmailAsync(user, token);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
         [Route("v1/change-password/{token}"), HttpPut]
+        [AllowAnonymous]
         public async Task<IActionResult> ConfirmPasswordChange(UserChangePassword model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -145,31 +146,32 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            else if (!await Context.UserMgmt.CheckPasswordAsync(user.Id, model.CurrentPassword))
+            else if (!await Context.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
 
-            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user.Id, BaseLib.Statics.ApiTokenResetPassword, token))
+            else if (!await Context.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenResetPassword, token))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.ChangePasswordAsync(user.Id, model.CurrentPassword, model.NewPassword);
+                var result = await Context.UserMgmt.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
 
         [Route("v1/change-phone/{token}"), HttpPut]
+        [AllowAnonymous]
         public async Task<IActionResult> ConfirmPhoneChange(UserChangePhone model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID());
+            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserNotExist);
@@ -177,18 +179,18 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await Context.UserMgmt.VerifyChangePhoneNumberTokenAsync(user.Id, token, model.CurrentPhoneNumber))
+            else if (!await Context.UserMgmt.VerifyChangePhoneNumberTokenAsync(user, token, model.CurrentPhoneNumber))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             else
             {
-                IdentityResult result = await Context.UserMgmt.ChangePhoneNumberAsync(user.Id, model.NewPhoneNumber, token);
+                var result = await Context.UserMgmt.ChangePhoneNumberAsync(user, model.NewPhoneNumber, token);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok();
+                    return NoContent();
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,13 +10,14 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
+//https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.userstorebase-8
+//https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers
+
 namespace Bhbk.Lib.Identity.Stores
 {
-    //https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers?view=aspnetcore-2.1
     public partial class CustomUserStore : UserStore<AppUser, AppRole, AppDbContext, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppUserToken, AppRoleClaim>
     {
         private AppDbContext _context;
-        public ModelFactory Mf;
 
         public CustomUserStore(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)
@@ -26,17 +26,18 @@ namespace Bhbk.Lib.Identity.Stores
                 throw new ArgumentNullException();
 
             _context = context;
-            Mf = new ModelFactory(_context);
         }
 
-        public Task AddRefreshTokenAsync(AppUserRefresh token)
+        public Task AddRefreshTokenAsync(AppUserRefresh refresh)
         {
-            var refresh = _context.AppUserRefresh.Where(x => x.ProtectedTicket == token.ProtectedTicket).SingleOrDefault();
+            var clean = _context.AppUserRefresh.Where(x => x.UserId == refresh.UserId
+                && x.IssuedUtc > DateTime.UtcNow
+                && x.ExpiresUtc < DateTime.UtcNow);
 
-            if (refresh != null)
-                _context.AppUserRefresh.Remove(refresh);
+            if (clean != null)
+                _context.AppUserRefresh.RemoveRange(clean);
 
-            _context.AppUserRefresh.Add(token);
+            _context.AppUserRefresh.Add(refresh);
             _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
@@ -48,10 +49,10 @@ namespace Bhbk.Lib.Identity.Stores
             {
                 var model = new AppUserClaim()
                 {
-                    //Id = Guid.NewGuid(),
                     UserId = user.Id,
                     ClaimType = claim.Type,
-                    ClaimValue = claim.Value
+                    ClaimValue = claim.Value,
+                    ClaimValueType = claim.ValueType
                 };
 
                 _context.AppUserClaim.Add(model);
@@ -111,9 +112,6 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            //TODO - figure out what to do with UserName requirement in Identity...
-            user.UserName = user.Email;
-
             _context.AppUser.Add(user);
             _context.SaveChanges();
 
@@ -138,14 +136,14 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppUser.Any(x => x.Email == UserEmail);
         }
 
-        public AppUser FindById(Guid userId)
+        public override Task<AppUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _context.AppUser.Where(x => x.Id == userId).SingleOrDefault();
+            return Task.FromResult(_context.AppUser.Where(x => x.Id.ToString() == userId).SingleOrDefault());
         }
 
-        public AppUser FindByName(string userName)
+        public override Task<AppUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _context.AppUser.Where(x => x.Email == userName).SingleOrDefault();
+            return Task.FromResult(_context.AppUser.Where(x => x.Email == normalizedUserName).SingleOrDefault());
         }
 
         public Task<AppUserRefresh> FindRefreshTokenAsync(string ticket)
@@ -201,11 +199,6 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(result);
         }
 
-        public IList<AppUserClaim> GetClaimsAsync(Guid userId)
-        {
-            return _context.AppUserClaim.Where(x => x.UserId == userId).ToList();
-        }
-
         public override Task<string> GetPasswordHashAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult(_context.Users.Where(x => x.Id == user.Id).Single().PasswordHash);
@@ -247,11 +240,6 @@ namespace Bhbk.Lib.Identity.Stores
                 result.Add(_context.Roles.Where(x => x.Id == role.RoleId).Select(r => r.Name).Single());
 
             return Task.FromResult(result);
-        }
-
-        public override Task<string> GetSecurityStampAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return Task.FromResult(_context.Users.Where(x => x.Id == user.Id).Single().SecurityStamp);
         }
 
         public override Task<bool> GetTwoFactorEnabledAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -316,9 +304,9 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task RemoveFromLoginAsync(AppUser user, string loginName)
+        public override Task RemoveLoginAsync(AppUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var login = _context.AppUserLogin.Where(x => x.LoginProvider == loginName).SingleOrDefault();
+            var login = _context.AppUserLogin.Where(x => x.LoginProvider == loginProvider).SingleOrDefault();
 
             if (login == null)
                 throw new ArgumentNullException();
@@ -346,9 +334,25 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task RemoveRefreshTokenAsync(Guid clientId, Guid audienceId, Guid userId)
+        public Task RemoveRefreshTokenAsync(AppUser user, AppUserRefresh refresh)
         {
-            var token = _context.AppUserRefresh.Where(x => x.ClientId == clientId && x.AudienceId == audienceId && x.UserId == userId);
+            var token = _context.AppUserRefresh.Where(x => x.UserId == user.Id && x.Id == refresh.Id);
+
+            if (token == null)
+                throw new ArgumentNullException();
+
+            else
+            {
+                _context.AppUserRefresh.RemoveRange(token);
+                _context.SaveChanges();
+            }
+
+            return Task.FromResult(IdentityResult.Success);
+        }
+
+        public Task RemoveRefreshTokensAsync(AppUser user)
+        {
+            var token = _context.AppUserRefresh.Where(x => x.UserId == user.Id);
 
             if (token == null)
                 throw new ArgumentNullException();
@@ -456,11 +460,10 @@ namespace Bhbk.Lib.Identity.Stores
             var model = _context.AppUser.Where(x => x.Id == user.Id).Single();
 
             model.UserName = user.Email;
-            model.NormalizedUserName = user.Email.ToLower();
             model.FirstName = user.FirstName;
             model.LastName = user.LastName;
             model.LockoutEnabled = user.LockoutEnabled;
-            model.LockoutEnd = user.LockoutEnd;
+            model.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
             model.Immutable = user.Immutable;
             model.LastUpdated = DateTime.Now;
 

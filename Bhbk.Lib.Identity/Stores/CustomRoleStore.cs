@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +9,14 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+//https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolestorebase-4
+//https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers
+
 namespace Bhbk.Lib.Identity.Stores
 {
-    //https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers?view=aspnetcore-2.1
     public class CustomRoleStore : RoleStore<AppRole, AppDbContext, Guid>
     {
         private AppDbContext _context;
-        public ModelFactory Mf;
 
         public CustomRoleStore(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)
@@ -25,7 +25,6 @@ namespace Bhbk.Lib.Identity.Stores
                 throw new ArgumentNullException();
 
             _context = context;
-            Mf = new ModelFactory(context);
         }
 
         public override Task<IdentityResult> CreateAsync(AppRole role, CancellationToken cancellationToken = default(CancellationToken))
@@ -44,14 +43,14 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public AppRole FindById(Guid roleId)
+        public override Task<AppRole> FindByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _context.AppRole.Where(x => x.Id == roleId).SingleOrDefault();
+            return Task.FromResult(_context.AppRole.Where(x => x.Id.ToString() == id).SingleOrDefault());
         }
 
-        public AppRole FindByName(string roleName)
+        public override Task<AppRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _context.AppRole.Where(x => x.Name == roleName).SingleOrDefault();
+            return Task.FromResult(_context.AppRole.Where(x => x.Name == normalizedName).SingleOrDefault());
         }
 
         public bool Exists(Guid roleId)
@@ -87,10 +86,10 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppRole.ToList();
         }
 
-        public IList<AppUser> GetUsersAsync(Guid roleId)
+        public IList<AppUser> GetUsersAsync(AppRole role)
         {
             IList<AppUser> result = new List<AppUser>();
-            var list = _context.AppUserRole.Where(x => x.RoleId == roleId).ToList();
+            var list = _context.AppUserRole.Where(x => x.RoleId == role.Id).ToList();
 
             if (list == null)
                 throw new InvalidOperationException();
