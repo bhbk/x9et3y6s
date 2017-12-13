@@ -6,6 +6,7 @@ using Bhbk.WebApi.Identity.Sts.Providers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,17 +20,19 @@ namespace Bhbk.WebApi.Identity.Sts
 {
     public class Startup
     {
+        private static IConfigurationRoot Config;
         public static IIdentityContext Context;
 
         public virtual void ConfigureContext(IServiceCollection services)
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(FileHelper.FindFileInDefaultPaths("appsettings.json").DirectoryName)
-                .AddJsonFile("appsettings.json")
+            Config = new ConfigurationBuilder()
+                .SetBasePath(FileHelper.SearchPaths("appsettings.json").DirectoryName)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             Context = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(config["ConnectionStrings:IdentityEntities"]));
+                .UseSqlServer(Config["ConnectionStrings:IdentityEntities"]));
 
             services.AddSingleton<IIdentityContext>(Context);
         }
@@ -62,6 +65,10 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             services.AddMvc();
             services.AddMvc().AddControllersAsServices();
+            services.Configure<ForwardedHeadersOptions>(headers =>
+            {
+                headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
@@ -69,21 +76,25 @@ namespace Bhbk.WebApi.Identity.Sts
             //order below makes big difference
             if (env.IsDevelopment())
             {
+                log.AddConsole();
+                log.AddDebug();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
             else
             {
+                log.AddConsole();
                 app.UseExceptionHandler();
             }
 
+            app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());
             app.UseStaticFiles();
             app.UseAuthentication();
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc();
 
-            //explicitely mapped elements for STS. want to avoid chained middleware to hit these end-points.
+            //explicitely mapped elements for STS. want to avoid chained middleware for these end-points.
             //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")

@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,18 +19,20 @@ namespace Bhbk.WebApi.Identity.Me
 {
     public class Startup
     {
+        private static IConfigurationRoot Config;
         public static IIdentityContext Context;
 
         //http://asp.net-hacker.rocks/2017/05/08/add-custom-ioc-in-aspnetcore.html
         public virtual void ConfigureContext(IServiceCollection services)
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(FileHelper.FindFileInDefaultPaths("appsettings.json").DirectoryName)
-                .AddJsonFile("appsettings.json")
+            Config = new ConfigurationBuilder()
+                .SetBasePath(FileHelper.SearchPaths("appsettings.json").DirectoryName)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             Context = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(config["ConnectionStrings:IdentityEntities"]));
+                .UseSqlServer(Config["ConnectionStrings:IdentityEntities"]));
 
             services.AddSingleton<IIdentityContext>(Context);
         }
@@ -62,6 +65,10 @@ namespace Bhbk.WebApi.Identity.Me
             });
             services.AddMvc();
             services.AddMvc().AddControllersAsServices();
+            services.Configure<ForwardedHeadersOptions>(headers =>
+            {
+                headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
@@ -69,19 +76,22 @@ namespace Bhbk.WebApi.Identity.Me
             //order below makes big difference
             if (env.IsDevelopment())
             {
+                log.AddDebug();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
             else
             {
+                log.AddConsole();
                 app.UseExceptionHandler();
             }
 
+            app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());
             app.UseStaticFiles();
             app.UseAuthentication();
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc();
         }
     }
 }

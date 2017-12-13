@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_values", _serializer));
             }
-
+            
             Guid clientID, audienceID;
             AppClient client;
             AppAudience audience;

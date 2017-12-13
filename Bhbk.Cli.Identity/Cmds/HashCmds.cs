@@ -26,7 +26,7 @@ namespace Bhbk.Cli.Identity.Cmds
             try
             {
                 var config = new ConfigurationBuilder()
-                    .SetBasePath(FileHelper.FindFileInDefaultPaths("appsettings.json").DirectoryName)
+                    .SetBasePath(FileHelper.SearchPaths("appsettings.json").DirectoryName)
                     .AddJsonFile("appsettings.json")
                     .Build();
 

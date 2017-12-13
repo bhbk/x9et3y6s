@@ -1,0 +1,15 @@
+﻿[Unit]
+Description=Bhbk WebApi Identity Sts
+
+[Service]
+WorkingDirectory=/<working-directory>/
+ExecStart=/usr/bin/dotnet /<working-directory>/Bhbk.WebApi.Identity.Sts.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=bhbk.webapi.identity.sts
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target

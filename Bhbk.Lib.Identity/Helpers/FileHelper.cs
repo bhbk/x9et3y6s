@@ -5,26 +5,36 @@ namespace Bhbk.Lib.Identity.Helpers
 {
     public class FileHelper
     {
-        public static FileInfo FindFileInDefaultPaths(string file)
+        public static FileInfo SearchPaths(string file)
         {
             string result;
 
-            result = Directory.GetCurrentDirectory() + @"\" + file;
+            result = Directory.GetCurrentDirectory() 
+                + Path.DirectorySeparatorChar + file;
+
+            if (File.Exists(result))
+                return new FileInfo(result);
+            
+            result = Directory.GetCurrentDirectory() 
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + file;
 
             if (File.Exists(result))
                 return new FileInfo(result);
 
-            result = Directory.GetCurrentDirectory() + @"\..\..\..\" + file;
+            result = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName
+                + Path.DirectorySeparatorChar + file;
 
             if (File.Exists(result))
                 return new FileInfo(result);
 
-            result = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName + @"\" + file;
-
-            if (File.Exists(result))
-                return new FileInfo(result);
-
-            result = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName + @"\..\..\..\" + file;
+            result = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + file;
 
             if (File.Exists(result))
                 return new FileInfo(result);
