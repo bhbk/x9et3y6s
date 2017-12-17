@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class StsHelperV1
+    public class StsV1Helper
     {
         public async Task<HttpResponseMessage> GetAccessToken(TestServer owin, string client, string audience, string user, string password)
         {

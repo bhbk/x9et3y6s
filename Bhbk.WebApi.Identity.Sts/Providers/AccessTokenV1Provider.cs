@@ -15,20 +15,20 @@ using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class ExtendAccessTokenProviderV1
+    public static class AccessTokenV1Extension
     {
-        public static IApplicationBuilder UseAccessTokenProviderV1(this IApplicationBuilder app)
+        public static IApplicationBuilder UseAccessTokenV1Provider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AccessTokenProviderV1>();
+            return app.UseMiddleware<AccessTokenV1Provider>();
         }
     }
 
-    public class AccessTokenProviderV1
+    public class AccessTokenV1Provider
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AccessTokenProviderV1(RequestDelegate next)
+        public AccessTokenV1Provider(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserIDV1)
-                || !context.Request.Form.ContainsKey("password"))
+                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrPasswordIDV1))
                 return _next(context);
 
             var postValues = context.Request.ReadFormAsync().Result;
@@ -53,25 +53,25 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
             string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
             string userValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV1).Value;
-            string passwordValue = postValues.FirstOrDefault(x => x.Key == "password").Value;
+            string passwordValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrPasswordIDV1).Value;
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
                 || string.IsNullOrEmpty(audienceValue)
-                || !grantTypeValue.Equals("password")
+                || !grantTypeValue.Equals(BaseLib.Statics.AttrPasswordIDV1)
                 || string.IsNullOrEmpty(userValue)
                 || string.IsNullOrEmpty(passwordValue))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_values", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSystemParametersInvalid }, _serializer));
             }
             
             Guid clientID, audienceID;
             AppClient client;
             AppAudience audience;
 
-            var ioc = context.RequestServices.GetService<IIdentityContext>();
+            var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
 
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_client", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
             }
 
             //check if identifier is guid. resolve to guid if not.
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_audience", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
             }
 
             var user = ioc.UserMgmt.FindByNameAsync(userValue).Result;
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_user", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
             //check that user is confirmed...
@@ -119,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_user", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
             var logins = ioc.UserMgmt.GetLoginsAsync(user).Result;
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_login", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginInvalid }, _serializer));
             }
 
             //check if login provider is local...
@@ -144,18 +144,19 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_user", _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
                 }
             }
             else
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_login", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginInvalid }, _serializer));
             }
 
-            var access = JwtHelperV1.GenerateAccessToken(context, client, audience, user).Result;
-            var refresh = JwtHelperV1.GenerateRefreshToken(context, client, audience, user).Result;
+            
+            var access = JwtV1Helper.GenerateAccessToken(context, client, audience, user).Result;
+            var refresh = JwtV1Helper.GenerateRefreshToken(context, client, audience, user).Result;
 
             var result = new
             {

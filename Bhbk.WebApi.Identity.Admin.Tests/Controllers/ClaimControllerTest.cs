@@ -29,13 +29,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Claim_Create_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClaimController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ClaimController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType,
-                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4));
+                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4));
 
             var result = await controller.CreateClaim(user.Id, claim) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -47,15 +47,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Claim_Delete_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClaimController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ClaimController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType,
-                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4));
+                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4));
 
-            var add = await Context.UserMgmt.AddClaimAsync(user, claim);
+            var add = await IoC.UserMgmt.AddClaimAsync(user, claim);
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
@@ -69,11 +69,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Claim_Get_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClaimController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ClaimController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.GetClaims(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

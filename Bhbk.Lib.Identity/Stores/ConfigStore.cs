@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Stores
         public void ReadJson()
         {
             var config = new ConfigurationBuilder()
-                .SetBasePath(FileHelper.SearchPaths("globalsettings.json").DirectoryName)
+                .SetBasePath(FileSystemHelper.SearchUsualPaths("globalsettings.json").DirectoryName)
                 .AddJsonFile("globalsettings.json")
                 .Build();
 

@@ -1,7 +1,13 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.WebApi.Identity.Me.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -13,8 +19,18 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public DetailController() { }
 
-        public DetailController(IIdentityContext context)
-            : base(context) { }
+        public DetailController(IIdentityContext ioc)
+            : base(ioc) { }
+
+        [Route("v1/quote-of-day"), HttpGet]
+        [AllowAnonymous]
+        public IActionResult QuoteOfDay()
+        {
+            var sc = HttpContext.RequestServices.GetServices<IHostedService>();
+            var svc = (QuoteOfDayTask)sc.Single(x => x.GetType() == typeof(QuoteOfDayTask));
+
+            return Ok(svc.QuoteOfDay.Result);
+        }
 
         [Route("v1/change-email"), HttpPut]
         public async Task<IActionResult> AskChangeEmail(UserChangeEmail model)
@@ -22,10 +38,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -33,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (user.Email != model.CurrentEmail)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
 
-            else if (await Context.UserMgmt.GetEmailAsync(user) != user.Email)
+            else if (await IoC.UserMgmt.GetEmailAsync(user) != user.Email)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
 
             else if (model.NewEmail != model.NewEmailConfirm)
@@ -41,9 +57,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                string token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
+                string token = await IoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
 
-                if (Context.ContextStatus == ContextType.UnitTest)
+                if (IoC.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
@@ -59,15 +75,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await Context.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -75,9 +91,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                string token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
+                string token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
 
-                if (Context.ContextStatus == ContextType.UnitTest)
+                if (IoC.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
@@ -93,15 +109,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (await Context.UserMgmt.GetPhoneNumberAsync(user) != model.CurrentPhoneNumber)
+            else if (await IoC.UserMgmt.GetPhoneNumberAsync(user) != model.CurrentPhoneNumber)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPhone);
 
             else if (model.NewPhoneNumber != model.NewPhoneNumberConfirm)
@@ -109,9 +125,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                string token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.NewPhoneNumber);
+                string token = await IoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.NewPhoneNumber);
 
-                if (Context.ContextStatus == ContextType.UnitTest)
+                if (IoC.ContextStatus == ContextType.UnitTest)
                     return Ok(token);
                 else
                 {
@@ -135,19 +151,19 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            bool current = await Context.UserMgmt.GetTwoFactorEnabledAsync(user);
+            bool current = await IoC.UserMgmt.GetTwoFactorEnabledAsync(user);
 
             if (current == status)
-                return BadRequest(BaseLib.Statics.MsgUserTwoFactorAlreadyExists);
+                return BadRequest(BaseLib.Statics.MsgUserInvalidTwoFactor);
 
             else
             {
-                var result = await Context.UserMgmt.SetTwoFactorEnabledAsync(user, status);
+                var result = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, status);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -163,10 +179,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -174,7 +190,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else
             {
                 var update = new UserFactory<UserUpdate>(model);
-                var result = await Context.UserMgmt.UpdateAsync(update.Devolve());
+                var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);

@@ -18,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public LoginController() { }
 
-        public LoginController(IIdentityContext context)
-            : base(context) { }
+        public LoginController(IIdentityContext ioc)
+            : base(ioc) { }
 
         [Route("v1/{loginID}/add/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -28,19 +28,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = await Context.LoginMgmt.FindByIdAsync(loginID);
+            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginNotExist);
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else
             {
-                var result = await Context.UserMgmt.AddLoginAsync(user, 
+                var result = await IoC.UserMgmt.AddLoginAsync(user, 
                     new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
 
                 if (!result.Succeeded)
@@ -58,13 +58,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = await Context.LoginMgmt.FindByNameAsync(model.LoginProvider);
+            var login = await IoC.LoginMgmt.FindByNameAsync(model.LoginProvider);
 
             if (login != null)
                 return BadRequest(BaseLib.Statics.MsgLoginAlreadyExists);
 
             var create = new LoginFactory<LoginCreate>(model);
-            var result = await Context.LoginMgmt.CreateAsync(create.Devolve());
+            var result = await IoC.LoginMgmt.CreateAsync(create.Devolve());
 
             return Ok(create.Evolve());
         }
@@ -73,12 +73,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteLogin(Guid loginID)
         {
-            var login = await Context.LoginMgmt.FindByIdAsync(loginID);
+            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginNotExist);
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            if (!await Context.LoginMgmt.DeleteAsync(loginID))
+            else if (login.LoginProvider == BaseLib.Statics.ApiDefaultLogin)
+                return BadRequest(BaseLib.Statics.MsgLoginImmutable);
+
+            if (!await IoC.LoginMgmt.DeleteAsync(loginID))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             else
@@ -88,10 +91,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{loginID}"), HttpGet]
         public async Task<IActionResult> GetLogin(Guid loginID)
         {
-            var login = await Context.LoginMgmt.FindByIdAsync(loginID);
+            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginNotExist);
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
             var result = new LoginFactory<AppLogin>(login);
 
@@ -102,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetLogins()
         {
             IList<LoginResult> result = new List<LoginResult>();
-            var logins = await Context.LoginMgmt.GetListAsync();
+            var logins = await IoC.LoginMgmt.GetListAsync();
 
             foreach (AppLogin entry in logins)
                 result.Add(new LoginFactory<AppLogin>(entry).Evolve());
@@ -113,13 +116,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{loginID}/users"), HttpGet]
         public async Task<IActionResult> GetLoginUsers(Guid loginID)
         {
-            var login = await Context.LoginMgmt.FindByIdAsync(loginID);
+            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginNotExist);
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
             IList<UserResult> result = new List<UserResult>();
-            var users = await Context.LoginMgmt.GetUsersListAsync(loginID);
+            var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
 
             foreach (AppUser entry in users)
                 result.Add(new UserFactory<AppUser>(entry).Evolve());
@@ -134,19 +137,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = await Context.LoginMgmt.FindByIdAsync(loginID);
+            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginNotExist);
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else
             {
-                var result = await Context.UserMgmt.RemoveFromProviderAsync(user, Context.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
+                var result = await IoC.UserMgmt.RemoveFromProviderAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -163,15 +166,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = await Context.LoginMgmt.FindByIdAsync(model.Id);
+            var login = await IoC.LoginMgmt.FindByIdAsync(model.Id);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginNotExist);
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
             else
             {
                 var update = new LoginFactory<LoginUpdate>(model);
-                var result = await Context.LoginMgmt.UpdateAsync(update.Devolve());
+                var result = await IoC.LoginMgmt.UpdateAsync(update.Devolve());
 
                 return Ok(update.Evolve());
             }

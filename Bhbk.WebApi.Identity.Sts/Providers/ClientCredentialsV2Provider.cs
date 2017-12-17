@@ -1,27 +1,26 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System;
 using System.Net;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
-using Microsoft.AspNetCore.Builder;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class ExtendAuthorizationCodeProviderV2
+    public static class ClientCredentialsV2Extension
     {
-        public static IApplicationBuilder UseAuthorizationCodeProviderV2(this IApplicationBuilder app)
+        public static IApplicationBuilder UseClientCredentialsV2Provider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AuthorizationCodeProviderV2>();
+            return app.UseMiddleware<ClientCredentialsV2Provider>();
         }
     }
 
-    public class AuthorizationCodeProviderV2
+    public class ClientCredentialsV2Provider
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AuthorizationCodeProviderV2(RequestDelegate next)
+        public ClientCredentialsV2Provider(RequestDelegate next)
         {
             _next = next;
 
@@ -37,12 +36,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || !context.Request.Form.ContainsKey("redirect_uri")
-                || !context.Request.Form.ContainsKey("code"))
+                || !context.Request.Form.ContainsKey("client_secret"))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_values", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSystemParametersInvalid }, _serializer));
             }
 
             return _next(context);

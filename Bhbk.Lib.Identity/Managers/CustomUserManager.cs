@@ -624,7 +624,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            await Store.SetSecurityStampAsync(user, Helpers.EntrophyHelper.GenerateRandomBase64(32));
+            await Store.SetSecurityStampAsync(user, Helpers.CryptoHelper.GenerateRandomBase64(32));
 
             return IdentityResult.Success;
         }

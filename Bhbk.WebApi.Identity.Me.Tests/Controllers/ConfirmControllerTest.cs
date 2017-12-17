@@ -26,12 +26,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Confirm_ChangeEmail_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -43,23 +43,23 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewEmailConfirm = email
             };
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
+            var token = await IoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailChange(model,
-                EntrophyHelper.GenerateRandomBase64(Context.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(IoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_ChangeEmail_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewEmailConfirm = email
             };
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
+            var token = await IoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailChange(model, token) as NoContentResult;
@@ -81,41 +81,41 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Confirm_ChangePassword_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = EntrophyHelper.GenerateRandomBase64(16),
+                CurrentPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
                 NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
+            var token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordChange(model,
-                EntrophyHelper.GenerateRandomBase64(Context.ConfigMgmt.Tweaks.DefaultPasswordLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(IoC.ConfigMgmt.Tweaks.DefaultPasswordLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.CheckPasswordAsync(user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var check = await IoC.UserMgmt.CheckPasswordAsync(user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_ChangePassword_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -127,24 +127,24 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
+            var token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordChange(model, token) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            var check = await IoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_ChangePhone_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -156,23 +156,23 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPhoneNumberConfirm = string.Empty
             };
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
+            var token = await IoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneChange(model,
-                EntrophyHelper.GenerateRandomBase64(Context.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(IoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_ChangePhone_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
             string phone = "32221110000";
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -184,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 NewPhoneNumberConfirm = phone
             };
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
+            var token = await IoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneChange(model, token) as NoContentResult;
@@ -194,36 +194,36 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Confirm_SetEmail_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
+            var token = await IoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmail(user.Id,
-                EntrophyHelper.GenerateRandomBase64(Context.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(IoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_SetEmail_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
+            var token = await IoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmail(user.Id, token) as NoContentResult;
@@ -233,34 +233,34 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Confirm_SetPassword_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
+            var token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPassword(user.Id,
-                EntrophyHelper.GenerateRandomBase64(Context.ConfigMgmt.Tweaks.DefaultPasswordLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(IoC.ConfigMgmt.Tweaks.DefaultPasswordLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_SetPassword_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
+            var token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPassword(user.Id, token) as NoContentResult;
@@ -270,34 +270,34 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Confirm_SetPhoneNumber_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+            var token = await IoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhone(user.Id,
-                EntrophyHelper.GenerateRandomBase64(Context.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(IoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_Confirm_SetPhoneNumber_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ConfirmController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new ConfirmController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var token = await Context.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+            var token = await IoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhone(user.Id, token) as NoContentResult;

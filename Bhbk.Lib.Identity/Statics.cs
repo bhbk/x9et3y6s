@@ -35,7 +35,6 @@ namespace Bhbk.Lib.Identity
         #region Configuration Settings
         public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
         public const String ApiDefaultClient = "Bhbk";
-        public const String ApiDefaultConfig = "Global.config";
         public const String ApiDefaultPhone = "12223334444";
         public const String ApiDefaultLogin = "local";
         public const String ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
@@ -55,8 +54,7 @@ namespace Bhbk.Lib.Identity
         public const String ApiUnitTestPasswordCurrent = "3uetw7W$mswU";
         public const String ApiUnitTestPasswordNew = "mv7wd3dks&k3";
         public const String ApiUnitTestRole = "Role-UnitTests-";
-        public const String ApiUnitTestUserDisplayName = "User-UnitTests-";
-        public const String ApiUnitTestUserEmail = "unit-tests@";
+        public const String ApiUnitTestUser = "unit-tests@";
         public const String ApiUnitTestLogin = "Login-UnitTests-";
         public const String ApiUnitTestLoginKey = "Login-UnitTests-sxW8wlsw1Z04heUckw";
         public const String ApiUnitTestLoginName = "Login-UnitTests-";
@@ -67,39 +65,31 @@ namespace Bhbk.Lib.Identity
         #region Message Settings
         public const String MsgAudienceAlreadyExists = "Audience already exists";
         public const String MsgAudienceImmutable = "Audience is immutable";
-        public const String MsgAudienceInvalid = "Audience is invalid";
-        public const String MsgAudienceNotExist = "Audience does not exist";
+        public const String MsgAudienceInvalid = "Audience is invalid or disabled";
         public const String MsgClientAlreadyExists = "Client already exists";
         public const String MsgClientImmutable = "Client is immutable";
-        public const String MsgClientInvalid = "Client is invalid";
-        public const String MsgClientNotExist = "Client does not exist";
-        public const String MsgGrantTypeInvalid = "Grant type is invalid";
+        public const String MsgClientInvalid = "Client is invalid or disabled";
         public const String MsgLoginAlreadyExists = "Login already exists";
         public const String MsgLoginImmutable = "Login is immutable";
-        public const String MsgLoginInvalid = "Login invalid";
-        public const String MsgLoginNotExist = "Login does not exist";
+        public const String MsgLoginInvalid = "Login invalid or disabled";
         public const String MsgRoleAlreadyExists = "Role already exists";
         public const String MsgRoleImmutable = "Role is immutable";
-        public const String MsgRoleInvalid = "Role invalid";
-        public const String MsgRoleNotAdded = "Role was not added";
+        public const String MsgRoleInvalid = "Role invalid or disabled";
         public const String MsgRoleNotExist = "Role does not exist";
-        public const String MsgRoleNotRemoved = "Role was not removed";
+        public const String MsgSystemParametersInvalid = "Parameters invalid";
+        public const String MsgSystemExceptionCaught = "Exception was caught";
         public const String MsgUserAlreadyExists = "User already exists";
         public const String MsgUserImmutable = "User is immutable";
-        public const String MsgUserInvalid = "User is invalid, locked or disabled";
+        public const String MsgUserInvalid = "User is invalid, locked or disabled.";
         public const String MsgUserInvalidCurrentEmail = "User current email incorrect";
         public const String MsgUserInvalidCurrentPassword = "User current password incorrect";
         public const String MsgUserInvalidCurrentPhone = "User current phone incorrect";
         public const String MsgUserInvalidEmailConfirm = "User new email does not match confirm email";
+        public const String MsgUserInvalidPassword = "User password invalid";
         public const String MsgUserInvalidPasswordConfirm = "User new password does not match confirm password";
         public const String MsgUserInvalidPhoneConfirm = "User new phone does not match confirm phone";
-        public const String MsgUserLocked = "User is locked";
-        public const String MsgUserNotExist = "User does not exist";
-        public const String MsgUserPasswordExists = "User already has password";
-        public const String MsgUserPasswordNotExists = "User does not have password";
         public const String MsgUserInvalidToken = "User token is invalid";
-        public const String MsgUserTwoFactorAlreadyExists = "User two factor invalid";
-        public const String MsgUserUnconfirmed = "User is unconfirmed";
+        public const String MsgUserInvalidTwoFactor = "User two factor is invalid";
         #endregion
     }
 }

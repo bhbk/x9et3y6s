@@ -14,8 +14,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClaimController() { }
 
-        public ClaimController(IIdentityContext context)
-            : base(context) { }
+        public ClaimController(IIdentityContext ioc)
+            : base(ioc) { }
 
         [Route("v1/{userID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -24,14 +24,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else
             {
-                var result = await Context.UserMgmt.AddClaimAsync(user, model);
+                var result = await IoC.UserMgmt.AddClaimAsync(user, model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -48,14 +48,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
             
             else
             {
-                var result = await Context.UserMgmt.RemoveClaimAsync(user, claim);
+                var result = await IoC.UserMgmt.RemoveClaimAsync(user, claim);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -68,12 +68,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID}"), HttpGet]
         public async Task<IActionResult> GetClaims(Guid userID)
         {
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            return Ok(await Context.UserMgmt.GetClaimsAsync(user));
+            return Ok(await IoC.UserMgmt.GetClaimsAsync(user));
         }
     }
 }

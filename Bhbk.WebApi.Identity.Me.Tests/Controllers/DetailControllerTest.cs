@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.WebApi.Identity.Me.Controllers;
+using Bhbk.WebApi.Identity.Me.Providers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -27,21 +27,37 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
+        public void Api_Me_Detail_GetQuoteOfDay_Success()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
+
+            controller.SetUser(user.Id);
+
+            var result = controller.QuoteOfDay() as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<QuoteOfDayResult>().Subject;
+        }
+
+        [TestMethod]
         public async Task Api_Me_Detail_AskChangeEmail_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
             var model = new UserChangeEmail()
             {
                 Id = user.Id,
-                CurrentEmail = BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4),
+                CurrentEmail = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
                 NewEmail = email,
                 NewEmailConfirm = email
             };
@@ -57,12 +73,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_AskChangeEmail_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -86,18 +102,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_AskChangePassword_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = EntrophyHelper.GenerateRandomBase64(16),
+                CurrentPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
                 NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
@@ -109,11 +125,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_AskChangePassword_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -133,12 +149,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_AskChangePhone_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
             string phone = "01112223333";
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -157,12 +173,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_AskChangePhone_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
             string phone = "01112223333";
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -182,11 +198,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public void Api_Me_Detail_GetClaimList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
@@ -198,15 +214,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_TwoFactor_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 
-            var status = await Context.UserMgmt.SetTwoFactorEnabledAsync(user, false);
+            var status = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, false);
             status.Should().BeAssignableTo(typeof(IdentityResult));
             status.Succeeded.Should().BeTrue();
 
@@ -217,11 +233,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_Detail_Update_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new DetailController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new DetailController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             controller.SetUser(user.Id);
 

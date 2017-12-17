@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class StsHelperV2
+    public class StsV2Helper
     {
         public async Task<HttpResponseMessage> GetAuthorizationRequest(TestServer owin, string client, string redirectUri, string state)
         {

@@ -16,8 +16,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public UserController() { }
 
-        public UserController(IIdentityContext context)
-            : base(context) { }
+        public UserController(IIdentityContext ioc)
+            : base(ioc) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -26,13 +26,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByNameAsync(model.Email);
+            var user = await IoC.UserMgmt.FindByNameAsync(model.Email);
 
             if (user != null)
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
 
             var create = new UserFactory<AppUser>(model);
-            var result = await Context.UserMgmt.CreateAsync(create.Devolve());
+            var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -45,17 +45,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteUser(Guid userID)
         {
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Immutable)
                 return BadRequest(BaseLib.Statics.MsgUserImmutable);
 
             else
             {
-                var result = await Context.UserMgmt.DeleteAsync(user);
+                var result = await IoC.UserMgmt.DeleteAsync(user);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -68,10 +68,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID}"), HttpGet]
         public async Task<IActionResult> GetUser(Guid userID)
         {
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -81,10 +81,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{username}"), HttpGet]
         public async Task<IActionResult> GetUserByName(string username)
         {
-            var user = await Context.UserMgmt.FindByNameAsync(username);
+            var user = await IoC.UserMgmt.FindByNameAsync(username);
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -94,12 +94,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID}/logins"), HttpGet]
         public async Task<IActionResult> GetUserLogins(Guid userID)
         {
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var result = await Context.UserMgmt.GetLoginsAsync(user);
+            var result = await IoC.UserMgmt.GetLoginsAsync(user);
 
             return Ok(result);
         }
@@ -107,12 +107,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID}/roles"), HttpGet]
         public async Task<IActionResult> GetUserRoles(Guid userID)
         {
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var result = await Context.UserMgmt.GetRolesAsync(user);
+            var result = await IoC.UserMgmt.GetRolesAsync(user);
 
             return Ok(result);
         }
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetUsers()
         {
             IList<UserResult> result = new List<UserResult>();
-            var users = await Context.UserMgmt.GetListAsync();
+            var users = await IoC.UserMgmt.GetListAsync();
 
             foreach (AppUser entry in users)
                 result.Add(new UserFactory<AppUser>(entry).Evolve());
@@ -136,17 +136,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
             else
             {
-                var result = await Context.UserMgmt.AddPasswordAsync(user, model.NewPassword);
+                var result = await IoC.UserMgmt.AddPasswordAsync(user, model.NewPassword);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -163,17 +163,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await Context.UserMgmt.HasPasswordAsync(user))
-                return BadRequest(BaseLib.Statics.MsgUserPasswordNotExists);
+            else if (!await IoC.UserMgmt.HasPasswordAsync(user))
+                return BadRequest(BaseLib.Statics.MsgUserInvalidPassword);
 
             else
             {
-                var result = await Context.UserMgmt.RemovePasswordAsync(user);
+                var result = await IoC.UserMgmt.RemovePasswordAsync(user);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -190,18 +190,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
             else
             {
-                string token = await Context.UserMgmt.GeneratePasswordResetTokenAsync(user);
-                var result = await Context.UserMgmt.ResetPasswordAsync(user, token, model.NewPassword);
+                string token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
+                var result = await IoC.UserMgmt.ResetPasswordAsync(user, token, model.NewPassword);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
@@ -218,10 +218,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await Context.UserMgmt.FindByIdAsync(model.Id.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(model.Id.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserNotExist);
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Immutable)
                 return BadRequest(BaseLib.Statics.MsgUserImmutable);
@@ -229,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else
             {
                 var update = new UserFactory<UserUpdate>(model);
-                var result = await Context.UserMgmt.UpdateAsync(update.Devolve());
+                var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);

@@ -17,8 +17,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClientController() { }
 
-        public ClientController(IIdentityContext context)
-            : base(context) { }
+        public ClientController(IIdentityContext ioc)
+            : base(ioc) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -27,13 +27,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var client = await Context.ClientMgmt.FindByNameAsync(model.Name);
+            var client = await IoC.ClientMgmt.FindByNameAsync(model.Name);
 
             if (client != null)
                 return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);
 
             var create = new ClientFactory<ClientCreate>(model);
-            var result = await Context.ClientMgmt.CreateAsync(create.Devolve());
+            var result = await IoC.ClientMgmt.CreateAsync(create.Devolve());
 
             return Ok(create.Evolve());
         }
@@ -42,15 +42,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteClient(Guid clientID)
         {
-            var client = await Context.ClientMgmt.FindByIdAsync(clientID);
+            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+                return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
             else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);
 
-            if (!await Context.ClientMgmt.DeleteAsync(clientID))
+            if (!await IoC.ClientMgmt.DeleteAsync(clientID))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             else
@@ -60,10 +60,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{clientID}"), HttpGet]
         public async Task<IActionResult> GetClient(Guid clientID)
         {
-            var client = await Context.ClientMgmt.FindByIdAsync(clientID);
+            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+                return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
             var result = new ClientFactory<AppAudience>(client);
 
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClients()
         {
             IList<ClientResult> result = new List<ClientResult>();
-            var users = await Context.ClientMgmt.GetListAsync();
+            var users = await IoC.ClientMgmt.GetListAsync();
 
             foreach (AppClient entry in users)
                 result.Add(new ClientFactory<AppClient>(entry).Evolve());
@@ -85,13 +85,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{clientID}/audiences"), HttpGet]
         public async Task<IActionResult> GetClientAudiences(Guid clientID)
         {
-            var client = await Context.ClientMgmt.FindByIdAsync(clientID);
+            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+                return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
             IList<AudienceResult> result = new List<AudienceResult>();
-            var audiences = await Context.ClientMgmt.GetAudiencesAsync(clientID);
+            var audiences = await IoC.ClientMgmt.GetAudiencesAsync(clientID);
 
             foreach (AppAudience entry in audiences)
                 result.Add(new AudienceFactory<AppAudience>(entry).Evolve());
@@ -106,10 +106,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var client = await Context.ClientMgmt.FindByIdAsync(model.Id);
+            var client = await IoC.ClientMgmt.FindByIdAsync(model.Id);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientNotExist);
+                return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
             else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else
             {
                 var update = new ClientFactory<ClientUpdate>(model);
-                var result = await Context.ClientMgmt.UpdateAsync(update.Devolve());
+                var result = await IoC.ClientMgmt.UpdateAsync(update.Devolve());
 
                 return Ok(update.Evolve());
             }

@@ -3,27 +3,12 @@ using System.Reflection;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class FileHelper
+    public class FileSystemHelper
     {
-        public static FileInfo SearchPaths(string file)
+        public static FileInfo SearchUsualPaths(string file)
         {
             string result;
 
-            result = Directory.GetCurrentDirectory() 
-                + Path.DirectorySeparatorChar + file;
-
-            if (File.Exists(result))
-                return new FileInfo(result);
-            
-            result = Directory.GetCurrentDirectory() 
-                + Path.DirectorySeparatorChar + ".."
-                + Path.DirectorySeparatorChar + ".."
-                + Path.DirectorySeparatorChar + ".."
-                + Path.DirectorySeparatorChar + file;
-
-            if (File.Exists(result))
-                return new FileInfo(result);
-
             result = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName
                 + Path.DirectorySeparatorChar + file;
 
@@ -31,6 +16,21 @@ namespace Bhbk.Lib.Identity.Helpers
                 return new FileInfo(result);
 
             result = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + ".."
+                + Path.DirectorySeparatorChar + file;
+
+            if (File.Exists(result))
+                return new FileInfo(result);
+
+            result = Directory.GetCurrentDirectory()
+                + Path.DirectorySeparatorChar + file;
+
+            if (File.Exists(result))
+                return new FileInfo(result);
+
+            result = Directory.GetCurrentDirectory()
                 + Path.DirectorySeparatorChar + ".."
                 + Path.DirectorySeparatorChar + ".."
                 + Path.DirectorySeparatorChar + ".."

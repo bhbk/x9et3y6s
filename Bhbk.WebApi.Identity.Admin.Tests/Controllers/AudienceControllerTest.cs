@@ -26,17 +26,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Audience_Create_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestAudience + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4);
-            var controller = new AudienceController(Context);
+            string name = BaseLib.Statics.ApiUnitTestAudience + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
+            var controller = new AudienceController(IoC);
             var model = new AudienceCreate()
             {
-                ClientId = Context.ClientMgmt.Store.Get().First().Id,
+                ClientId = IoC.ClientMgmt.Store.Get().First().Id,
                 Name = name,
                 AudienceType = BaseLib.AudienceType.thin_client.ToString(),
-                AudienceKey = BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(32),
+                AudienceKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
                 Enabled = true,
                 Immutable = false
             };
@@ -51,27 +51,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Audience_Delete_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new AudienceController(Context);
-            var audience = Context.AudienceMgmt.Store.Get().First();
+            var controller = new AudienceController(IoC);
+            var audience = IoC.AudienceMgmt.Store.Get().First();
 
             var result = await controller.DeleteAudience(audience.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = Context.AudienceMgmt.Store.Get(x => x.Id == audience.Id).Any();
+            var check = IoC.AudienceMgmt.Store.Get(x => x.Id == audience.Id).Any();
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_Audience_Get_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new AudienceController(Context);
-            var audience = Context.AudienceMgmt.Store.Get().First();
+            var controller = new AudienceController(IoC);
+            var audience = IoC.AudienceMgmt.Store.Get().First();
 
             var result = await controller.GetAudience(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -83,47 +83,47 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Audience_GetList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new AudienceController(Context);
+            var controller = new AudienceController(IoC);
 
             var result = await controller.GetAudiences() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
-            data.Count().Should().Equals(Context.AudienceMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.AudienceMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Audience_GetRoleList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new AudienceController(Context);
-            var audience = Context.AudienceMgmt.Store.Get().First();
+            var controller = new AudienceController(IoC);
+            var audience = IoC.AudienceMgmt.Store.Get().First();
 
             var result = await controller.GetAudienceRoles(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
-            data.Count().Should().Equals(Context.RoleMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.RoleMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Audience_Update_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestAudience + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4);
-            var controller = new AudienceController(Context);
-            var audience = Context.AudienceMgmt.Store.Get().First();
+            string name = BaseLib.Statics.ApiUnitTestAudience + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
+            var controller = new AudienceController(IoC);
+            var audience = IoC.AudienceMgmt.Store.Get().First();
             var model = new AudienceUpdate()
             {
                 Id = audience.Id,
-                ClientId = Context.ClientMgmt.Store.Get().First().Id,
+                ClientId = IoC.ClientMgmt.Store.Get().First().Id,
                 Name = name + "(Updated)",
                 AudienceType = audience.AudienceType,
                 AudienceKey = audience.AudienceKey,

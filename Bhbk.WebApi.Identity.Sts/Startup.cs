@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Sts.Providers;
+using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,8 +11,10 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System;
 using System.Linq;
 using System.Text;
@@ -20,33 +23,37 @@ namespace Bhbk.WebApi.Identity.Sts
 {
     public class Startup
     {
-        private static IConfigurationRoot Config;
-        public static IIdentityContext Context;
+        private static IConfigurationRoot _config;
+        private static IIdentityContext _ioc;
 
-        public virtual void ConfigureContext(IServiceCollection services)
+        public virtual void ConfigureContext(IServiceCollection sc)
         {
-            Config = new ConfigurationBuilder()
-                .SetBasePath(FileHelper.SearchPaths("appsettings.json").DirectoryName)
+            var location = FileSystemHelper.SearchUsualPaths("appsettings.json");
+
+            _config = new ConfigurationBuilder()
+                .SetBasePath(location.DirectoryName)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            Context = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(Config["ConnectionStrings:IdentityEntities"]));
+            _ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(_config["ConnectionStrings:IdentityEntities"]));
 
-            services.AddSingleton<IIdentityContext>(Context);
+            sc.AddSingleton<IIdentityContext>(_ioc);
+            sc.AddSingleton<IHostedService>(new MaintainTokensTask(_ioc));
+            sc.AddSingleton<IHostedService>(new TestingTask(_ioc));
         }
 
-        public virtual void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection sc)
         {
-            ConfigureContext(services);
+            ConfigureContext(sc);
 
-            var sp = services.BuildServiceProvider();
-            var ioc = sp.GetService<IIdentityContext>();
+            var sp = sc.BuildServiceProvider();
+            var ioc = sp.GetRequiredService<IIdentityContext>();
 
-            services.AddLogging();
-            services.AddCors();
-            services.AddAuthentication(auth =>
+            sc.AddLogging(log => log.AddSerilog());
+            sc.AddCors();
+            sc.AddAuthentication(auth =>
             {
                 auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -63,9 +70,9 @@ namespace Bhbk.WebApi.Identity.Sts
                     RequireSignedTokens = true,
                 };
             });
-            services.AddMvc();
-            services.AddMvc().AddControllersAsServices();
-            services.Configure<ForwardedHeadersOptions>(headers =>
+            sc.AddMvc();
+            sc.AddMvc().AddControllersAsServices();
+            sc.Configure<ForwardedHeadersOptions>(headers =>
             {
                 headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
@@ -73,18 +80,15 @@ namespace Bhbk.WebApi.Identity.Sts
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
         {
-            //order below makes big difference
+            //order below is important...
             if (env.IsDevelopment())
             {
-                log.AddConsole();
-                log.AddDebug();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
             else
             {
-                log.AddConsole();
                 app.UseExceptionHandler();
             }
 
@@ -100,56 +104,56 @@ namespace Bhbk.WebApi.Identity.Sts
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseAccessTokenProviderV1();
+                    x.UseAccessTokenV1Provider();
                 });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseAuthorizationCodeProviderV1();
+                    x.UseAuthorizationCodeV1Provider();
                 });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/client", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseClientCredentialsProviderV1();
+                    x.UseClientCredentialsV1Provider();
                 });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseRefreshTokenProviderV1();
+                    x.UseRefreshTokenV1Provider();
                 });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseAccessTokenProviderV2();
+                    x.UseAccessTokenV2Provider();
                 });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseAuthorizationCodeProviderV2();
+                    x.UseAuthorizationCodeV2Provider();
                 });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
                && context.Request.Method.Equals("POST")
                && context.Request.HasFormContentType, x =>
                {
-                   x.UseClientCredentialsProviderV2();
+                   x.UseClientCredentialsV2Provider();
                });
 
             app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType, x =>
                 {
-                    x.UseRefreshTokenProviderV2();
+                    x.UseRefreshTokenV2Provider();
                 });
 
         }

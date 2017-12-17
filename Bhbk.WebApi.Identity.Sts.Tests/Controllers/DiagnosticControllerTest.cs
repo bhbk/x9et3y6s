@@ -22,7 +22,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public void Api_Sts_Diagnostic_GetVersion_Success()
         {
-            var controller = new DiagnosticController(Context);
+            var controller = new DiagnosticController(IoC);
 
             var result = controller.GetVersion() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

@@ -2,10 +2,12 @@
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 //http://www.dotnetcurry.com/aspnet-core/1420/integration-testing-aspnet-core
@@ -14,18 +16,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 {
     public class StartupTest : Startup
     {
-        protected static IIdentityContext Context;
-        protected static DataHelper TestData;
+        protected static IIdentityContext IoC;
+        protected static DatasetHelper TestData;
 
-        public override void ConfigureContext(IServiceCollection services)
+        public override void ConfigureContext(IServiceCollection sc)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>();
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            Context = new CustomIdentityContext(options);
-            TestData = new DataHelper(Context);
+            IoC = new CustomIdentityContext(options);
+            TestData = new DatasetHelper(IoC);
 
-            services.AddSingleton<IIdentityContext>(Context);
+            sc.AddSingleton<IIdentityContext>(IoC);
+            sc.AddSingleton<IHostedService>(new QuoteOfDayTask());
         }
 
         public override void ConfigureServices(IServiceCollection services)

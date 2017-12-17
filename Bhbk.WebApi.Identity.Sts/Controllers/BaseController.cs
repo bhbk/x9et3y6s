@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -10,12 +11,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Authorize]
     public class BaseController : Controller
     {
-        private IIdentityContext _conext;
-        protected IIdentityContext Context
+        private IIdentityContext _ioc;
+        protected IIdentityContext IoC
         {
             get
             {
-                return _conext ?? (IIdentityContext)HttpContext.RequestServices.GetService(typeof(IIdentityContext));
+                return _ioc ?? (IIdentityContext)HttpContext.RequestServices.GetRequiredService(typeof(IIdentityContext));
             }
         }
 
@@ -26,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (context == null)
                 throw new ArgumentNullException();
 
-            _conext = context;
+            _ioc = context;
         }
 
         protected IActionResult GetErrorResult(IdentityResult result)

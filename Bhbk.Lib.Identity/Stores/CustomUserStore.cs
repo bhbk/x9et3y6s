@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public partial class CustomUserStore : UserStore<AppUser, AppRole, AppDbContext, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppUserToken, AppRoleClaim>
     {
-        private AppDbContext _context;
+        private AppDbContext _ioc;
 
         public CustomUserStore(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)
@@ -25,20 +25,20 @@ namespace Bhbk.Lib.Identity.Stores
             if (context == null)
                 throw new ArgumentNullException();
 
-            _context = context;
+            _ioc = context;
         }
 
         public Task AddRefreshTokenAsync(AppUserRefresh refresh)
         {
-            var clean = _context.AppUserRefresh.Where(x => x.UserId == refresh.UserId
+            var clean = _ioc.AppUserRefresh.Where(x => x.UserId == refresh.UserId
                 && x.IssuedUtc > DateTime.UtcNow
                 && x.ExpiresUtc < DateTime.UtcNow);
 
             if (clean != null)
-                _context.AppUserRefresh.RemoveRange(clean);
+                _ioc.AppUserRefresh.RemoveRange(clean);
 
-            _context.AppUserRefresh.Add(refresh);
-            _context.SaveChanges();
+            _ioc.AppUserRefresh.Add(refresh);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -55,17 +55,17 @@ namespace Bhbk.Lib.Identity.Stores
                     ClaimValueType = claim.ValueType
                 };
 
-                _context.AppUserClaim.Add(model);
+                _ioc.AppUserClaim.Add(model);
             }
 
-            _context.SaveChanges();
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task AddLoginAsync(AppUser user, UserLoginInfo info, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var login = _context.AppLogin.Where(x => x.LoginProvider == info.LoginProvider).SingleOrDefault();
+            var login = _ioc.AppLogin.Where(x => x.LoginProvider == info.LoginProvider).SingleOrDefault();
 
             if (login == null)
                 throw new ArgumentNullException();
@@ -83,15 +83,15 @@ namespace Bhbk.Lib.Identity.Stores
                 Immutable = false
             };
 
-            _context.AppUserLogin.Add(result);
-            _context.SaveChanges();
+            _ioc.AppUserLogin.Add(result);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task AddToRoleAsync(AppUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var role = _context.AppRole.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
+            var role = _ioc.AppRole.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
 
             if (role == null)
                 throw new ArgumentNullException();
@@ -104,62 +104,67 @@ namespace Bhbk.Lib.Identity.Stores
                 Immutable = false
             };
 
-            _context.AppUserRole.Add(result);
-            _context.SaveChanges();
+            _ioc.AppUserRole.Add(result);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            _context.AppUser.Add(user);
-            _context.SaveChanges();
+            _ioc.AppUser.Add(user);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task<IdentityResult> DeleteAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            _context.AppUser.Remove(user);
-            _context.SaveChanges();
+            _ioc.AppUser.Remove(user);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public bool Exists(Guid UserId)
         {
-            return _context.AppUser.Any(x => x.Id == UserId);
+            return _ioc.AppUser.Any(x => x.Id == UserId);
         }
 
         public bool Exists(string UserEmail)
         {
-            return _context.AppUser.Any(x => x.Email == UserEmail);
+            return _ioc.AppUser.Any(x => x.Email == UserEmail);
         }
 
         public override Task<AppUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.FromResult(_context.AppUser.Where(x => x.Id.ToString() == userId).SingleOrDefault());
+            return Task.FromResult(_ioc.AppUser.Where(x => x.Id.ToString() == userId).SingleOrDefault());
         }
 
         public override Task<AppUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.FromResult(_context.AppUser.Where(x => x.Email == normalizedUserName).SingleOrDefault());
+            return Task.FromResult(_ioc.AppUser.Where(x => x.Email == normalizedUserName).SingleOrDefault());
         }
 
         public Task<AppUserRefresh> FindRefreshTokenAsync(string ticket)
         {
-            return Task.FromResult(_context.AppUserRefresh.Where(x => x.ProtectedTicket == ticket).SingleOrDefault());
+            return Task.FromResult(_ioc.AppUserRefresh.Where(x => x.ProtectedTicket == ticket).SingleOrDefault());
         }
 
         public Task<AppUserRefresh> FindRefreshTokenByIdAsync(Guid tokenId)
         {
-            return Task.FromResult(_context.AppUserRefresh.Where(x => x.Id == tokenId).SingleOrDefault());
+            return Task.FromResult(_ioc.AppUserRefresh.Where(x => x.Id == tokenId).SingleOrDefault());
+        }
+
+        public IEnumerable<AppUserRefresh> FindRefreshTokensAsync()
+        {
+            return _ioc.AppUserRefresh.Where(x => x.ExpiresUtc == DateTime.UtcNow);
         }
 
         public IEnumerable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
             Func<IQueryable<AppUser>, IOrderedQueryable<AppUser>> orderBy = null, string includes = "")
         {
-            IQueryable<AppUser> query = _context.AppUser.AsQueryable();
+            IQueryable<AppUser> query = _ioc.AppUser.AsQueryable();
 
             if (filter != null)
                 query = query.Where(filter);
@@ -176,13 +181,13 @@ namespace Bhbk.Lib.Identity.Stores
 
         public IList<AppUser> GetAll()
         {
-            return _context.AppUser.ToList();
+            return _ioc.AppUser.ToList();
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             IList<Claim> result = new List<Claim>();
-            var claims = _context.AppUserClaim.Where(x => x.UserId == user.Id).ToList();
+            var claims = _ioc.AppUserClaim.Where(x => x.UserId == user.Id).ToList();
 
             if (claims == null)
                 throw new InvalidOperationException();
@@ -201,7 +206,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<string> GetPasswordHashAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.FromResult(_context.Users.Where(x => x.Id == user.Id).Single().PasswordHash);
+            return Task.FromResult(_ioc.Users.Where(x => x.Id == user.Id).Single().PasswordHash);
         }
 
         public override Task<string> GetEmailAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -217,13 +222,13 @@ namespace Bhbk.Lib.Identity.Stores
         public Task<IList<string>> GetLoginsAsync(AppUser user)
         {
             IList<string> result = new List<string>();
-            var logins = _context.AppUserLogin.Where(x => x.UserId == user.Id).ToList();
+            var logins = _ioc.AppUserLogin.Where(x => x.UserId == user.Id).ToList();
 
             if (logins == null)
                 throw new InvalidOperationException();
 
             foreach (AppUserLogin login in logins)
-                result.Add(_context.AppLogin.Where(x => x.Id == login.LoginId).Select(r => r.LoginProvider).Single());
+                result.Add(_ioc.AppLogin.Where(x => x.Id == login.LoginId).Select(r => r.LoginProvider).Single());
 
             return Task.FromResult(result);
         }
@@ -231,13 +236,13 @@ namespace Bhbk.Lib.Identity.Stores
         public override Task<IList<string>> GetRolesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             IList<string> result = new List<string>();
-            var roles = _context.AppUserRole.Where(x => x.UserId == user.Id).ToList();
+            var roles = _ioc.AppUserRole.Where(x => x.UserId == user.Id).ToList();
 
             if (roles == null)
                 throw new InvalidOperationException();
 
             foreach (AppUserRole role in roles)
-                result.Add(_context.Roles.Where(x => x.Id == role.RoleId).Select(r => r.Name).Single());
+                result.Add(_ioc.Roles.Where(x => x.Id == role.RoleId).Select(r => r.Name).Single());
 
             return Task.FromResult(result);
         }
@@ -249,7 +254,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<bool> HasPasswordAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = _context.Users.Where(x => x.Id == user.Id || x.UserName == user.UserName).SingleOrDefault();
+            var result = _ioc.Users.Where(x => x.Id == user.Id || x.UserName == user.UserName).SingleOrDefault();
 
             if (result == null)
                 return Task.FromResult(false);
@@ -264,7 +269,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public Task<bool> IsInLoginAsync(AppUser user, string loginName)
         {
-            if (_context.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginProvider == loginName))
+            if (_ioc.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginProvider == loginName))
                 return Task.FromResult(true);
 
             else
@@ -273,12 +278,12 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<bool> IsInRoleAsync(AppUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var role = _context.Roles.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
+            var role = _ioc.Roles.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
 
             if (role == null)
                 throw new ArgumentNullException();
 
-            else if (_context.AppUserRole.Any(x => x.UserId == user.Id && x.RoleId == role.Id))
+            else if (_ioc.AppUserRole.Any(x => x.UserId == user.Id && x.RoleId == role.Id))
                 return Task.FromResult(true);
 
             else
@@ -289,62 +294,62 @@ namespace Bhbk.Lib.Identity.Stores
         {
             foreach (Claim claim in claims)
             {
-                var result = _context.AppUserClaim.Where(x => x.UserId == user.Id
+                var result = _ioc.AppUserClaim.Where(x => x.UserId == user.Id
                     && x.ClaimType == claim.Type
                     && x.ClaimValue == claim.Value).SingleOrDefault();
 
                 if (result == null)
                     throw new ArgumentNullException();
 
-                _context.AppUserClaim.Remove(result);
+                _ioc.AppUserClaim.Remove(result);
             }
 
-            _context.SaveChanges();
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task RemoveLoginAsync(AppUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var login = _context.AppUserLogin.Where(x => x.LoginProvider == loginProvider).SingleOrDefault();
+            var login = _ioc.AppUserLogin.Where(x => x.LoginProvider == loginProvider).SingleOrDefault();
 
             if (login == null)
                 throw new ArgumentNullException();
 
-            var result = _context.AppUserLogin.Where(x => x.UserId == user.Id && x.LoginId == login.LoginId).Single();
+            var result = _ioc.AppUserLogin.Where(x => x.UserId == user.Id && x.LoginId == login.LoginId).Single();
 
-            _context.AppUserLogin.Remove(result);
-            _context.SaveChanges();
+            _ioc.AppUserLogin.Remove(result);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task RemoveFromRoleAsync(AppUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var role = _context.Roles.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
+            var role = _ioc.Roles.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
 
             if (role == null)
                 throw new ArgumentNullException();
 
-            var result = _context.AppUserRole.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
+            var result = _ioc.AppUserRole.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
-            _context.AppUserRole.Remove(result);
-            _context.SaveChanges();
+            _ioc.AppUserRole.Remove(result);
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public Task RemoveRefreshTokenAsync(AppUser user, AppUserRefresh refresh)
         {
-            var token = _context.AppUserRefresh.Where(x => x.UserId == user.Id && x.Id == refresh.Id);
+            var token = _ioc.AppUserRefresh.Where(x => x.UserId == user.Id && x.Id == refresh.Id);
 
             if (token == null)
                 throw new ArgumentNullException();
 
             else
             {
-                _context.AppUserRefresh.RemoveRange(token);
-                _context.SaveChanges();
+                _ioc.AppUserRefresh.RemoveRange(token);
+                _ioc.SaveChanges();
             }
 
             return Task.FromResult(IdentityResult.Success);
@@ -352,15 +357,15 @@ namespace Bhbk.Lib.Identity.Stores
 
         public Task RemoveRefreshTokensAsync(AppUser user)
         {
-            var token = _context.AppUserRefresh.Where(x => x.UserId == user.Id);
+            var token = _ioc.AppUserRefresh.Where(x => x.UserId == user.Id);
 
             if (token == null)
                 throw new ArgumentNullException();
 
             else
             {
-                _context.AppUserRefresh.RemoveRange(token);
-                _context.SaveChanges();
+                _ioc.AppUserRefresh.RemoveRange(token);
+                _ioc.SaveChanges();
             }
 
             return Task.FromResult(IdentityResult.Success);
@@ -372,8 +377,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.AccessSuccessCount++;
             user.AccessFailedCount = 0;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -383,8 +388,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.EmailConfirmed = confirmed;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -394,8 +399,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.Immutable = enabled;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -405,8 +410,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.PasswordConfirmed = confirmed;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -416,8 +421,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.PasswordHash = passwordHash;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -427,8 +432,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.PhoneNumberConfirmed = confirmed;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -438,8 +443,8 @@ namespace Bhbk.Lib.Identity.Stores
             user.SecurityStamp = stamp;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -449,15 +454,15 @@ namespace Bhbk.Lib.Identity.Stores
             user.TwoFactorEnabled = enabled;
             user.LastUpdated = DateTime.Now;
 
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(user).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
 
         public override Task<IdentityResult> UpdateAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var model = _context.AppUser.Where(x => x.Id == user.Id).Single();
+            var model = _ioc.AppUser.Where(x => x.Id == user.Id).Single();
 
             model.UserName = user.Email;
             model.FirstName = user.FirstName;
@@ -467,8 +472,8 @@ namespace Bhbk.Lib.Identity.Stores
             model.Immutable = user.Immutable;
             model.LastUpdated = DateTime.Now;
 
-            _context.Entry(model).State = EntityState.Modified;
-            _context.SaveChanges();
+            _ioc.Entry(model).State = EntityState.Modified;
+            _ioc.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }

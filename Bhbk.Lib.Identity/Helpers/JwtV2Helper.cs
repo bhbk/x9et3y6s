@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class JwtHelperV2
+    public class JwtV2Helper
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
             GenerateAccessToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
         {
-            var ioc = context.RequestServices.GetService<IIdentityContext>();
+            var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
             DateTime issueDate, expireDate;
 
             ClaimsIdentity claims = await ioc.UserMgmt.CreateIdentityAsync(user, "JWT");
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Helpers
         public static async Task<string>
             GenerateRefreshToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
         {
-            var ioc = context.RequestServices.GetService<IIdentityContext>();
+            var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
             DateTime issueDate, expireDate;
 
             if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Tweaks.UnitTestRefreshToken)
@@ -76,7 +76,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 ClientId = client.Id,
                 AudienceId = audience.Id,
                 UserId = user.Id,
-                ProtectedTicket = EntrophyHelper.GenerateRandomBase64(256),
+                ProtectedTicket = CryptoHelper.GenerateRandomBase64(256),
                 IssuedUtc = issueDate,
                 ExpiresUtc = expireDate
             };

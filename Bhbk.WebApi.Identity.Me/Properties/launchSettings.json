@@ -17,12 +17,11 @@
     },
     "Bhbk.WebApi.Identity.Me": {
       "commandName": "Project",
-      "launchBrowser": true,
       "launchUrl": "api/identity/me",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:55110/"
+      "applicationUrl": "http://localhost:55109/api/identity/me"
     }
   }
 }

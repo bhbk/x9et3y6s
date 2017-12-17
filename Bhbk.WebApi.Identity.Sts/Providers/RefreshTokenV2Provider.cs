@@ -11,24 +11,24 @@ using System.Net;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
-//https://blogs.ibs.com/2017/12/12/token-based-authentication-using-asp-net-core-2-0/
+//https://blogs.ibs.com/2017/12/19/token-based-auth-in-asp-net-core-2-part-2-refresh-tokens/
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class ExtendAccessTokenProviderV2
+    public static class RefreshTokenV2Extension
     {
-        public static IApplicationBuilder UseAccessTokenProviderV2(this IApplicationBuilder app)
+        public static IApplicationBuilder UseRefreshTokenV2Provider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AccessTokenProviderV2>();
+            return app.UseMiddleware<RefreshTokenV2Provider>();
         }
     }
 
-    public class AccessTokenProviderV2
+    public class RefreshTokenV2Provider
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AccessTokenProviderV2(RequestDelegate next)
+        public RefreshTokenV2Provider(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -43,8 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserIDV1)
-                || !context.Request.Form.ContainsKey("password"))
+                || !context.Request.Form.ContainsKey("refresh_token"))
                 return _next(context);
 
             var postValues = context.Request.ReadFormAsync().Result;
@@ -52,36 +51,43 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
             string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
             string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-            string userValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV1).Value;
-            string passwordValue = postValues.FirstOrDefault(x => x.Key == "password").Value;
+            string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == "refresh_token").Value;
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
                 || string.IsNullOrEmpty(audienceValue)
-                || !grantTypeValue.Equals("password")
-                || string.IsNullOrEmpty(userValue)
-                || string.IsNullOrEmpty(passwordValue))
+                || !grantTypeValue.Equals("refresh_token")
+                || string.IsNullOrEmpty(refreshTokenValue))
             {
-                //context.Result = new ContentResult()
-                //{
-                //    ContentType = "application/json",
-                //    StatusCode = (int)HttpStatusCode.BadRequest,
-                //    Content = "invalid_values"
-                //};
-
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_values", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSystemParametersInvalid }, _serializer));
+            }
+
+            var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
+
+            if (ioc == null)
+                throw new ArgumentNullException();
+
+            var current = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
+
+            if (current == null)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.ContentType = "application/json";
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+            }
+
+            else if (current.IssuedUtc >= DateTime.UtcNow || current.ExpiresUtc <= DateTime.UtcNow)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.ContentType = "application/json";
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalidToken }, _serializer));
             }
 
             Guid clientID, audienceID;
             AppClient client;
             AppAudience audience;
-
-            var ioc = context.RequestServices.GetService<IIdentityContext>();
-
-            if (ioc == null)
-                throw new ArgumentNullException();
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -93,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_client", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
             }
 
             //check if identifier is guid. resolve to guid if not.
@@ -106,63 +112,29 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_audience", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
             }
 
-            var user = ioc.UserMgmt.FindByNameAsync(userValue).Result;
+            var user = ioc.UserMgmt.FindByIdAsync(current.UserId.ToString()).Result;
 
             //check that user exists...
             if (user == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_user", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
-            //check that user is confirmed...
             //check that user is not locked...
-            else if (ioc.UserMgmt.IsLockedOutAsync(user).Result
-                || !user.EmailConfirmed)
+            else if (ioc.UserMgmt.IsLockedOutAsync(user).Result)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_user", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
-            var logins = ioc.UserMgmt.GetLoginsAsync(user).Result;
-
-            //check that login provider exists...
-            if (logins == null)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_login", _serializer));
-            }
-
-            //check if login provider is local...
-            //check if login provider is transient for unit/integration test...
-            else if (logins.Contains(BaseLib.Statics.ApiDefaultLogin)
-                || (logins.Where(x => x.StartsWith(BaseLib.Statics.ApiUnitTestLogin)).Any() && ioc.ContextStatus == ContextType.UnitTest))
-            {
-                //check that password is valid...
-                if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)
-                {
-                    ioc.UserMgmt.AccessFailedAsync(user).Wait();
-
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_user", _serializer));
-                }
-            }
-            else
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_login", _serializer));
-            }
-
-            var access = JwtHelperV2.GenerateAccessToken(context, client, audience, user).Result;
-            var refresh = JwtHelperV2.GenerateRefreshToken(context, client, audience, user).Result;
+            var access = JwtV2Helper.GenerateAccessToken(context, client, audience, user).Result;
+            var refresh = JwtV2Helper.GenerateRefreshToken(context, client, audience, user).Result;
 
             var result = new
             {

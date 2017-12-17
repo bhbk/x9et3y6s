@@ -26,11 +26,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Client_Create_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4);
-            var controller = new ClientController(Context);
+            string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
+            var controller = new ClientController(IoC);
             var model = new ClientCreate()
             {
                 Name = name,
@@ -48,27 +48,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Client_Delete_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClientController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
+            var controller = new ClientController(IoC);
+            var client = IoC.ClientMgmt.Store.Get().First();
 
             var result = await controller.DeleteClient(client.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = Context.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
+            var check = IoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_Client_Get_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClientController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
+            var controller = new ClientController(IoC);
+            var client = IoC.ClientMgmt.Store.Get().First();
 
             var result = await controller.GetClient(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -80,43 +80,43 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_Client_GetList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClientController(Context);
+            var controller = new ClientController(IoC);
 
             var result = await controller.GetClients() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<ClientResult>>().Subject;
 
-            data.Count().Should().Equals(Context.ClientMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.ClientMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Client_GetAudienceList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new ClientController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
+            var controller = new ClientController(IoC);
+            var client = IoC.ClientMgmt.Store.Get().First();
 
             var result = await controller.GetClientAudiences(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
-            data.Count().Should().Equals(Context.AudienceMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.AudienceMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_Client_Update_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4);
-            var controller = new ClientController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
+            string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
+            var controller = new ClientController(IoC);
+            var client = IoC.ClientMgmt.Store.Get().First();
             var model = new ClientUpdate()
             {
                 Id = client.Id,

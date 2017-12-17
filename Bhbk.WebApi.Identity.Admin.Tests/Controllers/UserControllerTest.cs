@@ -29,13 +29,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_User_Create_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
+            var controller = new UserController(IoC);
             var model = new UserCreate()
             {
-                Email = BaseLib.Statics.ApiUnitTestUserEmail + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net",
+                Email = BaseLib.Statics.ApiUnitTestUser + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net",
                 FirstName = "FirstName",
                 LastName = "LastName"
             };
@@ -50,45 +50,45 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_User_DeleteImmutable_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
-            await Context.UserMgmt.Store.SetImmutableEnabledAsync(user, true);
+            await IoC.UserMgmt.Store.SetImmutableEnabledAsync(user, true);
 
             var result = await controller.DeleteUser(user.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = Context.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
+            var check = IoC.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_DeleteMutable_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.DeleteUser(user.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = Context.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
+            var check = IoC.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_Get_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.GetUser(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -100,26 +100,26 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_User_GetList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
+            var controller = new UserController(IoC);
 
             var result = await controller.GetUsers() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
-            data.Count().Should().Equals(Context.UserMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.UserMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_User_GetByName_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.GetUserByName(user.UserName) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -131,71 +131,71 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_User_GetLoginList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.GetUserLogins(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<string>>().Subject;
 
-            data.Count().Should().Equals(Context.LoginMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.LoginMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_User_GetRoleList_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.GetUserRoles(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<string>>().Subject;
 
-            data.Count().Should().Equals(Context.RoleMgmt.Store.Get().Count());
+            data.Count().Should().Equals(IoC.RoleMgmt.Store.Get().Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_User_AddPassword_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
-            var remove = await Context.UserMgmt.RemovePasswordAsync(user);
+            var remove = await IoC.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
             var model = new UserAddPassword()
             {
-                NewPassword = EntrophyHelper.GenerateRandomBase64(16),
-                NewPasswordConfirm = EntrophyHelper.GenerateRandomBase64(16)
+                NewPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
+                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16)
             };
 
             var result = await controller.AddPassword(user.Id, model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.HasPasswordAsync(user);
+            var check = await IoC.UserMgmt.HasPasswordAsync(user);
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_AddPassword_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
-            var remove = await Context.UserMgmt.RemovePasswordAsync(user);
+            var remove = await IoC.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
@@ -208,75 +208,75 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var result = await controller.AddPassword(user.Id, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            var check = await IoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_RemovePassword_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
-            var remove = await Context.UserMgmt.RemovePasswordAsync(user);
+            var remove = await IoC.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
             var result = await controller.RemovePassword(user.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.HasPasswordAsync(user);
+            var check = await IoC.UserMgmt.HasPasswordAsync(user);
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_RemovePassword_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var result = await controller.RemovePassword(user.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = await Context.UserMgmt.HasPasswordAsync(user);
+            var check = await IoC.UserMgmt.HasPasswordAsync(user);
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_ResetPassword_Fail()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
             var model = new UserAddPassword()
             {
-                NewPassword = EntrophyHelper.GenerateRandomBase64(16),
-                NewPasswordConfirm = EntrophyHelper.GenerateRandomBase64(16)
+                NewPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
+                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16)
             };
 
             var result = await controller.ResetPassword(user.Id, model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            var check = await IoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_ResetPassword_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
             var model = new UserAddPassword()
             {
                 NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
@@ -286,19 +286,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var result = await controller.ResetPassword(user.Id, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = await Context.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            var check = await IoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Admin_User_Update_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            string email = BaseLib.Statics.ApiUnitTestUserEmail + BaseLib.Helpers.EntrophyHelper.GenerateRandomBase64(4) + ".net";
-            var controller = new UserController(Context);
-            var user = Context.UserMgmt.Store.Get().First();
+            string email = BaseLib.Statics.ApiUnitTestUser + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
             var model = new UserUpdate()
             {
                 Id = user.Id,

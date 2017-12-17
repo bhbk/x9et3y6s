@@ -1,27 +1,26 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System;
 using System.Net;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class ExtendAuthorizationCodeProviderV1
+    public static class ClientCredentialsV1Extension
     {
-        public static IApplicationBuilder UseAuthorizationCodeProviderV1(this IApplicationBuilder app)
+        public static IApplicationBuilder UseClientCredentialsV1Provider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AuthorizationCodeProviderV1>();
+            return app.UseMiddleware<ClientCredentialsV1Provider>();
         }
     }
 
-    public class AuthorizationCodeProviderV1
+    public class ClientCredentialsV1Provider
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AuthorizationCodeProviderV1(RequestDelegate next)
+        public ClientCredentialsV1Provider(RequestDelegate next)
         {
             _next = next;
 
@@ -37,12 +36,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
-                || !context.Request.Form.ContainsKey("redirect_uri")
-                || !context.Request.Form.ContainsKey("code"))
+                || !context.Request.Form.ContainsKey("client_secret"))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject("invalid_values", _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSystemParametersInvalid }, _serializer));
             }
 
             return _next(context);

@@ -17,12 +17,11 @@
     },
     "Bhbk.WebApi.Identity.Sts": {
       "commandName": "Project",
-      "launchBrowser": true,
       "launchUrl": "api/identity/sts",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:55115/"
+      "applicationUrl": "http://localhost:55114/api/identity/sts"
     }
   }
 }

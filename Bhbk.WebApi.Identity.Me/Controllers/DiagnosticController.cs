@@ -11,8 +11,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public DiagnosticController() { }
 
-        public DiagnosticController(IIdentityContext context)
-            : base(context) { }
+        public DiagnosticController(IIdentityContext ioc)
+            : base(ioc) { }
 
         [Route("v1/version"), HttpGet]
         [AllowAnonymous]

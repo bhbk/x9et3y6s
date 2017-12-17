@@ -27,7 +27,7 @@ namespace Bhbk.Cli.Identity.Cmds
             try
             {
                 var config = new ConfigurationBuilder()
-                    .SetBasePath(FileHelper.SearchPaths("appsettings.json").DirectoryName)
+                    .SetBasePath(FileSystemHelper.SearchUsualPaths("appsettings.json").DirectoryName)
                     .AddJsonFile("appsettings.json")
                     .Build();
 
@@ -35,7 +35,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(config["ConnectionStrings:IdentityEntities"]);
 
                 Statics.Context = new CustomIdentityContext(builder);
-                DataHelper seed = new DataHelper(Statics.Context);
+                DatasetHelper seed = new DatasetHelper(Statics.Context);
 
                 if (CreateDefault)
                 {
@@ -43,7 +43,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    seed.DefaultDataCreate();
+                    seed.CreateDefaultData();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -54,7 +54,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    seed.DefaultDataDestroy();
+                    seed.DestroyDefaultData();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -65,7 +65,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    seed.CompleteDestroy();
+                    seed.Destroy();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

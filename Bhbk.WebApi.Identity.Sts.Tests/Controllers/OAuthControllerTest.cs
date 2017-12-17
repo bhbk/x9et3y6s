@@ -27,13 +27,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_OAuth_RefreshToken_Revoke_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new OAuthController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
-            var audience = Context.AudienceMgmt.Store.Get().First();
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new OAuthController(IoC);
+            var client = IoC.ClientMgmt.Store.Get().First();
+            var audience = IoC.AudienceMgmt.Store.Get().First();
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -54,13 +54,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_OAuth_RefreshTokens_Revoke_Success()
         {
-            TestData.CompleteDestroy();
-            TestData.TestDataCreate();
+            TestData.Destroy();
+            TestData.CreateTestData();
 
-            var controller = new OAuthController(Context);
-            var client = Context.ClientMgmt.Store.Get().First();
-            var audience = Context.AudienceMgmt.Store.Get().First();
-            var user = Context.UserMgmt.Store.Get().First();
+            var controller = new OAuthController(IoC);
+            var client = IoC.ClientMgmt.Store.Get().First();
+            var audience = IoC.AudienceMgmt.Store.Get().First();
+            var user = IoC.UserMgmt.Store.Get().First();
 
             var access = await StsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
