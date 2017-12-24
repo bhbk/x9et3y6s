@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Id = client.Id;
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
+            this.ClientKey = client.ClientKey;
             this.Enabled = client.Enabled;
             this.Created = client.Created;
             this.LastUpdated = client.LastUpdated ?? null;
@@ -22,6 +23,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Id = Guid.NewGuid();
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
+            this.ClientKey = client.ClientKey;
             this.Enabled = client.Enabled;
             this.Created = DateTime.Now;
             this.Immutable = false;
@@ -44,6 +46,7 @@ namespace Bhbk.Lib.Identity.Factory
                 Id = this.Id,
                 Name = this.Name,
                 Description = this.Description ?? string.Empty,
+                ClientKey = this.ClientKey,
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
@@ -58,6 +61,7 @@ namespace Bhbk.Lib.Identity.Factory
                 Id = this.Id,
                 Name = this.Name,
                 Description = this.Description ?? string.Empty,
+                ClientKey = this.ClientKey,
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
@@ -70,6 +74,7 @@ namespace Bhbk.Lib.Identity.Factory
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public string ClientKey { get; set; }
         public bool Enabled { get; set; }
         public bool Immutable { get; set; }
     }
@@ -79,6 +84,7 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string ClientKey { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public Nullable<DateTime> LastUpdated { get; set; }
@@ -91,6 +97,7 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string ClientKey { get; set; }
         public bool Enabled { get; set; }
         public bool Immutable { get; set; }
     }

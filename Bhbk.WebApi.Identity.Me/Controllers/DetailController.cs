@@ -1,13 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.WebApi.Identity.Me.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -23,13 +17,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             : base(ioc) { }
 
         [Route("v1/quote-of-day"), HttpGet]
-        [AllowAnonymous]
         public IActionResult QuoteOfDay()
         {
-            var sc = HttpContext.RequestServices.GetServices<IHostedService>();
-            var svc = (QuoteOfDayTask)sc.Single(x => x.GetType() == typeof(QuoteOfDayTask));
-
-            return Ok(svc.QuoteOfDay.Result);
+            return Ok(IoC.UserQuote);
         }
 
         [Route("v1/change-email"), HttpPut]

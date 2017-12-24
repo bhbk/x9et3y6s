@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +17,7 @@ namespace Bhbk.Lib.Identity.Helpers
     public class JwtV2Helper
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            GenerateAccessToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
+            GenerateAccessToken(HttpContext context, AppClient client, List<AppAudience> audiences, AppUser user)
         {
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
             DateTime issueDate, expireDate;
@@ -25,7 +27,7 @@ namespace Bhbk.Lib.Identity.Helpers
             ClaimsPrincipal identity = new ClaimsPrincipal();
             identity.AddIdentity(claims);
 
-            var symmetricKeyAsBase64 = audience.AudienceKey;
+            var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -40,9 +42,17 @@ namespace Bhbk.Lib.Identity.Helpers
                 expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultAccessTokenLife);
             }
 
+            string audienceList = string.Empty;
+
+            if (audiences.Count == 0)
+                throw new InvalidOperationException();
+
+            else
+                audienceList = string.Join(",", audiences.Select(x => x.Id.ToString()));
+
             var access = new JwtSecurityToken(
-                issuer: client.Id.ToString(),
-                audience: audience.Id.ToString(),
+                issuer: client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                audience: audienceList,
                 claims: identity.Claims,
                 notBefore: issueDate,
                 expires: expireDate,
@@ -55,7 +65,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<string>
-            GenerateRefreshToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
+            GenerateRefreshToken(HttpContext context, AppClient client, AppUser user)
         {
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
             DateTime issueDate, expireDate;
@@ -74,7 +84,6 @@ namespace Bhbk.Lib.Identity.Helpers
             var refresh = new UserRefreshCreate()
             {
                 ClientId = client.Id,
-                AudienceId = audience.Id,
                 UserId = user.Id,
                 ProtectedTicket = CryptoHelper.GenerateRandomBase64(256),
                 IssuedUtc = issueDate,

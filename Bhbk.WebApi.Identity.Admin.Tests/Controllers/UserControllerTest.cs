@@ -121,11 +121,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(IoC);
             var user = IoC.UserMgmt.Store.Get().First();
 
-            var result = await controller.GetUserByName(user.UserName) as OkObjectResult;
+            var result = await controller.GetUser(user.UserName) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
             data.Id.Should().Be(user.Id);
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_User_GetAudienceList_Success()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new UserController(IoC);
+            var user = IoC.UserMgmt.Store.Get().First();
+
+            var result = await controller.GetUserAudiences(user.Id) as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
+
+            data.Count().Should().Equals(IoC.RoleMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -139,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetUserLogins(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<string>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<LoginResult>>().Subject;
 
             data.Count().Should().Equals(IoC.LoginMgmt.Store.Get().Count());
         }
@@ -155,7 +171,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await controller.GetUserRoles(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<string>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
             data.Count().Should().Equals(IoC.RoleMgmt.Store.Get().Count());
         }

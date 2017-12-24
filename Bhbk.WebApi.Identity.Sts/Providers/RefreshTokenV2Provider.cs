@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
-                || string.IsNullOrEmpty(audienceValue)
+                //|| string.IsNullOrEmpty(audienceValue)
                 || !grantTypeValue.Equals("refresh_token")
                 || string.IsNullOrEmpty(refreshTokenValue))
             {
@@ -85,9 +86,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalidToken }, _serializer));
             }
 
-            Guid clientID, audienceID;
+            Guid clientID;
             AppClient client;
-            AppAudience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -100,19 +100,6 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
-            }
-
-            //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(audienceValue, out audienceID))
-                audience = ioc.AudienceMgmt.FindByIdAsync(audienceID).Result;
-            else
-                audience = ioc.AudienceMgmt.FindByNameAsync(audienceValue).Result;
-
-            if (audience == null || !audience.Enabled)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
             }
 
             var user = ioc.UserMgmt.FindByIdAsync(current.UserId.ToString()).Result;
@@ -133,16 +120,66 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
-            var access = JwtV2Helper.GenerateAccessToken(context, client, audience, user).Result;
-            var refresh = JwtV2Helper.GenerateRefreshToken(context, client, audience, user).Result;
+            var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
+            List<AppAudience> audiences;
+
+            if (string.IsNullOrEmpty(audienceValue))
+            {
+                audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())).ToList();
+
+                foreach (AppAudience audience in audiences)
+                {
+                    if (audience == null || !audience.Enabled)
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        context.Response.ContentType = "application/json";
+                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
+                    }
+                }
+            }
+            else
+            {
+                audiences = new List<AppAudience>();
+
+                if (!audienceList.All(x => audienceValue.Split(",").Contains(x)))
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
+                }
+
+                foreach (string entry in audienceValue.Split(","))
+                {
+                    Guid audienceID;
+                    AppAudience audience;
+
+                    //check if identifier is guid. resolve to guid if not.
+                    if (Guid.TryParse(entry.Trim(), out audienceID))
+                        audience = ioc.AudienceMgmt.FindByIdAsync(audienceID).Result;
+                    else
+                        audience = ioc.AudienceMgmt.FindByNameAsync(entry.Trim()).Result;
+
+                    if (audience == null || !audience.Enabled)
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        context.Response.ContentType = "application/json";
+                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
+                    }
+
+                    audiences.Add(audience);
+                }
+            }
+
+            var access = JwtV2Helper.GenerateAccessToken(context, client, audiences, user).Result;
+            var refresh = JwtV2Helper.GenerateRefreshToken(context, client, user).Result;
 
             var result = new
             {
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
-                client = client.Id.ToString(),
-                audience = audience.Id.ToString(),
+                client = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                audiences = audiences.Select(x => x.Id.ToString()),
                 user = user.Id.ToString(),
                 issued = access.begin,
                 expires = access.end

@@ -9,7 +9,6 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = refresh.Id;
             this.ClientId = refresh.ClientId;
-            this.AudienceId = refresh.AudienceId;
             this.UserId = refresh.UserId;
             this.ProtectedTicket = refresh.ProtectedTicket;
             this.IssuedUtc = refresh.IssuedUtc;
@@ -20,7 +19,6 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = Guid.NewGuid();
             this.ClientId = refresh.ClientId;
-            this.AudienceId = refresh.AudienceId;
             this.UserId = refresh.UserId;
             this.ProtectedTicket = refresh.ProtectedTicket;
             this.IssuedUtc = refresh.IssuedUtc;
@@ -33,7 +31,6 @@ namespace Bhbk.Lib.Identity.Factory
             {
                 Id = this.Id,
                 ClientId = this.ClientId,
-                AudienceId = this.AudienceId,
                 UserId = this.UserId,
                 ProtectedTicket = this.ProtectedTicket,
                 IssuedUtc = this.IssuedUtc,
@@ -47,7 +44,6 @@ namespace Bhbk.Lib.Identity.Factory
             {
                 Id = this.Id,
                 ClientId = this.ClientId,
-                AudienceId = this.AudienceId,
                 UserId = this.UserId,
                 ProtectedTicket = this.ProtectedTicket,
                 IssuedUtc = this.IssuedUtc,

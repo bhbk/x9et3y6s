@@ -27,17 +27,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
             IoC = new CustomIdentityContext(options);
+            TestData = new DatasetHelper(IoC);
             StsV1 = new StsV1Helper();
             StsV2 = new StsV2Helper();
-            TestData = new DatasetHelper(IoC);
 
             sc.AddSingleton<IIdentityContext>(IoC);
             sc.AddSingleton<IHostedService>(new MaintainTokensTask(IoC));
         }
 
-        public override void ConfigureServices(IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection sc)
         {
-            base.ConfigureServices(services);
+            base.ConfigureServices(sc);
         }
 
         public override void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)

@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Stores
     public class ClientStore : IGenericStore<AppClient, Guid>
     {
         private AppDbContext _context;
+        public string Salt;
 
         public ClientStore(AppDbContext context)
         {
@@ -68,7 +69,7 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppClient.Where(x => x.Name == name).SingleOrDefault();
         }
 
-        public IList<AppClient> GetAll()
+        public IList<AppClient> Get()
         {
             return _context.AppClient.ToList();
         }
@@ -117,6 +118,7 @@ namespace Bhbk.Lib.Identity.Stores
 
             model.Name = entity.Name;
             model.Description = entity.Description;
+            model.ClientKey = entity.ClientKey;
             model.Enabled = entity.Enabled;
             model.Immutable = entity.Immutable;
             model.LastUpdated = DateTime.Now;

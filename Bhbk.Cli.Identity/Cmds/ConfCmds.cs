@@ -6,12 +6,15 @@ using ManyConsole;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.IO;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
     public class ConfCmds : ConsoleCommand
     {
-        private bool ReadConfig = false;
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static IConfigurationRoot _cb;
+        private static bool ReadConfig = false;
 
         public ConfCmds()
         {
@@ -24,13 +27,13 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(FileSystemHelper.SearchUsualPaths("appsettings.json").DirectoryName)
-                    .AddJsonFile("appsettings.json")
+                _cb = new ConfigurationBuilder()
+                    .SetBasePath(_cf.DirectoryName)
+                    .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(config["ConnectionStrings:IdentityEntities"]);
+                    .UseSqlServer(_cb["ConnectionStrings:IdentityEntities"]);
 
                 Statics.Context = new CustomIdentityContext(builder);
 

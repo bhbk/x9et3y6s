@@ -31,14 +31,12 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AudienceKey).IsRequired();
-
                 entity.Property(e => e.AudienceType)
                     .IsRequired()
                     .HasMaxLength(64)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Description).HasMaxLength(10);
+                entity.Property(e => e.Description).HasColumnType("nchar(10)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -58,6 +56,8 @@ namespace Bhbk.Lib.Identity.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.ClientKey).IsRequired();
 
                 entity.Property(e => e.Description).HasMaxLength(256);
 
@@ -92,7 +92,7 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(512);
 
-                entity.Property(e => e.Description).HasMaxLength(10);
+                entity.Property(e => e.Description).HasColumnType("nchar(10)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -144,6 +144,10 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.AccessFailedCount).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.AccessSuccessCount).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(512);
 
                 entity.Property(e => e.Email)
@@ -165,8 +169,6 @@ namespace Bhbk.Lib.Identity.Models
                 entity.Property(e => e.PasswordHash).HasMaxLength(512);
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(256);
-
-                entity.Property(e => e.PhoneNumberConfirmed).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.SecurityStamp).HasMaxLength(512);
 
@@ -233,9 +235,6 @@ namespace Bhbk.Lib.Identity.Models
 
             modelBuilder.Entity<AppUserRefresh>(entity =>
             {
-                entity.HasIndex(e => e.AudienceId)
-                    .HasName("IX_AppUserRefresh_AudienceID");
-
                 entity.HasIndex(e => e.Id)
                     .HasName("IX_AppUserRefresh_ID")
                     .IsUnique();
@@ -245,12 +244,6 @@ namespace Bhbk.Lib.Identity.Models
                 entity.Property(e => e.ProtectedTicket)
                     .IsRequired()
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.AppUserRefresh)
-                    .HasForeignKey(d => d.AudienceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AppUserRefresh_AudienceID");
 
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.AppUserRefresh)

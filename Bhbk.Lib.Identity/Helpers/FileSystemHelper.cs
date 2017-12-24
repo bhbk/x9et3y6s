@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Helpers
 {
     public class FileSystemHelper
     {
-        public static FileInfo SearchUsualPaths(string file)
+        public static FileInfo SearchPaths(string file)
         {
             string result;
 

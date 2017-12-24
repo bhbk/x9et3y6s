@@ -18,6 +18,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
     {
         protected static IIdentityContext IoC;
         protected static DatasetHelper TestData;
+        protected static StsV2Helper StsV2;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -31,9 +32,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
             sc.AddSingleton<IHostedService>(new MaintainUsersTask(IoC));
         }
 
-        public override void ConfigureServices(IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection sc)
         {
-            base.ConfigureServices(services);
+            base.ConfigureServices(sc);
         }
 
         public override void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)

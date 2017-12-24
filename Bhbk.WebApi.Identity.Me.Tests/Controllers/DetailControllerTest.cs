@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.WebApi.Identity.Me.Controllers;
-using Bhbk.WebApi.Identity.Me.Providers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -39,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var result = controller.QuoteOfDay() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<QuoteOfDayResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserQuoteOfDay>().Subject;
         }
 
         [TestMethod]
@@ -66,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             //var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            //var result = await _owin.HttpClient.PutAsync("/detail/v1/" + user.Id.ToString() + "/change-password", content);
+            //var result = _owin.CreateClient().PutAsync("/detail/v1/" + user.Id.ToString() + "/change-password", content).Result;
             //result.Should().BeNull();
         }
 
@@ -95,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
 
             //var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            //var result = await _owin.HttpClient.PutAsync("/detail/v1/" + user.Id.ToString() + "/change-password", content);
+            //var result = _owin.CreateClient().PutAsync("/detail/v1/" + user.Id.ToString() + "/change-password", content).Result;
             //result.Content.Should().BeAssignableTo(typeof(string));
         }
 

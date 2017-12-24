@@ -20,6 +20,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
+        public void Api_Sts_Diagnostic_GetTask_Success()
+        {
+            var controller = new DiagnosticController(IoC);
+
+            var result = controller.GetTasks() as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+        }
+
+        [TestMethod]
         public void Api_Sts_Diagnostic_GetVersion_Success()
         {
             var controller = new DiagnosticController(IoC);

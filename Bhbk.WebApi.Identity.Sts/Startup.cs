@@ -16,6 +16,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System;
+using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -23,25 +25,28 @@ namespace Bhbk.WebApi.Identity.Sts
 {
     public class Startup
     {
-        private static IConfigurationRoot _config;
-        private static IIdentityContext _ioc;
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static IConfigurationRoot _cb;
+        private static IEnumerable _clients, _audiences;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
-            var location = FileSystemHelper.SearchUsualPaths("appsettings.json");
-
-            _config = new ConfigurationBuilder()
-                .SetBasePath(location.DirectoryName)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            _cb = new ConfigurationBuilder()
+                .SetBasePath(_cf.DirectoryName)
+                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            _ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(_config["ConnectionStrings:IdentityEntities"]));
+            _clients = _cb.GetSection("Client:Names").GetChildren().Select(x => x.Value).ToList();
+            _audiences = _cb.GetSection("Audience:Names").GetChildren().Select(x => x.Value).ToList();
 
-            sc.AddSingleton<IIdentityContext>(_ioc);
-            sc.AddSingleton<IHostedService>(new MaintainTokensTask(_ioc));
-            sc.AddSingleton<IHostedService>(new TestingTask(_ioc));
+            var ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(_cb["ConnectionStrings:IdentityEntities"]));
+
+            ioc.ClientMgmt.Store.Salt = _cb["Client:Salt"];
+
+            sc.AddSingleton<IIdentityContext>(ioc);
+            sc.AddSingleton<IHostedService>(new MaintainTokensTask(ioc));
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -61,13 +66,17 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ClockSkew = TimeSpan.Zero,
-                    IssuerSigningKeys = ioc.AudienceMgmt.Store.GetAll().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.AudienceKey))),
-                    ValidIssuers = ioc.ClientMgmt.Store.GetAll().Select(x => x.Id.ToString()),
-                    ValidAudiences = ioc.AudienceMgmt.Store.GetAll().Select(x => x.Id.ToString()),
+                    ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
+                    IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
+                    ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Id.ToString()),
+                    AudienceValidator = CustomAudienceValidator.MultipleAudience,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
+                    ClockSkew = TimeSpan.Zero,
                 };
             });
             sc.AddMvc();

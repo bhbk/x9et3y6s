@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Factory;
 using System;
 using System.Collections.Generic;
 
@@ -14,7 +13,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
             this.AudienceType = audience.AudienceType;
-            this.AudienceKey = audience.AudienceKey;
             this.Created = audience.Created;
             this.LastUpdated = audience.LastUpdated ?? null;
             this.Enabled = audience.Enabled;
@@ -30,7 +28,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
             this.AudienceType = audience.AudienceType;
-            this.AudienceKey = audience.AudienceKey;
             this.Created = DateTime.Now;
             this.Enabled = audience.Enabled;
             this.Immutable = false;
@@ -43,7 +40,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
             this.AudienceType = audience.AudienceType;
-            this.AudienceKey = audience.AudienceKey;
             this.LastUpdated = DateTime.Now;
             this.Enabled = audience.Enabled;
             this.Immutable = audience.Immutable;
@@ -58,7 +54,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Name = this.Name,
                 Description = this.Description ?? string.Empty,
                 AudienceType = this.AudienceType,
-                AudienceKey = this.AudienceKey,
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
@@ -75,7 +70,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Name = this.Name,
                 Description = this.Description ?? string.Empty,
                 AudienceType = this.AudienceType,
-                AudienceKey = this.AudienceKey,
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
@@ -90,7 +84,6 @@ namespace Bhbk.Lib.Identity.Factory
         public string Name { get; set; }
         public string Description { get; set; }
         public string AudienceType { get; set; }
-        public string AudienceKey { get; set; }
         public bool Enabled { get; set; }
         public bool Immutable { get; set; }
     }
@@ -102,7 +95,6 @@ namespace Bhbk.Lib.Identity.Factory
         public string Name { get; set; }
         public string Description { get; set; }
         public string AudienceType { get; set; }
-        public string AudienceKey { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public Nullable<DateTime> LastUpdated { get; set; }
@@ -117,7 +109,6 @@ namespace Bhbk.Lib.Identity.Factory
         public string Name { get; set; }
         public string Description { get; set; }
         public string AudienceType { get; set; }
-        public string AudienceKey { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public Nullable<DateTime> LastUpdated { get; set; }

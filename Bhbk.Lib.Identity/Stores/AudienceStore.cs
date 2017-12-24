@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppAudience.Where(x => x.Name == name).SingleOrDefault();
         }
 
-        public IList<AppAudience> GetAll()
+        public IList<AppAudience> Get()
         {
             return _context.AppAudience.ToList();
         }
@@ -117,7 +117,6 @@ namespace Bhbk.Lib.Identity.Stores
             audience.Name = entity.Name;
             audience.Description = entity.Description;
             audience.AudienceType = entity.AudienceType;
-            audience.AudienceKey = entity.AudienceKey;
             audience.Enabled = entity.Enabled;
             audience.Immutable = entity.Immutable;
             audience.LastUpdated = DateTime.Now;

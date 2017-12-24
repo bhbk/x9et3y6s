@@ -134,14 +134,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             }
 
             var access = JwtV1Helper.GenerateAccessToken(context, client, audience, user).Result;
-            var refresh = JwtV1Helper.GenerateRefreshToken(context, client, audience, user).Result;
+            var refresh = JwtV1Helper.GenerateRefreshToken(context, client, user).Result;
 
             var result = new
             {
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
-                client_id = client.Id.ToString(),
+                client_id = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
                 audience_id = audience.Id.ToString(),
                 user = user.Id.ToString(),
                 issued = access.begin,

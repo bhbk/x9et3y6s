@@ -35,8 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             {
                 ClientId = IoC.ClientMgmt.Store.Get().First().Id,
                 Name = name,
-                AudienceType = BaseLib.AudienceType.thin_client.ToString(),
-                AudienceKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
+                AudienceType = BaseLib.AudienceType.user_agent.ToString(),
                 Enabled = true,
                 Immutable = false
             };
@@ -126,7 +125,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 ClientId = IoC.ClientMgmt.Store.Get().First().Id,
                 Name = name + "(Updated)",
                 AudienceType = audience.AudienceType,
-                AudienceKey = audience.AudienceKey,
                 Enabled = true
             };
 

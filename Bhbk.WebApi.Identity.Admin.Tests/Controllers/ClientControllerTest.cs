@@ -34,6 +34,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new ClientCreate()
             {
                 Name = name,
+                ClientKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
                 Enabled = true,
                 Immutable = false
             };
@@ -121,6 +122,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             {
                 Id = client.Id,
                 Name = name + "(Updated)",
+                ClientKey = client.ClientKey,
                 Enabled = true,
                 Immutable = false
             };

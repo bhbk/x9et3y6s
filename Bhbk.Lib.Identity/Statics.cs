@@ -2,11 +2,12 @@
 
 namespace Bhbk.Lib.Identity
 {
+    //https://tools.ietf.org/html/rfc6749#section-2.1
     public enum AudienceType
     {
-        thin_client,
-        thick_client,
-        webapi
+        user_agent,
+        native,
+        server
     }
 
     public enum GrantType
@@ -21,7 +22,7 @@ namespace Bhbk.Lib.Identity
     {
         #region Attribute Settings
         public const String AttrAudienceIDV1 = "audience_id";
-        public const String AttrAudienceIDV2 = "audience";
+        public const String AttrAudienceIDV2 = "audiences";
         public const String AttrClientIDV1 = "client_id";
         public const String AttrClientIDV2 = "client";
         public const String AttrGrantTypeIDV1 = "grant_type";
@@ -33,14 +34,15 @@ namespace Bhbk.Lib.Identity
         #endregion
 
         #region Configuration Settings
-        public const String ApiDefaultAudience = "Bhbk.WebUi.Identity";
         public const String ApiDefaultClient = "Bhbk";
+        public const String ApiDefaultAudienceUi = "Bhbk.WebUi.Identity";
+        public const String ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
         public const String ApiDefaultPhone = "12223334444";
         public const String ApiDefaultLogin = "local";
         public const String ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
         public const String ApiDefaultLoginName = "built-in";
-        public const String ApiDefaultRoleForAdmin = "(Built-In) Administrators";
-        public const String ApiDefaultRoleForViewer = "(Built-In) Viewers";
+        public const String ApiDefaultRoleForAdminUi = "(Built-In) Administrators";
+        public const String ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
         public const String ApiDefaultUserAdmin = "root@local";
         public const String ApiTokenConfirmEmail = "EmailConfirmation";
         public const String ApiTokenConfirmPhone = "PhoneNumberConfirmation";

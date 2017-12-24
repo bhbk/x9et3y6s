@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<IList<AppRole>> GetListAsync()
         {
-            return Store.GetAll();
+            return Store.Get();
         }
 
         public async Task<IList<AppUser>> GetUsersListAsync(AppRole role)

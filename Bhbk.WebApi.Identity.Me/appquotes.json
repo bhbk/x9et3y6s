@@ -1,0 +1,24 @@
+﻿{
+  "success": {
+    "total": 1
+  },
+  "contents": {
+    "quotes": [
+      {
+        "quote": "Ideas don't get smaller when they're shared, they get bigger.",
+        "length": "61",
+        "author": "Seth Godin",
+        "tags": [
+          "ideas",
+          "inspire",
+          "sharing"
+        ],
+        "category": "inspire",
+        "date": "2018-05-29",
+        "title": "Inspiring Quote of the day",
+        "background": "https://theysaidso.com/img/bgs/man_on_the_mountain.jpg",
+        "id": "JuCBZvZRrPtqRhQNjadt2geF"
+      }
+    ]
+  }
+}

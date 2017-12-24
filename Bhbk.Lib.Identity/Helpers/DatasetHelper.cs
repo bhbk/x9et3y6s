@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Helpers
 {
     public class DatasetHelper
     {
-        private IIdentityContext _ioc;
+        private readonly IIdentityContext _ioc;
 
         public DatasetHelper(IIdentityContext ioc)
         {
@@ -36,6 +36,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 client = new ClientCreate()
                 {
                     Name = Statics.ApiDefaultClient,
+                    ClientKey = CryptoHelper.GenerateRandomBase64(32),
                     Enabled = true,
                     Immutable = false
                 };
@@ -44,22 +45,38 @@ namespace Bhbk.Lib.Identity.Helpers
                 foundClient = _ioc.ClientMgmt.Store.Get(x => x.Name == client.Name).Single();
             }
 
-            var foundAudience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
+            var foundAudienceApi = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudienceApi).SingleOrDefault();
 
-            if (foundAudience == null)
+            if (foundAudienceApi == null)
             {
                 audience = new AudienceCreate()
                 {
                     ClientId = foundClient.Id,
-                    Name = Statics.ApiDefaultAudience,
-                    AudienceType = AudienceType.thin_client.ToString(),
-                    AudienceKey = CryptoHelper.GenerateRandomBase64(32),
+                    Name = Statics.ApiDefaultAudienceApi,
+                    AudienceType = AudienceType.server.ToString(),
                     Enabled = true,
                     Immutable = false
                 };
 
                 await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
-                foundAudience = _ioc.AudienceMgmt.Store.Get(x => x.Name == audience.Name).Single();
+                foundAudienceApi = _ioc.AudienceMgmt.Store.Get(x => x.Name == audience.Name).Single();
+            }
+
+            var foundAudienceUi = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudienceUi).SingleOrDefault();
+
+            if (foundAudienceUi == null)
+            {
+                audience = new AudienceCreate()
+                {
+                    ClientId = foundClient.Id,
+                    Name = Statics.ApiDefaultAudienceUi,
+                    AudienceType = AudienceType.user_agent.ToString(),
+                    Enabled = true,
+                    Immutable = false
+                };
+
+                await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
+                foundAudienceUi = _ioc.AudienceMgmt.Store.Get(x => x.Name == audience.Name).Single();
             }
 
             var foundUser = _ioc.UserMgmt.Store.Get(x => x.UserName == Statics.ApiDefaultUserAdmin).SingleOrDefault();
@@ -70,8 +87,8 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     Email = Statics.ApiDefaultUserAdmin,
                     PhoneNumber = Statics.ApiDefaultPhone,
-                    FirstName = "FirstName",
-                    LastName = "LastName",
+                    FirstName = "Uber",
+                    LastName = "Admin",
                     LockoutEnabled = false,
                     Immutable = false
                 };
@@ -84,36 +101,36 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.SetPhoneNumberConfirmedAsync(foundUser, true);
             }
 
-            var foundRoleForAdmin = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiDefaultRoleForAdmin).SingleOrDefault();
+            var foundRoleForAdminUi = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiDefaultRoleForAdminUi).SingleOrDefault();
 
-            if (foundRoleForAdmin == null)
+            if (foundRoleForAdminUi == null)
             {
                 role = new RoleCreate()
                 {
-                    AudienceId = foundAudience.Id,
-                    Name = Statics.ApiDefaultRoleForAdmin,
+                    AudienceId = foundAudienceUi.Id,
+                    Name = Statics.ApiDefaultRoleForAdminUi,
                     Enabled = true,
                     Immutable = true
                 };
 
                 await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(role).Devolve());
-                foundRoleForAdmin = _ioc.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
+                foundRoleForAdminUi = _ioc.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
             }
 
-            var foundRoleForViewer = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiDefaultRoleForViewer).SingleOrDefault();
+            var foundRoleForViewerApi = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiDefaultRoleForViewerApi).SingleOrDefault();
 
-            if (foundRoleForViewer == null)
+            if (foundRoleForViewerApi == null)
             {
                 role = new RoleCreate()
                 {
-                    AudienceId = foundAudience.Id,
-                    Name = Statics.ApiDefaultRoleForViewer,
+                    AudienceId = foundAudienceApi.Id,
+                    Name = Statics.ApiDefaultRoleForViewerApi,
                     Enabled = true,
                     Immutable = true
                 };
 
                 await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(role).Devolve());
-                foundRoleForViewer = _ioc.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
+                foundRoleForViewerApi = _ioc.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
             }
 
             var foundLogin = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiDefaultLogin).SingleOrDefault();
@@ -133,11 +150,11 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.AddLoginAsync(foundUser,
                     new UserLoginInfo(Statics.ApiDefaultLogin, Statics.ApiDefaultLoginKey, Statics.ApiDefaultLoginName));
 
-            if (!await _ioc.UserMgmt.IsInRoleAsync(foundUser, foundRoleForAdmin.Name))
-                await _ioc.UserMgmt.AddToRoleAsync(foundUser, foundRoleForAdmin.Name);
+            if (!await _ioc.UserMgmt.IsInRoleAsync(foundUser, foundRoleForAdminUi.Name))
+                await _ioc.UserMgmt.AddToRoleAsync(foundUser, foundRoleForAdminUi.Name);
 
-            if (!await _ioc.UserMgmt.IsInRoleAsync(foundUser, foundRoleForViewer.Name))
-                await _ioc.UserMgmt.AddToRoleAsync(foundUser, foundRoleForViewer.Name);
+            if (!await _ioc.UserMgmt.IsInRoleAsync(foundUser, foundRoleForViewerApi.Name))
+                await _ioc.UserMgmt.AddToRoleAsync(foundUser, foundRoleForViewerApi.Name);
         }
 
         public async void CreateTestData()
@@ -145,12 +162,13 @@ namespace Bhbk.Lib.Identity.Helpers
             AppAudience audience;
             AppClient client;
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
             {
                 await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
                     new ClientCreate()
                     {
                         Name = BaseLib.Statics.ApiUnitTestClient + CryptoHelper.GenerateRandomBase64(4),
+                        ClientKey = CryptoHelper.GenerateRandomBase64(32),
                         Enabled = true,
                         Immutable = false
                     }).Devolve());
@@ -158,15 +176,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             client = _ioc.ClientMgmt.Store.Get().First();
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
             {
                 await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
                     new AudienceCreate()
                     {
                         ClientId = client.Id,
                         Name = BaseLib.Statics.ApiUnitTestAudience + CryptoHelper.GenerateRandomBase64(4),
-                        AudienceType = AudienceType.thin_client.ToString(),
-                        AudienceKey = CryptoHelper.GenerateRandomBase64(32),
+                        AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false
                     }).Devolve());
@@ -186,7 +203,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     }).Devolve());
             }
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
             {
                 string email = "unit-test@" + CryptoHelper.GenerateRandomBase64(4) + ".net";
 
@@ -208,7 +225,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
             }
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
             {
                 await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                     new LoginCreate()
@@ -273,15 +290,25 @@ namespace Bhbk.Lib.Identity.Helpers
             if (login != null)
                 await _ioc.LoginMgmt.DeleteAsync(login.Id);
 
-            var role = await _ioc.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForAdmin);
+            var roleAdmin = await _ioc.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForAdminUi);
 
-            if (role != null)
-                await _ioc.RoleMgmt.DeleteAsync(role);
+            if (roleAdmin != null)
+                await _ioc.RoleMgmt.DeleteAsync(roleAdmin);
 
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudience).SingleOrDefault();
+            var roleViewer = await _ioc.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForViewerApi);
 
-            if (audience != null)
-                await _ioc.AudienceMgmt.DeleteAsync(audience.Id);
+            if (roleViewer != null)
+                await _ioc.RoleMgmt.DeleteAsync(roleViewer);
+
+            var audienceApi = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudienceApi).SingleOrDefault();
+
+            if (audienceApi != null)
+                await _ioc.AudienceMgmt.DeleteAsync(audienceApi.Id);
+
+            var audienceUi = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudienceUi).SingleOrDefault();
+
+            if (audienceUi != null)
+                await _ioc.AudienceMgmt.DeleteAsync(audienceUi.Id);
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
 

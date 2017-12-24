@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Stores
                 return query.ToList();
         }
 
-        public IList<AppRole> GetAll()
+        public IList<AppRole> Get()
         {
             return _context.AppRole.ToList();
         }

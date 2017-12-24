@@ -238,16 +238,17 @@ namespace Bhbk.Lib.Identity.Managers
             IList<Claim> claims = new List<Claim>();
 
             foreach (string role in await Store.GetRolesAsync(user))
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim(ClaimTypes.Role, role.ToLower()));
 
             foreach (Claim claim in await Store.GetClaimsAsync(user))
                 claims.Add(claim);
 
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString().ToLower()));
             claims.Add(new Claim(ClaimTypes.Email, user.Email));
             claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
+
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now)
                 .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -321,7 +322,7 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<IList<AppUser>> GetListAsync()
         {
-            return Store.GetAll();
+            return Store.Get();
         }
 
         public async Task<string> GetPhoneNumberAsync(AppUser user)
@@ -331,7 +332,15 @@ namespace Bhbk.Lib.Identity.Managers
 
             return await Store.GetPhoneNumberAsync(user);
         }
-        
+
+        public async Task<IList<string>> GetAudiencesAsync(AppUser user)
+        {
+            if (!Store.Exists(user.Id))
+                throw new ArgumentNullException();
+
+            return await Store.GetAudiencesAsync(user);
+        }
+
         public async Task<IList<string>> GetLoginsAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))

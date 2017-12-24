@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<IList<AppClient>> GetListAsync()
         {
-            return Store.GetAll();
+            return Store.Get();
         }
 
         public async Task<IList<AppAudience>> GetAudiencesAsync(Guid clientId)

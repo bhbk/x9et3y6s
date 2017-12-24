@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Helpers
             ClaimsPrincipal identity = new ClaimsPrincipal();
             identity.AddIdentity(claims);
 
-            var symmetricKeyAsBase64 = audience.AudienceKey;
+            var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Helpers
             }
 
             var access = new JwtSecurityToken(
-                issuer: client.Id.ToString(),
+                issuer: client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
                 audience: audience.Id.ToString(),
                 claims: identity.Claims,
                 notBefore: issueDate,
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<string>
-            GenerateRefreshToken(HttpContext context, AppClient client, AppAudience audience, AppUser user)
+            GenerateRefreshToken(HttpContext context, AppClient client, AppUser user)
         {
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
             DateTime issueDate, expireDate;
@@ -74,7 +74,6 @@ namespace Bhbk.Lib.Identity.Helpers
             var refresh = new UserRefreshCreate()
             {
                 ClientId = client.Id,
-                AudienceId = audience.Id,
                 UserId = user.Id,
                 ProtectedTicket = CryptoHelper.GenerateRandomBase64(256),
                 IssuedUtc = issueDate,

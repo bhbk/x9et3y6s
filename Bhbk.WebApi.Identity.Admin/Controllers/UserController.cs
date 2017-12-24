@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -79,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{username}"), HttpGet]
-        public async Task<IActionResult> GetUserByName(string username)
+        public async Task<IActionResult> GetUser(string username)
         {
             var user = await IoC.UserMgmt.FindByNameAsync(username);
 
@@ -99,7 +100,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var result = await IoC.UserMgmt.GetLoginsAsync(user);
+            var logins = IoC.UserMgmt.GetLoginsAsync(user).Result;
+            var result = IoC.LoginMgmt.Store.Get(x => logins.Contains(x.Id.ToString()))
+                .Select(x => new LoginFactory<AppLogin>(x).Evolve()).ToList();
+
+            return Ok(result);
+        }
+
+        [Route("v1/{userID}/audiences"), HttpGet]
+        public async Task<IActionResult> GetUserAudiences(Guid userID)
+        {
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
+            var audiences = IoC.UserMgmt.GetAudiencesAsync(user).Result;
+            var result = IoC.AudienceMgmt.Store.Get(x => audiences.Contains(x.Id.ToString()))
+                .Select(x => new AudienceFactory<AppAudience>(x).Evolve()).ToList();
 
             return Ok(result);
         }
@@ -112,7 +130,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var result = await IoC.UserMgmt.GetRolesAsync(user);
+            var roles = IoC.UserMgmt.GetRolesAsync(user).Result;
+            var result = IoC.RoleMgmt.Store.Get(x => roles.Contains(x.Id.ToString()))
+                .Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
 
             return Ok(result);
         }

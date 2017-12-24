@@ -1,8 +1,11 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -16,9 +19,24 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public OAuthController(IIdentityContext ioc)
             : base(ioc) { }
 
+        [Route("v1/refresh/{userID}"), HttpGet]
+        public async Task<IActionResult> GetRefreshTokens(Guid userID)
+        {
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
+            var roles = IoC.UserMgmt.GetRolesAsync(user).Result;
+            var result = IoC.RoleMgmt.Store.Get(x => roles.Contains(x.Id.ToString()))
+                .Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
+
+            throw new NotImplementedException();
+        }
+
         [Route("v1/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeToken(Guid userID, Guid tokenID)
+        public async Task<IActionResult> RevokeRefreshToken(Guid userID, Guid tokenID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -41,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}/revoke"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeTokens(Guid userID)
+        public async Task<IActionResult> RevokeRefreshTokens(Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 

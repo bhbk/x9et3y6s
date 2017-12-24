@@ -179,7 +179,7 @@ namespace Bhbk.Lib.Identity.Stores
                 return query.ToList();
         }
 
-        public IList<AppUser> GetAll()
+        public IList<AppUser> Get()
         {
             return _ioc.AppUser.ToList();
         }
@@ -187,12 +187,12 @@ namespace Bhbk.Lib.Identity.Stores
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             IList<Claim> result = new List<Claim>();
-            var claims = _ioc.AppUserClaim.Where(x => x.UserId == user.Id).ToList();
+            var map = _ioc.AppUserClaim.Where(x => x.UserId == user.Id).ToList();
 
-            if (claims == null)
+            if (map == null)
                 throw new InvalidOperationException();
 
-            foreach (var claim in claims)
+            foreach (var claim in map)
             {
                 var model = new Claim(claim.ClaimType,
                     claim.ClaimValue,
@@ -219,30 +219,51 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(user.PhoneNumber);
         }
 
-        public Task<IList<string>> GetLoginsAsync(AppUser user)
+        public Task<IList<string>> GetAudiencesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IList<string> result = new List<string>();
-            var logins = _ioc.AppUserLogin.Where(x => x.UserId == user.Id).ToList();
+            var result = (IList<string>)_ioc.AppAudience
+                .Join(_ioc.AppRole, x => x.Id, y => y.AudienceId, (audience, role) => new {
+                    AudienceId = audience.Id,
+                    RoleId = role.Id
+                })
+                .Join(_ioc.AppUserRole, x => x.RoleId, y => y.RoleId, (trole, tuser) => new {
+                    AudienceId = trole.AudienceId,
+                    UserId = tuser.UserId
+                })
+                .Where(x => x.UserId == user.Id)
+                .Select(x => x.AudienceId.ToString())
+                .Distinct()
+                .ToList();
 
-            if (logins == null)
-                throw new InvalidOperationException();
+            return Task.FromResult(result);
+        }
 
-            foreach (AppUserLogin login in logins)
-                result.Add(_ioc.AppLogin.Where(x => x.Id == login.LoginId).Select(r => r.LoginProvider).Single());
+        public Task<IList<string>> GetLoginsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var result = (IList<string>)_ioc.AppLogin
+                .Join(_ioc.AppUserLogin, x => x.Id, y => y.LoginId, (tlogin, tuser) => new {
+                    LoginId = tlogin.Id,
+                    UserId = tuser.UserId
+                })
+                .Where(x => x.UserId == user.Id)
+                .Select(x => x.LoginId.ToString())
+                .Distinct()
+                .ToList();
 
             return Task.FromResult(result);
         }
 
         public override Task<IList<string>> GetRolesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IList<string> result = new List<string>();
-            var roles = _ioc.AppUserRole.Where(x => x.UserId == user.Id).ToList();
-
-            if (roles == null)
-                throw new InvalidOperationException();
-
-            foreach (AppUserRole role in roles)
-                result.Add(_ioc.Roles.Where(x => x.Id == role.RoleId).Select(r => r.Name).Single());
+            var result = (IList<string>)_ioc.AppRole
+                .Join(_ioc.AppUserRole, x => x.Id, y => y.RoleId, (trole, tuser) => new {
+                    RoleId = trole.Id,
+                    UserId = tuser.UserId
+                })
+                .Where(x => x.UserId == user.Id)
+                .Select(x => x.RoleId.ToString())
+                .Distinct()
+                .ToList();
 
             return Task.FromResult(result);
         }
@@ -254,7 +275,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<bool> HasPasswordAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = _ioc.Users.Where(x => x.Id == user.Id || x.UserName == user.UserName).SingleOrDefault();
+            var result = _ioc.Users.Where(x => x.Id == user.Id).SingleOrDefault();
 
             if (result == null)
                 return Task.FromResult(false);
@@ -269,7 +290,12 @@ namespace Bhbk.Lib.Identity.Stores
 
         public Task<bool> IsInLoginAsync(AppUser user, string loginName)
         {
-            if (_ioc.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginProvider == loginName))
+            var login = _ioc.AppLogin.Where(x => x.LoginProvider == loginName).SingleOrDefault();
+
+            if (login == null)
+                throw new ArgumentNullException();
+
+            if (_ioc.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginId == login.Id))
                 return Task.FromResult(true);
 
             else
@@ -278,7 +304,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<bool> IsInRoleAsync(AppUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var role = _ioc.Roles.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
+            var role = _ioc.AppRole.Where(x => x.Name == normalizedRoleName).SingleOrDefault();
 
             if (role == null)
                 throw new ArgumentNullException();

@@ -13,7 +13,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize]
     public class BaseController : Controller
     {
-        private IIdentityContext _ioc;
+        private readonly IIdentityContext _ioc;
 
         protected IIdentityContext IoC
         {

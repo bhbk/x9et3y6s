@@ -122,10 +122,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
-            var logins = ioc.UserMgmt.GetLoginsAsync(user).Result;
+            var loginList = ioc.UserMgmt.GetLoginsAsync(user).Result;
+            var logins = ioc.LoginMgmt.Store.Get(x => loginList.Contains(x.Id.ToString()));
 
             //check that login provider exists...
-            if (logins == null)
+            if (loginList == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
@@ -134,8 +135,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
             //check if login provider is local...
             //check if login provider is transient for unit/integration test...
-            else if (logins.Contains(BaseLib.Statics.ApiDefaultLogin)
-                || (logins.Where(x => x.StartsWith(BaseLib.Statics.ApiUnitTestLogin)).Any() && ioc.ContextStatus == ContextType.UnitTest))
+            else if (logins.Where(x => x.LoginProvider == BaseLib.Statics.ApiDefaultLogin).Any()
+                || (logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLogin)).Any() && ioc.ContextStatus == ContextType.UnitTest))
             {
                 //check that password is valid...
                 if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)
@@ -156,14 +157,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
             
             var access = JwtV1Helper.GenerateAccessToken(context, client, audience, user).Result;
-            var refresh = JwtV1Helper.GenerateRefreshToken(context, client, audience, user).Result;
+            var refresh = JwtV1Helper.GenerateRefreshToken(context, client, user).Result;
 
             var result = new
             {
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
-                client_id = client.Id.ToString(),
+                client_id = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
                 audience_id = audience.Id.ToString(),
                 user = user.Id.ToString(),
                 issued = access.begin,
