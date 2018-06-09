@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -39,6 +40,18 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
         public Task Invoke(HttpContext context)
         {
+            //check if correct path
+            if (!context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal))
+                return _next(context);
+
+            //check if POST method
+            if (!context.Request.Method.Equals("POST"))
+                return _next(context);
+
+            //check for application/x-www-form-urlencoded
+            if (!context.Request.HasFormContentType)
+                return _next(context);
+
             //check for correct parameters
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
@@ -136,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             //check if login provider is local...
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.LoginProvider == BaseLib.Statics.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLogin)).Any() && ioc.ContextStatus == ContextType.UnitTest))
+                || (logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLoginA)).Any() && ioc.ContextStatus == ContextType.UnitTest))
             {
                 //check that password is valid...
                 if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)

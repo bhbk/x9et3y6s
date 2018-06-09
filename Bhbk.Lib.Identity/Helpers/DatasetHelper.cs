@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = Statics.ApiDefaultClient,
                     ClientKey = CryptoHelper.GenerateRandomBase64(32),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = true
                 };
 
                 await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(client).Devolve());
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = Statics.ApiDefaultAudienceApi,
                     AudienceType = AudienceType.server.ToString(),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = true
                 };
 
                 await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
@@ -72,14 +72,14 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = Statics.ApiDefaultAudienceUi,
                     AudienceType = AudienceType.user_agent.ToString(),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = true
                 };
 
                 await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
                 foundAudienceUi = _ioc.AudienceMgmt.Store.Get(x => x.Name == audience.Name).Single();
             }
 
-            var foundUser = _ioc.UserMgmt.Store.Get(x => x.UserName == Statics.ApiDefaultUserAdmin).SingleOrDefault();
+            var foundUser = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiDefaultUserAdmin).SingleOrDefault();
 
             if (foundUser == null)
             {
@@ -90,10 +90,10 @@ namespace Bhbk.Lib.Identity.Helpers
                     FirstName = "Uber",
                     LastName = "Admin",
                     LockoutEnabled = false,
-                    Immutable = false
+                    Immutable = true
                 };
 
-                await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(user).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+                await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(user).Devolve(), BaseLib.Statics.ApiDefaultUserPassword);
                 foundUser = _ioc.UserMgmt.Store.Get(x => x.Email == user.Email).Single();
 
                 await _ioc.UserMgmt.SetEmailConfirmedAsync(foundUser, true);
@@ -113,7 +113,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = true
                 };
 
-                await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(role).Devolve());
+                await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(role).Devolve());
                 foundRoleForAdminUi = _ioc.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
             }
 
@@ -129,7 +129,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Immutable = true
                 };
 
-                await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(role).Devolve());
+                await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(role).Devolve());
                 foundRoleForViewerApi = _ioc.RoleMgmt.Store.Get(x => x.Name == role.Name).Single();
             }
 
@@ -142,7 +142,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     LoginProvider = Statics.ApiDefaultLogin
                 };
 
-                await _ioc.LoginMgmt.CreateAsync(new LoginFactory<AppLogin>(login).Devolve());
+                await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
                 foundLogin = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == login.LoginProvider).SingleOrDefault();
             }
 
@@ -159,100 +159,145 @@ namespace Bhbk.Lib.Identity.Helpers
 
         public async void CreateTestData()
         {
-            AppAudience audience;
-            AppClient client;
+            AppLogin login;
+            AppUser user;
+            AppRole role;
 
-            for (int i = 0; i < 3; i++)
-            {
-                await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
-                    new ClientCreate()
-                    {
-                        Name = BaseLib.Statics.ApiUnitTestClient + CryptoHelper.GenerateRandomBase64(4),
-                        ClientKey = CryptoHelper.GenerateRandomBase64(32),
-                        Enabled = true,
-                        Immutable = false
-                    }).Devolve());
-            }
-
-            client = _ioc.ClientMgmt.Store.Get().First();
-
-            for (int i = 0; i < 3; i++)
-            {
-                await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
-                    new AudienceCreate()
-                    {
-                        ClientId = client.Id,
-                        Name = BaseLib.Statics.ApiUnitTestAudience + CryptoHelper.GenerateRandomBase64(4),
-                        AudienceType = AudienceType.user_agent.ToString(),
-                        Enabled = true,
-                        Immutable = false
-                    }).Devolve());
-            }
-
-            audience = _ioc.AudienceMgmt.Store.Get().First();
-
-            for (int i = 0; i < 3; i++)
-            {
-                await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(
-                    new RoleCreate()
-                    {
-                        AudienceId = audience.Id,
-                        Name = BaseLib.Statics.ApiUnitTestRole + CryptoHelper.GenerateRandomBase64(4),
-                        Enabled = true,
-                        Immutable = false
-                    }).Devolve());
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                string email = "unit-test@" + CryptoHelper.GenerateRandomBase64(4) + ".net";
-
-                await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(
-                    new UserCreate()
-                    {
-                        Email = email,
-                        PhoneNumber = Statics.ApiDefaultPhone,
-                        FirstName = "FirstName",
-                        LastName = "LastName",
-                        LockoutEnabled = false,
-                        Immutable = false
-                    }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
-
-                var user = _ioc.UserMgmt.Store.Get(x => x.Email == email).Single();
-
-                await _ioc.UserMgmt.SetEmailConfirmedAsync(user, true);
-                await _ioc.UserMgmt.SetPasswordConfirmedAsync(user, true);
-                await _ioc.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
-                    new LoginCreate()
-                    {
-                        LoginProvider = BaseLib.Statics.ApiUnitTestLogin + CryptoHelper.GenerateRandomBase64(4)
-                    }).Devolve());
-            }
-
-            var login = _ioc.LoginMgmt.Store.Get().First();
-
-            foreach (var user in _ioc.UserMgmt.Store.Get())
-            {
-                await _ioc.UserMgmt.AddClaimAsync(user,
-                    new Claim(BaseLib.Statics.ApiUnitTestClaimType,
-                        BaseLib.Statics.ApiUnitTestClaimValue + CryptoHelper.GenerateRandomBase64(4)));
-
-                foreach (var role in _ioc.RoleMgmt.Store.Get())
+            //create clients
+            await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
+                new ClientCreate()
                 {
-                    if (!await _ioc.UserMgmt.IsInRoleAsync(user, role.Name))
-                        await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);
-                }
+                    Name = BaseLib.Statics.ApiUnitTestClientA,
+                    ClientKey = CryptoHelper.GenerateRandomBase64(32),
+                    Enabled = true,
+                    Immutable = false
+                }).Devolve());
 
-                if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
+            await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
+                new ClientCreate()
                 {
-                    await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "built-in"));
-                }
-            }
+                    Name = BaseLib.Statics.ApiUnitTestClientB,
+                    ClientKey = CryptoHelper.GenerateRandomBase64(32),
+                    Enabled = true,
+                    Immutable = false
+                }).Devolve());
+
+            //create audiences
+            await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
+                new AudienceCreate()
+                {
+                    ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single().Id,
+                    Name = BaseLib.Statics.ApiUnitTestAudienceA,
+                    AudienceType = AudienceType.user_agent.ToString(),
+                    Enabled = true,
+                    Immutable = false
+                }).Devolve());
+
+            await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
+                new AudienceCreate()
+                {
+                    ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientB).Single().Id,
+                    Name = BaseLib.Statics.ApiUnitTestAudienceB,
+                    AudienceType = AudienceType.user_agent.ToString(),
+                    Enabled = true,
+                    Immutable = false
+                }).Devolve());
+
+            //create roles
+            await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(
+                new RoleCreate()
+                {
+                    AudienceId = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single().Id,
+                    Name = BaseLib.Statics.ApiUnitTestRoleA,
+                    Enabled = true,
+                    Immutable = false
+                }).Devolve());
+
+            await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(
+                new RoleCreate()
+                {
+                    AudienceId = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single().Id,
+                    Name = BaseLib.Statics.ApiUnitTestRoleB,
+                    Enabled = true,
+                    Immutable = false
+                }).Devolve());
+
+            //create logins
+            await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
+                new LoginCreate()
+                {
+                    LoginProvider = BaseLib.Statics.ApiUnitTestLoginA
+                }).Devolve());
+
+            await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
+                new LoginCreate()
+                {
+                    LoginProvider = BaseLib.Statics.ApiUnitTestLoginB
+                }).Devolve());
+
+            //create user A
+            await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(
+                new UserCreate()
+                {
+                    Email = BaseLib.Statics.ApiUnitTestUserA,
+                    PhoneNumber = Statics.ApiDefaultPhone,
+                    FirstName = "FirstName",
+                    LastName = "LastName",
+                    LockoutEnabled = false,
+                    Immutable = false
+                }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            await _ioc.UserMgmt.SetEmailConfirmedAsync(user, true);
+            await _ioc.UserMgmt.SetPasswordConfirmedAsync(user, true);
+            await _ioc.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
+
+            //create user B
+            await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(
+                new UserCreate()
+                {
+                    Email = BaseLib.Statics.ApiUnitTestUserB,
+                    PhoneNumber = Statics.ApiDefaultPhone,
+                    FirstName = "FirstName",
+                    LastName = "LastName",
+                    LockoutEnabled = false,
+                    Immutable = false
+                }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserB).Single();
+
+            await _ioc.UserMgmt.SetEmailConfirmedAsync(user, true);
+            await _ioc.UserMgmt.SetPasswordConfirmedAsync(user, true);
+            await _ioc.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
+
+            //assign roles, claims & logins to user A
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
+
+            await _ioc.UserMgmt.AddClaimAsync(user,
+                new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue));
+
+            if (!await _ioc.UserMgmt.IsInRoleAsync(user, role.Name))
+                await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);
+
+            if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
+                await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "built-in"));
+
+            //assign roles, claims & logins to user B
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserB).Single();
+            role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
+            login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginB).Single();
+
+            await _ioc.UserMgmt.AddClaimAsync(user,
+                new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue));
+
+            if (!await _ioc.UserMgmt.IsInRoleAsync(user, role.Name))
+                await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);
+
+            if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
+                await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "built-in"));
         }
 
         public async void Destroy()
@@ -275,7 +320,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
         public async void DestroyDefaultData()
         {
-            var user = await _ioc.UserMgmt.FindByNameAsync(Statics.ApiDefaultUserAdmin);
+            var user = await _ioc.UserMgmt.FindByNameAsync(Statics.ApiDefaultUserAdmin + "@local");
 
             if (user != null)
             {

@@ -7,11 +7,11 @@ using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Sts
             ioc.ClientMgmt.Store.Salt = _cb["Client:Salt"];
 
             sc.AddSingleton<IIdentityContext>(ioc);
-            sc.AddSingleton<IHostedService>(new MaintainTokensTask(ioc));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(ioc));
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts
             }
             else
             {
-                app.UseExceptionHandler();
+                app.UseExceptionHandler("/error");
             }
 
             app.UseForwardedHeaders();
@@ -107,63 +107,71 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseAuthentication();
             app.UseMvc();
 
-            //explicitely mapped elements for STS. want to avoid chained middleware for these end-points.
-            //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseAccessTokenV1Provider();
-                });
+            app.UseMiddleware<AccessTokenV1Provider>();
+            app.UseMiddleware<AccessTokenV2Provider>();
+            app.UseMiddleware<AuthorizationCodeV1Provider>();
+            app.UseMiddleware<AuthorizationCodeV2Provider>();
+            app.UseMiddleware<ClientCredentialsV1Provider>();
+            app.UseMiddleware<ClientCredentialsV2Provider>();
+            app.UseMiddleware<RefreshTokenV1Provider>();
+            app.UseMiddleware<RefreshTokenV2Provider>();
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseAuthorizationCodeV1Provider();
-                });
+            ////https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseAccessTokenV1Provider();
+            //    });
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/client", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseClientCredentialsV1Provider();
-                });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseAuthorizationCodeV1Provider();
+            //    });
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseRefreshTokenV1Provider();
-                });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/client", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseClientCredentialsV1Provider();
+            //    });
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseAccessTokenV2Provider();
-                });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseRefreshTokenV1Provider();
+            //    });
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseAuthorizationCodeV2Provider();
-                });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseAccessTokenV2Provider();
+            //    });
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
-               && context.Request.Method.Equals("POST")
-               && context.Request.HasFormContentType, x =>
-               {
-                   x.UseClientCredentialsV2Provider();
-               });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseAuthorizationCodeV2Provider();
+            //    });
 
-            app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
-                && context.Request.Method.Equals("POST")
-                && context.Request.HasFormContentType, x =>
-                {
-                    x.UseRefreshTokenV2Provider();
-                });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
+            //   && context.Request.Method.Equals("POST")
+            //   && context.Request.HasFormContentType, x =>
+            //   {
+            //       x.UseClientCredentialsV2Provider();
+            //   });
+
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseRefreshTokenV2Provider();
+            //    });
 
         }
     }

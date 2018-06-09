@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,12 +16,13 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public partial class CustomUserManager : UserManager<AppUser>
     {
-        private ConfigManager _config;
+        public ConfigManager Config;
+        public CustomClaimsProvider ClaimProvider;
+        public CustomPasswordHasher PasswordHasher;
+        public CustomPasswordValidator PasswordValidator;
+        public CustomTotpTokenProvider TokenProvider;
         public CustomUserStore Store;
-        public IPasswordHasher<AppUser> PasswordHasher;
-        public IPasswordValidator<AppUser> PasswordValidator;
-        public IUserValidator<AppUser> UserValidator;
-        public CustomTotpTokenProvider UserTokenProvider;
+        public CustomUserValidator UserValidator;
 
         public CustomUserManager(CustomUserStore store,
             IOptions<IdentityOptions> options = null,
@@ -38,20 +38,21 @@ namespace Bhbk.Lib.Identity.Managers
             if (store == null)
                 throw new ArgumentNullException();
 
-            _config = new ConfigManager();
-
             Store = store;
+            Config = new ConfigManager();
+            ClaimProvider = new CustomClaimsProvider(this, Config);
             PasswordHasher = new CustomPasswordHasher();
             PasswordValidator = new CustomPasswordValidator();
-            UserValidator = new CustomUserValidator();
 
             //create user token provider...
-            UserTokenProvider =
+            TokenProvider =
                 new CustomTotpTokenProvider
                 {
-                    OtpTokenSize = _config.Tweaks.DefaultAuhthorizationCodeLength,
-                    OtpTokenTimespan = _config.Tweaks.DefaultAuhthorizationCodeLife
+                    OtpTokenSize = Config.Tweaks.DefaultAuhthorizationCodeLength,
+                    OtpTokenTimespan = Config.Tweaks.DefaultAuhthorizationCodeLife
                 };
+
+            UserValidator = new CustomUserValidator();
         }
 
         public override async Task<IdentityResult> AccessFailedAsync(AppUser user)
@@ -98,12 +99,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (hash != null)
                 throw new InvalidOperationException();
 
-            var result = await UpdatePassword(Store, user, password);
-
-            if (!result.Succeeded)
-                throw new InvalidOperationException();
-
-            return IdentityResult.Success;
+            return await UpdatePassword(Store, user, password);
         }
 
         public async Task<IdentityResult> AddRefreshTokenAsync(AppUserRefresh refresh)
@@ -217,9 +213,12 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(user.Id))
                 throw new InvalidOperationException();
 
-            await Store.CreateAsync(user);
+            //var check = await UserValidator.ValidateAsync(this, user);
 
-            return IdentityResult.Success;
+            //if(!check.Succeeded)
+            //    return check;
+
+            return await Store.CreateAsync(user);
         }
 
         public override async Task<IdentityResult> CreateAsync(AppUser user, string password)
@@ -227,41 +226,17 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(user.Id))
                 throw new InvalidOperationException();
 
-            await Store.CreateAsync(user);
-            await UpdatePassword(Store, user, password);
+            //var check = await UserValidator.ValidateAsync(this, user);
 
-            return IdentityResult.Success;
-        }
+            //if (!check.Succeeded)
+            //    return check;
 
-        public async Task<ClaimsIdentity> CreateIdentityAsync(AppUser user, string authenticationType)
-        {
-            IList<Claim> claims = new List<Claim>();
+            var create = await Store.CreateAsync(user);
 
-            foreach (string role in await Store.GetRolesAsync(user))
-                claims.Add(new Claim(ClaimTypes.Role, role.ToLower()));
+            if (!create.Succeeded)
+                return create;
 
-            foreach (Claim claim in await Store.GetClaimsAsync(user))
-                claims.Add(claim);
-
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString().ToLower()));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
-            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
-            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
-            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
-
-            //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now)
-                .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-            //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.Now)
-                .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-            //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now)
-                .ToUniversalTime().Add(new TimeSpan((int)_config.Tweaks.DefaultAccessTokenLife)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            var result = new ClaimsIdentity(claims, authenticationType);
-
-            return await Task.Run(() => result);
+            return await UpdatePassword(this.Store, user, password);
         }
 
         public override async Task<IdentityResult> DeleteAsync(AppUser user)
@@ -269,9 +244,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            await Store.DeleteAsync(user, new CancellationToken());
-
-            return IdentityResult.Success;
+            return await Store.DeleteAsync(user, new CancellationToken());
         }
 
         public override async Task<AppUser> FindByIdAsync(string userId)
@@ -349,6 +322,14 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.GetLoginsAsync(user);
         }
 
+        public async Task<IList<string>> GetRefreshTokensAsync(AppUser user)
+        {
+            if (!Store.Exists(user.Id))
+                throw new ArgumentNullException();
+
+            return await Store.GetRefreshTokensAsync(user);
+        }
+
         public override async Task<IList<string>> GetRolesAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
@@ -387,13 +368,13 @@ namespace Bhbk.Lib.Identity.Managers
 
         public override async Task<string> GenerateUserTokenAsync(AppUser user, string tokenProvider, string purpose)
         {
-            if (UserTokenProvider == null)
+            if (TokenProvider == null)
                 throw new NotSupportedException();
 
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            return await UserTokenProvider.GenerateAsync(purpose, this, user);
+            return await TokenProvider.GenerateAsync(purpose, this, user);
         }
 
         public override async Task<bool> HasPasswordAsync(AppUser user)
@@ -466,7 +447,7 @@ namespace Bhbk.Lib.Identity.Managers
         }
 
         [System.Obsolete]
-        public async Task<IdentityResult> RemoveFromProviderAsync(AppUser user, string loginProvider, string providerKey)
+        public async Task<IdentityResult> RemoveFromLoginAsync(AppUser user, string loginProvider, string providerKey)
         {
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
@@ -640,13 +621,13 @@ namespace Bhbk.Lib.Identity.Managers
 
         public override async Task<bool> VerifyChangePhoneNumberTokenAsync(AppUser user, string token, string phoneNumber)
         {
-            if (UserTokenProvider == null)
+            if (TokenProvider == null)
                 throw new NotSupportedException();
 
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            return await UserTokenProvider.ValidateAsync(Statics.ApiTokenConfirmPhone, token, this, user);
+            return await TokenProvider.ValidateAsync(Statics.ApiTokenConfirmPhone, token, this, user);
         }
 
         protected override async Task<PasswordVerificationResult> VerifyPasswordAsync(IUserPasswordStore<AppUser> store, AppUser user, string password)
@@ -664,13 +645,13 @@ namespace Bhbk.Lib.Identity.Managers
 
         public override async Task<bool> VerifyUserTokenAsync(AppUser user, string tokenProvider, string purpose, string token)
         {
-            if (UserTokenProvider == null)
+            if (TokenProvider == null)
                 throw new NotSupportedException();
 
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            return await UserTokenProvider.ValidateAsync(purpose, token, this, user);
+            return await TokenProvider.ValidateAsync(purpose, token, this, user);
         }
     }
 }

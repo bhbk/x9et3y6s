@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -11,10 +12,11 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
+using Microsoft.Extensions.Hosting;
 
 namespace Bhbk.WebApi.Identity.Me.Tasks
 {
-    public class MaintainQuotesTask : CustomIdentityTask
+    public class MaintainQuotesTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
         private readonly IConfigurationRoot _cb;
@@ -22,52 +24,66 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         private readonly FileInfo _qf = FileSystemHelper.SearchPaths("appquotes.json");
         private readonly HttpClient _client = new HttpClient();
         private readonly int _interval;
-        private string _api;
+        private readonly string _url;
+        public UserQuoteOfDay QuoteOfDay { get; private set; }
+        public string Status { get; private set; }
 
         public MaintainQuotesTask(IIdentityContext ioc)
         {
             if (ioc == null)
-                throw new ArgumentNullException();
+                throw new NullReferenceException();
 
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
                 .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _ioc = ioc;
             _interval = int.Parse(_cb["Tasks:MaintainQuotes:PollingInterval"]);
-            _api = _cb["Tasks:MaintainQuotes:ApiGetQoDUrl"];
+            _url = _cb["Tasks:MaintainQuotes:ApiGetQoDUrl"];
+            _ioc = ioc;
         }
 
-        public async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            _ioc.UserQuote = JsonConvert.DeserializeObject<UserQuoteOfDay>
-                (File.ReadAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name));
+            if (_ioc.ContextStatus == ContextType.UnitTest)
+                QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
+                    (File.ReadAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name));
+            else
+                DoWork(cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                try
-                {
-                    await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
 
-                    Log.Information("Task " + typeof(MaintainQuotesTask).Name + ". Updated quote of the day.");
-
-                    var result = await _client.GetAsync(_api, cancellationToken);
-
-                    if (result.IsSuccessStatusCode)
-                        _ioc.UserQuote = JsonConvert.DeserializeObject<UserQuoteOfDay>(await result.Content.ReadAsStringAsync());
-
-                    Status = result.ReasonPhrase;
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, BaseLib.Statics.MsgSystemExceptionCaught);
-                }
+                DoWork(cancellationToken);
             }
 
-            File.WriteAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name, JsonConvert.SerializeObject(_ioc.UserQuote));
+            File.WriteAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name, JsonConvert.SerializeObject(QuoteOfDay));
         }
 
-        public string Status { get; private set; }
+        private void DoWork(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = _client.GetAsync(_url, cancellationToken).Result;
+                var quote = JsonConvert.DeserializeObject<UserQuoteOfDay>(result.Content.ReadAsStringAsync().Result);
+
+                if (result.IsSuccessStatusCode)
+                {
+                    if(quote.contents.quotes[0].id != QuoteOfDay.contents.quotes[0].id)
+                    {
+                        QuoteOfDay = quote;
+
+                        Log.Information("Task " + typeof(MaintainQuotesTask).Name + ". Update quote of the day.");
+                    }
+                }
+
+                Status = result.ReasonPhrase;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+            }
+        }
     }
 }

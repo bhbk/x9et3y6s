@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Managers;
+﻿using Bhbk.Lib.Identity.Managers;
 using System;
 
 namespace Bhbk.Lib.Identity.Interfaces
@@ -14,7 +13,6 @@ namespace Bhbk.Lib.Identity.Interfaces
         LoginManager LoginMgmt { get; }
         CustomRoleManager RoleMgmt { get; }
         CustomUserManager UserMgmt { get; }
-        UserQuoteOfDay UserQuote { get; set; }
         void Save();
     }
 

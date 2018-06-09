@@ -5,9 +5,9 @@ using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 //http://www.dotnetcurry.com/aspnet-core/1420/integration-testing-aspnet-core
@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
             TestData = new DatasetHelper(IoC);
 
             sc.AddSingleton<IIdentityContext>(IoC);
-            sc.AddSingleton<IHostedService>(new MaintainQuotesTask(IoC));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(IoC));
         }
 
         public override void ConfigureServices(IServiceCollection sc)

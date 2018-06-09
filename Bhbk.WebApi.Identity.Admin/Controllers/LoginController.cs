@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetLogins()
         {
-            IList<LoginResult> result = new List<LoginResult>();
+            var result = new List<LoginResult>();
             var logins = await IoC.LoginMgmt.GetListAsync();
 
             foreach (AppLogin entry in logins)
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            IList<UserResult> result = new List<UserResult>();
+            var result = new List<UserResult>();
             var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
 
             foreach (AppUser entry in users)
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var result = await IoC.UserMgmt.RemoveFromProviderAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
+                var result = await IoC.UserMgmt.RemoveFromLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);

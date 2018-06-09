@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity
     {
         #region Attribute Settings
         public const String AttrAudienceIDV1 = "audience_id";
-        public const String AttrAudienceIDV2 = "audiences";
+        public const String AttrAudienceIDV2 = "audience";
         public const String AttrClientIDV1 = "client_id";
         public const String AttrClientIDV2 = "client";
         public const String AttrGrantTypeIDV1 = "grant_type";
@@ -37,13 +37,14 @@ namespace Bhbk.Lib.Identity
         public const String ApiDefaultClient = "Bhbk";
         public const String ApiDefaultAudienceUi = "Bhbk.WebUi.Identity";
         public const String ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
-        public const String ApiDefaultPhone = "12223334444";
+        public const String ApiDefaultPhone = "0123456789";
         public const String ApiDefaultLogin = "local";
         public const String ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
         public const String ApiDefaultLoginName = "built-in";
         public const String ApiDefaultRoleForAdminUi = "(Built-In) Administrators";
         public const String ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
         public const String ApiDefaultUserAdmin = "root@local";
+        public const String ApiDefaultUserPassword = "3uetw7W$mswU";
         public const String ApiTokenConfirmEmail = "EmailConfirmation";
         public const String ApiTokenConfirmPhone = "PhoneNumberConfirmation";
         public const String ApiTokenConfirmTwoFactor = "TwoFactorConfirmation";
@@ -51,17 +52,22 @@ namespace Bhbk.Lib.Identity
         #endregion
 
         #region Configuration Settings (Unit Tests)
-        public const String ApiUnitTestAudience = "Audience-UnitTests-";
-        public const String ApiUnitTestClient = "Client-UnitTests-";
+        public const String ApiUnitTestAudienceA = "AudienceUnitTestsA";
+        public const String ApiUnitTestAudienceB = "AudienceUnitTestsB";
+        public const String ApiUnitTestClientA = "ClientUnitTestsA";
+        public const String ApiUnitTestClientB = "ClientUnitTestsB";
         public const String ApiUnitTestPasswordCurrent = "3uetw7W$mswU";
         public const String ApiUnitTestPasswordNew = "mv7wd3dks&k3";
-        public const String ApiUnitTestRole = "Role-UnitTests-";
-        public const String ApiUnitTestUser = "unit-tests@";
-        public const String ApiUnitTestLogin = "Login-UnitTests-";
-        public const String ApiUnitTestLoginKey = "Login-UnitTests-sxW8wlsw1Z04heUckw";
-        public const String ApiUnitTestLoginName = "Login-UnitTests-";
-        public const String ApiUnitTestClaimType = "ClaimType-UnitTests-";
-        public const String ApiUnitTestClaimValue = "ClaimValue-UnitTests-";
+        public const String ApiUnitTestRoleA = "RoleUnitTestsA";
+        public const String ApiUnitTestRoleB = "RoleUnitTestsB";
+        public const String ApiUnitTestUserA = "UserUnitTestsA@local";
+        public const String ApiUnitTestUserB = "UserUnitTestsB@local";
+        public const String ApiUnitTestLoginA = "LoginUnitTestsA";
+        public const String ApiUnitTestLoginB = "LoginUnitTestsB";
+        public const String ApiUnitTestLoginKeyA = "LoginUnitTestsKeyA";
+        public const String ApiUnitTestLoginNameA = "LoginUnitTests";
+        public const String ApiUnitTestClaimType = "ClaimTypeUnitTests";
+        public const String ApiUnitTestClaimValue = "ClaimValueUnitTests";
         #endregion
 
         #region Message Settings

@@ -1,9 +1,11 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -14,12 +16,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class BaseController : Controller
     {
         private readonly IIdentityContext _ioc;
-        
+        private readonly IHostedService[] _tasks;
+
         protected IIdentityContext IoC
         {
             get
             {
-                return _ioc ?? (IIdentityContext)HttpContext.RequestServices.GetRequiredService(typeof(IIdentityContext));
+                return _ioc ?? (IIdentityContext)ControllerContext.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityContext));
+            }
+        }
+
+        protected IHostedService[] Tasks
+        {
+            get
+            {
+                return _tasks ?? (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>();
             }
         }
 
@@ -64,10 +75,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public void SetUser(Guid userID)
         {
             var user = IoC.UserMgmt.Store.FindByIdAsync(userID.ToString()).Result;
-            var claims = IoC.UserMgmt.CreateIdentityAsync(user, "JWT").Result;
+            var identity = IoC.UserMgmt.ClaimProvider.CreateAsync(user).Result;
 
             ControllerContext.HttpContext = new DefaultHttpContext();
-            ControllerContext.HttpContext.User = new ClaimsPrincipal(claims);
+            ControllerContext.HttpContext.User = identity;
         }
     }
 }

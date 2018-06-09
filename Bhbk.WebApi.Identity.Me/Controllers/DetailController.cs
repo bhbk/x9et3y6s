@@ -1,7 +1,9 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -19,7 +21,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/quote-of-day"), HttpGet]
         public IActionResult QuoteOfDay()
         {
-            return Ok(IoC.UserQuote);
+            var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
+
+            return Ok(task.QuoteOfDay);
         }
 
         [Route("v1/change-email"), HttpPut]

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -40,6 +41,18 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
         public Task Invoke(HttpContext context)
         {
+            //check if correct path
+            if (!context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal))
+                return _next(context);
+
+            //check if POST method
+            if (!context.Request.Method.Equals("POST"))
+                return _next(context);
+
+            //check for application/x-www-form-urlencoded
+            if (!context.Request.HasFormContentType)
+                return _next(context);
+
             //check for correct parameters
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
@@ -58,7 +71,6 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
-                //|| string.IsNullOrEmpty(audienceValue)
                 || !grantTypeValue.Equals(BaseLib.Statics.AttrPasswordIDV1)
                 || string.IsNullOrEmpty(userValue)
                 || string.IsNullOrEmpty(passwordValue))
@@ -110,33 +122,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             }
 
             var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
-            List<AppAudience> audiences;
+            var audiences = new List<AppAudience>();
 
+            //check if audience is single, multiple or undefined...
             if (string.IsNullOrEmpty(audienceValue))
-            {
                 audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())).ToList();
-
-                foreach (AppAudience audience in audiences)
-                {
-                    if (audience == null || !audience.Enabled)
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        context.Response.ContentType = "application/json";
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
-                    }
-                }
-            }
             else
             {
-                audiences = new List<AppAudience>();
-
-                //if(!audienceList.All(x => audienceValue.Split(",").Contains(x)))
-                //{
-                //    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                //    context.Response.ContentType = "application/json";
-                //    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
-                //}
-
                 foreach (string entry in audienceValue.Split(","))
                 {
                     Guid audienceID;
@@ -148,7 +140,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     else
                         audience = ioc.AudienceMgmt.FindByNameAsync(entry.Trim()).Result;
 
-                    if (audience == null || !audience.Enabled)
+                    if (audience == null 
+                        || !audience.Enabled 
+                        || !audienceList.Contains(audience.Id.ToString()))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -173,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             //check if login provider is local...
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.LoginProvider == BaseLib.Statics.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLogin)).Any() && ioc.ContextStatus == ContextType.UnitTest))
+                || (ioc.ContextStatus == ContextType.UnitTest && logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLoginA)).Any()))
             {
                 //check that password is valid...
                 if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)

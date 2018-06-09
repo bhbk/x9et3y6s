@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user != null)
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
 
-            var create = new UserFactory<AppUser>(model);
+            var create = new UserFactory<UserCreate>(model);
             var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
 
             if (!result.Succeeded)

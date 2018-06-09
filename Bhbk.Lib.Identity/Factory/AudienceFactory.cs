@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bhbk.Lib.Identity.Factory
 {
@@ -17,7 +18,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.LastUpdated = audience.LastUpdated ?? null;
             this.Enabled = audience.Enabled;
             this.Immutable = audience.Immutable;
-
             this.AppRole = audience.AppRole;
         }
 
@@ -45,22 +45,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = audience.Immutable;
         }
 
-        public AudienceResult Evolve()
-        {
-            return new AudienceResult()
-            {
-                Id = this.Id,
-                ClientId = this.ClientId,
-                Name = this.Name,
-                Description = this.Description ?? string.Empty,
-                AudienceType = this.AudienceType,
-                Enabled = this.Enabled,
-                Created = this.Created,
-                LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable,
-            };
-        }
-
         public AppAudience Devolve()
         {
             return new AppAudience
@@ -74,6 +58,23 @@ namespace Bhbk.Lib.Identity.Factory
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
                 Immutable = this.Immutable
+            };
+        }
+
+        public AudienceResult Evolve()
+        {
+            return new AudienceResult()
+            {
+                Id = this.Id,
+                ClientId = this.ClientId,
+                Name = this.Name,
+                Description = this.Description ?? string.Empty,
+                AudienceType = this.AudienceType,
+                Enabled = this.Enabled,
+                Created = this.Created,
+                LastUpdated = this.LastUpdated ?? null,
+                Immutable = this.Immutable,
+                Roles = AppRole.Where(x => x.AudienceId == this.Id).Select(x => x.Id.ToString()).ToList()
             };
         }
     }
@@ -99,7 +100,7 @@ namespace Bhbk.Lib.Identity.Factory
         public DateTime Created { get; set; }
         public Nullable<DateTime> LastUpdated { get; set; }
         public bool Immutable { get; set; }
-        public IList<RoleResult> Roles { get; set; }
+        public IList<string> Roles { get; set; }
     }
 
     public class AudienceUpdate

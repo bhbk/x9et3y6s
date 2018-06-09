@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Factory
@@ -10,10 +11,10 @@ namespace Bhbk.Lib.Identity.Factory
         public UserFactory(AppUser user)
         {
             this.Id = user.Id;
-            this.UserName = user.UserName;
-            this.NormalizedUserName = user.NormalizedUserName ?? string.Empty;
+            this.UserName = user.Email;
+            this.NormalizedUserName = user.Email.ToLower() ?? string.Empty;
             this.Email = user.Email;
-            this.NormalizedEmail = user.NormalizedEmail;
+            this.NormalizedEmail = user.Email.ToLower() ?? string.Empty;
             this.EmailConfirmed = user.EmailConfirmed;
             this.PhoneNumber = user.PhoneNumber ?? string.Empty;
             this.PhoneNumberConfirmed = user.PhoneNumberConfirmed.HasValue ? user.PhoneNumberConfirmed : false;
@@ -33,15 +34,17 @@ namespace Bhbk.Lib.Identity.Factory
             this.SecurityStamp = user.SecurityStamp;
             this.TwoFactorEnabled = user.TwoFactorEnabled;
             this.Immutable = user.Immutable;
+            this.AppUserRole = user.AppUserRole;
+            this.AppUserLogin = user.AppUserLogin;
         }
 
         public UserFactory(UserCreate user)
         {
             this.Id = Guid.NewGuid();
             this.UserName = user.Email;
-            this.NormalizedUserName = string.Empty;
+            this.NormalizedUserName = user.Email.ToLower();
             this.Email = user.Email;
-            this.NormalizedEmail = string.Empty;
+            this.NormalizedEmail = user.Email.ToLower();
             this.EmailConfirmed = false;
             this.PhoneNumber = user.PhoneNumber;
             this.PhoneNumberConfirmed = false;
@@ -74,10 +77,10 @@ namespace Bhbk.Lib.Identity.Factory
             return new AppUser
             {
                 Id = this.Id,
-                UserName = this.UserName,
-                NormalizedUserName = this.NormalizedUserName,
+                UserName = this.Email,
+                NormalizedUserName = this.Email.ToLower(),
                 Email = this.Email,
-                NormalizedEmail = this.NormalizedEmail,
+                NormalizedEmail = this.Email.ToLower(),
                 EmailConfirmed = this.EmailConfirmed,
                 PhoneNumber = this.PhoneNumber,
                 PhoneNumberConfirmed = this.PhoneNumberConfirmed,
@@ -122,6 +125,9 @@ namespace Bhbk.Lib.Identity.Factory
                 PasswordConfirmed = this.PasswordConfirmed,
                 TwoFactorEnabled = this.TwoFactorEnabled,
                 Immutable = this.Immutable,
+                Claims = AppUserClaim.Where(x => x.UserId == this.Id).Select(x => x.UserId.ToString()).ToList(),
+                Roles = AppUserRole.Where(x => x.UserId == this.Id).Select(x => x.RoleId.ToString()).ToList(),
+                Logins = AppUserLogin.Where(x => x.UserId == this.Id).Select(x => x.LoginId.ToString()).ToList(),
             };
         }
     }
@@ -157,8 +163,9 @@ namespace Bhbk.Lib.Identity.Factory
         public bool PasswordConfirmed { get; set; }
         public bool TwoFactorEnabled { get; set; }
         public bool Immutable { get; set; }
-        public IList<Claim> Claims { get; set; }
-        public IList<RoleResult> Roles { get; set; }
+        public IList<string> Claims { get; set; }
+        public IList<string> Roles { get; set; }
+        public IList<string> Logins { get; set; }
     }
 
     public class UserUpdate

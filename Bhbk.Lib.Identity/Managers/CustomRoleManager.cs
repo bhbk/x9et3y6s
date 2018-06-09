@@ -1,11 +1,11 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
@@ -41,9 +41,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(role.Id))
                 throw new InvalidOperationException();
 
-            await Store.DeleteAsync(role);
-
-            return IdentityResult.Success;
+            return await Store.DeleteAsync(role);
         }
 
         public override async Task<AppRole> FindByIdAsync(string roleId)
@@ -71,7 +69,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(role.Id))
                 throw new InvalidOperationException();
 
-            IList<AppUser> result = new List<AppUser>();
+            var result = new List<AppUser>();
             var list = Store.GetUsersAsync(role);
 
             if (list == null)
@@ -88,9 +86,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(role.Id))
                 throw new InvalidOperationException();
 
-            await Store.UpdateAsync(role);
-
-            return IdentityResult.Success;
+            return await Store.UpdateAsync(role);
         }
     }
 }

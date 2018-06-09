@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -40,6 +41,18 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
         public Task Invoke(HttpContext context)
         {
+            //check if correct path
+            if (!context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal))
+                return _next(context);
+
+            //check if POST method
+            if (!context.Request.Method.Equals("POST"))
+                return _next(context);
+
+            //check for application/x-www-form-urlencoded
+            if (!context.Request.HasFormContentType)
+                return _next(context);
+
             //check for correct parameters
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)

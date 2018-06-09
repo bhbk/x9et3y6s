@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,12 +19,8 @@ namespace Bhbk.Lib.Identity.Helpers
             GenerateAccessToken(HttpContext context, AppClient client, List<AppAudience> audiences, AppUser user)
         {
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
+            var identity = await ioc.UserMgmt.ClaimProvider.CreateAsync(user);
             DateTime issueDate, expireDate;
-
-            ClaimsIdentity claims = await ioc.UserMgmt.CreateIdentityAsync(user, "JWT");
-
-            ClaimsPrincipal identity = new ClaimsPrincipal();
-            identity.AddIdentity(claims);
 
             var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);

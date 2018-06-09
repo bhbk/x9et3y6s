@@ -1,5 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Bhbk.Lib.Identity.Factory
 {
@@ -15,6 +17,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Created = role.Created;
             this.LastUpdated = role.LastUpdated ?? null;
             this.Immutable = role.Immutable;
+            this.AppUserRole = role.AppUserRole;
         }
         
         public RoleFactory(RoleCreate role)
@@ -65,7 +68,8 @@ namespace Bhbk.Lib.Identity.Factory
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable
+                Immutable = this.Immutable,
+                Users = AppUserRole.Where(x => x.RoleId == this.Id).Select(x => x.UserId.ToString()).ToList()                
             };
         }
     }
@@ -89,6 +93,7 @@ namespace Bhbk.Lib.Identity.Factory
         public Nullable<DateTime> LastUpdated { get; set; }
         public bool Enabled { get; set; }
         public bool Immutable { get; set; }
+        public IList<string> Users { get; set; }
     }
 
     public class RoleUpdate

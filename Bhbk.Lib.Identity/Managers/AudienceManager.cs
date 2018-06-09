@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using System;
@@ -38,22 +37,12 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<AppAudience> FindByIdAsync(Guid audienceId)
         {
-            var audience = Store.FindById(audienceId);
-
-            if (audience == null)
-                return null;
-
-            return audience;
+            return Store.FindById(audienceId);
         }
 
         public async Task<AppAudience> FindByNameAsync(string audienceName)
         {
-            var audience = Store.FindByName(audienceName);
-
-            if (audience == null)
-                return null;
-
-            return audience;
+            return Store.FindByName(audienceName);
         }
 
         public async Task<IList<AppAudience>> GetListAsync()
@@ -80,9 +69,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(audience.Id))
                 throw new InvalidOperationException();
 
-            var result = Store.Update(audience);
-
-            return result;
+            return Store.Update(audience);
         }
     }
 }

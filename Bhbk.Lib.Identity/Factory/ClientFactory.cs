@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bhbk.Lib.Identity.Factory
 {
@@ -16,6 +17,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Created = client.Created;
             this.LastUpdated = client.LastUpdated ?? null;
             this.Immutable = client.Immutable;
+            this.AppAudience = client.AppAudience;
         }
 
         public ClientFactory(ClientCreate client)
@@ -65,7 +67,8 @@ namespace Bhbk.Lib.Identity.Factory
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable
+                Immutable = this.Immutable,
+                Audiences = AppAudience.Where(x => x.ClientId == this.Id).Select(x => x.Id.ToString()).ToList()
             };
         }
     }
@@ -89,7 +92,7 @@ namespace Bhbk.Lib.Identity.Factory
         public DateTime Created { get; set; }
         public Nullable<DateTime> LastUpdated { get; set; }
         public bool Immutable { get; set; }
-        public IList<AudienceResult> Audiences { get; set; }
+        public IList<string> Audiences { get; set; }
     }
 
     public class ClientUpdate

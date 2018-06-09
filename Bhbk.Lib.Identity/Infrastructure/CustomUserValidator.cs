@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
@@ -10,20 +11,21 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         public Task<IdentityResult> ValidateAsync(UserManager<AppUser> manager, AppUser user)
         {
-            List<IdentityError> errors = new List<IdentityError>();
-            int match = 0;
+            var errors = new List<IdentityError>();
 
-            if (!new EmailAddressAttribute().IsValid(user.Email)
-                && !user.Email.EndsWith("@local"))
+            if(!new EmailAddressAttribute().IsValid(user.Email))
             {
-                errors.Add(new IdentityError() { Code = null, Description = "Invalid format" });
-                match++;
+                errors.Add(new IdentityError() { Code = null, Description = BaseLib.Statics.MsgUserInvalid });
+                return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
             }
 
-            if (match < 0)
+            if (!user.Email.EndsWith("@local"))
+            {
+                errors.Add(new IdentityError() { Code = null, Description = BaseLib.Statics.MsgUserInvalid });
                 return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
-            else
-                return Task.FromResult(IdentityResult.Success);
+            }
+
+            return Task.FromResult(IdentityResult.Success);
         }
     }
 }

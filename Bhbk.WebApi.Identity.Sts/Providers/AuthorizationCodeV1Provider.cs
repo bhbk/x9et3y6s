@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -32,6 +34,18 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
         public Task Invoke(HttpContext context)
         {
+            // exit if path does not match
+            if (!context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal))
+                return _next(context);
+
+            // exit if not POST method
+            if (!context.Request.Method.Equals("POST"))
+                return _next(context);
+
+            // exit if not application/x-www-form-urlencoded
+            if (!context.Request.HasFormContentType)
+                return _next(context);
+
             //check for correct parameters
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)

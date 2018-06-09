@@ -33,9 +33,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new ClaimController(IoC);
-            var user = IoC.UserMgmt.Store.Get().First();
-            var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType,
-                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4));
+            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue);
 
             var result = await controller.CreateClaim(user.Id, claim) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -51,9 +50,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new ClaimController(IoC);
-            var user = IoC.UserMgmt.Store.Get().First();
-            var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType,
-                BaseLib.Statics.ApiUnitTestClaimValue + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4));
+            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, 
+                BaseLib.Statics.ApiUnitTestClaimValue + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4));
 
             var add = await IoC.UserMgmt.AddClaimAsync(user, claim);
             add.Should().BeAssignableTo(typeof(IdentityResult));
@@ -73,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new ClaimController(IoC);
-            var user = IoC.UserMgmt.Store.Get().First();
+            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var result = await controller.GetClaims(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

@@ -29,12 +29,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestAudience + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
             var controller = new AudienceController(IoC);
             var model = new AudienceCreate()
             {
                 ClientId = IoC.ClientMgmt.Store.Get().First().Id,
-                Name = name,
+                Name = BaseLib.Statics.ApiUnitTestAudienceA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
                 AudienceType = BaseLib.AudienceType.user_agent.ToString(),
                 Enabled = true,
                 Immutable = false
@@ -54,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new AudienceController(IoC);
-            var audience = IoC.AudienceMgmt.Store.Get().First();
+            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
 
             var result = await controller.DeleteAudience(audience.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
@@ -70,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new AudienceController(IoC);
-            var audience = IoC.AudienceMgmt.Store.Get().First();
+            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
 
             var result = await controller.GetAudience(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -116,14 +115,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestAudience + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
             var controller = new AudienceController(IoC);
             var audience = IoC.AudienceMgmt.Store.Get().First();
             var model = new AudienceUpdate()
             {
                 Id = audience.Id,
                 ClientId = IoC.ClientMgmt.Store.Get().First().Id,
-                Name = name + "(Updated)",
+                Name = BaseLib.Statics.ApiUnitTestAudienceA + "(Updated)",
                 AudienceType = audience.AudienceType,
                 Enabled = true
             };

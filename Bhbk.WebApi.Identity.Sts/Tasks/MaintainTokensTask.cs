@@ -3,6 +3,8 @@ using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.IO;
@@ -13,55 +15,60 @@ using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Tasks
 {
-    public class MaintainTokensTask : CustomIdentityTask
+    public class MaintainTokensTask : BackgroundService
     {
-        private readonly IIdentityContext _ioc;
+        private readonly IIdentityContext _ioc; 
         private readonly IConfigurationRoot _cb;
         private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
         private readonly int _interval;
+        public string Status { get; private set; }
 
         public MaintainTokensTask(IIdentityContext ioc)
         {
             if (ioc == null)
-                throw new ArgumentNullException();
+                throw new NullReferenceException();
 
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
                 .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _ioc = ioc;
             _interval = int.Parse(_cb["Tasks:MaintainTokens:PollingInterval"]);
+            _ioc = ioc;
         }
 
-        public async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                try
-                {
-                    await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
 
-                    var expiredTokens = _ioc.UserMgmt.Store.Context.AppUserRefresh
-                        .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
-
-                    if (expiredTokens.Any())
-                    {
-                        Log.Information("Task " + typeof(MaintainTokensTask).Name + ". Delete " +  expiredTokens.Count().ToString() + " expired refresh tokens.");
-
-                        foreach (AppUserRefresh entry in expiredTokens.ToList())
-                            _ioc.UserMgmt.Store.Context.AppUserRefresh.Remove(entry);
-
-                        _ioc.UserMgmt.Store.Context.SaveChanges();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex, BaseLib.Statics.MsgSystemExceptionCaught);
-                }
+                DoWork();
             }
         }
 
-        public string Status { get; private set; }
+        private void DoWork()
+        {
+            try
+            {
+                var invalid = _ioc.UserMgmt.Store.Context.AppUserRefresh
+                    .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
+                var invalidCount = invalid.Count();
+
+                if (invalid.Any())
+                {
+                    foreach (AppUserRefresh entry in invalid.ToList())
+                        _ioc.UserMgmt.Store.Context.AppUserRefresh.Remove(entry);
+
+                    _ioc.UserMgmt.Store.Context.SaveChanges();
+
+                    Log.Information("Task " + typeof(MaintainTokensTask).Name + ". Delete " + invalidCount.ToString() + " invalid refresh tokens.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+            }
+        }
     }
 }

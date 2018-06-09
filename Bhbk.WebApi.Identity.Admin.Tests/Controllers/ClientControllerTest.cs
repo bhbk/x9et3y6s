@@ -29,11 +29,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
             var controller = new ClientController(IoC);
             var model = new ClientCreate()
             {
-                Name = name,
+                Name = BaseLib.Statics.ApiUnitTestClientA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
                 ClientKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
                 Enabled = true,
                 Immutable = false
@@ -53,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get().First();
+            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var result = await controller.DeleteClient(client.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
@@ -69,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get().First();
+            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var result = await controller.GetClient(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -100,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
 
             var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get().First();
+            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var result = await controller.GetClientAudiences(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -115,13 +114,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string name = BaseLib.Statics.ApiUnitTestClient + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4);
             var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get().First();
+            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new ClientUpdate()
             {
                 Id = client.Id,
-                Name = name + "(Updated)",
+                Name = BaseLib.Statics.ApiUnitTestClientA + "(Updated)",
                 ClientKey = client.ClientKey,
                 Enabled = true,
                 Immutable = false

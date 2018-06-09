@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new ConfirmController(IoC);
             var user = IoC.UserMgmt.Store.Get().First();
 
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
+            string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new ConfirmController(IoC);
             var user = IoC.UserMgmt.Store.Get().First();
 
@@ -197,7 +197,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
             var controller = new ConfirmController(IoC);
             var user = IoC.UserMgmt.Store.Get().First();
 
@@ -217,7 +216,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            string email = "unit-test@" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + ".net";
             var controller = new ConfirmController(IoC);
             var user = IoC.UserMgmt.Store.Get().First();
 

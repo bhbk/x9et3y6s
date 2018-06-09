@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using System;
@@ -38,22 +37,12 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<AppClient> FindByIdAsync(Guid clientId)
         {
-            var client = Store.FindById(clientId);
-
-            if (client == null)
-                return null;
-
-            return client;
+            return Store.FindById(clientId);
         }
 
         public async Task<AppClient> FindByNameAsync(string clientName)
         {
-            var client = Store.FindByName(clientName);
-
-            if (client == null)
-                return null;
-
-            return client;
+            return Store.FindByName(clientName);
         }
 
         public async Task<IList<AppClient>> GetListAsync()

@@ -6,11 +6,11 @@ using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me
             ioc.ClientMgmt.Store.Salt = _cb["Client:Salt"];
 
             sc.AddSingleton<IIdentityContext>(ioc);
-            sc.AddSingleton<IHostedService>(new MaintainQuotesTask(ioc));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(ioc));
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me
             }
             else
             {
-                app.UseExceptionHandler();
+                app.UseExceptionHandler("/error");
             }
 
             app.UseForwardedHeaders();

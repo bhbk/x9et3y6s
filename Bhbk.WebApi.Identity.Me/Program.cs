@@ -20,6 +20,7 @@ namespace Bhbk.WebApi.Identity.Me
                 })
                 .UseConfiguration(_cb)
                 .UseStartup<Startup>()
+                .UseApplicationInsights()
                 .CaptureStartupErrors(true)
                 .PreferHostingUrls(false)
                 .Build();

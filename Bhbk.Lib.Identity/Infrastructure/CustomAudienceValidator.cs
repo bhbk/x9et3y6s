@@ -13,11 +13,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
             foreach (string entry in audiences)
             {
                 foreach (string audience in entry.Split(','))
-                    audienceList.Add(audience.Trim().ToLower());
+                    audienceList.Add(audience.Trim());
             }
 
             foreach (string audience in audienceList)
-                if (validationParameters.ValidAudiences.Contains(audience.ToLower()))
+                if (validationParameters.ValidAudiences.Contains(audience))
                     return true;
 
             return false;

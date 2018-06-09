@@ -10,6 +10,7 @@ using BaseLib = Bhbk.Lib.Identity;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("confirm")]
+    [AllowAnonymous]
     public class ConfirmController : BaseController
     {
         public ConfirmController() { }
@@ -18,7 +19,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             : base(ioc) { }
 
         [Route("v1/set-email/{userId}"), HttpPut]
-        [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(Guid userId, [FromBody]string token)
         {
             if (!ModelState.IsValid)
@@ -45,7 +45,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password/{userId}"), HttpPut]
-        [AllowAnonymous]
         public async Task<IActionResult> ConfirmPassword(Guid userId, [FromBody]string token)
         {
             if (!ModelState.IsValid)
@@ -72,7 +71,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-phone/{userId}"), HttpPut]
-        [AllowAnonymous]
         public async Task<IActionResult> ConfirmPhone(Guid userId, [FromBody]string token)
         {
             if (!ModelState.IsValid)
@@ -99,7 +97,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-email/{token}"), HttpPut]
-        [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmailChange(UserChangeEmail model, string token)
         {
             if (!ModelState.IsValid)
@@ -129,7 +126,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-password/{token}"), HttpPut]
-        [AllowAnonymous]
         public async Task<IActionResult> ConfirmPasswordChange(UserChangePassword model, string token)
         {
             if (!ModelState.IsValid)
@@ -165,7 +161,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-phone/{token}"), HttpPut]
-        [AllowAnonymous]
         public async Task<IActionResult> ConfirmPhoneChange(UserChangePhone model, string token)
         {
             if (!ModelState.IsValid)
