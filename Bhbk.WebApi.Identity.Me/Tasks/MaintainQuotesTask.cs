@@ -1,9 +1,8 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -12,7 +11,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
-using Microsoft.Extensions.Hosting;
 
 namespace Bhbk.WebApi.Identity.Me.Tasks
 {
@@ -31,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         public MaintainQuotesTask(IIdentityContext ioc)
         {
             if (ioc == null)
-                throw new NullReferenceException();
+                throw new ArgumentNullException();
 
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
@@ -41,6 +39,8 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             _interval = int.Parse(_cb["Tasks:MaintainQuotes:PollingInterval"]);
             _url = _cb["Tasks:MaintainQuotes:ApiGetQoDUrl"];
             _ioc = ioc;
+
+            Status = string.Empty;
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                     {
                         QuoteOfDay = quote;
 
-                        Log.Information("Task " + typeof(MaintainQuotesTask).Name + ". Update quote of the day.");
+                        Log.Information("Ran " + typeof(MaintainQuotesTask).Name + " in background. Update quote of the day.");
                     }
                 }
 

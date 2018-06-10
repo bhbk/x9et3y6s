@@ -31,16 +31,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = false;
         }
 
-        public ClientFactory(ClientUpdate client)
-        {
-            this.Id = client.Id;
-            this.Name = client.Name;
-            this.Description = client.Description;
-            this.Enabled = client.Enabled;
-            this.LastUpdated = DateTime.Now;
-            this.Immutable = client.Immutable;
-        }
-
         public AppClient Devolve()
         {
             return new AppClient
@@ -70,6 +60,16 @@ namespace Bhbk.Lib.Identity.Factory
                 Immutable = this.Immutable,
                 Audiences = AppAudience.Where(x => x.ClientId == this.Id).Select(x => x.Id.ToString()).ToList()
             };
+        }
+
+        public void Update(ClientUpdate client)
+        {
+            this.Id = client.Id;
+            this.Name = client.Name;
+            this.Description = client.Description;
+            this.Enabled = client.Enabled;
+            this.LastUpdated = DateTime.Now;
+            this.Immutable = client.Immutable;
         }
     }
 

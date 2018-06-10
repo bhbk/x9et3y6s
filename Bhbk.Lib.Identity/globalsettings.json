@@ -5,7 +5,7 @@
   "DefaultAuthorizationCodeLife": "1000",
   "DefaultAccessTokenLife": "10",
   "DefaultFailedAccessAttempts": "10",
-  "DefaultRefreshTokenLife": "10080",
+  "DefaultRefreshTokenLife": "60",
   "IdentityAdminBaseUrl": "https://yolo.test.ochap.net",
   "IdentityMeBaseUrl": "https://yolo.test.ochap.net",
   "IdentityStsBaseUrl": "https://yolo.test.ochap.net"

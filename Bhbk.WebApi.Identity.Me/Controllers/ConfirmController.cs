@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -15,8 +16,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public ConfirmController() { }
 
-        public ConfirmController(IIdentityContext ioc)
-            : base(ioc) { }
+        public ConfirmController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1/set-email/{userId}"), HttpPut]
         public async Task<IActionResult> ConfirmEmail(Guid userId, [FromBody]string token)

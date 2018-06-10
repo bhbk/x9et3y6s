@@ -1,16 +1,13 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.WebApi.Identity.Sts.Controllers;
+﻿using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -33,23 +30,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new OAuthController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new OAuthController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await StsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var access = await TestStsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var result = request.GetAsync("/oauth/v1/refresh/" + user.Id.ToString()).Result;
+            var result = await request.GetAsync("/oauth/v1/refresh/" + user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -61,23 +58,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             TestData.CreateTestData();
             TestData.CreateDefaultData();
 
-            var controller = new OAuthController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var controller = new OAuthController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
 
-            var access = await StsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var access = await TestStsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var result = request.GetAsync("/oauth/v1/refresh/" + user.Id.ToString()).Result;
+            var result = await request.GetAsync("/oauth/v1/refresh/" + user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -88,16 +85,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new OAuthController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new OAuthController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await StsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var access = await TestStsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).Single();
 
@@ -105,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var result = request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke/" + refresh.Id.ToString()).Result;
+            var result = await request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke/" + refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -117,16 +114,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             TestData.CreateTestData();
             TestData.CreateDefaultData();
 
-            var controller = new OAuthController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var controller = new OAuthController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
 
-            var access = await StsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var access = await TestStsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).Single();
 
@@ -134,11 +131,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var result = request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke/" + refresh.Id.ToString()).Result;
+            var result = await request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke/" + refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), string.Empty, refresh.ProtectedTicket);
+            var check = await TestStsV2.GetRefreshToken(_owin, client.Id.ToString(), string.Empty, refresh.ProtectedTicket);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -149,23 +146,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new OAuthController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new OAuthController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await StsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var access = await TestStsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var result = request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke").Result;
+            var result = await request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -177,16 +174,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             TestData.CreateTestData();
             TestData.CreateDefaultData();
 
-            var controller = new OAuthController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = IoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var controller = new OAuthController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
 
-            var access = await StsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var access = await TestStsV2.GetAccessToken(_owin, client.Id.ToString(), string.Empty, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(access.Content.ReadAsStringAsync().Result);
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).Single();
 
@@ -194,11 +191,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var result = request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke").Result;
+            var result = await request.DeleteAsync("/oauth/v1/refresh/" + user.Id.ToString() + "/revoke");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await StsV2.GetRefreshToken(_owin, client.Id.ToString(), string.Empty, refresh.ProtectedTicket);
+            var check = await TestStsV2.GetRefreshToken(_owin, client.Id.ToString(), string.Empty, refresh.ProtectedTicket);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }

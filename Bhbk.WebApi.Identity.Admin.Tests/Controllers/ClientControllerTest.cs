@@ -29,10 +29,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(IoC);
+            var controller = new ClientController(TestIoC, TestTasks);
             var model = new ClientCreate()
             {
-                Name = BaseLib.Statics.ApiUnitTestClientA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
+                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestClientA,
                 ClientKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
                 Enabled = true,
                 Immutable = false
@@ -51,13 +51,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var controller = new ClientController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var result = await controller.DeleteClient(client.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = IoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
+            var check = TestIoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
             check.Should().BeFalse();
         }
 
@@ -67,8 +67,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var controller = new ClientController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var result = await controller.GetClient(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -83,13 +83,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(IoC);
+            var controller = new ClientController(TestIoC, TestTasks);
 
             var result = await controller.GetClients() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<ClientResult>>().Subject;
 
-            data.Count().Should().Equals(IoC.ClientMgmt.Store.Get().Count());
+            data.Count().Should().Equals(TestIoC.ClientMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -98,14 +98,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var controller = new ClientController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var result = await controller.GetClientAudiences(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
-            data.Count().Should().Equals(IoC.AudienceMgmt.Store.Get().Count());
+            data.Count().Should().Equals(TestIoC.AudienceMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -114,8 +114,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(IoC);
-            var client = IoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var controller = new ClientController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new ClientUpdate()
             {
                 Id = client.Id,

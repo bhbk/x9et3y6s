@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using System;
@@ -53,13 +52,10 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<IList<AppUser>> GetUsersListAsync(Guid loginId)
         {
-            var result = new List<AppUser>();
-            var list = Store.GetUsers(loginId);
+            if (!Store.Exists(loginId))
+                throw new InvalidOperationException();
 
-            foreach (AppUser entry in list)
-                result.Add(entry);
-
-            return result;
+            return Store.GetUsers(loginId);
         }
 
         public async Task<AppLogin> UpdateAsync(AppLogin login)

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public AudienceController() { }
 
-        public AudienceController(IIdentityContext ioc)
-            : base(ioc) { }
+        public AudienceController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -73,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1")]
         public async Task<IActionResult> GetAudiences()
         {
-            IList<AudienceResult> result = new List<AudienceResult>();
+            var result = new List<AudienceResult>();
             var users = await IoC.AudienceMgmt.GetListAsync();
 
             foreach (AppAudience entry in users)
@@ -90,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
 
-            IList<RoleResult> result = new List<RoleResult>();
+            var result = new List<RoleResult>();
             var roles = await IoC.AudienceMgmt.GetRoleListAsync(audienceID);
 
             foreach (AppRole entry in roles)
@@ -116,10 +117,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = new AudienceFactory<AudienceUpdate>(model);
-                var result = await IoC.AudienceMgmt.UpdateAsync(update.Devolve());
+                var result = new AudienceFactory<AppAudience>(audience);
+                result.Update(model);
 
-                return Ok(update.Evolve());
+                var update = await IoC.AudienceMgmt.UpdateAsync(result.Devolve());
+
+                return Ok(result.Evolve());
             }
         }
     }

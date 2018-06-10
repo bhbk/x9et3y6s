@@ -32,8 +32,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.CreateTestData();
 
             string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -56,8 +56,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.CreateTestData();
 
             string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -80,8 +80,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -103,8 +103,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -128,8 +128,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.CreateTestData();
 
             string phone = "01112223333";
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -152,8 +152,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.CreateTestData();
 
             string phone = "01112223333";
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -176,8 +176,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -192,8 +192,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -208,12 +208,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
-            var status = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, false);
+            var status = await TestIoC.UserMgmt.SetTwoFactorEnabledAsync(user, false);
             status.Should().BeAssignableTo(typeof(IdentityResult));
             status.Succeeded.Should().BeTrue();
 
@@ -227,8 +227,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new DetailController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 

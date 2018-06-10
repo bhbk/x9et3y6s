@@ -596,7 +596,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (PasswordHasher == null)
                 throw new NotSupportedException();
 
-            var result = PasswordValidator.ValidateAsync(this, user, newPassword).Result;
+            var result = await PasswordValidator.ValidateAsync(this, user, newPassword);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();

@@ -1,8 +1,11 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public DetailController() { }
 
-        public DetailController(IIdentityContext ioc)
-            : base(ioc) { }
+        public DetailController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1/quote-of-day"), HttpGet]
         public IActionResult QuoteOfDay()
@@ -183,14 +186,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             else
             {
-                var update = new UserFactory<UserUpdate>(model);
-                var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
+                var factory = new UserFactory<AppUser>(user);
+                factory.Update(model);
+
+                var result = await IoC.UserMgmt.UpdateAsync(factory.Devolve());
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
                 else
-                    return Ok(update.Evolve());
+                    return Ok(factory.Evolve());
             }
         }
     }

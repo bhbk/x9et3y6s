@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,8 +19,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public LoginController() { }
 
-        public LoginController(IIdentityContext ioc)
-            : base(ioc) { }
+        public LoginController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1/{loginID}/add/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -173,10 +174,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = new LoginFactory<LoginUpdate>(model);
-                var result = await IoC.LoginMgmt.UpdateAsync(update.Devolve());
+                var result = new LoginFactory<AppLogin>(login);
+                result.Update(model);
 
-                return Ok(update.Evolve());
+                var update = await IoC.LoginMgmt.UpdateAsync(result.Devolve());
+
+                return Ok(result.Evolve());
             }
         }
     }

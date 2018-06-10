@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,8 +15,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClaimController() { }
 
-        public ClaimController(IIdentityContext ioc)
-            : base(ioc) { }
+        public ClaimController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1/{userID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]

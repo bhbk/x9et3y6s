@@ -1,10 +1,9 @@
 ﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.IO;
@@ -12,7 +11,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
-using Microsoft.Extensions.Hosting;
 
 namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
@@ -27,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
         public MaintainUsersTask(IIdentityContext ioc)
         {
             if (ioc == null)
-                throw new NullReferenceException();
+                throw new ArgumentNullException();
 
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
@@ -36,6 +34,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
             _interval = int.Parse(_cb["Tasks:MaintainUsers:PollingInterval"]);
             _ioc = ioc;
+
+            Status = string.Empty;
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                     _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                    Log.Information("Task " + typeof(MaintainUsersTask).Name + ". Enabled " + disabledCount.ToString() + " users with lockout-end expire.");
+                    Log.Information("Ran " + typeof(MaintainUsersTask).Name + " in background. Enabled " + disabledCount.ToString() + " users with lockout-end expire.");
                 }
             }
             catch (Exception ex)

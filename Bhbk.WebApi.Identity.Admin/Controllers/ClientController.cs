@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClientController() { }
 
-        public ClientController(IIdentityContext ioc)
-            : base(ioc) { }
+        public ClientController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -73,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetClients()
         {
-            IList<ClientResult> result = new List<ClientResult>();
+            var result = new List<ClientResult>();
             var users = await IoC.ClientMgmt.GetListAsync();
 
             foreach (AppClient entry in users)
@@ -90,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
-            IList<AudienceResult> result = new List<AudienceResult>();
+            var result = new List<AudienceResult>();
             var audiences = await IoC.ClientMgmt.GetAudiencesAsync(clientID);
 
             foreach (AppAudience entry in audiences)
@@ -116,10 +117,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = new ClientFactory<ClientUpdate>(model);
-                var result = await IoC.ClientMgmt.UpdateAsync(update.Devolve());
+                var result = new ClientFactory<AppClient>(client);
+                result.Update(model);
 
-                return Ok(update.Evolve());
+                var update = await IoC.ClientMgmt.UpdateAsync(result.Devolve());
+
+                return Ok(result.Evolve());
             }
         }
     }

@@ -22,7 +22,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public void Api_Me_Diagnostic_GetTaskStatus_Success()
         {
-            var controller = new DiagnosticController(IoC);
+            var controller = new DiagnosticController(TestIoC, TestTasks);
 
             var result = controller.GetTaskStatus() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public void Api_Me_Diagnostic_GetVersion_Success()
         {
-            var controller = new DiagnosticController(IoC);
+            var controller = new DiagnosticController(TestIoC, TestTasks);
 
             var result = controller.GetVersion() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

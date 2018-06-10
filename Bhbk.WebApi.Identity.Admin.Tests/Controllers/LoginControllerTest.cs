@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -31,13 +30,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var user = IoC.UserMgmt.Store.Get().First();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var login = new LoginCreate()
             {
-                LoginProvider = BaseLib.Statics.ApiUnitTestLoginA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4)
+                LoginProvider = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
             };
-            var add = await IoC.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
+            var add = await TestIoC.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
             var model = new UserLoginCreate()
             {
                 UserId = user.Id,
@@ -59,8 +58,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new LoginCreate()
             {
                 LoginProvider = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
@@ -79,14 +78,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var login = new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
                     LoginProvider = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
                 }).Devolve();
-            var create = await IoC.LoginMgmt.CreateAsync(login);
+            var create = await TestIoC.LoginMgmt.CreateAsync(login);
             var model = new UserLoginCreate()
             {
                 UserId = user.Id,
@@ -98,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Immutable = false
             };
 
-            var add = await IoC.UserMgmt.AddLoginAsync(user, 
+            var add = await TestIoC.UserMgmt.AddLoginAsync(user, 
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
@@ -113,8 +112,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var login = IoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var login = TestIoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
 
             var result = await controller.GetLogin(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -129,13 +128,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
+            var controller = new LoginController(TestIoC, TestTasks);
 
             var result = await controller.GetLogins() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<LoginResult>>().Subject;
 
-            data.Count().Should().Equals(IoC.LoginMgmt.Store.Get().Count());
+            data.Count().Should().Equals(TestIoC.LoginMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -144,8 +143,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var login = IoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var login = TestIoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
 
             var result = await controller.GetLoginUsers(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -158,8 +157,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var login = IoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var login = TestIoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
             var model = new LoginUpdate()
             {
                 Id = login.Id,
@@ -179,13 +178,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new LoginController(IoC);
-            var login = IoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
+            var controller = new LoginController(TestIoC, TestTasks);
+            var login = TestIoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
 
             var result = await controller.DeleteLogin(login.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = IoC.LoginMgmt.Store.Get(x => x.Id == login.Id).Any();
+            var check = TestIoC.LoginMgmt.Store.Get(x => x.Id == login.Id).Any();
             check.Should().BeFalse();
         }
     }

@@ -62,16 +62,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = false;
         }
 
-        public UserFactory(UserUpdate user)
-        {
-            this.Id = user.Id;
-            this.FirstName = user.FirstName;
-            this.LastName = user.LastName;
-            this.LastUpdated = DateTime.Now;
-            this.LockoutEnabled = user.LockoutEnabled;
-            this.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
-        }
-
         public AppUser Devolve()
         {
             return new AppUser
@@ -129,6 +119,16 @@ namespace Bhbk.Lib.Identity.Factory
                 Roles = AppUserRole.Where(x => x.UserId == this.Id).Select(x => x.RoleId.ToString()).ToList(),
                 Logins = AppUserLogin.Where(x => x.UserId == this.Id).Select(x => x.LoginId.ToString()).ToList(),
             };
+        }
+
+        public void Update(UserUpdate user)
+        {
+            this.Id = user.Id;
+            this.FirstName = user.FirstName;
+            this.LastName = user.LastName;
+            this.LastUpdated = DateTime.Now;
+            this.LockoutEnabled = user.LockoutEnabled;
+            this.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
         }
     }
 

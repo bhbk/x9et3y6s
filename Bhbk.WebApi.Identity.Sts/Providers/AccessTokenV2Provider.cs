@@ -195,7 +195,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 access_token = access.token,
                 refresh_token = refresh,
                 client = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
-                audiences = audiences.Select(x => x.Id.ToString()),
+                audience = audiences.Select(x => x.Id.ToString()),
                 user = user.Id.ToString(),
                 issued = access.begin,
                 expires = access.end

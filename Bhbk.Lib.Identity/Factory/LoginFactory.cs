@@ -17,12 +17,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.LoginProvider = login.LoginProvider;
         }
 
-        public LoginFactory(LoginUpdate login)
-        {
-            this.Id = login.Id;
-            this.LoginProvider = login.LoginProvider;
-        }
-
         public LoginResult Evolve()
         {
             return new LoginResult
@@ -39,6 +33,12 @@ namespace Bhbk.Lib.Identity.Factory
                 Id = this.Id,
                 LoginProvider = this.LoginProvider
             };
+        }
+
+        public void Update(LoginUpdate login)
+        {
+            this.Id = login.Id;
+            this.LoginProvider = login.LoginProvider;
         }
     }
 

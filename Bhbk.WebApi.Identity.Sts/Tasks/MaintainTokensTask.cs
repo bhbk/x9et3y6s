@@ -1,9 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
@@ -26,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
         public MaintainTokensTask(IIdentityContext ioc)
         {
             if (ioc == null)
-                throw new NullReferenceException();
+                throw new ArgumentNullException();
 
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
@@ -35,6 +33,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
             _interval = int.Parse(_cb["Tasks:MaintainTokens:PollingInterval"]);
             _ioc = ioc;
+
+            Status = string.Empty;
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                    Log.Information("Task " + typeof(MaintainTokensTask).Name + ". Delete " + invalidCount.ToString() + " invalid refresh tokens.");
+                    Log.Information("Ran " + typeof(MaintainTokensTask).Name + " in background. Delete " + invalidCount.ToString() + " invalid refresh tokens.");
                 }
             }
             catch (Exception ex)

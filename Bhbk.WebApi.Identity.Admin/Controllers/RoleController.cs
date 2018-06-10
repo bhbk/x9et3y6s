@@ -4,6 +4,7 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,8 +17,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public RoleController() { }
 
-        public RoleController(IIdentityContext ioc)
-            : base(ioc) { }
+        public RoleController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1/{roleID}/add/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -97,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetRoles()
         {
-            IList<RoleResult> result = new List<RoleResult>();
+            var result = new List<RoleResult>();
             var users = await IoC.RoleMgmt.GetListAsync();
 
             foreach (AppRole entry in users)
@@ -127,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            IList<UserResult> result = new List<UserResult>();
+            var result = new List<UserResult>();
             var users = await IoC.RoleMgmt.GetUsersListAsync(role);
 
             foreach (AppUser entry in users)
@@ -182,14 +183,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = new RoleFactory<RoleUpdate>(model);
-                var result = await IoC.RoleMgmt.UpdateAsync(update.Devolve());
+                var result = new RoleFactory<AppRole>(role);
+                result.Update(model);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+                var update = await IoC.RoleMgmt.UpdateAsync(result.Devolve());
+
+                if (!update.Succeeded)
+                    return GetErrorResult(update);
 
                 else
-                    return Ok(update.Evolve());
+                    return Ok(result.Evolve());
             }
         }
     }

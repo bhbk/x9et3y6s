@@ -31,20 +31,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new RoleController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new RoleCreate()
             {
-                AudienceId = IoC.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Statics.ApiUnitTestRoleA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
+                AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
+                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };
-            var create = await IoC.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
+            var create = await TestIoC.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
             create.Should().BeAssignableTo(typeof(IdentityResult));
             create.Succeeded.Should().BeTrue();
 
-            var role = await IoC.RoleMgmt.FindByNameAsync(model.Name);
+            var role = await TestIoC.RoleMgmt.FindByNameAsync(model.Name);
             role.Should().BeAssignableTo(typeof(AppRole));
 
             var result = await controller.AddRoleToUser(role.Id, user.Id) as NoContentResult;
@@ -57,11 +57,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
+            var controller = new RoleController(TestIoC, TestTasks);
             var model = new RoleCreate()
             {
-                AudienceId = IoC.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Statics.ApiUnitTestRoleA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
+                AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
+                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };
@@ -79,13 +79,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
-            var role = IoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var controller = new RoleController(TestIoC, TestTasks);
+            var role = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
 
             var result = await controller.DeleteRole(role.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = IoC.RoleMgmt.Store.Get(x => x.Id == role.Id).Any();
+            var check = TestIoC.RoleMgmt.Store.Get(x => x.Id == role.Id).Any();
             check.Should().BeFalse();
         }
 
@@ -95,8 +95,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
-            var role = IoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var controller = new RoleController(TestIoC, TestTasks);
+            var role = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
 
             var result = await controller.GetRole(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -111,13 +111,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
+            var controller = new RoleController(TestIoC, TestTasks);
 
             var result = await controller.GetRoles() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
-            data.Count().Should().Equals(IoC.RoleMgmt.Store.Get().Count());
+            data.Count().Should().Equals(TestIoC.RoleMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -126,14 +126,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
-            var role = IoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var controller = new RoleController(TestIoC, TestTasks);
+            var role = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
 
             var result = await controller.GetRoleUsers(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
-            data.Count().Should().Equals(IoC.UserMgmt.Store.Get().Count());
+            data.Count().Should().Equals(TestIoC.UserMgmt.Store.Get().Count());
         }
 
         [TestMethod]
@@ -142,23 +142,23 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
-            var user = IoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new RoleController(TestIoC, TestTasks);
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new RoleCreate()
             {
-                AudienceId = IoC.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Statics.ApiUnitTestRoleA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
+                AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
+                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };
-            var create = await IoC.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
+            var create = await TestIoC.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
             create.Should().BeAssignableTo(typeof(IdentityResult));
             create.Succeeded.Should().BeTrue();
 
-            var role = await IoC.RoleMgmt.FindByNameAsync(model.Name);
+            var role = await TestIoC.RoleMgmt.FindByNameAsync(model.Name);
             role.Should().BeAssignableTo(typeof(AppRole));
 
-            var add = await IoC.UserMgmt.AddToRoleAsync(user, model.Name);
+            var add = await TestIoC.UserMgmt.AddToRoleAsync(user, model.Name);
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
@@ -172,12 +172,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new RoleController(IoC);
-            var role = IoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var controller = new RoleController(TestIoC, TestTasks);
+            var role = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
             var model = new RoleUpdate()
             {
                 Id = role.Id,
-                AudienceId = IoC.AudienceMgmt.Store.Get().First().Id,
+                AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
                 Name = BaseLib.Statics.ApiUnitTestRoleA + "(Updated)",
                 Enabled = true,
                 Immutable = false

@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public IList<AppUser> GetUsers(Guid key)
         {
-            IList<AppUser> result = new List<AppUser>();
+            var result = new List<AppUser>();
             var login = _context.AppLogin.Where(x => x.Id == key).SingleOrDefault();
 
             if (login == null)

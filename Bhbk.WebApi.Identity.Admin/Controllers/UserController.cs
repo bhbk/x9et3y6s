@@ -4,9 +4,10 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -17,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public UserController() { }
 
-        public UserController(IIdentityContext ioc)
-            : base(ioc) { }
+        public UserController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -100,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var logins = IoC.UserMgmt.GetLoginsAsync(user).Result;
+            var logins = await IoC.UserMgmt.GetLoginsAsync(user);
             var result = IoC.LoginMgmt.Store.Get(x => logins.Contains(x.Id.ToString()))
                 .Select(x => new LoginFactory<AppLogin>(x).Evolve()).ToList();
 
@@ -115,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var audiences = IoC.UserMgmt.GetAudiencesAsync(user).Result;
+            var audiences = await IoC.UserMgmt.GetAudiencesAsync(user);
             var result = IoC.AudienceMgmt.Store.Get(x => audiences.Contains(x.Id.ToString()))
                 .Select(x => new AudienceFactory<AppAudience>(x).Evolve()).ToList();
 
@@ -130,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var roles = IoC.UserMgmt.GetRolesAsync(user).Result;
+            var roles = await IoC.UserMgmt.GetRolesAsync(user);
             var result = IoC.RoleMgmt.Store.Get(x => roles.Contains(x.Id.ToString()))
                 .Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
 
@@ -140,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetUsers()
         {
-            IList<UserResult> result = new List<UserResult>();
+            var result = new List<UserResult>();
             var users = await IoC.UserMgmt.GetListAsync();
 
             foreach (AppUser entry in users)
@@ -248,14 +249,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var update = new UserFactory<UserUpdate>(model);
-                var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
+                var result = new UserFactory<AppUser>(user);
+                result.Update(model);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+                var update = await IoC.UserMgmt.UpdateAsync(result.Devolve());
+
+                if (!update.Succeeded)
+                    return GetErrorResult(update);
 
                 else
-                    return Ok(update.Evolve());
+                    return Ok(result.Evolve());
             }
         }
     }

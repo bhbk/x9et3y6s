@@ -146,7 +146,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 foundLogin = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == login.LoginProvider).SingleOrDefault();
             }
 
-            if (!_ioc.UserMgmt.IsInLoginAsync(foundUser, Statics.ApiDefaultLogin).Result)
+            if (!await _ioc.UserMgmt.IsInLoginAsync(foundUser, Statics.ApiDefaultLogin))
                 await _ioc.UserMgmt.AddLoginAsync(foundUser,
                     new UserLoginInfo(Statics.ApiDefaultLogin, Statics.ApiDefaultLoginKey, Statics.ApiDefaultLoginName));
 
@@ -276,8 +276,7 @@ namespace Bhbk.Lib.Identity.Helpers
             role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
             login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
 
-            await _ioc.UserMgmt.AddClaimAsync(user,
-                new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue));
+            await _ioc.UserMgmt.AddClaimAsync(user, new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue));
 
             if (!await _ioc.UserMgmt.IsInRoleAsync(user, role.Name))
                 await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);
@@ -290,8 +289,7 @@ namespace Bhbk.Lib.Identity.Helpers
             role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
             login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginB).Single();
 
-            await _ioc.UserMgmt.AddClaimAsync(user,
-                new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue));
+            await _ioc.UserMgmt.AddClaimAsync(user, new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue));
 
             if (!await _ioc.UserMgmt.IsInRoleAsync(user, role.Name))
                 await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);

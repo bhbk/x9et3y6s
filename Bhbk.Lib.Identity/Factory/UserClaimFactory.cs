@@ -20,11 +20,6 @@ namespace Bhbk.Lib.Identity.Factory
 
         }
 
-        public UserClaimFactory(UserClaimUpdate claim)
-        {
-
-        }
-
         public AppUserClaim Devolve()
         {
             return new AppUserClaim
@@ -41,6 +36,11 @@ namespace Bhbk.Lib.Identity.Factory
             return new Claim(this.ClaimType,
                 this.ClaimValue,
                 this.ClaimValueType);
+        }
+
+        public void Update(UserClaimUpdate claim)
+        {
+
         }
     }
 

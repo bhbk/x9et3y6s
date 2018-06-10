@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         {
             get
             {
-                return _ioc ?? (IIdentityContext)ControllerContext.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityContext));
+                return _ioc ?? (IIdentityContext)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityContext>();
             }
         }
 
@@ -33,12 +33,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         public BaseController() { }
 
-        public BaseController(IIdentityContext ioc)
+        public BaseController(IIdentityContext ioc, IHostedService[] tasks)
         {
-            if (ioc == null)
+            if (ioc == null || tasks == null)
                 throw new ArgumentNullException();
 
             _ioc = ioc;
+            _tasks = tasks;
         }
 
         protected IActionResult GetErrorResult(IdentityResult result)

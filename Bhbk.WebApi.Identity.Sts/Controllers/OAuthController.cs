@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
@@ -13,8 +14,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public OAuthController() { }
 
-        public OAuthController(IIdentityContext ioc)
-            : base(ioc) { }
+        public OAuthController(IIdentityContext ioc, IHostedService[] tasks)
+            : base(ioc, tasks) { }
 
         [Route("v1/refresh/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -25,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var result = IoC.UserMgmt.GetRefreshTokensAsync(user).Result;
+            var result = await IoC.UserMgmt.GetRefreshTokensAsync(user);
 
             return Ok(result);
         }

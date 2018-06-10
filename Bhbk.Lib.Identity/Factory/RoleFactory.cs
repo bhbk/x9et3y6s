@@ -31,17 +31,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = false;
         }
 
-        public RoleFactory(RoleUpdate role)
-        {
-            this.Id = role.Id;
-            this.AudienceId = role.AudienceId;
-            this.Name = role.Name;
-            this.Description = role.Description ?? string.Empty;
-            this.Enabled = role.Enabled;
-            this.LastUpdated = DateTime.Now;
-            this.Immutable = role.Immutable;
-        }
-
         public AppRole Devolve()
         {
             return new AppRole
@@ -71,6 +60,17 @@ namespace Bhbk.Lib.Identity.Factory
                 Immutable = this.Immutable,
                 Users = AppUserRole.Where(x => x.RoleId == this.Id).Select(x => x.UserId.ToString()).ToList()                
             };
+        }
+
+        public void Update(RoleUpdate role)
+        {
+            this.Id = role.Id;
+            this.AudienceId = role.AudienceId;
+            this.Name = role.Name;
+            this.Description = role.Description ?? string.Empty;
+            this.Enabled = role.Enabled;
+            this.LastUpdated = DateTime.Now;
+            this.Immutable = role.Immutable;
         }
     }
 
