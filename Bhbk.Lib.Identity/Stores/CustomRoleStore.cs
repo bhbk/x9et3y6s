@@ -63,6 +63,11 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppRole.Any(x => x.Name == roleName);
         }
 
+        public IList<AppRole> Get()
+        {
+            return _context.AppRole.ToList();
+        }
+
         public IEnumerable<AppRole> Get(Expression<Func<AppRole, bool>> filter = null,
             Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orderBy = null, string includes = "")
         {
@@ -79,11 +84,6 @@ namespace Bhbk.Lib.Identity.Stores
 
             else
                 return query.ToList();
-        }
-
-        public IList<AppRole> Get()
-        {
-            return _context.AppRole.ToList();
         }
 
         public IList<AppUser> GetUsersAsync(AppRole role)

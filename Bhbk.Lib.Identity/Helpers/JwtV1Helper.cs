@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Helpers
             }
 
             var access = new JwtSecurityToken(
-                issuer: client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
-                audience: audience.Id.ToString(),
+                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                audience: audience.Name.ToString(),
                 claims: identity.Claims,
                 notBefore: issueDate,
                 expires: expireDate,

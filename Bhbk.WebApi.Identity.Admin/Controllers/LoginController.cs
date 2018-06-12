@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var result = await IoC.UserMgmt.AddLoginAsync(user, 
+                var result = await IoC.UserMgmt.AddLoginAsync(user,
                     new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
 
                 if (!result.Succeeded)

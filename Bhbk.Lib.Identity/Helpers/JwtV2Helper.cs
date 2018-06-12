@@ -43,10 +43,10 @@ namespace Bhbk.Lib.Identity.Helpers
                 throw new InvalidOperationException();
 
             else
-                audienceList = string.Join(",", audiences.Select(x => x.Id.ToString()));
+                audienceList = string.Join(",", audiences.Select(x => x.Name.ToString()));
 
             var access = new JwtSecurityToken(
-                issuer: client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
                 audience: audienceList,
                 claims: identity.Claims,
                 notBefore: issueDate,

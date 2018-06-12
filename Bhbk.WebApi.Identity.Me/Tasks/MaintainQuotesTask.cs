@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                 .Build();
 
             _interval = int.Parse(_cb["Tasks:MaintainQuotes:PollingInterval"]);
-            _url = _cb["Tasks:MaintainQuotes:ApiGetQoDUrl"];
+            _url = _cb["Tasks:MaintainQuotes:QuoteOfDayUrl"];
             _ioc = ioc;
 
             Status = string.Empty;

@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Me
     {
         private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
         private static IConfigurationRoot _cb;
-        private static IEnumerable _clients, _audiences;
+        private static IEnumerable _issuers, _allowed;
 
         //http://asp.net-hacker.rocks/2017/05/08/add-custom-ioc-in-aspnetcore.html
         public virtual void ConfigureContext(IServiceCollection sc)
@@ -36,13 +36,13 @@ namespace Bhbk.WebApi.Identity.Me
                 .AddEnvironmentVariables()
                 .Build();
 
-            _clients = _cb.GetSection("Client:Names").GetChildren().Select(x => x.Value).ToList();
-            _audiences = _cb.GetSection("Audience:Names").GetChildren().Select(x => x.Value).ToList();
-
             var ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(_cb["ConnectionStrings:IdentityEntities"]));
+                .UseSqlServer(_cb["Databases:IdentityEntities"]));
 
-            ioc.ClientMgmt.Store.Salt = _cb["Client:Salt"];
+            ioc.ClientMgmt.Store.Salt = _cb["IdentityClients:Salt"];
+
+            _issuers = _cb.GetSection("IdentityClients:AllowedNames").GetChildren().Select(x => x.Value).ToList();
+            _allowed = _cb.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
 
             sc.AddSingleton<IIdentityContext>(ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(ioc));
@@ -65,9 +65,9 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
+                    ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
-                    ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Id.ToString()),
+                    ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
                     AudienceValidator = CustomAudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -91,6 +91,7 @@ namespace Bhbk.WebApi.Identity.Me
             //order below is important...
             if (env.IsDevelopment())
             {
+                log.AddDebug();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
@@ -99,6 +100,11 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 app.UseExceptionHandler("/error");
             }
+
+            if (_cb != null)
+                log.AddConsole(_cb.GetSection("Logging"));
+            else
+                log.AddConsole();
 
             app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());

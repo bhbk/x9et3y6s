@@ -34,7 +34,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_cb["ConnectionStrings:IdentityEntities"]);
+                    .UseSqlServer(_cb["Databases:IdentityEntities"]);
 
                 Statics.Context = new CustomIdentityContext(builder);
 

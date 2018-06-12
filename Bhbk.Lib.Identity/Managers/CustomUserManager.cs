@@ -213,10 +213,10 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(user.Id))
                 throw new InvalidOperationException();
 
-            //var check = await UserValidator.ValidateAsync(this, user);
+            var check = await UserValidator.ValidateAsync(this, user);
 
-            //if(!check.Succeeded)
-            //    return check;
+            if (!check.Succeeded)
+                return check;
 
             return await Store.CreateAsync(user);
         }
@@ -226,10 +226,10 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(user.Id))
                 throw new InvalidOperationException();
 
-            //var check = await UserValidator.ValidateAsync(this, user);
+            var check = await UserValidator.ValidateAsync(this, user);
 
-            //if (!check.Succeeded)
-            //    return check;
+            if (!check.Succeeded)
+                return check;
 
             var create = await Store.CreateAsync(user);
 

@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         public static bool MultipleAudience(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
-            List<string> audienceList = new List<string>();
+            var audienceList = new List<string>();
 
             foreach (string entry in audiences)
             {

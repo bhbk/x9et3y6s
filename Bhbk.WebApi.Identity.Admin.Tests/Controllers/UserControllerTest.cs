@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_Create_Fail_InvalidEmail()
+        public async Task Api_Admin_User_Create_InvalidEmail_Fail()
         {
             TestData.Destroy();
             TestData.CreateTestData();
@@ -34,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(TestIoC, TestTasks);
             var model = new UserCreate()
             {
-                Email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
+                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
                 FirstName = "FirstName",
                 LastName = "LastName",
                 PhoneNumber = "0123456789",
@@ -42,8 +42,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Immutable = false,
             };
 
-            var result = await controller.CreateUser(model) as BadRequestResult;
-            result.Should().BeAssignableTo(typeof(BadRequestResult));
+            var result = await controller.CreateUser(model) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]

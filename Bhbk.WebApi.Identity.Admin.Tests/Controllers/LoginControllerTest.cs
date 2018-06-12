@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             data.Count().Should().Equals(TestIoC.LoginMgmt.Store.Get().Count());
         }
-
+        
         [TestMethod]
         public async Task Api_Admin_Login_GetUserList_Success()
         {

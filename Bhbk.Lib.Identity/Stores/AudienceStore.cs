@@ -71,11 +71,6 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppAudience.ToList();
         }
 
-        public IList<AppRole> GetRoles(Guid key)
-        {
-            return _context.AppRole.Where(x => x.AudienceId == key).ToList();
-        }
-
         public IEnumerable<AppAudience> Get(Expression<Func<AppAudience, bool>> filter = null,
             Func<IQueryable<AppAudience>, IOrderedQueryable<AppAudience>> orderBy = null, string includes = "")
         {
@@ -92,6 +87,11 @@ namespace Bhbk.Lib.Identity.Stores
 
             else
                 return query.ToList();
+        }
+
+        public IList<AppRole> GetRoles(Guid key)
+        {
+            return _context.AppRole.Where(x => x.AudienceId == key).ToList();
         }
 
         public void LoadCollection(AppAudience entity, string collection)

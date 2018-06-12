@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Managers
 
         public async Task<IList<AppLogin>> GetListAsync()
         {
-            return Store.GetAll();
+            return Store.Get();
         }
 
         public async Task<IList<AppUser>> GetUsersListAsync(Guid loginId)

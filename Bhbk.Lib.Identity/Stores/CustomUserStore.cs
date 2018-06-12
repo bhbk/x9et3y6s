@@ -161,6 +161,11 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppUserRefresh.Where(x => x.ExpiresUtc == DateTime.UtcNow);
         }
 
+        public IList<AppUser> Get()
+        {
+            return _context.AppUser.ToList();
+        }
+
         public IEnumerable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
             Func<IQueryable<AppUser>, IOrderedQueryable<AppUser>> orderBy = null, string includes = "")
         {
@@ -177,11 +182,6 @@ namespace Bhbk.Lib.Identity.Stores
 
             else
                 return query.ToList();
-        }
-
-        public IList<AppUser> Get()
-        {
-            return _context.AppUser.ToList();
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -222,13 +222,13 @@ namespace Bhbk.Lib.Identity.Stores
         public Task<IList<string>> GetAudiencesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = (IList<string>)_context.AppAudience
-                .Join(_context.AppRole, x => x.Id, y => y.AudienceId, (audience, role) => new {
-                    AudienceId = audience.Id,
-                    RoleId = role.Id
+                .Join(_context.AppRole, x => x.Id, y => y.AudienceId, (audience1, role1) => new {
+                    AudienceId = audience1.Id,
+                    RoleId = role1.Id
                 })
-                .Join(_context.AppUserRole, x => x.RoleId, y => y.RoleId, (trole, tuser) => new {
-                    AudienceId = trole.AudienceId,
-                    UserId = tuser.UserId
+                .Join(_context.AppUserRole, x => x.RoleId, y => y.RoleId, (role2, user2) => new {
+                    AudienceId = role2.AudienceId,
+                    UserId = user2.UserId
                 })
                 .Where(x => x.UserId == user.Id)
                 .Select(x => x.AudienceId.ToString().ToLower())
@@ -241,9 +241,9 @@ namespace Bhbk.Lib.Identity.Stores
         public Task<IList<string>> GetLoginsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = (IList<string>)_context.AppLogin
-                .Join(_context.AppUserLogin, x => x.Id, y => y.LoginId, (tlogin, tuser) => new {
-                    LoginId = tlogin.Id,
-                    UserId = tuser.UserId
+                .Join(_context.AppUserLogin, x => x.Id, y => y.LoginId, (login1, user1) => new {
+                    LoginId = login1.Id,
+                    UserId = user1.UserId
                 })
                 .Where(x => x.UserId == user.Id)
                 .Select(x => x.LoginId.ToString().ToLower())
@@ -266,10 +266,10 @@ namespace Bhbk.Lib.Identity.Stores
         public override Task<IList<string>> GetRolesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = (IList<string>)_context.AppRole
-                .Join(_context.AppUserRole, x => x.Id, y => y.RoleId, (trole, tuser) => new {
-                    UserId = tuser.UserId,
-                    RoleId = trole.Id,
-                    RoleName = trole.Name
+                .Join(_context.AppUserRole, x => x.Id, y => y.RoleId, (role1, user1) => new {
+                    UserId = user1.UserId,
+                    RoleId = role1.Id,
+                    RoleName = role1.Name
                 })
                 .Where(x => x.UserId == user.Id)
                 .Select(x => x.RoleName.ToString())

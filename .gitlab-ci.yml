@@ -20,6 +20,7 @@ test:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
   - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
   - msbuild /t:build /p:Configuration=Release /verbosity:quiet
+  -
   - mstest /testcontainer:"Bhbk.Lib.Identity.Tests\bin\Release\Bhbk.Lib.Identity.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Admin.Tests\bin\Release\Bhbk.WebApi.Identity.Admin.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Me.Tests\bin\Release\Bhbk.WebApi.Identity.Me.Tests.dll"
@@ -32,5 +33,19 @@ deploy:
   script:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
   - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
-  - msbuild /t:build /p:Configuration=Release /verbosity:quiet /p:RunOctoPack=true /p:OctoPackEnforceAddingFiles=true /p:OctoPackPublishPackageToFileShare=..\
+  - msbuild /t:build /p:Configuration=Release /verbosity:quiet
+  -
+  - cd Bhbk.WebApi.Identity.Admin
+  - dotnet publish "Bhbk.WebApi.Identity.Admin.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
+  - octo pack --id="Bhbk.WebApi.Identity.Admin" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\" --version="0.9.0"
+  - nuget push *.nupkg -ApiKey %NUGET_FEED_KEY% -Source %NUGET_FEED_URL% -Verbosity detailed -NonInteractive
+  -
+  - cd ..\Bhbk.WebApi.Identity.Me
+  - dotnet publish "Bhbk.WebApi.Identity.Me.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
+  - octo pack --id="Bhbk.WebApi.Identity.Me" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\" --version="0.9.0"
+  - nuget push *.nupkg -ApiKey %NUGET_FEED_KEY% -Source %NUGET_FEED_URL% -Verbosity detailed -NonInteractive
+  -
+  - cd ..\Bhbk.WebApi.Identity.Sts
+  - dotnet publish "Bhbk.WebApi.Identity.Sts.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
+  - octo pack --id="Bhbk.WebApi.Identity.Sts" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\" --version="0.9.0"
   - nuget push *.nupkg -ApiKey %NUGET_FEED_KEY% -Source %NUGET_FEED_URL% -Verbosity detailed -NonInteractive

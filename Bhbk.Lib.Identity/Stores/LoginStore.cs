@@ -64,28 +64,24 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppLogin.Where(x => x.LoginProvider == name).SingleOrDefault();
         }
 
-        public IList<AppLogin> GetAll()
+        public IList<AppLogin> Get()
         {
             return _context.AppLogin.ToList();
         }
 
         public IList<AppUser> GetUsers(Guid key)
         {
-            var result = new List<AppUser>();
-            var login = _context.AppLogin.Where(x => x.Id == key).SingleOrDefault();
+            var result = (IList<string>)_context.AppLogin
+                .Join(_context.AppUserLogin, x => x.Id, y => y.LoginId, (login1, user1) => new {
+                    LoginId = login1.Id,
+                    UserId = user1.UserId
+                })
+                .Where(x => x.LoginId == key)
+                .Select(x => x.UserId.ToString().ToLower())
+                .Distinct()
+                .ToList();
 
-            if (login == null)
-                throw new InvalidOperationException();
-
-            var users = _context.AppUserLogin.Where(x => x.LoginProvider == login.LoginProvider);
-
-            if (users == null)
-                throw new InvalidOperationException();
-
-            foreach (AppUserLogin entry in users)
-                result.Add(_context.AppUser.Where(x => x.Id == entry.UserId).Single());
-
-            return result;
+            return _context.AppUser.Where(x => result.Contains(x.Id.ToString())).ToList();
         }
 
         public IEnumerable<AppLogin> Get(Expression<Func<AppLogin, bool>> filter = null,

@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
         {
             var options = new DbContextOptionsBuilder<AppDbContext>();
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
-
+            
             var ioc = new CustomIdentityContext(options);
 
             sc.AddSingleton<IIdentityContext>(ioc);
