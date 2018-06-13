@@ -29,6 +29,8 @@ namespace Bhbk.Lib.Identity
         public const string AttrGrantTypeIDV2 = "grant_type";
         public const string AttrPasswordIDV1 = "password";
         public const string AttrPasswordIDV2 = "password";
+        public const string AttrRefreshTokenIDV1 = "refresh_token";
+        public const string AttrRefreshTokenIDV2 = "refresh_token";
         public const string AttrUserIDV1 = "username";
         public const string AttrUserIDV2 = "username";
         #endregion

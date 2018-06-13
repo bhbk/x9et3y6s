@@ -57,8 +57,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserIDV1)
-                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrPasswordIDV1))
+                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserIDV2)
+                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrPasswordIDV2))
                 return _next(context);
 
             var postValues = context.Request.ReadFormAsync().Result;
@@ -66,12 +66,12 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
             string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
             string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-            string userValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV1).Value;
-            string passwordValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrPasswordIDV1).Value;
+            string userValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV2).Value;
+            string passwordValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrPasswordIDV2).Value;
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
-                || !grantTypeValue.Equals(BaseLib.Statics.AttrPasswordIDV1)
+                || !grantTypeValue.Equals(BaseLib.Statics.AttrPasswordIDV2)
                 || string.IsNullOrEmpty(userValue)
                 || string.IsNullOrEmpty(passwordValue))
             {
@@ -80,13 +80,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSystemParametersInvalid }, _serializer));
             }
 
-            Guid clientID;
-            AppClient client;
-
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
 
             if (ioc == null)
                 throw new ArgumentNullException();
+
+            Guid clientID;
+            AppClient client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -101,9 +101,15 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
             }
 
-            var user = ioc.UserMgmt.FindByNameAsync(userValue).Result;
+            Guid userID;
+            AppUser user;
 
-            //check that user exists...
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(userValue, out userID))
+                user = ioc.UserMgmt.FindByIdAsync(userID.ToString()).Result;
+            else
+                user = ioc.UserMgmt.FindByNameAsync(userValue).Result;
+
             if (user == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -126,7 +132,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
             //check if audience is single, multiple or undefined...
             if (string.IsNullOrEmpty(audienceValue))
-                audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())).ToList();
+                audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString()) 
+                    && x.Enabled == true).ToList();
             else
             {
                 foreach (string entry in audienceValue.Split(","))

@@ -80,14 +80,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSystemParametersInvalid }, _serializer));
             }
             
-            Guid clientID, audienceID;
-            AppClient client;
-            AppAudience audience;
-
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
 
             if (ioc == null)
                 throw new ArgumentNullException();
+
+            Guid clientID;
+            AppClient client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -102,6 +101,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
             }
 
+            Guid audienceID;
+            AppAudience audience;
+
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))
                 audience = ioc.AudienceMgmt.FindByIdAsync(audienceID).Result;
@@ -115,9 +117,15 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
             }
 
-            var user = ioc.UserMgmt.FindByNameAsync(userValue).Result;
+            Guid userID;
+            AppUser user;
 
-            //check that user exists...
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(userValue, out userID))
+                user = ioc.UserMgmt.FindByIdAsync(userID.ToString()).Result;
+            else
+                user = ioc.UserMgmt.FindByNameAsync(userValue).Result;
+
             if (user == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -167,7 +175,6 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginInvalid }, _serializer));
             }
-
             
             var access = JwtV1Helper.GenerateAccessToken(context, client, audience, user).Result;
             var refresh = JwtV1Helper.GenerateRefreshToken(context, client, user).Result;

@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
-                || !context.Request.Form.ContainsKey("refresh_token"))
+                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrRefreshTokenIDV1))
                 return _next(context);
 
             var postValues = context.Request.ReadFormAsync().Result;
@@ -64,12 +64,12 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV1).Value;
             string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
             string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
-            string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == "refresh_token").Value;
+            string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV1).Value;
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
                 || string.IsNullOrEmpty(audienceValue)
-                || !grantTypeValue.Equals("refresh_token")
+                || !grantTypeValue.Equals(BaseLib.Statics.AttrRefreshTokenIDV1)
                 || string.IsNullOrEmpty(refreshTokenValue))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -98,9 +98,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalidToken }, _serializer));
             }
 
-            Guid clientID, audienceID;
+            Guid clientID;
             AppClient client;
-            AppAudience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -114,6 +113,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
             }
+
+            Guid audienceID;
+            AppAudience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(audienceValue, out audienceID))

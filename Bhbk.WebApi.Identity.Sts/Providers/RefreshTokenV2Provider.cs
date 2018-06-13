@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (!context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
                 || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || !context.Request.Form.ContainsKey("refresh_token"))
+                || !context.Request.Form.ContainsKey(BaseLib.Statics.AttrRefreshTokenIDV2))
                 return _next(context);
 
             var postValues = context.Request.ReadFormAsync().Result;
@@ -65,12 +65,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
             string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
             string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-            string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == "refresh_token").Value;
+            string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV2).Value;
 
             //check for correct parameter format
             if (string.IsNullOrEmpty(clientValue)
-                //|| string.IsNullOrEmpty(audienceValue)
-                || !grantTypeValue.Equals("refresh_token")
+                || !grantTypeValue.Equals(BaseLib.Statics.AttrRefreshTokenIDV2)
                 || string.IsNullOrEmpty(refreshTokenValue))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -134,33 +133,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             }
 
             var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
-            List<AppAudience> audiences;
+            List<AppAudience> audiences = new List<AppAudience>();
 
+            //check if audience is single, multiple or undefined...
             if (string.IsNullOrEmpty(audienceValue))
-            {
-                audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())).ToList();
-
-                foreach (AppAudience audience in audiences)
-                {
-                    if (audience == null || !audience.Enabled)
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        context.Response.ContentType = "application/json";
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
-                    }
-                }
-            }
+                audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())
+                    && x.Enabled == true).ToList();
             else
             {
-                audiences = new List<AppAudience>();
-
-                if (!audienceList.All(x => audienceValue.Split(",").Contains(x)))
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
-                }
-
                 foreach (string entry in audienceValue.Split(","))
                 {
                     Guid audienceID;
@@ -172,7 +152,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     else
                         audience = ioc.AudienceMgmt.FindByNameAsync(entry.Trim()).Result;
 
-                    if (audience == null || !audience.Enabled)
+                    if (audience == null
+                        || !audience.Enabled
+                        || !audienceList.Contains(audience.Id.ToString()))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
