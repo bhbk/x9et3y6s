@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public partial class CustomRoleManager : RoleManager<AppRole>
     {
-        public CustomRoleStore Store;
+        public readonly CustomRoleStore Store;
 
         public CustomRoleManager(CustomRoleStore store, 
             IEnumerable<IRoleValidator<AppRole>> roleValidators = null, 

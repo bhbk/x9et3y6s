@@ -23,7 +23,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
         public override void ConfigureContext(IServiceCollection sc)
         {
-            var options = new DbContextOptionsBuilder<AppDbContext>();
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .EnableSensitiveDataLogging();
+
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
             var ioc = new CustomIdentityContext(options);
@@ -35,7 +37,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
             TestIoC = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
             TestTasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
-
             TestData = new DatasetHelper(TestIoC);
             TestStsV1 = new StsV1Helper();
             TestStsV2 = new StsV2Helper();

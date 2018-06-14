@@ -23,9 +23,9 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Startup
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
         private static IConfigurationRoot _cb;
-        private static IEnumerable _issuers, _allowed;
+        private static IEnumerable _issuers, _audiences;
 
         //http://asp.net-hacker.rocks/2017/05/08/add-custom-ioc-in-aspnetcore.html
         public virtual void ConfigureContext(IServiceCollection sc)
@@ -37,12 +37,13 @@ namespace Bhbk.WebApi.Identity.Admin
                 .Build();
 
             var ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(_cb["Databases:IdentityEntities"]));
+                .UseSqlServer(_cb["Databases:IdentityEntities"])
+                .EnableSensitiveDataLogging());
 
             ioc.ClientMgmt.Store.Salt = _cb["IdentityClients:Salt"];
 
             _issuers = _cb.GetSection("IdentityClients:AllowedNames").GetChildren().Select(x => x.Value).ToList();
-            _allowed = _cb.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
+            _audiences = _cb.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
 
             sc.AddSingleton<IIdentityContext>(ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(ioc));
@@ -101,10 +102,10 @@ namespace Bhbk.WebApi.Identity.Admin
                 app.UseExceptionHandler("/error");
             }
 
-            if(_cb != null)
-                log.AddConsole(_cb.GetSection("Logging"));
-            else
+            if (_cb == null)
                 log.AddConsole();
+            else
+                log.AddConsole(_cb.GetSection("Logging"));
 
             app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());

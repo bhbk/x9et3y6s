@@ -42,12 +42,38 @@ namespace Bhbk.Lib.Identity.Infrastructure
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now)
                 .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
             //issued at timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.Now)
                 .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now)
                 .ToUniversalTime().Add(new TimeSpan((int)_conf.Tweaks.DefaultAccessTokenLife)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            var identity = new ClaimsIdentity(claims, "JWT");
+            var result = new ClaimsPrincipal(identity);
+
+            return await Task.Run(() => result);
+        }
+
+        public async Task<ClaimsPrincipal> RefreshAsync(AppUser user)
+        {
+            var claims = new List<Claim>();
+
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+
+            //not before timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now)
+                .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //issued at timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.Now)
+                .ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //expire on timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now)
+                .ToUniversalTime().Add(new TimeSpan((int)_conf.Tweaks.DefaultRefreshTokenLife)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);

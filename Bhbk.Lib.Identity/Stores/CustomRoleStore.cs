@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class CustomRoleStore : RoleStore<AppRole, AppDbContext, Guid>
     {
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public CustomRoleStore(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)

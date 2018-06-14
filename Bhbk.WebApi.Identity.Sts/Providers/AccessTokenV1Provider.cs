@@ -177,11 +177,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
-                client_id = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                user_id = user.Id.ToString(),
                 audience_id = audience.Id.ToString(),
-                user = user.Id.ToString(),
-                issued = access.begin,
-                expires = access.end
+                client_id = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
             };
 
             context.Response.StatusCode = (int)HttpStatusCode.OK;

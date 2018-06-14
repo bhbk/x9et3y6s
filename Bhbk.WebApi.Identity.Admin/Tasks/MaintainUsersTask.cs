@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     {
         private readonly IIdentityContext _ioc;
         private readonly IConfigurationRoot _cb;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly int _interval;
         public string Status { get; private set; }
 

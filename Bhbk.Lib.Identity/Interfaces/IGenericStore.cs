@@ -9,13 +9,13 @@ namespace Bhbk.Lib.Identity.Interfaces
     public interface IGenericStore<TEntity, TKey>
         where TEntity : class
     {
-        IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>,
-            IOrderedQueryable<TEntity>> orderBy = null, string includes = "");
         void Attach(TEntity entity);
         TEntity Create(TEntity entity);
         bool Delete(TKey key);
         bool Exists(TKey key);
         TEntity FindById(TKey key);
+        IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>,
+            IOrderedQueryable<TEntity>> orderBy = null, string includes = "");
         void LoadCollection(TEntity entity, string collection);
         void LoadReference(TEntity entity, string reference);
         void Save();

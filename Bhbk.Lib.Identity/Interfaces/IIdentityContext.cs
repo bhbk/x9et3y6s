@@ -13,7 +13,6 @@ namespace Bhbk.Lib.Identity.Interfaces
         LoginManager LoginMgmt { get; }
         CustomRoleManager RoleMgmt { get; }
         CustomUserManager UserMgmt { get; }
-        void Save();
     }
 
     public enum ContextType

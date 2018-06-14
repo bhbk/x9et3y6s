@@ -13,7 +13,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class HashCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-cli.json");
         private static IConfigurationRoot _cb;
         private static bool Generate = false;
 
@@ -34,17 +34,18 @@ namespace Bhbk.Cli.Identity.Cmds
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_cb["Databases:IdentityEntities"]);
+                    .UseSqlServer(_cb["Databases:IdentityEntities"])
+                    .EnableSensitiveDataLogging();
 
-                Statics.Context = new CustomIdentityContext(builder);
+                Statics.IoC = new CustomIdentityContext(builder);
 
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = PasswordHelper.GetStdin();
-                    var hashvalue = Statics.Context.UserMgmt.PasswordHasher.HashPassword(null, cleartext);
+                    var hashvalue = Statics.IoC.UserMgmt.PasswordHasher.HashPassword(null, cleartext);
 
-                    if (Statics.Context.UserMgmt.PasswordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (Statics.IoC.UserMgmt.PasswordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

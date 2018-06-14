@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public class AudienceManager : IGenericManager<AppAudience, Guid>
     {
-        public AudienceStore Store;
+        public readonly AudienceStore Store;
 
         public AudienceManager(AudienceStore store)
         {

@@ -12,7 +12,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class ConfCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-cli.json");
         private static IConfigurationRoot _cb;
         private static bool ReadConfig = false;
 
@@ -33,9 +33,10 @@ namespace Bhbk.Cli.Identity.Cmds
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_cb["Databases:IdentityEntities"]);
+                    .UseSqlServer(_cb["Databases:IdentityEntities"])
+                    .EnableSensitiveDataLogging();
 
-                Statics.Context = new CustomIdentityContext(builder);
+                Statics.IoC = new CustomIdentityContext(builder);
 
                 if (ReadConfig)
                 {
@@ -43,7 +44,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(Statics.Context.ConfigMgmt.ToString());
+                    Console.Write(Statics.IoC.ConfigMgmt.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public class ClientManager : IGenericManager<AppClient, Guid>
     {
-        public ClientStore Store;
+        public readonly ClientStore Store;
 
         public ClientManager(ClientStore store)
         {

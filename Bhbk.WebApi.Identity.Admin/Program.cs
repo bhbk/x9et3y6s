@@ -10,7 +10,7 @@ namespace Bhbk.WebApi.Identity.Admin
     public class Program
     {
         private static IConfigurationRoot _cb;
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)

@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
     {
         private readonly IIdentityContext _ioc;
         private readonly IConfigurationRoot _cb;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly FileInfo _qf = FileSystemHelper.SearchPaths("appquotes.json");
         private readonly HttpClient _client = new HttpClient();
         private readonly int _interval;
@@ -57,8 +57,6 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                 DoWork(cancellationToken);
             }
-
-            File.WriteAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name, JsonConvert.SerializeObject(QuoteOfDay));
         }
 
         private void DoWork(CancellationToken cancellationToken)
@@ -74,6 +72,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                     {
                         QuoteOfDay = quote;
 
+                        File.WriteAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name, JsonConvert.SerializeObject(QuoteOfDay));
                         Log.Information("Ran " + typeof(MaintainQuotesTask).Name + " in background. Update quote of the day.");
                     }
                 }

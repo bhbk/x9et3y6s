@@ -25,19 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
@@ -58,7 +58,7 @@
     <Content Update="appquotes.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="appsettings.json">
+    <Content Update="appsettings-api.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

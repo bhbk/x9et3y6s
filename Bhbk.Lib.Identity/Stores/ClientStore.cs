@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class ClientStore : IGenericStore<AppClient, Guid>
     {
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
         public string Salt;
 
         public ClientStore(AppDbContext context)

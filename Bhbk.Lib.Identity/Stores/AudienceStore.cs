@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class AudienceStore : IGenericStore<AppAudience, Guid>
     {
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public AudienceStore(AppDbContext context)
         {

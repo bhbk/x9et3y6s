@@ -16,13 +16,13 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public partial class CustomUserManager : UserManager<AppUser>
     {
-        public ConfigManager Config;
-        public CustomClaimsProvider ClaimProvider;
-        public CustomPasswordHasher PasswordHasher;
-        public CustomPasswordValidator PasswordValidator;
-        public CustomTotpTokenProvider TokenProvider;
-        public CustomUserStore Store;
-        public CustomUserValidator UserValidator;
+        public readonly ConfigManager Config;
+        public readonly CustomClaimsProvider ClaimProvider;
+        public readonly CustomPasswordHasher PasswordHasher;
+        public readonly CustomPasswordValidator PasswordValidator;
+        public readonly CustomTotpTokenProvider TokenProvider;
+        public readonly CustomUserStore Store;
+        public readonly CustomUserValidator UserValidator;
 
         public CustomUserManager(CustomUserStore store,
             IOptions<IdentityOptions> options = null,

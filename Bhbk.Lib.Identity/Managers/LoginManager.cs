@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public class LoginManager : IGenericManager<AppLogin, Guid>
     {
-        public LoginStore Store;
+        public readonly LoginStore Store;
 
         public LoginManager(LoginStore store)
         {

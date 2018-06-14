@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class LoginStore : IGenericStore<AppLogin, Guid>
     {
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public LoginStore(AppDbContext context)
         {

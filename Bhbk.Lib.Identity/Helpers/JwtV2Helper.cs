@@ -63,7 +63,12 @@ namespace Bhbk.Lib.Identity.Helpers
             GenerateRefreshToken(HttpContext context, AppClient client, AppUser user)
         {
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
+            var identity = await ioc.UserMgmt.ClaimProvider.RefreshAsync(user);
             DateTime issueDate, expireDate;
+
+            var symmetricKeyAsBase64 = client.ClientKey;
+            var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Tweaks.UnitTestRefreshToken)
             {
@@ -76,29 +81,40 @@ namespace Bhbk.Lib.Identity.Helpers
                 expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
             }
 
-            var refresh = new UserRefreshCreate()
+            var refresh = new JwtSecurityToken(
+                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                audience: null,
+                claims: identity.Claims,
+                notBefore: issueDate,
+                expires: expireDate,
+                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+                );
+
+            var result = new JwtSecurityTokenHandler().WriteToken(refresh);
+
+            var create = new UserRefreshCreate()
             {
                 ClientId = client.Id,
                 UserId = user.Id,
-                ProtectedTicket = CryptoHelper.GenerateRandomBase64(256),
+                ProtectedTicket = result,
                 IssuedUtc = issueDate,
                 ExpiresUtc = expireDate
             };
 
-            var result = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(refresh).Devolve());
+            var add = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).Devolve());
 
-            if (!result.Succeeded)
+            if (!add.Succeeded)
                 throw new InvalidOperationException();
 
-            return refresh.ProtectedTicket;
+            return result;
         }
 
-        public static bool IsValidJwtFormat(string token)
+        public static bool IsValidJwtFormat(string str)
         {
             //check if string is in jwt format.
             var jwt = new JwtSecurityTokenHandler();
 
-            if (jwt.CanReadToken(token))
+            if (jwt.CanReadToken(str))
                 return true;
             else
                 return false;

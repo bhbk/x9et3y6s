@@ -12,7 +12,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class DataCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-cli.json");
         private static IConfigurationRoot _cb;
         private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
 
@@ -35,10 +35,11 @@ namespace Bhbk.Cli.Identity.Cmds
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_cb["Databases:IdentityEntities"]);
+                    .UseSqlServer(_cb["Databases:IdentityEntities"])
+                    .EnableSensitiveDataLogging();
 
-                Statics.Context = new CustomIdentityContext(builder);
-                DatasetHelper seed = new DatasetHelper(Statics.Context);
+                Statics.IoC = new CustomIdentityContext(builder);
+                DatasetHelper seed = new DatasetHelper(Statics.IoC);
 
                 if (CreateDefault)
                 {

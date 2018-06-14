@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public partial class CustomUserStore : UserStore<AppUser, AppRole, AppDbContext, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppUserToken, AppRoleClaim>
     {
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public CustomUserStore(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)

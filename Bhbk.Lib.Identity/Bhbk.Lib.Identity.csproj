@@ -12,31 +12,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings-lib.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings-lib.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BouncyCastle" Version="1.8.2" />
     <PackageReference Include="CryptoHelper" Version="3.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Https" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Https" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Otp.NET" Version="1.2.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="globalsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

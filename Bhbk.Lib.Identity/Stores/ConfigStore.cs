@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Stores
     public class ConfigStore
     {
         private AppConfig _config { get; set; }
-        private FileInfo _cf = FileSystemHelper.SearchPaths("globalsettings.json");
+        private FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
         private IConfigurationRoot _cb;
 
         public AppConfig Config

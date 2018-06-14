@@ -18,6 +18,14 @@ namespace Bhbk.Lib.Identity.Models
         public virtual DbSet<AppUserRole> AppUserRole { get; set; }
         public virtual DbSet<AppUserToken> AppUserToken { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AppAudience>(entity =>

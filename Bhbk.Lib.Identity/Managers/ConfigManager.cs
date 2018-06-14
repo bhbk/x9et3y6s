@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public class ConfigManager
     {
-        private ConfigStore _store;
+        private readonly ConfigStore _store;
 
         public AppConfig Tweaks
         {

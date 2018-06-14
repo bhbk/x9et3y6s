@@ -11,9 +11,8 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public class CustomIdentityContext : IIdentityContext
     {
-        private bool _disposed;
         private ContextType _status;
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
         private AudienceManager _audienceMgmt;
         private ClientManager _clientMgmt;
         private ConfigManager _configMgmt;
@@ -138,25 +137,39 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
+        #region IDisposable Support
+        private bool _disposed = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
             {
                 if (disposing)
-                    _context.Dispose();
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                _disposed = true;
             }
-            _disposed = true;
         }
 
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~CustomFitchnealContext() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            GC.SuppressFinalize(this);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }
