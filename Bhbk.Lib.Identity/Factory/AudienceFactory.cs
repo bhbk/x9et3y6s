@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BaseLib = Bhbk.Lib.Identity;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory
@@ -14,7 +15,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ClientId = audience.ClientId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
-            this.AudienceType = audience.AudienceType;
+            this.AudienceType = audience.AudienceType ?? BaseLib.AudienceType.user_agent.ToString();
             this.Created = audience.Created;
             this.LastUpdated = audience.LastUpdated ?? null;
             this.Enabled = audience.Enabled;
@@ -28,7 +29,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ClientId = audience.ClientId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
-            this.AudienceType = audience.AudienceType;
+            this.AudienceType = audience.AudienceType ?? BaseLib.AudienceType.user_agent.ToString();
             this.Created = DateTime.Now;
             this.Enabled = audience.Enabled;
             this.Immutable = false;

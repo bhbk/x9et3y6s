@@ -36,7 +36,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
                 AudienceType = BaseLib.AudienceType.user_agent.ToString(),
                 Enabled = true,
-                Immutable = false
             };
 
             var result = await controller.CreateAudience(model) as OkObjectResult;

@@ -45,7 +45,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 ProviderDisplayName = login.LoginProvider,
                 ProviderKey = BaseLib.Statics.ApiUnitTestLoginKeyA,
                 Enabled = true,
-                Immutable = false
             };
 
             var result = await controller.AddLoginToUser(model.LoginId, model.UserId, model) as NoContentResult;

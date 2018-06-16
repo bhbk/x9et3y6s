@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Id = Guid.NewGuid();
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
-            this.ClientKey = client.ClientKey;
+            this.ClientKey = client.ClientKey ?? Helpers.CryptoHelper.GenerateRandomBase64(32);
             this.Enabled = client.Enabled;
             this.Created = DateTime.Now;
             this.Immutable = false;

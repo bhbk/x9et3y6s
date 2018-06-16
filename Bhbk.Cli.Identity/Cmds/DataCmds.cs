@@ -12,7 +12,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class DataCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-cli.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
         private static IConfigurationRoot _cb;
         private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
 

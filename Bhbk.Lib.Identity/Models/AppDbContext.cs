@@ -18,14 +18,6 @@ namespace Bhbk.Lib.Identity.Models
         public virtual DbSet<AppUserRole> AppUserRole { get; set; }
         public virtual DbSet<AppUserToken> AppUserToken { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AppAudience>(entity =>
@@ -44,7 +36,7 @@ namespace Bhbk.Lib.Identity.Models
                     .HasMaxLength(64)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Description).HasColumnType("nchar(10)");
+                entity.Property(e => e.Description).HasMaxLength(256);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -100,7 +92,7 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(512);
 
-                entity.Property(e => e.Description).HasColumnType("nchar(10)");
+                entity.Property(e => e.Description).HasMaxLength(10);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -152,10 +144,6 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AccessFailedCount).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.AccessSuccessCount).HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(512);
 
                 entity.Property(e => e.Email)
@@ -177,6 +165,8 @@ namespace Bhbk.Lib.Identity.Models
                 entity.Property(e => e.PasswordHash).HasMaxLength(512);
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(256);
+
+                entity.Property(e => e.PhoneNumberConfirmed).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.SecurityStamp).HasMaxLength(512);
 

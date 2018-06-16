@@ -26,15 +26,15 @@ namespace Bhbk.Lib.Identity.Helpers
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Tweaks.UnitTestAccessToken)
+            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Tweaks.UnitTestsAccessToken)
             {
-                issueDate = ioc.ConfigMgmt.Tweaks.UnitTestAccessTokenFakeUtcNow;
-                expireDate = ioc.ConfigMgmt.Tweaks.UnitTestAccessTokenFakeUtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultAccessTokenLife);
+                issueDate = ioc.ConfigMgmt.Tweaks.UnitTestsAccessTokenFakeUtcNow;
+                expireDate = ioc.ConfigMgmt.Tweaks.UnitTestsAccessTokenFakeUtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultsAccessTokenLife);
             }
             else
             {
                 issueDate = DateTime.UtcNow;
-                expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultAccessTokenLife);
+                expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultsAccessTokenLife);
             }
 
             string audienceList = string.Empty;
@@ -63,22 +63,22 @@ namespace Bhbk.Lib.Identity.Helpers
             GenerateRefreshToken(HttpContext context, AppClient client, AppUser user)
         {
             var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
-            var identity = await ioc.UserMgmt.ClaimProvider.RefreshAsync(user);
+            var identity = await ioc.UserMgmt.ClaimProvider.CreateRefreshAsync(user);
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Tweaks.UnitTestRefreshToken)
+            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Tweaks.UnitTestsRefreshToken)
             {
-                issueDate = ioc.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow;
-                expireDate = ioc.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
+                issueDate = ioc.ConfigMgmt.Tweaks.UnitTestsRefreshTokenFakeUtcNow;
+                expireDate = ioc.ConfigMgmt.Tweaks.UnitTestsRefreshTokenFakeUtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultsRefreshTokenLife);
             }
             else
             {
                 issueDate = DateTime.UtcNow;
-                expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultRefreshTokenLife);
+                expireDate = DateTime.UtcNow.AddMinutes(ioc.ConfigMgmt.Tweaks.DefaultsRefreshTokenLife);
             }
 
             var refresh = new JwtSecurityToken(

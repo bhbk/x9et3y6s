@@ -37,20 +37,20 @@ namespace Bhbk.Lib.Identity.Managers
             StringBuilder output = new StringBuilder();
 
             output.Append(typeof(AppConfig).Name + Environment.NewLine);
-            output.Append("  Debug:" + _store.Config.Debug.ToString() + Environment.NewLine);
-            output.Append("  DefaultAuthorizationCodeLife:" + _store.Config.DefaultAuhthorizationCodeLife.ToString() + Environment.NewLine);
-            output.Append("  DefaultAuthorizationCodeLength:" + _store.Config.DefaultAuhthorizationCodeLength.ToString() + Environment.NewLine);
-            output.Append("  DefaultAccessTokenLife:" + _store.Config.DefaultAccessTokenLife.ToString() + Environment.NewLine);
-            output.Append("  DefaultFailedAccessAttempts:" + _store.Config.DefaultFailedAccessAttempts.ToString() + Environment.NewLine);
-            output.Append("  DefaultPasswordLength:" + _store.Config.DefaultPasswordLength.ToString() + Environment.NewLine);
-            output.Append("  DefaultRefreshTokenLife:" + _store.Config.DefaultRefreshTokenLife.ToString() + Environment.NewLine);
-            output.Append("  IdentityAdminBaseUrl:" + _store.Config.IdentityAdminBaseUrl.ToString() + Environment.NewLine);
-            output.Append("  IdentityMeBaseUrl:" + _store.Config.IdentityMeBaseUrl.ToString() + Environment.NewLine);
-            output.Append("  IdentityStsBaseUrl:" + _store.Config.IdentityStsBaseUrl.ToString() + Environment.NewLine);
-            output.Append("  UnitTestAccessToken:" + _store.Config.UnitTestAccessToken.ToString() + Environment.NewLine);
-            output.Append("  UnitTestAccessTokenFakeUtcNow:" + _store.Config.UnitTestAccessTokenFakeUtcNow.ToString() + Environment.NewLine);
-            output.Append("  UnitTestRefreshToken:" + _store.Config.UnitTestRefreshToken.ToString() + Environment.NewLine);
-            output.Append("  UnitTestRefreshTokenFakeUtcNow:" + _store.Config.UnitTestRefreshTokenFakeUtcNow.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:Debug:" + _store.Config.DefaultsDebug.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:AuthorizationCodeLife:" + _store.Config.DefaultsAuhthorizationCodeLife.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:AuthorizationCodeLength:" + _store.Config.DefaultsAuhthorizationCodeLength.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:AccessTokenLife:" + _store.Config.DefaultsAccessTokenLife.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:FailedAccessAttempts:" + _store.Config.DefaultsFailedAccessAttempts.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:PasswordLength:" + _store.Config.DefaultsPasswordLength.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:RefreshTokenLife:" + _store.Config.DefaultsRefreshTokenLife.ToString() + Environment.NewLine);
+            output.Append("\tEndpoints:AdminBaseUrl:" + _store.Config.EndpointsAdminBaseUrl.ToString() + Environment.NewLine);
+            output.Append("\tEndpoints:MeBaseUrl:" + _store.Config.EndpointsMeBaseUrl.ToString() + Environment.NewLine);
+            output.Append("\tEndpoints:StsBaseUrl:" + _store.Config.EndpointsStsBaseUrl.ToString() + Environment.NewLine);
+            output.Append("\tUnitTests:AccessToken:" + _store.Config.UnitTestsAccessToken.ToString() + Environment.NewLine);
+            output.Append("\tUnitTests:AccessTokenFakeUtcNow:" + _store.Config.UnitTestsAccessTokenFakeUtcNow.ToString() + Environment.NewLine);
+            output.Append("\tUnitTests:RefreshToken:" + _store.Config.UnitTestsRefreshToken.ToString() + Environment.NewLine);
+            output.Append("\tUnitTests:RefreshTokenFakeUtcNow:" + _store.Config.UnitTestsRefreshTokenFakeUtcNow.ToString() + Environment.NewLine);
 
             return output.ToString();
         }

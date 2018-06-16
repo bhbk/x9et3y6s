@@ -48,8 +48,8 @@ namespace Bhbk.Lib.Identity.Managers
             TokenProvider =
                 new CustomTotpTokenProvider
                 {
-                    OtpTokenSize = Config.Tweaks.DefaultAuhthorizationCodeLength,
-                    OtpTokenTimespan = Config.Tweaks.DefaultAuhthorizationCodeLife
+                    OtpTokenSize = Config.Tweaks.DefaultsAuhthorizationCodeLength,
+                    OtpTokenTimespan = Config.Tweaks.DefaultsAuhthorizationCodeLife
                 };
 
             UserValidator = new CustomUserValidator();

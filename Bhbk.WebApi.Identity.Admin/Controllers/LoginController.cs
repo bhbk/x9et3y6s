@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID}/add/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> AddLoginToUser(Guid loginID, Guid userID, UserLoginCreate model)
+        public async Task<IActionResult> AddLoginToUser(Guid loginID, Guid userID, [FromBody] UserLoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateLogin(LoginCreate model)
+        public async Task<IActionResult> CreateLogin([FromBody] LoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

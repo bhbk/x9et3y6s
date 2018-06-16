@@ -31,20 +31,20 @@ namespace Bhbk.Lib.Identity.Stores
 
             try
             {
-                _config.Debug = Boolean.Parse(_cb["Debug"]);
-                _config.DefaultAuhthorizationCodeLife = UInt16.Parse(_cb["DefaultAuthorizationCodeLife"]);
-                _config.DefaultAuhthorizationCodeLength = UInt16.Parse(_cb["DefaultAuthorizationCodeLength"]);
-                _config.DefaultAccessTokenLife = Double.Parse(_cb["DefaultAccessTokenLife"]);
-                _config.DefaultFailedAccessAttempts = UInt16.Parse(_cb["DefaultFailedAccessAttempts"]);
-                _config.DefaultPasswordLength = UInt16.Parse(_cb["DefaultPasswordLength"]);
-                _config.DefaultRefreshTokenLife = Double.Parse(_cb["DefaultRefreshTokenLife"]);
-                _config.IdentityAdminBaseUrl = _cb["IdentityAdminBaseUrl"];
-                _config.IdentityMeBaseUrl = _cb["IdentityMeBaseUrl"];
-                _config.IdentityStsBaseUrl = _cb["IdentityStsBaseUrl"];
-                _config.UnitTestAccessToken = false;
-                _config.UnitTestAccessTokenFakeUtcNow = DateTime.UtcNow;
-                _config.UnitTestRefreshToken = false;
-                _config.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
+                _config.DefaultsDebug = Boolean.Parse(_cb["IdentityDefaults:Debug"]);
+                _config.DefaultsAuhthorizationCodeLife = UInt16.Parse(_cb["IdentityDefaults:AuthorizationCodeLife"]);
+                _config.DefaultsAuhthorizationCodeLength = UInt16.Parse(_cb["IdentityDefaults:AuthorizationCodeLength"]);
+                _config.DefaultsAccessTokenLife = Double.Parse(_cb["IdentityDefaults:AccessTokenLife"]);
+                _config.DefaultsFailedAccessAttempts = UInt16.Parse(_cb["IdentityDefaults:FailedAccessAttempts"]);
+                _config.DefaultsPasswordLength = UInt16.Parse(_cb["IdentityDefaults:PasswordLength"]);
+                _config.DefaultsRefreshTokenLife = Double.Parse(_cb["IdentityDefaults:RefreshTokenLife"]);
+                _config.EndpointsAdminBaseUrl = _cb["IdentityEndpoints:AdminBaseUrl"];
+                _config.EndpointsMeBaseUrl = _cb["IdentityEndpoints:MeBaseUrl"];
+                _config.EndpointsStsBaseUrl = _cb["IdentityEndpoints:StsBaseUrl"];
+                _config.UnitTestsAccessToken = false;
+                _config.UnitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
+                _config.UnitTestsRefreshToken = false;
+                _config.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
             }
             catch (Exception ex)
             {

@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity
         public const string AttrRefreshTokenIDV1 = "refresh_token";
         public const string AttrRefreshTokenIDV2 = "refresh_token";
         public const string AttrUserIDV1 = "username";
-        public const string AttrUserIDV2 = "username";
+        public const string AttrUserIDV2 = "user";
         #endregion
 
         #region Configuration Settings

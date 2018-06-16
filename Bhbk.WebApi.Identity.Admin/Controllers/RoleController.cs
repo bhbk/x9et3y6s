@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public RoleController(IIdentityContext ioc, IHostedService[] tasks)
             : base(ioc, tasks) { }
 
-        [Route("v1/{roleID}/add/{userID}"), HttpPost]
+        [Route("v1/{roleID}/add/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> AddRoleToUser(Guid roleID, Guid userID)
         {
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateRole(RoleCreate model)
+        public async Task<IActionResult> CreateRole([FromBody] RoleCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -137,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{roleID}/remove/{userID}"), HttpDelete]
+        [Route("v1/{roleID}/remove/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RemoveRoleFromUser(Guid roleID, Guid userID)
         {

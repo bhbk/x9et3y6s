@@ -35,7 +35,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestClientA,
                 ClientKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
                 Enabled = true,
-                Immutable = false
             };
 
             var result = await controller.CreateClient(model) as OkObjectResult;

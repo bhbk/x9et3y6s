@@ -17,5 +17,13 @@ namespace Bhbk.Lib.Identity.Models
         : base(optionsBuilder.Options)
         {
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+
+            }
+        }
     }
 }

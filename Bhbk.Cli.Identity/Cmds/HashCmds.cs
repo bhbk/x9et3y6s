@@ -13,7 +13,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class HashCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-cli.json");
+        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
         private static IConfigurationRoot _cb;
         private static bool Generate = false;
 
@@ -42,7 +42,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
-                    var cleartext = PasswordHelper.GetStdin();
+                    var cleartext = ConsoleHelper.GetHiddenInput();
                     var hashvalue = Statics.IoC.UserMgmt.PasswordHasher.HashPassword(null, cleartext);
 
                     if (Statics.IoC.UserMgmt.PasswordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)

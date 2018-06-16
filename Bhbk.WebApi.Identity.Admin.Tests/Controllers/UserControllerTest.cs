@@ -39,7 +39,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LastName = "LastName",
                 PhoneNumber = "0123456789",
                 LockoutEnabled = false,
-                Immutable = false,
             };
 
             var result = await controller.CreateUser(model) as BadRequestObjectResult;

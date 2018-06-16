@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             }
 
             var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
-            List<AppAudience> audiences = new List<AppAudience>();
+            var audiences = new List<AppAudience>();
 
             //check if audience is single, multiple or undefined...
             if (string.IsNullOrEmpty(audienceValue))

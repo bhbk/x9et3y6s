@@ -43,31 +43,26 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             {
                 await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
 
-                DoWork();
-            }
-        }
-
-        private void DoWork()
-        {
-            try
-            {
-                var invalid = _ioc.UserMgmt.Store.Context.AppUserRefresh
-                    .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
-                var invalidCount = invalid.Count();
-
-                if (invalid.Any())
+                try
                 {
-                    foreach (AppUserRefresh entry in invalid.ToList())
-                        _ioc.UserMgmt.Store.Context.AppUserRefresh.Remove(entry);
+                    var invalid = _ioc.UserMgmt.Store.Context.AppUserRefresh
+                        .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
+                    var invalidCount = invalid.Count();
 
-                    _ioc.UserMgmt.Store.Context.SaveChanges();
+                    if (invalid.Any())
+                    {
+                        foreach (AppUserRefresh entry in invalid.ToList())
+                            _ioc.UserMgmt.Store.Context.AppUserRefresh.Remove(entry);
 
-                    Log.Information("Ran " + typeof(MaintainTokensTask).Name + " in background. Delete " + invalidCount.ToString() + " invalid refresh tokens.");
+                        _ioc.UserMgmt.Store.Context.SaveChanges();
+
+                        Log.Information("Ran " + typeof(MaintainTokensTask).Name + " in background. Delete " + invalidCount.ToString() + " invalid refresh tokens.");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+                catch (Exception ex)
+                {
+                    Log.Debug(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+                }
             }
         }
     }

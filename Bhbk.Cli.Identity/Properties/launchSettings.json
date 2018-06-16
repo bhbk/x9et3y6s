@@ -2,7 +2,7 @@
   "profiles": {
     "Bhbk.Cli.Identity": {
       "commandName": "Project",
-      "commandLineArgs": " data --create-defaults"
+      "commandLineArgs": " admin --create role"
     }
   }
 }

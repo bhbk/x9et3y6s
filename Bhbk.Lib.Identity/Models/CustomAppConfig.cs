@@ -4,19 +4,19 @@ namespace Bhbk.Lib.Identity.Factory
 {
     public class AppConfig
     {
-        public bool Debug { get; set; }
-        public Double DefaultAccessTokenLife { get; set; }
-        public UInt16 DefaultAuhthorizationCodeLife { get; set; }
-        public UInt16 DefaultAuhthorizationCodeLength { get; set; }
-        public UInt16 DefaultPasswordLength { get; set; }
-        public UInt16 DefaultFailedAccessAttempts { get; set; }
-        public Double DefaultRefreshTokenLife { get; set; }
-        public string IdentityAdminBaseUrl { get; set; }
-        public string IdentityMeBaseUrl { get; set; }
-        public string IdentityStsBaseUrl { get; set; }
-        public bool UnitTestAccessToken { get; set; }
-        public DateTime UnitTestAccessTokenFakeUtcNow { get; set; }
-        public bool UnitTestRefreshToken { get; set; }
-        public DateTime UnitTestRefreshTokenFakeUtcNow { get; set; }
+        public bool DefaultsDebug { get; set; }
+        public Double DefaultsAccessTokenLife { get; set; }
+        public UInt16 DefaultsAuhthorizationCodeLife { get; set; }
+        public UInt16 DefaultsAuhthorizationCodeLength { get; set; }
+        public UInt16 DefaultsPasswordLength { get; set; }
+        public UInt16 DefaultsFailedAccessAttempts { get; set; }
+        public Double DefaultsRefreshTokenLife { get; set; }
+        public string EndpointsAdminBaseUrl { get; set; }
+        public string EndpointsMeBaseUrl { get; set; }
+        public string EndpointsStsBaseUrl { get; set; }
+        public bool UnitTestsAccessToken { get; set; }
+        public DateTime UnitTestsAccessTokenFakeUtcNow { get; set; }
+        public bool UnitTestsRefreshToken { get; set; }
+        public DateTime UnitTestsRefreshTokenFakeUtcNow { get; set; }
     }
 }

@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailChange(model,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordChange(model,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultPasswordLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
@@ -159,7 +159,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneChange(model,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -205,7 +205,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmail(user.Id,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPassword(user.Id,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultPasswordLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -279,7 +279,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhone(user.Id,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 

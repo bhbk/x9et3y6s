@@ -44,34 +44,29 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
 
-                DoWork();
-            }
-        }
-
-        public void DoWork()
-        {
-            try
-            {
-                var disabled = _ioc.UserMgmt.Store.Context.AppUser.Where(x => x.LockoutEnd < DateTime.UtcNow);
-                var disabledCount = disabled.Count();
-
-                if (disabled.Any())
+                try
                 {
-                    foreach (AppUser entry in disabled.ToList())
+                    var disabled = _ioc.UserMgmt.Store.Context.AppUser.Where(x => x.LockoutEnd < DateTime.UtcNow);
+                    var disabledCount = disabled.Count();
+
+                    if (disabled.Any())
                     {
-                        entry.LockoutEnabled = false;
-                        entry.LockoutEnd = null;
-                        _ioc.UserMgmt.Store.Context.Entry(entry).State = EntityState.Modified;
+                        foreach (AppUser entry in disabled.ToList())
+                        {
+                            entry.LockoutEnabled = false;
+                            entry.LockoutEnd = null;
+                            _ioc.UserMgmt.Store.Context.Entry(entry).State = EntityState.Modified;
+                        }
+
+                        _ioc.UserMgmt.Store.Context.SaveChanges();
+
+                        Log.Information("Ran " + typeof(MaintainUsersTask).Name + " in background. Enabled " + disabledCount.ToString() + " users with lockout-end expire.");
                     }
-
-                    _ioc.UserMgmt.Store.Context.SaveChanges();
-
-                    Log.Information("Ran " + typeof(MaintainUsersTask).Name + " in background. Enabled " + disabledCount.ToString() + " users with lockout-end expire.");
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+                catch (Exception ex)
+                {
+                    Log.Error(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+                }
             }
         }
     }

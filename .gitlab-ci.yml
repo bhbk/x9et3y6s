@@ -21,7 +21,6 @@ test:
   - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
   - msbuild /t:build /p:Configuration=Release /verbosity:quiet
   -
-  - mstest /testcontainer:"Bhbk.Lib.Identity.Tests\bin\Release\Bhbk.Lib.Identity.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Admin.Tests\bin\Release\Bhbk.WebApi.Identity.Admin.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Me.Tests\bin\Release\Bhbk.WebApi.Identity.Me.Tests.dll"
   - mstest /testcontainer:"Bhbk.WebApi.Identity.Sts.Tests\bin\Release\Bhbk.WebApi.Identity.Sts.Tests.dll"

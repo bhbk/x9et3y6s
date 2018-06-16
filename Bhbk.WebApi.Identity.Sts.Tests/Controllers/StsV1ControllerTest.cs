@@ -364,15 +364,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshToken = true;
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshToken = true;
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
             var access = await TestStsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshToken = false;
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshToken = false;
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
@@ -392,15 +392,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshToken = true;
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(1);
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshToken = true;
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
             var access = await TestStsV1.GetAccessToken(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshToken = false;
-            TestIoC.ConfigMgmt.Tweaks.UnitTestRefreshTokenFakeUtcNow = DateTime.UtcNow;
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshToken = false;
+            TestIoC.ConfigMgmt.Tweaks.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];

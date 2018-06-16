@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Models;
+using System;
 
 namespace Bhbk.Cli.Identity
 {
@@ -7,7 +7,16 @@ namespace Bhbk.Cli.Identity
     {
         Success = 0,
         Failure = 1,
-        Exception = 2
+        Exception = 2,
+    }
+
+    internal enum CmdType
+    {
+        client,
+        audience,
+        role,
+        rolemap,
+        user,
     }
 
     internal class Statics

@@ -38,7 +38,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
                 Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
-                Immutable = false
             };
             var create = await TestIoC.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
             create.Should().BeAssignableTo(typeof(IdentityResult));

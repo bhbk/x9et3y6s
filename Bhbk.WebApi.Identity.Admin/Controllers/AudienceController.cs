@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateAudience(AudienceCreate model)
+        public async Task<IActionResult> CreateAudience([FromBody] AudienceCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

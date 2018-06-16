@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateUser(UserCreate model)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
