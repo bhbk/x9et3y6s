@@ -12,6 +12,7 @@ namespace Bhbk.Lib.Identity.Models
 
         public Guid Id { get; set; }
         public string LoginProvider { get; set; }
+        public bool Immutable { get; set; }
 
         public ICollection<AppUserLogin> AppUserLogin { get; set; }
     }

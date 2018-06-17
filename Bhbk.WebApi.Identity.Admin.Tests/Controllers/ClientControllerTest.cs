@@ -45,6 +45,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_Client_Delete_Fail_Immutable()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new ClientController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+
+            TestIoC.ClientMgmt.Store.SetImmutableAsync(client, true);
+
+            var result = await controller.DeleteClient(client.Id) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+            var check = TestIoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
+            check.Should().BeTrue();
+        }
+
+        [TestMethod]
         public async Task Api_Admin_Client_Delete_Success()
         {
             TestData.Destroy();

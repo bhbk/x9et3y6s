@@ -136,7 +136,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             //check that user is confirmed...
             //check that user is not locked...
             else if (ioc.UserMgmt.IsLockedOutAsync(user).Result
-                || !user.EmailConfirmed)
+                || !user.EmailConfirmed 
+                || !user.PasswordConfirmed)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
@@ -162,6 +163,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //check that password is valid...
                 if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)
                 {
+                    //adjust counter(s) for login failure...
                     ioc.UserMgmt.AccessFailedAsync(user).Wait();
 
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -175,7 +177,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginInvalid }, _serializer));
             }
-            
+
+            //adjust counter(s) for login success...
+            ioc.UserMgmt.AccessSuccessAsync(user).Wait();            
+
             var access = JwtV1Helper.GenerateAccessToken(context, client, audience, user).Result;
             var refresh = JwtV1Helper.GenerateRefreshToken(context, client, user).Result;
 

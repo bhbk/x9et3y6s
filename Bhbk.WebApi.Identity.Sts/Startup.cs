@@ -62,6 +62,10 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(bearer =>
             {
                 bearer.TokenValidationParameters = new TokenValidationParameters

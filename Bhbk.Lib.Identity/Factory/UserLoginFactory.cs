@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Enabled = login.Enabled;
             this.Created = login.Created;
             this.LastUpdated = login.LastUpdated ?? null;
-            this.Immutable = false;
+            this.Immutable = login.Immutable;
         }
 
         public UserLoginFactory(UserLoginCreate login)
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ProviderKey = login.ProviderKey;
             this.Enabled = login.Enabled;
             this.Created = DateTime.Now;
-            this.Immutable = false;
+            this.Immutable = login.Immutable;
         }
 
         public AppUserLogin Devolve()
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Factory
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable
+                Immutable = this.Immutable,
             };
         }
 
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Factory
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable
+                Immutable = this.Immutable,
             };
         }
 

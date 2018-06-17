@@ -66,6 +66,17 @@ namespace Bhbk.Lib.Identity.Managers
             return await UpdateAsync(user);
         }
 
+        public async Task<IdentityResult> AccessSuccessAsync(AppUser user)
+        {
+            if (!Store.Exists(user.Id))
+                throw new ArgumentNullException();
+
+            user.LastLoginSuccess = DateTime.Now;
+            user.AccessSuccessCount++;
+
+            return await UpdateAsync(user);
+        }
+
         public override async Task<IdentityResult> AddClaimAsync(AppUser user, Claim claim)
         {
             if (!Store.Exists(user.Id))
@@ -99,7 +110,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (hash != null)
                 throw new InvalidOperationException();
 
-            return await UpdatePassword(Store, user, password);
+            return await UpdatePassword(this.Store, user, password);
         }
 
         public async Task<IdentityResult> AddRefreshTokenAsync(AppUserRefresh refresh)
@@ -141,7 +152,7 @@ namespace Bhbk.Lib.Identity.Managers
             else if (!await CheckPasswordAsync(user, currentPassword))
                 throw new InvalidOperationException();
 
-            return await UpdatePassword(Store, user, newPassword);
+            return await UpdatePassword(this.Store, user, newPassword);
         }
 
         public override async Task<IdentityResult> ChangePhoneNumberAsync(AppUser user, string phoneNumber, string token)
@@ -492,23 +503,10 @@ namespace Bhbk.Lib.Identity.Managers
             return IdentityResult.Success;
         }
 
-        public override async Task<IdentityResult> ResetAccessFailedCountAsync(AppUser user)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            await Store.ResetAccessFailedCountAsync(user);
-
-            return IdentityResult.Success;
-        }
-
         public override async Task<IdentityResult> RemovePasswordAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
-
-            if (!await HasPasswordAsync(user))
-                throw new InvalidOperationException();
 
             await Store.SetPasswordHashAsync(user, null);
             await Store.SetSecurityStampAsync(user, null);
@@ -601,9 +599,10 @@ namespace Bhbk.Lib.Identity.Managers
             if (!result.Succeeded)
                 throw new InvalidOperationException();
 
-            var password = PasswordHasher.HashPassword(user, newPassword);
+            var hashedPassword = PasswordHasher.HashPassword(user, newPassword);
 
-            await passwordStore.SetPasswordHashAsync(user, password, new CancellationToken());
+            await passwordStore.SetPasswordHashAsync(user, hashedPassword, new CancellationToken());
+            await SetPasswordConfirmedAsync(user, true);
             await UpdateSecurityStampAsync(user);
 
             return IdentityResult.Success;

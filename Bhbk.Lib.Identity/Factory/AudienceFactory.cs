@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BaseLib = Bhbk.Lib.Identity;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory
@@ -15,7 +14,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ClientId = audience.ClientId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
-            this.AudienceType = audience.AudienceType ?? BaseLib.AudienceType.user_agent.ToString();
+            this.AudienceType = audience.AudienceType;
             this.Created = audience.Created;
             this.LastUpdated = audience.LastUpdated ?? null;
             this.Enabled = audience.Enabled;
@@ -29,10 +28,10 @@ namespace Bhbk.Lib.Identity.Factory
             this.ClientId = audience.ClientId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
-            this.AudienceType = audience.AudienceType ?? BaseLib.AudienceType.user_agent.ToString();
+            this.AudienceType = audience.AudienceType;
             this.Created = DateTime.Now;
             this.Enabled = audience.Enabled;
-            this.Immutable = false;
+            this.Immutable = audience.Immutable;
         }
 
         public AppAudience Devolve()
@@ -47,7 +46,8 @@ namespace Bhbk.Lib.Identity.Factory
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable
+                Immutable = this.Immutable,
+                AppRole = this.AppRole,
             };
         }
 

@@ -43,11 +43,21 @@ namespace Bhbk.Cli.Identity.Helpers
             while (true)
             {
                 ConsoleKeyInfo cki = Console.ReadKey(true);
-
                 if (cki.Key == ConsoleKey.Enter)
                 {
                     Console.WriteLine();
                     break;
+                }
+
+                if (cki.Key == ConsoleKey.Backspace)
+                {
+                    if (sb.Length > 0)
+                    {
+                        Console.Write("\b\0\b");
+                        sb.Length--;
+                    }
+
+                    continue;
                 }
 
                 Console.Write('*');

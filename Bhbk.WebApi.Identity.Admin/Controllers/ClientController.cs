@@ -75,9 +75,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClients()
         {
             var result = new List<ClientResult>();
-            var users = await IoC.ClientMgmt.GetListAsync();
+            var clients = await IoC.ClientMgmt.GetListAsync();
 
-            foreach (AppClient entry in users)
+            foreach (AppClient entry in clients)
                 result.Add(new ClientFactory<AppClient>(entry).Evolve());
 
             return Ok(result);
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateClient(ClientUpdate model)
+        public async Task<IActionResult> UpdateClient([FromBody] ClientUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

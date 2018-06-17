@@ -24,6 +24,43 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_Audience_Create_Fail_AudienceType()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new AudienceController(TestIoC, TestTasks);
+            var model = new AudienceCreate()
+            {
+                ClientId = TestIoC.ClientMgmt.Store.Get().First().Id,
+                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
+                AudienceType = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(8),
+                Enabled = true,
+            };
+
+            var result = await controller.CreateAudience(model) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_Audience_Delete_Fail_Immutable()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new AudienceController(TestIoC, TestTasks);
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+
+            TestIoC.AudienceMgmt.Store.SetImmutableAsync(audience, true);
+
+            var result = await controller.DeleteAudience(audience.Id) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+            var check = TestIoC.AudienceMgmt.Store.Get(x => x.Id == audience.Id).Any();
+            check.Should().BeTrue();
+        }
+
+        [TestMethod]
         public async Task Api_Admin_Audience_Create_Success()
         {
             TestData.Destroy();

@@ -12,11 +12,12 @@ namespace Bhbk.Cli.Identity
 
     internal enum CmdType
     {
-        client,
         audience,
+        client,
         role,
         rolemap,
         user,
+        userpass
     }
 
     internal class Statics

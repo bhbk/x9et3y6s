@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_Create_InvalidEmail_Fail()
+        public async Task Api_Admin_User_Create_Fail_InvalidEmail()
         {
             TestData.Destroy();
             TestData.CreateTestData();
@@ -35,8 +35,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new UserCreate()
             {
                 Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
-                FirstName = "FirstName",
-                LastName = "LastName",
+                FirstName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-First",
+                LastName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-Last",
                 PhoneNumber = "0123456789",
                 LockoutEnabled = false,
             };
@@ -55,8 +55,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new UserCreate()
             {
                 Email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = "FirstName",
-                LastName = "LastName",
+                FirstName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-First",
+                LastName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-Last",
                 PhoneNumber = "0123456789",
                 LockoutEnabled = false,
                 Immutable = false,
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_DeleteImmutable_Fail()
+        public async Task Api_Admin_User_Delete_Fail_Immutable()
         {
             TestData.Destroy();
             TestData.CreateTestData();
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            await TestIoC.UserMgmt.Store.SetImmutableEnabledAsync(user, true);
+            await TestIoC.UserMgmt.Store.SetImmutableAsync(user, true);
 
             var result = await controller.DeleteUser(user.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_DeleteMutable_Success()
+        public async Task Api_Admin_User_Delete_Success()
         {
             TestData.Destroy();
             TestData.CreateTestData();

@@ -37,6 +37,7 @@ namespace Bhbk.Lib.Identity.Models
         public bool PasswordConfirmed { get; set; }
         public string SecurityStamp { get; set; }
         public bool TwoFactorEnabled { get; set; }
+        public bool HumanBeing { get; set; }
         public bool Immutable { get; set; }
 
         public ICollection<AppUserClaim> AppUserClaim { get; set; }

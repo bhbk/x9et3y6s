@@ -125,7 +125,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             }
 
             //check that user is not locked...
-            else if (ioc.UserMgmt.IsLockedOutAsync(user).Result)
+            else if (ioc.UserMgmt.IsLockedOutAsync(user).Result
+                || !user.EmailConfirmed
+                || !user.PasswordConfirmed)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";

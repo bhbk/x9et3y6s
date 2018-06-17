@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory
@@ -12,10 +11,10 @@ namespace Bhbk.Lib.Identity.Factory
         public UserFactory(AppUser user)
         {
             this.Id = user.Id;
-            this.UserName = user.Email;
-            this.NormalizedUserName = user.Email.ToLower() ?? string.Empty;
+            this.UserName = user.UserName;
+            this.NormalizedUserName = user.UserName;
             this.Email = user.Email;
-            this.NormalizedEmail = user.Email.ToLower() ?? string.Empty;
+            this.NormalizedEmail = user.NormalizedEmail;
             this.EmailConfirmed = user.EmailConfirmed;
             this.PhoneNumber = user.PhoneNumber ?? string.Empty;
             this.PhoneNumberConfirmed = user.PhoneNumberConfirmed.HasValue ? user.PhoneNumberConfirmed : false;
@@ -34,18 +33,23 @@ namespace Bhbk.Lib.Identity.Factory
             this.PasswordConfirmed = user.PasswordConfirmed;
             this.SecurityStamp = user.SecurityStamp;
             this.TwoFactorEnabled = user.TwoFactorEnabled;
+            this.HumanBeing = user.HumanBeing;
             this.Immutable = user.Immutable;
-            this.AppUserRole = user.AppUserRole;
+            this.AppUserClaim = user.AppUserClaim;
             this.AppUserLogin = user.AppUserLogin;
+            this.AppUserRole = user.AppUserRole;
+
+            if (!user.HumanBeing)
+                user.EmailConfirmed = true;
         }
 
         public UserFactory(UserCreate user)
         {
             this.Id = Guid.NewGuid();
             this.UserName = user.Email;
-            this.NormalizedUserName = user.Email.ToLower();
+            this.NormalizedUserName = user.Email;
             this.Email = user.Email;
-            this.NormalizedEmail = user.Email.ToLower();
+            this.NormalizedEmail = user.Email;
             this.EmailConfirmed = false;
             this.PhoneNumber = user.PhoneNumber;
             this.PhoneNumberConfirmed = false;
@@ -60,7 +64,8 @@ namespace Bhbk.Lib.Identity.Factory
             this.PasswordConfirmed = false;
             this.SecurityStamp = string.Empty;
             this.TwoFactorEnabled = false;
-            this.Immutable = false;
+            this.HumanBeing = user.HumanBeing;
+            this.Immutable = user.Immutable;
         }
 
         public AppUser Devolve()
@@ -69,9 +74,9 @@ namespace Bhbk.Lib.Identity.Factory
             {
                 Id = this.Id,
                 UserName = this.Email,
-                NormalizedUserName = this.Email.ToLower(),
+                NormalizedUserName = this.NormalizedUserName,
                 Email = this.Email,
-                NormalizedEmail = this.Email.ToLower(),
+                NormalizedEmail = this.NormalizedEmail,
                 EmailConfirmed = this.EmailConfirmed,
                 PhoneNumber = this.PhoneNumber,
                 PhoneNumberConfirmed = this.PhoneNumberConfirmed,
@@ -90,7 +95,11 @@ namespace Bhbk.Lib.Identity.Factory
                 PasswordConfirmed = this.PasswordConfirmed,
                 SecurityStamp = this.SecurityStamp,
                 TwoFactorEnabled = this.TwoFactorEnabled,
+                HumanBeing = this.HumanBeing,
                 Immutable = this.Immutable,
+                AppUserClaim = this.AppUserClaim,
+                AppUserLogin = this.AppUserLogin,
+                AppUserRole = this.AppUserRole,
             };
         }
 
@@ -115,10 +124,11 @@ namespace Bhbk.Lib.Identity.Factory
                 AccessSuccessCount = this.AccessSuccessCount,
                 PasswordConfirmed = this.PasswordConfirmed,
                 TwoFactorEnabled = this.TwoFactorEnabled,
+                HumanBeing = this.HumanBeing,
                 Immutable = this.Immutable,
                 Claims = AppUserClaim.Where(x => x.UserId == this.Id).Select(x => x.UserId.ToString()).ToList(),
-                Roles = AppUserRole.Where(x => x.UserId == this.Id).Select(x => x.RoleId.ToString()).ToList(),
                 Logins = AppUserLogin.Where(x => x.UserId == this.Id).Select(x => x.LoginId.ToString()).ToList(),
+                Roles = AppUserRole.Where(x => x.UserId == this.Id).Select(x => x.RoleId.ToString()).ToList(),
             };
         }
 
@@ -141,6 +151,7 @@ namespace Bhbk.Lib.Identity.Factory
         public string LastName { get; set; }
         public DateTime Created { get; set; }
         public bool LockoutEnabled { get; set; }
+        public bool HumanBeing { get; set; }
         public bool Immutable { get; set; }
     }
 
@@ -163,6 +174,7 @@ namespace Bhbk.Lib.Identity.Factory
         public int AccessSuccessCount { get; set; }
         public bool PasswordConfirmed { get; set; }
         public bool TwoFactorEnabled { get; set; }
+        public bool HumanBeing { get; set; }
         public bool Immutable { get; set; }
         public IList<string> Claims { get; set; }
         public IList<string> Roles { get; set; }

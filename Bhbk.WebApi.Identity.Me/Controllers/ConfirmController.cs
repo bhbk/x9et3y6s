@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             : base(ioc, tasks) { }
 
         [Route("v1/set-email/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmEmail(Guid userId, [FromBody]string token)
+        public async Task<IActionResult> ConfirmEmail(Guid userId, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmPassword(Guid userId, [FromBody]string token)
+        public async Task<IActionResult> ConfirmPassword(Guid userId, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-phone/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmPhone(Guid userId, [FromBody]string token)
+        public async Task<IActionResult> ConfirmPhone(Guid userId, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-email/{token}"), HttpPut]
-        public async Task<IActionResult> ConfirmEmailChange(UserChangeEmail model, string token)
+        public async Task<IActionResult> ConfirmEmailChange([FromBody] UserChangeEmail model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-password/{token}"), HttpPut]
-        public async Task<IActionResult> ConfirmPasswordChange(UserChangePassword model, string token)
+        public async Task<IActionResult> ConfirmPasswordChange([FromBody] UserChangePassword model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-phone/{token}"), HttpPut]
-        public async Task<IActionResult> ConfirmPhoneChange(UserChangePhone model, string token)
+        public async Task<IActionResult> ConfirmPhoneChange([FromBody] UserChangePhone model, string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

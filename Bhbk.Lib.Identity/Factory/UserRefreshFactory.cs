@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Factory
                 UserId = this.UserId,
                 ProtectedTicket = this.ProtectedTicket,
                 IssuedUtc = this.IssuedUtc,
-                ExpiresUtc = this.ExpiresUtc
+                ExpiresUtc = this.ExpiresUtc,
             };
         }
 
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Factory
                 UserId = this.UserId,
                 ProtectedTicket = this.ProtectedTicket,
                 IssuedUtc = this.IssuedUtc,
-                ExpiresUtc = this.ExpiresUtc
+                ExpiresUtc = this.ExpiresUtc,
             };
         }
     }

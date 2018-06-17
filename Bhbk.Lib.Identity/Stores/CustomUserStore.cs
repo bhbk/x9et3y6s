@@ -112,6 +112,9 @@ namespace Bhbk.Lib.Identity.Stores
 
         public override Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (!user.HumanBeing)
+                user.EmailConfirmed = true;
+
             _context.AppUser.Add(user);
             _context.SaveChanges();
 
@@ -290,13 +293,11 @@ namespace Bhbk.Lib.Identity.Stores
 
             if (result == null)
                 return Task.FromResult(false);
-            else
-            {
-                if (string.IsNullOrEmpty(result.PasswordHash))
-                    return Task.FromResult(false);
 
-                return Task.FromResult(true);
-            }
+            else if (string.IsNullOrEmpty(result.PasswordHash))
+                return Task.FromResult(false);
+
+            return Task.FromResult(true);
         }
 
         public Task<bool> IsInLoginAsync(AppUser user, string loginName)
@@ -306,7 +307,7 @@ namespace Bhbk.Lib.Identity.Stores
             if (login == null)
                 throw new ArgumentNullException();
 
-            if (_context.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginId == login.Id))
+            else if (_context.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginId == login.Id))
                 return Task.FromResult(true);
 
             else
@@ -408,18 +409,6 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public override Task ResetAccessFailedCountAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            user.LastLoginSuccess = DateTime.Now;
-            user.AccessSuccessCount++;
-            user.AccessFailedCount = 0;
-
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Task.FromResult(IdentityResult.Success);
-        }
-
         public override Task SetEmailConfirmedAsync(AppUser user, bool confirmed, CancellationToken cancellationToken = default(CancellationToken))
         {
             user.EmailConfirmed = confirmed;
@@ -431,7 +420,7 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task SetImmutableEnabledAsync(AppUser user, bool enabled)
+        public Task SetImmutableAsync(AppUser user, bool enabled)
         {
             user.Immutable = enabled;
             user.LastUpdated = DateTime.Now;

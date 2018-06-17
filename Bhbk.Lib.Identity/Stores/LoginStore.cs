@@ -117,6 +117,16 @@ namespace Bhbk.Lib.Identity.Stores
             throw new NotImplementedException();
         }
 
+        public bool SetImmutableAsync(AppLogin login, bool enabled)
+        {
+            login.Immutable = enabled;
+
+            _context.Entry(login).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return true;
+        }
+
         public AppLogin Update(AppLogin entity)
         {
             var model = _context.AppLogin.Find(entity.Id);

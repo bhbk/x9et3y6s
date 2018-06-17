@@ -32,15 +32,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user != null)
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
-            
-            var create = new UserFactory<UserCreate>(model);
-            var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
 
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            var init = new UserFactory<UserCreate>(model);
+            var create = await IoC.UserMgmt.CreateAsync(init.Devolve());
 
-            else
-                return Ok(create.Evolve());
+            if (!create.Succeeded)
+                return GetErrorResult(create);
+
+            var find = await IoC.UserMgmt.FindByIdAsync(init.Id.ToString());
+            var result = new UserFactory<AppUser>(find);
+
+            return Ok(result.Evolve());
         }
 
         [Route("v1/{userID}"), HttpDelete]
@@ -152,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}/add-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> AddPassword(Guid userID, UserAddPassword model)
+        public async Task<IActionResult> AddPassword(Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -206,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}/reset-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> ResetPassword(Guid userID, UserAddPassword model)
+        public async Task<IActionResult> ResetPassword(Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -219,22 +221,35 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            else
+            else if (user.HumanBeing)
             {
                 string token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
-                var result = await IoC.UserMgmt.ResetPasswordAsync(user, token, model.NewPassword);
+                var reset = await IoC.UserMgmt.ResetPasswordAsync(user, token, model.NewPassword);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+                if (!reset.Succeeded)
+                    return GetErrorResult(reset);
 
-                else
-                    return NoContent();
+                return NoContent();
+            }
+            else
+            {
+                var remove = await IoC.UserMgmt.RemovePasswordAsync(user);
+
+                if (!remove.Succeeded)
+                    return GetErrorResult(remove);
+
+                var add = await IoC.UserMgmt.AddPasswordAsync(user, model.NewPassword);
+
+                if (!add.Succeeded)
+                    return GetErrorResult(add);
+
+                return NoContent();
             }
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateUser(UserUpdate model)
+        public async Task<IActionResult> UpdateUser([FromBody] UserUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

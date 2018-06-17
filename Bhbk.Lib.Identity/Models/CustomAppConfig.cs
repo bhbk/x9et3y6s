@@ -11,9 +11,9 @@ namespace Bhbk.Lib.Identity.Factory
         public UInt16 DefaultsPasswordLength { get; set; }
         public UInt16 DefaultsFailedAccessAttempts { get; set; }
         public Double DefaultsRefreshTokenLife { get; set; }
-        public string EndpointsAdminBaseUrl { get; set; }
-        public string EndpointsMeBaseUrl { get; set; }
-        public string EndpointsStsBaseUrl { get; set; }
+        public string EndpointsAdminUrl { get; set; }
+        public string EndpointsMeUrl { get; set; }
+        public string EndpointsStsUrl { get; set; }
         public bool UnitTestsAccessToken { get; set; }
         public DateTime UnitTestsAccessTokenFakeUtcNow { get; set; }
         public bool UnitTestsRefreshToken { get; set; }

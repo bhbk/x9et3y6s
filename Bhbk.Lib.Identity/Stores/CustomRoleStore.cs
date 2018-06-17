@@ -100,6 +100,17 @@ namespace Bhbk.Lib.Identity.Stores
             return result;
         }
 
+        public bool SetImmutableAsync(AppRole role, bool enabled)
+        {
+            role.Immutable = enabled;
+            role.LastUpdated = DateTime.Now;
+
+            _context.Entry(role).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return true;
+        }
+
         public override Task<IdentityResult> UpdateAsync(AppRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             var model = _context.AppRole.Where(x => x.Id == role.Id).Single();

@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-email"), HttpPut]
-        public async Task<IActionResult> AskChangeEmail(UserChangeEmail model)
+        public async Task<IActionResult> AskChangeEmail([FromBody] UserChangeEmail model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-password"), HttpPut]
-        public async Task<IActionResult> AskChangePassword(UserChangePassword model)
+        public async Task<IActionResult> AskChangePassword([FromBody] UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -78,6 +78,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Id != model.Id)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
+            else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
@@ -101,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/change-phone"), HttpPut]
-        public async Task<IActionResult> AskChangePhone(UserChangePhone model)
+        public async Task<IActionResult> AskChangePhone([FromBody] UserChangePhone model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -112,6 +115,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (user.Id != model.Id)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
+            else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (await IoC.UserMgmt.GetPhoneNumberAsync(user) != model.CurrentPhoneNumber)
@@ -153,6 +159,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
+            else if (!user.HumanBeing)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
             bool current = await IoC.UserMgmt.GetTwoFactorEnabledAsync(user);
 
             if (current == status)
@@ -171,7 +180,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpPut]
-        public async Task<IActionResult> UpdateDetail(UserUpdate model)
+        public async Task<IActionResult> UpdateDetail([FromBody] UserUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -182,6 +191,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             if (user.Id != model.Id)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
+            else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else

@@ -4,13 +4,13 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
@@ -18,8 +18,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     {
         private readonly IIdentityContext _ioc;
         private readonly IConfigurationRoot _cb;
+        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
-        private readonly int _interval;
+        private readonly int _delay;
         public string Status { get; private set; }
 
         public MaintainUsersTask(IIdentityContext ioc)
@@ -27,25 +28,35 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             if (ioc == null)
                 throw new ArgumentNullException();
 
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
+
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
                 .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _interval = int.Parse(_cb["Tasks:MaintainUsers:PollingInterval"]);
+            _delay = int.Parse(_cb["Tasks:MaintainUsers:PollingDelay"]);
             _ioc = ioc;
 
-            Status = string.Empty;
+            var message = typeof(MaintainUsersTask).Name + " not run yet.";
+
+            Status = JsonConvert.SerializeObject(new
+            {
+                status = message
+            }, _serializer);
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
-
                 try
                 {
+                    await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
+
                     var disabled = _ioc.UserMgmt.Store.Context.AppUser.Where(x => x.LockoutEnd < DateTime.UtcNow);
                     var disabledCount = disabled.Count();
 
@@ -60,12 +71,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                         _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                        Log.Information("Ran " + typeof(MaintainUsersTask).Name + " in background. Enabled " + disabledCount.ToString() + " users with lockout-end expire.");
+                        var message = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
+                                + disabledCount.ToString() + " users with expired lock-outs.";
+
+                        Status = JsonConvert.SerializeObject(new
+                        {
+                            status = message
+                        }, _serializer);
+
+                        Log.Information(message);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+                    Log.Error(ex.ToString());
                 }
             }
         }

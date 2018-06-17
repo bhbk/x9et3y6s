@@ -10,7 +10,6 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Tasks
 {
@@ -18,11 +17,12 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
     {
         private readonly IIdentityContext _ioc;
         private readonly IConfigurationRoot _cb;
+        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly FileInfo _qf = FileSystemHelper.SearchPaths("appquotes.json");
         private readonly HttpClient _client = new HttpClient();
-        private readonly int _interval;
-        private readonly string _url;
+        private readonly string _url = string.Empty, _output = string.Empty;
+        private readonly int _delay;
         public UserQuoteOfDay QuoteOfDay { get; private set; }
         public string Status { get; private set; }
 
@@ -31,29 +31,43 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             if (ioc == null)
                 throw new ArgumentNullException();
 
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
+
             _cb = new ConfigurationBuilder()
                 .SetBasePath(_cf.DirectoryName)
                 .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _interval = int.Parse(_cb["Tasks:MaintainQuotes:PollingInterval"]);
+            _output = _qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name;
+            _delay = int.Parse(_cb["Tasks:MaintainQuotes:PollingDelay"]);
             _url = _cb["Tasks:MaintainQuotes:QuoteOfDayUrl"];
             _ioc = ioc;
 
-            Status = string.Empty;
+            var message = typeof(MaintainQuotesTask).Name + " not run yet.";
+
+            Status = JsonConvert.SerializeObject(new
+            {
+                status = message
+            }, _serializer);
+
+            QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
+                (File.ReadAllText(_output));
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             if (_ioc.ContextStatus == ContextType.UnitTest)
                 QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
-                    (File.ReadAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name));
+                    (File.ReadAllText(_output));
             else
                 DoWork(cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromMinutes(_interval), cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
 
                 DoWork(cancellationToken);
             }
@@ -63,25 +77,47 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         {
             try
             {
-                var result = _client.GetAsync(_url, cancellationToken).Result;
-                var quote = JsonConvert.DeserializeObject<UserQuoteOfDay>(result.Content.ReadAsStringAsync().Result);
+                var response = _client.GetAsync(_url, cancellationToken).Result;
+                var quotes = JsonConvert.DeserializeObject<UserQuoteOfDay>(response.Content.ReadAsStringAsync().Result);
 
-                if (result.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
-                    if(quote.contents.quotes[0].id != QuoteOfDay.contents.quotes[0].id)
+                    if (QuoteOfDay == null
+                        || QuoteOfDay.contents.quotes[0].id != quotes.contents.quotes[0].id)
                     {
-                        QuoteOfDay = quote;
+                        QuoteOfDay = quotes;
 
-                        File.WriteAllText(_qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name, JsonConvert.SerializeObject(QuoteOfDay));
-                        Log.Information("Ran " + typeof(MaintainQuotesTask).Name + " in background. Update quote of the day.");
+                        File.WriteAllText(_output, JsonConvert.SerializeObject(QuoteOfDay));
+
+                        var message = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
+
+                        Status = JsonConvert.SerializeObject(new
+                        {
+                            status = message
+                        }, _serializer);
+
+                        Log.Information(message);
                     }
                 }
+                else
+                {
+                    var message = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
 
-                Status = result.ReasonPhrase;
+                    Status = JsonConvert.SerializeObject(new
+                    {
+                        status = message,
+                        request = response.RequestMessage.ToString(),
+                        response = response.ToString()
+                    }, _serializer);
+
+                    Log.Error(message 
+                        + Environment.NewLine + response.RequestMessage.ToString() 
+                        + Environment.NewLine + response.ToString());
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, BaseLib.Statics.MsgSystemExceptionCaught);
+                Log.Error(ex.ToString());
             }
         }
     }

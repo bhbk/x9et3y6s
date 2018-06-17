@@ -38,9 +38,9 @@ namespace Bhbk.Lib.Identity.Stores
                 _config.DefaultsFailedAccessAttempts = UInt16.Parse(_cb["IdentityDefaults:FailedAccessAttempts"]);
                 _config.DefaultsPasswordLength = UInt16.Parse(_cb["IdentityDefaults:PasswordLength"]);
                 _config.DefaultsRefreshTokenLife = Double.Parse(_cb["IdentityDefaults:RefreshTokenLife"]);
-                _config.EndpointsAdminBaseUrl = _cb["IdentityEndpoints:AdminBaseUrl"];
-                _config.EndpointsMeBaseUrl = _cb["IdentityEndpoints:MeBaseUrl"];
-                _config.EndpointsStsBaseUrl = _cb["IdentityEndpoints:StsBaseUrl"];
+                _config.EndpointsAdminUrl = _cb["IdentityEndpoints:AdminUrl"];
+                _config.EndpointsMeUrl = _cb["IdentityEndpoints:MeUrl"];
+                _config.EndpointsStsUrl = _cb["IdentityEndpoints:StsUrl"];
                 _config.UnitTestsAccessToken = false;
                 _config.UnitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
                 _config.UnitTestsRefreshToken = false;

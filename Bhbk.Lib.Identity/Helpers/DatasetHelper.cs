@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = Statics.ApiDefaultClient,
                     ClientKey = CryptoHelper.GenerateRandomBase64(32),
                     Enabled = true,
-                    Immutable = true
+                    Immutable = true,
                 };
 
                 await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(client).Devolve());
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = Statics.ApiDefaultAudienceApi,
                     AudienceType = AudienceType.server.ToString(),
                     Enabled = true,
-                    Immutable = true
+                    Immutable = true,
                 };
 
                 await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = Statics.ApiDefaultAudienceUi,
                     AudienceType = AudienceType.user_agent.ToString(),
                     Enabled = true,
-                    Immutable = true
+                    Immutable = true,
                 };
 
                 await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(audience).Devolve());
@@ -87,10 +87,11 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     Email = Statics.ApiDefaultUserAdmin,
                     PhoneNumber = Statics.ApiDefaultPhone,
-                    FirstName = "Uber",
+                    FirstName = "Identity",
                     LastName = "Admin",
                     LockoutEnabled = false,
-                    Immutable = true
+                    HumanBeing = true,
+                    Immutable = true,
                 };
 
                 await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(user).Devolve(), BaseLib.Statics.ApiDefaultUserPassword);
@@ -110,7 +111,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     AudienceId = foundAudienceUi.Id,
                     Name = Statics.ApiDefaultRoleForAdminUi,
                     Enabled = true,
-                    Immutable = true
+                    Immutable = true,
                 };
 
                 await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(role).Devolve());
@@ -126,7 +127,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     AudienceId = foundAudienceApi.Id,
                     Name = Statics.ApiDefaultRoleForViewerApi,
                     Enabled = true,
-                    Immutable = true
+                    Immutable = true,
                 };
 
                 await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(role).Devolve());
@@ -139,7 +140,8 @@ namespace Bhbk.Lib.Identity.Helpers
             {
                 login = new LoginCreate()
                 {
-                    LoginProvider = Statics.ApiDefaultLogin
+                    LoginProvider = Statics.ApiDefaultLogin,
+                    Immutable = true,
                 };
 
                 await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
@@ -170,7 +172,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = BaseLib.Statics.ApiUnitTestClientA,
                     ClientKey = CryptoHelper.GenerateRandomBase64(32),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = false,
                 }).Devolve());
 
             await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
@@ -179,7 +181,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = BaseLib.Statics.ApiUnitTestClientB,
                     ClientKey = CryptoHelper.GenerateRandomBase64(32),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = false,
                 }).Devolve());
 
             //create audiences
@@ -190,7 +192,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = BaseLib.Statics.ApiUnitTestAudienceA,
                     AudienceType = AudienceType.user_agent.ToString(),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = false,
                 }).Devolve());
 
             await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
@@ -200,7 +202,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     Name = BaseLib.Statics.ApiUnitTestAudienceB,
                     AudienceType = AudienceType.user_agent.ToString(),
                     Enabled = true,
-                    Immutable = false
+                    Immutable = false,
                 }).Devolve());
 
             //create roles
@@ -226,13 +228,13 @@ namespace Bhbk.Lib.Identity.Helpers
             await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
-                    LoginProvider = BaseLib.Statics.ApiUnitTestLoginA
+                    LoginProvider = BaseLib.Statics.ApiUnitTestLoginA,
                 }).Devolve());
 
             await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
-                    LoginProvider = BaseLib.Statics.ApiUnitTestLoginB
+                    LoginProvider = BaseLib.Statics.ApiUnitTestLoginB,
                 }).Devolve());
 
             //create user A
@@ -241,10 +243,11 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     Email = BaseLib.Statics.ApiUnitTestUserA,
                     PhoneNumber = Statics.ApiDefaultPhone,
-                    FirstName = "FirstName",
-                    LastName = "LastName",
+                    FirstName = "First " + CryptoHelper.GenerateRandomBase64(4),
+                    LastName = "Last " + CryptoHelper.GenerateRandomBase64(4),
                     LockoutEnabled = false,
-                    Immutable = false
+                    HumanBeing = true,
+                    Immutable = false,
                 }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
             user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -259,10 +262,10 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     Email = BaseLib.Statics.ApiUnitTestUserB,
                     PhoneNumber = Statics.ApiDefaultPhone,
-                    FirstName = "FirstName",
-                    LastName = "LastName",
+                    FirstName = "First " + CryptoHelper.GenerateRandomBase64(4),
+                    LastName = "Last " + CryptoHelper.GenerateRandomBase64(4),
                     LockoutEnabled = false,
-                    Immutable = false
+                    Immutable = false,
                 }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
 
             user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserB).Single();
@@ -282,7 +285,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);
 
             if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
-                await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "built-in"));
+                await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
 
             //assign roles, claims & logins to user B
             user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserB).Single();
@@ -295,7 +298,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.AddToRoleAsync(user, role.Name);
 
             if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
-                await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "built-in"));
+                await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
         }
 
         public async void Destroy()

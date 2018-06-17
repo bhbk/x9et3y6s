@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
@@ -20,7 +21,7 @@ namespace Bhbk.Cli.Identity.Cmds
         private static IConfigurationRoot _cb;
         private static CmdType _cmdType;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));
-        private static bool _create = false;
+        private static bool _create = false, _destroy = false;
 
         public AdminCmds()
         {
@@ -36,6 +37,8 @@ namespace Bhbk.Cli.Identity.Cmds
 
             HasOption("d=|delete", "Delete an entity", arg =>
             {
+                _destroy = true;
+
                 if (!Enum.TryParse<CmdType>(arg, out _cmdType))
                     throw new ConsoleHelpAsException("Invalid entity type. Possible are " + _cmdTypeList);
             });
@@ -49,6 +52,9 @@ namespace Bhbk.Cli.Identity.Cmds
                     .SetBasePath(_cf.DirectoryName)
                     .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                     .Build();
+
+                if (_create == false && _destroy == false)
+                    throw new ConsoleHelpAsException("Invalid action type.");
 
                 switch (_cmdType)
                 {
@@ -69,27 +75,27 @@ namespace Bhbk.Cli.Identity.Cmds
                                 clientID = CreateClient(clientName);
 
                                 if (clientID != Guid.Empty)
-                                    Console.WriteLine(Environment.NewLine + "CREATED client \"" + clientName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + clientID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to create client \"" + clientName + "\""
+                                    throw new ConsoleHelpAsException("FAILED create client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + clientID.ToString());
                             }
                         }
-                        else
+                        else if (_destroy)
                         {
                             var clientName = PromptForInput(CmdType.client);
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
-                                throw new ConsoleHelpAsException("FAILED to find client \"" + clientName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
                             else
                             {
                                 if (DeleteClient(clientID))
-                                    Console.WriteLine(Environment.NewLine + "DESTROY client \"" + clientName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + clientID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to destroy client \"" + clientName + "\""
+                                    throw new ConsoleHelpAsException("FAILED destroy client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + clientID.ToString());
                             }
                         }
@@ -106,7 +112,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
-                                throw new ConsoleHelpAsException("FAILED to find client \"" + clientName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
                             var audienceName = PromptForInput(CmdType.audience);
                             var audienceID = Guid.Empty;
@@ -119,33 +125,33 @@ namespace Bhbk.Cli.Identity.Cmds
                                 audienceID = CreateAudience(clientID, audienceName);
 
                                 if (audienceID != Guid.Empty)
-                                    Console.WriteLine(Environment.NewLine + "CREATED audience \"" + audienceName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create audience \"" + audienceName + "\""
                                         + Environment.NewLine + "\tID is " + audienceID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to create audience \"" + audienceName + "\""
+                                    throw new ConsoleHelpAsException("FAILED create audience \"" + audienceName + "\""
                                         + Environment.NewLine + "\tID is " + audienceID.ToString());
                             }
                         }
-                        else
+                        else if (_destroy)
                         {
                             var clientName = PromptForInput(CmdType.client);
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
-                                throw new ConsoleHelpAsException("FAILED to find client \"" + clientName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
                             var audienceName = PromptForInput(CmdType.audience);
                             var audienceID = Guid.Empty;
 
                             if (!CheckAudience(audienceName, ref audienceID))
-                                Console.WriteLine(Environment.NewLine + "FAILED to find audience \"" + audienceName + "\"");
+                                Console.WriteLine(Environment.NewLine + "FAILED find audience \"" + audienceName + "\"");
                             else
                             {
                                 if (DeleteAudience(audienceID))
-                                    Console.WriteLine(Environment.NewLine + "DESTROY audience \"" + audienceName + "\""
-                                        + Environment.NewLine + "\tID:" + audienceID.ToString());
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create audience \"" + audienceName + "\""
+                                        + Environment.NewLine + "\tID is " + audienceID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to destroy audience \"" + audienceName + "\""
+                                    throw new ConsoleHelpAsException("FAILED destroy audience \"" + audienceName + "\""
                                         + Environment.NewLine + "\tID is " + audienceID.ToString());
                             }
                         }
@@ -162,7 +168,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             var audienceID = Guid.Empty;
 
                             if (!CheckAudience(audienceName, ref audienceID))
-                                throw new ConsoleHelpAsException("FAILED to find audience \"" + audienceName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
 
                             var roleName = PromptForInput(CmdType.role);
                             var roleID = Guid.Empty;
@@ -175,33 +181,33 @@ namespace Bhbk.Cli.Identity.Cmds
                                 roleID = CreateRole(audienceID, roleName);
 
                                 if (roleID != Guid.Empty)
-                                    Console.WriteLine(Environment.NewLine + "CREATED role \"" + roleName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + roleID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to create role \"" + roleName + "\""
+                                    throw new ConsoleHelpAsException("FAILED create role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + roleID.ToString());
                             }
                         }
-                        else
+                        else if (_destroy)
                         {
                             var audienceName = PromptForInput(CmdType.audience);
                             var audienceID = Guid.Empty;
 
                             if (!CheckAudience(audienceName, ref audienceID))
-                                throw new ConsoleHelpAsException("FAILED to find audience \"" + audienceName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
 
                             var roleName = PromptForInput(CmdType.role);
                             var roleID = Guid.Empty;
 
                             if (!CheckRole(roleName, ref roleID))
-                                Console.WriteLine(Environment.NewLine + "FAILED to find role \"" + roleName + "\"");
+                                Console.WriteLine(Environment.NewLine + "FAILEDfind role \"" + roleName + "\"");
                             else
                             {
                                 if (DeleteRole(roleID))
-                                    Console.WriteLine(Environment.NewLine + "DESTROY role \"" + roleName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + roleID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to destroy role \"" + roleName + "\""
+                                    throw new ConsoleHelpAsException("FAILED destroy role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + roleID.ToString());
                             }
                         }
@@ -221,7 +227,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                 Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
                                     + Environment.NewLine + "\tID is " + userID.ToString());
                             else
-                                throw new ConsoleHelpAsException("FAILED to find user \"" + userName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
                             var roleName = PromptForInput(CmdType.role);
                             var roleID = Guid.Empty;
@@ -230,12 +236,14 @@ namespace Bhbk.Cli.Identity.Cmds
                                 Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
                                     + Environment.NewLine + "\tID is " + roleID.ToString());
                             else
-                                throw new ConsoleHelpAsException("FAILED to find role \"" + roleName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
 
                             if (AddUserToRole(roleID, userID))
-                                Console.WriteLine(Environment.NewLine + "ADD role \"" + roleName + "\" to user \"" + userName + "\"");
+                                Console.WriteLine(Environment.NewLine + "SUCCESS add role \"" + roleName + "\" to user \"" + userName + "\"");
+                            else
+                                Console.WriteLine(Environment.NewLine + "FAILED add role \"" + roleName + "\" to user \"" + userName + "\"");
                         }
-                        else
+                        else if (_destroy)
                         {
                             var userName = PromptForInput(CmdType.user);
                             var userID = Guid.Empty;
@@ -244,7 +252,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                 Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
                                     + Environment.NewLine + "\tID is " + userID.ToString());
                             else
-                                throw new ConsoleHelpAsException("FAILED to find user \"" + userName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
                             var roleName = PromptForInput(CmdType.role);
                             var roleID = Guid.Empty;
@@ -253,7 +261,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                 Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
                                     + Environment.NewLine + "\tID is " + roleID.ToString());
                             else
-                                throw new ConsoleHelpAsException("FAILED to find role \"" + roleName + "\"");
+                                throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
 
                             if (RemoveUserFromRole(roleID, userID))
                                 Console.WriteLine(Environment.NewLine + "REMOVE role \"" + roleName + "\" from user \"" + userName + "\"");
@@ -271,38 +279,81 @@ namespace Bhbk.Cli.Identity.Cmds
                             var userID = Guid.Empty;
 
                             if (CheckUser(userName, ref userID))
-                                Console.WriteLine(Environment.NewLine + "FOUND user:" + userName
-                                    + Environment.NewLine + "\tID:" + userID.ToString());
+                                Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
+                                    + Environment.NewLine + "\tID is " + userID.ToString());
                             else
                             {
                                 userID = CreateUser(userName);
 
                                 if (userID != Guid.Empty)
-                                    Console.WriteLine(Environment.NewLine + "CREATED user:" + userName
-                                        + Environment.NewLine + "\tID:" + userID.ToString());
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create user \"" + userName + "\""
+                                        + Environment.NewLine + "\tID is " + userID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to create user:" + userName
-                                        + Environment.NewLine + "\tID:" + userID.ToString());
+                                    throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\""
+                                        + Environment.NewLine + "\tID is " + userID.ToString());
                             }
+
+                            var loginName = BaseLib.Statics.ApiDefaultLogin;
+                            var loginID = Guid.Empty;
+
+                            if (CheckLogin(loginName, ref loginID))
+                                Console.WriteLine(Environment.NewLine + "FOUND login \"" + loginName + "\""
+                                    + Environment.NewLine + "\tID is " + loginID.ToString());
+                            else
+                                throw new ConsoleHelpAsException("FAILED find login \"" + loginName + "\"");
+
+                            if (AddUserToLogin(loginID, userID))
+                                Console.WriteLine(Environment.NewLine + "SUCCESS add login \"" + loginName + "\" to user \"" + userName + "\"");
+                            else
+                                throw new ConsoleHelpAsException("FAILED add login \"" + loginName + "\" to user \"" + userName + "\"");
                         }
-                        else
+                        else if (_destroy)
                         {
                             var userName = PromptForInput(CmdType.user);
                             var userID = Guid.Empty;
 
                             if (!CheckUser(userName, ref userID))
-                                Console.WriteLine(Environment.NewLine + "FAILED to find user:" + userName);
+                                Console.WriteLine(Environment.NewLine + "FAILED find user \"" + userName + "\"");
                             else
                             {
                                 if (DeleteUser(userID))
-                                    Console.WriteLine(Environment.NewLine + "DESTROY user:" + userName
-                                        + Environment.NewLine + "\tID:" + userID.ToString());
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy user \"" + userName + "\""
+                                        + Environment.NewLine + "\tID is " + userID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED to destroy user:" + userName
-                                        + Environment.NewLine + "\tID:" + userID.ToString());
+                                    throw new ConsoleHelpAsException("FAILED destroy user \"" + userName + "\""
+                                        + Environment.NewLine + "\tID is \"" + userID.ToString() + "\"");
                             }
                         }
 
+                        break;
+
+                    case CmdType.userpass:
+
+                        GetJWT();
+
+                        if (_create)
+                        {
+                            var userName = PromptForInput(CmdType.user);
+                            var userID = Guid.Empty;
+
+                            if (CheckUser(userName, ref userID))
+                                Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
+                                    + Environment.NewLine + "\tID is " + userID.ToString());
+                            else
+                                throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
+
+                            var password = PromptForInput(CmdType.userpass);
+
+                            if (SetPassword(userID, password))
+                                Console.WriteLine(Environment.NewLine + "SUCCESS set password for user \"" + userName + "\"");
+
+                            else
+                                throw new ConsoleHelpAsException("FAILED set password for user \"" + userName + "\"");
+                        }
+
+                        break;
+
+                    default:
                         break;
                 }
 
@@ -311,6 +362,63 @@ namespace Bhbk.Cli.Identity.Cmds
             catch (Exception ex)
             {
                 return MessageHelper.AngryFarewell(ex);
+            }
+        }
+
+        private bool AddUserToLogin(Guid loginID, Guid userID)
+        {
+            using (var httpHandler = new HttpClientHandler())
+            {
+                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
+                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+
+                var http = new HttpClient(httpHandler);
+
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.DefaultRequestHeaders.Accept.Clear();
+                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                var content = new StringContent(
+                    JsonConvert.SerializeObject(new
+                    {
+                        UserId = userID.ToString(),
+                        LoginId = loginID.ToString(),
+                        LoginProvider = BaseLib.Statics.ApiDefaultLogin,
+                        ProviderDisplayName = BaseLib.Statics.ApiDefaultLogin,
+                        ProviderKey = BaseLib.Statics.ApiDefaultLoginKey,
+                        Enabled = "true",
+                    }), Encoding.UTF8, "application/json");
+
+                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/login/v1/" + loginID.ToString() + "/add/" + userID.ToString(), content).Result;
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+
+                return false;
+            }
+        }
+
+        private bool AddUserToRole(Guid roleID, Guid userID)
+        {
+            using (var httpHandler = new HttpClientHandler())
+            {
+                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
+                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+
+                var http = new HttpClient(httpHandler);
+
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.DefaultRequestHeaders.Accept.Clear();
+                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString()).Result;
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+
+                return false;
             }
         }
 
@@ -327,12 +435,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                     http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
                     http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/audience/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/audience/v1").Result;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -372,12 +480,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                     http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
                     http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/client/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/client/v1").Result;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -388,6 +496,51 @@ namespace Bhbk.Cli.Identity.Cmds
                             if (entry["name"].Value<string>() == client)
                             {
                                 clientID = Guid.Parse(entry["id"].Value<string>());
+                                result = true;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+
+            return result;
+        }
+
+        private bool CheckLogin(string login, ref Guid loginID)
+        {
+            bool result = false;
+
+            try
+            {
+                using (var httpHandler = new HttpClientHandler())
+                {
+                    //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
+                    httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+
+                    var http = new HttpClient(httpHandler);
+
+                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
+                    http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                    http.DefaultRequestHeaders.Accept.Clear();
+                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/login/v1").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+
+                        foreach (var entry in content)
+                        {
+                            if (entry["loginProvider"].Value<string>() == login)
+                            {
+                                loginID = Guid.Parse(entry["id"].Value<string>());
                                 result = true;
 
                                 break;
@@ -417,12 +570,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                     http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
                     http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/role/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1").Result;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -462,12 +615,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                     http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
                     http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/user/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1").Result;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -503,12 +656,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var post = new StringContent(
+                var content = new StringContent(
                     JsonConvert.SerializeObject(new
                     {
                         ClientId = clientID.ToString(),
@@ -517,14 +670,14 @@ namespace Bhbk.Cli.Identity.Cmds
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/audience/v1", post).Result;
+                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/audience/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                    if (content["name"].Value<string>() == audience)
-                        return Guid.Parse(content["id"].Value<string>());
+                    if (result["name"].Value<string>() == audience)
+                        return Guid.Parse(result["id"].Value<string>());
                 }
 
                 return Guid.Empty;
@@ -540,26 +693,26 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var post = new StringContent(
+                var content = new StringContent(
                     JsonConvert.SerializeObject(new
                     {
                         Name = client,
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/client/v1", post).Result;
+                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/client/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                    if (content["name"].Value<string>() == client)
-                        return Guid.Parse(content["id"].Value<string>());
+                    if (result["name"].Value<string>() == client)
+                        return Guid.Parse(result["id"].Value<string>());
                 }
 
                 return Guid.Empty;
@@ -575,12 +728,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var post = new StringContent(
+                var content = new StringContent(
                     JsonConvert.SerializeObject(new
                     {
                         AudienceId = audienceID.ToString(),
@@ -588,14 +741,14 @@ namespace Bhbk.Cli.Identity.Cmds
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/role/v1", post).Result;
+                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                    if (content["name"].Value<string>() == role)
-                        return Guid.Parse(content["id"].Value<string>());
+                    if (result["name"].Value<string>() == role)
+                        return Guid.Parse(result["id"].Value<string>());
                 }
 
                 return Guid.Empty;
@@ -611,55 +764,34 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var post = new StringContent(
+                var content = new StringContent(
                     JsonConvert.SerializeObject(new
                     {
                         Email = user,
-                        FirstName = "FirstName",
-                        LastName = "LastName",
-                        PhoneNumber = "0123456789",
-                        LockoutEnabled = "true",
+                        FirstName = BaseLib.Statics.ApiDefaultFirstName,
+                        LastName = BaseLib.Statics.ApiDefaultLastName,
+                        PhoneNumber = BaseLib.Statics.ApiDefaultPhone,
+                        LockoutEnabled = "false",
+                        HumanBeing = "false",
+                        Immutable = "false",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/user/v1", post).Result;
+                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                    if (content["email"].Value<string>() == user)
-                        return Guid.Parse(content["id"].Value<string>());
+                    if (result["email"].Value<string>() == user)
+                        return Guid.Parse(result["id"].Value<string>());
                 }
 
                 return Guid.Empty;
-            }
-        }
-
-        private bool AddUserToRole(Guid roleID, Guid userID)
-        {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                var http = new HttpClient(httpHandler);
-
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = http.GetAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
             }
         }
 
@@ -672,12 +804,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/audience/v1/" + audienceID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/audience/v1/" + audienceID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -695,12 +827,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/client/v1/" + clientID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/client/v1/" + clientID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -718,12 +850,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/role/v1/" + roleID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1/" + roleID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -741,12 +873,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/user/v1/" + userID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1/" + userID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -764,12 +896,43 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
                 http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.GetAsync(_cb["IdentityEndpoints:AdminBasePath"] + "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString()).Result;
+                var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString()).Result;
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+
+                return false;
+            }
+        }
+
+        private bool SetPassword(Guid userID, string password)
+        {
+            using (var httpHandler = new HttpClientHandler())
+            {
+                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
+                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+
+                var http = new HttpClient(httpHandler);
+
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.DefaultRequestHeaders.Accept.Clear();
+                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                var content = new StringContent(
+                    JsonConvert.SerializeObject(new
+                    {
+                        Id = userID.ToString(),
+                        NewPassword = password,
+                        NewPasswordConfirm = password,
+                    }), Encoding.UTF8, "application/json");
+
+                var response = http.PutAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1/" + userID.ToString() + "/reset-password", content).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -783,20 +946,24 @@ namespace Bhbk.Cli.Identity.Cmds
             switch (cmd)
             {
                 case CmdType.audience:
-                    Console.Write(Environment.NewLine + "ENTER audience name:");
+                    Console.Write(Environment.NewLine + "ENTER audience name : ");
                     break;
 
                 case CmdType.client:
-                    Console.Write(Environment.NewLine + "ENTER client name:");
+                    Console.Write(Environment.NewLine + "ENTER client name : ");
                     break;
 
                 case CmdType.role:
-                    Console.Write(Environment.NewLine + "ENTER role name:");
+                    Console.Write(Environment.NewLine + "ENTER role name : ");
                     break;
 
                 case CmdType.user:
-                    Console.Write(Environment.NewLine + "ENTER user name:");
+                    Console.Write(Environment.NewLine + "ENTER user name : ");
                     break;
+
+                case CmdType.userpass:
+                    Console.Write(Environment.NewLine + "ENTER password : ");
+                    return ConsoleHelper.GetHiddenInput();
             }
 
             return ConsoleHelper.GetInput();
@@ -823,7 +990,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:StsBaseUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityEndpoints:StsUrl"]);
                 http.DefaultRequestHeaders.Accept.Clear();
                 http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -835,7 +1002,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     new KeyValuePair<string, string> ("grant_type", "password"),
                 });
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:StsBasePath"] + "/oauth/v2/access", post).Result;
+                var response = http.PostAsync(_cb["IdentityEndpoints:StsPath"] + "/oauth/v2/access", post).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -843,13 +1010,13 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     _access = new JwtSecurityToken((string)result["access_token"]);
 
-                    Console.WriteLine(Environment.NewLine + "GET JWT from STS: "
-                        + _cb["IdentityEndpoints:StsBaseUrl"] + _cb["IdentityEndpoints:StsBasePath"] + "/oauth/v2/access"
-                        + Environment.NewLine + "\tJWT:" + _access.RawData);
+                    Console.WriteLine(Environment.NewLine + "SUCCESS getting JWT from STS:\""
+                        + _cb["IdentityEndpoints:StsUrl"] + _cb["IdentityEndpoints:StsPath"] + "/oauth/v2/access" + "\""
+                        + Environment.NewLine + "\tJWT:\"" + _access.RawData + "\"");
                 }
                 else
-                    throw new ConsoleHelpAsException("FAILED GET JWT from STS: "
-                        + _cb["IdentityEndpoints:StsBaseUrl"] + _cb["IdentityEndpoints:StsBasePath"] + "/oauth/v2/access");
+                    throw new ConsoleHelpAsException("FAILED getting JWT from STS:\""
+                        + _cb["IdentityEndpoints:StsUrl"] + _cb["IdentityEndpoints:StsPath"] + "/oauth/v2/access" + "\"");
             }
         }
     }

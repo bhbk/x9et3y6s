@@ -168,7 +168,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateRole(RoleUpdate model)
+        public async Task<IActionResult> UpdateRole([FromBody] RoleUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -22,9 +22,12 @@
     [PasswordConfirmed]    BIT                CONSTRAINT [DF_AppUser_PasswordConfirmed] DEFAULT ((0)) NOT NULL,
     [SecurityStamp]        NVARCHAR (512)     NULL,
     [TwoFactorEnabled]     BIT                CONSTRAINT [DF_AppUser_TwoFactorEnabled] DEFAULT ((0)) NOT NULL,
+    [HumanBeing]           BIT                CONSTRAINT [DF_AppUser_HumanBeing] DEFAULT ((0)) NOT NULL,
     [Immutable]            BIT                CONSTRAINT [DF_AppUser_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_AppUser_ID] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 GO

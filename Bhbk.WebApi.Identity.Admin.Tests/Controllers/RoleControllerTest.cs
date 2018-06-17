@@ -51,6 +51,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_Role_Delete_Fail_Immutable()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new RoleController(TestIoC, TestTasks);
+            var role = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+
+            TestIoC.RoleMgmt.Store.SetImmutableAsync(role, true);
+
+            var result = await controller.DeleteRole(role.Id) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+            var check = TestIoC.RoleMgmt.Store.Get(x => x.Id == role.Id).Any();
+            check.Should().BeTrue();
+        }
+
+        [TestMethod]
         public async Task Api_Admin_Role_Create_Success()
         {
             TestData.Destroy();

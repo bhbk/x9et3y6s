@@ -39,14 +39,16 @@ namespace Bhbk.Lib.Identity
         public const string ApiDefaultClient = "Bhbk";
         public const string ApiDefaultAudienceUi = "Bhbk.WebUi.Identity";
         public const string ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
-        public const string ApiDefaultPhone = "0123456789";
+        public const string ApiDefaultPhone = "0000000000";
         public const string ApiDefaultLogin = "local";
         public const string ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
-        public const string ApiDefaultLoginName = "built-in";
+        public const string ApiDefaultLoginName = "local";
         public const string ApiDefaultRoleForAdminUi = "(Built-In) Administrators";
         public const string ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
         public const string ApiDefaultUserAdmin = "root@local";
         public const string ApiDefaultUserPassword = "3uetw7W$mswU";
+        public const string ApiDefaultFirstName = "First";
+        public const string ApiDefaultLastName = "Last";
         public const string ApiTokenConfirmEmail = "EmailConfirmation";
         public const string ApiTokenConfirmPhone = "PhoneNumberConfirmation";
         public const string ApiTokenConfirmTwoFactor = "TwoFactorConfirmation";
@@ -87,7 +89,6 @@ namespace Bhbk.Lib.Identity
         public const string MsgRoleInvalid = "Role invalid or disabled";
         public const string MsgRoleNotExist = "Role does not exist";
         public const string MsgSystemParametersInvalid = "Parameters invalid";
-        public const string MsgSystemExceptionCaught = "Exception was caught";
         public const string MsgUserAlreadyExists = "User already exists";
         public const string MsgUserImmutable = "User is immutable";
         public const string MsgUserInvalid = "User is invalid, locked or disabled.";

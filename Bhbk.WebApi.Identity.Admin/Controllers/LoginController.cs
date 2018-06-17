@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            else if (login.LoginProvider == BaseLib.Statics.ApiDefaultLogin)
+            else if (login.Immutable)
                 return BadRequest(BaseLib.Statics.MsgLoginImmutable);
 
             if (!await IoC.LoginMgmt.DeleteAsync(loginID))
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateLogin(LoginUpdate model)
+        public async Task<IActionResult> UpdateLogin([FromBody] LoginUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

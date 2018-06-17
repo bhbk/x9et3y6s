@@ -52,6 +52,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_Login_Delete_Fail_Immutable()
+        {
+            TestData.Destroy();
+            TestData.CreateTestData();
+
+            var controller = new LoginController(TestIoC, TestTasks);
+            var login = TestIoC.LoginMgmt.Store.Get(x => x.LoginProvider == BaseLib.Statics.ApiUnitTestLoginA).Single();
+
+            TestIoC.LoginMgmt.Store.SetImmutableAsync(login, true);
+
+            var result = await controller.DeleteLogin(login.Id) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+            var check = TestIoC.LoginMgmt.Store.Get(x => x.Id == login.Id).Any();
+            check.Should().BeTrue();
+        }
+
+        [TestMethod]
         public async Task Api_Admin_Login_Create_Success()
         {
             TestData.Destroy();

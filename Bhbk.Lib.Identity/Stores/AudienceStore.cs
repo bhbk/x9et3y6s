@@ -109,6 +109,17 @@ namespace Bhbk.Lib.Identity.Stores
             throw new NotImplementedException();
         }
 
+        public bool SetImmutableAsync(AppAudience audience, bool enabled)
+        {
+            audience.Immutable = enabled;
+            audience.LastUpdated = DateTime.Now;
+
+            _context.Entry(audience).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return true;
+        }
+
         public AppAudience Update(AppAudience entity)
         {
             var audience = _context.AppAudience.Where(x => x.Id == entity.Id).Single();

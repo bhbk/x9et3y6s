@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ClientKey = client.ClientKey ?? Helpers.CryptoHelper.GenerateRandomBase64(32);
             this.Enabled = client.Enabled;
             this.Created = DateTime.Now;
-            this.Immutable = false;
+            this.Immutable = client.Immutable;
         }
 
         public AppClient Devolve()
@@ -43,7 +43,8 @@ namespace Bhbk.Lib.Identity.Factory
                 Enabled = this.Enabled,
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
-                Immutable = this.Immutable
+                Immutable = this.Immutable,
+                AppAudience = this.AppAudience,
             };
         }
 
@@ -59,7 +60,7 @@ namespace Bhbk.Lib.Identity.Factory
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
                 Immutable = this.Immutable,
-                Audiences = AppAudience.Where(x => x.ClientId == this.Id).Select(x => x.Id.ToString()).ToList()
+                Audiences = AppAudience.Where(x => x.ClientId == this.Id).Select(x => x.Id.ToString()).ToList(),
             };
         }
 

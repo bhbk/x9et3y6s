@@ -112,6 +112,17 @@ namespace Bhbk.Lib.Identity.Stores
             throw new NotImplementedException();
         }
 
+        public bool SetImmutableAsync(AppClient client, bool enabled)
+        {
+            client.Immutable = enabled;
+            client.LastUpdated = DateTime.Now;
+
+            _context.Entry(client).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return true;
+        }
+
         public AppClient Update(AppClient entity)
         {
             var model = _context.AppClient.Where(x => x.Id == entity.Id).Single();

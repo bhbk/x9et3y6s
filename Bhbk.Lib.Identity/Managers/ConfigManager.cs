@@ -44,9 +44,9 @@ namespace Bhbk.Lib.Identity.Managers
             output.Append("\tDefaults:FailedAccessAttempts:" + _store.Config.DefaultsFailedAccessAttempts.ToString() + Environment.NewLine);
             output.Append("\tDefaults:PasswordLength:" + _store.Config.DefaultsPasswordLength.ToString() + Environment.NewLine);
             output.Append("\tDefaults:RefreshTokenLife:" + _store.Config.DefaultsRefreshTokenLife.ToString() + Environment.NewLine);
-            output.Append("\tEndpoints:AdminBaseUrl:" + _store.Config.EndpointsAdminBaseUrl.ToString() + Environment.NewLine);
-            output.Append("\tEndpoints:MeBaseUrl:" + _store.Config.EndpointsMeBaseUrl.ToString() + Environment.NewLine);
-            output.Append("\tEndpoints:StsBaseUrl:" + _store.Config.EndpointsStsBaseUrl.ToString() + Environment.NewLine);
+            output.Append("\tEndpoints:AdminUrl:" + _store.Config.EndpointsAdminUrl.ToString() + Environment.NewLine);
+            output.Append("\tEndpoints:MeUrl:" + _store.Config.EndpointsMeUrl.ToString() + Environment.NewLine);
+            output.Append("\tEndpoints:StsUrl:" + _store.Config.EndpointsStsUrl.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:AccessToken:" + _store.Config.UnitTestsAccessToken.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:AccessTokenFakeUtcNow:" + _store.Config.UnitTestsAccessTokenFakeUtcNow.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:RefreshToken:" + _store.Config.UnitTestsRefreshToken.ToString() + Environment.NewLine);

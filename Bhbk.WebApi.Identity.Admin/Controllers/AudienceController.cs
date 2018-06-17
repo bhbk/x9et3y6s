@@ -33,6 +33,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience != null)
                 return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);
 
+            BaseLib.AudienceType audienceType;
+
+            if (!Enum.TryParse<BaseLib.AudienceType>(model.AudienceType, out audienceType))
+                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+
             var create = new AudienceFactory<AudienceCreate>(model);
             var result = await IoC.AudienceMgmt.CreateAsync(create.Devolve());
 
@@ -71,13 +76,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result.Evolve());
         }
 
-        [Route("v1")]
+        [Route("v1"), HttpGet]
         public async Task<IActionResult> GetAudiences()
         {
             var result = new List<AudienceResult>();
-            var users = await IoC.AudienceMgmt.GetListAsync();
+            var audiences = await IoC.AudienceMgmt.GetListAsync();
 
-            foreach (AppAudience entry in users)
+            foreach (AppAudience entry in audiences)
                 result.Add(new AudienceFactory<AppAudience>(entry).Evolve());
 
             return Ok(result);
@@ -102,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateAudience(AudienceUpdate model)
+        public async Task<IActionResult> UpdateAudience([FromBody] AudienceUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
