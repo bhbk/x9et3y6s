@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Models
     {
         public Guid UserId { get; set; }
         public Guid LoginId { get; set; }
+        public Guid? ActorId { get; set; }
         public string LoginProvider { get; set; }
         public string ProviderDisplayName { get; set; }
         public string ProviderDescription { get; set; }

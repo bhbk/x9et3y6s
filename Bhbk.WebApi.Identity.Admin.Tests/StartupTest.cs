@@ -30,6 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
             var ioc = new CustomIdentityContext(options);
 
             sc.AddSingleton<IIdentityContext>(ioc);
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(ioc));
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(ioc));
 
             var sp = sc.BuildServiceProvider();

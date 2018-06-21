@@ -12,6 +12,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = audience.Id;
             this.ClientId = audience.ClientId;
+            this.ActorId = audience.ActorId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
             this.AudienceType = audience.AudienceType;
@@ -26,6 +27,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = Guid.NewGuid();
             this.ClientId = audience.ClientId;
+            this.ActorId = audience.ActorId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
             this.AudienceType = audience.AudienceType;
@@ -40,6 +42,7 @@ namespace Bhbk.Lib.Identity.Factory
             {
                 Id = this.Id,
                 ClientId = this.ClientId,
+                ActorId = this.ActorId,
                 Name = this.Name,
                 Description = this.Description ?? string.Empty,
                 AudienceType = this.AudienceType,
@@ -72,6 +75,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = audience.Id;
             this.ClientId = audience.ClientId;
+            this.ActorId = audience.ActorId;
             this.Name = audience.Name;
             this.Description = audience.Description ?? string.Empty;
             this.AudienceType = audience.AudienceType;
@@ -84,6 +88,7 @@ namespace Bhbk.Lib.Identity.Factory
     public class AudienceCreate
     {
         public Guid ClientId { get; set; }
+        public Guid ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string AudienceType { get; set; }
@@ -109,6 +114,7 @@ namespace Bhbk.Lib.Identity.Factory
     {
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }
+        public Guid ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string AudienceType { get; set; }

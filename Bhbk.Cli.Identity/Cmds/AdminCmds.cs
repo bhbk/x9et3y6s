@@ -148,7 +148,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             else
                             {
                                 if (DeleteAudience(audienceID))
-                                    Console.WriteLine(Environment.NewLine + "SUCCESS create audience \"" + audienceName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy audience \"" + audienceName + "\""
                                         + Environment.NewLine + "\tID is " + audienceID.ToString());
                                 else
                                     throw new ConsoleHelpAsException("FAILED destroy audience \"" + audienceName + "\""
@@ -200,11 +200,11 @@ namespace Bhbk.Cli.Identity.Cmds
                             var roleID = Guid.Empty;
 
                             if (!CheckRole(roleName, ref roleID))
-                                Console.WriteLine(Environment.NewLine + "FAILEDfind role \"" + roleName + "\"");
+                                Console.WriteLine(Environment.NewLine + "FAILED find role \"" + roleName + "\"");
                             else
                             {
                                 if (DeleteRole(roleID))
-                                    Console.WriteLine(Environment.NewLine + "SUCCESS create role \"" + roleName + "\""
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + roleID.ToString());
                                 else
                                     throw new ConsoleHelpAsException("FAILED destroy role \"" + roleName + "\""
@@ -264,7 +264,9 @@ namespace Bhbk.Cli.Identity.Cmds
                                 throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
 
                             if (RemoveUserFromRole(roleID, userID))
-                                Console.WriteLine(Environment.NewLine + "REMOVE role \"" + roleName + "\" from user \"" + userName + "\"");
+                                Console.WriteLine(Environment.NewLine + "SUCCESS remove role \"" + roleName + "\" from user \"" + userName + "\"");
+                            else
+                                Console.WriteLine(Environment.NewLine + "FAILED remove role \"" + roleName + "\" from user \"" + userName + "\"");
                         }
 
                         break;

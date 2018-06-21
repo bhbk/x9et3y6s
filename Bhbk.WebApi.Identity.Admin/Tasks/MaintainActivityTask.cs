@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -14,16 +13,16 @@ using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
-    public class MaintainUsersTask : BackgroundService
+    public class MaintainActivityTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
         private readonly IConfigurationRoot _cb;
         private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
-        private readonly int _delay;
+        private readonly int _delay, _keep;
         public string Status { get; private set; }
 
-        public MaintainUsersTask(IIdentityContext ioc)
+        public MaintainActivityTask(IIdentityContext ioc)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -38,10 +37,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _delay = int.Parse(_cb["Tasks:MaintainUsers:PollingDelay"]);
+            _delay = int.Parse(_cb["Tasks:MaintainActivity:PollingDelay"]);
+            _keep = int.Parse(_cb["Tasks:MaintainActivity:RetentionPeriod"]);
             _ioc = ioc;
 
-            var statusMsg = typeof(MaintainUsersTask).Name + " not run yet.";
+            var statusMsg = typeof(MaintainActivityTask).Name + " not run yet.";
 
             Status = JsonConvert.SerializeObject(new
             {
@@ -57,23 +57,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 {
                     await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
 
-                    var disabled = _ioc.UserMgmt.Store.Context.AppUser
-                        .Where(x => x.LockoutEnd < DateTime.UtcNow);
-                    var disabledCount = disabled.Count();
+                    var expired = _ioc.UserMgmt.Store.Context.AppActivity
+                        .Where(x => x.Created.AddMinutes(_keep) < DateTime.Now && x.Immutable == false);
+                    var expiredCount = expired.Count();
 
-                    if (disabled.Any())
+                    if (expired.Any())
                     {
-                        foreach (AppUser entry in disabled.ToList())
-                        {
-                            entry.LockoutEnabled = false;
-                            entry.LockoutEnd = null;
-                            _ioc.UserMgmt.Store.Context.Entry(entry).State = EntityState.Modified;
-                        }
+                        foreach (AppActivity entry in expired.ToList())
+                            _ioc.UserMgmt.Store.Context.AppActivity.Remove(entry);
 
                         _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                        var statusMsg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
-                                + disabledCount.ToString() + " users with expired lock-outs.";
+                        var statusMsg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                                + expiredCount.ToString() + " expired activity entries.";
 
                         Status = JsonConvert.SerializeObject(new
                         {

@@ -15,6 +15,7 @@ namespace Bhbk.Lib.Identity.Models
         }
 
         public Guid Id { get; set; }
+        public Guid? ActorId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public bool EmailConfirmed { get; set; }

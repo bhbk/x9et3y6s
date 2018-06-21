@@ -12,6 +12,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = role.Id;
             this.AudienceId = role.AudienceId;
+            this.ActorId = role.ActorId;
             this.Name = role.Name;
             this.NormalizedName = role.Name;
             this.Description = role.Description ?? string.Empty;
@@ -27,6 +28,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = Guid.NewGuid();
             this.AudienceId = role.AudienceId;
+            this.ActorId = role.ActorId;
             this.Name = role.Name;
             this.NormalizedName = role.Name;
             this.Description = role.Description ?? string.Empty;
@@ -39,9 +41,11 @@ namespace Bhbk.Lib.Identity.Factory
         {
             return new AppRole
             {
+                ActorId = this.ActorId,
                 Id = this.Id,
                 AudienceId = this.AudienceId,
                 Name = this.Name,
+                NormalizedName = this.Name,
                 Description = this.Description ?? string.Empty,
                 Enabled = this.Enabled,
                 Created = this.Created,
@@ -73,7 +77,9 @@ namespace Bhbk.Lib.Identity.Factory
         {
             this.Id = role.Id;
             this.AudienceId = role.AudienceId;
+            this.ActorId = role.ActorId;
             this.Name = role.Name;
+            this.NormalizedName = role.Name;
             this.Description = role.Description ?? string.Empty;
             this.Enabled = role.Enabled;
             this.LastUpdated = DateTime.Now;
@@ -83,6 +89,7 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class RoleCreate
     {
+        public Guid ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Enabled { get; set; }
@@ -106,8 +113,9 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class RoleUpdate
     {
-        public Guid AudienceId { get; set; }
         public Guid Id { get; set; }
+        public Guid AudienceId { get; set; }
+        public Guid ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Enabled { get; set; }

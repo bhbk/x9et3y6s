@@ -29,15 +29,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
+            var TestController = new ClientController(TestIoC, TestTasks);
+
             var model = new ClientCreate()
             {
                 Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestClientA,
                 ClientKey = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32),
                 Enabled = true,
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.CreateClient(model) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.CreateClient(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
@@ -50,12 +54,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
+            var TestController = new ClientController(TestIoC, TestTasks);
+
             var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             TestIoC.ClientMgmt.Store.SetImmutableAsync(client, true);
+            TestController.SetUser(user.Id);
 
-            var result = await controller.DeleteClient(client.Id) as BadRequestObjectResult;
+            var result = await TestController.DeleteClient(client.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = TestIoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
@@ -68,10 +75,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var TestController = new ClientController(TestIoC, TestTasks);
 
-            var result = await controller.DeleteClient(client.Id) as NoContentResult;
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.DeleteClient(client.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = TestIoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
@@ -84,10 +95,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
+            var TestController = new ClientController(TestIoC, TestTasks);
+
             var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await controller.GetClient(client.Id) as OkObjectResult;
+            var result = await TestController.GetClient(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
@@ -100,9 +112,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
+            var TestController = new ClientController(TestIoC, TestTasks);
 
-            var result = await controller.GetClients() as OkObjectResult;
+            var result = await TestController.GetClients() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<ClientResult>>().Subject;
 
@@ -115,10 +127,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
+            var TestController = new ClientController(TestIoC, TestTasks);
+
             var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await controller.GetClientAudiences(client.Id) as OkObjectResult;
+            var result = await TestController.GetClientAudiences(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
@@ -131,7 +144,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClientController(TestIoC, TestTasks);
+            var TestController = new ClientController(TestIoC, TestTasks);
+
             var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new ClientUpdate()
             {
@@ -141,8 +155,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Enabled = true,
                 Immutable = false
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.UpdateClient(model) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.UpdateClient(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 

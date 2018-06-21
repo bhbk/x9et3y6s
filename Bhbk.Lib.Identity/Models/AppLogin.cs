@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Models
         }
 
         public Guid Id { get; set; }
+        public Guid? ActorId { get; set; }
         public string LoginProvider { get; set; }
         public bool Immutable { get; set; }
 

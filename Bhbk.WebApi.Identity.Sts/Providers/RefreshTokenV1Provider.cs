@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Builder;
@@ -140,8 +141,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
             }
 
+            //no context for auth exists yet... so set actor id same as user id...
+            user.ActorId = user.Id;
+
             //check that user is not locked...
-            else if (ioc.UserMgmt.IsLockedOutAsync(user).Result
+            if (ioc.UserMgmt.IsLockedOutAsync(user).Result
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -162,6 +166,16 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 audience_id = audience.Id.ToString(),
                 client_id = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
             };
+
+            //add activity entry for login...
+            new CustomActivityProvider<AppActivity>(ioc.GetContext()).Commit(new AppActivity()
+            {
+                Id = Guid.NewGuid(),
+                ActorId = user.Id,
+                ActivityType = ActivityType.StsRefresh.ToString(),
+                Created = DateTime.Now,
+                Immutable = false
+            });
 
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             context.Response.ContentType = "application/json";

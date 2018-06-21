@@ -18,12 +18,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public DiagnosticController(IIdentityContext ioc, IHostedService[] tasks)
             : base(ioc, tasks) { }
 
-        [Route("v1/task"), HttpGet]
-        public IActionResult GetTaskStatus()
+        [Route("v1/status/{name}"), HttpGet]
+        public IActionResult GetStatus(string name)
         {
-            var task = (MaintainUsersTask)Tasks.Single(x => x.GetType() == typeof(MaintainUsersTask));
+            if (name.ToLower() == "activity")
+                return Ok(((MaintainActivityTask)Tasks.Single(x => x.GetType() == typeof(MaintainActivityTask))).Status);
 
-            return Ok(task.Status);
+            if (name.ToLower() == "users")
+                return Ok(((MaintainUsersTask)Tasks.Single(x => x.GetType() == typeof(MaintainUsersTask))).Status);
+
+            return BadRequest();
         }
 
         [Route("v1/version"), HttpGet]

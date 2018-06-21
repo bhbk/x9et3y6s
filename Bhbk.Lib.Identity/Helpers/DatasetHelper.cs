@@ -229,12 +229,14 @@ namespace Bhbk.Lib.Identity.Helpers
                 new LoginCreate()
                 {
                     LoginProvider = BaseLib.Statics.ApiUnitTestLoginA,
+                    Immutable = false
                 }).Devolve());
 
             await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
                     LoginProvider = BaseLib.Statics.ApiUnitTestLoginB,
+                    Immutable = false
                 }).Devolve());
 
             //create user A
@@ -307,16 +309,16 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.DeleteAsync(user);
 
             foreach (var login in _ioc.LoginMgmt.Store.Get())
-                await _ioc.LoginMgmt.DeleteAsync(login.Id);
+                await _ioc.LoginMgmt.DeleteAsync(login);
 
             foreach (var role in _ioc.RoleMgmt.Store.Get())
                 await _ioc.RoleMgmt.DeleteAsync(role);
 
             foreach (var audience in _ioc.AudienceMgmt.Store.Get())
-                await _ioc.AudienceMgmt.DeleteAsync(audience.Id);
+                await _ioc.AudienceMgmt.DeleteAsync(audience);
 
             foreach (var client in _ioc.ClientMgmt.Store.Get())
-                await _ioc.ClientMgmt.DeleteAsync(client.Id);
+                await _ioc.ClientMgmt.DeleteAsync(client);
         }
 
         public async void DestroyDefaultData()
@@ -334,7 +336,7 @@ namespace Bhbk.Lib.Identity.Helpers
             var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiDefaultLogin).SingleOrDefault();
 
             if (login != null)
-                await _ioc.LoginMgmt.DeleteAsync(login.Id);
+                await _ioc.LoginMgmt.DeleteAsync(login);
 
             var roleAdmin = await _ioc.RoleMgmt.FindByNameAsync(Statics.ApiDefaultRoleForAdminUi);
 
@@ -349,17 +351,17 @@ namespace Bhbk.Lib.Identity.Helpers
             var audienceApi = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudienceApi).SingleOrDefault();
 
             if (audienceApi != null)
-                await _ioc.AudienceMgmt.DeleteAsync(audienceApi.Id);
+                await _ioc.AudienceMgmt.DeleteAsync(audienceApi);
 
             var audienceUi = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiDefaultAudienceUi).SingleOrDefault();
 
             if (audienceUi != null)
-                await _ioc.AudienceMgmt.DeleteAsync(audienceUi.Id);
+                await _ioc.AudienceMgmt.DeleteAsync(audienceUi);
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiDefaultClient).SingleOrDefault();
 
             if (client != null)
-                await _ioc.ClientMgmt.DeleteAsync(client.Id);
+                await _ioc.ClientMgmt.DeleteAsync(client);
         }
     }
 }

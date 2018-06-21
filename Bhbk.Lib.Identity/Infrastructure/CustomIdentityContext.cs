@@ -13,6 +13,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         private ContextType _status;
         private readonly AppDbContext _context;
+        private ActivityStore _activity;
         private AudienceManager _audienceMgmt;
         private ClientManager _clientMgmt;
         private ConfigManager _configMgmt;
@@ -40,6 +41,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             _context = context;
 
+            _activity = new ActivityStore(_context);
             _audienceMgmt = new AudienceManager(new AudienceStore(_context));
             _clientMgmt = new ClientManager(new ClientStore(_context));
             _configMgmt = new ConfigManager(new ConfigStore());
@@ -48,11 +50,27 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _userMgmt = new CustomUserManager(new CustomUserStore(_context));
         }
 
+        public AppDbContext GetContext()
+        {
+            return _context;
+        }
+
         public ContextType ContextStatus
         {
             get
             {
                 return _status;
+            }
+        }
+
+        public ActivityStore Activity
+        {
+            get
+            {
+                if (_activity == null)
+                    _activity = new ActivityStore(_context);
+
+                return _activity;
             }
         }
 

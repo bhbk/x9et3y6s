@@ -20,11 +20,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Me_Diagnostic_GetTaskStatus_Success()
+        public void Api_Me_Diagnostic_GetStatus_Quotes_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetTaskStatus() as OkObjectResult;
+            var result = controller.GetStatus("quotes") as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }

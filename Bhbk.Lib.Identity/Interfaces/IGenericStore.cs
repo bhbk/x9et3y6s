@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Interfaces
     {
         void Attach(TEntity entity);
         TEntity Create(TEntity entity);
-        bool Delete(TKey key);
+        bool Delete(TEntity entity);
         bool Exists(TKey key);
         TEntity FindById(TKey key);
         IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>,

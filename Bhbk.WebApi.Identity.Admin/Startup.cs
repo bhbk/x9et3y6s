@@ -46,6 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin
             _audiences = _cb.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
 
             sc.AddSingleton<IIdentityContext>(ioc);
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(ioc));
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(ioc));
         }
 

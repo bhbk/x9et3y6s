@@ -56,6 +56,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var role = await IoC.RoleMgmt.FindByNameAsync(model.Name);
 
             if (role != null)
@@ -85,6 +87,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
+                role.ActorId = GetUserGUID();
+
                 var result = await IoC.RoleMgmt.DeleteAsync(role);
 
                 if (!result.Succeeded)
@@ -173,6 +177,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var role = await IoC.RoleMgmt.FindByIdAsync(model.Id.ToString());
 
             if (role == null)
@@ -183,16 +189,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var result = new RoleFactory<AppRole>(role);
-                result.Update(model);
+                var update = new RoleFactory<AppRole>(role);
+                update.Update(model);
 
-                var update = await IoC.RoleMgmt.UpdateAsync(result.Devolve());
+                var result = await IoC.RoleMgmt.UpdateAsync(update.Devolve());
 
-                if (!update.Succeeded)
-                    return GetErrorResult(update);
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
 
                 else
-                    return Ok(result.Evolve());
+                    return Ok(update.Evolve());
             }
         }
     }

@@ -12,6 +12,7 @@ namespace Bhbk.Lib.Identity.Models
         }
 
         public Guid Id { get; set; }
+        public Guid? ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string ClientKey { get; set; }

@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Factory
         public UserFactory(AppUser user)
         {
             this.Id = user.Id;
+            this.ActorId = user.ActorId;
             this.UserName = user.UserName;
             this.NormalizedUserName = user.UserName;
             this.Email = user.Email;
@@ -46,6 +47,7 @@ namespace Bhbk.Lib.Identity.Factory
         public UserFactory(UserCreate user)
         {
             this.Id = Guid.NewGuid();
+            this.ActorId = user.ActorId;
             this.UserName = user.Email;
             this.NormalizedUserName = user.Email;
             this.Email = user.Email;
@@ -72,6 +74,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             return new AppUser
             {
+                ActorId = this.ActorId,
                 Id = this.Id,
                 UserName = this.Email,
                 NormalizedUserName = this.NormalizedUserName,
@@ -135,6 +138,7 @@ namespace Bhbk.Lib.Identity.Factory
         public void Update(UserUpdate user)
         {
             this.Id = user.Id;
+            this.ActorId = user.ActorId;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
             this.LastUpdated = DateTime.Now;
@@ -145,6 +149,7 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class UserCreate
     {
+        public Guid ActorId { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string FirstName { get; set; }
@@ -184,6 +189,7 @@ namespace Bhbk.Lib.Identity.Factory
     public class UserUpdate
     {
         public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public bool LockoutEnabled { get; set; }

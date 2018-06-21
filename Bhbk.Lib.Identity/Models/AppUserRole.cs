@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Models
     {
         public Guid UserId { get; set; }
         public Guid RoleId { get; set; }
+        public Guid? ActorId { get; set; }
         public DateTime Created { get; set; }
         public bool Immutable { get; set; }
 

@@ -118,8 +118,8 @@ namespace Bhbk.Lib.Identity.Stores
             model.Name = role.Name;
             model.Description = role.Description;
             model.Enabled = role.Enabled;
-            model.Immutable = role.Immutable;
             model.LastUpdated = DateTime.Now;
+            model.Immutable = role.Immutable;
 
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();

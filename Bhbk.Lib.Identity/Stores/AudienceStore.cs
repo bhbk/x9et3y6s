@@ -33,17 +33,16 @@ namespace Bhbk.Lib.Identity.Stores
             return result.Entity;
         }
 
-        public bool Delete(Guid key)
+        public bool Delete(AppAudience entity)
         {
-            var audience = _context.AppAudience.Where(x => x.Id == key).Single();
-            var roles = _context.AppRole.Where(x => x.AudienceId == key);
+            var audience = _context.AppAudience.Where(x => x.Id == entity.Id).Single();
+            var roles = _context.AppRole.Where(x => x.AudienceId == entity.Id);
 
             _context.AppRole.RemoveRange(roles);
             _context.AppAudience.Remove(audience);
             _context.SaveChanges();
 
-            return true;
-            //return Exists(audienceId);
+            return !Exists(entity.Id);
         }
 
         public bool Exists(Guid key)
@@ -129,8 +128,8 @@ namespace Bhbk.Lib.Identity.Stores
             audience.Description = entity.Description;
             audience.AudienceType = entity.AudienceType;
             audience.Enabled = entity.Enabled;
-            audience.Immutable = entity.Immutable;
             audience.LastUpdated = DateTime.Now;
+            audience.Immutable = entity.Immutable;
 
             _context.Entry(audience).State = EntityState.Modified;
             _context.SaveChanges();

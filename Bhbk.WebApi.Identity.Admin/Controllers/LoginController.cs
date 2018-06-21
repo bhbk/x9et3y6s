@@ -59,6 +59,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var login = await IoC.LoginMgmt.FindByNameAsync(model.LoginProvider);
 
             if (login != null)
@@ -82,7 +84,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (login.Immutable)
                 return BadRequest(BaseLib.Statics.MsgLoginImmutable);
 
-            if (!await IoC.LoginMgmt.DeleteAsync(loginID))
+            login.ActorId = GetUserGUID();
+
+            if (!await IoC.LoginMgmt.DeleteAsync(login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             else
@@ -167,6 +171,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var login = await IoC.LoginMgmt.FindByIdAsync(model.Id);
 
             if (login == null)
@@ -174,12 +180,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var result = new LoginFactory<AppLogin>(login);
-                result.Update(model);
+                var update = new LoginFactory<AppLogin>(login);
+                update.Update(model);
 
-                var update = await IoC.LoginMgmt.UpdateAsync(result.Devolve());
+                var result = await IoC.LoginMgmt.UpdateAsync(update.Devolve());
 
-                return Ok(result.Evolve());
+                return Ok(update.Evolve());
             }
         }
     }

@@ -28,21 +28,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var user = await IoC.UserMgmt.FindByNameAsync(model.Email);
 
             if (user != null)
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
 
-            var init = new UserFactory<UserCreate>(model);
-            var create = await IoC.UserMgmt.CreateAsync(init.Devolve());
+            var create = new UserFactory<UserCreate>(model);
+            var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
 
-            if (!create.Succeeded)
-                return GetErrorResult(create);
+            if (!result.Succeeded)
+                return GetErrorResult(result);
 
-            var find = await IoC.UserMgmt.FindByIdAsync(init.Id.ToString());
-            var result = new UserFactory<AppUser>(find);
+            var verify = await IoC.UserMgmt.FindByIdAsync(create.Id.ToString());
 
-            return Ok(result.Evolve());
+            return Ok((new UserFactory<AppUser>(verify)).Evolve());
         }
 
         [Route("v1/{userID}"), HttpDelete]
@@ -59,6 +60,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
+                user.ActorId = GetUserGUID();
+
                 var result = await IoC.UserMgmt.DeleteAsync(user);
 
                 if (!result.Succeeded)
@@ -82,10 +85,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result.Evolve());
         }
 
-        [Route("v1/{username}"), HttpGet]
-        public async Task<IActionResult> GetUser(string username)
+        [Route("v1/{email}"), HttpGet]
+        public async Task<IActionResult> GetUser(string email)
         {
-            var user = await IoC.UserMgmt.FindByNameAsync(username);
+            var user = await IoC.UserMgmt.FindByEmailAsync(email);
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -169,6 +172,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
+                user.ActorId = GetUserGUID();
+
                 var result = await IoC.UserMgmt.AddPasswordAsync(user, model.NewPassword);
 
                 if (!result.Succeeded)
@@ -196,6 +201,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
+                user.ActorId = GetUserGUID();
+
                 var result = await IoC.UserMgmt.RemovePasswordAsync(user);
 
                 if (!result.Succeeded)
@@ -221,7 +228,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            else if (user.HumanBeing)
+            user.ActorId = GetUserGUID();
+
+            if (user.HumanBeing)
             {
                 string token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
                 var reset = await IoC.UserMgmt.ResetPasswordAsync(user, token, model.NewPassword);
@@ -254,6 +263,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var user = await IoC.UserMgmt.FindByIdAsync(model.Id.ToString());
 
             if (user == null)
@@ -264,16 +275,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var result = new UserFactory<AppUser>(user);
-                result.Update(model);
+                var update = new UserFactory<AppUser>(user);
+                update.Update(model);
 
-                var update = await IoC.UserMgmt.UpdateAsync(result.Devolve());
+                var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
 
-                if (!update.Succeeded)
-                    return GetErrorResult(update);
+                if (!result.Succeeded)
+                    return GetErrorResult(result);
 
                 else
-                    return Ok(result.Evolve());
+                    return Ok(update.Evolve());
             }
         }
     }

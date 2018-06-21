@@ -29,7 +29,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
+            var TestController = new AudienceController(TestIoC, TestTasks);
+
             var model = new AudienceCreate()
             {
                 ClientId = TestIoC.ClientMgmt.Store.Get().First().Id,
@@ -37,8 +38,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 AudienceType = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(8),
                 Enabled = true,
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.CreateAudience(model) as BadRequestObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.CreateAudience(model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -48,12 +52,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
+            var TestController = new AudienceController(TestIoC, TestTasks);
+
             var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             TestIoC.AudienceMgmt.Store.SetImmutableAsync(audience, true);
+            TestController.SetUser(user.Id);
 
-            var result = await controller.DeleteAudience(audience.Id) as BadRequestObjectResult;
+            var result = await TestController.DeleteAudience(audience.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = TestIoC.AudienceMgmt.Store.Get(x => x.Id == audience.Id).Any();
@@ -66,7 +73,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
+            var TestController = new AudienceController(TestIoC, TestTasks);
+
             var model = new AudienceCreate()
             {
                 ClientId = TestIoC.ClientMgmt.Store.Get().First().Id,
@@ -74,8 +82,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 AudienceType = BaseLib.AudienceType.user_agent.ToString(),
                 Enabled = true,
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.CreateAudience(model) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.CreateAudience(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<AudienceResult>().Subject;
 
@@ -88,10 +99,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var TestController = new AudienceController(TestIoC, TestTasks);
 
-            var result = await controller.DeleteAudience(audience.Id) as NoContentResult;
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.DeleteAudience(audience.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = TestIoC.AudienceMgmt.Store.Get(x => x.Id == audience.Id).Any();
@@ -104,10 +119,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var TestController = new AudienceController(TestIoC, TestTasks);
 
-            var result = await controller.GetAudience(audience.Id) as OkObjectResult;
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.GetAudience(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<AudienceResult>().Subject;
 
@@ -120,9 +139,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
+            var TestController = new AudienceController(TestIoC, TestTasks);
 
-            var result = await controller.GetAudiences() as OkObjectResult;
+            var result = await TestController.GetAudiences() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
@@ -135,10 +154,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
+            var TestController = new AudienceController(TestIoC, TestTasks);
+
             var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
 
-            var result = await controller.GetAudienceRoles(audience.Id) as OkObjectResult;
+            var result = await TestController.GetAudienceRoles(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
@@ -151,7 +171,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new AudienceController(TestIoC, TestTasks);
+            var TestController = new AudienceController(TestIoC, TestTasks);
+
             var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var model = new AudienceUpdate()
             {
@@ -161,8 +182,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 AudienceType = audience.AudienceType,
                 Enabled = true
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.UpdateAudience(model) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.UpdateAudience(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<AudienceResult>().Subject;
 

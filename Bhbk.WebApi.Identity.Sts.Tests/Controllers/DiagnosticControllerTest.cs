@@ -20,11 +20,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Sts_Diagnostic_GetTaskStatus_Success()
+        public void Api_Sts_Diagnostic_GetStatus_Tokens_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetTaskStatus() as OkObjectResult;
+            var result = controller.GetStatus("tokens") as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }

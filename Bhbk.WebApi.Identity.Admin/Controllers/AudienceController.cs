@@ -27,7 +27,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
+            model.ActorId = GetUserGUID();
+
             var audience = await IoC.AudienceMgmt.FindByNameAsync(model.Name);
 
             if (audience != null)
@@ -56,7 +58,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
 
-            if (!await IoC.AudienceMgmt.DeleteAsync(audienceID))
+            audience.ActorId = GetUserGUID();
+
+            if (!await IoC.AudienceMgmt.DeleteAsync(audience))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             else
@@ -112,6 +116,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            model.ActorId = GetUserGUID();
+
             var audience = await IoC.AudienceMgmt.FindByIdAsync(model.Id);
 
             if (audience == null)
@@ -122,12 +128,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             else
             {
-                var result = new AudienceFactory<AppAudience>(audience);
-                result.Update(model);
+                var update = new AudienceFactory<AppAudience>(audience);
+                update.Update(model);
 
-                var update = await IoC.AudienceMgmt.UpdateAsync(result.Devolve());
+                var result = await IoC.AudienceMgmt.UpdateAsync(update.Devolve());
 
-                return Ok(result.Evolve());
+                return Ok(update.Evolve());
             }
         }
     }

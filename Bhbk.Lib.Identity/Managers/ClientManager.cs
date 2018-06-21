@@ -27,12 +27,12 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.Create(client);
         }
 
-        public async Task<bool> DeleteAsync(Guid clientId)
+        public async Task<bool> DeleteAsync(AppClient client)
         {
-            if (!Store.Exists(clientId))
+            if (!Store.Exists(client.Id))
                 throw new InvalidOperationException();
 
-            return Store.Delete(clientId);
+            return Store.Delete(client);
         }
 
         public async Task<AppClient> FindByIdAsync(Guid clientId)

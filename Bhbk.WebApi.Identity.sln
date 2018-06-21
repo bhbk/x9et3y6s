@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		.gitlab-ci.yml = .gitlab-ci.yml
+		build.cmd = build.cmd
 	EndProjectSection
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Bhbk.Dal.Identity.Mssql", "Bhbk.Dal.Identity.Mssql\Bhbk.Dal.Identity.Mssql.sqlproj", "{B707B63B-2F49-4E67-9EAB-DD667FB8944C}"

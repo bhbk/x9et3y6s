@@ -31,7 +31,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var model = new UserCreate()
             {
                 Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
@@ -40,8 +41,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 PhoneNumber = "0123456789",
                 LockoutEnabled = false,
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.CreateUser(model) as BadRequestObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.CreateUser(model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -51,7 +55,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var model = new UserCreate()
             {
                 Email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
@@ -61,8 +66,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LockoutEnabled = false,
                 Immutable = false,
             };
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.CreateUser(model) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.CreateUser(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
@@ -75,12 +83,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            await TestIoC.UserMgmt.Store.SetImmutableAsync(user, true);
+            TestIoC.UserMgmt.Store.SetImmutableAsync(user, true).Wait();
+            TestController.SetUser(user.Id);
 
-            var result = await controller.DeleteUser(user.Id) as BadRequestObjectResult;
+            var result = await TestController.DeleteUser(user.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = TestIoC.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
@@ -93,10 +103,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.DeleteUser(user.Id) as NoContentResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.DeleteUser(user.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = TestIoC.UserMgmt.Store.Get(x => x.Id == user.Id).Any();
@@ -109,10 +122,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.GetUser(user.Id) as OkObjectResult;
+            var result = await TestController.GetUser(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
@@ -125,9 +139,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
 
-            var result = await controller.GetUsers() as OkObjectResult;
+            var result = await TestController.GetUsers() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
@@ -140,10 +154,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.GetUser(user.UserName) as OkObjectResult;
+            var result = await TestController.GetUser(user.UserName) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 
@@ -156,10 +171,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.GetUserAudiences(user.Id) as OkObjectResult;
+            var result = await TestController.GetUserAudiences(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
@@ -172,10 +188,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.GetUserLogins(user.Id) as OkObjectResult;
+            var result = await TestController.GetUserLogins(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<LoginResult>>().Subject;
 
@@ -188,10 +205,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.GetUserRoles(user.Id) as OkObjectResult;
+            var result = await TestController.GetUserRoles(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
@@ -204,7 +222,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var remove = await TestIoC.UserMgmt.RemovePasswordAsync(user);
@@ -217,7 +236,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16)
             };
 
-            var result = await controller.AddPassword(user.Id, model) as BadRequestObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.AddPassword(user.Id, model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = await TestIoC.UserMgmt.HasPasswordAsync(user);
@@ -230,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var remove = await TestIoC.UserMgmt.RemovePasswordAsync(user);
@@ -243,7 +264,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var result = await controller.AddPassword(user.Id, model) as NoContentResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.AddPassword(user.Id, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
@@ -256,14 +279,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var remove = await TestIoC.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
             remove.Succeeded.Should().BeTrue();
 
-            var result = await controller.RemovePassword(user.Id) as BadRequestObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.RemovePassword(user.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = await TestIoC.UserMgmt.HasPasswordAsync(user);
@@ -276,10 +301,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.RemovePassword(user.Id) as NoContentResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.RemovePassword(user.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await TestIoC.UserMgmt.HasPasswordAsync(user);
@@ -292,7 +320,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserAddPassword()
             {
@@ -300,7 +329,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16)
             };
 
-            var result = await controller.ResetPassword(user.Id, model) as BadRequestObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.ResetPassword(user.Id, model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
@@ -313,7 +344,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserAddPassword()
             {
@@ -321,7 +353,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
 
-            var result = await controller.ResetPassword(user.Id, model) as NoContentResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.ResetPassword(user.Id, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
@@ -334,7 +368,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new UserController(TestIoC, TestTasks);
+            var TestController = new UserController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserUpdate()
             {
@@ -345,7 +380,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LockoutEnd = DateTime.Now.AddDays(30)
             };
 
-            var result = await controller.UpdateUser(model) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.UpdateUser(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 

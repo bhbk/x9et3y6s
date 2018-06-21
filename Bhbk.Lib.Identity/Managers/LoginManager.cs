@@ -27,12 +27,12 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.Create(login);
         }
 
-        public async Task<bool> DeleteAsync(Guid loginId)
+        public async Task<bool> DeleteAsync(AppLogin login)
         {
-            if (!Store.Exists(loginId))
+            if (!Store.Exists(login.Id))
                 throw new InvalidOperationException();
 
-            return Store.Delete(loginId);
+            return Store.Delete(login);
         }
 
         public async Task<AppLogin> FindByIdAsync(Guid loginId)

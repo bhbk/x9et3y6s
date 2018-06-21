@@ -46,11 +46,11 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             _url = _cb["Tasks:MaintainQuotes:QuoteOfDayUrl"];
             _ioc = ioc;
 
-            var message = typeof(MaintainQuotesTask).Name + " not run yet.";
+            var statusMsg = typeof(MaintainQuotesTask).Name + " not run yet.";
 
             Status = JsonConvert.SerializeObject(new
             {
-                status = message
+                status = statusMsg
             }, _serializer);
 
             QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
@@ -89,28 +89,28 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                         File.WriteAllText(_output, JsonConvert.SerializeObject(QuoteOfDay));
 
-                        var message = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
+                        var statusMsg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
 
                         Status = JsonConvert.SerializeObject(new
                         {
-                            status = message
+                            status = statusMsg
                         }, _serializer);
 
-                        Log.Information(message);
+                        Log.Information(statusMsg);
                     }
                 }
                 else
                 {
-                    var message = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
+                    var statusMsg = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
 
                     Status = JsonConvert.SerializeObject(new
                     {
-                        status = message,
+                        status = statusMsg,
                         request = response.RequestMessage.ToString(),
                         response = response.ToString()
                     }, _serializer);
 
-                    Log.Error(message 
+                    Log.Error(statusMsg 
                         + Environment.NewLine + response.RequestMessage.ToString() 
                         + Environment.NewLine + response.ToString());
                 }

@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Factory
         public ClientFactory(AppClient client)
         {
             this.Id = client.Id;
+            this.ActorId = client.ActorId;
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
             this.ClientKey = client.ClientKey;
@@ -24,6 +25,7 @@ namespace Bhbk.Lib.Identity.Factory
         public ClientFactory(ClientCreate client)
         {
             this.Id = Guid.NewGuid();
+            this.ActorId = client.ActorId;
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
             this.ClientKey = client.ClientKey ?? Helpers.CryptoHelper.GenerateRandomBase64(32);
@@ -36,6 +38,7 @@ namespace Bhbk.Lib.Identity.Factory
         {
             return new AppClient
             {
+                ActorId = this.ActorId,
                 Id = this.Id,
                 Name = this.Name,
                 Description = this.Description ?? string.Empty,
@@ -67,6 +70,7 @@ namespace Bhbk.Lib.Identity.Factory
         public void Update(ClientUpdate client)
         {
             this.Id = client.Id;
+            this.ActorId = client.ActorId;
             this.Name = client.Name;
             this.Description = client.Description;
             this.Enabled = client.Enabled;
@@ -77,6 +81,7 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class ClientCreate
     {
+        public Guid ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string ClientKey { get; set; }
@@ -100,6 +105,7 @@ namespace Bhbk.Lib.Identity.Factory
     public class ClientUpdate
     {
         public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string ClientKey { get; set; }

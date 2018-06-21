@@ -6,6 +6,7 @@ namespace Bhbk.Lib.Identity.Models
 {
     public partial class AppDbContext
     {
+        public virtual DbSet<AppActivity> AppActivity { get; set; }
         public virtual DbSet<AppAudience> AppAudience { get; set; }
         public virtual DbSet<AppClient> AppClient { get; set; }
         public virtual DbSet<AppLogin> AppLogin { get; set; }
@@ -20,6 +21,28 @@ namespace Bhbk.Lib.Identity.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AppActivity>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_AppActivity")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.ActivityType)
+                    .IsRequired()
+                    .HasMaxLength(32)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrentValues).IsUnicode(false);
+
+                entity.Property(e => e.KeyValues).IsUnicode(false);
+
+                entity.Property(e => e.OriginalValues).IsUnicode(false);
+
+                entity.Property(e => e.TableName).IsUnicode(false);
+            });
+
             modelBuilder.Entity<AppAudience>(entity =>
             {
                 entity.HasIndex(e => e.ClientId)

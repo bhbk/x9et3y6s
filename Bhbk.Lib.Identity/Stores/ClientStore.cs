@@ -34,10 +34,10 @@ namespace Bhbk.Lib.Identity.Stores
             return result.Entity;
         }
 
-        public bool Delete(Guid key)
+        public bool Delete(AppClient entity)
         {
-            var client = _context.AppClient.Where(x => x.Id == key).Single();
-            var audiences = _context.AppAudience.Where(x => x.ClientId == key);
+            var client = _context.AppClient.Where(x => x.Id == entity.Id).Single();
+            var audiences = _context.AppAudience.Where(x => x.ClientId == entity.Id);
             var roles = _context.AppRole.Where(x => x.AudienceId == audiences.FirstOrDefault().Id);
 
             _context.AppRole.RemoveRange(roles);
@@ -45,8 +45,7 @@ namespace Bhbk.Lib.Identity.Stores
             _context.AppClient.Remove(client);
             _context.SaveChanges();
 
-            return true;
-            //return Exists(clientId);
+            return !Exists(entity.Id);
         }
 
         public bool Exists(Guid key)
@@ -131,8 +130,8 @@ namespace Bhbk.Lib.Identity.Stores
             model.Description = entity.Description;
             model.ClientKey = entity.ClientKey;
             model.Enabled = entity.Enabled;
-            model.Immutable = entity.Immutable;
             model.LastUpdated = DateTime.Now;
+            model.Immutable = entity.Immutable;
 
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();

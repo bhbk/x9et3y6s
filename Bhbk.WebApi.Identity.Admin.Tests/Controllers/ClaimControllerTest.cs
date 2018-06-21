@@ -30,11 +30,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClaimController(TestIoC, TestTasks);
+            var TestController = new ClaimController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue);
 
-            var result = await controller.CreateClaim(user.Id, claim) as OkObjectResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.CreateClaim(user.Id, claim) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<Claim>().Subject;
 
@@ -47,7 +50,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClaimController(TestIoC, TestTasks);
+            var TestController = new ClaimController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, 
                 BaseLib.Statics.ApiUnitTestClaimValue + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4));
@@ -56,7 +60,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
-            var result = await controller.DeleteClaim(user.Id, claim) as NoContentResult;
+            TestController.SetUser(user.Id);
+
+            var result = await TestController.DeleteClaim(user.Id, claim) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = user.AppUserClaim.Where(x => x.ClaimType == claim.Type && x.ClaimValue == claim.Value).Any();
@@ -69,10 +75,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTestData();
 
-            var controller = new ClaimController(TestIoC, TestTasks);
+            var TestController = new ClaimController(TestIoC, TestTasks);
+
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await controller.GetClaims(user.Id) as OkObjectResult;
+            var result = await TestController.GetClaims(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<Claim>>().Subject;
 

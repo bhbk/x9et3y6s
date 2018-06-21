@@ -9,6 +9,7 @@ namespace Bhbk.Lib.Identity.Factory
         public LoginFactory(AppLogin login)
         {
             this.Id = login.Id;
+            this.ActorId = login.ActorId;
             this.LoginProvider = login.LoginProvider;
             this.Immutable = login.Immutable;
         }
@@ -16,8 +17,20 @@ namespace Bhbk.Lib.Identity.Factory
         public LoginFactory(LoginCreate login)
         {
             this.Id = Guid.NewGuid();
+            this.ActorId = login.ActorId;
             this.LoginProvider = login.LoginProvider;
             this.Immutable = login.Immutable;
+        }
+
+        public AppLogin Devolve()
+        {
+            return new AppLogin
+            {
+                ActorId = this.ActorId,
+                Id = this.Id,
+                LoginProvider = this.LoginProvider,
+                Immutable = this.Immutable,
+            };
         }
 
         public LoginResult Evolve()
@@ -30,19 +43,10 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public AppLogin Devolve()
-        {
-            return new AppLogin
-            {
-                Id = this.Id,
-                LoginProvider = this.LoginProvider,
-                Immutable = this.Immutable,
-            };
-        }
-
         public void Update(LoginUpdate login)
         {
             this.Id = login.Id;
+            this.ActorId = login.ActorId;
             this.LoginProvider = login.LoginProvider;
             this.Immutable = login.Immutable;
         }
@@ -50,6 +54,7 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class LoginCreate
     {
+        public Guid ActorId { get; set; }
         public string LoginProvider { get; set; }
         public bool Immutable { get; set; }
     }
@@ -64,6 +69,7 @@ namespace Bhbk.Lib.Identity.Factory
     public class LoginUpdate
     {
         public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
         public string LoginProvider { get; set; }
         public bool Immutable { get; set; }
     }

@@ -20,11 +20,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_Diagnostic_GetTaskStatus_Success()
+        public void Api_Admin_Diagnostic_GetStatus_Activity_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetTaskStatus() as OkObjectResult;
+            var result = controller.GetStatus("activity") as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+        }
+
+        [TestMethod]
+        public void Api_Admin_Diagnostic_GetStatus_Users_Success()
+        {
+            var controller = new DiagnosticController(TestIoC, TestTasks);
+
+            var result = controller.GetStatus("users") as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }

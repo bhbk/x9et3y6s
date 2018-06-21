@@ -144,9 +144,9 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(_context.AppUser.Where(x => x.Id.ToString() == userId).SingleOrDefault());
         }
 
-        public override Task<AppUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<AppUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.FromResult(_context.AppUser.Where(x => x.Email == normalizedUserName).SingleOrDefault());
+            return Task.FromResult(_context.AppUser.Where(x => x.Email == normalizedEmail).SingleOrDefault());
         }
 
         public Task<AppUserRefresh> FindRefreshTokenAsync(string ticket)
@@ -495,8 +495,8 @@ namespace Bhbk.Lib.Identity.Stores
             model.LastName = user.LastName;
             model.LockoutEnabled = user.LockoutEnabled;
             model.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
-            model.Immutable = user.Immutable;
             model.LastUpdated = DateTime.Now;
+            model.Immutable = user.Immutable;
 
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();

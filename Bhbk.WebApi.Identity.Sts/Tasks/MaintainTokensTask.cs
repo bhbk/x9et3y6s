@@ -40,11 +40,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             _delay = int.Parse(_cb["Tasks:MaintainTokens:PollingDelay"]);
             _ioc = ioc;
 
-            var message = typeof(MaintainTokensTask).Name + " not run yet.";
+            var statusMsg = typeof(MaintainTokensTask).Name + " not run yet.";
 
             Status = JsonConvert.SerializeObject(new
             {
-                status = message
+                status = statusMsg
             }, _serializer);
         }
 
@@ -67,15 +67,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                         _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                        var message = typeof(MaintainTokensTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                        var statusMsg = typeof(MaintainTokensTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + invalidCount.ToString() + " invalid refresh tokens.";
 
                         Status = JsonConvert.SerializeObject(new
                         {
-                            status = message
+                            status = statusMsg
                         }, _serializer);
 
-                        Log.Information(message);
+                        Log.Information(statusMsg);
                     }
                 }
                 catch (Exception ex)

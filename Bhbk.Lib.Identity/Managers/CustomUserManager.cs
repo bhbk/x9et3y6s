@@ -267,10 +267,10 @@ namespace Bhbk.Lib.Identity.Managers
 
             return await Store.FindByIdAsync(userId);
         }
-        
-        public override async Task<AppUser> FindByNameAsync(string userName)
+
+        public override async Task<AppUser> FindByEmailAsync(string email)
         {
-            return await Store.FindByNameAsync(userName);
+            return await Store.FindByEmailAsync(email);
         }
 
         public async Task<AppUserRefresh> FindRefreshTokenAsync(string token)

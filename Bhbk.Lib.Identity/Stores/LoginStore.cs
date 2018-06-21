@@ -33,15 +33,14 @@ namespace Bhbk.Lib.Identity.Stores
             return result.Entity;
         }
 
-        public bool Delete(Guid key)
+        public bool Delete(AppLogin entity)
         {
-            var login = _context.AppLogin.Where(x => x.Id == key).Single();
+            var login = _context.AppLogin.Where(x => x.Id == entity.Id).Single();
 
             _context.AppLogin.Remove(login);
             _context.SaveChanges();
 
-            return true;
-            //return Exists(key);
+            return !Exists(entity.Id);
         }
 
         public bool Exists(Guid key)
@@ -132,6 +131,7 @@ namespace Bhbk.Lib.Identity.Stores
             var model = _context.AppLogin.Find(entity.Id);
 
             model.LoginProvider = entity.LoginProvider;
+            model.Immutable = entity.Immutable;
 
             _context.Entry(model).State = EntityState.Modified;
             _context.SaveChanges();
