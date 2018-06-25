@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [dbo].[AppUser] (
     [Id]                   UNIQUEIDENTIFIER   NOT NULL,
+    [ActorId]              UNIQUEIDENTIFIER   NULL,
     [UserName]             NVARCHAR (256)     NOT NULL,
     [Email]                NVARCHAR (256)     NOT NULL,
     [EmailConfirmed]       BIT                CONSTRAINT [DF_AppUser_EmailConfirmed] DEFAULT ((0)) NOT NULL,
@@ -26,6 +27,8 @@
     [Immutable]            BIT                CONSTRAINT [DF_AppUser_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_AppUser_ID] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

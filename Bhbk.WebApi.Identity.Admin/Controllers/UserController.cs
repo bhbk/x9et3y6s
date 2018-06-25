@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -6,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -36,6 +37,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
 
             var create = new UserFactory<UserCreate>(model);
+
             var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
 
             if (!result.Succeeded)
@@ -107,6 +109,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             var logins = await IoC.UserMgmt.GetLoginsAsync(user);
+
             var result = IoC.LoginMgmt.Store.Get(x => logins.Contains(x.Id.ToString()))
                 .Select(x => new LoginFactory<AppLogin>(x).Evolve()).ToList();
 
@@ -122,6 +125,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             var audiences = await IoC.UserMgmt.GetAudiencesAsync(user);
+
             var result = IoC.AudienceMgmt.Store.Get(x => audiences.Contains(x.Id.ToString()))
                 .Select(x => new AudienceFactory<AppAudience>(x).Evolve()).ToList();
 
@@ -136,7 +140,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var roles = await IoC.UserMgmt.GetRolesAsync(user);
+            var roles = await IoC.UserMgmt.GetRolesReturnIdAsync(user);
+
             var result = IoC.RoleMgmt.Store.Get(x => roles.Contains(x.Id.ToString()))
                 .Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
 
@@ -144,13 +149,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] UrlFilter filter = null)
         {
-            var result = new List<UserResult>();
-            var users = await IoC.UserMgmt.GetListAsync();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            foreach (AppUser entry in users)
-                result.Add(new UserFactory<AppUser>(entry).Evolve());
+            else if (filter == null)
+                filter = new UrlFilter(20, 1, "email", "ascending");
+
+            var users = IoC.UserMgmt.Store.Get().AsQueryable()
+                .OrderBy(filter.OrderBy + " " + filter.Sort)
+                .Skip(Convert.ToInt32((filter.PageNum - 1) * filter.PageSize))
+                .Take(Convert.ToInt32(filter.PageSize));
+
+            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve()).ToList();
 
             return Ok(result);
         }
@@ -232,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user.HumanBeing)
             {
-                string token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
+                var token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
                 var reset = await IoC.UserMgmt.ResetPasswordAsync(user, token, model.NewPassword);
 
                 if (!reset.Succeeded)

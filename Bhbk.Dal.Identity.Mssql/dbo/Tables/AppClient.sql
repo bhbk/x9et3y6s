@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [dbo].[AppClient] (
     [Id]          UNIQUEIDENTIFIER NOT NULL,
+    [ActorId]     UNIQUEIDENTIFIER NULL,
     [Name]        NVARCHAR (256)   NOT NULL,
     [Description] NVARCHAR (256)   NULL,
     [ClientKey]   NVARCHAR (MAX)   NOT NULL,
@@ -9,6 +10,8 @@
     [Immutable]   BIT              NOT NULL,
     CONSTRAINT [PK_AppClient_ID] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 GO

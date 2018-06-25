@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -111,14 +112,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             TestData.Destroy();
             TestData.CreateTestData();
+            TestData.CreateTestDataRandom();
 
+            ushort size = 3;
             var TestController = new ClientController(TestIoC, TestTasks);
+            var filter = new UrlFilter(size, 1, "name", "ascending");
 
-            var result = await TestController.GetClients() as OkObjectResult;
+            var result = await TestController.GetClients(filter) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<ClientResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.ClientMgmt.Store.Get().Count());
+            data.Count().Should().Be(size);
         }
 
         [TestMethod]
@@ -135,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.AudienceMgmt.Store.Get().Count());
+            data.Count().Should().Be(TestIoC.ClientMgmt.Store.GetAudiences(client.Id).Count());
         }
 
         [TestMethod]

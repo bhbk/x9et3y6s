@@ -71,11 +71,11 @@ namespace Bhbk.Lib.Identity.Models
         }
 
         //https://www.meziantou.net/2017/08/14/entity-framework-core-history-audit-table    
-        private List<AppActivityEntry> OnSaveActivityBefore()
+        private List<ActivityCreate> OnSaveActivityBefore()
         {
             ChangeTracker.DetectChanges();
 
-            var activityList = new List<AppActivityEntry>();
+            var activityList = new List<ActivityCreate>();
 
             foreach (var entry in ChangeTracker.Entries())
             {
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Models
                 if (_tablesExcluded.Contains(entry.Entity.GetType().Name))
                     continue;
 
-                var activity = new AppActivityEntry(entry);
+                var activity = new ActivityCreate(entry);
 
                 foreach (var prop in entry.Properties)
                 {
@@ -117,6 +117,7 @@ namespace Bhbk.Lib.Identity.Models
 
                     activity.ActorId = actorId;
                     activity.TableName = entry.Metadata.Relational().TableName;
+                    activity.Immutable = true;
 
                     switch (entry.State)
                     {
@@ -152,7 +153,7 @@ namespace Bhbk.Lib.Identity.Models
                     }
                 }
 
-                var verify = activity.ToValues();
+                var verify = activity.Devolve();
 
                 if(verify.OriginalValues != verify.CurrentValues)
                     activityList.Add(activity);
@@ -160,13 +161,13 @@ namespace Bhbk.Lib.Identity.Models
 
             //save entities that have all the changes
             foreach (var entry in activityList.Where(x => !x.HasTemporaryProperties))
-                AppActivity.Add(entry.ToValues());
+                AppActivity.Add(entry.Devolve());
 
             //add to list of entries where some property values are unknown
             return activityList.Where(x => x.HasTemporaryProperties).ToList();
         }
 
-        private Task OnSaveActivityAfter(List<AppActivityEntry> entryList)
+        private Task OnSaveActivityAfter(List<ActivityCreate> entryList)
         {
             if (entryList == null || entryList.Count == 0)
                 return Task.CompletedTask;
@@ -182,7 +183,7 @@ namespace Bhbk.Lib.Identity.Models
                         entry.CurrentValues[prop.Metadata.Name] = prop.CurrentValue;
                 }
 
-                AppActivity.Add(entry.ToValues());
+                AppActivity.Add(entry.Devolve());
             }
 
             return SaveChangesAsync();

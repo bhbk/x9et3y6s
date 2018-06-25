@@ -1,11 +1,15 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -17,15 +21,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ActivityController(IIdentityContext ioc, IHostedService[] tasks)
             : base(ioc, tasks) { }
 
-        [Authorize(Roles = "(Built-In) Administrators")]
         [Route("v1"), HttpGet]
-        public IActionResult GetActivity()
+        [Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IActionResult> GetActivity([FromQuery] UrlFilter filter = null)
         {
-            var result = new List<ActivityResult>();
-            var activities = IoC.Activity.Get();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            foreach (AppActivity entry in activities)
-                result.Add(new ActivityFactory<AppActivity>(entry).Evolve());
+            else if (filter == null)
+                filter = new UrlFilter(20, 1, "created", "descending");
+
+            var activity = IoC.Activity.Get().AsQueryable()
+                .OrderBy(filter.OrderBy + " " + filter.Sort)
+                .Skip(Convert.ToInt32((filter.PageNum - 1) * filter.PageSize))
+                .Take(Convert.ToInt32(filter.PageSize));
+
+            var result = activity.Select(x => new ActivityFactory<AppActivity>(x).Evolve()).ToList();
 
             return Ok(result);
         }

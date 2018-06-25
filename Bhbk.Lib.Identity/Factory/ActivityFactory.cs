@@ -10,11 +10,11 @@ namespace Bhbk.Lib.Identity.Factory
     //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
     public class ActivityFactory<T> : AppActivity
     {
-        public ActivityFactory(AppActivity audience)
+        public ActivityFactory(AppActivity activity)
         {
-            this.Id = audience.Id;
-            this.ActorId = audience.ActorId;
-            this.ActivityType = audience.ActivityType;
+            this.Id = activity.Id;
+            this.ActorId = activity.ActorId;
+            this.ActivityType = activity.ActivityType;
             this.TableName = TableName;
             this.KeyValues = KeyValues;
             this.OriginalValues = OriginalValues;
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class AppActivityEntry
+    public class ActivityCreate
     {
         public EntityEntry Entry { get; }
         public Guid ActorId { get; set; }
@@ -49,13 +49,14 @@ namespace Bhbk.Lib.Identity.Factory
         public Dictionary<string, object> CurrentValues { get; } = new Dictionary<string, object>();
         public List<PropertyEntry> TemporaryProperties { get; } = new List<PropertyEntry>();
         public bool HasTemporaryProperties => TemporaryProperties.Any();
+        public bool Immutable { get; set; }
 
-        public AppActivityEntry(EntityEntry entry)
+        public ActivityCreate(EntityEntry entry)
         {
             Entry = entry;
         }
 
-        public AppActivity ToValues()
+        public AppActivity Devolve()
         {
             var entry = new AppActivity();
 
@@ -67,7 +68,7 @@ namespace Bhbk.Lib.Identity.Factory
             entry.OriginalValues = OriginalValues.Count == 0 ? null : JsonConvert.SerializeObject(OriginalValues);
             entry.CurrentValues = CurrentValues.Count == 0 ? null : JsonConvert.SerializeObject(CurrentValues);
             entry.Created = DateTime.Now;
-            entry.Immutable = false;
+            entry.Immutable = Immutable;
 
             return entry;
         }

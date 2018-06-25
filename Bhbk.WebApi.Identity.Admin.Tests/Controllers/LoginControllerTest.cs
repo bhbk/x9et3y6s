@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -157,14 +158,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             TestData.Destroy();
             TestData.CreateTestData();
+            TestData.CreateTestDataRandom();
 
+            ushort size = 3;
             var TestController = new LoginController(TestIoC, TestTasks);
+            var filter = new UrlFilter(size, 1, "loginprovider", "ascending");
 
-            var result = await TestController.GetLogins() as OkObjectResult;
+            var result = await TestController.GetLogins(filter) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<LoginResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.LoginMgmt.Store.Get().Count());
+            data.Count().Should().Be(size);
         }
         
         [TestMethod]
@@ -180,6 +184,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var result = await TestController.GetLoginUsers(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
+
+            data.Count().Should().Be(TestIoC.LoginMgmt.Store.GetUsers(login.Id).Count());
         }
 
         [TestMethod]

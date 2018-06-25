@@ -266,6 +266,7 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(result);
         }
 
+        [Obsolete]
         public override Task<IList<string>> GetRolesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = (IList<string>)_context.AppRole
@@ -276,6 +277,23 @@ namespace Bhbk.Lib.Identity.Stores
                 })
                 .Where(x => x.UserId == user.Id)
                 .Select(x => x.RoleName.ToString())
+                .Distinct()
+                .ToList();
+
+            return Task.FromResult(result);
+        }
+
+        [Obsolete]
+        public Task<IList<string>> GetRolesReturnIdAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var result = (IList<string>)_context.AppRole
+                .Join(_context.AppUserRole, x => x.Id, y => y.RoleId, (role1, user1) => new {
+                    UserId = user1.UserId,
+                    RoleId = role1.Id,
+                    RoleName = role1.Name
+                })
+                .Where(x => x.UserId == user.Id)
+                .Select(x => x.RoleId.ToString())
                 .Distinct()
                 .ToList();
 

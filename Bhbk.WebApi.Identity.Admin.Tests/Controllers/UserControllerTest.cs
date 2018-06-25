@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -138,14 +139,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             TestData.Destroy();
             TestData.CreateTestData();
+            TestData.CreateTestDataRandom();
 
+            ushort size = 3;
             var TestController = new UserController(TestIoC, TestTasks);
+            var filter = new UrlFilter(size, 1, "email", "ascending");
 
-            var result = await TestController.GetUsers() as OkObjectResult;
+            var result = await TestController.GetUsers(filter) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.UserMgmt.Store.Get().Count());
+            data.Count().Should().Be(size);
         }
 
         [TestMethod]
@@ -179,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<AudienceResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.RoleMgmt.Store.Get().Count());
+            data.Count().Should().Be((await TestIoC.UserMgmt.Store.GetAudiencesAsync(user)).Count());
         }
 
         [TestMethod]
@@ -196,7 +200,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<LoginResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.LoginMgmt.Store.Get().Count());
+            data.Count().Should().Be((await TestIoC.UserMgmt.Store.GetLoginsAsync(user)).Count());
         }
 
         [TestMethod]
@@ -213,7 +217,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.RoleMgmt.Store.Get().Count());
+            data.Count().Should().Be((await TestIoC.UserMgmt.Store.GetRolesReturnIdAsync(user)).Count());
         }
 
         [TestMethod]

@@ -59,11 +59,6 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.FindByNameAsync(roleName);
         }
 
-        public async Task<IList<AppRole>> GetListAsync()
-        {
-            return Store.Get();
-        }
-
         public async Task<IList<AppUser>> GetUsersListAsync(AppRole role)
         {
             if (!Store.Exists(role.Id))

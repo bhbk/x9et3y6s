@@ -45,11 +45,6 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.FindByName(audienceName);
         }
 
-        public async Task<IList<AppAudience>> GetListAsync()
-        {
-            return Store.Get();
-        }
-
         public async Task<IList<AppRole>> GetRoleListAsync(Guid audienceId)
         {
             IList<AppRole> result = new List<AppRole>();

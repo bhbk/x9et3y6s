@@ -1,6 +1,7 @@
 ﻿CREATE TABLE [dbo].[AppRole] (
     [Id]               UNIQUEIDENTIFIER NOT NULL,
     [AudienceId]       UNIQUEIDENTIFIER NOT NULL,
+    [ActorId]          UNIQUEIDENTIFIER NULL,
     [Name]             NVARCHAR (256)   NOT NULL,
     [NormalizedName]   NVARCHAR (256)   NULL,
     [Description]      NCHAR (10)       NULL,
@@ -12,6 +13,8 @@
     CONSTRAINT [PK_AppRole_ID] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_AppRole_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[AppAudience] ([Id]) ON UPDATE CASCADE
 );
+
+
 
 
 GO

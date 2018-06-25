@@ -45,11 +45,6 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.FindByName(loginName);
         }
 
-        public async Task<IList<AppLogin>> GetListAsync()
-        {
-            return Store.Get();
-        }
-
         public async Task<IList<AppUser>> GetUsersListAsync(Guid loginId)
         {
             if (!Store.Exists(loginId))

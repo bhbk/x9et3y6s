@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -67,6 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(BaseLib.Statics.MsgLoginAlreadyExists);
 
             var create = new LoginFactory<LoginCreate>(model);
+
             var result = await IoC.LoginMgmt.CreateAsync(create.Devolve());
 
             return Ok(create.Evolve());
@@ -107,13 +110,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetLogins()
+        public async Task<IActionResult> GetLogins([FromQuery] UrlFilter filter = null)
         {
-            var result = new List<LoginResult>();
-            var logins = await IoC.LoginMgmt.GetListAsync();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            foreach (AppLogin entry in logins)
-                result.Add(new LoginFactory<AppLogin>(entry).Evolve());
+            else if (filter == null)
+                filter = new UrlFilter(20, 1, "loginprovider", "ascending");
+
+            var logins = IoC.LoginMgmt.Store.Get().AsQueryable()
+                .OrderBy(filter.OrderBy + " " + filter.Sort)
+                .Skip(Convert.ToInt32((filter.PageNum - 1) * filter.PageSize))
+                .Take(Convert.ToInt32(filter.PageSize));
+
+            var result = logins.Select(x => new LoginFactory<AppLogin>(x).Evolve()).ToList();
 
             return Ok(result);
         }
@@ -126,11 +136,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            var result = new List<UserResult>();
             var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
 
-            foreach (AppUser entry in users)
-                result.Add(new UserFactory<AppUser>(entry).Evolve());
+            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve()).ToList();
 
             return Ok(result);
         }

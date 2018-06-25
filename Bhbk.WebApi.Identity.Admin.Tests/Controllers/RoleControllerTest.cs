@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
@@ -142,14 +143,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             TestData.Destroy();
             TestData.CreateTestData();
+            TestData.CreateTestDataRandom();
 
+            ushort size = 3;
             var TestController = new RoleController(TestIoC, TestTasks);
+            var filter = new UrlFilter(size, 1, "name", "ascending");
 
-            var result = await TestController.GetRoles() as OkObjectResult;
+            var result = await TestController.GetRoles(filter) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.RoleMgmt.Store.Get().Count());
+            data.Count().Should().Be(size);
         }
 
         [TestMethod]
@@ -166,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
 
-            data.Count().Should().Equals(TestIoC.UserMgmt.Store.Get().Count());
+            data.Count().Should().Be(TestIoC.RoleMgmt.Store.GetUsersAsync(role).Count());
         }
 
         [TestMethod]

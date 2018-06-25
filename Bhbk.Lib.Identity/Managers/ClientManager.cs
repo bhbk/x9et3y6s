@@ -45,11 +45,6 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.FindByName(clientName);
         }
 
-        public async Task<IList<AppClient>> GetListAsync()
-        {
-            return Store.Get();
-        }
-
         public async Task<IList<AppAudience>> GetAudiencesAsync(Guid clientId)
         {
             if (!Store.Exists(clientId))

@@ -1,6 +1,7 @@
 ﻿CREATE TABLE [dbo].[AppRoleClaim] (
     [Id]             INT              IDENTITY (1000, 1) NOT NULL,
     [RoleId]         UNIQUEIDENTIFIER NOT NULL,
+    [ActorId]        UNIQUEIDENTIFIER NULL,
     [ClaimType]      VARCHAR (MAX)    NOT NULL,
     [ClaimValue]     VARCHAR (MAX)    NOT NULL,
     [ClaimTypeValue] VARCHAR (MAX)    NULL,
@@ -10,6 +11,8 @@
     CONSTRAINT [PK_AppRoleClaim] PRIMARY KEY CLUSTERED ([Id] ASC, [RoleId] ASC),
     CONSTRAINT [FK_AppRoleClaim_RoleID] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[AppRole] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 GO

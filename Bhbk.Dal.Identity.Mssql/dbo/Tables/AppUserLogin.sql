@@ -1,6 +1,7 @@
 ﻿CREATE TABLE [dbo].[AppUserLogin] (
     [UserId]              UNIQUEIDENTIFIER NOT NULL,
     [LoginId]             UNIQUEIDENTIFIER NOT NULL,
+    [ActorId]             UNIQUEIDENTIFIER NULL,
     [LoginProvider]       NVARCHAR (256)   NOT NULL,
     [ProviderDisplayName] NVARCHAR (256)   NOT NULL,
     [ProviderDescription] NVARCHAR (256)   NULL,
@@ -13,6 +14,8 @@
     CONSTRAINT [FK_AppUserLogin_LoginID] FOREIGN KEY ([LoginId]) REFERENCES [dbo].[AppLogin] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_AppUserLogin_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AppUser] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 GO

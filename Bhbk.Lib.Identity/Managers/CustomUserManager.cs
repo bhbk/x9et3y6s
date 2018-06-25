@@ -304,11 +304,6 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.GetEmailAsync(user);
         }
 
-        public async Task<IList<AppUser>> GetListAsync()
-        {
-            return Store.Get();
-        }
-
         public async Task<string> GetPhoneNumberAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
@@ -347,6 +342,15 @@ namespace Bhbk.Lib.Identity.Managers
                 throw new ArgumentNullException();
 
             return await Store.GetRolesAsync(user);
+        }
+
+        [Obsolete]
+        public async Task<IList<string>> GetRolesReturnIdAsync(AppUser user)
+        {
+            if (!Store.Exists(user.Id))
+                throw new ArgumentNullException();
+
+            return await Store.GetRolesReturnIdAsync(user);
         }
 
         public override async Task<bool> GetTwoFactorEnabledAsync(AppUser user)

@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
         private readonly IConfigurationRoot _cb;
         private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
-        private readonly int _delay, _keep;
+        private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
         public MaintainActivityTask(IIdentityContext ioc)
@@ -38,7 +38,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 .Build();
 
             _delay = int.Parse(_cb["Tasks:MaintainActivity:PollingDelay"]);
-            _keep = int.Parse(_cb["Tasks:MaintainActivity:RetentionPeriod"]);
+            _auditable = int.Parse(_cb["Tasks:MaintainActivity:HoldAuditable"]);
+            _transient = int.Parse(_cb["Tasks:MaintainActivity:HoldTransient"]);
             _ioc = ioc;
 
             var statusMsg = typeof(MaintainActivityTask).Name + " not run yet.";
@@ -58,7 +59,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
 
                     var expired = _ioc.UserMgmt.Store.Context.AppActivity
-                        .Where(x => x.Created.AddMinutes(_keep) < DateTime.Now && x.Immutable == false);
+                        .Where(x => (x.Created.AddMinutes(_transient) < DateTime.Now && x.Immutable == false)
+                            || (x.Created.AddMinutes(_auditable) < DateTime.Now && x.Immutable == true));
+
                     var expiredCount = expired.Count();
 
                     if (expired.Any())
