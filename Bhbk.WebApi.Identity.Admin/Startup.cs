@@ -87,11 +87,15 @@ namespace Bhbk.WebApi.Identity.Admin
                 };
             });
             sc.AddMvc();
-            sc.AddMvc().AddControllersAsServices();
-            sc.AddMvc().AddJsonOptions(options =>
+            sc.AddMvc().AddMvcOptions(binder =>
             {
-                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                binder.UseCustomPagingModelBinder();
+            });
+            sc.AddMvc().AddControllersAsServices();
+            sc.AddMvc().AddJsonOptions(json =>
+            {
+                json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {

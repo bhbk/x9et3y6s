@@ -87,10 +87,10 @@ namespace Bhbk.WebApi.Identity.Me
             });
             sc.AddMvc();
             sc.AddMvc().AddControllersAsServices();
-            sc.AddMvc().AddJsonOptions(options =>
+            sc.AddMvc().AddJsonOptions(json =>
             {
-                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {

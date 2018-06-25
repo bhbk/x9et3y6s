@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -141,9 +141,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             TestData.CreateTestData();
             TestData.CreateTestDataRandom();
 
-            ushort size = 3;
             var TestController = new AudienceController(TestIoC, TestTasks);
-            var filter = new UrlFilter(size, 1, "name", "ascending");
+            ushort size = 3;
+            var filter = new CustomPagingModel("name", size, 1);
 
             var result = await TestController.GetAudiences(filter) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -79,17 +79,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetClients([FromQuery] UrlFilter filter = null)
+        public async Task<IActionResult> GetClients([FromQuery] CustomPagingModel filter)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            else if (filter == null)
-                filter = new UrlFilter(20, 1, "name", "ascending");
-
             var clients = IoC.ClientMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy + " " + filter.Sort)
-                .Skip(Convert.ToInt32((filter.PageNum - 1) * filter.PageSize))
+                .OrderBy(filter.OrderBy)
+                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
                 .Take(Convert.ToInt32(filter.PageSize));
 
             var result = clients.Select(x => new ClientFactory<AppClient>(x).Evolve()).ToList();

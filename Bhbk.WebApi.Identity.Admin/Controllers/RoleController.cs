@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -104,17 +103,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetRoles([FromQuery] UrlFilter filter = null)
+        public async Task<IActionResult> GetRoles([FromQuery] CustomPagingModel filter)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            else if (filter == null)
-                filter = new UrlFilter(20, 1, "name", "ascending");
-
             var roles = IoC.RoleMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy + " " + filter.Sort)
-                .Skip(Convert.ToInt32((filter.PageNum - 1) * filter.PageSize))
+                .OrderBy(filter.OrderBy)
+                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
                 .Take(Convert.ToInt32(filter.PageSize));
 
             var result = roles.Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
