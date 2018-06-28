@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AddEnvironmentVariables()
                 .Build();
 
-            var ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
+            var ioc = new IdentityContext(new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlServer(_cb["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging());
 
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = CustomAudienceValidator.MultipleAudience,
+                    AudienceValidator = Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
@@ -124,72 +124,64 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseAuthentication();
             app.UseMvc();
 
-            app.UseMiddleware<AccessTokenV1Provider>();
-            app.UseMiddleware<AccessTokenV2Provider>();
-            app.UseMiddleware<AuthorizationCodeV1Provider>();
-            app.UseMiddleware<AuthorizationCodeV2Provider>();
-            app.UseMiddleware<ClientCredentialsV1Provider>();
-            app.UseMiddleware<ClientCredentialsV2Provider>();
-            app.UseMiddleware<RefreshTokenV1Provider>();
-            app.UseMiddleware<RefreshTokenV2Provider>();
+            //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
 
-            ////https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
+            app.UseMiddleware<AccessTokenProvider>();
+            app.UseMiddleware<AuthorizationCodeProvider>();
+            app.UseMiddleware<ClientCredentialsProvider>();
+            app.UseMiddleware<RefreshTokenProvider>();
+
             //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
-            //        x.UseAccessTokenV1Provider();
+            //        x.UseAccessTokenProvider();
+            //    });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseAccessTokenProvider();
             //    });
 
             //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
-            //        x.UseAuthorizationCodeV1Provider();
+            //        x.UseAuthorizationCodeProvider();
+            //    });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
+            //    && context.Request.Method.Equals("POST")
+            //    && context.Request.HasFormContentType, x =>
+            //    {
+            //        x.UseAuthorizationCodeProvider();
             //    });
 
             //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/client", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
-            //        x.UseClientCredentialsV1Provider();
+            //        x.UseClientCredentialsProvider();
             //    });
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
+            //   && context.Request.Method.Equals("POST")
+            //   && context.Request.HasFormContentType, x =>
+            //   {
+            //       x.UseClientCredentialsProvider();
+            //   });
 
             //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
-            //        x.UseRefreshTokenV1Provider();
+            //        x.UseRefreshTokenProvider();
             //    });
-
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
-            //    && context.Request.Method.Equals("POST")
-            //    && context.Request.HasFormContentType, x =>
-            //    {
-            //        x.UseAccessTokenV2Provider();
-            //    });
-
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
-            //    && context.Request.Method.Equals("POST")
-            //    && context.Request.HasFormContentType, x =>
-            //    {
-            //        x.UseAuthorizationCodeV2Provider();
-            //    });
-
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
-            //   && context.Request.Method.Equals("POST")
-            //   && context.Request.HasFormContentType, x =>
-            //   {
-            //       x.UseClientCredentialsV2Provider();
-            //   });
-
             //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
-            //        x.UseRefreshTokenV2Provider();
+            //        x.UseRefreshTokenProvider();
             //    });
-
         }
     }
 }

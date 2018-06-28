@@ -110,17 +110,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetLogins([FromQuery] CustomPagingModel filter)
+        public async Task<IActionResult> GetLogins([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var logins = IoC.LoginMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy)
-                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
-                .Take(Convert.ToInt32(filter.PageSize));
+            var logins = IoC.LoginMgmt.Store.Get()
+                .OrderBy(model.OrderBy)
+                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
+                .Take(Convert.ToInt32(model.PageSize));
 
-            var result = logins.Select(x => new LoginFactory<AppLogin>(x).Evolve()).ToList();
+            var result = logins.Select(x => new LoginFactory<AppLogin>(x).Evolve());
 
             return Ok(result);
         }
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve()).ToList();
+            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve());
 
             return Ok(result);
         }

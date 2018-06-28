@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public class CustomClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
+    public class ClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
     {
-        private readonly UserManager<AppUser> _ioc;
+        private readonly UserManager<AppUser> _userMgmt;
         private readonly ConfigManager _conf;
 
-        public CustomClaimsProvider(UserManager<AppUser> ioc, ConfigManager conf)
+        public ClaimsProvider(UserManager<AppUser> userMgmt, ConfigManager conf)
         {
-            if (ioc == null)
+            if (userMgmt == null)
                 throw new ArgumentNullException();
 
-            _ioc = ioc;
+            _userMgmt = userMgmt;
             _conf = conf;
         }
 
@@ -27,10 +27,10 @@ namespace Bhbk.Lib.Identity.Infrastructure
         {
             var claims = new List<Claim>();
 
-            foreach (string role in await _ioc.GetRolesAsync(user))
+            foreach (string role in await _userMgmt.GetRolesAsync(user))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            foreach (Claim claim in await _ioc.GetClaimsAsync(user))
+            foreach (Claim claim in await _userMgmt.GetClaimsAsync(user))
                 claims.Add(claim);
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));

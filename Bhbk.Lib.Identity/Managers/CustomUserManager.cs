@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Managers
     public partial class CustomUserManager : UserManager<AppUser>
     {
         public readonly ConfigManager Config;
-        public readonly CustomClaimsProvider ClaimProvider;
-        public readonly CustomPasswordHasher PasswordHasher;
-        public readonly CustomPasswordValidator PasswordValidator;
-        public readonly CustomTotpTokenProvider TokenProvider;
+        public readonly ClaimsProvider ClaimProvider;
+        public readonly PasswordHasher PasswordHasher;
+        public readonly PasswordValidator PasswordValidator;
+        public readonly TotpTokenProvider TokenProvider;
         public readonly CustomUserStore Store;
-        public readonly CustomUserValidator UserValidator;
+        public readonly UserValidator UserValidator;
 
         public CustomUserManager(CustomUserStore store,
             IOptions<IdentityOptions> options = null,
@@ -40,19 +40,19 @@ namespace Bhbk.Lib.Identity.Managers
 
             Store = store;
             Config = new ConfigManager();
-            ClaimProvider = new CustomClaimsProvider(this, Config);
-            PasswordHasher = new CustomPasswordHasher();
-            PasswordValidator = new CustomPasswordValidator();
+            ClaimProvider = new ClaimsProvider(this, Config);
+            PasswordHasher = new PasswordHasher();
+            PasswordValidator = new PasswordValidator();
 
             //create user token provider...
             TokenProvider =
-                new CustomTotpTokenProvider
+                new TotpTokenProvider
                 {
                     OtpTokenSize = Config.Tweaks.DefaultsAuhthorizationCodeLength,
                     OtpTokenTimespan = Config.Tweaks.DefaultsAuhthorizationCodeLife
                 };
 
-            UserValidator = new CustomUserValidator();
+            UserValidator = new UserValidator();
         }
 
         public override async Task<IdentityResult> AccessFailedAsync(AppUser user)

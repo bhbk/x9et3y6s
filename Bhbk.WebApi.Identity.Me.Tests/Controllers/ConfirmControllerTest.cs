@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_ChangeEmail_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new ConfirmController(TestIoC, TestTasks);
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_ChangeEmail_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new ConfirmController(TestIoC, TestTasks);
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_ChangePassword_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_ChangePassword_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_ChangePhone_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_ChangePhone_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string phone = "32221110000";
             var controller = new ConfirmController(TestIoC, TestTasks);
@@ -194,7 +194,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_SetEmail_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -213,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_SetEmail_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -231,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_SetPassword_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -250,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_SetPassword_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_SetPhoneNumber_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Confirm_SetPhoneNumber_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();

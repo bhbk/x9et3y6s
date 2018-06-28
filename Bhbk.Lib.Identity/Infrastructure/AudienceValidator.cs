@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public class CustomAudienceValidator
+    public class AudienceValidator
     {
         public static bool MultipleAudience(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {

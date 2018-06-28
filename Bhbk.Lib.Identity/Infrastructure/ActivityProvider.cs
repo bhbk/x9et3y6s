@@ -4,7 +4,7 @@ using System;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public abstract class CustomActivityProvider
+    public abstract class ActivityProvider
     {
 
     }
@@ -19,12 +19,12 @@ namespace Bhbk.Lib.Identity.Infrastructure
         StsRefresh
     }
 
-    public class CustomActivityProvider<TEntity> : CustomActivityProvider
-        where TEntity : class, IActivityEntry, new()
+    public class ActivityProvider<TEntity> : ActivityProvider
+        where TEntity : class, IGenericEntry, new()
     {
         private readonly DbContext _context;
 
-        public CustomActivityProvider(DbContext context)
+        public ActivityProvider(DbContext context)
         {
             _context = context;
         }

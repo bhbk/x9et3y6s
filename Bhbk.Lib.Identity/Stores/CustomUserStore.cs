@@ -159,17 +159,17 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(_context.AppUserRefresh.Where(x => x.Id == tokenId).SingleOrDefault());
         }
 
-        public IEnumerable<AppUserRefresh> FindRefreshTokensAsync()
+        public IQueryable<AppUserRefresh> FindRefreshTokensAsync()
         {
             return _context.AppUserRefresh.Where(x => x.ExpiresUtc == DateTime.UtcNow);
         }
 
-        public IList<AppUser> Get()
+        public IQueryable<AppUser> Get()
         {
-            return _context.AppUser.ToList();
+            return _context.AppUser.AsQueryable();
         }
 
-        public IEnumerable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
+        public IQueryable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
             Func<IQueryable<AppUser>, IOrderedQueryable<AppUser>> orderBy = null, string includes = "")
         {
             IQueryable<AppUser> query = _context.AppUser.AsQueryable();
@@ -181,16 +181,16 @@ namespace Bhbk.Lib.Identity.Stores
                 query = query.Include(include);
 
             if (orderBy != null)
-                return orderBy(query).ToList();
+                return orderBy(query);
 
             else
-                return query.ToList();
+                return query;
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             IList<Claim> result = new List<Claim>();
-            var map = _context.AppUserClaim.Where(x => x.UserId == user.Id).ToList();
+            var map = _context.AppUserClaim.Where(x => x.UserId == user.Id);
 
             if (map == null)
                 throw new InvalidOperationException();

@@ -37,7 +37,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_cb["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new CustomIdentityContext(builder);
+                Statics.IoC = new IdentityContext(builder);
 
                 if (Generate)
                 {

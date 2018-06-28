@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://www.stevejgordon.co.uk/asp-net-core-identity-token-providers
     //https://blog.kraken.com/post/291/the-importance-of-two-factor-authentication/
 
-    public class CustomTotpTokenProvider : TotpSecurityStampBasedTokenProvider<AppUser>
+    public class TotpTokenProvider : TotpSecurityStampBasedTokenProvider<AppUser>
     {
         public int OtpTokenTimespan;
         public int OtpTokenSize;

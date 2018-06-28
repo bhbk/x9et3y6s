@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await IoC.UserMgmt.GetLoginsAsync(user);
 
             var result = IoC.LoginMgmt.Store.Get(x => logins.Contains(x.Id.ToString()))
-                .Select(x => new LoginFactory<AppLogin>(x).Evolve()).ToList();
+                .Select(x => new LoginFactory<AppLogin>(x).Evolve());
 
             return Ok(result);
         }
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = await IoC.UserMgmt.GetAudiencesAsync(user);
 
             var result = IoC.AudienceMgmt.Store.Get(x => audiences.Contains(x.Id.ToString()))
-                .Select(x => new AudienceFactory<AppAudience>(x).Evolve()).ToList();
+                .Select(x => new AudienceFactory<AppAudience>(x).Evolve());
 
             return Ok(result);
         }
@@ -143,23 +143,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await IoC.UserMgmt.GetRolesReturnIdAsync(user);
 
             var result = IoC.RoleMgmt.Store.Get(x => roles.Contains(x.Id.ToString()))
-                .Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
+                .Select(x => new RoleFactory<AppRole>(x).Evolve());
 
             return Ok(result);
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery] CustomPagingModel filter)
+        public async Task<IActionResult> GetUsers([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var users = IoC.UserMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy)
-                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
-                .Take(Convert.ToInt32(filter.PageSize));
+            var users = IoC.UserMgmt.Store.Get()
+                .OrderBy(model.OrderBy)
+                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
+                .Take(Convert.ToInt32(model.PageSize));
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve()).ToList();
+            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve());
 
             return Ok(result);
         }

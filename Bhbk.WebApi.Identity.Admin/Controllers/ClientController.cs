@@ -79,17 +79,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetClients([FromQuery] CustomPagingModel filter)
+        public async Task<IActionResult> GetClients([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var clients = IoC.ClientMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy)
-                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
-                .Take(Convert.ToInt32(filter.PageSize));
+            var clients = IoC.ClientMgmt.Store.Get()
+                .OrderBy(model.OrderBy)
+                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
+                .Take(Convert.ToInt32(model.PageSize));
 
-            var result = clients.Select(x => new ClientFactory<AppClient>(x).Evolve()).ToList();
+            var result = clients.Select(x => new ClientFactory<AppClient>(x).Evolve());
 
             return Ok(result);
         }

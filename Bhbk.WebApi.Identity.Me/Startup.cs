@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me
                 .AddEnvironmentVariables()
                 .Build();
 
-            var ioc = new CustomIdentityContext(new DbContextOptionsBuilder<AppDbContext>()
+            var ioc = new IdentityContext(new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlServer(_cb["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging());
 
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Me
                     ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = CustomAudienceValidator.MultipleAudience,
+                    AudienceValidator = Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,

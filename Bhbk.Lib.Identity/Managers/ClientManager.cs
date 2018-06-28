@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Managers
@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.FindByName(clientName);
         }
 
-        public async Task<IList<AppAudience>> GetAudiencesAsync(Guid clientId)
+        public async Task<IQueryable<AppAudience>> GetAudiencesAsync(Guid clientId)
         {
             if (!Store.Exists(clientId))
                 throw new InvalidOperationException();

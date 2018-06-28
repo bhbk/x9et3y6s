@@ -18,7 +18,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests
         protected static IIdentityContext TestIoC;
         protected static Microsoft.Extensions.Hosting.IHostedService[] TestTasks;
         protected static DatasetHelper TestData;
-        protected static StsV2Helper TestStsV2;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -27,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            var ioc = new CustomIdentityContext(options);
+            var ioc = new IdentityContext(options);
 
             sc.AddSingleton<IIdentityContext>(ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(ioc));

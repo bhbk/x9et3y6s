@@ -63,12 +63,12 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppRole.Any(x => x.Name == roleName);
         }
 
-        public IList<AppRole> Get()
+        public IQueryable<AppRole> Get()
         {
-            return _context.AppRole.ToList();
+            return _context.AppRole.AsQueryable();
         }
 
-        public IEnumerable<AppRole> Get(Expression<Func<AppRole, bool>> filter = null,
+        public IQueryable<AppRole> Get(Expression<Func<AppRole, bool>> filter = null,
             Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orderBy = null, string includes = "")
         {
             IQueryable<AppRole> query = _context.AppRole.AsQueryable();
@@ -80,16 +80,16 @@ namespace Bhbk.Lib.Identity.Stores
                 query = query.Include(include);
 
             if (orderBy != null)
-                return orderBy(query).ToList();
+                return orderBy(query);
 
             else
-                return query.ToList();
+                return query;
         }
 
         public IList<AppUser> GetUsersAsync(AppRole role)
         {
             IList<AppUser> result = new List<AppUser>();
-            var list = _context.AppUserRole.Where(x => x.RoleId == role.Id).ToList();
+            var list = _context.AppUserRole.Where(x => x.RoleId == role.Id).AsQueryable();
 
             if (list == null)
                 throw new InvalidOperationException();

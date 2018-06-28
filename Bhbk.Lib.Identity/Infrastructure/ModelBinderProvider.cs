@@ -7,10 +7,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public class CustomPagingModel
+    public class PagingModel
     {
         private int _pageSizeMax = 100;
 
@@ -23,7 +24,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         [Required]
         public int? PageSize { get; private set; }
 
-        public CustomPagingModel(string orderBy, int pageSize, int pageNumber)
+        public PagingModel(string orderBy, int pageSize, int pageNumber)
         {
             PageNumber = pageNumber;
 
@@ -37,13 +38,13 @@ namespace Bhbk.Lib.Identity.Infrastructure
     }
 
     //https://www.dotnetcurry.com/aspnet-mvc/1368/aspnet-core-mvc-custom-model-binding
-    public class CustomPagingModelBinder : IModelBinder
+    public class PagingModelBinder : IModelBinder
     {
         private readonly IModelBinder _binder;
 
-        public CustomPagingModelBinder() { }
+        public PagingModelBinder() { }
 
-        public CustomPagingModelBinder(IModelBinder binder)
+        public PagingModelBinder(IModelBinder binder)
         {
             if (binder == null)
                 throw new ArgumentNullException(nameof(binder));
@@ -56,29 +57,26 @@ namespace Bhbk.Lib.Identity.Infrastructure
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            var orderByValue = "orderBy";
-            var pageSizeValue = "pageSize";
-            var pageNumberValue = "pageNumber";
             var errorMsg = "null";
 
-            var orderBy = context.ValueProvider.GetValue(orderByValue);
+            var orderBy = context.ValueProvider.GetValue(BaseLib.Statics.GetOrderBy);
 
             if (orderBy == ValueProviderResult.None)
-                context.ModelState.AddModelError(orderByValue, errorMsg);
+                context.ModelState.AddModelError(BaseLib.Statics.GetOrderBy, errorMsg);
 
-            var pageSize = context.ValueProvider.GetValue(pageSizeValue);
+            var pageSize = context.ValueProvider.GetValue(BaseLib.Statics.GetPageSize);
 
             if (pageSize == ValueProviderResult.None)
-                context.ModelState.AddModelError(pageSizeValue, errorMsg);
+                context.ModelState.AddModelError(BaseLib.Statics.GetPageSize, errorMsg);
 
-            var pageNumber = context.ValueProvider.GetValue(pageNumberValue);
+            var pageNumber = context.ValueProvider.GetValue(BaseLib.Statics.GetPageNumber);
 
             if (pageNumber == ValueProviderResult.None)
-                context.ModelState.AddModelError(pageNumberValue, errorMsg);
+                context.ModelState.AddModelError(BaseLib.Statics.GetPageNumber, errorMsg);
 
             if (context.ModelState.ErrorCount == 0)
                 context.Result = ModelBindingResult.Success(
-                    new CustomPagingModel(orderBy.FirstValue, Convert.ToInt32(pageSize.FirstValue), Convert.ToInt32(pageNumber.FirstValue)));
+                    new PagingModel(orderBy.FirstValue, Convert.ToInt32(pageSize.FirstValue), Convert.ToInt32(pageNumber.FirstValue)));
 
             else if (context.ModelState.ErrorCount > 0)
                 context.Result = ModelBindingResult.Failed();
@@ -87,13 +85,13 @@ namespace Bhbk.Lib.Identity.Infrastructure
         }
     }
 
-    public class CustomPagingModelBinderProvider : IModelBinderProvider
+    public class ModelBinderProvider : IModelBinderProvider
     {
         private readonly IModelBinderProvider _binder;
 
-        public CustomPagingModelBinderProvider() { }
+        public ModelBinderProvider() { }
 
-        public CustomPagingModelBinderProvider(IModelBinderProvider binder)
+        public ModelBinderProvider(IModelBinderProvider binder)
         {
             if (binder == null)
                 throw new ArgumentNullException(nameof(binder));
@@ -106,8 +104,8 @@ namespace Bhbk.Lib.Identity.Infrastructure
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Metadata.IsComplexType && context.Metadata.ModelType == typeof(CustomPagingModel))
-                return new CustomPagingModelBinder();
+            if (context.Metadata.IsComplexType && context.Metadata.ModelType == typeof(PagingModel))
+                return new PagingModelBinder();
 
             //if (context.Metadata.IsComplexType && context.Metadata.ModelType == typeof(CustomPagingModel))
             //    return new CustomPagingModelBinder(new ComplexTypeModelBinder(context.Metadata.Properties.ToDictionary(x => x, context.CreateBinder)));
@@ -118,7 +116,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
     public static class MvcOptionsExtensions
     {
-        public static void UseCustomPagingModelBinder(this MvcOptions options)
+        public static void UseMyModelBinders(this MvcOptions options)
         {
             var binder = options.ModelBinderProviders.FirstOrDefault(x => x.GetType() == typeof(ComplexTypeModelBinderProvider));
 
@@ -127,7 +125,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             var index = options.ModelBinderProviders.IndexOf(binder);
 
-            options.ModelBinderProviders.Insert(index, new CustomPagingModelBinderProvider());
+            options.ModelBinderProviders.Insert(index, new ModelBinderProvider());
         }
     }
 }

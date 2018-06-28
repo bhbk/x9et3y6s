@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Me_Diagnostic_GetStatus_Quotes_Success()
+        public void Api_Me_Diag_GetStatus_Quotes_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Me_Diagnostic_GetVersion_Success()
+        public void Api_Me_Diag_GetVersion_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 

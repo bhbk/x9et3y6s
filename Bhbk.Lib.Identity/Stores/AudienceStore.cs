@@ -65,12 +65,12 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppAudience.Where(x => x.Name == name).SingleOrDefault();
         }
 
-        public IList<AppAudience> Get()
+        public IQueryable<AppAudience> Get()
         {
-            return _context.AppAudience.ToList();
+            return _context.AppAudience.AsQueryable();
         }
 
-        public IEnumerable<AppAudience> Get(Expression<Func<AppAudience, bool>> filter = null,
+        public IQueryable<AppAudience> Get(Expression<Func<AppAudience, bool>> filter = null,
             Func<IQueryable<AppAudience>, IOrderedQueryable<AppAudience>> orderBy = null, string includes = "")
         {
             IQueryable<AppAudience> query = _context.AppAudience.AsQueryable();
@@ -82,15 +82,15 @@ namespace Bhbk.Lib.Identity.Stores
                 query = query.Include(include);
 
             if (orderBy != null)
-                return orderBy(query).ToList();
+                return orderBy(query);
 
             else
-                return query.ToList();
+                return query;
         }
 
-        public IList<AppRole> GetRoles(Guid key)
+        public IQueryable<AppRole> GetRoles(Guid key)
         {
-            return _context.AppRole.Where(x => x.AudienceId == key).ToList();
+            return _context.AppRole.Where(x => x.AudienceId == key).AsQueryable();
         }
 
         public void LoadCollection(AppAudience entity, string collection)

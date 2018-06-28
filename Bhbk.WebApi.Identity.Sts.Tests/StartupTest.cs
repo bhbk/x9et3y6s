@@ -18,8 +18,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
         protected static IIdentityContext TestIoC;
         protected static Microsoft.Extensions.Hosting.IHostedService[] TestTasks;
         protected static DatasetHelper TestData;
-        protected static StsV1Helper TestStsV1;
-        protected static StsV2Helper TestStsV2;
+        protected static EndpointHelper TestEndpoints;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -28,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            var ioc = new CustomIdentityContext(options);
+            var ioc = new IdentityContext(options);
 
             sc.AddSingleton<IIdentityContext>(ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(ioc));
@@ -38,8 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
             TestIoC = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
             TestTasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
             TestData = new DatasetHelper(TestIoC);
-            TestStsV1 = new StsV1Helper();
-            TestStsV2 = new StsV2Helper();
+            TestEndpoints = new EndpointHelper();
         }
 
         public override void ConfigureServices(IServiceCollection sc)

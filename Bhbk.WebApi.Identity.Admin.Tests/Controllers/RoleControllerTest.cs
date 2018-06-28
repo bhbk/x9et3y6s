@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
@@ -8,8 +8,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -30,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_AddToUser_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -58,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_Delete_Fail_Immutable()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -79,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_Create_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -105,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_Delete_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -125,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_Get_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -139,19 +143,96 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_Role_GetList_Fail_Auth()
+        {
+            TestData.Destroy();
+            TestData.CreateDefault();
+            TestData.CreateRandom(10);
+
+            var TestController = new RoleController(TestIoC, TestTasks);
+
+            var request = _owin.CreateClient();
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32));
+            request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            string order = "name";
+            ushort size = 3;
+            ushort page = 1;
+
+            var response = await request.GetAsync("/role/v1?"
+                + BaseLib.Statics.GetOrderBy + "=" + order + "&"
+                + BaseLib.Statics.GetPageSize + "=" + size.ToString() + "&"
+                + BaseLib.Statics.GetPageNumber + "=" + page.ToString());
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_Role_GetList_Fail_ParamInvalid()
+        {
+            TestData.Destroy();
+            TestData.CreateDefault();
+            TestData.CreateRandom(10);
+
+            var TestController = new RoleController(TestIoC, TestTasks);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+
+            var audiences = new List<AppAudience>();
+            audiences.Add(audience);
+
+            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+
+            var request = _owin.CreateClient();
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
+            request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            string order = "name";
+
+            var response = await request.GetAsync("/role/v1?"
+                + BaseLib.Statics.GetOrderBy + "=" + order);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
         public async Task Api_Admin_Role_GetList_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
-            TestData.CreateTestDataRandom();
+            TestData.CreateDefault();
+            TestData.CreateRandom(10);
 
             var TestController = new RoleController(TestIoC, TestTasks);
-            ushort size = 3;
-            var filter = new CustomPagingModel("name", size, 1);
+            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
 
-            var result = await TestController.GetRoles(filter) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<RoleResult>>().Subject;
+            var audiences = new List<AppAudience>();
+            audiences.Add(audience);
+
+            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+
+            var request = _owin.CreateClient();
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
+            request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            string order = "name";
+            ushort size = 3;
+            ushort page = 1;
+
+            var response = await request.GetAsync("/role/v1?"
+                + BaseLib.Statics.GetOrderBy + "=" + order + "&"
+                + BaseLib.Statics.GetPageSize + "=" + size.ToString() + "&"
+                + BaseLib.Statics.GetPageNumber + "=" + page.ToString());
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<RoleResult>>();
+            var data = ok.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
 
             data.Count().Should().Be(size);
         }
@@ -160,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_GetUserList_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -168,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var result = await TestController.GetRoleUsers(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IList<UserResult>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IEnumerable<UserResult>>().Subject;
 
             data.Count().Should().Be(TestIoC.RoleMgmt.Store.GetUsersAsync(role).Count());
         }
@@ -177,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_RemoveFromUser_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 
@@ -211,7 +292,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Role_Update_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new RoleController(TestIoC, TestTasks);
 

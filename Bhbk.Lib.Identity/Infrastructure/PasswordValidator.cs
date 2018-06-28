@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Bhbk.Lib.Identity.Infrastructure
 {
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.ipasswordvalidator-1?view=aspnetcore-2.0
-    public sealed class CustomPasswordValidator : IPasswordValidator<AppUser>
+    public sealed class PasswordValidator : IPasswordValidator<AppUser>
     {
         private readonly Regex _number = new Regex(@"[0-9]+");
         private readonly Regex _lower = new Regex(@"[a-z]+");

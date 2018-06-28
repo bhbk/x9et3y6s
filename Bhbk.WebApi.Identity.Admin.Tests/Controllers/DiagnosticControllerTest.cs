@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_Diagnostic_GetStatus_Activity_Success()
+        public void Api_Admin_Diag_GetStatus_Activity_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_Diagnostic_GetStatus_Users_Success()
+        public void Api_Admin_Diag_GetStatus_Users_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_Diagnostic_GetVersion_Success()
+        public void Api_Admin_Diag_GetVersion_Success()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 

@@ -38,7 +38,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_cb["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new CustomIdentityContext(builder);
+                Statics.IoC = new IdentityContext(builder);
                 DatasetHelper seed = new DatasetHelper(Statics.IoC);
 
                 if (CreateDefault)
@@ -47,7 +47,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    seed.CreateDefaultData();
+                    seed.CreateDefault();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -58,7 +58,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    seed.DestroyDefaultData();
+                    seed.DestroyDefault();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();

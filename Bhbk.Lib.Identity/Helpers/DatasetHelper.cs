@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Helpers
             _ioc = ioc;
         }
 
-        public async void CreateDefaultData()
+        public async void CreateDefault()
         {
             AudienceCreate audience;
             ClientCreate client;
@@ -159,7 +159,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.AddToRoleAsync(foundUser, foundRoleForViewerApi.Name);
         }
 
-        public async void CreateTestData()
+        public async void CreateTest()
         {
             AppLogin login;
             AppUser user;
@@ -303,9 +303,9 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
         }
 
-        public async void CreateTestDataRandom()
+        public async void CreateRandom(uint sets)
         {
-            for(int i = 0; i < 20; i++)
+            for(int i = 0; i < sets; i++)
             {
                 AppLogin login;
                 AppUser user;
@@ -405,7 +405,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 await _ioc.ClientMgmt.DeleteAsync(client);
         }
 
-        public async void DestroyDefaultData()
+        public async void DestroyDefault()
         {
             var user = await _ioc.UserMgmt.FindByNameAsync(Statics.ApiDefaultUserAdmin + "@local");
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public sealed class CustomUserValidator : IUserValidator<AppUser>
+    public sealed class UserValidator : IUserValidator<AppUser>
     {
         public Task<IdentityResult> ValidateAsync(UserManager<AppUser> manager, AppUser user)
         {

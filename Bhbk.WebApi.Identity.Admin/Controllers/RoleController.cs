@@ -103,17 +103,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetRoles([FromQuery] CustomPagingModel filter)
+        public async Task<IActionResult> GetRoles([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var roles = IoC.RoleMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy)
-                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
-                .Take(Convert.ToInt32(filter.PageSize));
+            var roles = IoC.RoleMgmt.Store.Get()
+                .OrderBy(model.OrderBy)
+                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
+                .Take(Convert.ToInt32(model.PageSize));
 
-            var result = roles.Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
+            var result = roles.Select(x => new RoleFactory<AppRole>(x).Evolve());
 
             return Ok(result);
         }
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await IoC.RoleMgmt.GetUsersListAsync(role);
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve()).ToList();
+            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve());
 
             return Ok(result);
         }

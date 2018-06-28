@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity
 
     public class Statics
     {
-        #region Attribute Settings
+        #region Attribute Constants
         public const string AttrAudienceIDV1 = "audience_id";
         public const string AttrAudienceIDV2 = "audience";
         public const string AttrClientIDV1 = "client_id";
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity
         public const string AttrUserIDV2 = "user";
         #endregion
 
-        #region Configuration Settings
+        #region Configuration Constants
         public const string ApiDefaultClient = "Bhbk";
         public const string ApiDefaultAudienceUi = "Bhbk.WebUi.Identity";
         public const string ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity
         public const string ApiTokenResetPassword = "ResetPassword";
         #endregion
 
-        #region Configuration Settings (Unit Tests)
+        #region Configuration Constants (Unit Tests)
         public const string ApiUnitTestAudienceA = "AudienceUnitTestsA";
         public const string ApiUnitTestAudienceB = "AudienceUnitTestsB";
         public const string ApiUnitTestClientA = "ClientUnitTestsA";
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity
         public const string ApiUnitTestClaimValue = "ClaimValueUnitTests";
         #endregion
 
-        #region Message Settings
+        #region Messages
         public const string MsgAudienceAlreadyExists = "Audience already exists";
         public const string MsgAudienceImmutable = "Audience is immutable";
         public const string MsgAudienceInvalid = "Audience is invalid or disabled";
@@ -88,7 +88,8 @@ namespace Bhbk.Lib.Identity
         public const string MsgRoleImmutable = "Role is immutable";
         public const string MsgRoleInvalid = "Role invalid or disabled";
         public const string MsgRoleNotExist = "Role does not exist";
-        public const string MsgSystemParametersInvalid = "Parameters invalid";
+        public const string MsgSysNotImplemented = "Feature not implemented yet";
+        public const string MsgSysParamsInvalid = "One or more parameters invalid";
         public const string MsgUserAlreadyExists = "User already exists";
         public const string MsgUserImmutable = "User is immutable";
         public const string MsgUserInvalid = "User is invalid, locked or disabled.";
@@ -101,6 +102,12 @@ namespace Bhbk.Lib.Identity
         public const string MsgUserInvalidPhoneConfirm = "User new phone does not match confirm phone";
         public const string MsgUserInvalidToken = "User token is invalid";
         public const string MsgUserInvalidTwoFactor = "User two factor is invalid";
+        #endregion
+
+        #region Parameter Constants
+        public const string GetOrderBy = "orderBy";
+        public const string GetPageSize = "pageSize";
+        public const string GetPageNumber = "pageNumber";
         #endregion
     }
 }

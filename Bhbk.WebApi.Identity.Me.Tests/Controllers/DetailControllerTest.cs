@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_AskChangeEmail_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new DetailController(TestIoC, TestTasks);
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_AskChangeEmail_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new DetailController(TestIoC, TestTasks);
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_AskChangePassword_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_AskChangePassword_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_AskChangePhone_Fail()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string phone = "01112223333";
             var controller = new DetailController(TestIoC, TestTasks);
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_AskChangePhone_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             string phone = "01112223333";
             var controller = new DetailController(TestIoC, TestTasks);
@@ -174,7 +174,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public void Api_Me_Detail_GetClaimList_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -190,7 +190,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public void Api_Me_Detail_GetQuoteOfDay_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -206,7 +206,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_TwoFactor_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_Detail_Update_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();

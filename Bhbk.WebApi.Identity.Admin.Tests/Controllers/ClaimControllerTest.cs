@@ -28,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Claim_Create_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new ClaimController(TestIoC, TestTasks);
 
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Claim_Delete_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new ClaimController(TestIoC, TestTasks);
 
@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_Claim_Get_Success()
         {
             TestData.Destroy();
-            TestData.CreateTestData();
+            TestData.CreateTest();
 
             var TestController = new ClaimController(TestIoC, TestTasks);
 

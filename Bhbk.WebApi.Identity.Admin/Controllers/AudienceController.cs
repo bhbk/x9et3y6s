@@ -83,18 +83,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAudiences([FromQuery] CustomPagingModel filter)
+        public async Task<IActionResult> GetAudiences([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audiences = IoC.AudienceMgmt.Store.Get().AsQueryable()
-                .OrderBy(filter.OrderBy)
-                .Skip(Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize))
-                .Take(Convert.ToInt32(filter.PageSize));
+            var audiences = IoC.AudienceMgmt.Store.Get()
+                .OrderBy(model.OrderBy)
+                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
+                .Take(Convert.ToInt32(model.PageSize));
 
-            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).Evolve()).ToList();
+            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).Evolve());
 
             return Ok(result);
         }

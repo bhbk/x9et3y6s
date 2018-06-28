@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Managers
@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Managers
             return Store.FindByName(loginName);
         }
 
-        public async Task<IList<AppUser>> GetUsersListAsync(Guid loginId)
+        public async Task<IQueryable<AppUser>> GetUsersListAsync(Guid loginId)
         {
             if (!Store.Exists(loginId))
                 throw new InvalidOperationException();

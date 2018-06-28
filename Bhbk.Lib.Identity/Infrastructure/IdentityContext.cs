@@ -9,7 +9,7 @@ using System;
 namespace Bhbk.Lib.Identity.Infrastructure
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
-    public class CustomIdentityContext : IIdentityContext
+    public class IdentityContext : IIdentityContext
     {
         private ContextType _status;
         private readonly AppDbContext _context;
@@ -22,17 +22,17 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private LoginManager _loginMgmt;
         private UserQuoteOfDay _userQuote;
 
-        public CustomIdentityContext(DbContextOptions<AppDbContext> options)
+        public IdentityContext(DbContextOptions<AppDbContext> options)
             : this(new AppDbContext(options))
         {
         }
 
-        public CustomIdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder)
+        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder)
             : this(new AppDbContext(optionsBuilder.Options))
         {
         }
 
-        private CustomIdentityContext(AppDbContext context)
+        private IdentityContext(AppDbContext context)
         {
             _disposed = false;
 

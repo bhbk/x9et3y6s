@@ -63,12 +63,12 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppLogin.Where(x => x.LoginProvider == name).SingleOrDefault();
         }
 
-        public IList<AppLogin> Get()
+        public IQueryable<AppLogin> Get()
         {
-            return _context.AppLogin.ToList();
+            return _context.AppLogin.AsQueryable();
         }
 
-        public IList<AppUser> GetUsers(Guid key)
+        public IQueryable<AppUser> GetUsers(Guid key)
         {
             var result = (IList<string>)_context.AppLogin
                 .Join(_context.AppUserLogin, x => x.Id, y => y.LoginId, (login1, user1) => new {
@@ -80,10 +80,10 @@ namespace Bhbk.Lib.Identity.Stores
                 .Distinct()
                 .ToList();
 
-            return _context.AppUser.Where(x => result.Contains(x.Id.ToString())).ToList();
+            return _context.AppUser.Where(x => result.Contains(x.Id.ToString()));
         }
 
-        public IEnumerable<AppLogin> Get(Expression<Func<AppLogin, bool>> filter = null,
+        public IQueryable<AppLogin> Get(Expression<Func<AppLogin, bool>> filter = null,
             Func<IQueryable<AppLogin>, IOrderedQueryable<AppLogin>> orderBy = null, string includes = "")
         {
             IQueryable<AppLogin> query = _context.AppLogin.AsQueryable();
@@ -95,10 +95,10 @@ namespace Bhbk.Lib.Identity.Stores
                 query = query.Include(include);
 
             if (orderBy != null)
-                return orderBy(query).ToList();
+                return orderBy(query);
 
             else
-                return query.ToList();
+                return query;
         }
 
         public void LoadCollection(AppLogin entity, string collection)
