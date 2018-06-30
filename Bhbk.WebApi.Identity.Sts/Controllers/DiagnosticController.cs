@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Reflection;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
@@ -21,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatus(string name)
         {
-            if (name.ToLower() == "tokens")
+            if (name.ToLower() == BaseLib.TaskType.MaintainTokens.ToString().ToLower())
                 return Ok(((MaintainTokensTask)Tasks.Single(x => x.GetType() == typeof(MaintainTokensTask))).Status);
 
             return BadRequest();

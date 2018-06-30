@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {
@@ -20,27 +21,37 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetStatus_Activity_Success()
+        public void Api_Admin_Diag_GetStatus_MaintainActivity_Pass()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetStatus("activity") as OkObjectResult;
+            var result = controller.GetStatus(BaseLib.TaskType.MaintainActivity.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetStatus_Users_Success()
+        public void Api_Admin_Diag_GetStatus_MaintainNotify_Pass()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetStatus("users") as OkObjectResult;
+            var result = controller.GetStatus(BaseLib.TaskType.MaintainNotify.ToString().ToLower()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetVersion_Success()
+        public void Api_Admin_Diag_GetStatus_MaintainUsers_Pass()
+        {
+            var controller = new DiagnosticController(TestIoC, TestTasks);
+
+            var result = controller.GetStatus(BaseLib.TaskType.MaintainUsers.ToString()) as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+        }
+
+        [TestMethod]
+        public void Api_Admin_Diag_GetVersion_Pass()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 

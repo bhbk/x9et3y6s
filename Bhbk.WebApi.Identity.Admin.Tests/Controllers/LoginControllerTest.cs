@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_AddToUser_Success()
+        public async Task Api_Admin_Login_AddToUser_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var login = new LoginCreate()
             {
-                LoginProvider = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
+                LoginProvider = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
             };
             var add = await TestIoC.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
             var model = new UserLoginCreate()
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_Create_Success()
+        public async Task Api_Admin_Login_Create_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new LoginCreate()
             {
-                LoginProvider = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
+                LoginProvider = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
             };
 
             TestController.SetUser(user.Id);
@@ -105,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_RemoveFromUser_Success()
+        public async Task Api_Admin_Login_RemoveFromUser_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -116,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var login = new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
-                    LoginProvider = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
+                    LoginProvider = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
                 }).Devolve();
             var create = await TestIoC.LoginMgmt.CreateAsync(login);
             var model = new UserLoginCreate()
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_Get_Success()
+        public async Task Api_Admin_Login_Get_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -168,7 +168,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var TestController = new LoginController(TestIoC, TestTasks);
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "loginprovider";
@@ -199,7 +199,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -215,7 +215,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_GetList_Success()
+        public async Task Api_Admin_Login_GetList_Pass()
         {
             TestData.Destroy();
             TestData.CreateDefault();
@@ -229,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -254,7 +254,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_GetUserList_Success()
+        public async Task Api_Admin_Login_GetUserList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -271,7 +271,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_Update_Success()
+        public async Task Api_Admin_Login_Update_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Login_Delete_Success()
+        public async Task Api_Admin_Login_Delete_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

@@ -28,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTest();
 
-            string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            string email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
@@ -46,17 +46,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailChange(model,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
-        public async Task Api_Me_Confirm_ChangeEmail_Success()
+        public async Task Api_Me_Confirm_ChangeEmail_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
 
-            string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            string email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new ConfirmController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
@@ -91,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
+                CurrentPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
                 NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordChange(model,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Confirm_ChangePassword_Success()
+        public async Task Api_Me_Confirm_ChangePassword_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -159,12 +159,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneChange(model,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
-        public async Task Api_Me_Confirm_ChangePhone_Success()
+        public async Task Api_Me_Confirm_ChangePhone_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -205,12 +205,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmail(user.Id,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
-        public async Task Api_Me_Confirm_SetEmail_Success()
+        public async Task Api_Me_Confirm_SetEmail_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -242,12 +242,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPassword(user.Id,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
-        public async Task Api_Me_Confirm_SetPassword_Success()
+        public async Task Api_Me_Confirm_SetPassword_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -279,12 +279,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhone(user.Id,
-                BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
+                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
-        public async Task Api_Me_Confirm_SetPhoneNumber_Success()
+        public async Task Api_Me_Confirm_SetPhoneNumber_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

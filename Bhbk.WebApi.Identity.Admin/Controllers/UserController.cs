@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var user = await IoC.UserMgmt.FindByNameAsync(model.Email);
+            var user = await IoC.UserMgmt.FindByEmailAsync(model.Email);
 
             if (user != null)
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);

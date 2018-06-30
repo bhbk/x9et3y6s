@@ -1,6 +1,6 @@
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

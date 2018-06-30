@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 try
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
                     var expired = _ioc.UserMgmt.Store.Context.AppActivity
                         .Where(x => (x.Created.AddMinutes(_transient) < DateTime.Now && x.Immutable == false)

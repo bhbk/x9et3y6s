@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Providers
 {
     public class ClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
     {

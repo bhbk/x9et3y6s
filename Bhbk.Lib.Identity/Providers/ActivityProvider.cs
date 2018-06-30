@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Providers
 {
     public abstract class ActivityProvider
     {
@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     }
 
     public class ActivityProvider<TEntity> : ActivityProvider
-        where TEntity : class, IGenericEntry, new()
+        where TEntity : class, IGenericActivity, new()
     {
         private readonly DbContext _context;
 

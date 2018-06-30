@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 client = new ClientCreate()
                 {
                     Name = Statics.ApiDefaultClient,
-                    ClientKey = CryptoHelper.GenerateRandomBase64(32),
+                    ClientKey = CryptoHelper.CreateRandomBase64(32),
                     Enabled = true,
                     Immutable = true,
                 };
@@ -170,7 +170,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 new ClientCreate()
                 {
                     Name = BaseLib.Statics.ApiUnitTestClientA,
-                    ClientKey = CryptoHelper.GenerateRandomBase64(32),
+                    ClientKey = CryptoHelper.CreateRandomBase64(32),
                     Enabled = true,
                     Immutable = false,
                 }).Devolve());
@@ -179,7 +179,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 new ClientCreate()
                 {
                     Name = BaseLib.Statics.ApiUnitTestClientB,
-                    ClientKey = CryptoHelper.GenerateRandomBase64(32),
+                    ClientKey = CryptoHelper.CreateRandomBase64(32),
                     Enabled = true,
                     Immutable = false,
                 }).Devolve());
@@ -245,8 +245,8 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     Email = BaseLib.Statics.ApiUnitTestUserA,
                     PhoneNumber = Statics.ApiDefaultPhone,
-                    FirstName = "First " + CryptoHelper.GenerateRandomBase64(4),
-                    LastName = "Last " + CryptoHelper.GenerateRandomBase64(4),
+                    FirstName = "First " + CryptoHelper.CreateRandomBase64(4),
+                    LastName = "Last " + CryptoHelper.CreateRandomBase64(4),
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = false,
@@ -264,8 +264,8 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     Email = BaseLib.Statics.ApiUnitTestUserB,
                     PhoneNumber = Statics.ApiDefaultPhone,
-                    FirstName = "First " + CryptoHelper.GenerateRandomBase64(4),
-                    LastName = "Last " + CryptoHelper.GenerateRandomBase64(4),
+                    FirstName = "First " + CryptoHelper.CreateRandomBase64(4),
+                    LastName = "Last " + CryptoHelper.CreateRandomBase64(4),
                     LockoutEnabled = false,
                     Immutable = false,
                 }).Devolve(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
@@ -311,18 +311,18 @@ namespace Bhbk.Lib.Identity.Helpers
                 AppUser user;
                 AppRole role;
 
-                var clientName = BaseLib.Statics.ApiUnitTestClientA + "-" + CryptoHelper.GenerateRandomBase64(4);
-                var audienceName = BaseLib.Statics.ApiUnitTestAudienceA + "-" + CryptoHelper.GenerateRandomBase64(4);
-                var roleName = BaseLib.Statics.ApiUnitTestRoleA + "-" + CryptoHelper.GenerateRandomBase64(4);
-                var loginName = BaseLib.Statics.ApiUnitTestLoginA + "-" + CryptoHelper.GenerateRandomBase64(4);
-                var userName = CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+                var clientName = BaseLib.Statics.ApiUnitTestClientA + "-" + CryptoHelper.CreateRandomBase64(4);
+                var audienceName = BaseLib.Statics.ApiUnitTestAudienceA + "-" + CryptoHelper.CreateRandomBase64(4);
+                var roleName = BaseLib.Statics.ApiUnitTestRoleA + "-" + CryptoHelper.CreateRandomBase64(4);
+                var loginName = BaseLib.Statics.ApiUnitTestLoginA + "-" + CryptoHelper.CreateRandomBase64(4);
+                var userName = CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
 
                 //create random client
                 await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
                     new ClientCreate()
                     {
                         Name = clientName,
-                        ClientKey = CryptoHelper.GenerateRandomBase64(32),
+                        ClientKey = CryptoHelper.CreateRandomBase64(32),
                         Enabled = true,
                         Immutable = false,
                     }).Devolve());
@@ -362,8 +362,8 @@ namespace Bhbk.Lib.Identity.Helpers
                     {
                         Email = userName,
                         PhoneNumber = Statics.ApiDefaultPhone,
-                        FirstName = "First " + CryptoHelper.GenerateRandomBase64(4),
-                        LastName = "Last " + CryptoHelper.GenerateRandomBase64(4),
+                        FirstName = "First " + CryptoHelper.CreateRandomBase64(4),
+                        LastName = "Last " + CryptoHelper.CreateRandomBase64(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,

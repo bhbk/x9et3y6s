@@ -9,7 +9,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Providers
 {
     public class PagingModel
     {

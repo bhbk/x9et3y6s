@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
                 DoWork(cancellationToken);
             }

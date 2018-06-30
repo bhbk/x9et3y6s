@@ -2,7 +2,7 @@
 
 namespace Bhbk.Lib.Identity.Interfaces
 {
-    public interface IGenericEntry
+    public interface IGenericActivity
     {
         Guid Id { get; set; }
         Guid ActorId { get; set; }

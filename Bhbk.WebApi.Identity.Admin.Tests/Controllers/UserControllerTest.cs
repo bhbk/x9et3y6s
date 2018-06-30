@@ -41,9 +41,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserCreate()
             {
-                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
-                FirstName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-First",
-                LastName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-Last",
+                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
+                FirstName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-First",
+                LastName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-Last",
                 PhoneNumber = "0123456789",
                 LockoutEnabled = false,
             };
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_Create_Success()
+        public async Task Api_Admin_User_Create_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -65,9 +65,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserCreate()
             {
-                Email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-First",
-                LastName = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-Last",
+                Email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
+                FirstName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-First",
+                LastName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-Last",
                 PhoneNumber = "0123456789",
                 LockoutEnabled = false,
                 Immutable = false,
@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_Delete_Success()
+        public async Task Api_Admin_User_Delete_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_Get_Success()
+        public async Task Api_Admin_User_Get_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var TestController = new UserController(TestIoC, TestTasks);
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "email";
@@ -180,7 +180,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_GetList_Success()
+        public async Task Api_Admin_User_GetList_Pass()
         {
             TestData.Destroy();
             TestData.CreateDefault();
@@ -210,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -235,7 +235,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_GetByName_Success()
+        public async Task Api_Admin_User_GetByName_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_GetAudienceList_Success()
+        public async Task Api_Admin_User_GetAudienceList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -269,7 +269,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_GetLoginList_Success()
+        public async Task Api_Admin_User_GetLoginList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -286,7 +286,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_GetRoleList_Success()
+        public async Task Api_Admin_User_GetRoleList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -318,8 +318,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserAddPassword()
             {
-                NewPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
-                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16)
+                NewPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
+                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16)
             };
 
             TestController.SetUser(user.Id);
@@ -332,7 +332,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_AddPassword_Success()
+        public async Task Api_Admin_User_AddPassword_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -382,7 +382,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_RemovePassword_Success()
+        public async Task Api_Admin_User_RemovePassword_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -411,8 +411,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserAddPassword()
             {
-                NewPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
-                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16)
+                NewPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
+                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16)
             };
 
             TestController.SetUser(user.Id);
@@ -425,7 +425,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_ResetPassword_Success()
+        public async Task Api_Admin_User_ResetPassword_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -449,7 +449,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_User_Update_Success()
+        public async Task Api_Admin_User_Update_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

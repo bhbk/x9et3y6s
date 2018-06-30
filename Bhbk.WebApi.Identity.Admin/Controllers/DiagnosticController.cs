@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Reflection;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -21,11 +23,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatus(string name)
         {
-            if (name.ToLower() == "activity")
+            if (name.ToLower() == BaseLib.TaskType.MaintainActivity.ToString().ToLower())
                 return Ok(((MaintainActivityTask)Tasks.Single(x => x.GetType() == typeof(MaintainActivityTask))).Status);
 
-            if (name.ToLower() == "users")
+            if (name.ToLower() == BaseLib.TaskType.MaintainUsers.ToString().ToLower())
                 return Ok(((MaintainUsersTask)Tasks.Single(x => x.GetType() == typeof(MaintainUsersTask))).Status);
+
+            if (name.ToLower() == BaseLib.TaskType.MaintainNotify.ToString().ToLower())
+                return Ok(((MaintainNotifyTask)Tasks.Single(x => x.GetType() == typeof(MaintainNotifyTask))).Status);
 
             return BadRequest();
         }

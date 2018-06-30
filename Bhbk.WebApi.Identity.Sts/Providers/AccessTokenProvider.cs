@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -177,8 +177,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 ioc.UserMgmt.AccessSuccessAsync(user).Wait();
 
-                var access = JwtHelper.GenerateAccessTokenV1(ioc, client, audience, user).Result;
-                var refresh = JwtHelper.GenerateRefreshTokenV1(ioc, client, user).Result;
+                var access = JwtHelper.CreateAccessTokenV1(ioc, client, audience, user).Result;
+                var refresh = JwtHelper.CreateRefreshTokenV1(ioc, client, user).Result;
 
                 var result = new
                 {
@@ -358,8 +358,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 ioc.UserMgmt.AccessSuccessAsync(user).Wait();
 
-                var access = JwtHelper.GenerateAccessTokenV2(ioc, client, audiences, user).Result;
-                var refresh = JwtHelper.GenerateRefreshTokenV2(ioc, client, user).Result;
+                var access = JwtHelper.CreateAccessTokenV2(ioc, client, audiences, user).Result;
+                var refresh = JwtHelper.CreatefreshTokenV2(ioc, client, user).Result;
 
                 var result = new
                 {

@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AuthCodeV2_PlaceHolder()
+        public async Task Api_StsProvider_AuthCodeV2_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_Refresh_GetList_Success()
+        public async Task Api_Sts_OAuth_Refresh_GetList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_Refresh_RevokeOne_Success()
+        public async Task Api_Sts_OAuth_Refresh_RevokeOne_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -169,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_Refresh_RevokeAll_Success()
+        public async Task Api_Sts_OAuth_Refresh_RevokeAll_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

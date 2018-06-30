@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.totpsecuritystampbasedtokenprovider-1
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Providers
 {
     //https://www.stevejgordon.co.uk/asp-net-core-identity-token-providers
     //https://blog.kraken.com/post/291/the-importance-of-two-factor-authentication/

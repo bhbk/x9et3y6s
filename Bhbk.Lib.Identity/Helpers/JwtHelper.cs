@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Helpers
     public class JwtHelper
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            GenerateAccessTokenV1(IIdentityContext ioc, AppClient client, AppAudience audience, AppUser user)
+            CreateAccessTokenV1(IIdentityContext ioc, AppClient client, AppAudience audience, AppUser user)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -52,7 +52,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            GenerateAccessTokenV2(IIdentityContext ioc, AppClient client, List<AppAudience> audiences, AppUser user)
+            CreateAccessTokenV2(IIdentityContext ioc, AppClient client, List<AppAudience> audiences, AppUser user)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -98,7 +98,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<string>
-            GenerateRefreshTokenV1(IIdentityContext ioc, AppClient client, AppUser user)
+            CreateRefreshTokenV1(IIdentityContext ioc, AppClient client, AppUser user)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -150,7 +150,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<string>
-            GenerateRefreshTokenV2(IIdentityContext ioc, AppClient client, AppUser user)
+            CreatefreshTokenV2(IIdentityContext ioc, AppClient client, AppUser user)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -210,6 +210,22 @@ namespace Bhbk.Lib.Identity.Helpers
                 return true;
             else
                 return false;
+        }
+
+        public static async Task<(string token, DateTime begin, DateTime end)>
+            GetAccessTokenV2(IIdentityContext ioc, string clientName, string audienceName, string userName)
+        {
+            if (ioc == null)
+                throw new ArgumentNullException();
+
+            var client = ioc.ClientMgmt.Store.Get(x => x.Name == clientName).Single();
+            var audience = ioc.AudienceMgmt.Store.Get(x => x.Name == audienceName).Single();
+            var user = ioc.UserMgmt.Store.Get(x => x.Email == userName).Single();
+
+            var audiences = new List<AppAudience>();
+            audiences.Add(audience);
+
+            return CreateAccessTokenV2(ioc, client, audiences, user).Result;
         }
     }
 }

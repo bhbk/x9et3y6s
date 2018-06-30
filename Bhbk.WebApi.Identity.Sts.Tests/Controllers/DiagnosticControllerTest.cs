@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
@@ -20,17 +21,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Sts_Diag_GetStatus_Tokens_Success()
+        public void Api_Sts_Diag_GetStatus_MaintainTokens_Pass()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetStatus("tokens") as OkObjectResult;
+            var result = controller.GetStatus(BaseLib.TaskType.MaintainTokens.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Sts_Diag_GetVersion_Success()
+        public void Api_Sts_Diag_GetVersion_Pass()
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 

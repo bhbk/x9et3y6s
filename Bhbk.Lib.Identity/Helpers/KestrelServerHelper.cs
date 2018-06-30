@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             {
                                 if (endpoint.Value.Scheme == "https")
                                 {
-                                    listenOptions.UseHttps(CryptoHelper.GenerateCertificate());
+                                    listenOptions.UseHttps(CryptoHelper.CreateCertificate());
                                 }
                             });
                     }

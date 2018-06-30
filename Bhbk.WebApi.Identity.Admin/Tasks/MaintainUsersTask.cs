@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 try
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
                     var disabled = _ioc.UserMgmt.Store.Context.AppUser
                         .Where(x => x.LockoutEnd < DateTime.UtcNow);

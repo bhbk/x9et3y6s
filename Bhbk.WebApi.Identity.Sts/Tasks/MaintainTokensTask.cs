@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             {
                 try
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(_delay), cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
                     var invalid = _ioc.UserMgmt.Store.Context.AppUserRefresh
                         .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);

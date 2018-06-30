@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
     public static class CryptoHelper
     {
-        public static X509Certificate2 GenerateCertificate()
+        public static X509Certificate2 CreateCertificate()
         {
             var randomGenerator = new CryptoApiRandomGenerator();
             var random = new SecureRandom(randomGenerator);
@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Helpers
             return x509;
         }
 
-        public static string GenerateRandomBase64(int length)
+        public static string CreateRandomBase64(int length)
         {
             byte[] byteValue = new byte[length];
             RNGCryptoServiceProvider.Create().GetBytes(byteValue);
@@ -89,7 +89,18 @@ namespace Bhbk.Lib.Identity.Helpers
             return Base64UrlTextEncoder.Encode(byteValue);
         }
 
-        public static string GenerateSHA256(string input)
+        public static string CreateRandomNumberAsString(int length)
+        {
+            var random = new Random();
+            var result = string.Empty;
+
+            for (int i = 0; i < length; i++)
+                result = String.Concat(result, random.Next(10).ToString());
+
+            return result;
+        }
+
+        public static string CreateSHA256(string input)
         {
             HashAlgorithm algo = new SHA256CryptoServiceProvider();
 

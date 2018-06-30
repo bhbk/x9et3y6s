@@ -39,10 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
     <ProjectReference Include="..\Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj" />
   </ItemGroup>

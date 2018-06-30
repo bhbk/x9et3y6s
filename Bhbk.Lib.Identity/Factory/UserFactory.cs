@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
@@ -150,14 +151,77 @@ namespace Bhbk.Lib.Identity.Factory
     public class UserCreate
     {
         public Guid ActorId { get; set; }
+
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
+
+        [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
+
+        [Required]
+        [RegularExpression(@"^[\w\s-`']+$", ErrorMessage = "Special characters are not allowed (except - and `).")]
         public string FirstName { get; set; }
+
+        [Required]
+        [RegularExpression(@"^[\w\s-`']+$", ErrorMessage = "Special characters are not allowed (except - and `).")]
         public string LastName { get; set; }
         public DateTime Created { get; set; }
         public bool LockoutEnabled { get; set; }
         public bool HumanBeing { get; set; }
         public bool Immutable { get; set; }
+    }
+
+    public class UserCreateEmail
+    {
+        public Guid Id { get; set; }
+
+        [Required]
+        public Guid FromId { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string FromEmail { get; set; }
+
+        public string FromDisplay { get; set; }
+
+        [Required]
+        public Guid ToId { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string ToEmail { get; set; }
+
+        public string ToDisplay { get; set; }
+
+        [Required]
+        public string Subject { get; set; }
+
+        public string HtmlContent { get; set; }
+
+        public string PLaintextContent { get; set; }
+    }
+
+    public class UserCreateText
+    {
+        public Guid Id { get; set; }
+
+        [Required]
+        public Guid FromId { get; set; }
+
+        [Required]
+        [Phone]
+        public string FromPhoneNumber { get; set; }
+
+        [Required]
+        public Guid ToId { get; set; }
+
+        [Required]
+        [Phone]
+        public string ToPhoneNumber { get; set; }
+
+        [Required]
+        public string Body { get; set; }
     }
 
     public class UserResult

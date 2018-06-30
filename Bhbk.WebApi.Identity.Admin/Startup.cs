@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -50,6 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin
             sc.AddSingleton<IIdentityContext>(ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(ioc));
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(ioc));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainNotifyTask(ioc));
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -76,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
+                    AudienceValidator = Bhbk.Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,

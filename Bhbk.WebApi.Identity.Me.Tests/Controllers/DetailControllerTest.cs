@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             TestData.Destroy();
             TestData.CreateTest();
 
-            string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            string email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangeEmail()
             {
                 Id = user.Id,
-                CurrentEmail = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4),
+                CurrentEmail = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
                 NewEmail = email,
                 NewEmailConfirm = email
             };
@@ -50,12 +50,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_AskChangeEmail_Success()
+        public async Task Api_Me_Detail_AskChangeEmail_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
 
-            string email = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            string email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
             var controller = new DetailController(TestIoC, TestTasks);
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(16),
+                CurrentPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
                 NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
             };
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_AskChangePassword_Success()
+        public async Task Api_Me_Detail_AskChangePassword_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -146,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_AskChangePhone_Success()
+        public async Task Api_Me_Detail_AskChangePhone_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -171,7 +171,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Me_Detail_GetClaimList_Success()
+        public void Api_Me_Detail_GetClaimList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Me_Detail_GetQuoteOfDay_Success()
+        public void Api_Me_Detail_GetQuoteOfDay_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -203,7 +203,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_TwoFactor_Success()
+        public async Task Api_Me_Detail_TwoFactor_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -222,7 +222,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_Update_Success()
+        public async Task Api_Me_Detail_Update_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

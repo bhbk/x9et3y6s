@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_AddToUser_Success()
+        public async Task Api_Admin_Role_AddToUser_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
             };
             var create = await TestIoC.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_Create_Success()
+        public async Task Api_Admin_Role_Create_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_Delete_Success()
+        public async Task Api_Admin_Role_Delete_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_Get_Success()
+        public async Task Api_Admin_Role_Get_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var TestController = new RoleController(TestIoC, TestTasks);
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "name";
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -199,7 +199,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_GetList_Success()
+        public async Task Api_Admin_Role_GetList_Pass()
         {
             TestData.Destroy();
             TestData.CreateDefault();
@@ -213,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.GenerateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -238,7 +238,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_GetUserList_Success()
+        public async Task Api_Admin_Role_GetUserList_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -255,7 +255,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_RemoveFromUser_Success()
+        public async Task Api_Admin_Role_RemoveFromUser_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();
@@ -266,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = TestIoC.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.GenerateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };
@@ -289,7 +289,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Role_Update_Success()
+        public async Task Api_Admin_Role_Update_Pass()
         {
             TestData.Destroy();
             TestData.CreateTest();

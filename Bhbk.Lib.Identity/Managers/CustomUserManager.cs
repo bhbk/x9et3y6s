@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Providers;
 using Bhbk.Lib.Identity.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -617,7 +618,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            await Store.SetSecurityStampAsync(user, Helpers.CryptoHelper.GenerateRandomBase64(32));
+            await Store.SetSecurityStampAsync(user, Helpers.CryptoHelper.CreateRandomBase64(32));
 
             return IdentityResult.Success;
         }

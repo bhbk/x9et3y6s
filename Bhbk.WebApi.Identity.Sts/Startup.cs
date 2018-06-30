@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
+                    AudienceValidator = Bhbk.Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,

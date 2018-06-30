@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Reflection;
+using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -21,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatus(string name)
         {
-            if (name.ToLower() == "quotes")
+            if (name.ToLower() == BaseLib.TaskType.MaintainQuote.ToString().ToLower())
                 return Ok(((MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask))).Status);
 
             return BadRequest();
