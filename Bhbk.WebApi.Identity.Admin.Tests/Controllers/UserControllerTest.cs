@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
                 FirstName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-First",
                 LastName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-Last",
-                PhoneNumber = "0123456789",
+                PhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10),
                 LockoutEnabled = false,
             };
             var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
                 FirstName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-First",
                 LastName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-Last",
-                PhoneNumber = "0123456789",
+                PhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10),
                 LockoutEnabled = false,
                 Immutable = false,
             };

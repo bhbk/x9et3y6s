@@ -46,12 +46,11 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             _url = _cb["Tasks:MaintainQuotes:QuoteOfDayUrl"];
             _ioc = ioc;
 
-            var statusMsg = typeof(MaintainQuotesTask).Name + " not run yet.";
-
-            Status = JsonConvert.SerializeObject(new
-            {
-                status = statusMsg
-            }, _serializer);
+            Status = JsonConvert.SerializeObject(
+                new
+                {
+                    status = typeof(MaintainQuotesTask).Name + " not run yet."
+                }, _serializer);
 
             QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
                 (File.ReadAllText(_output));
@@ -89,29 +88,31 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                         File.WriteAllText(_output, JsonConvert.SerializeObject(QuoteOfDay));
 
-                        var statusMsg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
+                        var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
 
-                        Status = JsonConvert.SerializeObject(new
-                        {
-                            status = statusMsg
-                        }, _serializer);
+                        Status = JsonConvert.SerializeObject(
+                            new
+                            {
+                                status = msg
+                            }, _serializer);
 
-                        Log.Information(statusMsg);
+                        Log.Information(msg);
                     }
                 }
                 else
                 {
-                    var statusMsg = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
+                    var msg = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
 
-                    Status = JsonConvert.SerializeObject(new
-                    {
-                        status = statusMsg,
-                        request = response.RequestMessage.ToString(),
-                        response = response.ToString()
-                    }, _serializer);
+                    Status = JsonConvert.SerializeObject(
+                        new
+                        {
+                            status = msg,
+                            request = response.RequestMessage.ToString(),
+                            response = response.ToString()
+                        }, _serializer);
 
-                    Log.Error(statusMsg 
-                        + Environment.NewLine + response.RequestMessage.ToString() 
+                    Log.Error(msg
+                        + Environment.NewLine + response.RequestMessage.ToString()
                         + Environment.NewLine + response.ToString());
                 }
             }

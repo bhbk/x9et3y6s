@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteAudience(Guid audienceID)
+        public async Task<IActionResult> DeleteAudience([FromRoute] Guid audienceID)
         {
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID}"), HttpGet]
-        public async Task<IActionResult> GetAudience(Guid audienceID)
+        public async Task<IActionResult> GetAudience([FromRoute] Guid audienceID)
         {
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID}/roles"), HttpGet]
-        public async Task<IActionResult> GetAudienceRoles(Guid audienceID)
+        public async Task<IActionResult> GetAudienceRoles([FromRoute] Guid audienceID)
         {
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 

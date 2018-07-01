@@ -1,6 +1,8 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
@@ -82,10 +84,19 @@ namespace Bhbk.Lib.Identity.Factory
     public class ClientCreate
     {
         public Guid ActorId { get; set; }
+
+        [Required]
         public string Name { get; set; }
+
         public string Description { get; set; }
+
+        [Required]
         public string ClientKey { get; set; }
+
+        [Required]
         public bool Enabled { get; set; }
+
+        [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
@@ -104,12 +115,23 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class ClientUpdate
     {
+
+        [Required]
         public Guid Id { get; set; }
+
         public Guid ActorId { get; set; }
+
+        [Required]
         public string Name { get; set; }
+
         public string Description { get; set; }
+
+        [Required]
         public string ClientKey { get; set; }
+
+        [Required]
         public bool Enabled { get; set; }
+
         public bool Immutable { get; set; }
     }
 }

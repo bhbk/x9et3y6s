@@ -12,8 +12,6 @@
 );
 
 
-
-
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_AppClient_ID]
     ON [dbo].[AppClient]([Id] ASC);

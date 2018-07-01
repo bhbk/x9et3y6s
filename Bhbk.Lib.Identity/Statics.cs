@@ -9,7 +9,8 @@ namespace Bhbk.Lib.Identity
         MaintainQuote,
         MaintainTokens,
         MaintainUsers,
-        MaintainNotify
+        QueueEmails,
+        QueueTexts
     }
 
     //https://tools.ietf.org/html/rfc6749#section-2.1
@@ -58,8 +59,8 @@ namespace Bhbk.Lib.Identity
         public const string ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
         public const string ApiDefaultUserAdmin = "root@local";
         public const string ApiDefaultUserPassword = "3uetw7W$mswU";
-        public const string ApiDefaultFirstName = "First";
-        public const string ApiDefaultLastName = "Last";
+        public const string ApiDefaultFirstName = "System";
+        public const string ApiDefaultLastName = "Administrator";
         public const string ApiTokenConfirmEmail = "EmailConfirmation";
         public const string ApiTokenConfirmPhone = "PhoneNumberConfirmation";
         public const string ApiTokenConfirmTwoFactor = "TwoFactorConfirmation";

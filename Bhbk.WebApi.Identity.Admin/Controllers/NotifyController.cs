@@ -30,10 +30,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if(user.Email != model.ToEmail)
+            else if (user.Email != model.ToEmail)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var queue = ((MaintainNotifyTask)Tasks.Single(x => x.GetType() == typeof(MaintainNotifyTask)));
+            var queue = ((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask)));
 
             if (!queue.TryEnqueueEmail(model))
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/text"), HttpPost]
-        public async Task<IActionResult> SendSms([FromBody] UserCreateText model)
+        public async Task<IActionResult> SendText([FromBody] UserCreateText model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (user.PhoneNumber != model.ToPhoneNumber)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var queue = ((MaintainNotifyTask)Tasks.Single(x => x.GetType() == typeof(MaintainNotifyTask)));
+            var queue = ((QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask)));
 
             if (!queue.TryEnqueueText(model))
                 return BadRequest(BaseLib.Statics.MsgSysQueueSmsError);

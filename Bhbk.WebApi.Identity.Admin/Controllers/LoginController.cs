@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID}/add/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> AddLoginToUser(Guid loginID, Guid userID, [FromBody] UserLoginCreate model)
+        public async Task<IActionResult> AddLoginToUser([FromRoute] Guid loginID, [FromRoute] Guid userID, [FromBody] UserLoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteLogin(Guid loginID)
+        public async Task<IActionResult> DeleteLogin([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID}"), HttpGet]
-        public async Task<IActionResult> GetLogin(Guid loginID)
+        public async Task<IActionResult> GetLogin([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID}/users"), HttpGet]
-        public async Task<IActionResult> GetLoginUsers(Guid loginID)
+        public async Task<IActionResult> GetLoginUsers([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID}/remove/{userID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RemoveLoginFromUser(Guid loginID, Guid userID)
+        public async Task<IActionResult> RemoveLoginFromUser([FromRoute] Guid loginID, [FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

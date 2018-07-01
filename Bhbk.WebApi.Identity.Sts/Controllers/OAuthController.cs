@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> GetRefreshTokens(Guid userID)
+        public async Task<IActionResult> GetRefreshTokens([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeRefreshToken(Guid userID, Guid tokenID)
+        public async Task<IActionResult> RevokeRefreshToken([FromRoute] Guid userID, [FromRoute] Guid tokenID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}/revoke"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeRefreshTokens(Guid userID)
+        public async Task<IActionResult> RevokeRefreshTokens([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 

@@ -21,7 +21,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             : base(ioc, tasks) { }
 
         [Route("v1/status/{name}"), HttpGet]
-        public IActionResult GetStatus(string name)
+        public IActionResult GetStatus([FromRoute] string name)
         {
             if (name.ToLower() == BaseLib.TaskType.MaintainActivity.ToString().ToLower())
                 return Ok(((MaintainActivityTask)Tasks.Single(x => x.GetType() == typeof(MaintainActivityTask))).Status);
@@ -29,8 +29,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (name.ToLower() == BaseLib.TaskType.MaintainUsers.ToString().ToLower())
                 return Ok(((MaintainUsersTask)Tasks.Single(x => x.GetType() == typeof(MaintainUsersTask))).Status);
 
-            if (name.ToLower() == BaseLib.TaskType.MaintainNotify.ToString().ToLower())
-                return Ok(((MaintainNotifyTask)Tasks.Single(x => x.GetType() == typeof(MaintainNotifyTask))).Status);
+            if (name.ToLower() == BaseLib.TaskType.QueueEmails.ToString().ToLower())
+                return Ok(((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask))).Status);
+
+            if (name.ToLower() == BaseLib.TaskType.QueueTexts.ToString().ToLower())
+                return Ok(((QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask))).Status);
 
             return BadRequest();
         }

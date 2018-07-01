@@ -45,8 +45,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var token = await TestIoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmEmailChange(model,
-                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
+            var result = await controller.ConfirmEmailChange(BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength),
+                model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var token = await TestIoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmEmailChange(model, token) as NoContentResult;
+            var result = await controller.ConfirmEmailChange(token, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
@@ -99,8 +99,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var token = await TestIoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPasswordChange(model,
-                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength)) as BadRequestObjectResult;
+            var result = await controller.ConfirmPasswordChange(BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsPasswordLength),
+                model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, BaseLib.Statics.ApiUnitTestPasswordCurrent);
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var token = await TestIoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPasswordChange(model, token) as NoContentResult;
+            var result = await controller.ConfirmPasswordChange(token, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = await TestIoC.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
@@ -158,8 +158,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var token = await TestIoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPhoneChange(model,
-                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength)) as BadRequestObjectResult;
+            var result = await controller.ConfirmPhoneChange(BaseLib.Helpers.CryptoHelper.CreateRandomBase64(TestIoC.ConfigMgmt.Tweaks.DefaultsAuhthorizationCodeLength),
+                model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -186,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var token = await TestIoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.CurrentPhoneNumber);
             token.Should().NotBeNullOrEmpty();
 
-            var result = await controller.ConfirmPhoneChange(model, token) as NoContentResult;
+            var result = await controller.ConfirmPhoneChange(token, model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 

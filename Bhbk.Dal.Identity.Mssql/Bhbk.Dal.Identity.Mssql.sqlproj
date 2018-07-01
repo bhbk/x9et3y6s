@@ -107,13 +107,18 @@
     <Folder Include="Properties" />
     <Folder Include="Maintenance" />
     <Folder Include="dbo\" />
-    <Folder Include="dbo\Tables\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Maintenance\DbContext-Scaffold.ps1" />
     <None Include="Maintenance\DbCompare-Debug.scmp" />
     <None Include="Maintenance\DbCompare-Live.scmp" />
     <None Include="Maintenance\DbCompare-Test.scmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\AppUserToken.sql">
@@ -164,11 +169,5 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 </Project>

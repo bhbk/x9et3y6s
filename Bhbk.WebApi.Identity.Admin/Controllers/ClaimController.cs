@@ -18,9 +18,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ClaimController(IIdentityContext ioc, IHostedService[] tasks)
             : base(ioc, tasks) { }
 
-        [Route("v1/{userID}"), HttpPut]
+        [Route("v1/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateClaim(Guid userID, Claim model)
+        public async Task<IActionResult> CreateClaim([FromRoute] Guid userID, [FromBody] Claim model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteClaim(Guid userID, Claim claim)
+        public async Task<IActionResult> DeleteClaim([FromRoute] Guid userID, [FromBody] Claim claim)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID}"), HttpGet]
-        public async Task<IActionResult> GetClaims(Guid userID)
+        public async Task<IActionResult> GetClaims([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 

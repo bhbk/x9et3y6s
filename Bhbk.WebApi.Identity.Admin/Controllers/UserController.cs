@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteUser(Guid userID)
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID}"), HttpGet]
-        public async Task<IActionResult> GetUser(Guid userID)
+        public async Task<IActionResult> GetUser([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{email}"), HttpGet]
-        public async Task<IActionResult> GetUser(string email)
+        public async Task<IActionResult> GetUser([FromRoute] string email)
         {
             var user = await IoC.UserMgmt.FindByEmailAsync(email);
 
@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID}/logins"), HttpGet]
-        public async Task<IActionResult> GetUserLogins(Guid userID)
+        public async Task<IActionResult> GetUserLogins([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID}/audiences"), HttpGet]
-        public async Task<IActionResult> GetUserAudiences(Guid userID)
+        public async Task<IActionResult> GetUserAudiences([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID}/roles"), HttpGet]
-        public async Task<IActionResult> GetUserRoles(Guid userID)
+        public async Task<IActionResult> GetUserRoles([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}/add-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> AddPassword(Guid userID, [FromBody] UserAddPassword model)
+        public async Task<IActionResult> AddPassword([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -195,7 +195,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}/remove-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RemovePassword(Guid userID)
+        public async Task<IActionResult> RemovePassword([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -224,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID}/reset-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> ResetPassword(Guid userID, [FromBody] UserAddPassword model)
+        public async Task<IActionResult> ResetPassword([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

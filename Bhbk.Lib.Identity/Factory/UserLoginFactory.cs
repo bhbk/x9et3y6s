@@ -1,5 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory
@@ -83,39 +85,71 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class UserLoginCreate
     {
+        [Required]
         public Guid UserId { get; set; }
+
+        [Required]
         public Guid LoginId { get; set; }
+
+        [Required]
         public string LoginProvider { get; set; }
+
         public string ProviderDisplayName { get; set; }
+
         public string ProviderDescription { get; set; }
+
         public string ProviderKey { get; set; }
+
+        [Required]
         public bool Enabled { get; set; }
+
+        [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
     public class UserLoginResult
     {
         public Guid UserId { get; set; }
+
         public Guid LoginId { get; set; }
+
         public string LoginProvider { get; set; }
+
         public string ProviderDisplayName { get; set; }
+
         public string ProviderDescription { get; set; }
+
         public string ProviderKey { get; set; }
+
         public bool Enabled { get; set; }
+
         public DateTime Created { get; set; }
+
         public Nullable<DateTime> LastUpdated { get; set; }
+
         public bool Immutable { get; set; }
     }
 
     public class UserLoginUpdate
     {
+        [Required]
         public Guid UserId { get; set; }
+
+        [Required]
         public Guid LoginId { get; set; }
+
+        [Required]
         public string LoginProvider { get; set; }
+
         public string ProviderDisplayName { get; set; }
+
         public string ProviderDescription { get; set; }
+
+        [Required]
         public string ProviderKey { get; set; }
+
         public bool Enabled { get; set; }
+
         public bool Immutable { get; set; }
     }
 }

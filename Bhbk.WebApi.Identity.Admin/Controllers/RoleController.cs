@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{roleID}/add/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> AddRoleToUser(Guid roleID, Guid userID)
+        public async Task<IActionResult> AddRoleToUser([FromRoute] Guid roleID, [FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{roleID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteRole(Guid roleID)
+        public async Task<IActionResult> DeleteRole([FromRoute] Guid roleID)
         {
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
@@ -119,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID}"), HttpGet]
-        public async Task<IActionResult> GetRole(Guid roleID)
+        public async Task<IActionResult> GetRole([FromRoute] Guid roleID)
         {
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
@@ -132,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID}/users"), HttpGet]
-        public async Task<IActionResult> GetRoleUsers(Guid roleID)
+        public async Task<IActionResult> GetRoleUsers([FromRoute] Guid roleID)
         {
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{roleID}/remove/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RemoveRoleFromUser(Guid roleID, Guid userID)
+        public async Task<IActionResult> RemoveRoleFromUser([FromRoute] Guid roleID, [FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

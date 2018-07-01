@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -166,9 +167,15 @@ namespace Bhbk.Lib.Identity.Factory
         [Required]
         [RegularExpression(@"^[\w\s-`']+$", ErrorMessage = "Special characters are not allowed (except - and `).")]
         public string LastName { get; set; }
+
         public DateTime Created { get; set; }
+
         public bool LockoutEnabled { get; set; }
+
+        [Required]
         public bool HumanBeing { get; set; }
+
+        [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
@@ -200,6 +207,8 @@ namespace Bhbk.Lib.Identity.Factory
         public string HtmlContent { get; set; }
 
         public string PLaintextContent { get; set; }
+
+        public DateTime Created { get; set; }
     }
 
     public class UserCreateText
@@ -222,6 +231,8 @@ namespace Bhbk.Lib.Identity.Factory
 
         [Required]
         public string Body { get; set; }
+
+        public DateTime Created { get; set; }
     }
 
     public class UserResult
@@ -252,49 +263,90 @@ namespace Bhbk.Lib.Identity.Factory
 
     public class UserUpdate
     {
+        [Required]
         public Guid Id { get; set; }
+
         public Guid ActorId { get; set; }
+
+        [Required]
         public string FirstName { get; set; }
+
+        [Required]
         public string LastName { get; set; }
+
+        [Required]
         public bool LockoutEnabled { get; set; }
+
+        [Required]
         public Nullable<DateTimeOffset> LockoutEnd { get; set; }
     }
 
     public class UserAddPassword
     {
+        [Required]
         public Guid Id { get; set; }
+
+        [Required]
         public string NewPassword { get; set; }
+
+        [Required]
         public string NewPasswordConfirm { get; set; }
     }
 
     public class UserAddPhoneNumber
     {
+        [Required]
         public Guid Id { get; set; }
+
+        [Required]
         public string NewPhoneNumber { get; set; }
+
+        [Required]
         public string NewPhoneNumberConfirm { get; set; }
     }
 
     public class UserChangePassword
     {
+        [Required]
         public Guid Id { get; set; }
+
+        [Required]
         public string CurrentPassword { get; set; }
+
+        [Required]
         public string NewPassword { get; set; }
+
+        [Required]
         public string NewPasswordConfirm { get; set; }
     }
 
     public class UserChangePhone
     {
+        [Required]
         public Guid Id { get; set; }
+
+        [Required]
         public string CurrentPhoneNumber { get; set; }
+
+        [Required]
         public string NewPhoneNumber { get; set; }
+
+        [Required]
         public string NewPhoneNumberConfirm { get; set; }
     }
 
     public class UserChangeEmail
     {
+        [Required]
         public Guid Id { get; set; }
+
+        [Required]
         public string CurrentEmail { get; set; }
+
+        [Required]
         public string NewEmail { get; set; }
+
+        [Required]
         public string NewEmailConfirm { get; set; }
     }
 

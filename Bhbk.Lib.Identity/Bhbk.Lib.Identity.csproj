@@ -38,6 +38,7 @@
     <PackageReference Include="Otp.NET" Version="1.2.0" />
     <PackageReference Include="Sendgrid" Version="9.5.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.2" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.11" />

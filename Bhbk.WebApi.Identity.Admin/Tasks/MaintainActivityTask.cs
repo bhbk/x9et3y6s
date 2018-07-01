@@ -42,12 +42,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             _transient = int.Parse(_cb["Tasks:MaintainActivity:HoldTransient"]);
             _ioc = ioc;
 
-            var statusMsg = typeof(MaintainActivityTask).Name + " not run yet.";
-
-            Status = JsonConvert.SerializeObject(new
-            {
-                status = statusMsg
-            }, _serializer);
+            Status = JsonConvert.SerializeObject(
+                new
+                {
+                    status = typeof(MaintainActivityTask).Name + " not run yet."
+                }, _serializer);
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -71,15 +70,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                         _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                        var statusMsg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                        var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + expiredCount.ToString() + " expired activity entries.";
 
-                        Status = JsonConvert.SerializeObject(new
-                        {
-                            status = statusMsg
-                        }, _serializer);
+                        Status = JsonConvert.SerializeObject(
+                            new
+                            {
+                                status = msg
+                            }, _serializer);
 
-                        Log.Information(statusMsg);
+                        Log.Information(msg);
                     }
                 }
                 catch (Exception ex)

@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             var controller = new DiagnosticController(TestIoC, TestTasks);
 
-            var result = controller.GetStatus(BaseLib.TaskType.MaintainNotify.ToString().ToLower()) as OkObjectResult;
+            var result = controller.GetStatus(BaseLib.TaskType.QueueEmails.ToString().ToLower()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }

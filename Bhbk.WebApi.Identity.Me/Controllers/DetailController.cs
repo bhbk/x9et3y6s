@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/two-factor/{status}"), HttpPut]
-        public async Task<IActionResult> SetTwoFactor(bool status)
+        public async Task<IActionResult> SetTwoFactor([FromRoute] bool status)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

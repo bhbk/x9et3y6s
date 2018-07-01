@@ -21,7 +21,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             : base(ioc, tasks) { }
 
         [Route("v1/status/{name}"), HttpGet]
-        public IActionResult GetStatus(string name)
+        public IActionResult GetStatus([FromRoute] string name)
         {
             if (name.ToLower() == BaseLib.TaskType.MaintainTokens.ToString().ToLower())
                 return Ok(((MaintainTokensTask)Tasks.Single(x => x.GetType() == typeof(MaintainTokensTask))).Status);

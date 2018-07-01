@@ -43,6 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             _tasks = tasks;
         }
 
+        [NonAction]
         protected IActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)

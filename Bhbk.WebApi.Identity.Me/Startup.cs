@@ -92,6 +92,7 @@ namespace Bhbk.WebApi.Identity.Me
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+            sc.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
                 headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -120,8 +121,10 @@ namespace Bhbk.WebApi.Identity.Me
 
             app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());
-            app.UseStaticFiles();
             app.UseAuthentication();
+            app.UseStaticFiles();
+            app.UseSwagger(SwaggerHelper.ConfigureSwagger);
+            app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
             app.UseMvc();
         }
     }

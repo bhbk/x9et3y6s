@@ -41,12 +41,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             _delay = int.Parse(_cb["Tasks:MaintainUsers:PollingDelay"]);
             _ioc = ioc;
 
-            var statusMsg = typeof(MaintainUsersTask).Name + " not run yet.";
-
-            Status = JsonConvert.SerializeObject(new
-            {
-                status = statusMsg
-            }, _serializer);
+            Status = JsonConvert.SerializeObject(
+                new
+                {
+                    status = typeof(MaintainUsersTask).Name + " not run yet."
+                }, _serializer);
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -72,15 +71,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                         _ioc.UserMgmt.Store.Context.SaveChanges();
 
-                        var statusMsg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
+                        var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                 + disabledCount.ToString() + " users with expired lock-outs.";
 
-                        Status = JsonConvert.SerializeObject(new
-                        {
-                            status = statusMsg
-                        }, _serializer);
+                        Status = JsonConvert.SerializeObject(
+                            new
+                            {
+                                status = msg
+                            }, _serializer);
 
-                        Log.Information(statusMsg);
+                        Log.Information(msg);
                     }
                 }
                 catch (Exception ex)

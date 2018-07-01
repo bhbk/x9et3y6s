@@ -45,6 +45,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             _tasks = tasks;
         }
 
+        [NonAction]
         protected IActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)
@@ -67,12 +68,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             return null;
         }
 
+        [NonAction]
         protected Guid GetUserGUID()
         {
             var claims = ControllerContext.HttpContext.User.Identity as ClaimsIdentity;
             return Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
         }
 
+        [NonAction]
         public void SetUser(Guid userID)
         {
             var user = IoC.UserMgmt.Store.FindByIdAsync(userID.ToString()).Result;
