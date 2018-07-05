@@ -8,43 +8,37 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class ConfigStore
     {
-        private AppConfig _config { get; set; }
-        private FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
-        private IConfigurationRoot _cb;
+        private FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private AppConfig _app { get; set; }
+        private IConfigurationRoot _conf;
 
         public AppConfig Config
         {
             get
             {
-                return _config;
+                return _app;
             }
         }
 
         public void ReadJson()
         {
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name)
                 .Build();
 
-            _config = new AppConfig();
+            _app = new AppConfig();
 
             try
             {
-                _config.DefaultsDebug = Boolean.Parse(_cb["IdentityDefaults:Debug"]);
-                _config.DefaultsAuhthorizationCodeLife = UInt16.Parse(_cb["IdentityDefaults:AuthorizationCodeLife"]);
-                _config.DefaultsAuhthorizationCodeLength = UInt16.Parse(_cb["IdentityDefaults:AuthorizationCodeLength"]);
-                _config.DefaultsAccessTokenLife = Double.Parse(_cb["IdentityDefaults:AccessTokenLife"]);
-                _config.DefaultsFailedAccessAttempts = UInt16.Parse(_cb["IdentityDefaults:FailedAccessAttempts"]);
-                _config.DefaultsPasswordLength = UInt16.Parse(_cb["IdentityDefaults:PasswordLength"]);
-                _config.DefaultsRefreshTokenLife = Double.Parse(_cb["IdentityDefaults:RefreshTokenLife"]);
-                _config.EndpointsAdminUrl = _cb["IdentityEndpoints:AdminUrl"];
-                _config.EndpointsMeUrl = _cb["IdentityEndpoints:MeUrl"];
-                _config.EndpointsStsUrl = _cb["IdentityEndpoints:StsUrl"];
-                _config.UnitTestsAccessToken = false;
-                _config.UnitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
-                _config.UnitTestsRefreshToken = false;
-                _config.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
+                _app.DefaultsAccessTokenExpire = UInt16.Parse(_conf["IdentityDefaults:AccessTokenExpire"]);
+                _app.DefaultsAuthorizeCodeExpire = UInt16.Parse(_conf["IdentityDefaults:AuthorizeCodeExpire"]);
+                _app.DefaultsBrowserCookieExpire = UInt16.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
+                _app.DefaultsRefreshTokenExpire = UInt16.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
+                _app.UnitTestsAccessToken = false;
+                _app.UnitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
+                _app.UnitTestsRefreshToken = false;
+                _app.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
             }
             catch (Exception ex)
             {

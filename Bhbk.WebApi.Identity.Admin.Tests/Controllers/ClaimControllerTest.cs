@@ -25,19 +25,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Claim_Create_Pass()
+        public async Task Api_Admin_ClaimV1_Create_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClaimController(TestIoC, TestTasks);
-
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new ClaimController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, BaseLib.Statics.ApiUnitTestClaimValue);
 
-            TestController.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-            var result = await TestController.CreateClaim(user.Id, claim) as OkObjectResult;
+            var result = await controller.CreateClaimV1(user.Id, claim) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<Claim>().Subject;
 
@@ -45,24 +44,23 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Claim_Delete_Pass()
+        public async Task Api_Admin_ClaimV1_Delete_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClaimController(TestIoC, TestTasks);
-
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new ClaimController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, 
                 BaseLib.Statics.ApiUnitTestClaimValue + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4));
 
-            var add = await TestIoC.UserMgmt.AddClaimAsync(user, claim);
+            var add = await _ioc.UserMgmt.AddClaimAsync(user, claim);
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
-            TestController.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-            var result = await TestController.DeleteClaim(user.Id, claim) as NoContentResult;
+            var result = await controller.DeleteClaimV1(user.Id, claim) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
             var check = user.AppUserClaim.Where(x => x.ClaimType == claim.Type && x.ClaimValue == claim.Value).Any();
@@ -70,16 +68,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Claim_Get_Pass()
+        public async Task Api_Admin_ClaimV1_Get_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClaimController(TestIoC, TestTasks);
+            var controller = new ClaimController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            var result = await TestController.GetClaims(user.Id) as OkObjectResult;
+            var result = await controller.GetClaimsV1(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IList<Claim>>().Subject;
 

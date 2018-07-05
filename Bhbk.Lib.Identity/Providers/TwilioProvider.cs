@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
-namespace Bhbk.Lib.Identity.Externals
+namespace Bhbk.Lib.Identity.Providers
 {
     public class TwilioProvider
     {

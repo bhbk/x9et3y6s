@@ -154,6 +154,9 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid ActorId { get; set; }
 
         [Required]
+        public Guid ClientId { get; set; }
+
+        [Required]
         [EmailAddress]
         public string Email { get; set; }
 
@@ -206,7 +209,7 @@ namespace Bhbk.Lib.Identity.Factory
 
         public string HtmlContent { get; set; }
 
-        public string PLaintextContent { get; set; }
+        public string PlaintextContent { get; set; }
 
         public DateTime Created { get; set; }
     }

@@ -15,8 +15,9 @@ namespace Bhbk.Lib.Identity.Providers
         Read,
         Update,
         Delete,
-        StsAccess,
-        StsRefresh
+        StsAccessToken,
+        StsAuthorizeCode,
+        StsRefreshToken,
     }
 
     public class ActivityProvider<TEntity> : ActivityProvider

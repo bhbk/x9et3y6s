@@ -18,7 +18,7 @@ using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class RefreshTokenV1Extension
+    public static class RefreshTokenExtension
     {
         public static IApplicationBuilder UseRefreshTokenProvider(this IApplicationBuilder app)
         {
@@ -43,6 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
         public Task Invoke(HttpContext context)
         {
             #region v1 end-point
+
             //check if correct v1 path, method, content and params...
             if (context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
@@ -52,12 +53,12 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrRefreshTokenIDV1)))
             {
-                var postValues = context.Request.ReadFormAsync().Result;
+                var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV1).Value;
-                string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
-                string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
-                string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV1).Value;
+                string audienceValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
@@ -164,7 +165,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsRefresh.ToString(),
+                    ActivityType = ActivityType.StsRefreshToken.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });
@@ -173,9 +174,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(result, _serializer));
             }
+
             #endregion
 
             #region v2 end-point
+
             //check if correct v2 path, method, content and params...
             if (context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
@@ -185,12 +188,12 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrRefreshTokenIDV2)))
             {
-                var postValues = context.Request.ReadFormAsync().Result;
+                var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
-                string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
-                string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-                string refreshTokenValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
+                string audienceValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
@@ -313,7 +316,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsRefresh.ToString(),
+                    ActivityType = ActivityType.StsRefreshToken.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });
@@ -322,6 +325,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(result, _serializer));
             }
+
             #endregion
 
             return _next(context);

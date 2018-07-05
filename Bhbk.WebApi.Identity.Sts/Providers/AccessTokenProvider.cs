@@ -43,6 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
         public Task Invoke(HttpContext context)
         {
             #region v1 end-point
+
             //check if correct v1 path, method, content and params...
             if (context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
@@ -51,20 +52,20 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserIDV1)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrPasswordIDV1)))
+                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserPasswordIDV1)))
             {
-                var postValues = context.Request.ReadFormAsync().Result;
+                var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV1).Value;
-                string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
-                string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
-                string userValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV1).Value;
-                string passwordValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrPasswordIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV1).Value;
+                string audienceValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
+                string userValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV1).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserPasswordIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
                     || string.IsNullOrEmpty(audienceValue)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrPasswordIDV1)
+                    || !grantTypeValue.Equals(BaseLib.Statics.AttrUserPasswordIDV1)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -195,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsAccess.ToString(),
+                    ActivityType = ActivityType.StsAccessToken.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });
@@ -205,9 +206,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(result, _serializer));
 
             }
+
             #endregion
 
             #region v2 end-point
+
             //check if correct v2 path, method, content and params...
             if (context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
@@ -216,19 +219,19 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
                 || context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserIDV2)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrPasswordIDV2)))
+                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrUserPasswordIDV2)))
             {
-                var postValues = context.Request.ReadFormAsync().Result;
+                var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
-                string audienceValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
-                string grantTypeValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-                string userValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV2).Value;
-                string passwordValue = postValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrPasswordIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
+                string audienceValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
+                string userValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV2).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserPasswordIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrPasswordIDV2)
+                    || !grantTypeValue.Equals(BaseLib.Statics.AttrUserPasswordIDV2)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -376,7 +379,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsAccess.ToString(),
+                    ActivityType = ActivityType.StsAccessToken.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });
@@ -385,6 +388,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(result, _serializer));
             }
+
             #endregion
 
             return _next(context);

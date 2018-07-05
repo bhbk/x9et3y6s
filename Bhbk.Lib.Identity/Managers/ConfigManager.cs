@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Managers
     {
         private readonly ConfigStore _store;
 
-        public AppConfig Tweaks
+        public AppConfig Store
         {
             get
             {
@@ -37,16 +37,9 @@ namespace Bhbk.Lib.Identity.Managers
             StringBuilder output = new StringBuilder();
 
             output.Append(typeof(AppConfig).Name + Environment.NewLine);
-            output.Append("\tDefaults:Debug:" + _store.Config.DefaultsDebug.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:AuthorizationCodeLife:" + _store.Config.DefaultsAuhthorizationCodeLife.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:AuthorizationCodeLength:" + _store.Config.DefaultsAuhthorizationCodeLength.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:AccessTokenLife:" + _store.Config.DefaultsAccessTokenLife.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:FailedAccessAttempts:" + _store.Config.DefaultsFailedAccessAttempts.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:PasswordLength:" + _store.Config.DefaultsPasswordLength.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:RefreshTokenLife:" + _store.Config.DefaultsRefreshTokenLife.ToString() + Environment.NewLine);
-            output.Append("\tEndpoints:AdminUrl:" + _store.Config.EndpointsAdminUrl.ToString() + Environment.NewLine);
-            output.Append("\tEndpoints:MeUrl:" + _store.Config.EndpointsMeUrl.ToString() + Environment.NewLine);
-            output.Append("\tEndpoints:StsUrl:" + _store.Config.EndpointsStsUrl.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:AccessTokenExpire:" + _store.Config.DefaultsAccessTokenExpire.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:AuthorizeCodeExpire:" + _store.Config.DefaultsAuthorizeCodeExpire.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:RefreshTokenExpire:" + _store.Config.DefaultsRefreshTokenExpire.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:AccessToken:" + _store.Config.UnitTestsAccessToken.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:AccessTokenFakeUtcNow:" + _store.Config.UnitTestsAccessTokenFakeUtcNow.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:RefreshToken:" + _store.Config.UnitTestsRefreshToken.ToString() + Environment.NewLine);

@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Lib.Identity.Providers
 {
@@ -59,20 +58,20 @@ namespace Bhbk.Lib.Identity.Providers
 
             var errorMsg = "null";
 
-            var orderBy = context.ValueProvider.GetValue(BaseLib.Statics.GetOrderBy);
+            var orderBy = context.ValueProvider.GetValue(Statics.GetOrderBy);
 
             if (orderBy == ValueProviderResult.None)
-                context.ModelState.AddModelError(BaseLib.Statics.GetOrderBy, errorMsg);
+                context.ModelState.AddModelError(Statics.GetOrderBy, errorMsg);
 
-            var pageSize = context.ValueProvider.GetValue(BaseLib.Statics.GetPageSize);
+            var pageSize = context.ValueProvider.GetValue(Statics.GetPageSize);
 
             if (pageSize == ValueProviderResult.None)
-                context.ModelState.AddModelError(BaseLib.Statics.GetPageSize, errorMsg);
+                context.ModelState.AddModelError(Statics.GetPageSize, errorMsg);
 
-            var pageNumber = context.ValueProvider.GetValue(BaseLib.Statics.GetPageNumber);
+            var pageNumber = context.ValueProvider.GetValue(Statics.GetPageNumber);
 
             if (pageNumber == ValueProviderResult.None)
-                context.ModelState.AddModelError(BaseLib.Statics.GetPageNumber, errorMsg);
+                context.ModelState.AddModelError(Statics.GetPageNumber, errorMsg);
 
             if (context.ModelState.ErrorCount == 0)
                 context.Result = ModelBindingResult.Success(
@@ -116,7 +115,7 @@ namespace Bhbk.Lib.Identity.Providers
 
     public static class MvcOptionsExtensions
     {
-        public static void UseMyModelBinders(this MvcOptions options)
+        public static void UseMyModelBinderProvider(this MvcOptions options)
         {
             var binder = options.ModelBinderProviders.FirstOrDefault(x => x.GetType() == typeof(ComplexTypeModelBinderProvider));
 

@@ -21,7 +21,6 @@ namespace Bhbk.Lib.Identity.Managers
         public readonly ClaimsProvider ClaimProvider;
         public readonly PasswordHasher PasswordHasher;
         public readonly PasswordValidator PasswordValidator;
-        public readonly TotpTokenProvider TokenProvider;
         public readonly CustomUserStore Store;
         public readonly UserValidator UserValidator;
 
@@ -44,15 +43,6 @@ namespace Bhbk.Lib.Identity.Managers
             ClaimProvider = new ClaimsProvider(this, Config);
             PasswordHasher = new PasswordHasher();
             PasswordValidator = new PasswordValidator();
-
-            //create user token provider...
-            TokenProvider =
-                new TotpTokenProvider
-                {
-                    OtpTokenSize = Config.Tweaks.DefaultsAuhthorizationCodeLength,
-                    OtpTokenTimespan = Config.Tweaks.DefaultsAuhthorizationCodeLife
-                };
-
             UserValidator = new UserValidator();
         }
 
@@ -100,7 +90,7 @@ namespace Bhbk.Lib.Identity.Managers
 
             return IdentityResult.Success;
         }
-        
+
         public override async Task<IdentityResult> AddPasswordAsync(AppUser user, string password)
         {
             if (!Store.Exists(user.Id))
@@ -161,7 +151,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            if (!await VerifyUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmPhone, token))
+            if (!await VerifyUserTokenAsync(user, string.Empty, phoneNumber, token))
                 throw new InvalidOperationException();
 
             user.PhoneNumber = phoneNumber;
@@ -179,45 +169,6 @@ namespace Bhbk.Lib.Identity.Managers
                 return true;
 
             return false;
-        }
-
-        public override async Task<IdentityResult> ConfirmEmailAsync(AppUser user, string token)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            if (!await VerifyUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmEmail, token))
-                throw new InvalidOperationException();
-
-            await Store.SetEmailConfirmedAsync(user, true);
-
-            return IdentityResult.Success;
-        }
-
-        public async Task<IdentityResult> ConfirmPasswordAsync(AppUser user, string token)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            if (!await VerifyUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmEmail, token))
-                throw new InvalidOperationException();
-
-            await Store.SetPasswordConfirmedAsync(user, true);
-
-            return IdentityResult.Success;
-        }
-
-        public async Task<IdentityResult> ConfirmPhoneNumberAsync(AppUser user, string token)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            if (!await VerifyUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmEmail, token))
-                throw new InvalidOperationException();
-
-            await Store.SetPhoneNumberConfirmedAsync(user, true);
-
-            return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> CreateAsync(AppUser user)
@@ -297,22 +248,6 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.GetClaimsAsync(user);
         }
 
-        public async Task<string> GetEmailAsync(AppUser user)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            return await Store.GetEmailAsync(user);
-        }
-
-        public async Task<string> GetPhoneNumberAsync(AppUser user)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            return await Store.GetPhoneNumberAsync(user);
-        }
-
         public async Task<IList<string>> GetAudiencesAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
@@ -362,37 +297,6 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.GetTwoFactorEnabledAsync(user);
         }
 
-        public override async Task<string> GenerateChangePhoneNumberTokenAsync(AppUser user, string phoneNumber)
-        {
-            return await GenerateUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmPhone);
-        }
-
-        public override async Task<string> GenerateEmailConfirmationTokenAsync(AppUser user)
-        {
-            return await GenerateUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmEmail);
-        }
-
-        public override async Task<string> GeneratePasswordResetTokenAsync(AppUser user)
-        {
-            return await GenerateUserTokenAsync(user, string.Empty, Statics.ApiTokenResetPassword);
-        }
-
-        public override async Task<string> GenerateTwoFactorTokenAsync(AppUser user, string tokenProvider)
-        {
-            return await GenerateUserTokenAsync(user, string.Empty, Statics.ApiTokenConfirmTwoFactor);
-        }
-
-        public override async Task<string> GenerateUserTokenAsync(AppUser user, string tokenProvider, string purpose)
-        {
-            if (TokenProvider == null)
-                throw new NotSupportedException();
-
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            return await TokenProvider.GenerateAsync(purpose, this, user);
-        }
-
         public override async Task<bool> HasPasswordAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
@@ -428,6 +332,7 @@ namespace Bhbk.Lib.Identity.Managers
                 {
                     user.LockoutEnabled = false;
                     user.LockoutEnd = null;
+
                     await UpdateAsync(user);
 
                     return false;
@@ -456,7 +361,7 @@ namespace Bhbk.Lib.Identity.Managers
 
             return IdentityResult.Success;
         }
-        
+
         public override Task<IdentityResult> RemoveLoginAsync(AppUser user, string loginProvider, string providerKey)
         {
             return base.RemoveLoginAsync(user, loginProvider, providerKey);
@@ -514,53 +419,6 @@ namespace Bhbk.Lib.Identity.Managers
                 throw new ArgumentNullException();
 
             await Store.SetPasswordHashAsync(user, null);
-            await Store.SetSecurityStampAsync(user, null);
-
-            return IdentityResult.Success;
-        }
-
-        public override async Task<IdentityResult> ResetPasswordAsync(AppUser user, string token, string newPassword)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            if (!await VerifyUserTokenAsync(user, string.Empty, Statics.ApiTokenResetPassword, token))
-                throw new InvalidOperationException();
-
-            var result = await UpdatePassword(this.Store, user, newPassword);
-
-            if (result.Succeeded)
-                return await UpdateAsync(user);
-            else
-                return result;
-        }
-
-        public async Task<IdentityResult> SetEmailConfirmedAsync(AppUser user, bool confirmed)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            await Store.SetEmailConfirmedAsync(user, confirmed);
-
-            return IdentityResult.Success;
-        }
-
-        public async Task<IdentityResult> SetPasswordConfirmedAsync(AppUser user, bool confirmed)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            await Store.SetPasswordConfirmedAsync(user, confirmed);
-
-            return IdentityResult.Success;
-        }
-
-        public async Task<IdentityResult> SetPhoneNumberConfirmedAsync(AppUser user, bool confirmed)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            await Store.SetPhoneNumberConfirmedAsync(user, confirmed);
 
             return IdentityResult.Success;
         }
@@ -604,34 +462,12 @@ namespace Bhbk.Lib.Identity.Managers
             if (!result.Succeeded)
                 throw new InvalidOperationException();
 
-            var hashedPassword = PasswordHasher.HashPassword(user, newPassword);
+            var hash = PasswordHasher.HashPassword(user, newPassword);
 
-            await passwordStore.SetPasswordHashAsync(user, hashedPassword, new CancellationToken());
-            await SetPasswordConfirmedAsync(user, true);
-            await UpdateSecurityStampAsync(user);
-
-            return IdentityResult.Success;
-        }
-
-        public override async Task<IdentityResult> UpdateSecurityStampAsync(AppUser user)
-        {
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
+            await passwordStore.SetPasswordHashAsync(user, hash, new CancellationToken());
             await Store.SetSecurityStampAsync(user, Helpers.CryptoHelper.CreateRandomBase64(32));
 
             return IdentityResult.Success;
-        }
-
-        public override async Task<bool> VerifyChangePhoneNumberTokenAsync(AppUser user, string token, string phoneNumber)
-        {
-            if (TokenProvider == null)
-                throw new NotSupportedException();
-
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            return await TokenProvider.ValidateAsync(Statics.ApiTokenConfirmPhone, token, this, user);
         }
 
         protected override async Task<PasswordVerificationResult> VerifyPasswordAsync(IUserPasswordStore<AppUser> store, AppUser user, string password)
@@ -645,17 +481,6 @@ namespace Bhbk.Lib.Identity.Managers
                 return PasswordVerificationResult.Success;
 
             return PasswordVerificationResult.Failed;
-        }
-
-        public override async Task<bool> VerifyUserTokenAsync(AppUser user, string tokenProvider, string purpose, string token)
-        {
-            if (TokenProvider == null)
-                throw new NotSupportedException();
-
-            if (!Store.Exists(user.Id))
-                throw new ArgumentNullException();
-
-            return await TokenProvider.ValidateAsync(purpose, token, this, user);
         }
     }
 }

@@ -27,11 +27,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Activity_GetList_Fail_Auth()
+        public async Task Api_Admin_ActivityV1_GetList_Fail_Auth()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateRandom(10);
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateRandom(10);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
@@ -51,13 +51,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Activity_GetList_Fail_ParamInvalid()
+        public async Task Api_Admin_ActivityV1_GetList_Fail_ParamInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateRandom(10);
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateRandom(10);
 
-            var access = await JwtHelper.GetAccessTokenV2(TestIoC,
+            var access = await JwtHelper.GetAccessTokenV2(_ioc,
                 BaseLib.Statics.ApiDefaultClient, BaseLib.Statics.ApiDefaultAudienceUi, BaseLib.Statics.ApiDefaultUserAdmin);
 
             var request = _owin.CreateClient();
@@ -74,13 +74,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Activity_GetList_Pass()
+        public async Task Api_Admin_ActivityV1_GetList_Success()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateRandom(10);
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateRandom(10);
 
-            var access = await JwtHelper.GetAccessTokenV2(TestIoC,
+            var access = await JwtHelper.GetAccessTokenV2(_ioc,
                 BaseLib.Statics.ApiDefaultClient, BaseLib.Statics.ApiDefaultAudienceUi, BaseLib.Statics.ApiDefaultUserAdmin);
 
             var request = _owin.CreateClient();

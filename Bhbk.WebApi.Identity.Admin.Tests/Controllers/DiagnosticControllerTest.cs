@@ -21,41 +21,41 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetStatus_MaintainActivity_Pass()
+        public void Api_Admin_DiagV1_GetStatus_Success_MaintainActivity()
         {
-            var controller = new DiagnosticController(TestIoC, TestTasks);
+            var controller = new DiagnosticController(_conf, _ioc, _tasks);
 
-            var result = controller.GetStatus(BaseLib.TaskType.MaintainActivity.ToString()) as OkObjectResult;
+            var result = controller.GetStatusV1(BaseLib.TaskType.MaintainActivity.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetStatus_MaintainNotify_Pass()
+        public void Api_Admin_DiagV1_GetStatus_Success_MaintainNotify()
         {
-            var controller = new DiagnosticController(TestIoC, TestTasks);
+            var controller = new DiagnosticController(_conf, _ioc, _tasks);
 
-            var result = controller.GetStatus(BaseLib.TaskType.QueueEmails.ToString().ToLower()) as OkObjectResult;
+            var result = controller.GetStatusV1(BaseLib.TaskType.QueueEmails.ToString().ToLower()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetStatus_MaintainUsers_Pass()
+        public void Api_Admin_DiagV1_GetStatus_Success_MaintainUsers()
         {
-            var controller = new DiagnosticController(TestIoC, TestTasks);
+            var controller = new DiagnosticController(_conf, _ioc, _tasks);
 
-            var result = controller.GetStatus(BaseLib.TaskType.MaintainUsers.ToString()) as OkObjectResult;
+            var result = controller.GetStatusV1(BaseLib.TaskType.MaintainUsers.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Admin_Diag_GetVersion_Pass()
+        public void Api_Admin_DiagV1_GetVersion_Success()
         {
-            var controller = new DiagnosticController(TestIoC, TestTasks);
+            var controller = new DiagnosticController(_conf, _ioc, _tasks);
 
-            var result = controller.GetVersion() as OkObjectResult;
+            var result = controller.GetVersionV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
 

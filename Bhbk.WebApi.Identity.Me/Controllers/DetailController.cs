@@ -4,8 +4,8 @@ using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,56 +18,27 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public DetailController() { }
 
-        public DetailController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public DetailController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
         [Route("v1/quote-of-day"), HttpGet]
-        public IActionResult QuoteOfDay()
+        public IActionResult GetQuoteOfDayV1()
         {
             var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
 
             return Ok(task.QuoteOfDay);
         }
 
-        [Route("v1/change-email"), HttpPut]
-        public async Task<IActionResult> AskChangeEmail([FromBody] UserChangeEmail model)
+        [Route("v1/claims"), HttpGet]
+        public IActionResult GetClaimsV1()
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = User.Identity as ClaimsIdentity;
 
-            if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (user.Email != model.CurrentEmail)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
-
-            else if (await IoC.UserMgmt.GetEmailAsync(user) != user.Email)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
-
-            else if (model.NewEmail != model.NewEmailConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidEmailConfirm);
-
-            else
-            {
-                string token = await IoC.UserMgmt.GenerateEmailConfirmationTokenAsync(user);
-
-                if (IoC.ContextStatus == ContextType.UnitTest)
-                    return Ok(token);
-                else
-                {
-                    //await Context.UserMgmt.SendEmailAsync(user.Id, "Confirmation Email", "Confirmatil Email Body " + token);
-                    return NoContent();
-                }
-            }
+            return Ok(user.Claims);
         }
 
-        [Route("v1/change-password"), HttpPut]
-        public async Task<IActionResult> AskChangePassword([FromBody] UserChangePassword model)
+        [Route("v1/set-password"), HttpPut]
+        public async Task<IActionResult> SetPasswordV1([FromBody] UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -75,12 +46,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
             else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
@@ -89,67 +54,26 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            else
-            {
-                string token = await IoC.UserMgmt.GeneratePasswordResetTokenAsync(user);
-
-                if (IoC.ContextStatus == ContextType.UnitTest)
-                    return Ok(token);
-                else
-                {
-                    //await Context.UserMgmt.SendEmailAsync(user.Id, "Confirmation Email", "Confirmation Email Body " + token);
-                    return NoContent();
-                }
-            }
-        }
-
-        [Route("v1/change-phone"), HttpPut]
-        public async Task<IActionResult> AskChangePhone([FromBody] UserChangePhone model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
-
-            if (user == null)
+            if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+            user.ActorId = GetUserGUID();
 
-            else if (!user.HumanBeing)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+            var remove = await IoC.UserMgmt.RemovePasswordAsync(user);
 
-            else if (await IoC.UserMgmt.GetPhoneNumberAsync(user) != model.CurrentPhoneNumber)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPhone);
+            if (!remove.Succeeded)
+                return GetErrorResult(remove);
 
-            else if (model.NewPhoneNumber != model.NewPhoneNumberConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPhoneConfirm);
+            var add = await IoC.UserMgmt.AddPasswordAsync(user, model.NewPassword);
 
-            else
-            {
-                string token = await IoC.UserMgmt.GenerateChangePhoneNumberTokenAsync(user, model.NewPhoneNumber);
+            if (!add.Succeeded)
+                return GetErrorResult(add);
 
-                if (IoC.ContextStatus == ContextType.UnitTest)
-                    return Ok(token);
-                else
-                {
-                    //await Context.UserMgmt.SendSmsAsync(user.Id, "Confirmation Code" + token);
-                    return NoContent();
-                }
-            }
-        }
-
-        [Route("v1/claims"), HttpGet]
-        public IActionResult GetClaims()
-        {
-            var user = User.Identity as ClaimsIdentity;
-
-            return Ok(user.Claims);
+            return NoContent();
         }
 
         [Route("v1/two-factor/{status}"), HttpPut]
-        public async Task<IActionResult> SetTwoFactor([FromRoute] bool status)
+        public async Task<IActionResult> SetTwoFactorV1([FromRoute] bool status)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -162,25 +86,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            bool current = await IoC.UserMgmt.GetTwoFactorEnabledAsync(user);
+            bool two = await IoC.UserMgmt.GetTwoFactorEnabledAsync(user);
 
-            if (current == status)
+            if (two == status)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidTwoFactor);
 
-            else
-            {
-                var result = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, status);
+            var result = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, status);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+            if (!result.Succeeded)
+                return GetErrorResult(result);
 
-                else
-                    return NoContent();
-            }
+            return NoContent();
         }
 
         [Route("v1"), HttpPut]
-        public async Task<IActionResult> UpdateDetail([FromBody] UserUpdate model)
+        public async Task<IActionResult> UpdateDetailV1([FromBody] UserUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -196,19 +116,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else
-            {
-                var factory = new UserFactory<AppUser>(user);
-                factory.Update(model);
+            var update = new UserFactory<AppUser>(user);
+            update.Update(model);
 
-                var result = await IoC.UserMgmt.UpdateAsync(factory.Devolve());
+            var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+            if (!result.Succeeded)
+                return GetErrorResult(result);
 
-                else
-                    return Ok(factory.Evolve());
-            }
+            return Ok(update.Evolve());
         }
     }
 }

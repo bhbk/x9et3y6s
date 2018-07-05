@@ -21,21 +21,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Sts_Diag_GetStatus_MaintainTokens_Pass()
+        public void Api_Sts_DiagV1_GetStatus_Success_MaintainTokens()
         {
-            var controller = new DiagnosticController(TestIoC, TestTasks);
+            var controller = new DiagnosticController(_conf, _ioc, _tasks);
 
-            var result = controller.GetStatus(BaseLib.TaskType.MaintainTokens.ToString()) as OkObjectResult;
+            var result = controller.GetStatusV1(BaseLib.TaskType.MaintainTokens.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
         [TestMethod]
-        public void Api_Sts_Diag_GetVersion_Pass()
+        public void Api_Sts_DiagV1_GetVersion_Success()
         {
-            var controller = new DiagnosticController(TestIoC, TestTasks);
+            var controller = new DiagnosticController(_conf, _ioc, _tasks);
 
-            var result = controller.GetVersion() as OkObjectResult;
+            var result = controller.GetVersionV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
 

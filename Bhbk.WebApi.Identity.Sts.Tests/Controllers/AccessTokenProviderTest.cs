@@ -18,204 +18,207 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
     public class AccessTokenProviderTest : StartupTest
     {
         private TestServer _owin;
+        private S2STests _s2s;
 
         public AccessTokenProviderTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
+
+            _s2s = new S2STests(_conf, _ioc, _owin);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_AudienceDisabled()
+        public async Task Api_Sts_AccessV1_Fail_AudienceDisabled()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             audience.Enabled = false;
-            TestIoC.AudienceMgmt.Store.Update(audience);
+            _ioc.AudienceMgmt.Store.Update(audience);
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_AudienceInvalid()
+        public async Task Api_Sts_AccessV1_Fail_AudienceInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_AudienceMultiple()
+        public async Task Api_Sts_AccessV1_Fail_AudienceMultiple()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audienceA = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var audienceB = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audienceB = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
             var audiences = new List<string> { audienceA.Id.ToString(), audienceB.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             if (audienceA.Id == audienceB.Id)
                 Assert.Fail();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), string.Join(",", audiences.Select(x => x)), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), string.Join(",", audiences.Select(x => x)), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_AudienceUndefined()
+        public async Task Api_Sts_AccessV1_Fail_AudienceUndefined()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = string.Empty;
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_ClientDisabled()
+        public async Task Api_Sts_AccessV1_Fail_ClientDisabled()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             client.Enabled = false;
-            TestIoC.ClientMgmt.Store.Update(client);
+            _ioc.ClientMgmt.Store.Update(client);
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_ClientInvalid()
+        public async Task Api_Sts_AccessV1_Fail_ClientInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
             var client = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_ClientUndefined()
+        public async Task Api_Sts_AccessV1_Fail_ClientUndefined()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
             var client = string.Empty;
-            var audience = TestIoC.AudienceMgmt.Store.Get().First();
-            var user = TestIoC.UserMgmt.Store.Get().First();
+            var audience = _ioc.AudienceMgmt.Store.Get().First();
+            var user = _ioc.UserMgmt.Store.Get().First();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_UserInvalid()
+        public async Task Api_Sts_AccessV1_Fail_UserInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_UserLocked()
+        public async Task Api_Sts_AccessV1_Fail_UserLocked()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             user.LockoutEnabled = true;
-            user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
-            TestIoC.UserMgmt.UpdateAsync(user).Wait();
+            user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
+            _ioc.UserMgmt.UpdateAsync(user).Wait();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_UserUndefined()
+        public async Task Api_Sts_AccessV1_Fail_UserUndefined()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = string.Empty;
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Fail_UserPassword()
+        public async Task Api_Sts_AccessV1_Fail_UserPassword()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8));
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Pass_AudienceSingle_ById()
+        public async Task Api_Sts_AccessV1_Success_AudienceSingle_ById()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -227,16 +230,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV1_Pass_AudienceSingle_ByName()
+        public async Task Api_Sts_AccessV1_Success_AudienceSingle_ByName()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV1(_owin, client.Name, audience.Name, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV1(client.Name, audience.Name, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -248,188 +251,188 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_AudienceDisabled()
+        public async Task Api_Sts_AccessV2_Fail_AudienceDisabled()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             audience.Enabled = false;
-            TestIoC.AudienceMgmt.Store.Update(audience);
+            _ioc.AudienceMgmt.Store.Update(audience);
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_AudienceInvalid()
+        public async Task Api_Sts_AccessV2_Fail_AudienceInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audiences = new List<string> { BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8) };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_AudienceMultiple()
+        public async Task Api_Sts_AccessV2_Fail_AudienceMultiple()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audienceA = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var audienceB = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audienceB = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
             var audiences = new List<string> { audienceA.Id.ToString(), audienceB.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             if (audienceA.Id == audienceB.Id)
                 Assert.Fail();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_ClientDisabled()
+        public async Task Api_Sts_AccessV2_Fail_ClientDisabled()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             client.Enabled = false;
-            TestIoC.ClientMgmt.Store.Update(client);
+            _ioc.ClientMgmt.Store.Update(client);
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_ClientInvalid()
+        public async Task Api_Sts_AccessV2_Fail_ClientInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
             var client = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_ClientUndefined()
+        public async Task Api_Sts_AccessV2_Fail_ClientUndefined()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
             var client = string.Empty;
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_UserInvalid()
+        public async Task Api_Sts_AccessV2_Fail_UserInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8), string.Empty);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_UserLocked()
+        public async Task Api_Sts_AccessV2_Fail_UserLocked()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
-            TestIoC.UserMgmt.UpdateAsync(user).Wait();
+            _ioc.UserMgmt.UpdateAsync(user).Wait();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_UserUndefined()
+        public async Task Api_Sts_AccessV2_Fail_UserUndefined()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, string.Empty, string.Empty);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, string.Empty, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Fail_UserPassword()
+        public async Task Api_Sts_AccessV2_Fail_UserPassword()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8));
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Pass_AudienceSingle_ById()
+        public async Task Api_Sts_AccessV2_Success_AudienceSingle_ById()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -441,17 +444,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Pass_AudienceSingle_ByName()
+        public async Task Api_Sts_AccessV2_Success_AudienceSingle_ByName()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Name };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -463,24 +466,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Pass_AudienceMultiple_ById()
+        public async Task Api_Sts_AccessV2_Success_AudienceMultiple_ById()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audienceA = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var audienceB = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audienceB = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
             var audiences = new List<string> { audienceA.Id.ToString(), audienceB.Id.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             if (audienceA.Id == audienceB.Id)
                 Assert.Fail();
 
-            var roleB = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
-            await TestIoC.UserMgmt.AddToRoleAsync(user, roleB.Name);
+            var roleB = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
+            await _ioc.UserMgmt.AddToRoleAsync(user, roleB.Name);
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -492,24 +495,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Pass_AudienceMultiple_ByName()
+        public async Task Api_Sts_AccessV2_Success_AudienceMultiple_ByName()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audienceA = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var audienceB = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audienceB = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
             var audiences = new List<string> { audienceA.Name.ToString(), audienceB.Name.ToString() };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             if (audienceA.Id == audienceB.Id)
                 Assert.Fail();
 
-            var roleB = TestIoC.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
-            await TestIoC.UserMgmt.AddToRoleAsync(user, roleB.Name);
+            var roleB = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
+            await _ioc.UserMgmt.AddToRoleAsync(user, roleB.Name);
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -521,16 +524,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_StsProvider_AccessV2_Pass_AudienceUndefined()
+        public async Task Api_Sts_AccessV2_Success_AudienceUndefined()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audiences = new List<string> { string.Empty };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await TestEndpoints.GetAccessTokenV2(_owin, client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestPasswordCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

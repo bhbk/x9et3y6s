@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan((int)_conf.Tweaks.DefaultsAccessTokenLife)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan((int)_conf.Store.DefaultsAccessTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan((int)_conf.Tweaks.DefaultsRefreshTokenLife)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan((int)_conf.Store.DefaultsRefreshTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);

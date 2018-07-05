@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Helpers
         Length2048Bits = 2048, Length4096Bits = 4096
     }
 
-    public static class CryptoHelper
+    public class CryptoHelper
     {
         public static X509Certificate2 CreateCertificate()
         {

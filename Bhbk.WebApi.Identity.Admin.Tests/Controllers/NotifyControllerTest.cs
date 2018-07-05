@@ -25,18 +25,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Notify_Email_Fail_InvalidRecipient()
+        public async Task Api_Admin_NotifyV1_Email_Fail_InvalidRecipient()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
-            var recipient = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(TestIoC, client.Name, audience.Name, user.Email);
+            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -61,18 +61,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Notify_Email_Pass()
+        public async Task Api_Admin_NotifyV1_Email_Success()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
-            var recipient = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(TestIoC, client.Name, audience.Name, user.Email);
+            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -97,18 +97,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Notify_Text_Fail_InvalidRecipient()
+        public async Task Api_Admin_NotifyV1_Text_Fail_InvalidRecipient()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
-            var recipient = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(TestIoC, client.Name, audience.Name, user.Email);
+            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -130,18 +130,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Notify_Text_Pass()
+        public async Task Api_Admin_NotifyV1_Text_Success()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateTest();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
-            var recipient = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(TestIoC, client.Name, audience.Name, user.Email);
+            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);

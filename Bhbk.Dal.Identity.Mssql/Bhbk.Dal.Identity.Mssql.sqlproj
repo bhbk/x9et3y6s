@@ -107,12 +107,14 @@
     <Folder Include="Properties" />
     <Folder Include="Maintenance" />
     <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Maintenance\DbContext-Scaffold.ps1" />
     <None Include="Maintenance\DbCompare-Debug.scmp" />
-    <None Include="Maintenance\DbCompare-Live.scmp" />
     <None Include="Maintenance\DbCompare-Test.scmp" />
+    <None Include="Maintenance\DbCompare-Live.scmp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -169,5 +171,19 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
+    <Build Include="dbo\Tables\SystemError.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Stored Procedures\uspSystem_ErrorCreate.sql" />
+    <Build Include="dbo\Stored Procedures\uspSystem_ErrorDelete.sql" />
+    <Build Include="dbo\Stored Procedures\uspSystem_PostRefreshTasks.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
+    </ArtifactReference>
   </ItemGroup>
 </Project>

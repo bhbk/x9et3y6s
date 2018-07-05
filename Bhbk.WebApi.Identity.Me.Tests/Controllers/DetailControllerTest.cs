@@ -26,209 +26,112 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_AskChangeEmail_Fail()
+        public void Api_Me_DetailV1_GetClaimList_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            string email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
-            var model = new UserChangeEmail()
-            {
-                Id = user.Id,
-                CurrentEmail = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
-                NewEmail = email,
-                NewEmailConfirm = email
-            };
-
-            var result = await controller.AskChangeEmail(model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-        }
-
-        [TestMethod]
-        public async Task Api_Me_Detail_AskChangeEmail_Pass()
-        {
-            TestData.Destroy();
-            TestData.CreateTest();
-
-            string email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            controller.SetUser(user.Id);
-
-            var model = new UserChangeEmail()
-            {
-                Id = user.Id,
-                CurrentEmail = user.Email,
-                NewEmail = email,
-                NewEmailConfirm = email
-            };
-
-            var result = await controller.AskChangeEmail(model) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-        }
-
-        [TestMethod]
-        public async Task Api_Me_Detail_AskChangePassword_Fail()
-        {
-            TestData.Destroy();
-            TestData.CreateTest();
-
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            controller.SetUser(user.Id);
-
-            var model = new UserChangePassword()
-            {
-                Id = user.Id,
-                CurrentPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
-                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
-            };
-
-            var result = await controller.AskChangePassword(model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-        }
-
-        [TestMethod]
-        public async Task Api_Me_Detail_AskChangePassword_Pass()
-        {
-            TestData.Destroy();
-            TestData.CreateTest();
-
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            controller.SetUser(user.Id);
-
-            var model = new UserChangePassword()
-            {
-                Id = user.Id,
-                CurrentPassword = BaseLib.Statics.ApiUnitTestPasswordCurrent,
-                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
-            };
-
-            var result = await controller.AskChangePassword(model) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-        }
-
-        [TestMethod]
-        public async Task Api_Me_Detail_AskChangePhone_Fail()
-        {
-            TestData.Destroy();
-            TestData.CreateTest();
-
-            string phone = "01112223333";
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            controller.SetUser(user.Id);
-
-            var model = new UserChangePhone()
-            {
-                Id = user.Id,
-                CurrentPhoneNumber = phone,
-                NewPhoneNumber = user.PhoneNumber,
-                NewPhoneNumberConfirm = user.PhoneNumber
-            };
-
-            var result = await controller.AskChangePhone(model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-        }
-
-        [TestMethod]
-        public async Task Api_Me_Detail_AskChangePhone_Pass()
-        {
-            TestData.Destroy();
-            TestData.CreateTest();
-
-            string phone = "01112223333";
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            controller.SetUser(user.Id);
-
-            var model = new UserChangePhone()
-            {
-                Id = user.Id,
-                CurrentPhoneNumber = user.PhoneNumber,
-                NewPhoneNumber = phone,
-                NewPhoneNumberConfirm = phone
-            };
-
-            var result = await controller.AskChangePhone(model) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-        }
-
-        [TestMethod]
-        public void Api_Me_Detail_GetClaimList_Pass()
-        {
-            TestData.Destroy();
-            TestData.CreateTest();
-
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            controller.SetUser(user.Id);
-
-            var result = controller.GetClaims() as OkObjectResult;
+            var result = controller.GetClaimsV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IEnumerable<Claim>>().Subject;
         }
 
         [TestMethod]
-        public void Api_Me_Detail_GetQuoteOfDay_Pass()
+        public void Api_Me_DetailV1_GetQuoteOfDay_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
-            var result = controller.QuoteOfDay() as OkObjectResult;
+            var result = controller.GetQuoteOfDayV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserQuoteOfDay>().Subject;
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_TwoFactor_Pass()
+        public async Task Api_Me_DetailV1_SetPassword_Fail()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var model = new UserChangePassword()
+            {
+                CurrentPassword = BaseLib.Statics.ApiUnitTestPasswordCurrent,
+                NewPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
+                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16)
+            };
 
             controller.SetUser(user.Id);
 
-            var status = await TestIoC.UserMgmt.SetTwoFactorEnabledAsync(user, false);
+            var result = await controller.SetPasswordV1(model) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+            var check = await _ioc.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            check.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Api_Me_DetailV1_SetPassword_Success()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var model = new UserChangePassword()
+            {
+                CurrentPassword = BaseLib.Statics.ApiUnitTestPasswordCurrent,
+                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
+                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
+            };
+
+            controller.SetUser(user.Id);
+
+            var result = await controller.SetPasswordV1(model) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
+
+            var check = await _ioc.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            check.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task Api_Me_DetailV1_TwoFactor_Success()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            controller.SetUser(user.Id);
+
+            var status = await _ioc.UserMgmt.SetTwoFactorEnabledAsync(user, false);
             status.Should().BeAssignableTo(typeof(IdentityResult));
             status.Succeeded.Should().BeTrue();
 
-            var result = await controller.SetTwoFactor(true) as NoContentResult;
+            var result = await controller.SetTwoFactorV1(true) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [TestMethod]
-        public async Task Api_Me_Detail_Update_Pass()
+        public async Task Api_Me_DetailV1_Update_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var controller = new DetailController(TestIoC, TestTasks);
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
@@ -239,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 LastName = user.LastName + "(Updated)"
             };
 
-            var result = await controller.UpdateDetail(model) as OkObjectResult;
+            var result = await controller.UpdateDetailV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 

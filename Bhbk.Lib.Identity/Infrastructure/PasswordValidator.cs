@@ -19,6 +19,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
             List<IdentityError> errors = new List<IdentityError>();
 
             int match = 0;
+            int minimum = 8;
 
             if (_number.IsMatch(password))
             {
@@ -44,10 +45,16 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 match++;
             }
 
-            if (match < 3)
+            if (password.Length <= minimum)
+            {
+                errors.Add(new IdentityError() { Code = null, Description = "Does not meet minimum length" });
+                match++;
+            }
+
+            if (match < 3 || password.Length <= minimum)
                 return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
-            else
-                return Task.FromResult(IdentityResult.Success);
+
+            return Task.FromResult(IdentityResult.Success);
         }
     }
 }

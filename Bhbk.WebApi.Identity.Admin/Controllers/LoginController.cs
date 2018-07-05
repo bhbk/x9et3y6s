@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
@@ -21,12 +22,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public LoginController() { }
 
-        public LoginController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public LoginController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
         [Route("v1/{loginID}/add/{userID}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> AddLoginToUser([FromRoute] Guid loginID, [FromRoute] Guid userID, [FromBody] UserLoginCreate model)
+        public async Task<IActionResult> AddLoginToUserV1([FromRoute] Guid loginID, [FromRoute] Guid userID, [FromBody] UserLoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -41,43 +42,39 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else
-            {
-                var result = await IoC.UserMgmt.AddLoginAsync(user,
-                    new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
+            var result = await IoC.UserMgmt.AddLoginAsync(user,
+                new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+            if (!result.Succeeded)
+                return GetErrorResult(result);
 
-                else
-                    return NoContent();
-            }
+            return NoContent();
         }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateLogin([FromBody] LoginCreate model)
+        public async Task<IActionResult> CreateLoginV1([FromBody] LoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             model.ActorId = GetUserGUID();
 
-            var login = await IoC.LoginMgmt.FindByNameAsync(model.LoginProvider);
+            var check = await IoC.LoginMgmt.FindByNameAsync(model.LoginProvider);
 
-            if (login != null)
+            if (check != null)
                 return BadRequest(BaseLib.Statics.MsgLoginAlreadyExists);
 
-            var create = new LoginFactory<LoginCreate>(model);
+            var login = new LoginFactory<LoginCreate>(model);
 
-            var result = await IoC.LoginMgmt.CreateAsync(create.Devolve());
+            var result = await IoC.LoginMgmt.CreateAsync(login.Devolve());
 
-            return Ok(create.Evolve());
+            return Ok(login.Evolve());
         }
 
         [Route("v1/{loginID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteLogin([FromRoute] Guid loginID)
+        public async Task<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
@@ -96,8 +93,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NoContent();
         }
 
-        [Route("v1/{loginID}"), HttpGet]
-        public async Task<IActionResult> GetLogin([FromRoute] Guid loginID)
+        [Route("v1/{loginID:guid}"), HttpGet]
+        public async Task<IActionResult> GetLoginV1([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
@@ -109,8 +106,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result.Evolve());
         }
 
+        [Route("v1/{loginName}"), HttpGet]
+        public async Task<IActionResult> GetLoginV1([FromRoute] string loginName)
+        {
+            var login = await IoC.LoginMgmt.FindByNameAsync(loginName);
+
+            if (login == null)
+                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+
+            var result = new LoginFactory<AppLogin>(login);
+
+            return Ok(result.Evolve());
+        }
+
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetLogins([FromQuery] PagingModel model)
+        public async Task<IActionResult> GetLoginsV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -126,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID}/users"), HttpGet]
-        public async Task<IActionResult> GetLoginUsers([FromRoute] Guid loginID)
+        public async Task<IActionResult> GetLoginUsersV1([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
@@ -142,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID}/remove/{userID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RemoveLoginFromUser([FromRoute] Guid loginID, [FromRoute] Guid userID)
+        public async Task<IActionResult> RemoveLoginFromUserV1([FromRoute] Guid loginID, [FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -157,21 +167,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else
-            {
-                var result = await IoC.UserMgmt.RemoveFromLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
+            var result = await IoC.UserMgmt.RemoveFromLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+            if (!result.Succeeded)
+                return GetErrorResult(result);
 
-                else
-                    return NoContent();
-            }
+            return NoContent();
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateLogin([FromBody] LoginUpdate model)
+        public async Task<IActionResult> UpdateLoginV1([FromBody] LoginUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -183,15 +189,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return BadRequest(BaseLib.Statics.MsgLoginInvalid);
 
-            else
-            {
-                var update = new LoginFactory<AppLogin>(login);
-                update.Update(model);
+            var update = new LoginFactory<AppLogin>(login);
+            update.Update(model);
 
-                var result = await IoC.LoginMgmt.UpdateAsync(update.Devolve());
+            var result = await IoC.LoginMgmt.UpdateAsync(update.Devolve());
 
-                return Ok(update.Evolve());
-            }
+            return Ok(update.Evolve());
         }
     }
 }

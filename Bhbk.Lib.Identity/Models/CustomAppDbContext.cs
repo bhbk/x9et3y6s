@@ -18,8 +18,8 @@ namespace Bhbk.Lib.Identity.Models
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
     public partial class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
-        private static IConfigurationRoot _cb;
+        private static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private static IConfigurationRoot _conf;
         private static IList _fieldsExcluded, _fieldsSensitive, _tablesExcluded;
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -34,15 +34,15 @@ namespace Bhbk.Lib.Identity.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            _fieldsExcluded = _cb.GetSection("IdentityActivity:FieldsExcluded").GetChildren().Select(x => x.Value).ToList();
-            _fieldsSensitive = _cb.GetSection("IdentityActivity:FieldsSensitive").GetChildren().Select(x => x.Value).ToList();
-            _tablesExcluded = _cb.GetSection("IdentityActivity:TablesExcluded").GetChildren().Select(x => x.Value).ToList();
+            _fieldsExcluded = _conf.GetSection("IdentityActivity:FieldsExcluded").GetChildren().Select(x => x.Value).ToList();
+            _fieldsSensitive = _conf.GetSection("IdentityActivity:FieldsSensitive").GetChildren().Select(x => x.Value).ToList();
+            _tablesExcluded = _conf.GetSection("IdentityActivity:TablesExcluded").GetChildren().Select(x => x.Value).ToList();
 
             if (!optionsBuilder.IsConfigured)
             {

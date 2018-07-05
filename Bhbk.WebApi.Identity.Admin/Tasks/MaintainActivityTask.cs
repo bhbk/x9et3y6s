@@ -16,9 +16,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class MaintainActivityTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _cb;
+        private readonly IConfigurationRoot _conf;
         private readonly JsonSerializerSettings _serializer;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
@@ -32,14 +32,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 Formatting = Formatting.Indented
             };
 
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _delay = int.Parse(_cb["Tasks:MaintainActivity:PollingDelay"]);
-            _auditable = int.Parse(_cb["Tasks:MaintainActivity:HoldAuditable"]);
-            _transient = int.Parse(_cb["Tasks:MaintainActivity:HoldTransient"]);
+            _delay = int.Parse(_conf["Tasks:MaintainActivity:PollingDelay"]);
+            _auditable = int.Parse(_conf["Tasks:MaintainActivity:HoldAuditable"]);
+            _transient = int.Parse(_conf["Tasks:MaintainActivity:HoldTransient"]);
             _ioc = ioc;
 
             Status = JsonConvert.SerializeObject(
@@ -58,8 +58,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
                     var expired = _ioc.UserMgmt.Store.Context.AppActivity
-                        .Where(x => (x.Created.AddMinutes(_transient) < DateTime.Now && x.Immutable == false)
-                            || (x.Created.AddMinutes(_auditable) < DateTime.Now && x.Immutable == true));
+                        .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
+                            || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true));
 
                     var expiredCount = expired.Count();
 

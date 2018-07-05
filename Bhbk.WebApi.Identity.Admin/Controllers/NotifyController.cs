@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -16,11 +17,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public NotifyController() { }
 
-        public NotifyController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public NotifyController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
         [Route("v1/email"), HttpPost]
-        public async Task<IActionResult> SendEmail([FromBody] UserCreateEmail model)
+        public async Task<IActionResult> SendEmailV1([FromBody] UserCreateEmail model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -42,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/text"), HttpPost]
-        public async Task<IActionResult> SendText([FromBody] UserCreateText model)
+        public async Task<IActionResult> SendTextV1([FromBody] UserCreateText model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

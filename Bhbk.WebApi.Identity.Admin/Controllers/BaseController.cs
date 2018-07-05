@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -15,8 +16,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class BaseController : Controller
     {
+        private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly IHostedService[] _tasks;
+
+        protected IConfigurationRoot Conf
+        {
+            get
+            {
+                return _conf ?? (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>();
+            }
+        }
 
         protected IIdentityContext IoC
         {
@@ -36,11 +46,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         public BaseController() { }
 
-        public BaseController(IIdentityContext ioc, IHostedService[] tasks)
+        public BaseController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
         {
-            if (ioc == null || tasks == null)
+            if (conf == null || ioc == null || tasks == null)
                 throw new ArgumentNullException();
 
+            _conf = conf;
             _ioc = ioc;
             _tasks = tasks;
         }

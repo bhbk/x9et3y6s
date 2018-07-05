@@ -115,6 +115,8 @@ namespace Bhbk.Lib.Identity.Stores
             if (!user.HumanBeing)
                 user.EmailConfirmed = true;
 
+            user.SecurityStamp = Helpers.CryptoHelper.CreateRandomBase64(32);
+
             _context.AppUser.Add(user);
             _context.SaveChanges();
 
@@ -210,16 +212,6 @@ namespace Bhbk.Lib.Identity.Stores
         public override Task<string> GetPasswordHashAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult(_context.Users.Where(x => x.Id == user.Id).Single().PasswordHash);
-        }
-
-        public override Task<string> GetEmailAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return Task.FromResult(user.Email);
-        }
-
-        public override Task<string> GetPhoneNumberAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return Task.FromResult(user.PhoneNumber);
         }
 
         public Task<IList<string>> GetAudiencesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))

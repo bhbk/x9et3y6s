@@ -1,8 +1,9 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
@@ -16,11 +17,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public ConfirmController() { }
 
-        public ConfirmController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public ConfirmController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
-        [Route("v1/set-email/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmEmail([FromRoute] Guid userId, [FromBody] string token)
+
+        [Route("v1/email/{userId}"), HttpPut]
+        public async Task<IActionResult> ConfirmEmailV1([FromRoute] Guid userId, [FromBody] string email, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -30,23 +32,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await IoC.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenConfirmEmail, token))
+            if (!await new ProtectProvider(IoC.ContextStatus.ToString()).ValidateAsync(email, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
-            else
-            {
-                var result = await IoC.UserMgmt.SetEmailConfirmedAsync(user, true);
+            await IoC.UserMgmt.Store.SetEmailConfirmedAsync(user, true);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return NoContent();
-            }
+            return NoContent();
         }
 
-        [Route("v1/set-password/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmPassword([FromRoute] Guid userId, [FromBody] string token)
+        [Route("v1/password/{userId}"), HttpPut]
+        public async Task<IActionResult> ConfirmPasswordV1([FromRoute] Guid userId, [FromBody] string password, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,23 +51,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await IoC.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenResetPassword, token))
+            if (!await new ProtectProvider(IoC.ContextStatus.ToString()).ValidateAsync(password, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
-            else
-            {
-                var result = await IoC.UserMgmt.SetPasswordConfirmedAsync(user, true);
+            await IoC.UserMgmt.Store.SetPasswordConfirmedAsync(user, true);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return NoContent();
-            }
+            return NoContent();
         }
 
-        [Route("v1/set-phone/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmPhone([FromRoute] Guid userId, [FromBody] string token)
+        [Route("v1/phone/{userId}"), HttpPut]
+        public async Task<IActionResult> ConfirmPhoneV1([FromRoute] Guid userId, [FromBody] string phoneNumber, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -82,112 +70,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            else if (!await IoC.UserMgmt.VerifyChangePhoneNumberTokenAsync(user, token, user.PhoneNumber))
+            if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
-            else
-            {
-                var result = await IoC.UserMgmt.SetPhoneNumberConfirmedAsync(user, true);
+            await IoC.UserMgmt.Store.SetPhoneNumberConfirmedAsync(user, true);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return NoContent();
-            }
-        }
-
-        [Route("v1/change-email/{token}"), HttpPut]
-        public async Task<IActionResult> ConfirmEmailChange([FromRoute] string token, [FromBody] UserChangeEmail model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
-
-            if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (!await IoC.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenConfirmEmail, token))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
-
-            else
-            {
-                var result = await IoC.UserMgmt.ConfirmEmailAsync(user, token);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return NoContent();
-            }
-        }
-
-        [Route("v1/change-password/{token}"), HttpPut]
-        public async Task<IActionResult> ConfirmPasswordChange([FromRoute] string token, [FromBody] UserChangePassword model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
-
-            if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
-
-            else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
-
-            else if (!await IoC.UserMgmt.VerifyUserTokenAsync(user, string.Empty, BaseLib.Statics.ApiTokenResetPassword, token))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
-
-            else
-            {
-                var result = await IoC.UserMgmt.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return NoContent();
-            }
-        }
-
-        [Route("v1/change-phone/{token}"), HttpPut]
-        public async Task<IActionResult> ConfirmPhoneChange([FromRoute] string token, [FromBody] UserChangePhone model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
-
-            if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
-
-            else if (!await IoC.UserMgmt.VerifyChangePhoneNumberTokenAsync(user, token, model.CurrentPhoneNumber))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
-
-            else
-            {
-                var result = await IoC.UserMgmt.ChangePhoneNumberAsync(user, model.NewPhoneNumber, token);
-
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
-
-                else
-                    return NoContent();
-            }
+            return NoContent();
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
@@ -20,21 +21,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public AudienceController() { }
 
-        public AudienceController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public AudienceController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
-        [Route("v1"), HttpPost]
+        [Route("v1"), HttpPost] 
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateAudience([FromBody] AudienceCreate model)
+        public async Task<IActionResult> CreateAudienceV1([FromBody] AudienceCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             model.ActorId = GetUserGUID();
 
-            var audience = await IoC.AudienceMgmt.FindByNameAsync(model.Name);
+            var check = await IoC.AudienceMgmt.FindByNameAsync(model.Name);
 
-            if (audience != null)
+            if (check != null)
                 return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);
 
             BaseLib.AudienceType audienceType;
@@ -42,15 +43,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!Enum.TryParse<BaseLib.AudienceType>(model.AudienceType, out audienceType))
                 return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
 
-            var create = new AudienceFactory<AudienceCreate>(model);
-            var result = await IoC.AudienceMgmt.CreateAsync(create.Devolve());
+            var audience = new AudienceFactory<AudienceCreate>(model);
+            var result = await IoC.AudienceMgmt.CreateAsync(audience.Devolve());
 
-            return Ok(create.Evolve());
+            return Ok(audience.Evolve());
         }
 
         [Route("v1/{audienceID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> DeleteAudience([FromRoute] Guid audienceID)
+        public async Task<IActionResult> DeleteAudienceV1([FromRoute] Guid audienceID)
         {
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
@@ -65,12 +66,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!await IoC.AudienceMgmt.DeleteAsync(audience))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            else
-                return NoContent();
+            return NoContent();
         }
 
-        [Route("v1/{audienceID}"), HttpGet]
-        public async Task<IActionResult> GetAudience([FromRoute] Guid audienceID)
+        [Route("v1/{audienceID:guid}"), HttpGet]
+        public async Task<IActionResult> GetAudienceV1([FromRoute] Guid audienceID)
         {
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
@@ -82,8 +82,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result.Evolve());
         }
 
+        [Route("v1/{audienceName}"), HttpGet]
+        public async Task<IActionResult> GetAudienceV1([FromRoute] string audienceName)
+        {
+            var audience = await IoC.AudienceMgmt.FindByNameAsync(audienceName);
+
+            if (audience == null)
+                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+
+            var result = new AudienceFactory<AppAudience>(audience);
+
+            return Ok(result.Evolve());
+        }
+
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetAudiences([FromQuery] PagingModel model)
+        public async Task<IActionResult> GetAudiencesV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -99,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID}/roles"), HttpGet]
-        public async Task<IActionResult> GetAudienceRoles([FromRoute] Guid audienceID)
+        public async Task<IActionResult> GetAudienceRolesV1([FromRoute] Guid audienceID)
         {
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
@@ -115,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> UpdateAudience([FromBody] AudienceUpdate model)
+        public async Task<IActionResult> UpdateAudienceV1([FromBody] AudienceUpdate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -130,15 +143,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
 
-            else
-            {
-                var update = new AudienceFactory<AppAudience>(audience);
-                update.Update(model);
+            var update = new AudienceFactory<AppAudience>(audience);
+            update.Update(model);
 
-                var result = await IoC.AudienceMgmt.UpdateAsync(update.Devolve());
+            var result = await IoC.AudienceMgmt.UpdateAsync(update.Devolve());
 
-                return Ok(update.Evolve());
-            }
+            return Ok(update.Evolve());
         }
     }
 }

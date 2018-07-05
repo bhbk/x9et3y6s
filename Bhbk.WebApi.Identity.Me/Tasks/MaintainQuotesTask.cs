@@ -16,10 +16,10 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
     public class MaintainQuotesTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _cb;
+        private readonly IConfigurationRoot _conf;
         private readonly JsonSerializerSettings _serializer;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
-        private readonly FileInfo _qf = FileSystemHelper.SearchPaths("appquotes.json");
+        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _qod = FileSystemHelper.SearchPaths("appquotes.json");
         private readonly HttpClient _client = new HttpClient();
         private readonly string _url = string.Empty, _output = string.Empty;
         private readonly int _delay;
@@ -36,14 +36,14 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                 Formatting = Formatting.Indented
             };
 
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _output = _qf.DirectoryName + Path.DirectorySeparatorChar + _qf.Name;
-            _delay = int.Parse(_cb["Tasks:MaintainQuotes:PollingDelay"]);
-            _url = _cb["Tasks:MaintainQuotes:QuoteOfDayUrl"];
+            _output = _qod.DirectoryName + Path.DirectorySeparatorChar + _qod.Name;
+            _delay = int.Parse(_conf["Tasks:MaintainQuotes:PollingDelay"]);
+            _url = _conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
             _ioc = ioc;
 
             Status = JsonConvert.SerializeObject(

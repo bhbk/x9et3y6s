@@ -6,6 +6,7 @@ using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -15,9 +16,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 {
     public class StartupTest : Startup
     {
-        protected static IIdentityContext TestIoC;
-        protected static Microsoft.Extensions.Hosting.IHostedService[] TestTasks;
-        protected static DatasetHelper TestData;
+        protected static DatasetHelper _data;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -26,16 +25,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            var ioc = new IdentityContext(options);
+            _ioc = new IdentityContext(options);
 
-            sc.AddSingleton<IIdentityContext>(ioc);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(ioc));
+            sc.AddSingleton<IConfigurationRoot>(_conf);
+            sc.AddSingleton<IIdentityContext>(_ioc);
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(_ioc));
 
             var sp = sc.BuildServiceProvider();
 
-            TestIoC = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
-            TestTasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
-            TestData = new DatasetHelper(TestIoC);
+            _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
+            _ioc = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
+            _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
         }
 
         public override void ConfigureServices(IServiceCollection sc)
@@ -45,6 +45,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
         public override void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
         {
+            _data = new DatasetHelper(_ioc);
+
             base.Configure(app, env, log);
         }
     }

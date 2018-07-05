@@ -16,9 +16,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
     public class MaintainTokensTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _cb;
+        private readonly IConfigurationRoot _conf;
         private readonly JsonSerializerSettings _serializer;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly int _delay;
         public string Status { get; private set; }
 
@@ -32,12 +32,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                 Formatting = Formatting.Indented
             };
 
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _delay = int.Parse(_cb["Tasks:MaintainTokens:PollingDelay"]);
+            _delay = int.Parse(_conf["Tasks:MaintainTokens:PollingDelay"]);
             _ioc = ioc;
 
             Status = JsonConvert.SerializeObject(

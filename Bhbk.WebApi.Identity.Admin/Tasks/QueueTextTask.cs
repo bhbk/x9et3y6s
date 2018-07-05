@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Externals;
-using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -18,12 +18,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class QueueTextTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _cb;
+        private readonly IConfigurationRoot _conf;
         private readonly JsonSerializerSettings _serializer;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly ConcurrentQueue<UserCreateText> _queue;
         private readonly TwilioProvider _provider;
-        private readonly int _delay;
+        private readonly int _delay, _expire;
         private readonly bool _enabled;
         private readonly string _providerSid, _providerToken;
 
@@ -39,15 +39,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 Formatting = Formatting.Indented
             };
 
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _delay = int.Parse(_cb["Tasks:QueueText:PollingDelay"]);
-            _enabled = bool.Parse(_cb["Tasks:QueueText:Enabled"]);
-            _providerSid = _cb["Tasks:QueueText:ProviderSid"];
-            _providerToken = _cb["Tasks:QueueText:ProviderToken"];
+            _delay = int.Parse(_conf["Tasks:QueueText:PollingDelay"]);
+            _expire = int.Parse(_conf["Tasks:QueueText:ExpireDelay"]);
+            _enabled = bool.Parse(_conf["Tasks:QueueText:Enabled"]);
+            _providerSid = _conf["Tasks:QueueText:ProviderSid"];
+            _providerToken = _conf["Tasks:QueueText:ProviderToken"];
             _ioc = ioc;
             _queue = new ConcurrentQueue<UserCreateText>();
             _provider = new TwilioProvider();
@@ -77,12 +78,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         if (!_queue.TryPeek(out model))
                             break;
 
+                        if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
+                        {
+                            _queue.TryDequeue(out model);
+
+                            Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") failed many times. The text was created on "
+                                + model.Created + " and is being deleted now.");
+
+                            continue;
+                        }
+
                         if (_ioc.ContextStatus == ContextType.Live)
                         {
                             await _provider.TryTextHandoff(_providerSid, _providerToken, model);
 
                             if (!_queue.TryDequeue(out model))
                                 break;
+
+                            Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") was successfull.");
                         }
                     }
                     catch (Exception ex)
@@ -91,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     }
                 }
 
-                var msg = typeof(QueueTextTask).Name + " contains " + _queue.Count() + " text messages queued for delivery.";
+                var msg = typeof(QueueTextTask).Name + " contains " + _queue.Count() + " text messages queued for hand-off.";
 
                 Status = JsonConvert.SerializeObject(
                     new
@@ -104,8 +117,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             To = x.ToPhoneNumber
                         })
                     }, _serializer);
-
-                Log.Information(msg);
             }
         }
 

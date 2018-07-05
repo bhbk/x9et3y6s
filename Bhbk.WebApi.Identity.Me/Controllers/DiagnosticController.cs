@@ -3,6 +3,7 @@ using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -17,20 +18,20 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public DiagnosticController() { }
 
-        public DiagnosticController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public DiagnosticController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
         [Route("v1/status/{name}"), HttpGet]
-        public IActionResult GetStatus([FromRoute] string name)
+        public IActionResult GetStatusV1([FromRoute] string name)
         {
-            if (name.ToLower() == BaseLib.TaskType.MaintainQuote.ToString().ToLower())
+            if (name.ToLower() == BaseLib.TaskType.MaintainQuotes.ToString().ToLower())
                 return Ok(((MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask))).Status);
 
             return BadRequest();
         }
 
         [Route("v1/version"), HttpGet]
-        public IActionResult GetVersion()
+        public IActionResult GetVersionV1()
         {
             return Ok(Assembly.GetAssembly(typeof(DiagnosticController)).GetName().Version.ToString());
         }

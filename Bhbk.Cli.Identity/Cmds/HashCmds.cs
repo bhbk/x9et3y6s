@@ -13,7 +13,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class HashCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
         private static IConfigurationRoot _cb;
         private static bool Generate = false;
 
@@ -29,8 +29,8 @@ namespace Bhbk.Cli.Identity.Cmds
             try
             {
                 _cb = new ConfigurationBuilder()
-                    .SetBasePath(_cf.DirectoryName)
-                    .AddJsonFile(_cf.Name)
+                    .SetBasePath(_lib.DirectoryName)
+                    .AddJsonFile(_lib.Name)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()

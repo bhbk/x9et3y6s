@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public class IdentityContext : IIdentityContext
     {
-        private ContextType _status;
+        private readonly ContextType _status;
         private readonly AppDbContext _context;
         private ActivityStore _activity;
         private AudienceManager _audienceMgmt;
@@ -40,6 +40,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 throw new ArgumentNullException();
 
             _context = context;
+
+            if (_context.Database.IsInMemory())
+                _status = ContextType.UnitTest;
+            else
+                _status = ContextType.Live;
 
             _activity = new ActivityStore(_context);
             _audienceMgmt = new AudienceManager(new AudienceStore(_context));

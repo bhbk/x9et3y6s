@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Externals;
-using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -19,12 +19,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class QueueEmailTask : BackgroundService
     {
         private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _cb;
+        private readonly IConfigurationRoot _conf;
         private readonly JsonSerializerSettings _serializer;
-        private readonly FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly ConcurrentQueue<UserCreateEmail> _queue;
         private readonly SendgridProvider _provider;
-        private readonly int _delay;
+        private readonly int _delay, _expire;
         private readonly bool _enabled;
         private readonly string _providerApiKey;
 
@@ -40,14 +40,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 Formatting = Formatting.Indented
             };
 
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            _delay = int.Parse(_cb["Tasks:QueueEmail:PollingDelay"]);
-            _enabled = bool.Parse(_cb["Tasks:QueueEmail:Enabled"]);
-            _providerApiKey = _cb["Tasks:QueueEmail:ProviderApiKey"];
+            _delay = int.Parse(_conf["Tasks:QueueEmail:PollingDelay"]);
+            _expire = int.Parse(_conf["Tasks:QueueEmail:ExpireDelay"]);
+            _enabled = bool.Parse(_conf["Tasks:QueueEmail:Enabled"]);
+            _providerApiKey = _conf["Tasks:QueueEmail:ProviderApiKey"];
             _ioc = ioc;
             _queue = new ConcurrentQueue<UserCreateEmail>();
             _provider = new SendgridProvider();
@@ -77,13 +78,29 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         if (!_queue.TryPeek(out model))
                             break;
 
+                        if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
+                        {
+                            _queue.TryDequeue(out model);
+
+                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") failed many times. The email was created on "
+                                + model.Created + " and is being deleted now.");
+
+                            continue;
+                        }
+
                         if (_ioc.ContextStatus == ContextType.Live)
                         {
                             var result = await _provider.TryEmailHandoff(_providerApiKey, model);
 
-                            if (result.StatusCode == HttpStatusCode.OK)
+                            if (result.StatusCode == HttpStatusCode.Accepted)
+                            {
                                 if (!_queue.TryDequeue(out model))
                                     break;
+
+                                Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") was successfull.");
+                            }
+                            else
+                                Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") failed. Error=" + result.StatusCode);
                         }
                     }
                     catch (Exception ex)
@@ -92,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     }
                 }
 
-                var msg = typeof(QueueEmailTask).Name + " contains " + _queue.Count() + " email messages queued for delivery.";
+                var msg = typeof(QueueEmailTask).Name + " contains " + _queue.Count() + " email messages queued for hand-off.";
 
                 Status = JsonConvert.SerializeObject(
                     new
@@ -106,8 +123,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             Subject = x.Subject
                         })
                     }, _serializer);
-
-                Log.Information(msg);
             }
         }
 

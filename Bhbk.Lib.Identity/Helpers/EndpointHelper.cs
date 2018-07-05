@@ -1,96 +1,227 @@
-﻿using Microsoft.AspNetCore.TestHost;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Interfaces;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
+    public class S2STests : EndpointHelper
+    {
+        public S2STests(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
+            : base(conf, ioc, connect) { }
+    }
+
+    public class S2SClients : EndpointHelper
+    {
+        public S2SClients(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
+            : base(conf, ioc, connect) { }
+
+        public async Task<HttpResponseMessage> PostEmailV1(JwtSecurityToken jwt, UserCreateEmail email)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:AdminUrl"], _conf["IdentityApis:AdminPath"]));
+                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
+
+            return await _connect.PostAsync("/notify/v1/email", content);
+        }
+
+        public async Task<HttpResponseMessage> PostTextV1(JwtSecurityToken jwt, UserCreateText email)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:AdminUrl"], _conf["IdentityApis:AdminPath"]));
+                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
+
+            return await _connect.PostAsync("/notify/v1/text", content);
+        }
+    }
+
+    //https://oauth.com/playground/
     public class EndpointHelper
     {
-        public async Task<HttpResponseMessage> GetAuthorizationRequestV2(TestServer owin, string client, string redirectUri, string state)
+        protected IConfigurationRoot _conf;
+        protected IIdentityContext _ioc;
+        protected HttpClient _connect;
+
+        public EndpointHelper(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
         {
+            _conf = conf;
+            _ioc = ioc;
+            _connect = connect.CreateClient();
+        }
+
+        public EndpointHelper(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
+        {
+            _conf = conf;
+            _ioc = ioc;
+
+            //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
+            connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+
+            _connect = new HttpClient(connect);
+        }
+
+        //https://oauth.net/2/grant-types/password/
+        public async Task<HttpResponseMessage> AccessTokenV1(string client, string audience, string user, string secret)
+        {
+            if(_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("client_id", client),
+                    new KeyValuePair<string, string>("audience_id", audience),
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("username", user),
+                    new KeyValuePair<string, string>("password", secret),
+                });
+
+            return await _connect.PostAsync("/oauth/v1/access", content);
+        }
+
+        public async Task<HttpResponseMessage> AccessTokenV2(string client, List<string> audiences, string user, string secret)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("client", client),
+                    new KeyValuePair<string, string>("audience", string.Join(",", audiences.Select(x => x))),
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("user", user),
+                    new KeyValuePair<string, string>("password", secret),
+                });
+
+            return await _connect.PostAsync("/oauth/v2/access", content);
+        }
+
+        //https://oauth.net/2/grant-types/authorization-code/
+        public async Task<HttpResponseMessage> AuthorizeCodeRequestV2(string client, string user, string redirectUri, string scope, string state)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
             string content = HttpUtility.UrlPathEncode("?client=" + client
+                + "&user=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&state=" + state
-                + "&scope=" + "all"
-                + "&response_type=" + "code");
+                + "&response_type=" + "code"
+                + "&scope=" + scope
+                + "&state=" + state);
 
-            return await owin.CreateClient().GetAsync("/oauth/v2/authorize" + content);
+            return await _connect.GetAsync("/code/v2" + content);
         }
 
-        public async Task<HttpResponseMessage> GetAuthorizationCodeV2(TestServer owin, string code, string redirectUri)
+        public async Task<HttpResponseMessage> AuthorizeCodeV2(string client, string user, string redirectUri, string code)
         {
-            var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("code", code),
-                    new KeyValuePair<string, string>("redirect_uri", redirectUri),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrGrantTypeIDV2, "authorization_code"),
-                });
-            return await owin.CreateClient().PostAsync("/oauth/v2/authorize", content);
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = HttpUtility.UrlPathEncode("?client=" + client
+                + "&user=" + user
+                + "&redirect_uri=" + redirectUri
+                + "&grant_type=" + "code"
+                + "&code=" + code);
+
+            return await _connect.GetAsync("/oauth/v2/authorize" + content);
         }
 
-        public async Task<HttpResponseMessage> GetAccessTokenV1(TestServer owin, string client, string audience, string user, string password)
+        //https://oauth.net/2/grant-types/client-credentials/
+        public async Task<HttpResponseMessage> ClientCredentialsV2(string client, string secret)
         {
-            var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrClientIDV1, client),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrAudienceIDV1, audience),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrUserIDV1, user),
-                    new KeyValuePair<string, string>("password", password),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrGrantTypeIDV1, "password")
-                });
-            return await owin.CreateClient().PostAsync("/oauth/v1/access", content);
-        }
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
 
-        public async Task<HttpResponseMessage> GetAccessTokenV2(TestServer owin, string client, List<string> audiences, string user, string password)
-        {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrClientIDV2, client),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrAudienceIDV2, string.Join(",", audiences.Select(x => x))),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrUserIDV2, user),
-                    new KeyValuePair<string, string>("password", password),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrGrantTypeIDV2, "password")
-                });
-            return await owin.CreateClient().PostAsync("/oauth/v2/access", content);
-        }
-
-        public async Task<HttpResponseMessage> GetClientCredentialsV2(TestServer owin, string client, string secret)
-        {
-            var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrClientIDV2, client),
+                    new KeyValuePair<string, string>("client", client),
                     new KeyValuePair<string, string>("client_secret", secret),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrGrantTypeIDV2, "client_credentials")
+                    new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
-            return await owin.CreateClient().PostAsync("/oauth/v2/client", content);
+
+            return await _connect.PostAsync("/oauth/v2/client", content);
         }
 
-        public async Task<HttpResponseMessage> GetRefreshTokenV1(TestServer owin, string client, string audience, string refresh)
+        //https://oauth.net/2/grant-types/refresh-token/
+        public async Task<HttpResponseMessage> RefreshTokenV1(string client, string audience, string refresh)
         {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrClientIDV1, client),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrAudienceIDV1, audience),
+                    new KeyValuePair<string, string>("client_id", client),
+                    new KeyValuePair<string, string>("audience_id", audience),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
                     new KeyValuePair<string, string>("refresh_token", refresh),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrGrantTypeIDV1, "refresh_token")
                 });
-            return await owin.CreateClient().PostAsync("/oauth/v1/refresh", content);
+
+            return await _connect.PostAsync("/oauth/v1/refresh", content);
         }
 
-        public async Task<HttpResponseMessage> GetRefreshTokenV2(TestServer owin, string client, List<string> audiences, string refresh)
+        public async Task<HttpResponseMessage> RefreshTokenV2(string client, List<string> audiences, string refresh)
         {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrClientIDV2, client),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrAudienceIDV2,string.Join(",", audiences.Select(x => x))),
+                    new KeyValuePair<string, string>("client", client),
+                    new KeyValuePair<string, string>("audience", string.Join(",", audiences.Select(x => x))),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
                     new KeyValuePair<string, string>("refresh_token", refresh),
-                    new KeyValuePair<string, string>(BaseLib.Statics.AttrGrantTypeIDV2, "refresh_token")
                 });
-            return await owin.CreateClient().PostAsync("/oauth/v2/refresh", content);
+
+            return await _connect.PostAsync("/oauth/v2/refresh", content);
         }
     }
 }

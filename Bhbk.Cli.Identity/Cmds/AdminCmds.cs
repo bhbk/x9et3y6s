@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -16,7 +17,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class AdminCmds : ConsoleCommand
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
         private static JwtSecurityToken _access;
         private static IConfigurationRoot _cb;
         private static CmdType _cmdType;
@@ -49,8 +50,8 @@ namespace Bhbk.Cli.Identity.Cmds
             try
             {
                 _cb = new ConfigurationBuilder()
-                    .SetBasePath(_cf.DirectoryName)
-                    .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+                    .SetBasePath(_lib.DirectoryName)
+                    .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 if (_create == false && _destroy == false)
@@ -376,10 +377,10 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -392,7 +393,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/login/v1/" + loginID.ToString() + "/add/" + userID.ToString(), content).Result;
+                var response = http.PostAsync(_cb["IdentityApis:AdminPath"] + "/login/v1/" + loginID.ToString() + "/add/" + userID.ToString(), content).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -410,12 +411,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString()).Result;
+                var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -437,26 +438,21 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                    http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/audience/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/audience/v1/" + audience).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var content = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                        foreach (var entry in content)
+                        if (content["name"].Value<string>() == audience)
                         {
-                            if (entry["name"].Value<string>() == audience)
-                            {
-                                audienceID = Guid.Parse(entry["id"].Value<string>());
-                                result = true;
-
-                                break;
-                            }
+                            audienceID = Guid.Parse(content["id"].Value<string>());
+                            result = true;
                         }
                     }
                 }
@@ -482,26 +478,21 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                    http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/client/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/client/v1/" + client).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var content = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                        foreach (var entry in content)
+                        if (content["name"].Value<string>() == client)
                         {
-                            if (entry["name"].Value<string>() == client)
-                            {
-                                clientID = Guid.Parse(entry["id"].Value<string>());
-                                result = true;
-
-                                break;
-                            }
+                            clientID = Guid.Parse(content["id"].Value<string>());
+                            result = true;
                         }
                     }
                 }
@@ -527,26 +518,21 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                    http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/login/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/login/v1/" + login).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var content = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                        foreach (var entry in content)
+                        if (content["loginProvider"].Value<string>() == login)
                         {
-                            if (entry["loginProvider"].Value<string>() == login)
-                            {
-                                loginID = Guid.Parse(entry["id"].Value<string>());
-                                result = true;
-
-                                break;
-                            }
+                            loginID = Guid.Parse(content["id"].Value<string>());
+                            result = true;
                         }
                     }
                 }
@@ -572,26 +558,21 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                    http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/role/v1/" + role).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var content = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                        foreach (var entry in content)
+                        if (content["name"].Value<string>() == role)
                         {
-                            if (entry["name"].Value<string>() == role)
-                            {
-                                roleID = Guid.Parse(entry["id"].Value<string>());
-                                result = true;
-
-                                break;
-                            }
+                            roleID = Guid.Parse(content["id"].Value<string>());
+                            result = true;
                         }
                     }
                 }
@@ -617,26 +598,21 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     var http = new HttpClient(httpHandler);
 
-                    http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                    http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                     http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1").Result;
+                    var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/user/v1/" + user).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var content = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                        foreach (var entry in content)
+                        if (content["email"].Value<string>() == user)
                         {
-                            if (entry["email"].Value<string>() == user)
-                            {
-                                userID = Guid.Parse(entry["id"].Value<string>());
-                                result = true;
-
-                                break;
-                            }
+                            userID = Guid.Parse(content["id"].Value<string>());
+                            result = true;
                         }
                     }
                 }
@@ -658,10 +634,10 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -672,7 +648,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/audience/v1", content).Result;
+                var response = http.PostAsync(_cb["IdentityApis:AdminPath"] + "/audience/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -695,10 +671,10 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -707,7 +683,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/client/v1", content).Result;
+                var response = http.PostAsync(_cb["IdentityApis:AdminPath"] + "/client/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -730,10 +706,10 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -743,7 +719,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         Enabled = "true",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1", content).Result;
+                var response = http.PostAsync(_cb["IdentityApis:AdminPath"] + "/role/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -766,10 +742,10 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -783,7 +759,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         Immutable = "false",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1", content).Result;
+                var response = http.PostAsync(_cb["IdentityApis:AdminPath"] + "/user/v1", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -806,12 +782,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/audience/v1/" + audienceID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityApis:AdminPath"] + "/audience/v1/" + audienceID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -829,12 +805,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/client/v1/" + clientID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityApis:AdminPath"] + "/client/v1/" + clientID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -852,12 +828,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1/" + roleID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityApis:AdminPath"] + "/role/v1/" + roleID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -875,12 +851,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.DeleteAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1/" + userID.ToString()).Result;
+                var response = http.DeleteAsync(_cb["IdentityApis:AdminPath"] + "/user/v1/" + userID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -898,12 +874,12 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = http.GetAsync(_cb["IdentityEndpoints:AdminPath"] + "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString()).Result;
+                var response = http.GetAsync(_cb["IdentityApis:AdminPath"] + "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString()).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -921,10 +897,10 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", _access.RawData);
+                http.BaseAddress = new Uri(_cb["IdentityApis:AdminUrl"]);
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -934,7 +910,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         NewPasswordConfirm = password,
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PutAsync(_cb["IdentityEndpoints:AdminPath"] + "/user/v1/" + userID.ToString() + "/reset-password", content).Result;
+                var response = http.PutAsync(_cb["IdentityApis:AdminPath"] + "/user/v1/" + userID.ToString() + "/reset-password", content).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;
@@ -992,9 +968,9 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var http = new HttpClient(httpHandler);
 
-                http.BaseAddress = new Uri(_cb["IdentityEndpoints:StsUrl"]);
+                http.BaseAddress = new Uri(_cb["IdentityApis:StsUrl"]);
                 http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var post = new FormUrlEncodedContent(new[] {
                     new KeyValuePair<string, string> ("client", clientName),
@@ -1004,7 +980,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     new KeyValuePair<string, string> ("grant_type", "password"),
                 });
 
-                var response = http.PostAsync(_cb["IdentityEndpoints:StsPath"] + "/oauth/v2/access", post).Result;
+                var response = http.PostAsync(_cb["IdentityApis:StsPath"] + "/oauth/v2/access", post).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1013,12 +989,12 @@ namespace Bhbk.Cli.Identity.Cmds
                     _access = new JwtSecurityToken((string)result["access_token"]);
 
                     Console.WriteLine(Environment.NewLine + "SUCCESS getting JWT from STS:\""
-                        + _cb["IdentityEndpoints:StsUrl"] + _cb["IdentityEndpoints:StsPath"] + "/oauth/v2/access" + "\""
+                        + _cb["IdentityApis:StsUrl"] + _cb["IdentityApis:StsPath"] + "/oauth/v2/access" + "\""
                         + Environment.NewLine + "\tJWT:\"" + _access.RawData + "\"");
                 }
                 else
                     throw new ConsoleHelpAsException("FAILED getting JWT from STS:\""
-                        + _cb["IdentityEndpoints:StsUrl"] + _cb["IdentityEndpoints:StsPath"] + "/oauth/v2/access" + "\"");
+                        + _cb["IdentityApis:StsUrl"] + _cb["IdentityApis:StsPath"] + "/oauth/v2/access" + "\"");
             }
         }
     }

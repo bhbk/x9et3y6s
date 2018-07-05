@@ -1,13 +1,19 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
@@ -15,8 +21,20 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class BaseController : Controller
     {
+        private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly IHostedService[] _tasks;
+        private readonly string _client, _audience, _user, _pass;
+        private JwtSecurityToken _access, _refresh;
+        protected readonly S2SClients Connect;
+
+        protected IConfigurationRoot Conf
+        {
+            get
+            {
+                return _conf ?? (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>();
+            }
+        }
 
         protected IIdentityContext IoC
         {
@@ -34,15 +52,69 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
         }
 
+        protected JwtSecurityToken Jwt
+        {
+            get
+            {
+                //check if access is valid...
+                if (_access != null
+                    && _access.ValidFrom < DateTime.UtcNow
+                    && _access.ValidTo > DateTime.UtcNow)
+                {
+                    return _access;
+                }
+                //check if refresh is valid. update access with refresh if so.
+                else if (_refresh != null
+                    && _refresh.ValidFrom < DateTime.UtcNow
+                    && _refresh.ValidTo > DateTime.UtcNow)
+                {
+                    var response = Connect.RefreshTokenV2(_client, new List<string> { _audience }, _refresh.RawData).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+                        _access = new JwtSecurityToken((string)json["access_token"]);
+                        _refresh = new JwtSecurityToken((string)json["refresh_token"]);
+                    }
+
+                    return _access;
+                }
+
+                else
+                {
+                    var response = Connect.AccessTokenV2(_client, new List<string> { _audience }, _user, _pass).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+                        _access = new JwtSecurityToken((string)json["access_token"]);
+                        _refresh = new JwtSecurityToken((string)json["refresh_token"]);
+                    }
+
+                    return _access;
+                }
+            }
+        }
+
         public BaseController() { }
 
-        public BaseController(IIdentityContext ioc, IHostedService[] tasks)
+        public BaseController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
         {
-            if (ioc == null || tasks == null)
+            if (conf == null || ioc == null || tasks == null)
                 throw new ArgumentNullException();
 
+            _conf = conf;
             _ioc = ioc;
             _tasks = tasks;
+
+            _client = _conf["IdentityLogin:ClientName"];
+            _audience = _conf["IdentityLogin:AudienceName"];
+            _user = _conf["IdentityLogin:UserName"];
+            _pass = _conf["IdentityLogin:Password"];
+
+            Connect = new S2SClients(conf, ioc, new HttpClientHandler());
         }
 
         [NonAction]

@@ -30,24 +30,23 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_Create_Pass()
+        public async Task Api_Admin_ClientV1_Create_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
-
+            var controller = new ClientController(_conf, _ioc, _tasks);
             var model = new ClientCreate()
             {
                 Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestClientA,
                 ClientKey = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32),
                 Enabled = true,
             };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            TestController.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-            var result = await TestController.CreateClient(model) as OkObjectResult;
+            var result = await controller.CreateClientV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
@@ -55,57 +54,54 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_Delete_Fail_Immutable()
+        public async Task Api_Admin_ClientV1_Delete_Fail_Immutable()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
+            var controller = new ClientController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            _ioc.ClientMgmt.Store.SetImmutableAsync(client, true);
+            controller.SetUser(user.Id);
 
-            TestIoC.ClientMgmt.Store.SetImmutableAsync(client, true);
-            TestController.SetUser(user.Id);
-
-            var result = await TestController.DeleteClient(client.Id) as BadRequestObjectResult;
+            var result = await controller.DeleteClientV1(client.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = TestIoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
+            var check = _ioc.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
             check.Should().BeTrue();
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_Delete_Pass()
+        public async Task Api_Admin_ClientV1_Delete_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
+            var controller = new ClientController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            controller.SetUser(user.Id);
 
-            TestController.SetUser(user.Id);
-
-            var result = await TestController.DeleteClient(client.Id) as NoContentResult;
+            var result = await controller.DeleteClientV1(client.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = TestIoC.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
+            var check = _ioc.ClientMgmt.Store.Get(x => x.Id == client.Id).Any();
             check.Should().BeFalse();
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_Get_Pass()
+        public async Task Api_Admin_ClientV1_GetById_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
+            var controller = new ClientController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-
-            var result = await TestController.GetClient(client.Id) as OkObjectResult;
+            var result = await controller.GetClientV1(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 
@@ -113,13 +109,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_GetList_Fail_Auth()
+        public async Task Api_Admin_ClientV1_GetByName_Success()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateRandom(10);
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
+            var controller = new ClientController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+
+            var result = await controller.GetClientV1(client.Name) as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
+
+            data.Id.Should().Be(client.Id);
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_ClientV1_GetList_Fail_Auth()
+        {
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateRandom(10);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
@@ -139,21 +149,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_GetList_Fail_ParamInvalid()
+        public async Task Api_Admin_ClientV1_GetList_Fail_ParamInvalid()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateRandom(10);
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateRandom(10);
 
-            var TestController = new ClientController(TestIoC, TestTasks);
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
 
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -169,21 +178,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_GetList_Pass()
+        public async Task Api_Admin_ClientV1_GetList_Success()
         {
-            TestData.Destroy();
-            TestData.CreateDefault();
-            TestData.CreateRandom(10);
+            _data.Destroy();
+            _data.CreateDefault();
+            _data.CreateRandom(10);
 
-            var TestController = new ClientController(TestIoC, TestTasks);
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
-            var audience = TestIoC.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
 
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.CreateAccessTokenV2(TestIoC, client, audiences, user).Result;
+            var access = JwtHelper.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -208,31 +216,29 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_GetAudienceList_Pass()
+        public async Task Api_Admin_ClientV1_GetAudienceList_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
+            var controller = new ClientController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-
-            var result = await TestController.GetClientAudiences(client.Id) as OkObjectResult;
+            var result = await controller.GetClientAudiencesV1(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IEnumerable<AudienceResult>>().Subject;
 
-            data.Count().Should().Be(TestIoC.ClientMgmt.Store.GetAudiences(client.Id).Count());
+            data.Count().Should().Be(_ioc.ClientMgmt.Store.GetAudiences(client.Id).Count());
         }
 
         [TestMethod]
-        public async Task Api_Admin_Client_Update_Pass()
+        public async Task Api_Admin_ClientV1_Update_Success()
         {
-            TestData.Destroy();
-            TestData.CreateTest();
+            _data.Destroy();
+            _data.CreateTest();
 
-            var TestController = new ClientController(TestIoC, TestTasks);
-
-            var client = TestIoC.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var controller = new ClientController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new ClientUpdate()
             {
                 Id = client.Id,
@@ -241,11 +247,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Enabled = true,
                 Immutable = false
             };
-            var user = TestIoC.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            TestController.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-            var result = await TestController.UpdateClient(model) as OkObjectResult;
+            var result = await controller.UpdateClientV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
 

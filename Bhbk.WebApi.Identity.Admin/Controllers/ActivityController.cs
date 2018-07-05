@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
@@ -18,12 +19,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ActivityController() { }
 
-        public ActivityController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public ActivityController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
         [Route("v1"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> GetActivity([FromQuery] PagingModel model)
+        public async Task<IActionResult> GetActivityV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

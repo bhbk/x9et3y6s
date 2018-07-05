@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
@@ -14,12 +15,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public OAuthController() { }
 
-        public OAuthController(IIdentityContext ioc, IHostedService[] tasks)
-            : base(ioc, tasks) { }
+        public OAuthController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+            : base(conf, ioc, tasks) { }
 
         [Route("v1/refresh/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> GetRefreshTokens([FromRoute] Guid userID)
+        public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -33,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeRefreshToken([FromRoute] Guid userID, [FromRoute] Guid tokenID)
+        public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid tokenID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -50,13 +51,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!result.Succeeded)
                 return GetErrorResult(result);
 
-            else
-                return NoContent();
+            return NoContent();
         }
 
         [Route("v1/refresh/{userID}/revoke"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeRefreshTokens([FromRoute] Guid userID)
+        public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
@@ -68,8 +68,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!result.Succeeded)
                 return GetErrorResult(result);
 
-            else
-                return NoContent();
+            return NoContent();
         }
     }
 }

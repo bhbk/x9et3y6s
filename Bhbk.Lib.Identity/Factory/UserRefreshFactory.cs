@@ -1,12 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
-using Bhbk.Lib.Identity.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory

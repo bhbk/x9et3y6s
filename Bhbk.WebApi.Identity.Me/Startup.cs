@@ -25,38 +25,44 @@ namespace Bhbk.WebApi.Identity.Me
 {
     public class Startup
     {
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
-        private static IConfigurationRoot _cb;
-        private static IEnumerable _issuers, _audiences;
+        protected static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        protected static FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        protected static IConfigurationRoot _conf;
+        protected static IIdentityContext _ioc;
+        protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
+        protected static IEnumerable _issuers, _audiences;
 
-        //http://asp.net-hacker.rocks/2017/05/08/add-custom-ioc-in-aspnetcore.html
         public virtual void ConfigureContext(IServiceCollection sc)
         {
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            var ioc = new IdentityContext(new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(_cb["Databases:IdentityEntities"])
+            _ioc = new IdentityContext(new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(_conf["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging());
 
-            ioc.ClientMgmt.Store.Salt = _cb["IdentityClients:Salt"];
+            sc.AddSingleton<IConfigurationRoot>(_conf);
+            sc.AddSingleton<IIdentityContext>(_ioc);
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(_ioc));
 
-            _issuers = _cb.GetSection("IdentityClients:AllowedNames").GetChildren().Select(x => x.Value).ToList();
-            _audiences = _cb.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
+            var sp = sc.BuildServiceProvider();
 
-            sc.AddSingleton<IIdentityContext>(ioc);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainQuotesTask(ioc));
+            _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
+            _ioc = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
+            _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
         {
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             ConfigureContext(sc);
 
-            var sp = sc.BuildServiceProvider();
-            var ioc = sp.GetRequiredService<IIdentityContext>();
+            _ioc.ClientMgmt.Store.Salt = _conf["IdentityClients:Salt"];
+            _issuers = _conf.GetSection("IdentityClients:AllowedNames").GetChildren().Select(x => x.Value).ToList();
+            _audiences = _conf.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -72,9 +78,9 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuers = ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt),
-                    IssuerSigningKeys = ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
-                    ValidAudiences = ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
+                    ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
+                    IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
+                    ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
                     AudienceValidator = Bhbk.Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -92,6 +98,7 @@ namespace Bhbk.WebApi.Identity.Me
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+            sc.AddDataProtection();
             sc.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
@@ -114,10 +121,10 @@ namespace Bhbk.WebApi.Identity.Me
                 app.UseExceptionHandler("/error");
             }
 
-            if (_cb == null)
+            if (_conf == null)
                 log.AddConsole();
             else
-                log.AddConsole(_cb.GetSection("Logging"));
+                log.AddConsole(_conf.GetSection("Logging"));
 
             app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());

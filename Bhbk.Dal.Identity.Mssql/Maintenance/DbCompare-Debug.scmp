@@ -297,6 +297,10 @@
         <Value>True</Value>
       </PropertyElementName>
       <PropertyElementName>
+        <Name>TargetDatabaseName</Name>
+        <Value>Bhbk.Dal.Identity.Mssql</Value>
+      </PropertyElementName>
+      <PropertyElementName>
         <Name>TargetConnectionString</Name>
         <Value>Integrated Security=True;Pooling=False;Connect Timeout=30</Value>
       </PropertyElementName>

@@ -9,8 +9,8 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Program
     {
-        private static IConfigurationRoot _cb;
-        private static FileInfo _cf = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private static IConfigurationRoot _conf;
+        private static FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 {
                     options.ConfigureEndpoints();
                 })
-                .UseConfiguration(_cb)
+                .UseConfiguration(_conf)
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
                 .CaptureStartupErrors(true)
@@ -31,13 +31,12 @@ namespace Bhbk.WebApi.Identity.Admin
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .WriteTo.LiterateConsole()
-                .WriteTo.RollingFile(_cf.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log",
-                    fileSizeLimitBytes: 1048576, retainedFileCountLimit: 7)
+                .WriteTo.RollingFile(_api.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
-            _cb = new ConfigurationBuilder()
-                .SetBasePath(_cf.DirectoryName)
-                .AddJsonFile(_cf.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
             BuildWebHost(args).Run();
