@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Models
     {
         public AppAudience()
         {
+            AppAudienceUri = new HashSet<AppAudienceUri>();
             AppRole = new HashSet<AppRole>();
         }
 
@@ -22,6 +23,7 @@ namespace Bhbk.Lib.Identity.Models
         public bool Immutable { get; set; }
 
         public AppClient Client { get; set; }
+        public ICollection<AppAudienceUri> AppAudienceUri { get; set; }
         public ICollection<AppRole> AppRole { get; set; }
     }
 }

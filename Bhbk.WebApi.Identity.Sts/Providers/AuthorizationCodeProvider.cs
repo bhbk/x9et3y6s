@@ -15,20 +15,20 @@ using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class AuthorizeCodeExtension
+    public static class AuthorizationCodeExtension
     {
         public static IApplicationBuilder UseAuthorizationCodeProvider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AuthorizeCodeProvider>();
+            return app.UseMiddleware<AuthorizationCodeProvider>();
         }
     }
 
-    public class AuthorizeCodeProvider
+    public class AuthorizationCodeProvider
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AuthorizeCodeProvider(RequestDelegate next)
+        public AuthorizationCodeProvider(RequestDelegate next)
         {
             _next = next;
 
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth/v1/authorization", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
                 && (context.Request.Query.ContainsKey(BaseLib.Statics.AttrClientIDV1)
                 || context.Request.Query.ContainsKey(BaseLib.Statics.AttrRedirectUriIDV1)
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth/v2/authorization", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
                 && (context.Request.Query.ContainsKey(BaseLib.Statics.AttrClientIDV2)
                 || context.Request.Query.ContainsKey(BaseLib.Statics.AttrUserIDV2)
@@ -74,14 +74,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 string userValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV2).Value;
                 string redirectUriValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRedirectUriIDV2).Value;
                 string grantTypeValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-                string authorizeCodeValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAuthorizeCodeIDV2).Value;
+                string authorizationCodeValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAuthorizeCodeIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(redirectUriValue)
                     || !grantTypeValue.Equals(BaseLib.Statics.AttrAuthorizeCodeIDV2)
-                    || string.IsNullOrEmpty(authorizeCodeValue))
+                    || string.IsNullOrEmpty(authorizationCodeValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //check that payload can be decrypted and validated...
-                if (!new ProtectProvider(ioc.ContextStatus.ToString()).ValidateAsync(user.PasswordHash, authorizeCodeValue, user).Result)
+                if (!new ProtectProvider(ioc.ContextStatus.ToString()).ValidateAsync(user.PasswordHash, authorizationCodeValue, user).Result)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsAuthorizeCode.ToString(),
+                    ActivityType = ActivityType.StsAuthorizationCode.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });

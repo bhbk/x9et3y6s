@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Models
     {
         public AppUser()
         {
+            AppAudienceUri = new HashSet<AppAudienceUri>();
             AppUserClaim = new HashSet<AppUserClaim>();
             AppUserLogin = new HashSet<AppUserLogin>();
             AppUserRefresh = new HashSet<AppUserRefresh>();
@@ -41,6 +42,7 @@ namespace Bhbk.Lib.Identity.Models
         public bool HumanBeing { get; set; }
         public bool Immutable { get; set; }
 
+        public ICollection<AppAudienceUri> AppAudienceUri { get; set; }
         public ICollection<AppUserClaim> AppUserClaim { get; set; }
         public ICollection<AppUserLogin> AppUserLogin { get; set; }
         public ICollection<AppUserRefresh> AppUserRefresh { get; set; }

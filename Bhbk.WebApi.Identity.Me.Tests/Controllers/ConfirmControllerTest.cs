@@ -35,7 +35,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString()).GenerateAsync(newEmail, TimeSpan.FromSeconds(10), user);
+            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
@@ -55,7 +56,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString()).GenerateAsync(newEmail, TimeSpan.FromSeconds(10), user);
+            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
@@ -74,7 +76,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString()).GenerateAsync(newPassword, TimeSpan.FromSeconds(10), user);
+            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
@@ -94,7 +97,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString()).GenerateAsync(newPassword, TimeSpan.FromSeconds(10), user);
+            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;

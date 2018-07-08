@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -59,14 +60,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 //check if access is valid...
                 if (_access != null
                     && _access.ValidFrom < DateTime.UtcNow
-                    && _access.ValidTo > DateTime.UtcNow)
+                    && _access.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
                     return _access;
                 }
                 //check if refresh is valid. update access with refresh if so.
                 else if (_refresh != null
                     && _refresh.ValidFrom < DateTime.UtcNow
-                    && _refresh.ValidTo > DateTime.UtcNow)
+                    && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
                     var response = Connect.RefreshTokenV2(_client, new List<string> { _audience }, _refresh.RawData).Result;
 
@@ -77,6 +78,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                         _access = new JwtSecurityToken((string)json["access_token"]);
                         _refresh = new JwtSecurityToken((string)json["refresh_token"]);
                     }
+                    else
+                        Log.Error(typeof(BaseController).Name + " success on " + DateTime.Now.ToString()
+                            + Environment.NewLine
+                            + "JWT (access_token) valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
+                            + Environment.NewLine
+                            + "JWT (refresh_token) valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString()
+                            + Environment.NewLine);
 
                     return _access;
                 }
@@ -92,6 +100,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                         _access = new JwtSecurityToken((string)json["access_token"]);
                         _refresh = new JwtSecurityToken((string)json["refresh_token"]);
                     }
+                    else
+                        Log.Error(typeof(BaseController).Name + " success on " + DateTime.Now.ToString()
+                            + Environment.NewLine
+                            + "JWT (access_token) valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
+                            + Environment.NewLine
+                            + "JWT (refresh_token) valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString()
+                            + Environment.NewLine);
 
                     return _access;
                 }

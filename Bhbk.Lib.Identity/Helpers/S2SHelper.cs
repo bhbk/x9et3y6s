@@ -15,13 +15,13 @@ using System.Web;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class S2STests : EndpointHelper
+    public class S2STests : S2SHelper
     {
         public S2STests(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
             : base(conf, ioc, connect) { }
     }
 
-    public class S2SClients : EndpointHelper
+    public class S2SClients : S2SHelper
     {
         public S2SClients(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
             : base(conf, ioc, connect) { }
@@ -58,20 +58,20 @@ namespace Bhbk.Lib.Identity.Helpers
     }
 
     //https://oauth.com/playground/
-    public class EndpointHelper
+    public class S2SHelper
     {
-        protected IConfigurationRoot _conf;
-        protected IIdentityContext _ioc;
-        protected HttpClient _connect;
+        protected readonly IConfigurationRoot _conf;
+        protected readonly IIdentityContext _ioc;
+        protected readonly HttpClient _connect;
 
-        public EndpointHelper(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
+        public S2SHelper(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
         {
             _conf = conf;
             _ioc = ioc;
             _connect = connect.CreateClient();
         }
 
-        public EndpointHelper(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
+        public S2SHelper(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
         {
             _conf = conf;
             _ioc = ioc;
@@ -126,7 +126,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
-        public async Task<HttpResponseMessage> AuthorizeCodeRequestV2(string client, string user, string redirectUri, string scope, string state)
+        public async Task<HttpResponseMessage> AuthorizationCodeRequestV2(string client, string audience, string user, string redirectUri, string scope)
         {
             if (_ioc.ContextStatus == ContextType.Live)
             {
@@ -136,16 +136,16 @@ namespace Bhbk.Lib.Identity.Helpers
             }
 
             string content = HttpUtility.UrlPathEncode("?client=" + client
+                + "&audience=" + audience
                 + "&user=" + user
                 + "&redirect_uri=" + redirectUri
                 + "&response_type=" + "code"
-                + "&scope=" + scope
-                + "&state=" + state);
+                + "&scope=" + scope);
 
-            return await _connect.GetAsync("/code/v2" + content);
+            return await _connect.GetAsync("/oauth/v2/authorization-code" + content);
         }
 
-        public async Task<HttpResponseMessage> AuthorizeCodeV2(string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> AuthorizationCodeV2(string client, string user, string redirectUri, string code)
         {
             if (_ioc.ContextStatus == ContextType.Live)
             {
@@ -160,7 +160,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 + "&grant_type=" + "code"
                 + "&code=" + code);
 
-            return await _connect.GetAsync("/oauth/v2/authorize" + content);
+            return await _connect.GetAsync("/oauth/v2/authorization" + content);
         }
 
         //https://oauth.net/2/grant-types/client-credentials/

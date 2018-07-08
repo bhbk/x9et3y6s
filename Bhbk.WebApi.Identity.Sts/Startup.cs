@@ -101,22 +101,21 @@ namespace Bhbk.WebApi.Identity.Sts
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
             sc.AddDataProtection();
+            sc.AddSession(session =>
+            {
+                session.IdleTimeout = TimeSpan.FromSeconds(10);
+                session.Cookie.HttpOnly = true;
+            });
             sc.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
                 headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-
-            //sc.Configure<CookiePolicyOptions>(cookie =>
-            //{
-            //    cookie.CheckConsentNeeded = context => true;
-            //    cookie.MinimumSameSitePolicy = SameSiteMode.None;
-            //});
-            //sc.AddSession(session =>
-            //{
-            //    session.IdleTimeout = TimeSpan.FromSeconds(10);
-            //    session.Cookie.HttpOnly = true;
-            //});
+            sc.Configure<CookiePolicyOptions>(cookie =>
+            {
+                cookie.CheckConsentNeeded = context => true;
+                cookie.MinimumSameSitePolicy = SameSiteMode.None;
+            });
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
@@ -145,13 +144,13 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseStaticFiles();
             app.UseSwagger(SwaggerHelper.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
-            //app.UseSession();
+            app.UseSession();
             app.UseMvc();
 
             //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
 
             app.UseMiddleware<AccessTokenProvider>();
-            app.UseMiddleware<AuthorizeCodeProvider>();
+            app.UseMiddleware<AuthorizationCodeProvider>();
             app.UseMiddleware<ClientCredentialsProvider>();
             app.UseMiddleware<RefreshTokenProvider>();
 
@@ -168,13 +167,13 @@ namespace Bhbk.WebApi.Identity.Sts
             //        x.UseAccessTokenProvider();
             //    });
 
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorize", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorization", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseAuthorizationCodeProvider();
             //    });
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorize", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorization", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {

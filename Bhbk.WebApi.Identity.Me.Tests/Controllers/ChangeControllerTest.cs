@@ -86,8 +86,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             {
                 Id = user.Id,
                 CurrentPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
-                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
+                NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
             };
 
             var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
@@ -108,9 +108,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = BaseLib.Statics.ApiUnitTestPasswordCurrent,
-                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
+                CurrentPassword = BaseLib.Statics.ApiUnitTestUserPassCurrent,
+                NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
             };
 
             var result = await controller.ChangePasswordV1(model) as OkObjectResult;

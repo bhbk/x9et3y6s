@@ -41,7 +41,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (model.NewEmail != model.NewEmailConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidEmailConfirm);
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString()).GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(10), user));
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
             if (IoC.ContextStatus == ContextType.UnitTest)
                 return Ok(token);
@@ -90,7 +91,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString()).GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(10), user));
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
             if (IoC.ContextStatus == ContextType.UnitTest)
                 return Ok(token);

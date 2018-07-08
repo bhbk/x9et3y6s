@@ -85,7 +85,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var deliver = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
 
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString()).GenerateAsync(user.Email, TimeSpan.FromSeconds(10), user));
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
+                .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
             var url = UrlBuilder.UiConfirmEmail(Conf, user, code);
 

@@ -25,6 +25,14 @@ namespace Bhbk.Lib.Identity.Stores
             throw new NotImplementedException();
         }
 
+        public AppAudienceUri AddUri(AppAudienceUri entity)
+        {
+            var result = _context.AppAudienceUri.Add(entity);
+            _context.SaveChanges();
+
+            return result.Entity;
+        }
+
         public AppAudience Create(AppAudience entity)
         {
             var result = _context.AppAudience.Add(entity);
@@ -121,20 +129,20 @@ namespace Bhbk.Lib.Identity.Stores
 
         public AppAudience Update(AppAudience entity)
         {
-            var audience = _context.AppAudience.Where(x => x.Id == entity.Id).Single();
+            var mode = _context.AppAudience.Where(x => x.Id == entity.Id).Single();
 
-            audience.ClientId = entity.ClientId;
-            audience.Name = entity.Name;
-            audience.Description = entity.Description;
-            audience.AudienceType = entity.AudienceType;
-            audience.Enabled = entity.Enabled;
-            audience.LastUpdated = DateTime.Now;
-            audience.Immutable = entity.Immutable;
+            mode.ClientId = entity.ClientId;
+            mode.Name = entity.Name;
+            mode.Description = entity.Description;
+            mode.AudienceType = entity.AudienceType;
+            mode.Enabled = entity.Enabled;
+            mode.LastUpdated = DateTime.Now;
+            mode.Immutable = entity.Immutable;
 
-            _context.Entry(audience).State = EntityState.Modified;
+            _context.Entry(mode).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return audience;
+            return mode;
         }
     }
 }

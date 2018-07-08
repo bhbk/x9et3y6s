@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class UserClaimCreate
+    public abstract class UserClaimBase
     {
         [Required]
         public Guid UserId { get; set; }
@@ -72,61 +72,25 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class UserClaimResult
+    public class UserClaimCreate: UserClaimBase { }
+
+    public class UserClaimResult : UserClaimBase
     {
+        [Required]
         public Guid Id { get; set; }
-
-        public Guid UserId { get; set; }
-
-        public string ClaimType { get; set; }
-
-        public string ClaimValue { get; set; }
-
-        public string ClaimValueType { get; set; }
-
-        public string Issuer { get; set; }
-
-        public string OriginalIssuer { get; set; }
-
-        public string Subject { get; set; }
-
-        public IDictionary<string, string> Properties { get; set; }
 
         public DateTime Created { get; set; }
 
         public Nullable<DateTime> LastUpdated { get; set; }
-
-        public bool Immutable { get; set; }
     }
 
-    public class UserClaimUpdate
+    public class UserClaimUpdate : UserClaimBase
     {
         [Required]
         public Guid Id { get; set; }
 
-        [Required]
-        public Guid UserId { get; set; }
-
-        [Required]
-        public string ClaimType { get; set; }
-
-        [Required]
-        public string ClaimValue { get; set; }
-
-        public string ClaimValueType { get; set; }
-
-        public string Issuer { get; set; }
-
-        public string OriginalIssuer { get; set; }
-
-        public string Subject { get; set; }
-
-        public IDictionary<string, string> Properties { get; set; }
-
         public DateTime Created { get; set; }
 
         public Nullable<DateTime> LastUpdated { get; set; }
-
-        public bool Immutable { get; set; }
     }
 }

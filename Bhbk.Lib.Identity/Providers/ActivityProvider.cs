@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Providers
         Update,
         Delete,
         StsAccessToken,
-        StsAuthorizeCode,
+        StsAuthorizationCode,
         StsRefreshToken,
     }
 

@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Factory
     {
         public bool DefaultsDebug { get; set; }
         public UInt16 DefaultsAccessTokenExpire { get; set; }
-        public UInt16 DefaultsAuthorizeCodeExpire { get; set; }
+        public UInt16 DefaultsAuthorizationCodeExpire { get; set; }
         public UInt16 DefaultsBrowserCookieExpire { get; set; }
         public UInt16 DefaultsRefreshTokenExpire { get; set; }
         public string EndpointsAdminUrl { get; set; }

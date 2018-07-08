@@ -30,9 +30,9 @@ namespace Bhbk.Lib.Identity.Helpers
                 + "&code=" + code);
         }
 
-        public static Uri UiAuthorizeCodeRequest(IConfigurationRoot conf, AppClient client, AppUser user, string redirectUri, string scope, string state)
+        public static Uri UiAuthorizationCodeRequest(IConfigurationRoot conf, AppClient client, AppUser user, string redirectUri, string scope, string state)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentitySpas:MeUrl"], conf["IdentitySpas:MePath"], "/authorize-code");
+            var path = string.Format("{0}{1}{2}", conf["IdentitySpas:MeUrl"], conf["IdentitySpas:MePath"], "/authorization-code");
 
             return new Uri(path + "?client=" + client.Id.ToString()
                 + "&user=" + user.Id.ToString()

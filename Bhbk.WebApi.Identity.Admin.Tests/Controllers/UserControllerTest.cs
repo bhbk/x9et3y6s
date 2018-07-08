@@ -74,8 +74,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserAddPassword()
             {
-                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
+                NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
             };
 
             controller.SetUser(user.Id);
@@ -421,8 +421,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserAddPassword()
             {
-                NewPassword = BaseLib.Statics.ApiUnitTestPasswordNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestPasswordNew
+                NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
             };
 
             controller.SetUser(user.Id);

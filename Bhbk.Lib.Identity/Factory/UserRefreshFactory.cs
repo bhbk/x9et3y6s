@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class UserRefreshCreate
+    public abstract class UserRefreshBase
     {
         [Required]
         public Guid ClientId { get; set; }
@@ -75,14 +75,11 @@ namespace Bhbk.Lib.Identity.Factory
         public DateTime ExpiresUtc { get; set; }
     }
 
-    public class UserRefreshResult
+    public class UserRefreshCreate : UserRefreshBase { }
+
+    public class UserRefreshResult : UserRefreshBase
     {
+        [Required]
         public Guid Id { get; set; }
-        public Guid ClientId { get; set; }
-        public Guid AudienceId { get; set; }
-        public Guid UserId { get; set; }
-        public string ProtectedTicket { get; set; }
-        public DateTime IssuedUtc { get; set; }
-        public DateTime ExpiresUtc { get; set; }
     }
 }

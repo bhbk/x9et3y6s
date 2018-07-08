@@ -39,7 +39,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .EnableSensitiveDataLogging();
 
                 Statics.IoC = new IdentityContext(builder);
-                DatasetHelper seed = new DatasetHelper(Statics.IoC);
+                DataHelper seed = new DataHelper(Statics.IoC);
 
                 if (CreateDefault)
                 {

@@ -87,7 +87,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class AudienceCreate
+    public abstract class AudienceBase
     {
         [Required]
         public Guid ClientId { get; set; }
@@ -109,45 +109,27 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class AudienceResult
+    public class AudienceCreate : AudienceBase { }
+
+    public class AudienceResult : AudienceBase
     {
+        [Required]
         public Guid Id { get; set; }
-        public Guid ClientId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string AudienceType { get; set; }
-        public bool Enabled { get; set; }
+
         public DateTime Created { get; set; }
+
         public Nullable<DateTime> LastUpdated { get; set; }
-        public bool Immutable { get; set; }
+
         public IList<string> Roles { get; set; }
     }
 
-    public class AudienceUpdate
+    public class AudienceUpdate : AudienceBase
     {
         [Required]
         public Guid Id { get; set; }
 
-        [Required]
-        public Guid ClientId { get; set; }
-
-        public Guid ActorId { get; set; }
-
-        [Required]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        [Required]
-        public string AudienceType { get; set; }
-
-        [Required]
-        public bool Enabled { get; set; }
-
         public DateTime Created { get; set; }
 
         public Nullable<DateTime> LastUpdated { get; set; }
-
-        public bool Immutable { get; set; }
     }
 }

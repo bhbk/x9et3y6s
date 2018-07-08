@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,6 +85,27 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 if (ioc == null)
                     throw new ArgumentNullException();
+
+                Guid clientID;
+                AppClient client;
+
+                //check if identifier is guid. resolve to guid if not.
+                if (Guid.TryParse(clientValue, out clientID))
+                    client = ioc.ClientMgmt.FindByIdAsync(clientID).Result;
+                else
+                    client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
+
+                if (client == null || !client.Enabled)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
+                }
+
+                //provider not implemented yet...
+                context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
+                context.Response.ContentType = "application/json";
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysNotImplemented }, _serializer));
             }
 
             #endregion

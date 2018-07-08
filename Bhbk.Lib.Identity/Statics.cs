@@ -82,17 +82,20 @@ namespace Bhbk.Lib.Identity
         public const string ApiUnitTestClaimValue = "ClaimValueUnitTests";
         public const string ApiUnitTestEmailContent = "EmailUnitTestsContent";
         public const string ApiUnitTestEmailSubject = "EmailUnitTestsSubject";
-        public const string ApiUnitTestPasswordCurrent = "3uetw7W$mswU";
         public const string ApiUnitTestLoginA = "LoginUnitTestsA";
+        public const string ApiUnitTestLoginAKey = "LoginUnitTestsAKey";
         public const string ApiUnitTestLoginB = "LoginUnitTestsB";
-        public const string ApiUnitTestLoginKeyA = "LoginUnitTestsKeyA";
-        public const string ApiUnitTestLoginNameA = "LoginUnitTests";
-        public const string ApiUnitTestPasswordNew = "mv7wd3dks&k3";
+        public const string ApiUnitTestLoginBKey = "LoginUnitTestsBKey";
         public const string ApiUnitTestRoleA = "RoleUnitTestsA";
         public const string ApiUnitTestRoleB = "RoleUnitTestsB";
-        public const string ApiUnitTestTextContext = "TextUnitTestsContent";
         public const string ApiUnitTestUserA = "UserUnitTestsA@local";
         public const string ApiUnitTestUserB = "UserUnitTestsB@local";
+        public const string ApiUnitTestUserPassCurrent = "3uetw7W$mswU";
+        public const string ApiUnitTestUserPassNew = "mv7wd3dks&k3";
+        public const string ApiUnitTestUriA = "UrlUnitTestsA";
+        public const string ApiUnitTestUriALink = "https://app.test.net/a/redirect";
+        public const string ApiUnitTestUriB = "UrlUnitTestsB";
+        public const string ApiUnitTestUriBLink = "https://app.test.net/b/redirect";
 
         #endregion
 
@@ -118,6 +121,9 @@ namespace Bhbk.Lib.Identity
         public const string MsgUserAlreadyExists = "User already exists";
         public const string MsgUserImmutable = "User is immutable";
         public const string MsgUserInvalid = "User is invalid, locked or disabled.";
+        public const string MsgUriAlreadyExists = "Uri already exists";
+        public const string MsgUriImmutable = "Uri is immutable";
+        public const string MsgUriInvalid = "Uri is invalid or disabled.";
         public const string MsgUserInvalidCurrentEmail = "User current email incorrect";
         public const string MsgUserInvalidCurrentPassword = "User current password incorrect";
         public const string MsgUserInvalidCurrentPhone = "User current phone incorrect";

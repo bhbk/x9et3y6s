@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class RoleCreate
+    public abstract class RoleBase
     {
         [Required]
         public Guid AudienceId { get; set; }
@@ -108,38 +108,29 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class RoleResult
+    public class RoleCreate : RoleBase { }
+
+    public class RoleResult : RoleBase
     {
+        [Required]
         public Guid Id { get; set; }
-        public Guid AudienceId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+
         public DateTime Created { get; set; }
+
         public Nullable<DateTime> LastUpdated { get; set; }
-        public bool Enabled { get; set; }
-        public bool Immutable { get; set; }
+
         public IList<string> Claims { get; set; }
+
         public IList<string> Users { get; set; }
     }
 
-    public class RoleUpdate
+    public class RoleUpdate : RoleBase
     {
         [Required]
         public Guid Id { get; set; }
 
-        [Required]
-        public Guid AudienceId { get; set; }
+        public DateTime Created { get; set; }
 
-        public Guid ActorId { get; set; }
-
-        [Required]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        [Required]
-        public bool Enabled { get; set; }
-
-        public bool Immutable { get; set; }
+        public Nullable<DateTime> LastUpdated { get; set; }
     }
 }

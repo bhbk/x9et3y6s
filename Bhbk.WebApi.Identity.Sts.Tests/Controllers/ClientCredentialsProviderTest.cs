@@ -31,22 +31,45 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_ClientV2_Success()
+        public async Task Api_Sts_ClientV2_Fail_ClientInvalid()
         {
-            //evaluate this unit test further... it is not good yet...
-            Assert.Fail();
-
             _data.Destroy();
             _data.CreateTest();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString()).GenerateAsync(user.Email, TimeSpan.FromSeconds(10), user));
-
-            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), code);
+            var result = await _s2s.ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_ClientV2_Fail_SecretInvalid()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+
+            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16));
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_ClientV2_Success()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+
+            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+
+            //not complete yet, throw failure...
+            Assert.Fail();
 
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];

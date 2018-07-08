@@ -149,7 +149,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class UserCreate
+    public abstract class UserBase
     {
         public Guid ActorId { get; set; }
 
@@ -180,6 +180,50 @@ namespace Bhbk.Lib.Identity.Factory
 
         [DefaultValue(false)]
         public bool Immutable { get; set; }
+    }
+
+    public class UserCreate : UserBase { }
+
+    public class UserResult : UserBase
+    {
+        public Guid Id { get; set; }
+
+        public bool EmailConfirmed { get; set; }
+
+        public Nullable<bool> PhoneNumberConfirmed { get; set; }
+
+        public Nullable<DateTime> LastUpdated { get; set; }
+
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
+
+        public Nullable<DateTime> LastLoginFailure { get; set; }
+
+        public Nullable<DateTime> LastLoginSuccess { get; set; }
+
+        public int AccessFailedCount { get; set; }
+
+        public int AccessSuccessCount { get; set; }
+
+        public bool PasswordConfirmed { get; set; }
+
+        public bool TwoFactorEnabled { get; set; }
+
+        public IList<string> Claims { get; set; }
+
+        public IList<string> Roles { get; set; }
+
+        public IList<string> Logins { get; set; }
+    }
+
+    public class UserUpdate : UserBase
+    {
+        [Required]
+        public Guid Id { get; set; }
+
+        public Guid ActorId { get; set; }
+
+        [Required]
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
     }
 
     public class UserCreateEmail
@@ -236,52 +280,6 @@ namespace Bhbk.Lib.Identity.Factory
         public string Body { get; set; }
 
         public DateTime Created { get; set; }
-    }
-
-    public class UserResult
-    {
-        public Guid Id { get; set; }
-        public string Email { get; set; }
-        public bool EmailConfirmed { get; set; }
-        public string PhoneNumber { get; set; }
-        public Nullable<bool> PhoneNumberConfirmed { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime Created { get; set; }
-        public Nullable<DateTime> LastUpdated { get; set; }
-        public bool LockoutEnabled { get; set; }
-        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
-        public Nullable<DateTime> LastLoginFailure { get; set; }
-        public Nullable<DateTime> LastLoginSuccess { get; set; }
-        public int AccessFailedCount { get; set; }
-        public int AccessSuccessCount { get; set; }
-        public bool PasswordConfirmed { get; set; }
-        public bool TwoFactorEnabled { get; set; }
-        public bool HumanBeing { get; set; }
-        public bool Immutable { get; set; }
-        public IList<string> Claims { get; set; }
-        public IList<string> Roles { get; set; }
-        public IList<string> Logins { get; set; }
-    }
-
-    public class UserUpdate
-    {
-        [Required]
-        public Guid Id { get; set; }
-
-        public Guid ActorId { get; set; }
-
-        [Required]
-        public string FirstName { get; set; }
-
-        [Required]
-        public string LastName { get; set; }
-
-        [Required]
-        public bool LockoutEnabled { get; set; }
-
-        [Required]
-        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
     }
 
     public class UserAddPassword

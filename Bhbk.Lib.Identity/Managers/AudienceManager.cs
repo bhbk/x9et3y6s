@@ -19,6 +19,14 @@ namespace Bhbk.Lib.Identity.Managers
             Store = store;
         }
 
+        public async Task<AppAudienceUri> AddUriAsync(AppAudienceUri audienceUri)
+        {
+            if (!Store.Exists(audienceUri.AudienceId))
+                throw new InvalidOperationException();
+
+            return Store.AddUri(audienceUri);
+        }
+
         public async Task<AppAudience> CreateAsync(AppAudience audience)
         {
             if (Store.Exists(audience.Name))

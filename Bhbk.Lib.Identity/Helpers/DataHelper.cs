@@ -8,11 +8,11 @@ using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class DatasetHelper
+    public class DataHelper
     {
         private readonly IIdentityContext _ioc;
 
-        public DatasetHelper(IIdentityContext ioc)
+        public DataHelper(IIdentityContext ioc)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -163,6 +163,7 @@ namespace Bhbk.Lib.Identity.Helpers
             AppLogin login;
             AppUser user;
             AppRole role;
+            AppAudience audience;
 
             //create clients
             await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
@@ -199,7 +200,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 {
                     ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestClientB).Single().Id,
                     Name = Statics.ApiUnitTestAudienceB,
-                    AudienceType = AudienceType.user_agent.ToString(),
+                    AudienceType = AudienceType.server.ToString(),
                     Enabled = true,
                     Immutable = false,
                 }).Devolve());
@@ -249,7 +250,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = false,
-                }).Devolve(), Statics.ApiUnitTestPasswordCurrent);
+                }).Devolve(), Statics.ApiUnitTestUserPassCurrent);
 
             user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUserA).Single();
 
@@ -267,7 +268,7 @@ namespace Bhbk.Lib.Identity.Helpers
                     LastName = "Last " + CryptoHelper.CreateRandomBase64(4),
                     LockoutEnabled = false,
                     Immutable = false,
-                }).Devolve(), Statics.ApiUnitTestPasswordCurrent);
+                }).Devolve(), Statics.ApiUnitTestUserPassCurrent);
 
             user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUserB).Single();
 
@@ -300,6 +301,30 @@ namespace Bhbk.Lib.Identity.Helpers
 
             if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
                 await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+
+            //assign uris to audience A
+            audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudienceA).Single();
+
+            await _ioc.AudienceMgmt.AddUriAsync(new AudienceUriFactory<AudienceUriCreate>(
+                new AudienceUriCreate()
+                {
+                    AudienceId = audience.Id,
+                    Name = Statics.ApiUnitTestUriA,
+                    AbsoluteUri = Statics.ApiUnitTestUriALink,
+                    Enabled = true,
+                }).Devolve());
+
+            //assign uris to audience B
+            audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudienceB).Single();
+
+            await _ioc.AudienceMgmt.AddUriAsync(new AudienceUriFactory<AudienceUriCreate>(
+                new AudienceUriCreate()
+                {
+                    AudienceId = audience.Id,
+                    Name = Statics.ApiUnitTestUriB,
+                    AbsoluteUri = Statics.ApiUnitTestUriBLink,
+                    Enabled = true,
+                }).Devolve());
         }
 
         public async void CreateRandom(uint sets)
@@ -309,12 +334,14 @@ namespace Bhbk.Lib.Identity.Helpers
                 AppLogin login;
                 AppUser user;
                 AppRole role;
+                AppAudience audience;
 
                 var clientName = Statics.ApiUnitTestClientA + "-" + CryptoHelper.CreateRandomBase64(4);
                 var audienceName = Statics.ApiUnitTestAudienceA + "-" + CryptoHelper.CreateRandomBase64(4);
                 var roleName = Statics.ApiUnitTestRoleA + "-" + CryptoHelper.CreateRandomBase64(4);
                 var loginName = Statics.ApiUnitTestLoginA + "-" + CryptoHelper.CreateRandomBase64(4);
                 var userName = CryptoHelper.CreateRandomBase64(4) + "-" + Statics.ApiUnitTestUserA;
+                var uriName = Statics.ApiUnitTestUriA + "-" + CryptoHelper.CreateRandomBase64(4);
 
                 //create random client
                 await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
@@ -366,7 +393,7 @@ namespace Bhbk.Lib.Identity.Helpers
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
-                    }).Devolve(), Statics.ApiUnitTestPasswordCurrent);
+                    }).Devolve(), Statics.ApiUnitTestUserPassCurrent);
 
                 //assign roles, claims & logins to random user
                 user = _ioc.UserMgmt.Store.Get(x => x.Email == userName).Single();
@@ -383,6 +410,18 @@ namespace Bhbk.Lib.Identity.Helpers
 
                 if (!await _ioc.UserMgmt.IsInLoginAsync(user, login.LoginProvider))
                     await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+
+                //assign uris to random audience
+                audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == audienceName).Single();
+
+                await _ioc.AudienceMgmt.AddUriAsync(new AudienceUriFactory<AudienceUriCreate>(
+                    new AudienceUriCreate()
+                    {
+                        AudienceId = audience.Id,
+                        Name = uriName,
+                        AbsoluteUri = Statics.ApiUnitTestUriALink,
+                        Enabled = true,
+                    }).Devolve());
             }
         }
 

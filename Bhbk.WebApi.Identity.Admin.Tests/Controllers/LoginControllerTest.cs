@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LoginId = add.Id,
                 LoginProvider = login.LoginProvider,
                 ProviderDisplayName = login.LoginProvider,
-                ProviderKey = BaseLib.Statics.ApiUnitTestLoginKeyA,
+                ProviderKey = BaseLib.Statics.ApiUnitTestLoginAKey,
                 Enabled = true,
             };
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LoginId = create.Id,
                 LoginProvider = login.LoginProvider,
                 ProviderDisplayName = login.LoginProvider,
-                ProviderKey = BaseLib.Statics.ApiUnitTestLoginKeyA,
+                ProviderKey = BaseLib.Statics.ApiUnitTestLoginAKey,
                 Enabled = true,
                 Immutable = false
             };

@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Stores
             try
             {
                 _app.DefaultsAccessTokenExpire = UInt16.Parse(_conf["IdentityDefaults:AccessTokenExpire"]);
-                _app.DefaultsAuthorizeCodeExpire = UInt16.Parse(_conf["IdentityDefaults:AuthorizeCodeExpire"]);
+                _app.DefaultsAuthorizationCodeExpire = UInt16.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"]);
                 _app.DefaultsBrowserCookieExpire = UInt16.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
                 _app.DefaultsRefreshTokenExpire = UInt16.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
                 _app.UnitTestsAccessToken = false;

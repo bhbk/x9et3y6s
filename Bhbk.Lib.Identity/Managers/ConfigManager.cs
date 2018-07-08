@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Managers
 
             output.Append(typeof(AppConfig).Name + Environment.NewLine);
             output.Append("\tDefaults:AccessTokenExpire:" + _store.Config.DefaultsAccessTokenExpire.ToString() + Environment.NewLine);
-            output.Append("\tDefaults:AuthorizeCodeExpire:" + _store.Config.DefaultsAuthorizeCodeExpire.ToString() + Environment.NewLine);
+            output.Append("\tDefaults:AuthorizeCodeExpire:" + _store.Config.DefaultsAuthorizationCodeExpire.ToString() + Environment.NewLine);
             output.Append("\tDefaults:RefreshTokenExpire:" + _store.Config.DefaultsRefreshTokenExpire.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:AccessToken:" + _store.Config.UnitTestsAccessToken.ToString() + Environment.NewLine);
             output.Append("\tUnitTests:AccessTokenFakeUtcNow:" + _store.Config.UnitTestsAccessTokenFakeUtcNow.ToString() + Environment.NewLine);

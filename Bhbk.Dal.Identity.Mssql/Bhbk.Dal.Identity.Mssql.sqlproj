@@ -178,6 +178,10 @@
     <Build Include="dbo\Stored Procedures\uspSystem_ErrorCreate.sql" />
     <Build Include="dbo\Stored Procedures\uspSystem_ErrorDelete.sql" />
     <Build Include="dbo\Stored Procedures\uspSystem_PostRefreshTasks.sql" />
+    <Build Include="dbo\Tables\AppAudienceUri.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac">

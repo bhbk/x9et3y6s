@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Factory
         }
     }
 
-    public class ClientCreate
+    public abstract class ClientBase
     {
         public Guid ActorId { get; set; }
 
@@ -100,38 +100,28 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class ClientResult
+    public class ClientCreate : ClientBase { }
+
+    public class ClientResult : ClientBase
     {
+        [Required]
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string ClientKey { get; set; }
-        public bool Enabled { get; set; }
+
         public DateTime Created { get; set; }
+
         public Nullable<DateTime> LastUpdated { get; set; }
-        public bool Immutable { get; set; }
+
         public IList<string> Audiences { get; set; }
     }
 
-    public class ClientUpdate
+    public class ClientUpdate : ClientBase
     {
 
         [Required]
         public Guid Id { get; set; }
 
-        public Guid ActorId { get; set; }
+        public DateTime Created { get; set; }
 
-        [Required]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        [Required]
-        public string ClientKey { get; set; }
-
-        [Required]
-        public bool Enabled { get; set; }
-
-        public bool Immutable { get; set; }
+        public Nullable<DateTime> LastUpdated { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 {
     public class StartupTest : Startup
     {
-        protected static DatasetHelper _data;
+        protected static DataHelper _data;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
         public override void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
         {
-            _data = new DatasetHelper(_ioc);
+            _data = new DataHelper(_ioc);
 
             base.Configure(app, env, log);
         }
