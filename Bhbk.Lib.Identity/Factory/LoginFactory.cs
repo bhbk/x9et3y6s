@@ -56,8 +56,6 @@ namespace Bhbk.Lib.Identity.Factory
 
     public abstract class LoginBase
     {
-        public Guid ActorId { get; set; }
-
         [Required]
         public string LoginProvider { get; set; }
 
@@ -65,7 +63,10 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class LoginCreate : LoginBase { }
+    public class LoginCreate : LoginBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class LoginResult : LoginBase
     {
@@ -77,5 +78,7 @@ namespace Bhbk.Lib.Identity.Factory
     {
         [Required]
         public Guid Id { get; set; }
+
+        public Guid ActorId { get; set; }
     }
 }

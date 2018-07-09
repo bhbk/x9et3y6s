@@ -212,7 +212,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 return false;
         }
 
-        public static async Task<(string token, DateTime begin, DateTime end)>
+        public static (string token, DateTime begin, DateTime end)
             GetAccessTokenV2(IIdentityContext ioc, string clientName, string audienceName, string userName)
         {
             if (ioc == null)

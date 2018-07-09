@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Net;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
 
@@ -75,6 +76,32 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return NoContent();
         }
 
+        [Route("v1/authorization-code"), HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> AuthCodeRequestV1([FromQuery(Name = "client")] Guid clientID,
+            [FromQuery(Name = "audience")] Guid audienceID,
+            [FromQuery(Name = "user")] Guid userID,
+            [FromQuery(Name = "redirect_uri")] string redirectUri,
+            [FromQuery(Name = "scope")] string scope)
+        {
+            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
+
+            if (client == null)
+                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+
+            var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
+
+            if (audience == null)
+                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
         [Route("v2/authorization-code"), HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> AuthCodeRequestV2([FromQuery(Name = "client")] Guid clientID,
@@ -119,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             Response.Cookies.Append("auth-code-state", state);
             Response.Cookies.Append("auth-code-url", url.AbsoluteUri);
 
-            return NoContent();
+            return StatusCode((int)HttpStatusCode.NotImplemented);
         }
     }
 }

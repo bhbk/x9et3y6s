@@ -94,8 +94,6 @@ namespace Bhbk.Lib.Identity.Factory
         [Required]
         public Guid AudienceId { get; set; }
 
-        public Guid ActorId { get; set; }
-
         [Required]
         public string Name { get; set; }
 
@@ -108,7 +106,10 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class RoleCreate : RoleBase { }
+    public class RoleCreate : RoleBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class RoleResult : RoleBase
     {
@@ -128,6 +129,8 @@ namespace Bhbk.Lib.Identity.Factory
     {
         [Required]
         public Guid Id { get; set; }
+
+        public Guid ActorId { get; set; }
 
         public DateTime Created { get; set; }
 

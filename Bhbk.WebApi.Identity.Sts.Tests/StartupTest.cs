@@ -25,11 +25,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
+            //DRY up contexts across controllers and tasks after made thread safe...
             _ioc = new IdentityContext(options);
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
             sc.AddSingleton<IIdentityContext>(_ioc);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(_ioc));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(new IdentityContext(options)));
 
             var sp = sc.BuildServiceProvider();
 

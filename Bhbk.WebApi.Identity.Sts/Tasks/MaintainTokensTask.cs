@@ -15,10 +15,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 {
     public class MaintainTokensTask : BackgroundService
     {
-        private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _conf;
-        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext _ioc;
+        private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 

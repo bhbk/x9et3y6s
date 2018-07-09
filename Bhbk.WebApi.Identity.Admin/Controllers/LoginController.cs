@@ -120,7 +120,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetLoginsV1([FromQuery] PagingModel model)
+        public IActionResult GetLoginsV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
 
-            var result = await IoC.UserMgmt.RemoveFromLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
+            var result = await IoC.UserMgmt.RemoveLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);

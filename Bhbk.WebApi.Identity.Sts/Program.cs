@@ -9,8 +9,8 @@ namespace Bhbk.WebApi.Identity.Sts
 {
     public class Program
     {
-        private static IConfigurationRoot _conf;
         private static FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private static IConfigurationRoot _conf;
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)

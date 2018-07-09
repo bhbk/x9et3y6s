@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(client.Name))
                 throw new InvalidOperationException();
 
-            return Store.Create(client);
+            return await Task.FromResult(Store.Create(client));
         }
 
         public async Task<bool> DeleteAsync(AppClient client)
@@ -32,17 +32,17 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(client.Id))
                 throw new InvalidOperationException();
 
-            return Store.Delete(client);
+            return await Task.FromResult(Store.Delete(client));
         }
 
         public async Task<AppClient> FindByIdAsync(Guid clientId)
         {
-            return Store.FindById(clientId);
+            return await Task.FromResult(Store.FindById(clientId));
         }
 
         public async Task<AppClient> FindByNameAsync(string clientName)
         {
-            return Store.FindByName(clientName);
+            return await Task.FromResult(Store.FindByName(clientName));
         }
 
         public async Task<IQueryable<AppAudience>> GetAudiencesAsync(Guid clientId)
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(clientId))
                 throw new InvalidOperationException();
 
-            return Store.GetAudiences(clientId);
+            return await Task.FromResult(Store.GetAudiences(clientId));
         }
 
         public async Task<AppClient> UpdateAsync(AppClient client)
@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(client.Id))
                 throw new InvalidOperationException();
 
-            return Store.Update(client);
+            return await Task.FromResult(Store.Update(client));
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
             var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
+            var access = JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
             var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
+            var access = JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
             var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
+            var access = JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
             var recipient = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
+            var access = JwtHelper.GetAccessTokenV2(_ioc, client.Name, audience.Name, user.Email);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);

@@ -24,6 +24,8 @@ namespace Bhbk.Lib.Identity.Helpers
                     return endpoint;
                 });
 
+            var certificate = CryptoHelper.CreateX509Certificate(RsaKeyLength.Bits2048);
+
             foreach (var endpoint in endpoints)
             {
                 if (endpoint.Value.Enable)
@@ -32,8 +34,8 @@ namespace Bhbk.Lib.Identity.Helpers
 
                     if (endpoint.Value.Host == "localhost")
                     {
-                        list.Add(IPAddress.IPv6Loopback);
                         list.Add(IPAddress.Loopback);
+                        list.Add(IPAddress.IPv6Loopback);
                     }
                     else if (IPAddress.TryParse(endpoint.Value.Host, out var address))
                         list.Add(address);
@@ -47,7 +49,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             {
                                 if (endpoint.Value.Scheme == "https")
                                 {
-                                    listenOptions.UseHttps(CryptoHelper.CreateCertificate());
+                                    listenOptions.UseHttps(certificate);
                                 }
                             });
                     }
@@ -58,9 +60,9 @@ namespace Bhbk.Lib.Identity.Helpers
 
     public class EndPointConfig
     {
+        public string Scheme { get; set; }
         public string Host { get; set; }
         public int Port { get; set; }
-        public string Scheme { get; set; }
         public bool Enable { get; set; }
     }
 }

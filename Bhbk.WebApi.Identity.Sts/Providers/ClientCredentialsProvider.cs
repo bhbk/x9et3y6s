@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrGrantTypeIDV2)
+                    || !grantTypeValue.Equals(BaseLib.Statics.AttrClientSecretIDV2)
                     || string.IsNullOrEmpty(secretValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;

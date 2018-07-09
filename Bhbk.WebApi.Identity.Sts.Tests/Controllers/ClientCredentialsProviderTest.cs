@@ -31,6 +31,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Sts_ClientV1_Fail_NotImplemented()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+
+            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+        }
+
+        [TestMethod]
         public async Task Api_Sts_ClientV2_Fail_ClientInvalid()
         {
             _data.Destroy();
@@ -66,11 +79,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            //not complete yet, throw failure...
-            Assert.Fail();
-
+            //not done yet...
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 

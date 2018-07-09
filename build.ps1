@@ -22,3 +22,5 @@ dotnet clean "Bhbk.WebApi.Identity.Sts.csproj" --configuration Release
 dotnet build "Bhbk.WebApi.Identity.Sts.csproj" --configuration Release --framework netcoreapp2.1
 dotnet publish "Bhbk.WebApi.Identity.Sts.csproj" --output "bin\\Release\\netcoreapp2.1\\publish\\" --configuration Release --framework netcoreapp2.1
 octo pack --id="Bhbk.WebApi.Identity.Sts" --basePath="bin\\Release\\netcoreapp2.1\\publish\\" --outFolder="..\\"
+
+cd ..

@@ -18,10 +18,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class QueueEmailTask : BackgroundService
     {
-        private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _conf;
-        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext _ioc;
+        private readonly JsonSerializerSettings _serializer;
         private readonly ConcurrentQueue<UserCreateEmail> _queue;
         private readonly SendgridProvider _provider;
         private readonly int _delay, _expire;
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         {
                             _queue.TryDequeue(out model);
 
-                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") failed many times. The email was created on "
+                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The email was created on "
                                 + model.Created + " and is being deleted now.");
 
                             continue;
@@ -97,10 +97,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                                 if (!_queue.TryDequeue(out model))
                                     break;
 
-                                Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") was successfull.");
+                                Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
                             }
                             else
-                                Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") failed. Error=" + result.StatusCode);
+                                Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed. Error=" + result.StatusCode);
                         }
                     }
                     catch (Exception ex)

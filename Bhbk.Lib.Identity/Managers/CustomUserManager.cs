@@ -280,13 +280,13 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.GetRolesAsync(user);
         }
 
-        [Obsolete]
-        public async Task<IList<string>> GetRolesReturnIdAsync(AppUser user)
+        [System.Obsolete]
+        public async Task<IList<string>> GetRolesResultIdAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            return await Store.GetRolesReturnIdAsync(user);
+            return await Store.GetRolesResultIdAsync(user);
         }
 
         public override async Task<bool> GetTwoFactorEnabledAsync(AppUser user)
@@ -362,13 +362,7 @@ namespace Bhbk.Lib.Identity.Managers
             return IdentityResult.Success;
         }
 
-        public override Task<IdentityResult> RemoveLoginAsync(AppUser user, string loginProvider, string providerKey)
-        {
-            return base.RemoveLoginAsync(user, loginProvider, providerKey);
-        }
-
-        [System.Obsolete]
-        public async Task<IdentityResult> RemoveFromLoginAsync(AppUser user, string loginProvider, string providerKey)
+        public override async Task<IdentityResult> RemoveLoginAsync(AppUser user, string loginProvider, string providerKey)
         {
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();

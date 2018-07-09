@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
+using Serilog;
 using System;
 using System.Collections;
 using System.Reflection;
@@ -20,65 +18,69 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    internal enum RsaKeyLength
+    public enum RsaKeyLength
     {
-        Length2048Bits = 2048, Length4096Bits = 4096
+        Bits1024 = 1024,
+        Bits2048 = 2048,
+        Bits4096 = 4096
     }
 
     public class CryptoHelper
     {
-        public static X509Certificate2 CreateCertificate()
+        //https://svrooij.nl/2018/04/generate-x509certificate2-in-csharp/
+        public static X509Certificate2 CreateX509Certificate(RsaKeyLength length)
         {
-            var randomGenerator = new CryptoApiRandomGenerator();
-            var random = new SecureRandom(randomGenerator);
-
-            var certificateGenerator = new X509V3CertificateGenerator();
+            var issuerName = Assembly.GetEntryAssembly().GetName().Name;
+            var subjectName = Assembly.GetEntryAssembly().GetName().Name;
             var issuerAttrs = new Hashtable();
             var subjectAttrs = new Hashtable();
 
-            issuerAttrs.Add(X509Name.CN, Assembly.GetCallingAssembly().ToString());
-            subjectAttrs.Add(X509Name.OU, Assembly.GetCallingAssembly().ToString());
+            var randomGenerator = new CryptoApiRandomGenerator();
+            var randomNumber = new SecureRandom(randomGenerator);
+
+            var serialNumber = BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), randomNumber);
+
+            issuerAttrs.Add(X509Name.CN, issuerName);
+            subjectAttrs.Add(X509Name.OU, subjectName);
 
             var issuerDetails = new X509Name(new ArrayList(issuerAttrs.Keys), issuerAttrs);
             var subjectDetails = new X509Name(new ArrayList(subjectAttrs.Keys), subjectAttrs);
+            var x509generator = new X509V3CertificateGenerator();
 
-            certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
-            certificateGenerator.SetSignatureAlgorithm(PkcsObjectIdentifiers.Sha256WithRsaEncryption.Id);
-            certificateGenerator.SetIssuerDN(issuerDetails);
-            certificateGenerator.SetSubjectDN(subjectDetails);
-            certificateGenerator.SetNotBefore(DateTime.UtcNow.Date);
-            certificateGenerator.SetNotAfter(DateTime.UtcNow.Date.AddYears(1));
+            x509generator.SetSerialNumber(serialNumber);
+            x509generator.SetIssuerDN(issuerDetails);
+            x509generator.SetSubjectDN(subjectDetails);
+            x509generator.SetNotBefore(DateTime.UtcNow.Date);
+            x509generator.SetNotAfter(DateTime.UtcNow.Date.AddYears(1));
 
             var keyPairGenerator = new RsaKeyPairGenerator();
-            var keyPairParams = new KeyGenerationParameters(random, (int)RsaKeyLength.Length2048Bits);
+            var keyPairParams = new KeyGenerationParameters(randomNumber, (int)length);
 
             keyPairGenerator.Init(keyPairParams);
 
             var subjectKeyPair = keyPairGenerator.GenerateKeyPair();
+
+            x509generator.SetPublicKey(subjectKeyPair.Public);
+
             var issuerKeyPair = subjectKeyPair;
+            var signatureGenerator = new Asn1SignatureFactory("SHA256WithRSA", issuerKeyPair.Private);
+            var x509certificate = x509generator.Generate(signatureGenerator);
 
-            certificateGenerator.SetPublicKey(subjectKeyPair.Public);
+            var pkcsStream = new System.IO.MemoryStream();
+            var pkcsStore = new Pkcs12StoreBuilder().Build();
+            var exportPass = Guid.NewGuid().ToString("x");
 
-            var certFlags = X509KeyStorageFlags.Exportable;
-            var certificate = certificateGenerator.Generate(issuerKeyPair.Private, random);
-            var privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(subjectKeyPair.Private);
+            pkcsStore.SetKeyEntry($"{subjectName}_key", 
+                new AsymmetricKeyEntry(subjectKeyPair.Private), 
+                new[] { new X509CertificateEntry(x509certificate) });
+            pkcsStore.Save(pkcsStream, exportPass.ToCharArray(), randomNumber);
 
-            //create certificate that holds public/private key
-            var x509 = new X509Certificate2(certificate.GetEncoded());
-            var secret = (Asn1Sequence)Asn1Object.FromByteArray(privateKeyInfo.PrivateKey.GetDerEncoded());
+            var result = new X509Certificate2(pkcsStream.ToArray(), exportPass, X509KeyStorageFlags.Exportable);
+            var msg = $"The issuer \"{result.Issuer}\" created x509 certificate with thumbprint \"{result.Thumbprint}\" and subject \"{result.Subject}\"";
 
-            if (secret.Count != 9)
-                throw new PemException("malformed sequence in RSA private key");
+            Log.Information(msg);
 
-            var rsaKey = new RsaPrivateKeyStructure(secret);
-            var rsaParams = new RsaPrivateCrtKeyParameters(rsaKey.Modulus, rsaKey.PublicExponent, rsaKey.PrivateExponent,
-                rsaKey.Prime1, rsaKey.Prime2, rsaKey.Exponent1, rsaKey.Exponent2, rsaKey.Coefficient);
-
-            throw new NotImplementedException();
-
-            x509.PrivateKey = DotNetUtilities.ToRSA(rsaParams);
-
-            return x509;
+            return result;
         }
 
         public static string CreateRandomBase64(int length)
@@ -91,11 +93,11 @@ namespace Bhbk.Lib.Identity.Helpers
 
         public static string CreateRandomNumberAsString(int length)
         {
-            var random = new Random();
+            var randomNumber = new Random();
             var result = string.Empty;
 
             for (int i = 0; i < length; i++)
-                result = String.Concat(result, random.Next(10).ToString());
+                result = String.Concat(result, randomNumber.Next(10).ToString());
 
             return result;
         }

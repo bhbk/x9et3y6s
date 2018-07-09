@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -24,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> GetActivityV1([FromQuery] PagingModel model)
+        public IActionResult GetActivityV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _data.CreateDefault();
             _data.CreateRandom(10);
 
-            var access = await JwtHelper.GetAccessTokenV2(_ioc,
+            var access = JwtHelper.GetAccessTokenV2(_ioc,
                 BaseLib.Statics.ApiDefaultClient, BaseLib.Statics.ApiDefaultAudienceUi, BaseLib.Statics.ApiDefaultUserAdmin);
 
             var request = _owin.CreateClient();
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _data.CreateDefault();
             _data.CreateRandom(10);
 
-            var access = await JwtHelper.GetAccessTokenV2(_ioc,
+            var access = JwtHelper.GetAccessTokenV2(_ioc,
                 BaseLib.Statics.ApiDefaultClient, BaseLib.Statics.ApiDefaultAudienceUi, BaseLib.Statics.ApiDefaultUserAdmin);
 
             var request = _owin.CreateClient();

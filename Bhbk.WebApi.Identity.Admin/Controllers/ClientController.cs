@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetClientsV1([FromQuery] PagingModel model)
+        public IActionResult GetClientsV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -201,6 +201,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Sts_OAuthV1_RequestCode_Fail_NotImplemented()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
+            var redirect = new Uri(url.AbsoluteUri);
+
+            var result = await _s2s.AuthorizationCodeRequestV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, "all");
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+        }
+
+        [TestMethod]
         public async Task Api_Sts_OAuthV2_RequestCode_Fail_AudienceInvalid()
         {
             _data.Destroy();
@@ -287,6 +305,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var result = await _s2s.AuthorizationCodeRequestV2(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            //not done yet...
+            var pairs = result.Headers.GetValues("Set-Cookie");
+
+            CookieContainer cookies = new CookieContainer();
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.CookieContainer = cookies;
+
+            HttpClient http = new HttpClient(handler);
+            HttpResponseMessage response = result;
+
+            Uri uri = new Uri("http://google.com");
+            IEnumerable<Cookie> responseCookies = cookies.GetCookies(uri).Cast<Cookie>();
+            foreach (Cookie cookie in responseCookies)
+                Console.WriteLine(cookie.Name + ": " + cookie.Value);
+
+            var check = new Uri(await result.Content.ReadAsStringAsync());
+            check.Should().BeAssignableTo(typeof(Uri));
         }
     }
 }

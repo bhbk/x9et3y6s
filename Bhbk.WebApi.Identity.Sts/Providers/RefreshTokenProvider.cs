@@ -78,14 +78,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 var current = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
 
-                if (current == null)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
-                }
-
-                else if (current.IssuedUtc >= DateTime.UtcNow || current.ExpiresUtc <= DateTime.UtcNow)
+                if (current == null 
+                    || current.IssuedUtc >= DateTime.UtcNow 
+                    || current.ExpiresUtc <= DateTime.UtcNow)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -212,14 +207,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 var current = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
 
-                if (current == null)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
-                }
-
-                else if (current.IssuedUtc >= DateTime.UtcNow || current.ExpiresUtc <= DateTime.UtcNow)
+                if (current == null
+                    || current.IssuedUtc >= DateTime.UtcNow
+                    || current.ExpiresUtc <= DateTime.UtcNow)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";

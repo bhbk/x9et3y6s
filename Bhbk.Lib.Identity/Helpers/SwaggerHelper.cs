@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Helpers
             options.SwaggerDoc("v1",
                 new Info
                 {
-                    Title = "API Help",
+                    Title = "Reference",
                     Version = "v1"
                 });
 
@@ -51,7 +51,7 @@ namespace Bhbk.Lib.Identity.Helpers
         {
             //includes virtual directory if site is configured with one...
             options.RoutePrefix = "help";
-            options.SwaggerEndpoint("v1/index.json", "API Help");
+            options.SwaggerEndpoint("v1/index.json", "Reference");
         }
     }
 }

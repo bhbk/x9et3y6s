@@ -35,16 +35,19 @@ namespace Bhbk.WebApi.Identity.Admin
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
-            _ioc = new IdentityContext(new DbContextOptionsBuilder<AppDbContext>()
+            var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlServer(_conf["Databases:IdentityEntities"])
-                .EnableSensitiveDataLogging());
+                .EnableSensitiveDataLogging();
+
+            //DRY up contexts across controllers and tasks after made thread safe...
+            _ioc = new IdentityContext(options);
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
             sc.AddSingleton<IIdentityContext>(_ioc);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(_ioc));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(_ioc));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new QueueEmailTask(_ioc));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new QueueTextTask(_ioc));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options)));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options)));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new QueueEmailTask(new IdentityContext(options)));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new QueueTextTask(new IdentityContext(options)));
 
             var sp = sc.BuildServiceProvider();
 

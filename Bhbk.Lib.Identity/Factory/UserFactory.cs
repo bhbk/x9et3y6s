@@ -151,8 +151,6 @@ namespace Bhbk.Lib.Identity.Factory
 
     public abstract class UserBase
     {
-        public Guid ActorId { get; set; }
-
         [Required]
         public Guid ClientId { get; set; }
 
@@ -182,7 +180,10 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class UserCreate : UserBase { }
+    public class UserCreate : UserBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class UserResult : UserBase
     {

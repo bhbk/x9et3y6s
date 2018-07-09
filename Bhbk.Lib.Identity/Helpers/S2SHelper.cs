@@ -126,6 +126,25 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
+        public async Task<HttpResponseMessage> AuthorizationCodeRequestV1(string client, string audience, string user, string redirectUri, string scope)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            string content = HttpUtility.UrlPathEncode("?client=" + client
+                + "&audience=" + audience
+                + "&user=" + user
+                + "&redirect_uri=" + redirectUri
+                + "&response_type=" + "code"
+                + "&scope=" + scope);
+
+            return await _connect.GetAsync("/oauth/v1/authorization-code" + content);
+        }
+
         public async Task<HttpResponseMessage> AuthorizationCodeRequestV2(string client, string audience, string user, string redirectUri, string scope)
         {
             if (_ioc.ContextStatus == ContextType.Live)
@@ -143,6 +162,24 @@ namespace Bhbk.Lib.Identity.Helpers
                 + "&scope=" + scope);
 
             return await _connect.GetAsync("/oauth/v2/authorization-code" + content);
+        }
+
+        public async Task<HttpResponseMessage> AuthorizationCodeV1(string client, string user, string redirectUri, string code)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = HttpUtility.UrlPathEncode("?client=" + client
+                + "&user=" + user
+                + "&redirect_uri=" + redirectUri
+                + "&grant_type=" + "code"
+                + "&code=" + code);
+
+            return await _connect.GetAsync("/oauth/v1/authorization" + content);
         }
 
         public async Task<HttpResponseMessage> AuthorizationCodeV2(string client, string user, string redirectUri, string code)
@@ -164,6 +201,25 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
+        public async Task<HttpResponseMessage> ClientCredentialsV1(string client, string secret)
+        {
+            if (_ioc.ContextStatus == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("client", client),
+                    new KeyValuePair<string, string>("client_secret", secret),
+                    new KeyValuePair<string, string>("grant_type", "client_secret")
+                });
+
+            return await _connect.PostAsync("/oauth/v1/client", content);
+        }
+
         public async Task<HttpResponseMessage> ClientCredentialsV2(string client, string secret)
         {
             if (_ioc.ContextStatus == ContextType.Live)

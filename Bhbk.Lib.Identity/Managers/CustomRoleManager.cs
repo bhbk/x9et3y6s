@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -59,7 +58,7 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.FindByNameAsync(roleName);
         }
 
-        public async Task<IList<AppUser>> GetUsersListAsync(AppRole role)
+        public IList<AppUser> GetUsersListAsync(AppRole role)
         {
             if (!Store.Exists(role.Id))
                 throw new InvalidOperationException();

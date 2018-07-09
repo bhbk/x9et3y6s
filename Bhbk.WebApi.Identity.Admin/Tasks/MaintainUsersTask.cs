@@ -16,10 +16,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class MaintainUsersTask : BackgroundService
     {
-        private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _conf;
-        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext _ioc;
+        private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 

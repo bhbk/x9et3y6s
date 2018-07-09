@@ -17,10 +17,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class QueueTextTask : BackgroundService
     {
-        private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _conf;
-        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext _ioc;
+        private readonly JsonSerializerSettings _serializer;
         private readonly ConcurrentQueue<UserCreateText> _queue;
         private readonly TwilioProvider _provider;
         private readonly int _delay, _expire;
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         {
                             _queue.TryDequeue(out model);
 
-                            Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") failed many times. The text was created on "
+                            Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The text was created on "
                                 + model.Created + " and is being deleted now.");
 
                             continue;
@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             if (!_queue.TryDequeue(out model))
                                 break;
 
-                            Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") was successfull.");
+                            Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
                         }
                     }
                     catch (Exception ex)

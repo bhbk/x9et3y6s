@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(login.LoginProvider))
                 throw new InvalidOperationException();
 
-            return Store.Create(login);
+            return await Task.FromResult(Store.Create(login));
         }
 
         public async Task<bool> DeleteAsync(AppLogin login)
@@ -32,17 +32,17 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(login.Id))
                 throw new InvalidOperationException();
 
-            return Store.Delete(login);
+            return await Task.FromResult(Store.Delete(login));
         }
 
         public async Task<AppLogin> FindByIdAsync(Guid loginId)
         {
-            return Store.FindById(loginId);
+            return await Task.FromResult(Store.FindById(loginId));
         }
 
         public async Task<AppLogin> FindByNameAsync(string loginName)
         {
-            return Store.FindByName(loginName);
+            return await Task.FromResult(Store.FindByName(loginName));
         }
 
         public async Task<IQueryable<AppUser>> GetUsersListAsync(Guid loginId)
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(loginId))
                 throw new InvalidOperationException();
 
-            return Store.GetUsers(loginId);
+            return await Task.FromResult(Store.GetUsers(loginId));
         }
 
         public async Task<AppLogin> UpdateAsync(AppLogin login)
@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(login.Id))
                 throw new InvalidOperationException();
 
-            return Store.Update(login);
+            return await Task.FromResult(Store.Update(login));
         }
     }
 }

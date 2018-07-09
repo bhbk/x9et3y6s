@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(audienceUri.AudienceId))
                 throw new InvalidOperationException();
 
-            return Store.AddUri(audienceUri);
+            return await Task.FromResult(Store.AddUri(audienceUri));
         }
 
         public async Task<AppAudience> CreateAsync(AppAudience audience)
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (Store.Exists(audience.Name))
                 throw new InvalidOperationException();
 
-            return Store.Create(audience);
+            return await Task.FromResult(Store.Create(audience));
         }
 
         public async Task<bool> DeleteAsync(AppAudience audience)
@@ -40,17 +40,17 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(audience.Id))
                 throw new InvalidOperationException();
 
-            return Store.Delete(audience);
+            return await Task.FromResult(Store.Delete(audience));
         }
 
         public async Task<AppAudience> FindByIdAsync(Guid audienceId)
         {
-            return Store.FindById(audienceId);
+            return await Task.FromResult(Store.FindById(audienceId));
         }
 
         public async Task<AppAudience> FindByNameAsync(string audienceName)
         {
-            return Store.FindByName(audienceName);
+            return await Task.FromResult(Store.FindByName(audienceName));
         }
 
         public async Task<IList<AppRole>> GetRoleListAsync(Guid audienceId)
@@ -64,7 +64,7 @@ namespace Bhbk.Lib.Identity.Managers
             foreach (AppRole role in roles)
                 result.Add(role);
 
-            return result;
+            return await Task.FromResult(result);
         }
 
         public async Task<AppAudience> UpdateAsync(AppAudience audience)
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Managers
             if (!Store.Exists(audience.Id))
                 throw new InvalidOperationException();
 
-            return Store.Update(audience);
+            return await Task.FromResult(Store.Update(audience));
         }
     }
 }

@@ -1,4 +1,6 @@
 
+Remove-Item *.nupkg
+
 cd Bhbk.Cli.Identity
 if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force }
 if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force }
@@ -34,3 +36,5 @@ if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force }
 cd ..\Bhbk.WebApi.Identity.Sts.Tests
 if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force }
 if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force }
+
+cd..

@@ -345,7 +345,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
 
-            data.Count().Should().Be((await _ioc.UserMgmt.Store.GetRolesReturnIdAsync(user)).Count());
+            data.Count().Should().Be((await _ioc.UserMgmt.Store.GetRolesResultIdAsync(user)).Count());
         }
 
         [TestMethod]

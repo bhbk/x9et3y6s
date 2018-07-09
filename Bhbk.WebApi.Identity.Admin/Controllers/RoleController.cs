@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetRolesV1([FromQuery] PagingModel model)
+        public IActionResult GetRolesV1([FromQuery] PagingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (role == null)
                 return BadRequest(BaseLib.Statics.MsgRoleNotExist);
 
-            var users = await IoC.RoleMgmt.GetUsersListAsync(role);
+            var users = IoC.RoleMgmt.GetUsersListAsync(role);
 
             var result = users.Select(x => new UserFactory<AppUser>(x).Evolve());
 

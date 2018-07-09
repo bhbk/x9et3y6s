@@ -83,8 +83,6 @@ namespace Bhbk.Lib.Identity.Factory
 
     public abstract class ClientBase
     {
-        public Guid ActorId { get; set; }
-
         [Required]
         public string Name { get; set; }
 
@@ -100,7 +98,10 @@ namespace Bhbk.Lib.Identity.Factory
         public bool Immutable { get; set; }
     }
 
-    public class ClientCreate : ClientBase { }
+    public class ClientCreate : ClientBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class ClientResult : ClientBase
     {
@@ -119,6 +120,8 @@ namespace Bhbk.Lib.Identity.Factory
 
         [Required]
         public Guid Id { get; set; }
+
+        public Guid ActorId { get; set; }
 
         public DateTime Created { get; set; }
 

@@ -15,11 +15,11 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 {
     public class MaintainQuotesTask : BackgroundService
     {
-        private readonly IIdentityContext _ioc;
-        private readonly IConfigurationRoot _conf;
-        private readonly JsonSerializerSettings _serializer;
         private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
         private readonly FileInfo _qod = FileSystemHelper.SearchPaths("appquotes.json");
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext _ioc;
+        private readonly JsonSerializerSettings _serializer;
         private readonly HttpClient _client = new HttpClient();
         private readonly string _url = string.Empty, _output = string.Empty;
         private readonly int _delay;
