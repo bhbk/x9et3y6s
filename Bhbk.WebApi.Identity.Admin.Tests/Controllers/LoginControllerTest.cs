@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Controllers;
@@ -40,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var login = new LoginCreate()
             {
-                LoginProvider = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
+                LoginProvider = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
             };
             var add = await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
             var model = new UserLoginCreate()
@@ -89,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new LoginCreate()
             {
-                LoginProvider = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
+                LoginProvider = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
             };
 
             controller.SetUser(user.Id);
@@ -112,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var login = new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
-                    LoginProvider = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
+                    LoginProvider = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestLoginA
                 }).Devolve();
             var create = await _ioc.LoginMgmt.CreateAsync(login);
             var model = new UserLoginCreate()
@@ -178,7 +179,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var controller = new LoginController(_conf, _ioc, _tasks);
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomNumber.CreateBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "loginprovider";

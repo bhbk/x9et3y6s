@@ -1,4 +1,5 @@
-﻿using Bhbk.WebApi.Identity.Admin.Controllers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -52,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new ClaimController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var claim = new Claim(BaseLib.Statics.ApiUnitTestClaimType, 
-                BaseLib.Statics.ApiUnitTestClaimValue + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4));
+                BaseLib.Statics.ApiUnitTestClaimValue + "-" + RandomNumber.CreateBase64(4));
 
             var add = await _ioc.UserMgmt.AddClaimAsync(user, claim);
             add.Should().BeAssignableTo(typeof(IdentityResult));

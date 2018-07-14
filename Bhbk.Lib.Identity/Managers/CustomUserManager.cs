@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
 using Bhbk.Lib.Identity.Stores;
@@ -459,7 +460,7 @@ namespace Bhbk.Lib.Identity.Managers
             var hash = PasswordHasher.HashPassword(user, newPassword);
 
             await passwordStore.SetPasswordHashAsync(user, hash, new CancellationToken());
-            await Store.SetSecurityStampAsync(user, Helpers.CryptoHelper.CreateRandomBase64(32));
+            await Store.SetSecurityStampAsync(user, RandomNumber.CreateBase64(32));
 
             return IdentityResult.Success;
         }

@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -53,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _data.CreateTest();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
+            var audience = RandomNumber.CreateBase64(8);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
@@ -120,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _data.Destroy();
             _data.CreateTest();
 
-            var client = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
+            var client = RandomNumber.CreateBase64(8);
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
@@ -152,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
+            var user = RandomNumber.CreateBase64(8);
 
             var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -203,7 +204,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8));
+            var result = await _s2s.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), RandomNumber.CreateBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -276,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _data.CreateTest();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audiences = new List<string> { BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8) };
+            var audiences = new List<string> { RandomNumber.CreateBase64(8) };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
@@ -329,7 +330,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _data.Destroy();
             _data.CreateTest();
 
-            var client = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8);
+            var client = RandomNumber.CreateBase64(8);
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -365,7 +366,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
 
-            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8), string.Empty);
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, RandomNumber.CreateBase64(8), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -416,7 +417,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8));
+            var result = await _s2s.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), RandomNumber.CreateBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }

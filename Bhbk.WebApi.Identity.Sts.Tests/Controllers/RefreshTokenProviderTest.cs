@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -46,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.RefreshTokenV1(client.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8), refresh);
+            var result = await _s2s.RefreshTokenV1(client.Id.ToString(), RandomNumber.CreateBase64(8), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -116,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.RefreshTokenV1(BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8), audience.Id.ToString(), refresh);
+            var result = await _s2s.RefreshTokenV1(RandomNumber.CreateBase64(8), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -218,7 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
 
-            var result = await _s2s.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8)));
+            var result = await _s2s.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, RandomNumber.CreateBase64(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -362,7 +363,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            audiences = new List<string> { BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8) };
+            audiences = new List<string> { RandomNumber.CreateBase64(8) };
 
             var result = await _s2s.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -387,7 +388,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.RefreshTokenV2(BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8), audiences, refresh);
+            var result = await _s2s.RefreshTokenV2(RandomNumber.CreateBase64(8), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -493,7 +494,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
 
-            var result = await _s2s.RefreshTokenV2(client.Id.ToString(), audiences, refresh.Remove(pos, 8).Insert(pos, BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8)));
+            var result = await _s2s.RefreshTokenV2(client.Id.ToString(), audiences, refresh.Remove(pos, 8).Insert(pos, RandomNumber.CreateBase64(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }

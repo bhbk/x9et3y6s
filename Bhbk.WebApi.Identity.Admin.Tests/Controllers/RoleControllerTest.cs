@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Controllers;
@@ -41,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
             };
             var create = await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
@@ -87,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };
@@ -161,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _data.CreateRandom(10);
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomNumber.CreateBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "name";
@@ -271,7 +272,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
                 Enabled = true,
                 Immutable = false
             };

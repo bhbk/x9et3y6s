@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -48,10 +49,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 FromEmail = user.Email,
                 FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 ToId = recipient.Id,
-                ToEmail = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + recipient.Email,
+                ToEmail = RandomNumber.CreateBase64(4) + "-" + recipient.Email,
                 ToDisplay = string.Format("{0} {1}", recipient.FirstName, recipient.LastName),
-                Subject = BaseLib.Statics.ApiUnitTestEmailSubject + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
-                HtmlContent = BaseLib.Statics.ApiUnitTestEmailContent + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4)
+                Subject = BaseLib.Statics.ApiUnitTestEmailSubject + "-" + RandomNumber.CreateBase64(4),
+                HtmlContent = BaseLib.Statics.ApiUnitTestEmailContent + "-" + RandomNumber.CreateBase64(4)
             };
 
             var response = await request.PostAsJsonAsync("/notify/v1/email", email);
@@ -86,8 +87,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 ToId = recipient.Id,
                 ToEmail = recipient.Email,
                 ToDisplay = string.Format("{0} {1}", recipient.FirstName, recipient.LastName),
-                Subject = BaseLib.Statics.ApiUnitTestEmailSubject + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
-                HtmlContent = BaseLib.Statics.ApiUnitTestEmailContent + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4)
+                Subject = BaseLib.Statics.ApiUnitTestEmailSubject + "-" + RandomNumber.CreateBase64(4),
+                HtmlContent = BaseLib.Statics.ApiUnitTestEmailContent + "-" + RandomNumber.CreateBase64(4)
             };
 
             var response = await request.PostAsJsonAsync("/notify/v1/email", email);
@@ -119,8 +120,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 FromId = user.Id,
                 FromPhoneNumber = user.PhoneNumber,
                 ToId = recipient.Id,
-                ToPhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10),
-                Body = BaseLib.Statics.ApiUnitTestEmailContent + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4)
+                ToPhoneNumber = RandomNumber.CreateNumberAsString(10),
+                Body = BaseLib.Statics.ApiUnitTestEmailContent + "-" + RandomNumber.CreateBase64(4)
             };
 
             var response = await request.PostAsJsonAsync("/notify/v1/text", email);
@@ -153,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 FromPhoneNumber = user.PhoneNumber,
                 ToId = recipient.Id,
                 ToPhoneNumber = recipient.PhoneNumber,
-                Body = BaseLib.Statics.ApiUnitTestEmailContent + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4)
+                Body = BaseLib.Statics.ApiUnitTestEmailContent + "-" + RandomNumber.CreateBase64(4)
             };
 
             var response = await request.PostAsJsonAsync("/notify/v1/text", email);

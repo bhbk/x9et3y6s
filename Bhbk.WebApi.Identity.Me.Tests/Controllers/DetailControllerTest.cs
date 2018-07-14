@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -68,8 +69,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangePassword()
             {
                 CurrentPassword = BaseLib.Statics.ApiUnitTestUserPassCurrent,
-                NewPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
-                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16)
+                NewPassword = RandomNumber.CreateBase64(16),
+                NewPasswordConfirm = RandomNumber.CreateBase64(16)
             };
 
             controller.SetUser(user.Id);

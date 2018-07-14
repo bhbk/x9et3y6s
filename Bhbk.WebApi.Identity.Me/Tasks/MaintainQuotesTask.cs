@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.FileSystem;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -15,8 +15,8 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 {
     public class MaintainQuotesTask : BackgroundService
     {
-        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
-        private readonly FileInfo _qod = FileSystemHelper.SearchPaths("appquotes.json");
+        private readonly FileInfo _api = Search.DefaultPaths("appsettings-api.json");
+        private readonly FileInfo _qod = Search.DefaultPaths("appquotes.json");
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly JsonSerializerSettings _serializer;

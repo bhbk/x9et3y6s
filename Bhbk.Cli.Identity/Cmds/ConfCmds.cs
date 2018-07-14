@@ -1,5 +1,5 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Helpers.FileSystem;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using ManyConsole;
@@ -12,7 +12,7 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class ConfCmds : ConsoleCommand
     {
-        private static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
         private static IConfigurationRoot _cb;
         private static bool ReadConfig = false;
 

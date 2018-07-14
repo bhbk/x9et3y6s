@@ -3,11 +3,11 @@
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with the SQLCLR assembly.
-[assembly: AssemblyTitle("Bhbk.Dal.Identity.Mssql")]
+[assembly: AssemblyTitle("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Bhbk")]
-[assembly: AssemblyProduct("Bhbk.Dal.Identity.Mssql")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.FileSystem;
+using Bhbk.Lib.Helpers.Options;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,7 @@ namespace Bhbk.WebApi.Identity.Me
 {
     public class Program
     {
-        private static FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private static FileInfo _api = Search.DefaultPaths("appsettings-api.json");
         private static IConfigurationRoot _conf;
 
         public static IWebHost BuildWebHost(string[] args) =>

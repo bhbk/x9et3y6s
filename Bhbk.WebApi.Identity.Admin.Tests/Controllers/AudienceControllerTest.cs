@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
+using Bhbk.Lib.Helpers.Cryptography;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {
@@ -39,8 +40,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new AudienceCreate()
             {
                 ClientId = _ioc.ClientMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
-                AudienceType = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(8),
+                Name = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
+                AudienceType = RandomNumber.CreateBase64(8),
                 Enabled = true,
             };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -81,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new AudienceCreate()
             {
                 ClientId = _ioc.ClientMgmt.Store.Get().First().Id,
-                Name = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
+                Name = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
                 AudienceType = BaseLib.AudienceType.user_agent.ToString(),
                 Enabled = true,
             };
@@ -161,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _data.CreateRandom(10);
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomNumber.CreateBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "name";

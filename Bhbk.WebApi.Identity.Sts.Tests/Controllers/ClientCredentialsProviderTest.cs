@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Providers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -11,7 +11,6 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
@@ -64,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16));
+            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), RandomNumber.CreateBase64(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }

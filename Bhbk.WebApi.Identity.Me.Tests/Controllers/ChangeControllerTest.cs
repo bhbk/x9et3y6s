@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
+using Bhbk.Lib.Helpers.Cryptography;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
@@ -30,14 +31,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            var newEmail = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
 
             controller.SetUser(user.Id);
 
             var model = new UserChangeEmail()
             {
                 Id = user.Id,
-                CurrentEmail = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
+                CurrentEmail = RandomNumber.CreateBase64(4),
                 NewEmail = newEmail,
                 NewEmailConfirm = newEmail
             };
@@ -54,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            var newEmail = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
 
             controller.SetUser(user.Id);
 
@@ -85,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
+                CurrentPassword = RandomNumber.CreateBase64(16),
                 NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
             };
@@ -126,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhone = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10);
+            var newPhone = RandomNumber.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 
@@ -150,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhone = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10);
+            var newPhone = RandomNumber.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 

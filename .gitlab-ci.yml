@@ -1,3 +1,7 @@
+
+variables:
+  version: "2018.7.13.3291"
+
 stages:
   - build
   - test
@@ -8,48 +12,34 @@ build:
   only:
   - debug
   script:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-  - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity detailed -NoCache
-  - msbuild /t:build /p:Configuration=Release /verbosity:normal
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
+  - dotnet build "Bhbk.WebApi.Identity.sln" --configuration Release
 
 test:
   stage: test
   only:
   - debug
   script:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-  - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
-  - msbuild /t:build /p:Configuration=Release /verbosity:quiet
-  -
-  - mstest /testcontainer:"Bhbk.WebApi.Identity.Admin.Tests\bin\Release\Bhbk.WebApi.Identity.Admin.Tests.dll"
-  - mstest /testcontainer:"Bhbk.WebApi.Identity.Me.Tests\bin\Release\Bhbk.WebApi.Identity.Me.Tests.dll"
-  - mstest /testcontainer:"Bhbk.WebApi.Identity.Sts.Tests\bin\Release\Bhbk.WebApi.Identity.Sts.Tests.dll"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
+  - dotnet build --verbosity quiet "Bhbk.WebApi.Identity.sln" --configuration Release
+  - dotnet test "Bhbk.WebApi.Identity.Admin.Tests\Bhbk.WebApi.Identity.Admin.Tests.csproj" --configuration Release
+  - dotnet test "Bhbk.WebApi.Identity.Me.Tests\Bhbk.WebApi.Identity.Me.Tests.csproj" --configuration Release
+  - dotnet test "Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj" --configuration Release
 
 deploy:
   stage: deploy
   only:
-  - debug
+  - dummy
   script:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-  - nuget restore "Bhbk.WebApi.Identity.sln" -Verbosity quiet -NoCache
-  - msbuild /t:build /p:Configuration=Release /verbosity:quiet
-  -
-  - cd Bhbk.Cli.Identity
-  - dotnet publish "Bhbk.Cli.Identity.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
-  - octo pack --id="Bhbk.Cli.Identity" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\"
-  - nuget push *.nupkg -ApiKey %ARTIFACT_FEED_KEY% -Source %ARTIFACT_FEED_URL% -Verbosity detailed -NonInteractive
-  -
-  - cd ..\Bhbk.WebApi.Identity.Admin
-  - dotnet publish "Bhbk.WebApi.Identity.Admin.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
-  - octo pack --id="Bhbk.WebApi.Identity.Admin" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\"
-  - nuget push *.nupkg -ApiKey %ARTIFACT_FEED_KEY% -Source %ARTIFACT_FEED_URL% -Verbosity detailed -NonInteractive
-  -
-  - cd ..\Bhbk.WebApi.Identity.Me
-  - dotnet publish "Bhbk.WebApi.Identity.Me.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
-  - octo pack --id="Bhbk.WebApi.Identity.Me" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\"
-  - nuget push *.nupkg -ApiKey %ARTIFACT_FEED_KEY% -Source %ARTIFACT_FEED_URL% -Verbosity detailed -NonInteractive
-  -
-  - cd ..\Bhbk.WebApi.Identity.Sts
-  - dotnet publish "Bhbk.WebApi.Identity.Sts.csproj" --output "bin\Release\netcoreapp2.1\publish\" --configuration Release --framework netcoreapp2.1
-  - octo pack --id="Bhbk.WebApi.Identity.Sts" --basePath="bin\Release\netcoreapp2.1\publish\" --outFolder="..\"
-  - nuget push *.nupkg -ApiKey %ARTIFACT_FEED_KEY% -Source %ARTIFACT_FEED_URL% -Verbosity detailed -NonInteractive
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
+  - dotnet build --verbosity quiet "Bhbk.WebApi.Identity.sln" --configuration Release
+  - dotnet pack "Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" -p:PackageVersion=$version --output ".." --configuration Release -p:TargetFrameworks=netstandard2.0
+  - dotnet publish "Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj" --output "bin\Release\netcoreapp2.1\publish" --configuration Release --framework netcoreapp2.1
+  - dotnet publish "Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj" --output "bin\Release\netcoreapp2.1\publish" --configuration Release --framework netcoreapp2.1
+  - dotnet publish "Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj" --output "bin\Release\netcoreapp2.1\publish" --configuration Release --framework netcoreapp2.1
+  - dotnet publish "Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj" --output "bin\Release\netcoreapp2.1\publish" --configuration Release --framework netcoreapp2.1
+  - octo pack --id="Bhbk.Cli.Identity" --version=$version --basePath="Bhbk.Cli.Identity\bin\Release\netcoreapp2.1\publish" --outFolder="."
+  - octo pack --id="Bhbk.WebApi.Identity.Admin" --version=$version --basePath="Bhbk.WebApi.Identity.Admin\bin\Release\netcoreapp2.1\publish" --outFolder="."
+  - octo pack --id="Bhbk.WebApi.Identity.Me" --version=$version --basePath="Bhbk.WebApi.Identity.Me\bin\Release\netcoreapp2.1\publish" --outFolder="."
+  - octo pack --id="Bhbk.WebApi.Identity.Sts" --version=$version --basePath="Bhbk.WebApi.Identity.Sts\bin\Release\netcoreapp2.1\publish" --outFolder="."
+  - dotnet nuget push *.nupkg --api-key %NUGET_FEED_KEY% --source %NUGET_FEED_URL%

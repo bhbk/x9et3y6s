@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.FileSystem;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class MaintainUsersTask : BackgroundService
     {
-        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _api = Search.DefaultPaths("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly JsonSerializerSettings _serializer;

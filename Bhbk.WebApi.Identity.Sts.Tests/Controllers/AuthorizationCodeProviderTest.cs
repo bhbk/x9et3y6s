@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -82,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(64);
+            var code = RandomNumber.CreateBase64(64);
 
             var result = await _s2s.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));

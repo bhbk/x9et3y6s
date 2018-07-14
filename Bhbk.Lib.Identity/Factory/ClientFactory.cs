@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Bhbk.Lib.Helpers.Cryptography;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory
@@ -30,7 +31,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ActorId = client.ActorId;
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
-            this.ClientKey = client.ClientKey ?? Helpers.CryptoHelper.CreateRandomBase64(32);
+            this.ClientKey = client.ClientKey ?? RandomNumber.CreateBase64(32);
             this.Enabled = client.Enabled;
             this.Created = DateTime.Now;
             this.Immutable = client.Immutable;

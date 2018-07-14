@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.FileSystem;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +17,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class QueueTextTask : BackgroundService
     {
-        private readonly FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        private readonly FileInfo _api = Search.DefaultPaths("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly JsonSerializerSettings _serializer;

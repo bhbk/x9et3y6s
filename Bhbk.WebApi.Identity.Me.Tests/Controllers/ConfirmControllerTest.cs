@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Providers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -31,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = string.Format("{0}{1}", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4), user.Email);
+            var newEmail = string.Format("{0}{1}", RandomNumber.CreateBase64(4), user.Email);
 
             controller.SetUser(user.Id);
 
@@ -40,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
-                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(token.Length)) as BadRequestObjectResult;
+                RandomNumber.CreateBase64(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -52,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = string.Format("{0}{1}", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4), user.Email);
+            var newEmail = string.Format("{0}{1}", RandomNumber.CreateBase64(4), user.Email);
 
             controller.SetUser(user.Id);
 
@@ -72,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(12);
+            var newPassword = RandomNumber.CreateBase64(12);
 
             controller.SetUser(user.Id);
 
@@ -81,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
-                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(token.Length)) as BadRequestObjectResult;
+                RandomNumber.CreateBase64(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -93,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(12);
+            var newPassword = RandomNumber.CreateBase64(12);
 
             controller.SetUser(user.Id);
 
@@ -113,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10);
+            var newPhoneNumber = RandomNumber.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 
@@ -121,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber,
-                BaseLib.Helpers.CryptoHelper.CreateRandomBase64(token.Length)) as BadRequestObjectResult;
+                RandomNumber.CreateBase64(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -133,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10);
+            var newPhoneNumber = RandomNumber.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 

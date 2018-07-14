@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -115,7 +116,7 @@ namespace Bhbk.Lib.Identity.Stores
             if (!user.HumanBeing)
                 user.EmailConfirmed = true;
 
-            user.SecurityStamp = Helpers.CryptoHelper.CreateRandomBase64(32);
+            user.SecurityStamp = RandomNumber.CreateBase64(32);
 
             _context.AppUser.Add(user);
             _context.SaveChanges();

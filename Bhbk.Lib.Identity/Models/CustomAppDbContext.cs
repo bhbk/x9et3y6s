@@ -1,5 +1,5 @@
+using Bhbk.Lib.Helpers.FileSystem;
 using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Models
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
     public partial class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
     {
-        private static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
         private static IConfigurationRoot _conf;
         private static IList _fieldsExcluded, _fieldsSensitive, _tablesExcluded;
 

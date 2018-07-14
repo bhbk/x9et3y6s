@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.FileSystem;
+using Bhbk.Lib.Helpers.Options;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
@@ -25,8 +26,8 @@ namespace Bhbk.WebApi.Identity.Me
 {
     public class Startup
     {
-        protected static FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
-        protected static FileInfo _api = FileSystemHelper.SearchPaths("appsettings-api.json");
+        protected static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
+        protected static FileInfo _api = Search.DefaultPaths("appsettings-api.json");
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext _ioc;
         protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
@@ -102,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Me
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
             sc.AddDataProtection();
-            sc.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
+            sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
                 headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -133,8 +134,8 @@ namespace Bhbk.WebApi.Identity.Me
             app.UseCors(policy => policy.AllowAnyOrigin());
             app.UseAuthentication();
             app.UseStaticFiles();
-            app.UseSwagger(SwaggerHelper.ConfigureSwagger);
-            app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
+            app.UseSwagger(SwaggerOptions.ConfigureSwagger);
+            app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
             app.UseMvc();
         }
     }

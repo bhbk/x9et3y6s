@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Controllers;
@@ -46,8 +47,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserAddPassword()
             {
-                NewPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
-                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16)
+                NewPassword = RandomNumber.CreateBase64(16),
+                NewPasswordConfirm = RandomNumber.CreateBase64(16)
             };
 
             controller.SetUser(user.Id);
@@ -96,10 +97,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new UserController(_conf, _ioc, _tasks);
             var model = new UserCreate()
             {
-                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4),
-                FirstName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-First",
-                LastName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-Last",
-                PhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10),
+                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + RandomNumber.CreateBase64(4),
+                FirstName = RandomNumber.CreateBase64(4) + "-First",
+                LastName = RandomNumber.CreateBase64(4) + "-Last",
+                PhoneNumber = RandomNumber.CreateNumberAsString(10),
                 LockoutEnabled = false,
             };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -122,10 +123,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new UserCreate()
             {
                 ClientId = client.Id,
-                Email = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-First",
-                LastName = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(4) + "-Last",
-                PhoneNumber = BaseLib.Helpers.CryptoHelper.CreateRandomNumberAsString(10),
+                Email = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
+                FirstName = RandomNumber.CreateBase64(4) + "-First",
+                LastName = RandomNumber.CreateBase64(4) + "-Last",
+                PhoneNumber = RandomNumber.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 Immutable = false,
             };
@@ -201,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _data.CreateRandom(10);
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomNumber.CreateBase64(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "email";
@@ -398,8 +399,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserAddPassword()
             {
-                NewPassword = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16),
-                NewPasswordConfirm = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(16)
+                NewPassword = RandomNumber.CreateBase64(16),
+                NewPasswordConfirm = RandomNumber.CreateBase64(16)
             };
 
             controller.SetUser(user.Id);

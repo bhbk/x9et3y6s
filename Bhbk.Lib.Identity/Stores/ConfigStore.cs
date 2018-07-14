@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.FileSystem;
+using Bhbk.Lib.Identity.Factory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class ConfigStore
     {
-        private FileInfo _lib = FileSystemHelper.SearchPaths("appsettings-lib.json");
+        private FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
         private AppConfig _app { get; set; }
         private IConfigurationRoot _conf;
 

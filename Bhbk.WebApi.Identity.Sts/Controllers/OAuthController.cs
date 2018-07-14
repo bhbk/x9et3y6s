@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -129,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!audience.AppAudienceUri.Where(x => x.AbsoluteUri == redirectUri).Any())
                 return BadRequest(BaseLib.Statics.MsgUriInvalid);
 
-            var state = BaseLib.Helpers.CryptoHelper.CreateRandomBase64(32);
+            var state = RandomNumber.CreateBase64(32);
             var url = UrlBuilder.UiAuthorizationCodeRequest(Conf, client, user, redirectUri, scope, state);
 
             /*
