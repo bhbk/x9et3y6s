@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
@@ -27,7 +25,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         private readonly IHostedService[] _tasks;
         private readonly string _client, _audience, _user, _pass;
         private JwtSecurityToken _access, _refresh;
-        protected readonly S2SClients Connect;
+        protected readonly Bhbk.Lib.Alert.Helpers.S2SClient alert;
+        protected readonly Bhbk.Lib.Identity.Helpers.S2SClient identity;
 
         protected IConfigurationRoot Conf
         {
@@ -69,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     && _refresh.ValidFrom < DateTime.UtcNow
                     && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
-                    var response = Connect.RefreshTokenV2(_client, new List<string> { _audience }, _refresh.RawData).Result;
+                    var response = identity.Sts_RefreshTokenV2(_client, new List<string> { _audience }, _refresh.RawData).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -79,19 +78,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                         _refresh = new JwtSecurityToken((string)json["refresh_token"]);
                     }
                     else
-                        Log.Error(typeof(BaseController).Name + " success on " + DateTime.Now.ToString()
-                            + Environment.NewLine
-                            + "JWT (access_token) valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
-                            + Environment.NewLine
-                            + "JWT (refresh_token) valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString()
-                            + Environment.NewLine);
+                        Log.Error(typeof(BaseController).Name + " success on " + DateTime.Now.ToString() + Environment.NewLine
+                            + "JWT (access_token) valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString() + Environment.NewLine
+                            + "JWT (refresh_token) valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString() + Environment.NewLine);
 
                     return _access;
                 }
 
                 else
                 {
-                    var response = Connect.AccessTokenV2(_client, new List<string> { _audience }, _user, _pass).Result;
+                    var response = identity.Sts_AccessTokenV2(_client, new List<string> { _audience }, _user, _pass).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -101,12 +97,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                         _refresh = new JwtSecurityToken((string)json["refresh_token"]);
                     }
                     else
-                        Log.Error(typeof(BaseController).Name + " success on " + DateTime.Now.ToString()
-                            + Environment.NewLine
-                            + "JWT (access_token) valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
-                            + Environment.NewLine
-                            + "JWT (refresh_token) valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString()
-                            + Environment.NewLine);
+                        Log.Error(typeof(BaseController).Name + " success on " + DateTime.Now.ToString() + Environment.NewLine
+                            + "JWT (access_token) valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString() + Environment.NewLine
+                            + "JWT (refresh_token) valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString() + Environment.NewLine);
 
                     return _access;
                 }
@@ -129,7 +122,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             _user = _conf["IdentityLogin:UserName"];
             _pass = _conf["IdentityLogin:Password"];
 
-            Connect = new S2SClients(conf, ioc, new HttpClientHandler());
+            alert = new Bhbk.Lib.Alert.Helpers.S2SClient(conf, ioc.ContextStatus.ToString());
+            identity = new Bhbk.Lib.Identity.Helpers.S2SClient(conf, ioc.ContextStatus.ToString());
         }
 
         [NonAction]

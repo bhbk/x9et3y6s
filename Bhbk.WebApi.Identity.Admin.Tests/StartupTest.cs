@@ -32,8 +32,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
             sc.AddSingleton<IIdentityContext>(_ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options)));
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options)));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new QueueEmailTask(new IdentityContext(options)));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new QueueTextTask(new IdentityContext(options)));
 
             var sp = sc.BuildServiceProvider();
 

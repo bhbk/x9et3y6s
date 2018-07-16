@@ -30,12 +30,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (name.ToLower() == BaseLib.TaskType.MaintainUsers.ToString().ToLower())
                 return Ok(((MaintainUsersTask)Tasks.Single(x => x.GetType() == typeof(MaintainUsersTask))).Status);
 
-            if (name.ToLower() == BaseLib.TaskType.QueueEmails.ToString().ToLower())
-                return Ok(((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask))).Status);
-
-            if (name.ToLower() == BaseLib.TaskType.QueueTexts.ToString().ToLower())
-                return Ok(((QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask))).Status);
-
             return BadRequest();
         }
 

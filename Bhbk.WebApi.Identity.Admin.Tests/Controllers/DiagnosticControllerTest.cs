@@ -41,26 +41,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Admin_DiagV1_GetStatus_Success_QueueEmails()
-        {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
-
-            var result = controller.GetStatusV1(BaseLib.TaskType.QueueEmails.ToString().ToLower()) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-        }
-
-        [TestMethod]
-        public void Api_Admin_DiagV1_GetStatus_Success_QueueTexts()
-        {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
-
-            var result = controller.GetStatusV1(BaseLib.TaskType.QueueTexts.ToString().ToLower()) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-        }
-
-        [TestMethod]
         public void Api_Admin_DiagV1_GetVersion_Success()
         {
             var controller = new DiagnosticController(_conf, _ioc, _tasks);

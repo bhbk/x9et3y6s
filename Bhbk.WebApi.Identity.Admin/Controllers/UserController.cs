@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Alert.Factory;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
-using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -83,26 +83,29 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var deliver = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
+            if (IoC.ContextStatus == ContextType.Live)
+            {
+                var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
+                    .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
-                .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
+                var url = UrlBuilder.UiConfirmEmail(Conf, user, code);
 
-            var url = UrlBuilder.UiConfirmEmail(Conf, user, code);
+                var spam = await alert.SendEmailV1(Jwt,
+                    new EmailCreate()
+                    {
+                        FromId = user.Id,
+                        FromEmail = user.Email,
+                        FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                        ToId = user.Id,
+                        ToEmail = user.Email,
+                        ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                        Subject = string.Format("{0} {1}", client.Name, BaseLib.Statics.ApiEmailConfirmNewUserSubject),
+                        HtmlContent = BaseLib.Statics.ApiEmailConfirmNewUserHtml(client, user, url)
+                    });
 
-            if (!deliver.TryEnqueueEmail(
-                new UserCreateEmail()
-                {
-                    FromId = user.Id,
-                    FromEmail = user.Email,
-                    FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    ToId = user.Id,
-                    ToEmail = user.Email,
-                    ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0} {1}", client.Name, BaseLib.Statics.ApiEmailConfirmNewUserSubject),
-                    HtmlContent = BaseLib.Statics.ApiEmailConfirmNewUserHtml(client, user, url)
-                }))
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                if (!spam.IsSuccessStatusCode)
+                    return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
+            }
 
             return Ok((new UserFactory<AppUser>(user)).Evolve());
         }

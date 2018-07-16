@@ -21,14 +21,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
     public class AuthorizationCodeProviderTest : StartupTest
     {
         private TestServer _owin;
-        private S2STests _s2s;
+        private S2STester _s2s;
 
         public AuthorizationCodeProviderTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
 
-            _s2s = new S2STests(_conf, _ioc, _owin);
+            _s2s = new S2STester(_conf, _ioc.ContextStatus.ToString(), _owin);
         }
 
         [TestMethod]
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.AuthorizationCodeV1(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _s2s.Sts_AuthorizationCodeV1(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var check = await _s2s.AuthorizationCodeV2(Guid.NewGuid().ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var check = await _s2s.Sts_AuthorizationCodeV2(Guid.NewGuid().ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var redirect = new Uri(url.AbsoluteUri);
             var code = RandomNumber.CreateBase64(64);
 
-            var result = await _s2s.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _s2s.Sts_AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -105,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.AuthorizationCodeV2(client.Id.ToString(), Guid.NewGuid().ToString(), redirect.AbsoluteUri, code);
+            var result = await _s2s.Sts_AuthorizationCodeV2(client.Id.ToString(), Guid.NewGuid().ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.AuthorizationCodeV2(Guid.NewGuid().ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _s2s.Sts_AuthorizationCodeV2(Guid.NewGuid().ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _s2s.Sts_AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

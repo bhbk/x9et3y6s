@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity
     {
         user_agent,
         native,
-        server
+        server,
     }
 
     public enum GrantType
@@ -25,8 +25,6 @@ namespace Bhbk.Lib.Identity
         MaintainQuotes,
         MaintainTokens,
         MaintainUsers,
-        QueueEmails,
-        QueueTexts
     }
 
     public class Statics
@@ -80,8 +78,6 @@ namespace Bhbk.Lib.Identity
         public const string ApiUnitTestClientB = "ClientUnitTestsB";
         public const string ApiUnitTestClaimType = "ClaimTypeUnitTests";
         public const string ApiUnitTestClaimValue = "ClaimValueUnitTests";
-        public const string ApiUnitTestEmailContent = "EmailUnitTestsContent";
-        public const string ApiUnitTestEmailSubject = "EmailUnitTestsSubject";
         public const string ApiUnitTestLoginA = "LoginUnitTestsA";
         public const string ApiUnitTestLoginAKey = "LoginUnitTestsAKey";
         public const string ApiUnitTestLoginB = "LoginUnitTestsB";

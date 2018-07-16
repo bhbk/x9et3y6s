@@ -19,14 +19,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
     public class ClientCredentialsProviderTest : StartupTest
     {
         private TestServer _owin;
-        private S2STests _s2s;
+        private S2STester _s2s;
 
         public ClientCredentialsProviderTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
 
-            _s2s = new S2STests(_conf, _ioc, _owin);
+            _s2s = new S2STester(_conf, _ioc.ContextStatus.ToString(), _owin);
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            var result = await _s2s.Sts_ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
+            var result = await _s2s.Sts_ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), RandomNumber.CreateBase64(16));
+            var result = await _s2s.Sts_ClientCredentialsV2(client.Id.ToString(), RandomNumber.CreateBase64(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            var result = await _s2s.Sts_ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

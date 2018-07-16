@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Alert.Factory;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Providers;
@@ -49,8 +50,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var url = UrlBuilder.UiConfirmEmail(Conf, user, token);
 
-            var result = await Connect.PostEmailV1(Jwt,
-                new UserCreateEmail()
+            var spam = await alert.SendEmailV1(Jwt,
+                new EmailCreate()
                 {
                     FromId = user.Id,
                     FromEmail = user.Email,
@@ -62,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     HtmlContent = BaseLib.Statics.ApiEmailConfirmEmailHtml(user, url)
                 });
 
-            if (!result.IsSuccessStatusCode)
+            if (!spam.IsSuccessStatusCode)
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
 
             return NoContent();
@@ -99,8 +100,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var url = UrlBuilder.UiConfirmPassword(Conf, user, token);
 
-            var result = await Connect.PostEmailV1(Jwt,
-                new UserCreateEmail()
+            var spam = await alert.SendEmailV1(Jwt,
+                new EmailCreate()
                 {
                     FromId = user.Id,
                     FromEmail = user.Email,
@@ -112,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     HtmlContent = BaseLib.Statics.ApiEmailConfirmPasswordHtml(user, url)
                 });
 
-            if (!result.IsSuccessStatusCode)
+            if (!spam.IsSuccessStatusCode)
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
 
             return NoContent();
@@ -148,8 +149,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var url = UrlBuilder.UiConfirmPassword(Conf, user, token);
 
-            var result = await Connect.PostTextV1(Jwt,
-                new UserCreateText()
+            var spam = await alert.SendTextV1(Jwt,
+                new SmsCreate()
                 {
                     FromId = user.Id,
                     FromPhoneNumber = model.NewPhoneNumber,
@@ -158,7 +159,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     Body = token
                 });
 
-            if (!result.IsSuccessStatusCode)
+            if (!spam.IsSuccessStatusCode)
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
 
             return NoContent();

@@ -17,7 +17,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,7 +30,6 @@ namespace Bhbk.WebApi.Identity.Me
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext _ioc;
         protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
-        protected static IEnumerable _issuers, _audiences;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
@@ -65,8 +63,6 @@ namespace Bhbk.WebApi.Identity.Me
             ConfigureContext(sc);
 
             _ioc.ClientMgmt.Store.Salt = _conf["IdentityClients:Salt"];
-            _issuers = _conf.GetSection("IdentityClients:AllowedNames").GetChildren().Select(x => x.Value).ToList();
-            _audiences = _conf.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -85,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Me
                     ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = Bhbk.Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
+                    AudienceValidator = Bhbk.Lib.Helpers.Validators.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
@@ -102,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
-            sc.AddDataProtection();
+            sc.AddSession();
             sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
@@ -136,6 +132,7 @@ namespace Bhbk.WebApi.Identity.Me
             app.UseStaticFiles();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
+            app.UseSession();
             app.UseMvc();
         }
     }

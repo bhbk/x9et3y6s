@@ -8,7 +8,6 @@ using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,7 +18,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,7 +31,6 @@ namespace Bhbk.WebApi.Identity.Sts
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext _ioc;
         protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
-        protected static IEnumerable _issuers, _audiences;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
@@ -67,8 +64,6 @@ namespace Bhbk.WebApi.Identity.Sts
             ConfigureContext(sc);
 
             _ioc.ClientMgmt.Store.Salt = _conf["IdentityClients:Salt"];
-            _issuers = _conf.GetSection("IdentityClients:AllowedNames").GetChildren().Select(x => x.Value).ToList();
-            _audiences = _conf.GetSection("IdentityAudiences:AllowedNames").GetChildren().Select(x => x.Value).ToList();
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -87,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = Bhbk.Lib.Identity.Infrastructure.AudienceValidator.MultipleAudience,
+                    AudienceValidator = Bhbk.Lib.Helpers.Validators.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
@@ -104,21 +99,11 @@ namespace Bhbk.WebApi.Identity.Sts
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
-            sc.AddDataProtection();
-            sc.AddSession(session =>
-            {
-                session.IdleTimeout = TimeSpan.FromSeconds(10);
-                session.Cookie.HttpOnly = true;
-            });
+            sc.AddSession();
             sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
                 headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            });
-            sc.Configure<CookiePolicyOptions>(cookie =>
-            {
-                cookie.CheckConsentNeeded = context => true;
-                cookie.MinimumSameSitePolicy = SameSiteMode.None;
             });
         }
 

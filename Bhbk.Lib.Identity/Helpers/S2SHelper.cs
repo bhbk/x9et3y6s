@@ -1,93 +1,117 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class S2STests : S2SHelper
+    public class S2SClient : S2SHelper
     {
-        public S2STests(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
-            : base(conf, ioc, connect) { }
+        public S2SClient(IConfigurationRoot conf, string context)
+            : base(conf, context) { }
     }
 
-    public class S2SClients : S2SHelper
+    public class S2STester : S2SHelper
     {
-        public S2SClients(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
-            : base(conf, ioc, connect) { }
-
-        public async Task<HttpResponseMessage> PostEmailV1(JwtSecurityToken jwt, UserCreateEmail email)
-        {
-            if (_ioc.ContextStatus == ContextType.Live)
-            {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:AdminUrl"], _conf["IdentityApis:AdminPath"]));
-                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-                _connect.DefaultRequestHeaders.Accept.Clear();
-                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            }
-
-            var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
-
-            return await _connect.PostAsync("/notify/v1/email", content);
-        }
-
-        public async Task<HttpResponseMessage> PostTextV1(JwtSecurityToken jwt, UserCreateText email)
-        {
-            if (_ioc.ContextStatus == ContextType.Live)
-            {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:AdminUrl"], _conf["IdentityApis:AdminPath"]));
-                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-                _connect.DefaultRequestHeaders.Accept.Clear();
-                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            }
-
-            var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
-
-            return await _connect.PostAsync("/notify/v1/text", content);
-        }
+        public S2STester(IConfigurationRoot conf, string context, TestServer connect)
+            : base(conf, context, connect) { }
     }
 
     //https://oauth.com/playground/
     public class S2SHelper
     {
         protected readonly IConfigurationRoot _conf;
-        protected readonly IIdentityContext _ioc;
+        protected readonly ContextType _context;
         protected readonly HttpClient _connect;
 
-        public S2SHelper(IConfigurationRoot conf, IIdentityContext ioc, TestServer connect)
+        public S2SHelper(IConfigurationRoot conf, string context)
         {
-            _conf = conf;
-            _ioc = ioc;
-            _connect = connect.CreateClient();
-        }
-
-        public S2SHelper(IConfigurationRoot conf, IIdentityContext ioc, HttpClientHandler connect)
-        {
-            _conf = conf;
-            _ioc = ioc;
+            var connect = new HttpClientHandler();
 
             //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
             connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
 
+            if (!Enum.TryParse<ContextType>(context, out _context))
+                throw new InvalidOperationException();
+
+            _conf = conf;
             _connect = new HttpClient(connect);
         }
 
-        //https://oauth.net/2/grant-types/password/
-        public async Task<HttpResponseMessage> AccessTokenV1(string client, string audience, string user, string secret)
+        public S2SHelper(IConfigurationRoot conf, string context, TestServer connect)
         {
-            if(_ioc.ContextStatus == ContextType.Live)
+            if (!Enum.TryParse<ContextType>(context, out _context))
+                throw new InvalidOperationException();
+
+            _conf = conf;
+            _connect = connect.CreateClient();
+        }
+
+        public async Task<HttpResponseMessage> Admin_GetAudienceV1(JwtSecurityToken jwt, Guid audienceId)
+        {
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"]));
+                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            return await _connect.GetAsync("/audience/v1/" + audienceId.ToString());
+        }
+
+        public async Task<HttpResponseMessage> Admin_GetClientV1(JwtSecurityToken jwt, Guid clientId)
+        {
+            if (_context == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"]));
+                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            return await _connect.GetAsync("/client/v1/" + clientId.ToString());
+        }
+
+        public async Task<HttpResponseMessage> Admin_GetRoleV1(JwtSecurityToken jwt, Guid roleId)
+        {
+            if (_context == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"]));
+                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            return await _connect.GetAsync("/role/v1/" + roleId.ToString());
+        }
+
+        public async Task<HttpResponseMessage> Admin_GetUserV1(JwtSecurityToken jwt, Guid userId)
+        {
+            if (_context == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"]));
+                _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+                _connect.DefaultRequestHeaders.Accept.Clear();
+                _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+
+            return await _connect.GetAsync("/user/v1/" + userId.ToString());
+        }
+
+        //https://oauth.net/2/grant-types/password/
+        public async Task<HttpResponseMessage> Sts_AccessTokenV1(string client, string audience, string user, string secret)
+        {
+            if (_context == ContextType.Live)
+            {
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -104,11 +128,11 @@ namespace Bhbk.Lib.Identity.Helpers
             return await _connect.PostAsync("/oauth/v1/access", content);
         }
 
-        public async Task<HttpResponseMessage> AccessTokenV2(string client, List<string> audiences, string user, string secret)
+        public async Task<HttpResponseMessage> Sts_AccessTokenV2(string client, List<string> audiences, string user, string secret)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -126,11 +150,11 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
-        public async Task<HttpResponseMessage> AuthorizationCodeRequestV1(string client, string audience, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> Sts_AuthorizationCodeRequestV1(string client, string audience, string user, string redirectUri, string scope)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -145,11 +169,11 @@ namespace Bhbk.Lib.Identity.Helpers
             return await _connect.GetAsync("/oauth/v1/authorization-code" + content);
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCodeRequestV2(string client, string audience, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> Sts_AuthorizationCodeRequestV2(string client, string audience, string user, string redirectUri, string scope)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -164,11 +188,11 @@ namespace Bhbk.Lib.Identity.Helpers
             return await _connect.GetAsync("/oauth/v2/authorization-code" + content);
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCodeV1(string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> Sts_AuthorizationCodeV1(string client, string user, string redirectUri, string code)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -182,11 +206,11 @@ namespace Bhbk.Lib.Identity.Helpers
             return await _connect.GetAsync("/oauth/v1/authorization" + content);
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCodeV2(string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> Sts_AuthorizationCodeV2(string client, string user, string redirectUri, string code)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -201,11 +225,11 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
-        public async Task<HttpResponseMessage> ClientCredentialsV1(string client, string secret)
+        public async Task<HttpResponseMessage> Sts_ClientCredentialsV1(string client, string secret)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -220,11 +244,11 @@ namespace Bhbk.Lib.Identity.Helpers
             return await _connect.PostAsync("/oauth/v1/client", content);
         }
 
-        public async Task<HttpResponseMessage> ClientCredentialsV2(string client, string secret)
+        public async Task<HttpResponseMessage> Sts_ClientCredentialsV2(string client, string secret)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -240,11 +264,11 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         //https://oauth.net/2/grant-types/refresh-token/
-        public async Task<HttpResponseMessage> RefreshTokenV1(string client, string audience, string refresh)
+        public async Task<HttpResponseMessage> Sts_RefreshTokenV1(string client, string audience, string refresh)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
@@ -260,11 +284,11 @@ namespace Bhbk.Lib.Identity.Helpers
             return await _connect.PostAsync("/oauth/v1/refresh", content);
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenV2(string client, List<string> audiences, string refresh)
+        public async Task<HttpResponseMessage> Sts_RefreshTokenV2(string client, List<string> audiences, string refresh)
         {
-            if (_ioc.ContextStatus == ContextType.Live)
+            if (_context == ContextType.Live)
             {
-                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApis:StsUrl"], _conf["IdentityApis:StsPath"]));
+                _connect.BaseAddress = new Uri(string.Format("{0}{1}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"]));
                 _connect.DefaultRequestHeaders.Accept.Clear();
                 _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }

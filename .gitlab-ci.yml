@@ -1,6 +1,6 @@
 
 variables:
-  version: "2018.7.13.3291"
+  version: "2018.7.15.3163"
 
 stages:
   - build
