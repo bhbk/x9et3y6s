@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
+using Bhbk.Lib.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;

@@ -3,6 +3,8 @@ using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Primitives.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +52,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var url = UrlBuilder.UiConfirmEmail(Conf, user, token);
 
-            var spam = await alert.SendEmailV1(Jwt,
+            var alert = new Bhbk.Lib.Alert.Helpers.S2SClient(Conf, IoC.ContextStatus);
+
+            if (alert == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var email = await alert.SendEmailV1(Jwt.AccessToken,
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -63,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     HtmlContent = BaseLib.Statics.ApiEmailConfirmEmailHtml(user, url)
                 });
 
-            if (!spam.IsSuccessStatusCode)
+            if (!email.IsSuccessStatusCode)
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
 
             return NoContent();
@@ -100,7 +107,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var url = UrlBuilder.UiConfirmPassword(Conf, user, token);
 
-            var spam = await alert.SendEmailV1(Jwt,
+            var alert = new Bhbk.Lib.Alert.Helpers.S2SClient(Conf, IoC.ContextStatus);
+
+            if (alert == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var email = await alert.SendEmailV1(Jwt.AccessToken,
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -113,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     HtmlContent = BaseLib.Statics.ApiEmailConfirmPasswordHtml(user, url)
                 });
 
-            if (!spam.IsSuccessStatusCode)
+            if (!email.IsSuccessStatusCode)
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
 
             return NoContent();
@@ -149,8 +161,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var url = UrlBuilder.UiConfirmPassword(Conf, user, token);
 
-            var spam = await alert.SendTextV1(Jwt,
-                new SmsCreate()
+            var alert = new Bhbk.Lib.Alert.Helpers.S2SClient(Conf, IoC.ContextStatus);
+
+            if (alert == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var spam = await alert.SendTextV1(Jwt.AccessToken,
+                new TextCreate()
                 {
                     FromId = user.Id,
                     FromPhoneNumber = model.NewPhoneNumber,

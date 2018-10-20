@@ -21,13 +21,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             : base(conf, ioc, tasks) { }
 
 
-        [Route("v1/email/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmEmailV1([FromRoute] Guid userId, [FromBody] string email, [FromBody] string token)
+        [Route("v1/email/{userID:guid}"), HttpPut]
+        public async Task<IActionResult> ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userId.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -40,13 +40,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             return NoContent();
         }
 
-        [Route("v1/password/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmPasswordV1([FromRoute] Guid userId, [FromBody] string password, [FromBody] string token)
+        [Route("v1/password/{userID:guid}"), HttpPut]
+        public async Task<IActionResult> ConfirmPasswordV1([FromRoute] Guid userID, [FromBody] string password, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userId.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -59,13 +59,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             return NoContent();
         }
 
-        [Route("v1/phone/{userId}"), HttpPut]
-        public async Task<IActionResult> ConfirmPhoneV1([FromRoute] Guid userId, [FromBody] string phoneNumber, [FromBody] string token)
+        [Route("v1/phone/{userID:guid}"), HttpPut]
+        public async Task<IActionResult> ConfirmPhoneV1([FromRoute] Guid userID, [FromBody] string phoneNumber, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userId.ToString());
+            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);

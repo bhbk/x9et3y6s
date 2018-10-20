@@ -57,14 +57,14 @@ namespace Bhbk.Lib.Identity
         public const string ApiDefaultClient = "Bhbk";
         public const string ApiDefaultAudienceUi = "Bhbk.WebUi.Identity";
         public const string ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
-        public const string ApiDefaultPhone = "0000000000";
+        public const string ApiDefaultPhone = "+00000000000";
         public const string ApiDefaultLogin = "local";
         public const string ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
         public const string ApiDefaultLoginName = "local";
         public const string ApiDefaultRoleForAdminUi = "(Built-In) Administrators";
         public const string ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
         public const string ApiDefaultUserAdmin = "root@local";
-        public const string ApiDefaultUserPassword = "3uetw7W$mswU";
+        public const string ApiDefaultUserPassword = "pa$$word01!";
         public const string ApiDefaultFirstName = "System";
         public const string ApiDefaultLastName = "Administrator";
 
@@ -86,8 +86,8 @@ namespace Bhbk.Lib.Identity
         public const string ApiUnitTestRoleB = "RoleUnitTestsB";
         public const string ApiUnitTestUserA = "UserUnitTestsA@local";
         public const string ApiUnitTestUserB = "UserUnitTestsB@local";
-        public const string ApiUnitTestUserPassCurrent = "3uetw7W$mswU";
-        public const string ApiUnitTestUserPassNew = "mv7wd3dks&k3";
+        public const string ApiUnitTestUserPassCurrent = "pa$$word01!";
+        public const string ApiUnitTestUserPassNew = "pa$$word01!new";
         public const string ApiUnitTestUriA = "UrlUnitTestsA";
         public const string ApiUnitTestUriALink = "https://app.test.net/a/redirect";
         public const string ApiUnitTestUriB = "UrlUnitTestsB";

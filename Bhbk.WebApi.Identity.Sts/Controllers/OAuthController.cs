@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authorization;

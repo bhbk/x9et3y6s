@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Helpers.FileSystem;
-using Bhbk.Lib.Helpers.Options;
+﻿using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
@@ -31,6 +31,7 @@ namespace Bhbk.WebApi.Identity.Sts
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext _ioc;
         protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
+        protected static IS2SJwtContext _jwt;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
@@ -40,16 +41,19 @@ namespace Bhbk.WebApi.Identity.Sts
 
             //DRY up contexts across controllers and tasks after made thread safe...
             _ioc = new IdentityContext(options);
+            _jwt = new S2SJwtContext(_conf, _ioc.ContextStatus);
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
             sc.AddSingleton<IIdentityContext>(_ioc);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(new IdentityContext(options)));
+            sc.AddSingleton<IS2SJwtContext>(_jwt);
 
             var sp = sc.BuildServiceProvider();
 
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
             _ioc = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
             _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
+            _jwt = (IS2SJwtContext)sp.GetRequiredService<IS2SJwtContext>();
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -82,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = Bhbk.Lib.Helpers.Validators.AudienceValidator.MultipleAudience,
+                    AudienceValidator = Bhbk.Lib.Core.Validators.AudienceValidator.MultipleAudience,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
@@ -99,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
-            sc.AddSession();
+            //sc.AddSession();
             sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
@@ -133,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseStaticFiles();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
-            app.UseSession();
+            //app.UseSession();
             app.UseMvc();
 
             //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware

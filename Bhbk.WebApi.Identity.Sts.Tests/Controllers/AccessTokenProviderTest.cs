@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
 
-            _s2s = new S2STester(_conf, _ioc.ContextStatus.ToString(), _owin);
+            _s2s = new S2STester(_conf, _ioc.ContextStatus, _owin);
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             audience.Enabled = false;
             _ioc.AudienceMgmt.Store.Update(audience);
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = RandomNumber.CreateBase64(8);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             if (audienceA.Id == audienceB.Id)
                 Assert.Fail();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), string.Join(",", audiences.Select(x => x)), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), string.Join(",", audiences.Select(x => x)), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = string.Empty;
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             client.Enabled = false;
             _ioc.ClientMgmt.Store.Update(client);
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get().First();
             var user = _ioc.UserMgmt.Store.Get().First();
 
-            var result = await _s2s.Sts_AccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = RandomNumber.CreateBase64(8);
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -174,7 +174,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
             _ioc.UserMgmt.UpdateAsync(user).Wait();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -189,7 +189,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = string.Empty;
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -204,7 +204,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), RandomNumber.CreateBase64(8));
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), RandomNumber.CreateBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -219,7 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -240,7 +240,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV1(client.Name, audience.Name, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV1(client.Name, audience.Name, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -265,7 +265,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             audience.Enabled = false;
             _ioc.AudienceMgmt.Store.Update(audience);
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -280,7 +280,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { RandomNumber.CreateBase64(8) };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -300,7 +300,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             if (audienceA.Id == audienceB.Id)
                 Assert.Fail();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -319,7 +319,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             client.Enabled = false;
             _ioc.ClientMgmt.Store.Update(client);
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -335,7 +335,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -351,7 +351,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client, audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -366,7 +366,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, RandomNumber.CreateBase64(8), string.Empty);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, RandomNumber.CreateBase64(8), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -386,7 +386,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
             _ioc.UserMgmt.UpdateAsync(user).Wait();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -401,7 +401,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, string.Empty, string.Empty);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, string.Empty, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -417,7 +417,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), RandomNumber.CreateBase64(8));
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), RandomNumber.CreateBase64(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -433,7 +433,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -455,7 +455,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Name };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -484,7 +484,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var roleB = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
             await _ioc.UserMgmt.AddToRoleAsync(user, roleB.Name);
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -513,7 +513,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var roleB = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
             await _ioc.UserMgmt.AddToRoleAsync(user, roleB.Name);
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -534,7 +534,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { string.Empty };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var result = await _s2s.Sts_AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var result = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

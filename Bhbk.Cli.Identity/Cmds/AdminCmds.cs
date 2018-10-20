@@ -1,5 +1,5 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Lib.Helpers.FileSystem;
+using Bhbk.Lib.Core.FileSystem;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -759,7 +759,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         Immutable = "false",
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1", content).Result;
+                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/no-notify", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -910,7 +910,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         NewPasswordConfirm = password,
                     }), Encoding.UTF8, "application/json");
 
-                var response = http.PutAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/" + userID.ToString() + "/reset-password", content).Result;
+                var response = http.PutAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/" + userID.ToString() + "/set-password", content).Result;
 
                 if (response.IsSuccessStatusCode)
                     return true;

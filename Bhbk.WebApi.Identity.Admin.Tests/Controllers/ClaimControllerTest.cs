@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;

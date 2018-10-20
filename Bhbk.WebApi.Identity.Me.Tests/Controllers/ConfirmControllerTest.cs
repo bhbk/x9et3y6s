@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;

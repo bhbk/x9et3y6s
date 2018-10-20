@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Core.Cryptography;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory

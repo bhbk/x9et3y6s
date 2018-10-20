@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
-using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Core.Cryptography;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {

@@ -15,7 +15,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
-using Bhbk.Lib.Helpers.Cryptography;
+using Bhbk.Lib.Core.Cryptography;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {

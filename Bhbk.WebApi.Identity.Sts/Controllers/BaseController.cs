@@ -17,6 +17,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly IHostedService[] _tasks;
+        private IS2SJwtContext _jwt;
 
         protected IConfigurationRoot Conf
         {
@@ -39,6 +40,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             get
             {
                 return _tasks ?? (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>();
+            }
+        }
+
+        protected IS2SJwtContext Jwt
+        {
+            get
+            {
+                return _jwt ?? (IS2SJwtContext)ControllerContext.HttpContext.RequestServices.GetService<IS2SJwtContext>();
             }
         }
 

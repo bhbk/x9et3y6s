@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public LoginController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
             : base(conf, ioc, tasks) { }
 
-        [Route("v1/{loginID}/add/{userID}"), HttpPost]
+        [Route("v1/{loginID:guid}/add/{userID:guid}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> AddLoginToUserV1([FromRoute] Guid loginID, [FromRoute] Guid userID, [FromBody] UserLoginCreate model)
         {
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(login.Evolve());
         }
 
-        [Route("v1/{loginID}"), HttpDelete]
+        [Route("v1/{loginID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
         {
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{loginID}/users"), HttpGet]
+        [Route("v1/{loginID:guid}/users"), HttpGet]
         public async Task<IActionResult> GetLoginUsersV1([FromRoute] Guid loginID)
         {
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{loginID}/remove/{userID}"), HttpDelete]
+        [Route("v1/{loginID:guid}/remove/{userID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RemoveLoginFromUserV1([FromRoute] Guid loginID, [FromRoute] Guid userID)
         {

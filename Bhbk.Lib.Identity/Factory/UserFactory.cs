@@ -151,7 +151,6 @@ namespace Bhbk.Lib.Identity.Factory
 
     public abstract class UserBase
     {
-        [Required]
         public Guid ClientId { get; set; }
 
         [Required]

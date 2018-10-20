@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(client.Evolve());
         }
 
-        [Route("v1/{clientID}"), HttpDelete]
+        [Route("v1/{clientID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteClientV1([FromRoute] Guid clientID)
         {
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{clientID}/audiences"), HttpGet]
+        [Route("v1/{clientID:guid}/audiences"), HttpGet]
         public async Task<IActionResult> GetClientAudiencesV1([FromRoute] Guid clientID)
         {
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
@@ -95,13 +95,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _data.CreateTest();
 
             var controller = new UserController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new UserCreate()
             {
+                ClientId = client.Id,
                 Email = BaseLib.Statics.ApiUnitTestUserA + "-" + RandomNumber.CreateBase64(4),
                 FirstName = RandomNumber.CreateBase64(4) + "-First",
                 LastName = RandomNumber.CreateBase64(4) + "-Last",
                 PhoneNumber = RandomNumber.CreateNumberAsString(10),
                 LockoutEnabled = false,
+                HumanBeing = true,
             };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
@@ -112,7 +115,36 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_UserV1_Create_Success()
+        public async Task Api_Admin_UserV1_Create_Success_Standard()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var controller = new UserController(_conf, _ioc, _tasks);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var model = new UserCreate()
+            {
+                ClientId = client.Id,
+                Email = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
+                FirstName = RandomNumber.CreateBase64(4) + "-First",
+                LastName = RandomNumber.CreateBase64(4) + "-Last",
+                PhoneNumber = RandomNumber.CreateNumberAsString(10),
+                LockoutEnabled = false,
+                HumanBeing = true,
+            };
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            controller.SetUser(user.Id);
+
+            var result = await controller.CreateUserV1(model) as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+
+            data.Email.Should().Be(model.Email);
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_UserV1_Create_Success_System()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -122,19 +154,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserCreate()
             {
-                ClientId = client.Id,
                 Email = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
                 FirstName = RandomNumber.CreateBase64(4) + "-First",
                 LastName = RandomNumber.CreateBase64(4) + "-Last",
                 PhoneNumber = RandomNumber.CreateNumberAsString(10),
                 LockoutEnabled = false,
-                Immutable = false,
+                HumanBeing = false,
             };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             controller.SetUser(user.Id);
 
-            var result = await controller.CreateUserV1(model) as OkObjectResult;
+            var result = await controller.CreateUserNoConfirmV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
 

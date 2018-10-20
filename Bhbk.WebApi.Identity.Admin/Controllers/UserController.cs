@@ -4,6 +4,7 @@ using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public UserController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
             : base(conf, ioc, tasks) { }
 
-        [Route("v1/{userID}/add-password"), HttpPut]
+        [Route("v1/{userID:guid}/add-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> AddPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
@@ -63,6 +64,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var exists = await IoC.UserMgmt.FindByEmailAsync(model.Email);
 
+            //if (exists != null)
+            //    return BadRequest(new { error = BaseLib.Statics.MsgUserAlreadyExists });
+
             if (exists != null)
                 return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
 
@@ -72,6 +76,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(BaseLib.Statics.MsgClientInvalid);
 
             var create = new UserFactory<UserCreate>(model);
+
+            //ignore how bit may be set in model...
+            create.HumanBeing = true;
 
             var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
 
@@ -85,12 +92,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (IoC.ContextStatus == ContextType.Live)
             {
+                var alert = new Bhbk.Lib.Alert.Helpers.S2SClient(Conf, IoC.ContextStatus);
+
+                if (alert == null)
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
                     .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
                 var url = UrlBuilder.UiConfirmEmail(Conf, user, code);
 
-                var spam = await alert.SendEmailV1(Jwt,
+                var email = await alert.SendEmailV1(Jwt.AccessToken,
                     new EmailCreate()
                     {
                         FromId = user.Id,
@@ -103,14 +115,46 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         HtmlContent = BaseLib.Statics.ApiEmailConfirmNewUserHtml(client, user, url)
                     });
 
-                if (!spam.IsSuccessStatusCode)
+                if (!email.IsSuccessStatusCode)
                     return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
             }
 
             return Ok((new UserFactory<AppUser>(user)).Evolve());
         }
 
-        [Route("v1/{userID}"), HttpDelete]
+        [Route("v1/no-confirm"), HttpPost]
+        [Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IActionResult> CreateUserNoConfirmV1([FromBody] UserCreate model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            model.ActorId = GetUserGUID();
+
+            var exists = await IoC.UserMgmt.FindByEmailAsync(model.Email);
+
+            if (exists != null)
+                return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
+
+            var create = new UserFactory<UserCreate>(model);
+
+            //ignore how bit may be set in model...
+            create.HumanBeing = false;
+
+            var result = await IoC.UserMgmt.CreateAsync(create.Devolve());
+
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
+            var user = await IoC.UserMgmt.FindByIdAsync(create.Id.ToString());
+
+            if (user == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            return Ok((new UserFactory<AppUser>(user)).Evolve());
+        }
+
+        [Route("v1/{userID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteUserV1([FromRoute] Guid userID)
         {
@@ -132,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{userID}"), HttpGet]
+        [Route("v1/{userID:guid}"), HttpGet]
         public async Task<IActionResult> GetUserV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
@@ -158,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result.Evolve());
         }
 
-        [Route("v1/{userID}/logins"), HttpGet]
+        [Route("v1/{userID:guid}/logins"), HttpGet]
         public async Task<IActionResult> GetUserLoginsV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
@@ -174,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{userID}/audiences"), HttpGet]
+        [Route("v1/{userID:guid}/audiences"), HttpGet]
         public async Task<IActionResult> GetUserAudiencesV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
@@ -190,7 +234,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{userID}/roles"), HttpGet]
+        [Route("v1/{userID:guid}/roles"), HttpGet]
         public async Task<IActionResult> GetUserRolesV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
@@ -222,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{userID}/remove-password"), HttpPut]
+        [Route("v1/{userID:guid}/remove-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RemovePasswordV1([FromRoute] Guid userID)
         {
@@ -247,7 +291,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{userID}/set-password"), HttpPut]
+        [Route("v1/{userID:guid}/set-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {

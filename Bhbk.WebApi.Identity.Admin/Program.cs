@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Helpers.FileSystem;
-using Bhbk.Lib.Helpers.Options;
+﻿using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Options;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

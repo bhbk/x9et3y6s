@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Helpers.FileSystem;
+﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Identity.Factory;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -31,10 +31,10 @@ namespace Bhbk.Lib.Identity.Stores
 
             try
             {
-                _app.DefaultsAccessTokenExpire = UInt16.Parse(_conf["IdentityDefaults:AccessTokenExpire"]);
-                _app.DefaultsAuthorizationCodeExpire = UInt16.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"]);
-                _app.DefaultsBrowserCookieExpire = UInt16.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
-                _app.DefaultsRefreshTokenExpire = UInt16.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
+                _app.DefaultsAccessTokenExpire = UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]);
+                _app.DefaultsAuthorizationCodeExpire = UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"]);
+                _app.DefaultsBrowserCookieExpire = UInt32.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
+                _app.DefaultsRefreshTokenExpire = UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
                 _app.UnitTestsAccessToken = false;
                 _app.UnitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
                 _app.UnitTestsRefreshToken = false;

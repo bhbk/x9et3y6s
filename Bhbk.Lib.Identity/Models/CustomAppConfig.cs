@@ -5,10 +5,10 @@ namespace Bhbk.Lib.Identity.Factory
     public class AppConfig
     {
         public bool DefaultsDebug { get; set; }
-        public UInt16 DefaultsAccessTokenExpire { get; set; }
-        public UInt16 DefaultsAuthorizationCodeExpire { get; set; }
-        public UInt16 DefaultsBrowserCookieExpire { get; set; }
-        public UInt16 DefaultsRefreshTokenExpire { get; set; }
+        public UInt32 DefaultsAccessTokenExpire { get; set; }
+        public UInt32 DefaultsAuthorizationCodeExpire { get; set; }
+        public UInt32 DefaultsBrowserCookieExpire { get; set; }
+        public UInt32 DefaultsRefreshTokenExpire { get; set; }
         public string EndpointsAdminUrl { get; set; }
         public string EndpointsMeUrl { get; set; }
         public string EndpointsStsUrl { get; set; }

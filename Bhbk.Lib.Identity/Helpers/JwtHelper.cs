@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Primitives.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;

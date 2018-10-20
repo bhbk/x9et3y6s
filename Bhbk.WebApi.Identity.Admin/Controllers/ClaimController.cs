@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ClaimController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
             : base(conf, ioc, tasks) { }
 
-        [Route("v1/{userID}"), HttpPost]
+        [Route("v1/{userID:guid}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> CreateClaimV1([FromRoute] Guid userID, [FromBody] Claim model)
         {
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/{userID}"), HttpPut]
+        [Route("v1/{userID:guid}"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteClaimV1([FromRoute] Guid userID, [FromBody] Claim claim)
         {
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/{userID}"), HttpGet]
+        [Route("v1/{userID:guid}"), HttpGet]
         public async Task<IActionResult> GetClaimsV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());

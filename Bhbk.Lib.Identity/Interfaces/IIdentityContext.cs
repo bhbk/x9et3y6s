@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Managers;
-using Bhbk.Lib.Identity.Stores;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Stores;
+using Bhbk.Lib.Primitives.Enums;
 using System;
 
 namespace Bhbk.Lib.Identity.Interfaces
@@ -17,11 +18,5 @@ namespace Bhbk.Lib.Identity.Interfaces
         LoginManager LoginMgmt { get; }
         CustomRoleManager RoleMgmt { get; }
         CustomUserManager UserMgmt { get; }
-    }
-
-    public enum ContextType
-    {
-        UnitTest,
-        Live
     }
 }
