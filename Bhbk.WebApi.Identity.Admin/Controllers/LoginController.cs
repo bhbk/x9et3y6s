@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -35,12 +35,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.AddLoginAsync(user,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             else if (login.Immutable)
                 return BadRequest(BaseLib.Statics.MsgLoginImmutable);
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             var result = new LoginFactory<AppLogin>(login);
 
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByNameAsync(loginName);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             var result = new LoginFactory<AppLogin>(login);
 
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
 
@@ -160,12 +160,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.RemoveLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
 
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(model.Id);
 
             if (login == null)
-                return BadRequest(BaseLib.Statics.MsgLoginInvalid);
+                return NotFound(BaseLib.Statics.MsgLoginNotExist);
 
             var update = new LoginFactory<AppLogin>(login);
             update.Update(model);

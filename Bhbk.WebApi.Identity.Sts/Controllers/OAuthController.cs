@@ -25,13 +25,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             : base(conf, ioc, tasks) { }
 
         [Route("v1/refresh/{userID}"), HttpGet]
+        [Route("v2/refresh/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.GetRefreshTokensAsync(user);
 
@@ -39,13 +40,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
+        [Route("v2/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid tokenID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var token = await IoC.UserMgmt.FindRefreshTokenByIdAsync(tokenID.ToString());
 
@@ -61,13 +63,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/refresh/{userID}/revoke"), HttpDelete]
+        [Route("v2/refresh/{userID}/revoke"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
         {
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.RemoveRefreshTokensAsync(user);
 
@@ -88,17 +91,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
@@ -114,21 +117,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
-            //check that redirect is registered with client/audience...
-            if (!audience.AppAudienceUri.Where(x => x.AbsoluteUri == redirectUri).Any())
-                return BadRequest(BaseLib.Statics.MsgUriInvalid);
+            //check that redirect url is valid...
+            if (!audience.AppAudienceUri.Any(x => x.AbsoluteUri == redirectUri))
+                return NotFound(BaseLib.Statics.MsgUriNotExist);
 
             var state = RandomNumber.CreateBase64(32);
             var url = UrlBuilder.UiAuthorizationCodeRequest(Conf, client, user, redirectUri, scope, state);

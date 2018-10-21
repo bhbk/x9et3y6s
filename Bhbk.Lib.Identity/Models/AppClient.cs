@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Models
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 
-        public ICollection<AppAudience> AppAudience { get; set; }
-        public ICollection<AppUserRefresh> AppUserRefresh { get; set; }
+        public virtual ICollection<AppAudience> AppAudience { get; set; }
+        public virtual ICollection<AppUserRefresh> AppUserRefresh { get; set; }
     }
 }

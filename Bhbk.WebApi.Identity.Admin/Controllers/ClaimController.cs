@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserInvalid);
 
             else
             {
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserInvalid);
             
             else
             {
@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserInvalid);
 
             return Ok(await IoC.UserMgmt.GetClaimsAsync(user));
         }

@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var email = await alert.SendEmailV1(Jwt.AccessToken,
+            var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -66,8 +66,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     ToId = user.Id,
                     ToEmail = user.Email,
                     ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0}", BaseLib.Statics.ApiEmailConfirmEmailSubject),
-                    HtmlContent = BaseLib.Statics.ApiEmailConfirmEmailHtml(user, url)
+                    Subject = string.Format("{0}", BaseLib.Statics.ApiMsgConfirmEmailSubject),
+                    HtmlContent = BaseLib.Statics.ApiTemplateConfirmEmail(user, url)
                 });
 
             if (!email.IsSuccessStatusCode)
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var email = await alert.SendEmailV1(Jwt.AccessToken,
+            var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -121,8 +121,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     ToId = user.Id,
                     ToEmail = user.Email,
                     ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0}", BaseLib.Statics.ApiEmailConfirmPasswordSubject),
-                    HtmlContent = BaseLib.Statics.ApiEmailConfirmPasswordHtml(user, url)
+                    Subject = string.Format("{0}", BaseLib.Statics.ApiMsgConfirmPasswordSubject),
+                    HtmlContent = BaseLib.Statics.ApiTemplateConfirmPassword(user, url)
                 });
 
             if (!email.IsSuccessStatusCode)
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var spam = await alert.SendTextV1(Jwt.AccessToken,
+            var email = await alert.EnqueueTextV1(Jwt.AccessToken,
                 new TextCreate()
                 {
                     FromId = user.Id,
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     Body = token
                 });
 
-            if (!spam.IsSuccessStatusCode)
+            if (!email.IsSuccessStatusCode)
                 return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
 
             return NoContent();

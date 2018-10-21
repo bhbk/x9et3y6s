@@ -15,6 +15,6 @@ namespace Bhbk.Lib.Identity.Models
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 
-        public AppUser User { get; set; }
+        public virtual AppUser User { get; set; }
     }
 }

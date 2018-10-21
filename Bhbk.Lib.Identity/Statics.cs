@@ -100,12 +100,15 @@ namespace Bhbk.Lib.Identity
         public const string MsgAudienceAlreadyExists = "Audience already exists";
         public const string MsgAudienceImmutable = "Audience is immutable";
         public const string MsgAudienceInvalid = "Audience is invalid or disabled";
+        public const string MsgAudienceNotExist = "Audience does not exist";
         public const string MsgClientAlreadyExists = "Client already exists";
         public const string MsgClientImmutable = "Client is immutable";
         public const string MsgClientInvalid = "Client is invalid or disabled";
+        public const string MsgClientNotExist = "Client does not exist";
         public const string MsgLoginAlreadyExists = "Login already exists";
         public const string MsgLoginImmutable = "Login is immutable";
         public const string MsgLoginInvalid = "Login invalid or disabled";
+        public const string MsgLoginNotExist = "Login does not exist";
         public const string MsgRoleAlreadyExists = "Role already exists";
         public const string MsgRoleImmutable = "Role is immutable";
         public const string MsgRoleInvalid = "Role invalid or disabled";
@@ -117,9 +120,11 @@ namespace Bhbk.Lib.Identity
         public const string MsgUserAlreadyExists = "User already exists";
         public const string MsgUserImmutable = "User is immutable";
         public const string MsgUserInvalid = "User is invalid, locked or disabled.";
+        public const string MsgUserNotExist = "User does not exist";
         public const string MsgUriAlreadyExists = "Uri already exists";
         public const string MsgUriImmutable = "Uri is immutable";
         public const string MsgUriInvalid = "Uri is invalid or disabled.";
+        public const string MsgUriNotExist = "Uri does not exist";
         public const string MsgUserInvalidCurrentEmail = "User current email incorrect";
         public const string MsgUserInvalidCurrentPassword = "User current password incorrect";
         public const string MsgUserInvalidCurrentPhone = "User current phone incorrect";
@@ -132,202 +137,161 @@ namespace Bhbk.Lib.Identity
 
         #endregion
 
-        #region Messages (Email)
+        #region Messages (Templates)
 
-        public const string ApiEmailConfirmEmailSubject = "Confirm Email Address";
-        public const string ApiEmailConfirmPasswordSubject = "Confirm Password";
-        public const string ApiEmailConfirmPhoneSubject = "Confirm Phone Number";
-        public const string ApiEmailConfirmNewUserSubject = "Confirm New User";
+        public const string ApiMsgConfirmEmailSubject = "Confirm Email Address";
+        public const string ApiMsgConfirmPasswordSubject = "Confirm Password";
+        public const string ApiMsgConfirmPhoneSubject = "Confirm Phone Number";
+        public const string ApiMsgConfirmNewUserSubject = "Confirm New User";
 
         //https://htmlformatter.com/, https://www.freeformatter.com/java-dotnet-escape.html
 
-        public static string ApiEmailConfirmEmailHtml(AppUser user, Uri link)
+        public static string ApiTemplateConfirmEmail(AppUser user, Uri link)
         {
-            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w=\r\n3.org/TR/REC-html40/loose.dtd\">\r\n" +
-                "<html xmlns=3D \"http://www.w3.org/1999/xhtml\">\r\n" +
-                "<head>\r\n" +
-                "    <!--[if !mso]><!-- -->\r\n" +
-                "    <meta http-equiv=3D \"Content-Type\" content=3D \"text/html; charset=3Dutf-8\">\r\n" +
-                "    <style>\r\n" +
-                "        @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?f= amily=3DOpen+Sans'); }\r\n" +
-                "    </style>\r\n" +
-                "    <!--<![endif]-->\r\n" +
-                "    <style>\r\n" +
-                "        table { color: inherit; }\r\n" +
-                "    </style>\r\n" +
-                "</head>\r\n" +
-                "<body style=3D \"font-size: 31px; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:=#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" mar=g inheight=3D \"0\" marginwidth=3D \"0\" id=3D \"dbx-email-body\">\r\n" +
-                "    <div style=3D \"max-width: 600px !important; padding: 4px;\">\r\n" +
-                "        <table cellpadding=3D \"0\" cellspacing==3D \"0\" style=3D \"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=3D \"0\" align==3D \"center\">\r\n" +
-                "            <tr>\r\n" +
-                "                <td align=3D \"center\">\r\n" +
-                "                    <table cellpadding=3D \"0\" cellspacing=3D \"0\" border=3D \"0\" width=3D \"100%\">\r\n" +
-                "                        <tr style=3D \"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">\r\n" +
-                "                            <td>\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + ",\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>We just need to verify your email address b= efore your sign up is complete!\r\n" +
-                "                                <br>\r\n" +
-                "                                <br><a style=3D \"border-radius: 4px; font=\r\n-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: \"Open Sans\", \"Helvetica Neue\", Arial; margin: 0; display: block; background-color:#007ee6; text-align: center;\" href=3D \"" + link.AbsoluteUri + "\">Verify your email</a>\r\n" +
-                "                                <br>Happy Dropboxing!" +
-                "                           </td>\r\n" +
-                "                        <tr>\r\n" +
-                "                        <tr>\r\n" +
-                "                           <td height=3D \"40\"></td>\r\n" +
-                "                        </tr>\r\n" +
-                "                    </table>\r\n" +
-                "                </td>\r\n" +
-                "            </tr>\r\n" +
-                "        </table>\r\n" +
-                "    </div>\r\n" +
-                "</body>\r\n" +
-                "</html>";
+            //use http://rendera.herokuapp.com/ to test template before format...
+            //use https://www.buildmystring.com to format template into string that compiles...
+
+            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
+            "  <head>" +
+            "    <!--[if !mso]><!-- -->" +
+            "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">" +
+            "    <style>" +
+            "      @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?family=Open+Sans'); }" +
+            "    </style>" +
+            "    <!--<![endif]-->" +
+            "    <style>" +
+            "      table { color: inherit; }" +
+            "    </style>" +
+            "  </head>" +
+            "  <body style=\"font-size: 31px; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" mar=g inheight=\"0\" marginwidth=\"0\" id=\"dbx-email-body\">" +
+            "    <div style=\"max-width: 600px !important; padding: 4px;\">" +
+            "      <table cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=\"0\" align==\"center\">" +
+            "        <tr>" +
+            "          <td align=\"center\">" +
+            "            <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">" +
+            "              <tr style=\"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">" +
+            "                <td>" +
+            "                  <br>" +
+            "                  <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + "." +
+            "                  <br>" +
+            "                  <br>Someone recently requested an email change for your account. If this was you, you can set a new password below." +
+            "                  <br>" +
+            "                  <br><a style= 'border-radius: 4px; font-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: \"Open Sans\", \"Helvetica Neue\", Arial; margin: 0; display: block; background-color: #007ee6; text-align: center;' href=" + link.AbsoluteUri + ">Change email address</a>" +
+            "                  <br>If you don't want to change your email address or didn't request this, just ignore and delete this message." +
+            "                  <br>" +
+            "                  <br>To keep your account secure, please don't forward this email to anyone." +
+            "                  <br>" +
+            "                </td>" +
+            "              </tr>" +
+            "              <tr>" +
+            "                <td height=\"40\"></td>" +
+            "              </tr>" +
+            "            </table>" +
+            "          </td>" +
+            "        </tr>" +
+            "      </table>" +
+            "    </div>" +
+            "  </body>" +
+            "</html>";
         }
 
-        public static string ApiEmailConfirmPasswordHtml(AppUser user, Uri link)
+        public static string ApiTemplateConfirmPassword(AppUser user, Uri link)
         {
-            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">\r\n" +
-                "<html xmlns=3D \"http://www.w3.org/1999/xhtml\">\r\n" +
-                "<head>\r\n" +
-                "    <!--[if !mso]><!-- -->\r\n" +
-                "    <style>\r\n" +
-                "        @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?family=3DOpen+Sans'); }\r\n" +
-                "    </style>\r\n" +
-                "    <!--<![endif]-->\r\n" +
-                "    <style>\r\n" +
-                "        table { color: inherit; }\r\n" +
-                "    </style>\r\n" +
-                "</head>\r\n" +
-                "<body style=3D \"font-size: 31px; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" mar=g inheight=3D \"0\" marginwidth=3D \"0\" id=3D \"dbx-email-body\">\r\n" +
-                "    <div style=3D \"max-width: 600px !important; padding: 4px;\">\r\n" +
-                "        <table cellpadding=3D \"0\" cellspacing=3D \"0\" style=3D \"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=3D \"0\" align==3D \"center\">\r\n" +
-                "            <tr>\r\n" +
-                "                <td align=3D \"center\">\r\n" +
-                "                    <table cellpadding=3D \"0\" cellspacing=3D \"0\" border=3D \"0\" width=3D \"100%\">\r\n" +
-                "                        <tr style=3D \"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">\r\n" +
-                "                            <td>\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + ",\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>Someone recently requested a password change= for your account. If this was you, you can set a new password here= :\r\n" +
-                "                                <br>\r\n" +
-                "                                <br><a style=3D 'border-radius: 4px; font-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: \"Open Sans\", \"Helvetica Neue\", Arial; margin: 0; display: block; background-color: #007ee6; text-align: center;' href=3D \"" + link.AbsoluteUri + "\">Reset password</a>\r\n" +
-                "                                <br>If you don't want to change your password or didn't request this, just ignore and delete this message.\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>To keep your account secure, please don't forward this email to anyone.\r\n" +
-                "                                <br>\r\n" +
-                "                            </td>\r\n" +
-                "                        </tr>\r\n" +
-                "                        <tr>\r\n" +
-                "                            <td height=3D \"40\"></td>\r\n" +
-                "                        </tr>\r\n" +
-                "                    </table>\r\n" +
-                "                </td>\r\n" +
-                "            </tr>\r\n" +
-                "        </table>\r\n" +
-                "    </div>\r\n" +
-                "</body>\r\n" +
-                "</html>";
+            //use http://rendera.herokuapp.com/ to test template before format...
+            //use https://www.buildmystring.com to format template into string that compiles...
+
+            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
+            "  <head>" +
+            "    <!--[if !mso]><!-- -->" +
+            "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">" +
+            "    <style>" +
+            "      @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?family=Open+Sans'); }" +
+            "    </style>" +
+            "    <!--<![endif]-->" +
+            "    <style>" +
+            "      table { color: inherit; }" +
+            "    </style>" +
+            "  </head>" +
+            "  <body style=\"font-size: 31px; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" mar=g inheight=\"0\" marginwidth=\"0\" id=\"dbx-email-body\">" +
+            "    <div style=\"max-width: 600px !important; padding: 4px;\">" +
+            "      <table cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=\"0\" align==\"center\">" +
+            "        <tr>" +
+            "          <td align=\"center\">" +
+            "            <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">" +
+            "              <tr style=\"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">" +
+            "                <td>" +
+            "                  <br>" +
+            "                  <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + "." +
+            "                  <br>" +
+            "                  <br>Someone recently requested a password change for your account. If this was you, you can set a new password below." +
+            "                  <br>" +
+            "                  <br><a style= 'border-radius: 4px; font-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: \"Open Sans\", \"Helvetica Neue\", Arial; margin: 0; display: block; background-color: #007ee6; text-align: center;' href=" + link.AbsoluteUri + ">Change password</a>" +
+            "                  <br>If you don't want to change your password or didn't request this, just ignore and delete this message." +
+            "                  <br>" +
+            "                  <br>To keep your account secure, please don't forward this email to anyone." +
+            "                  <br>" +
+            "                </td>" +
+            "              </tr>" +
+            "              <tr>" +
+            "                <td height=\"40\"></td>" +
+            "              </tr>" +
+            "            </table>" +
+            "          </td>" +
+            "        </tr>" +
+            "      </table>" +
+            "    </div>" +
+            "  </body>" +
+            "</html>";
         }
 
-        public static string ApiEmailConfirmPhoneHtml(AppUser user, Uri link)
+        public static string ApiTemplateConfirmNewUser(AppClient client, AppUser user, Uri link)
         {
-            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">\r\n" +
-                "<html xmlns=3D \"http://www.w3.org/1999/xhtml\">\r\n" +
-                "<head>\r\n" +
-                "    <!--[if !mso]><!-- -->\r\n" +
-                "    <style>\r\n" +
-                "        @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?family=3DOpen+Sans'); }\r\n" +
-                "    </style>\r\n" +
-                "    <!--<![endif]-->\r\n" +
-                "    <style>\r\n" +
-                "        table { color: inherit; }\r\n" +
-                "    </style>\r\n" +
-                "</head>\r\n" +
-                "<body style=3D \"font-size: 31px; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" mar=g inheight=3D \"0\" marginwidth=3D \"0\" id=3D \"dbx-email-body\">\r\n" +
-                "    <div style=3D \"max-width: 600px !important; padding: 4px;\">\r\n" +
-                "        <table cellpadding=3D \"0\" cellspacing=3D \"0\" style=3D \"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=3D \"0\" align==3D \"center\">\r\n" +
-                "            <tr>\r\n" +
-                "                <td align=3D \"center\">\r\n" +
-                "                    <table cellpadding=3D \"0\" cellspacing=3D \"0\" border=3D \"0\" width=3D \"100%\">\r\n" +
-                "                        <tr style=3D \"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">\r\n" +
-                "                            <td>\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + ",\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>Someone recently requested a password change= for your account. If this was you, you can set a new password here= :\r\n" +
-                "                                <br>\r\n" +
-                "                                <br><a style=3D 'border-radius: 4px; font-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: \"Open Sans\", \"Helvetica Neue\", Arial; margin: 0; display: block; background-color: #007ee6; text-align: center;' href=3D \"" + link.AbsoluteUri + "\">Reset password</a>\r\n" +
-                "                                <br>If you don't want to change your password or didn't request this, just ignore and delete this message.\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>To keep your account secure, please don't forward this email to anyone.\r\n" +
-                "                                <br>\r\n" +
-                "                            </td>\r\n" +
-                "                        </tr>\r\n" +
-                "                        <tr>\r\n" +
-                "                            <td height=3D \"40\"></td>\r\n" +
-                "                        </tr>\r\n" +
-                "                    </table>\r\n" +
-                "                </td>\r\n" +
-                "            </tr>\r\n" +
-                "        </table>\r\n" +
-                "    </div>\r\n" +
-                "</body>\r\n" +
-                "</html>";
+            //use http://rendera.herokuapp.com/ to test template before format...
+            //use https://www.buildmystring.com to format template into string that compiles...
+
+            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
+            "  <head>" +
+            "    <!--[if !mso]><!-- -->" +
+            "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">" +
+            "    <style>" +
+            "      @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?f= amily=Open+Sans'); }" +
+            "    </style>" +
+            "    <!--<![endif]-->" +
+            "    <style>" +
+            "      table { color: inherit; }" +
+            "    </style>" +
+            "  </head>" +
+            "  <body style=\"font-size: 31px; font-family: 'Open Sans', 'Helvetica Neue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:=#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" marginheight=\"0\" marginwidth=\"0\" id=\"dbx-email-body\">" +
+            "    <div style=\"max-width: 600px !important; padding: 4px;\">" +
+            "      <table cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=\"0\" align=\"center\">" +
+            "        <tr>" +
+            "          <td align=\"center\">" +
+            "            <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">" +
+            "              <tr style=\"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">" +
+            "                <td>" +
+            "                  <br>" +
+            "                  <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + "." +
+            "                  <br>" +
+            "                  <br>We just need to verify your email address before your sign-up is complete!" +
+            "                  <br>" +
+            "                  <br><a style=\"border-radius: 4px; font-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: 'Open Sans', 'Helvetica Neue', Arial; margin: 0; display: block; background-color:#007ee6; text-align: center;\" href=" + link.AbsoluteUri + ">Verify your email</a>" +
+            "                  <br>" +
+            "                </td>" +
+            "              <tr>" +
+            "              <tr>" +
+            "                <td height=\"40\"></td>" +
+            "              </tr>" +
+            "            </table>" +
+            "          </td>" +
+            "        </tr>" +
+            "      </table>" +
+            "    </div>" +
+            "  </body>" +
+            "</html>";
         }
-
-        public static string ApiEmailConfirmNewUserHtml(AppClient client, AppUser user, Uri link)
-        {
-            return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w=\r\n3.org/TR/REC-html40/loose.dtd\">\r\n" +
-                "<html xmlns=3D \"http://www.w3.org/1999/xhtml\">\r\n" +
-                "<head>\r\n" +
-                "    <!--[if !mso]><!-- -->\r\n" +
-                "    <meta http-equiv=3D \"Content-Type\" content=3D \"text/html; charset=3Dutf-8\">\r\n" +
-                "    <style>\r\n" +
-                "        @font-face { font-family: Open Sans; src: url('http://fonts.googleapis.com/css?f= amily=3DOpen+Sans'); }\r\n" +
-                "    </style>\r\n" +
-                "    <!--<![endif]-->\r\n" +
-                "    <style>\r\n" +
-                "        table { color: inherit; }\r\n" +
-                "    </style>\r\n" +
-                "</head>\r\n" +
-                "<body style=3D \"font-size: 31px; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; color:=#404040; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; font-weight: 300 !important; margin: 0; -ms-text-size-adjust: 100%;\" mar=g inheight=3D \"0\" marginwidth=3D \"0\" id=3D \"dbx-email-body\">\r\n" +
-                "    <div style=3D \"max-width: 600px !important; padding: 4px;\">\r\n" +
-                "        <table cellpadding=3D \"0\" cellspacing==3D \"0\" style=3D \"padding: 0 45px; width: 100% !important; padding-top: 45px;border: 1px solid #F0F0F0; background-color: #FFFFFF;\" border=3D \"0\" align==3D \"center\">\r\n" +
-                "            <tr>\r\n" +
-                "                <td align=3D \"center\">\r\n" +
-                "                    <table cellpadding=3D \"0\" cellspacing=3D \"0\" border=3D \"0\" width=3D \"100%\">\r\n" +
-                "                        <tr style=3D \"font-size: 16px; font-weight: 300; color: #404040; font-family: 'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 26px; text-align: left;\">\r\n" +
-                "                            <td>\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + ",\r\n" +
-                "                                <br>\r\n" +
-                "                                <br>We just need to verify your email address b= efore your sign up is complete!\r\n" +
-                "                                <br>\r\n" +
-                "                                <br><a style=3D \"border-radius: 4px; font=\r\n-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: \"Open Sans\", \"Helvetica Neue\", Arial; margin: 0; display: block; background-color:#007ee6; text-align: center;\" href=3D \"" + link.AbsoluteUri + "\">Verify your email</a>\r\n" +
-                "                                <br>Happy Dropboxing!" +
-                "                           </td>\r\n" +
-                "                        <tr>\r\n" +
-                "                        <tr>\r\n" +
-                "                           <td height=3D \"40\"></td>\r\n" +
-                "                        </tr>\r\n" +
-                "                    </table>\r\n" +
-                "                </td>\r\n" +
-                "            </tr>\r\n" +
-                "        </table>\r\n" +
-                "    </div>\r\n" +
-                "</body>\r\n" +
-                "</html>";
-        }
-
-        #endregion
-
-        #region Parameter Constants
-
-        public const string GetOrderBy = "orderBy";
-        public const string GetPageSize = "pageSize";
-        public const string GetPageNumber = "pageNumber";
 
         #endregion
     }

@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_ClientV1_Fail_NotImplemented()
+        public async Task Api_Sts_OAuth_ClientV1_Fail_NotImplemented()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_ClientV2_Fail_ClientInvalid()
+        public async Task Api_Sts_OAuth_ClientV2_Fail_ClientNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -52,11 +52,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _s2s.StsClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_ClientV2_Fail_SecretInvalid()
+        public async Task Api_Sts_OAuth_ClientV2_Fail_ClientSecret()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -65,11 +65,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _s2s.StsClientCredentialsV2(client.Id.ToString(), RandomNumber.CreateBase64(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [TestMethod]
-        public async Task Api_Sts_ClientV2_Success()
+        public async Task Api_Sts_OAuth_ClientV2_Success()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -78,14 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _s2s.StsClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            //not done yet...
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
-
-            var check = JwtHelper.IsValidJwtFormat(access);
-            check.Should().BeTrue();
+            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
     }
 }

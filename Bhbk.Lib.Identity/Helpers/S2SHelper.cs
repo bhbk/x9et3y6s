@@ -1,12 +1,15 @@
-﻿using Bhbk.Lib.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Primitives.Enums;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -56,65 +59,329 @@ namespace Bhbk.Lib.Identity.Helpers
             _connect = connect.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> AdminGetAudienceV1(JwtSecurityToken jwt, Guid audienceId)
+        public async Task<HttpResponseMessage> AdminAudienceCreateV1(JwtSecurityToken jwt, AudienceCreate model)
         {
-            var endpoint = "/audience/v1/";
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + audienceId.ToString());
+            var endpoint = "/audience/v1";
 
             _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"], endpoint) + audienceId.ToString());
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
         }
 
-        public async Task<HttpResponseMessage> AdminGetClientV1(JwtSecurityToken jwt, Guid clientId)
+        public async Task<HttpResponseMessage> AdminAudienceDeleteV1(JwtSecurityToken jwt, Guid audienceID)
         {
-            var endpoint = "/client/v1/";
-
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + clientId.ToString());
+            var endpoint = "/audience/v1/" + audienceID.ToString();
 
             _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"], endpoint) + clientId.ToString());
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
         }
 
-        public async Task<HttpResponseMessage> AdminGetRoleV1(JwtSecurityToken jwt, Guid roleId)
+        public async Task<HttpResponseMessage> AdminAudienceGetV1(JwtSecurityToken jwt, string audience)
         {
-            var endpoint = "/role/v1/";
-
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + roleId.ToString());
+            var endpoint = "/audience/v1/" + audience;
 
             _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
             return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"], endpoint) + roleId.ToString());
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminClientCreateV1(JwtSecurityToken jwt, ClientCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/client/v1";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> AdminClientDeleteV1(JwtSecurityToken jwt, Guid clientID)
+        {
+            var endpoint = "/client/v1/" + clientID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminClientGetV1(JwtSecurityToken jwt, string client)
+        {
+            var endpoint = "/client/v1/" + client;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminLoginAddUserV1(JwtSecurityToken jwt, Guid loginID, Guid userID, UserLoginCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/login/v1/" + loginID.ToString() + "/add/" + userID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> AdminLoginCreateV1(JwtSecurityToken jwt, LoginCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/login/v1";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> AdminLoginDeleteV1(JwtSecurityToken jwt, Guid loginID)
+        {
+            var endpoint = "/login/v1/" + loginID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminLoginGetV1(JwtSecurityToken jwt, string login)
+        {
+            var endpoint = "/login/v1/" + login;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
         }
 
-        public async Task<HttpResponseMessage> AdminGetUserV1(JwtSecurityToken jwt, Guid userId)
+        public async Task<HttpResponseMessage> AdminRoleAddToUserV1(JwtSecurityToken jwt, Guid roleID, Guid userID)
         {
-            var endpoint = "/user/v1/";
-
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + userId.ToString());
+            var endpoint = "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString();
 
             _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
             return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityApiUrls:AdminUrl"], _conf["IdentityApiUrls:AdminPath"], endpoint) + userId.ToString());
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminRoleCreateV1(JwtSecurityToken jwt, RoleCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/role/v1";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> AdminRoleDeleteV1(JwtSecurityToken jwt, Guid roleID)
+        {
+            var endpoint = "/role/v1/" + roleID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminRoleGetV1(JwtSecurityToken jwt, string role)
+        {
+            var endpoint = "/role/v1/" + role;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+        }
+
+        public async Task<HttpResponseMessage> AdminRoleRemoveFromUserV1(JwtSecurityToken jwt, Guid roleID, Guid userID)
+        {
+            var endpoint = "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminUserCreateV1(JwtSecurityToken jwt, UserCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/user/v1";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> AdminUserCreateV1NoConfirm(JwtSecurityToken jwt, UserCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/user/v1/no-confirm";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> AdminUserDeleteV1(JwtSecurityToken jwt, Guid userID)
+        {
+            var endpoint = "/user/v1/" + userID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminUserGetV1(JwtSecurityToken jwt, string user)
+        {
+            var endpoint = "/user/v1/" + user;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> AdminUserSetPasswordV1(JwtSecurityToken jwt, UserAddPassword model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/user/v1/" + model.Id.ToString() + "/set-password";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PutAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
         }
 
         //https://oauth.net/2/grant-types/password/
@@ -131,13 +398,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v1/access";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint), content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
         }
 
         public async Task<HttpResponseMessage> StsAccessTokenV2(string client, List<string> audiences, string user, string password)
@@ -153,13 +421,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v2/access";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint), content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
@@ -174,13 +443,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v1/authorization-code";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint) + content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint + content);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
         }
 
         public async Task<HttpResponseMessage> StsAuthorizationCodeRequestV2(string client, string audience, string user, string redirectUri, string scope)
@@ -194,13 +464,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v2/authorization-code";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint) + content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint + content);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
         }
 
         public async Task<HttpResponseMessage> StsAuthorizationCodeV1(string client, string user, string redirectUri, string code)
@@ -213,13 +484,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v1/authorization";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint) + content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint + content);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
         }
 
         public async Task<HttpResponseMessage> StsAuthorizationCodeV2(string client, string user, string redirectUri, string code)
@@ -232,13 +504,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v2/authorization";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint + content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint) + content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint + content);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
@@ -253,13 +526,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v1/client";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint), content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
         }
 
         public async Task<HttpResponseMessage> StsClientCredentialsV2(string client, string secret)
@@ -273,13 +547,104 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v2/client";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint), content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+        }
+
+        public async Task<HttpResponseMessage> StsRefreshTokenGetListV1(JwtSecurityToken jwt, string user)
+        {
+            var endpoint = "/oauth/v1/refresh/" + user;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> StsRefreshTokenGetListV2(JwtSecurityToken jwt, string user)
+        {
+            var endpoint = "/oauth/v2/refresh/" + user;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            return await _connect.GetAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> StsRefreshTokenDeleteV1(JwtSecurityToken jwt, string user, string token)
+        {
+            var endpoint = "/oauth/v1/refresh/" + user + "/revoke/" + token;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> StsRefreshTokenDeleteV2(JwtSecurityToken jwt, string user, string token)
+        {
+            var endpoint = "/oauth/v2/refresh/" + user + "/revoke/" + token;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> StsRefreshTokenDeleteAllV1(JwtSecurityToken jwt, string user)
+        {
+            var endpoint = "/oauth/v1/refresh/" + user + "/revoke";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+        }
+
+        public async Task<HttpResponseMessage> StsRefreshTokenDeleteAllV2(JwtSecurityToken jwt, string user)
+        {
+            var endpoint = "/oauth/v2/refresh/" + user + "/revoke";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            return await _connect.DeleteAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
         }
 
         //https://oauth.net/2/grant-types/refresh-token/
@@ -295,13 +660,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v1/refresh";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint), content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
         }
 
         public async Task<HttpResponseMessage> StsRefreshTokenV2(string client, List<string> audiences, string refresh)
@@ -316,13 +682,14 @@ namespace Bhbk.Lib.Identity.Helpers
 
             var endpoint = "/oauth/v2/refresh";
 
-            if (_context == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return await _connect.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityApiUrls:StsUrl"], _conf["IdentityApiUrls:StsPath"], endpoint), content);
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            return await _connect.PostAsync(
+                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
         }
     }
 }

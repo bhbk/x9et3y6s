@@ -14,5 +14,7 @@ namespace Bhbk.Lib.Identity.Models
         public string CurrentValues { get; set; }
         public DateTime Created { get; set; }
         public bool Immutable { get; set; }
+
+        public virtual AppUser Actor { get; set; }
     }
 }

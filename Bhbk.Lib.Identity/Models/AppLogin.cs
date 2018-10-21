@@ -15,6 +15,6 @@ namespace Bhbk.Lib.Identity.Models
         public string LoginProvider { get; set; }
         public bool Immutable { get; set; }
 
-        public ICollection<AppUserLogin> AppUserLogin { get; set; }
+        public virtual ICollection<AppUserLogin> AppUserLogin { get; set; }
     }
 }

@@ -11,6 +11,6 @@ namespace Bhbk.Lib.Identity.Models
         public DateTime IssuedUtc { get; set; }
         public DateTime ExpiresUtc { get; set; }
 
-        public AppUser User { get; set; }
+        public virtual AppUser User { get; set; }
     }
 }

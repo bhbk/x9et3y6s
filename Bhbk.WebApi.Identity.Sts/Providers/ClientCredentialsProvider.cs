@@ -95,7 +95,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 else
                     client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
 
-                if (client == null || !client.Enabled)
+                if (client == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                }
+
+                if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";

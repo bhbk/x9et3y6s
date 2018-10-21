@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_AuthCodeV1_Use_Fail_NotImplemented()
+        public async Task Api_Sts_OAuth_AuthCodeV1_Use_Fail_NotImplemented()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_AuthCodeV2_Use_Fail_ClientInvalid()
+        public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_ClientNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -66,13 +66,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var check = await _s2s.StsAuthorizationCodeV2(Guid.NewGuid().ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            _ioc.ClientMgmt.Store.Delete(client);
+
+            var check = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            check.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_AuthCodeV2_Use_Fail_CodeInvalid()
+        public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_CodeNotValid()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -91,7 +93,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_AuthCodeV2_Use_Fail_UserInvalid()
+        public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UriNotValid()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            var redirect = new Uri("https://app.test.net/a/invalid");
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
+                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
+
+            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), RandomNumber.CreateBase64(64), code);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UserNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -105,32 +130,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), Guid.NewGuid().ToString(), redirect.AbsoluteUri, code);
+            _ioc.UserMgmt.Store.DeleteAsync(user).Wait();
+
+            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_AuthCodeV2_Use_Fail_UriInvalid()
-        {
-            _data.Destroy();
-            _data.CreateTest();
-
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-
-            var redirect = new Uri("https://app.test.net/a/invalid");
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
-
-            var result = await _s2s.StsAuthorizationCodeV2(Guid.NewGuid().ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [TestMethod]
-        public async Task Api_Sts_AuthCodeV2_Use_Success()
+        public async Task Api_Sts_OAuth_AuthCodeV2_Use_Success()
         {
             _data.Destroy();
             _data.CreateTest();

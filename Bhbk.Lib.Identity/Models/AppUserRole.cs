@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Models
         public DateTime Created { get; set; }
         public bool Immutable { get; set; }
 
-        public AppRole Role { get; set; }
-        public AppUser User { get; set; }
+        public virtual AppRole Role { get; set; }
+        public virtual AppUser User { get; set; }
     }
 }

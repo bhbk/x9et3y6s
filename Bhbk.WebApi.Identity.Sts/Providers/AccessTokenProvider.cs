@@ -89,7 +89,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 else
                     client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
 
-                if (client == null || !client.Enabled)
+                if (client == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                }
+
+                if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -105,7 +112,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 else
                     audience = ioc.AudienceMgmt.FindByNameAsync(audienceValue).Result;
 
-                if (audience == null || !audience.Enabled)
+                if (audience == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceNotExist }, _serializer));
+                }
+
+                if (!audience.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -123,9 +137,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 if (user == null)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserNotExist }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -148,9 +162,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //check that login provider exists...
                 if (loginList == null)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginNotExist }, _serializer));
                 }
 
                 //check if login provider is local...
@@ -255,7 +269,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 else
                     client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
 
-                if (client == null || !client.Enabled)
+                if (client == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                }
+
+                if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -273,9 +294,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 if (user == null)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserNotExist }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -312,8 +333,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         else
                             audience = ioc.AudienceMgmt.FindByNameAsync(entry.Trim()).Result;
 
-                        if (audience == null
-                            || !audience.Enabled
+                        if (audience == null)
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                            context.Response.ContentType = "application/json";
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceNotExist }, _serializer));
+                        }
+
+                        if (!audience.Enabled
                             || !audienceList.Contains(audience.Id.ToString()))
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -331,9 +358,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //check that login provider exists...
                 if (loginList == null)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgLoginNotExist }, _serializer));
                 }
 
                 //check if login provider is local...

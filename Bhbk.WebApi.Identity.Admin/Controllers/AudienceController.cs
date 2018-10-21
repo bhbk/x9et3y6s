@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             var result = new AudienceFactory<AppAudience>(audience);
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByNameAsync(audienceName);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             var result = new AudienceFactory<AppAudience>(audience);
 
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             var roles = await IoC.AudienceMgmt.GetRoleListAsync(audienceID);
 
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(model.Id);
 
             if (audience == null)
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
 
             else if (audience.Immutable)
                 return BadRequest(BaseLib.Statics.MsgAudienceImmutable);

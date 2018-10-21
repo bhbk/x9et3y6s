@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Helpers
     {
         public static Uri UiConfirmEmail(IConfigurationRoot conf, AppUser user, string code)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentitySpaUrls:MeUrl"], conf["IdentitySpaUrls:MePath"], "/confirm-email");
+            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");
 
             return new Uri(path + "?user=" + user.Id.ToString()
                 + "&code=" + code);
@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
         public static Uri UiConfirmPassword(IConfigurationRoot conf, AppUser user, string code)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentitySpaUrls:MeUrl"], conf["IdentitySpaUrls:MePath"], "/confirm-password");
+            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-password");
 
             return new Uri(path + "?user=" + user.Id.ToString()
                 + "&code=" + code);
@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
         public static Uri UiConfirmPhone(IConfigurationRoot conf, AppUser user, string code)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentitySpaUrls:MeUrl"], conf["IdentitySpaUrls:MePath"], "/confirm-phone");
+            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-phone");
 
             return new Uri(path + "?user=" + user.Id.ToString()
                 + "&code=" + code);
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
         public static Uri UiAuthorizationCodeRequest(IConfigurationRoot conf, AppClient client, AppUser user, string redirectUri, string scope, string state)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentitySpaUrls:MeUrl"], conf["IdentitySpaUrls:MePath"], "/authorization-code");
+            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/authorization-code");
 
             return new Uri(path + "?client=" + client.Id.ToString()
                 + "&user=" + user.Id.ToString()

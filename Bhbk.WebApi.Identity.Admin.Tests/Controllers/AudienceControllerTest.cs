@@ -170,9 +170,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             ushort page = 1;
 
             var response = await request.GetAsync("/audience/v1?"
-                + BaseLib.Statics.GetOrderBy + "=" + order + "&"
-                + BaseLib.Statics.GetPageSize + "=" + size.ToString() + "&"
-                + BaseLib.Statics.GetPageNumber + "=" + page.ToString());
+                + "orderBy=" + order + "&"
+                + "pageSize=" + size.ToString() + "&"
+                + "pageNumber=" + page.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -201,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             string order = "name";
 
             var response = await request.GetAsync("/audience/v1?"
-                + BaseLib.Statics.GetOrderBy + "=" + order);
+                + "orderBy=" + order);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -232,9 +232,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             ushort page = 1;
 
             var response = await request.GetAsync("/audience/v1?"
-                + BaseLib.Statics.GetOrderBy + "=" + order + "&"
-                + BaseLib.Statics.GetPageSize + "=" + size.ToString() + "&"
-                + BaseLib.Statics.GetPageNumber + "=" + page.ToString());
+                + "orderBy=" + order + "&"
+                + "pageSize=" + size.ToString() + "&"
+                + "pageNumber=" + page.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);

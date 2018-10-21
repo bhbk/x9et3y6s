@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             var result = new ClientFactory<AppAudience>(client);
 
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByNameAsync(clientName);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             var result = new ClientFactory<AppAudience>(client);
 
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             var audiences = await IoC.ClientMgmt.GetAudiencesAsync(clientID);
 
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(model.Id);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             else if (client.Immutable)
                 return BadRequest(BaseLib.Statics.MsgClientImmutable);

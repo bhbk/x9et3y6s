@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             if (!await new ProtectProvider(IoC.ContextStatus.ToString()).ValidateAsync(email, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             if (!await new ProtectProvider(IoC.ContextStatus.ToString()).ValidateAsync(password, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);

@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (!user.HumanBeing)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             if (user.Id != model.Id)
                 return BadRequest(BaseLib.Statics.MsgUserInvalid);

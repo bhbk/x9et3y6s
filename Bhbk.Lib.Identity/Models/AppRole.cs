@@ -23,8 +23,8 @@ namespace Bhbk.Lib.Identity.Models
         public string ConcurrencyStamp { get; set; }
         public bool Immutable { get; set; }
 
-        public AppAudience Audience { get; set; }
-        public ICollection<AppRoleClaim> AppRoleClaim { get; set; }
-        public ICollection<AppUserRole> AppUserRole { get; set; }
+        public virtual AppAudience Audience { get; set; }
+        public virtual ICollection<AppRoleClaim> AppRoleClaim { get; set; }
+        public virtual ICollection<AppUserRole> AppUserRole { get; set; }
     }
 }

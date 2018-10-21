@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -33,12 +33,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.AddToRoleAsync(user, role.Name);
 
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             else if (role.Immutable)
                 return BadRequest(BaseLib.Statics.MsgRoleImmutable);
@@ -116,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             var result = new RoleFactory<AppRole>(role);
 
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByNameAsync(roleName.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             var result = new RoleFactory<AppRole>(role);
 
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             var users = IoC.RoleMgmt.GetUsersListAsync(role);
 
@@ -161,12 +161,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.RemoveFromRoleAsync(user, role.Name);
 
@@ -188,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(model.Id.ToString());
 
             if (role == null)
-                return BadRequest(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(BaseLib.Statics.MsgRoleNotExist);
 
             else if (role.Immutable)
                 return BadRequest(BaseLib.Statics.MsgRoleImmutable);

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -27,7 +29,7 @@ namespace Bhbk.Lib.Identity.Providers
         {
             var claims = new List<Claim>();
 
-            foreach (string role in await _userMgmt.GetRolesAsync(user))
+            foreach (string role in (await _userMgmt.GetRolesAsync(user)).OrderBy(x => x))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
             foreach (Claim claim in await _userMgmt.GetClaimsAsync(user))

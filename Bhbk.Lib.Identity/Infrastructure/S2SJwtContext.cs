@@ -23,6 +23,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 throw new ArgumentNullException();
 
             _conf = conf;
+            _context = context;
             _client = new S2SClient(conf, context);
         }
 
@@ -42,52 +43,52 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     && _refresh.ValidFrom < DateTime.UtcNow
                     && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
-                    var response = _client.StsRefreshTokenV2(_conf["IdentityLogin:ClientName"],
+                    var result = _client.StsRefreshTokenV2(_conf["IdentityLogin:ClientName"],
                         new List<string> { _conf["IdentityLogin:AudienceName"] }, _refresh.RawData).Result;
 
-                    if (response.IsSuccessStatusCode)
+                    if (result.IsSuccessStatusCode)
                     {
-                        var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                        _access = new JwtSecurityToken((string)json["access_token"]);
-                        _refresh = new JwtSecurityToken((string)json["refresh_token"]);
+                        _access = new JwtSecurityToken((string)content["access_token"]);
+                        _refresh = new JwtSecurityToken((string)content["refresh_token"]);
 
-                        Log.Information(typeof(S2SJwtContext).Name + " success on " + DateTime.Now.ToString()
+                        Log.Information(typeof(S2SJwtContext).Name + " success using JWT refresh_token on " + DateTime.Now.ToString()
                             + ". JWT \"access_token\" valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
                             + ". JWT \"refresh_token\" valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString()+ ".");
 
                         return _access;
                     }
 
-                    Log.Error(typeof(S2SJwtContext).Name + " fail on " + DateTime.Now.ToString()
-                        + ". Request Method:" + response.RequestMessage.Method.ToString() + ", URI:" + response.RequestMessage.RequestUri
-                        + ". Response Code:" + (int)response.StatusCode + " " + response.StatusCode.ToString() + ", Reason:" + response.ReasonPhrase + ".");
+                    Log.Error(typeof(S2SJwtContext).Name + " fail using JWT refresh_token on " + DateTime.Now.ToString()
+                        + ". Request Method:" + result.RequestMessage.Method.ToString() + ", URI:" + result.RequestMessage.RequestUri
+                        + ". Response Code:" + (int)result.StatusCode + " " + result.StatusCode.ToString() + ", Reason:" + result.ReasonPhrase + ".");
 
                     throw new UnauthorizedAccessException();
                 }
 
                 else
                 {
-                    var response = _client.StsAccessTokenV2(_conf["IdentityLogin:ClientName"],
+                    var result = _client.StsAccessTokenV2(_conf["IdentityLogin:ClientName"],
                         new List<string> { _conf["IdentityLogin:AudienceName"] }, _conf["IdentityLogin:UserName"], _conf["IdentityLogin:UserPass"]).Result;
 
-                    if (response.IsSuccessStatusCode)
+                    if (result.IsSuccessStatusCode)
                     {
-                        var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                        var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                        _access = new JwtSecurityToken((string)json["access_token"]);
-                        _refresh = new JwtSecurityToken((string)json["refresh_token"]);
+                        _access = new JwtSecurityToken((string)content["access_token"]);
+                        _refresh = new JwtSecurityToken((string)content["refresh_token"]);
 
-                        Log.Information(typeof(S2SJwtContext).Name + " success on " + DateTime.Now.ToString()
+                        Log.Information(typeof(S2SJwtContext).Name + " success using user/pass for JWT access_token on " + DateTime.Now.ToString()
                             + ". JWT \"access_token\" valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
                             + ". JWT \"refresh_token\" valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString() + ".");
 
                         return _access;
                     }
 
-                    Log.Error(typeof(S2SJwtContext).Name + " fail on " + DateTime.Now.ToString()
-                        + ". Request Method:" + response.RequestMessage.Method.ToString() + ", URI:" + response.RequestMessage.RequestUri
-                        + ". Response Code:" + (int)response.StatusCode + " " + response.StatusCode.ToString() + ", Reason:" + response.ReasonPhrase + ".");
+                    Log.Error(typeof(S2SJwtContext).Name + " fail using user/pass for JWT access_token on " + DateTime.Now.ToString()
+                        + ". Request Method:" + result.RequestMessage.Method.ToString() + ", URI:" + result.RequestMessage.RequestUri
+                        + ". Response Code:" + (int)result.StatusCode + " " + result.StatusCode.ToString() + ", Reason:" + result.ReasonPhrase + ".");
 
                     throw new UnauthorizedAccessException();
                 }

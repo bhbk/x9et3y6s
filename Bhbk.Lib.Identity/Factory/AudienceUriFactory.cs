@@ -13,8 +13,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Id = audienceUri.Id;
             this.AudienceId = audienceUri.AudienceId;
             this.ActorId = audienceUri.ActorId;
-            this.Name = audienceUri.Name;
-            this.Description = audienceUri.Description ?? string.Empty;
             this.AbsoluteUri = audienceUri.AbsoluteUri;
             this.Enabled = audienceUri.Enabled;
             this.Created = audienceUri.Created;
@@ -26,8 +24,6 @@ namespace Bhbk.Lib.Identity.Factory
             this.Id = Guid.NewGuid();
             this.AudienceId = audienceUri.AudienceId;
             this.ActorId = audienceUri.ActorId;
-            this.Name = audienceUri.Name;
-            this.Description = audienceUri.Description ?? string.Empty;
             this.AbsoluteUri = audienceUri.AbsoluteUri;
             this.Enabled = audienceUri.Enabled;
             this.Created = DateTime.Now;

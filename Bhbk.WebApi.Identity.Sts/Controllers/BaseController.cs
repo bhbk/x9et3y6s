@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly IHostedService[] _tasks;
-        private IS2SJwtContext _jwt;
+        private readonly IS2SJwtContext _jwt;
 
         protected IConfigurationRoot Conf
         {
@@ -61,6 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             _conf = conf;
             _ioc = ioc;
             _tasks = tasks;
+            _jwt = new S2SJwtContext(_conf, _ioc.ContextStatus);
         }
 
         [NonAction]

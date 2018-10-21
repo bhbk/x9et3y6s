@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
                     || string.IsNullOrEmpty(userValue)
-                    || string.IsNullOrEmpty(redirectUriValue)
+                    || string.IsNullOrEmpty(redirectUriValue) || !Uri.IsWellFormedUriString(redirectUriValue, UriKind.RelativeOrAbsolute)
                     || !grantTypeValue.Equals(BaseLib.Statics.AttrAuthorizeCodeIDV2)
                     || string.IsNullOrEmpty(authorizationCodeValue))
                 {
@@ -102,7 +102,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 else
                     client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
 
-                if (client == null || !client.Enabled)
+                if (client == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                }
+
+                if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -151,6 +158,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
                 var audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())
                     && x.Enabled == true).ToList();
+
+                //check that redirect url is valid...
+                if (!audiences.Any(x => x.AppAudienceUri.Any(y => y.AbsoluteUri == redirectUriValue)))
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUriNotExist }, _serializer));
+                }
 
                 var access = JwtHelper.CreateAccessTokenV2(ioc, client, audiences, user).Result;
                 var refresh = JwtHelper.CreatefreshTokenV2(ioc, client, user).Result;

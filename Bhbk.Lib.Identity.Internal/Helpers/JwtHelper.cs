@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 throw new InvalidOperationException();
 
             else
-                audienceList = string.Join(",", audiences.Select(x => x.Name.ToString()));
+                audienceList = string.Join(",", audiences.Select(x => x.Name.ToString()).OrderBy(x => x));
 
             var access = new JwtSecurityToken(
                 issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,

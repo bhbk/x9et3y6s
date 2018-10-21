@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_AudienceInvalid()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_AudienceDisabled()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -47,39 +47,40 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), RandomNumber.CreateBase64(8), refresh);
+            audience.Enabled = false;
+            _ioc.AudienceMgmt.Store.Update(audience);
+
+            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_AudienceMultiple()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_AudienceNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var audienceB = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceB).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            if (audienceA.Id == audienceB.Id)
-                Assert.Fail();
-
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audienceA.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audienceA.Id.ToString() + "," + audienceB.Id.ToString(), refresh);
+            _ioc.AudienceMgmt.Store.Delete(audience);
+
+            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_AudienceUndefined()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_AudienceUndefined()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -101,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_ClientInvalid()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_ClientDisabled()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -117,13 +118,40 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(RandomNumber.CreateBase64(8), audience.Id.ToString(), refresh);
+            client.Enabled = false;
+            _ioc.ClientMgmt.Store.Update(client);
+
+            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_ClientUndefined()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_ClientNotFound()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var refresh = (string)jwt["refresh_token"];
+
+            _ioc.ClientMgmt.Store.Delete(client);
+
+            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_ClientUndefined()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -145,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_DateExpired()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_DateExpired()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -173,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_DateIssued()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_DateIssued()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -201,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_TokenInvalid()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_TokenNotValid()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -225,7 +253,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_TokenUndefined()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_TokenUndefined()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -247,7 +275,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_UserInvalid()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_UserNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -273,7 +301,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Fail_UserLocked()
+        public async Task Api_Sts_OAuth_RefreshV1_Fail_UserLocked()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -302,7 +330,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Success_AudienceSingle_ById()
+        public async Task Api_Sts_OAuth_RefreshV1_Success_AudienceSingle_ById()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -324,7 +352,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV1_Success_AudienceSingle_ByName()
+        public async Task Api_Sts_OAuth_RefreshV1_Success_AudienceSingle_ByName()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -346,7 +374,35 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_AudienceInvalid()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_AudienceDisabled()
+        {
+            _data.Destroy();
+            _data.CreateTest();
+
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audiences = new List<string> { audience.Id.ToString() };
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            access.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var refresh = (string)jwt["refresh_token"];
+
+            audience.Enabled = false;
+            _ioc.AudienceMgmt.Store.Update(audience);
+
+            audiences = new List<string> { audience.Id.ToString() };
+
+            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_AudienceNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -367,11 +423,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_ClientInvalid()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_ClientNotFound()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -390,11 +446,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _s2s.StsRefreshTokenV2(RandomNumber.CreateBase64(8), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_ClientUndefined()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_ClientUndefined()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -417,7 +473,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_DateExpired()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_DateExpired()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -446,7 +502,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_DateIssued()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_DateIssued()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -475,7 +531,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_TokenInvalid()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_TokenNotValid()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -500,7 +556,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_TokenUndefined()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_TokenUndefined()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -523,7 +579,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_UserInvalid()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_UserNotValid()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -550,7 +606,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Fail_UserLocked()
+        public async Task Api_Sts_OAuth_RefreshV2_Fail_UserLocked()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -580,7 +636,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Success_AudienceMultiple_ById()
+        public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceMultiple_ById()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -610,7 +666,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Success_AudienceMultiple_ByName()
+        public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceMultiple_ByName()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -640,7 +696,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Success_AudienceSingle_ById()
+        public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceSingle_ById()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -663,7 +719,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Success_AudienceSingle_ByName()
+        public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceSingle_ByName()
         {
             _data.Destroy();
             _data.CreateTest();
@@ -686,7 +742,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_RefreshV2_Success_AudienceUndefined()
+        public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceEmpty()
         {
             _data.Destroy();
             _data.CreateTest();

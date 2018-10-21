@@ -23,6 +23,8 @@ namespace Bhbk.Lib.Identity.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+
             modelBuilder.Entity<AppActivity>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -33,16 +35,12 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ActivityType)
                     .IsRequired()
-                    .HasMaxLength(32)
-                    .IsUnicode(false);
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.CurrentValues).IsUnicode(false);
-
-                entity.Property(e => e.KeyValues).IsUnicode(false);
-
-                entity.Property(e => e.OriginalValues).IsUnicode(false);
-
-                entity.Property(e => e.TableName).IsUnicode(false);
+                entity.HasOne(d => d.Actor)
+                    .WithMany(p => p.AppActivity)
+                    .HasForeignKey(d => d.ActorId)
+                    .HasConstraintName("FK_AppActivity_ID");
             });
 
             modelBuilder.Entity<AppAudience>(entity =>
@@ -58,19 +56,17 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.AudienceType)
                     .IsRequired()
-                    .HasMaxLength(64)
-                    .IsUnicode(false);
+                    .HasMaxLength(64);
 
-                entity.Property(e => e.Description).IsUnicode(false);
+                entity.Property(e => e.Description).HasMaxLength(256);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasMaxLength(64);
+                    .HasMaxLength(128);
 
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.AppAudience)
                     .HasForeignKey(d => d.ClientId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AppAudience_ClientID");
             });
 
@@ -82,15 +78,7 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AbsoluteUri)
-                    .IsRequired()
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Description).IsUnicode(false);
-
-                entity.Property(e => e.Name)
-                    .HasMaxLength(64)
-                    .IsUnicode(false);
+                entity.Property(e => e.AbsoluteUri).IsRequired();
 
                 entity.HasOne(d => d.Actor)
                     .WithMany(p => p.AppAudienceUri)
@@ -101,7 +89,7 @@ namespace Bhbk.Lib.Identity.Models
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.AppAudienceUri)
                     .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_AppAudienceUri_AudienceID");
+                    .HasConstraintName("FK_AppAudienceUri_ID");
             });
 
             modelBuilder.Entity<AppClient>(entity =>
@@ -114,11 +102,11 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ClientKey).IsRequired();
 
-                entity.Property(e => e.Description).IsUnicode(false);
+                entity.Property(e => e.Description).HasMaxLength(256);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasMaxLength(64);
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<AppLogin>(entity =>
@@ -131,7 +119,7 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.LoginProvider)
                     .IsRequired()
-                    .HasMaxLength(256);
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<AppRole>(entity =>
@@ -145,15 +133,13 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.ConcurrencyStamp).HasMaxLength(512);
-
-                entity.Property(e => e.Description).IsUnicode(false);
+                entity.Property(e => e.Description).HasMaxLength(256);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasMaxLength(64);
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.NormalizedName).HasMaxLength(64);
+                entity.Property(e => e.NormalizedName).HasMaxLength(128);
 
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.AppRole)
@@ -174,9 +160,9 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ClaimType)
                     .IsRequired()
-                    .IsUnicode(false);
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.ClaimTypeValue).IsUnicode(false);
+                entity.Property(e => e.ClaimTypeValue).HasMaxLength(50);
 
                 entity.Property(e => e.ClaimValue)
                     .IsRequired()
@@ -199,35 +185,33 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.ConcurrencyStamp).HasMaxLength(512);
-
                 entity.Property(e => e.Email)
                     .IsRequired()
-                    .HasMaxLength(256);
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.FirstName).IsRequired();
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(128);
 
                 entity.Property(e => e.LastLoginFailure).HasColumnType("datetime");
 
                 entity.Property(e => e.LastLoginSuccess).HasColumnType("datetime");
 
-                entity.Property(e => e.LastName).IsRequired();
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+                entity.Property(e => e.NormalizedEmail).HasMaxLength(128);
 
-                entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+                entity.Property(e => e.NormalizedUserName).HasMaxLength(128);
 
-                entity.Property(e => e.PasswordHash).HasMaxLength(512);
-
-                entity.Property(e => e.PhoneNumber).HasMaxLength(256);
+                entity.Property(e => e.PhoneNumber).HasMaxLength(16);
 
                 entity.Property(e => e.PhoneNumberConfirmed).HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.SecurityStamp).HasMaxLength(512);
-
                 entity.Property(e => e.UserName)
                     .IsRequired()
-                    .HasMaxLength(256);
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<AppUserClaim>(entity =>
@@ -241,13 +225,9 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ClaimType)
                     .IsRequired()
-                    .IsUnicode(false);
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.ClaimValue)
-                    .IsRequired()
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ClaimValueType).IsUnicode(false);
+                entity.Property(e => e.ClaimValue).IsRequired();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AppUserClaim)
@@ -265,13 +245,13 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.LoginProvider)
                     .IsRequired()
-                    .HasMaxLength(256);
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.ProviderDescription).IsUnicode(false);
+                entity.Property(e => e.ProviderDescription).HasMaxLength(256);
 
                 entity.Property(e => e.ProviderDisplayName)
                     .IsRequired()
-                    .HasMaxLength(64);
+                    .HasMaxLength(128);
 
                 entity.Property(e => e.ProviderKey).HasMaxLength(256);
 
@@ -294,14 +274,11 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.ProtectedTicket)
-                    .IsRequired()
-                    .IsUnicode(false);
+                entity.Property(e => e.ProtectedTicket).IsRequired();
 
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.AppUserRefresh)
                     .HasForeignKey(d => d.ClientId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AppUserRefresh_ClientID");
 
                 entity.HasOne(d => d.User)
@@ -337,9 +314,7 @@ namespace Bhbk.Lib.Identity.Models
                     .HasName("IX_AppUserToken")
                     .IsUnique();
 
-                entity.Property(e => e.Code)
-                    .IsRequired()
-                    .IsUnicode(false);
+                entity.Property(e => e.Code).IsRequired();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AppUserToken)
@@ -349,7 +324,8 @@ namespace Bhbk.Lib.Identity.Models
 
             modelBuilder.Entity<SystemError>(entity =>
             {
-                entity.HasKey(e => e.ErrorId);
+                entity.HasKey(e => e.ErrorId)
+                    .HasName("PK_SystemErrorInfo");
 
                 entity.Property(e => e.ErrorId)
                     .HasColumnName("ErrorID")

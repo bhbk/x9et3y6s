@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Alert.Factory;
+using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
@@ -38,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
@@ -73,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(model.ClientId);
 
             if (client == null)
-                return BadRequest(BaseLib.Statics.MsgClientInvalid);
+                return NotFound(BaseLib.Statics.MsgClientNotExist);
 
             var create = new UserFactory<UserCreate>(model);
 
@@ -102,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
                 var url = UrlBuilder.UiConfirmEmail(Conf, user, code);
 
-                var email = await alert.SendEmailV1(Jwt.AccessToken,
+                var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
                     new EmailCreate()
                     {
                         FromId = user.Id,
@@ -111,8 +112,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         ToId = user.Id,
                         ToEmail = user.Email,
                         ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                        Subject = string.Format("{0} {1}", client.Name, BaseLib.Statics.ApiEmailConfirmNewUserSubject),
-                        HtmlContent = BaseLib.Statics.ApiEmailConfirmNewUserHtml(client, user, url)
+                        Subject = string.Format("{0} {1}", client.Name, BaseLib.Statics.ApiMsgConfirmNewUserSubject),
+                        HtmlContent = BaseLib.Statics.ApiTemplateConfirmNewUser(client, user, url)
                     });
 
                 if (!email.IsSuccessStatusCode)
@@ -124,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/no-confirm"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> CreateUserNoConfirmV1([FromBody] UserCreate model)
+        public async Task<IActionResult> CreateUserV1NoConfirm([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -161,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (user.Immutable)
                 return BadRequest(BaseLib.Statics.MsgUserImmutable);
@@ -182,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -195,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByEmailAsync(email);
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -208,7 +209,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var logins = await IoC.UserMgmt.GetLoginsAsync(user);
 
@@ -224,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var audiences = await IoC.UserMgmt.GetAudiencesAsync(user);
 
@@ -240,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             var roles = await IoC.UserMgmt.GetRolesResultIdAsync(user);
 
@@ -276,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (!await IoC.UserMgmt.HasPasswordAsync(user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPassword);
@@ -301,7 +302,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
@@ -333,7 +334,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(model.Id.ToString());
 
             if (user == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
 
             else if (user.Immutable)
                 return BadRequest(BaseLib.Statics.MsgUserImmutable);

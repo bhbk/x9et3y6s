@@ -1,16 +1,15 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Primitives.Enums;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Cli.Identity.Cmds
@@ -18,9 +17,10 @@ namespace Bhbk.Cli.Identity.Cmds
     public class AdminCmds : ConsoleCommand
     {
         private static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
-        private static JwtSecurityToken _access;
-        private static IConfigurationRoot _cb;
+        private static IConfigurationRoot _conf;
         private static CmdType _cmdType;
+        private static JwtSecurityToken _access;
+        private static S2SClient _client;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));
         private static bool _create = false, _destroy = false;
 
@@ -49,10 +49,12 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                _cb = new ConfigurationBuilder()
+                _conf = new ConfigurationBuilder()
                     .SetBasePath(_lib.DirectoryName)
                     .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
                     .Build();
+
+                _client = new S2SClient(_conf, ContextType.Live);
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
@@ -79,8 +81,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + clientID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED create client \"" + clientName + "\""
-                                        + Environment.NewLine + "\tID is " + clientID.ToString());
+                                    throw new ConsoleHelpAsException("FAILED create client \"" + clientName + "\"");
                             }
                         }
                         else if (_destroy)
@@ -129,8 +130,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create audience \"" + audienceName + "\""
                                         + Environment.NewLine + "\tID is " + audienceID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED create audience \"" + audienceName + "\""
-                                        + Environment.NewLine + "\tID is " + audienceID.ToString());
+                                    throw new ConsoleHelpAsException("FAILED create audience \"" + audienceName + "\"");
                             }
                         }
                         else if (_destroy)
@@ -185,8 +185,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + roleID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED create role \"" + roleName + "\""
-                                        + Environment.NewLine + "\tID is " + roleID.ToString());
+                                    throw new ConsoleHelpAsException("FAILED create role \"" + roleName + "\"");
                             }
                         }
                         else if (_destroy)
@@ -264,7 +263,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             else
                                 throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
 
-                            if (RemoveUserFromRole(roleID, userID))
+                            if (RemoveRoleFromUser(roleID, userID))
                                 Console.WriteLine(Environment.NewLine + "SUCCESS remove role \"" + roleName + "\" from user \"" + userName + "\"");
                             else
                                 Console.WriteLine(Environment.NewLine + "FAILED remove role \"" + roleName + "\" from user \"" + userName + "\"");
@@ -292,8 +291,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create user \"" + userName + "\""
                                         + Environment.NewLine + "\tID is " + userID.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\""
-                                        + Environment.NewLine + "\tID is " + userID.ToString());
+                                    throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\"");
                             }
 
                             var loginName = BaseLib.Statics.ApiDefaultLogin;
@@ -370,553 +368,319 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool AddUserToLogin(Guid loginID, Guid userID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminLoginAddUserV1(_access, loginID, userID,
+                new UserLoginCreate()
+                {
+                    UserId = userID,
+                    LoginId = loginID,
+                    LoginProvider = BaseLib.Statics.ApiDefaultLogin,
+                    ProviderDisplayName = BaseLib.Statics.ApiDefaultLogin,
+                    ProviderKey = BaseLib.Statics.ApiDefaultLoginKey,
+                    Enabled = true,
+                }).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var content = new StringContent(
-                    JsonConvert.SerializeObject(new
-                    {
-                        UserId = userID.ToString(),
-                        LoginId = loginID.ToString(),
-                        LoginProvider = BaseLib.Statics.ApiDefaultLogin,
-                        ProviderDisplayName = BaseLib.Statics.ApiDefaultLogin,
-                        ProviderKey = BaseLib.Statics.ApiDefaultLoginKey,
-                        Enabled = "true",
-                    }), Encoding.UTF8, "application/json");
-
-                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/login/v1/" + loginID.ToString() + "/add/" + userID.ToString(), content).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private bool AddUserToRole(Guid roleID, Guid userID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminRoleAddToUserV1(_access, roleID, userID).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private bool CheckAudience(string audience, ref Guid audienceID)
         {
-            bool result = false;
+            var result = _client.AdminAudienceGetV1(_access, audience).Result;
 
-            try
+            if (result.IsSuccessStatusCode)
             {
-                using (var httpHandler = new HttpClientHandler())
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["name"].Value<string>() == audience)
                 {
-                    //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                    httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                    var http = new HttpClient(httpHandler);
-
-                    http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                    http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/audience/v1/" + audience).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                        if (content["name"].Value<string>() == audience)
-                        {
-                            audienceID = Guid.Parse(content["id"].Value<string>());
-                            result = true;
-                        }
-                    }
+                    audienceID = Guid.Parse(content["id"].Value<string>());
+                    return true;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
 
-            return result;
+            return false;
         }
 
         private bool CheckClient(string client, ref Guid clientID)
         {
-            bool result = false;
+            var result = _client.AdminClientGetV1(_access, client).Result;
 
-            try
+            if (result.IsSuccessStatusCode)
             {
-                using (var httpHandler = new HttpClientHandler())
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["name"].Value<string>() == client)
                 {
-                    //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                    httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                    var http = new HttpClient(httpHandler);
-
-                    http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                    http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/client/v1/" + client).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                        if (content["name"].Value<string>() == client)
-                        {
-                            clientID = Guid.Parse(content["id"].Value<string>());
-                            result = true;
-                        }
-                    }
+                    clientID = Guid.Parse(content["id"].Value<string>());
+                    return true;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
 
-            return result;
+            return false;
         }
 
         private bool CheckLogin(string login, ref Guid loginID)
         {
-            bool result = false;
+            var result = _client.AdminLoginGetV1(_access, login).Result;
 
-            try
+            if (result.IsSuccessStatusCode)
             {
-                using (var httpHandler = new HttpClientHandler())
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["loginProvider"].Value<string>() == login)
                 {
-                    //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                    httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                    var http = new HttpClient(httpHandler);
-
-                    http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                    http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/login/v1/" + login).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                        if (content["loginProvider"].Value<string>() == login)
-                        {
-                            loginID = Guid.Parse(content["id"].Value<string>());
-                            result = true;
-                        }
-                    }
+                    loginID = Guid.Parse(content["id"].Value<string>());
+                    return true;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
 
-            return result;
+            return false;
         }
 
         private bool CheckRole(string role, ref Guid roleID)
         {
-            bool result = false;
+            var result = _client.AdminRoleGetV1(_access, role).Result;
 
-            try
+            if (result.IsSuccessStatusCode)
             {
-                using (var httpHandler = new HttpClientHandler())
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["name"].Value<string>() == role)
                 {
-                    //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                    httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                    var http = new HttpClient(httpHandler);
-
-                    http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                    http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/role/v1/" + role).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                        if (content["name"].Value<string>() == role)
-                        {
-                            roleID = Guid.Parse(content["id"].Value<string>());
-                            result = true;
-                        }
-                    }
+                    roleID = Guid.Parse(content["id"].Value<string>());
+                    return true;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
 
-            return result;
+            return false;
         }
 
         private bool CheckUser(string user, ref Guid userID)
         {
-            bool result = false;
+            var result = _client.AdminUserGetV1(_access, user).Result;
 
-            try
+            if (result.IsSuccessStatusCode)
             {
-                using (var httpHandler = new HttpClientHandler())
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["email"].Value<string>() == user)
                 {
-                    //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                    httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                    var http = new HttpClient(httpHandler);
-
-                    http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                    http.DefaultRequestHeaders.Accept.Clear();
-                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/" + user).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                        if (content["email"].Value<string>() == user)
-                        {
-                            userID = Guid.Parse(content["id"].Value<string>());
-                            result = true;
-                        }
-                    }
+                    userID = Guid.Parse(content["id"].Value<string>());
+                    return true;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
 
-            return result;
+            return false;
         }
 
         private Guid CreateAudience(Guid clientID, string audience)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                var http = new HttpClient(httpHandler);
-
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var content = new StringContent(
-                    JsonConvert.SerializeObject(new
-                    {
-                        ClientId = clientID.ToString(),
-                        Name = audience,
-                        AudienceType = "server",
-                        Enabled = "true",
-                    }), Encoding.UTF8, "application/json");
-
-                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/audience/v1", content).Result;
-
-                if (response.IsSuccessStatusCode)
+            var result = _client.AdminAudienceCreateV1(_access,
+                new AudienceCreate()
                 {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    ClientId = clientID,
+                    Name = audience,
+                    AudienceType = "server",
+                    Enabled = true,
+                }).Result;
 
-                    if (result["name"].Value<string>() == audience)
-                        return Guid.Parse(result["id"].Value<string>());
-                }
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                return Guid.Empty;
+                if (content["name"].Value<string>() == audience)
+                    return Guid.Parse(content["id"].Value<string>());
+
+                Console.WriteLine(BaseLib.Statics.MsgAudienceInvalid);
             }
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return Guid.Empty;
         }
 
         private Guid CreateClient(string client)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                var http = new HttpClient(httpHandler);
-
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var content = new StringContent(
-                    JsonConvert.SerializeObject(new
-                    {
-                        Name = client,
-                        Enabled = "true",
-                    }), Encoding.UTF8, "application/json");
-
-                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/client/v1", content).Result;
-
-                if (response.IsSuccessStatusCode)
+            var result = _client.AdminClientCreateV1(_access,
+                new ClientCreate()
                 {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    Name = client,
+                    Enabled = true,
+                }).Result;
 
-                    if (result["name"].Value<string>() == client)
-                        return Guid.Parse(result["id"].Value<string>());
-                }
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                return Guid.Empty;
+                if (content["name"].Value<string>() == client)
+                    return Guid.Parse(content["id"].Value<string>());
+
+                Console.WriteLine(BaseLib.Statics.MsgClientInvalid);
             }
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return Guid.Empty;
         }
 
         private Guid CreateRole(Guid audienceID, string role)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                var http = new HttpClient(httpHandler);
-
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var content = new StringContent(
-                    JsonConvert.SerializeObject(new
-                    {
-                        AudienceId = audienceID.ToString(),
-                        Name = role,
-                        Enabled = "true",
-                    }), Encoding.UTF8, "application/json");
-
-                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/role/v1", content).Result;
-
-                if (response.IsSuccessStatusCode)
+            var result = _client.AdminRoleCreateV1(_access,
+                new RoleCreate()
                 {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    AudienceId = audienceID,
+                    Name = role,
+                    Enabled = true,
+                }).Result;
 
-                    if (result["name"].Value<string>() == role)
-                        return Guid.Parse(result["id"].Value<string>());
-                }
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                return Guid.Empty;
+                if (content["name"].Value<string>() == role)
+                    return Guid.Parse(content["id"].Value<string>());
+
+                Console.WriteLine(BaseLib.Statics.MsgRoleInvalid);
             }
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return Guid.Empty;
         }
 
         private Guid CreateUser(string user)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-                var http = new HttpClient(httpHandler);
-
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var content = new StringContent(
-                    JsonConvert.SerializeObject(new
-                    {
-                        Email = user,
-                        FirstName = BaseLib.Statics.ApiDefaultFirstName,
-                        LastName = BaseLib.Statics.ApiDefaultLastName,
-                        PhoneNumber = BaseLib.Statics.ApiDefaultPhone,
-                        LockoutEnabled = "false",
-                        HumanBeing = "false",
-                        Immutable = "false",
-                    }), Encoding.UTF8, "application/json");
-
-                var response = http.PostAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/no-notify", content).Result;
-
-                if (response.IsSuccessStatusCode)
+            var result = _client.AdminUserCreateV1NoConfirm(_access,
+                new UserCreate()
                 {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    Email = user,
+                    FirstName = BaseLib.Statics.ApiDefaultFirstName,
+                    LastName = BaseLib.Statics.ApiDefaultLastName,
+                    PhoneNumber = BaseLib.Statics.ApiDefaultPhone,
+                    LockoutEnabled = false,
+                    HumanBeing = false,
+                    Immutable = false,
+                }).Result;
 
-                    if (result["email"].Value<string>() == user)
-                        return Guid.Parse(result["id"].Value<string>());
-                }
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                return Guid.Empty;
+                if (content["email"].Value<string>() == user)
+                    return Guid.Parse(content["id"].Value<string>());
+
+                Console.WriteLine(BaseLib.Statics.MsgUserInvalid);
             }
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return Guid.Empty;
         }
 
         private bool DeleteAudience(Guid audienceID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminAudienceDeleteV1(_access, audienceID).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var response = http.DeleteAsync(_cb["IdentityApiUrls:AdminPath"] + "/audience/v1/" + audienceID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private bool DeleteClient(Guid clientID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminClientDeleteV1(_access, clientID).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var response = http.DeleteAsync(_cb["IdentityApiUrls:AdminPath"] + "/client/v1/" + clientID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private bool DeleteRole(Guid roleID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminRoleDeleteV1(_access, roleID).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var response = http.DeleteAsync(_cb["IdentityApiUrls:AdminPath"] + "/role/v1/" + roleID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private bool DeleteUser(Guid userID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminUserDeleteV1(_access, userID).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var response = http.DeleteAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/" + userID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
-        private bool RemoveUserFromRole(Guid roleID, Guid userID)
+        private bool RemoveRoleFromUser(Guid roleID, Guid userID)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminRoleRemoveFromUserV1(_access, roleID, userID).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var response = http.GetAsync(_cb["IdentityApiUrls:AdminPath"] + "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString()).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private bool SetPassword(Guid userID, string password)
         {
-            using (var httpHandler = new HttpClientHandler())
-            {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+            var result = _client.AdminUserSetPasswordV1(_access,
+                new UserAddPassword()
+                {
+                    Id = userID,
+                    NewPassword = password,
+                    NewPasswordConfirm = password,
+                }).Result;
 
-                var http = new HttpClient(httpHandler);
+            if (result.IsSuccessStatusCode)
+                return true;
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:AdminUrl"]);
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _access.RawData);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
 
-                var content = new StringContent(
-                    JsonConvert.SerializeObject(new
-                    {
-                        Id = userID.ToString(),
-                        NewPassword = password,
-                        NewPasswordConfirm = password,
-                    }), Encoding.UTF8, "application/json");
-
-                var response = http.PutAsync(_cb["IdentityApiUrls:AdminPath"] + "/user/v1/" + userID.ToString() + "/set-password", content).Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-
-                return false;
-            }
+            return false;
         }
 
         private string PromptForInput(CmdType cmd)
@@ -949,53 +713,47 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private void GetJWT()
         {
-            Console.Write("ENTER admin client name or GUID:");
+            var clientName = _conf["IdentityLogin:ClientName"];
+            Console.WriteLine("USED admin client name or GUID: " + clientName);
+
+            var audienceName = _conf["IdentityLogin:AudienceName"];
+            Console.WriteLine("USED admin audience name or GUID: " + audienceName);
+
+            var userName = _conf["IdentityLogin:UserName"];
+            Console.WriteLine("USED admin user name or GUID: " + userName);
+
+            var password = _conf["IdentityLogin:UserPass"];
+            Console.WriteLine("USED admin password: " + password);
+
+            /*
+            Console.WriteLine("ENTER admin client name or GUID:");
             var clientName = ConsoleHelper.GetInput();
 
-            Console.Write("ENTER admin audience name or GUID:");
+            Console.WriteLine("ENTER admin audience name or GUID:");
             var audienceName = ConsoleHelper.GetInput();
 
-            Console.Write("ENTER admin user name or GUID:");
+            Console.WriteLine("ENTER admin user name or GUID:");
             var userName = ConsoleHelper.GetInput();
 
-            Console.Write("ENTER admin password:");
+            Console.WriteLine("ENTER admin password:");
             var password = ConsoleHelper.GetHiddenInput();
+            */
 
-            using (var httpHandler = new HttpClientHandler())
+            var result = _client.StsAccessTokenV2(clientName, new List<string> { audienceName }, userName, password).Result;
+
+            if (result.IsSuccessStatusCode)
             {
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-                httpHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                var http = new HttpClient(httpHandler);
+                _access = new JwtSecurityToken((string)content["access_token"]);
 
-                http.BaseAddress = new Uri(_cb["IdentityApiUrls:StsUrl"]);
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var post = new FormUrlEncodedContent(new[] {
-                    new KeyValuePair<string, string> ("client", clientName),
-                    new KeyValuePair<string, string> ("audience", audienceName),
-                    new KeyValuePair<string, string> ("user", userName),
-                    new KeyValuePair<string, string> ("password", password),
-                    new KeyValuePair<string, string> ("grant_type", "password"),
-                });
-
-                var response = http.PostAsync(_cb["IdentityApiUrls:StsPath"] + "/oauth/v2/access", post).Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                    _access = new JwtSecurityToken((string)result["access_token"]);
-
-                    Console.WriteLine(Environment.NewLine + "SUCCESS getting JWT from STS:\""
-                        + _cb["IdentityApiUrls:StsUrl"] + _cb["IdentityApiUrls:StsPath"] + "/oauth/v2/access" + "\""
-                        + Environment.NewLine + "\tJWT:\"" + _access.RawData + "\"");
-                }
-                else
-                    throw new ConsoleHelpAsException("FAILED getting JWT from STS:\""
-                        + _cb["IdentityApiUrls:StsUrl"] + _cb["IdentityApiUrls:StsPath"] + "/oauth/v2/access" + "\"");
+                Console.WriteLine(Environment.NewLine + "SUCCESS getting JWT from STS:\""
+                    + _conf["IdentityStsUrls:BaseApiUrl"] + _conf["IdentityStsUrls:BaseApiPath"] + "/oauth/v2/access" + "\""
+                    + Environment.NewLine + "\tJWT:\"" + _access.RawData + "\"");
             }
+            else
+                throw new ConsoleHelpAsException("FAILED getting JWT from STS:\""
+                    + _conf["IdentityStsUrls:BaseApiUrl"] + _conf["IdentityStsUrls:BaseApiPath"] + "/oauth/v2/access" + "\"");
         }
     }
 }
