@@ -1,5 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using ManyConsole;
@@ -13,8 +14,8 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class HashCmds : ConsoleCommand
     {
-        private static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
-        private static IConfigurationRoot _cb;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private static IConfigurationRoot _conf;
         private static bool Generate = false;
 
         public HashCmds()
@@ -28,16 +29,16 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                _cb = new ConfigurationBuilder()
+                _conf = new ConfigurationBuilder()
                     .SetBasePath(_lib.DirectoryName)
                     .AddJsonFile(_lib.Name)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_cb["Databases:IdentityEntities"])
+                    .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new IdentityContext(builder);
+                Statics.IoC = new IdentityContext(builder, ContextType.Live);
 
                 if (Generate)
                 {

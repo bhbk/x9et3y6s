@@ -27,10 +27,28 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_UserV1_Get_Success()
+        {
+            _tests.DestroyAll();
+            _tests.Create();
+
+            var controller = new DetailController(_conf, _ioc, _tasks);
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+
+            controller.SetUser(user.Id);
+
+            var result = await controller.GetDetailV1() as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+
+            data.Id.Should().Be(user.Id);
+        }
+
+        [TestMethod]
         public void Api_Me_DetailV1_GetClaimList_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -45,8 +63,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public void Api_Me_DetailV1_GetQuoteOfDay_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -61,16 +79,16 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_SetPassword_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserChangePassword()
             {
                 CurrentPassword = BaseLib.Statics.ApiUnitTestUserPassCurrent,
-                NewPassword = RandomNumber.CreateBase64(16),
-                NewPasswordConfirm = RandomNumber.CreateBase64(16)
+                NewPassword = RandomValues.CreateBase64String(16),
+                NewPasswordConfirm = RandomValues.CreateBase64String(16)
             };
 
             controller.SetUser(user.Id);
@@ -85,8 +103,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_SetPassword_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -109,8 +127,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_TwoFactor_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -128,8 +146,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_Update_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();

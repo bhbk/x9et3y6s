@@ -1,6 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Database;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using ManyConsole;
@@ -8,13 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
+using Bhbk.Lib.Core.Primitives.Enums;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
     public class DataCmds : ConsoleCommand
     {
-        private static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
-        private static IConfigurationRoot _cb;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private static IConfigurationRoot _conf;
         private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
 
         public DataCmds()
@@ -30,17 +31,17 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
-                _cb = new ConfigurationBuilder()
+                _conf = new ConfigurationBuilder()
                     .SetBasePath(_lib.DirectoryName)
                     .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_cb["Databases:IdentityEntities"])
+                    .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new IdentityContext(builder);
-                DataHelper seed = new DataHelper(Statics.IoC);
+                Statics.IoC = new IdentityContext(builder, ContextType.Live);
+                Defaults seed = new Defaults(Statics.IoC);
 
                 if (CreateDefault)
                 {
@@ -48,7 +49,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    seed.CreateDefault();
+                    seed.Create();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -59,7 +60,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    seed.DestroyDefault();
+                    seed.Destroy();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();

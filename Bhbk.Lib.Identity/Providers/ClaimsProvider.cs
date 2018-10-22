@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,14 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Providers
 {
+    public class ClaimsTransformer : IClaimsTransformation
+    {
+        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
     {
         private readonly UserManager<AppUser> _userMgmt;
@@ -29,10 +38,17 @@ namespace Bhbk.Lib.Identity.Providers
         {
             var claims = new List<Claim>();
 
-            foreach (string role in (await _userMgmt.GetRolesAsync(user)).OrderBy(x => x))
+            foreach (string role in (await _userMgmt.GetRolesAsync(user)).ToList().OrderBy(x => x))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            foreach (Claim claim in await _userMgmt.GetClaimsAsync(user))
+            //add same role claims using deprecated name. backward compatibility because microsoft...
+            if (_conf.Store.DefaultsCompatibileClaimTypeNames)
+            {
+                foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
+                    claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
+            }
+
+            foreach (Claim claim in (await _userMgmt.GetClaimsAsync(user)).ToList().OrderBy(x => x.Type))
                 claims.Add(claim);
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));

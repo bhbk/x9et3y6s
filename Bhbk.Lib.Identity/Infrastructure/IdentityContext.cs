@@ -3,7 +3,7 @@ using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
-using Bhbk.Lib.Primitives.Enums;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -23,17 +23,17 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private LoginManager _loginMgmt;
         private UserQuoteOfDay _userQuote;
 
-        public IdentityContext(DbContextOptions<AppDbContext> options)
-            : this(new AppDbContext(options))
+        public IdentityContext(DbContextOptions<AppDbContext> options, ContextType status)
+            : this(new AppDbContext(options), status)
         {
         }
 
-        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder)
-            : this(new AppDbContext(optionsBuilder.Options))
+        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType status)
+            : this(new AppDbContext(optionsBuilder.Options), status)
         {
         }
 
-        private IdentityContext(AppDbContext context)
+        private IdentityContext(AppDbContext context, ContextType status)
         {
             _disposed = false;
 
@@ -41,11 +41,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 throw new ArgumentNullException();
 
             _context = context;
-
-            if (_context.Database.IsInMemory())
-                _status = ContextType.UnitTest;
-            else
-                _status = ContextType.Live;
+            _status = status;
 
             _activity = new ActivityStore(_context);
             _audienceMgmt = new AudienceManager(new AudienceStore(_context));
@@ -61,7 +57,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
             return _context;
         }
 
-        public ContextType ContextStatus
+        public ContextType Status
         {
             get
             {

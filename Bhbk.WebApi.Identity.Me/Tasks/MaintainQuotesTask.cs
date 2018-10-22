@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Primitives.Enums;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -16,8 +16,8 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 {
     public class MaintainQuotesTask : BackgroundService
     {
-        private readonly FileInfo _api = Search.DefaultPaths("appsettings-api.json");
-        private readonly FileInfo _qod = Search.DefaultPaths("appquotes.json");
+        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
+        private readonly FileInfo _qod = SearchRoots.ByAssemblyContext("appquotes.json");
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly JsonSerializerSettings _serializer;
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (_ioc.ContextStatus == ContextType.UnitTest)
+            if (_ioc.Status == ContextType.UnitTest)
                 QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
                     (File.ReadAllText(_output));
             else

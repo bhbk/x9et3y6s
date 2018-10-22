@@ -111,7 +111,6 @@
     <Folder Include="dbo\Stored Procedures" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Maintenance\DbContext-Scaffold.ps1" />
     <None Include="Maintenance\DbCompare-Test.scmp" />
     <None Include="Maintenance\DbCompare-Live.scmp" />
     <None Include="Maintenance\DbCompare-Debug.scmp" />

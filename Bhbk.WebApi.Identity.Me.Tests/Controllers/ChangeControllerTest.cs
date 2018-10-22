@@ -26,19 +26,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ChangeV1_Email_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            var newEmail = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
 
             controller.SetUser(user.Id);
 
             var model = new UserChangeEmail()
             {
                 Id = user.Id,
-                CurrentEmail = RandomNumber.CreateBase64(4),
+                CurrentEmail = RandomValues.CreateBase64String(4),
                 NewEmail = newEmail,
                 NewEmailConfirm = newEmail
             };
@@ -50,12 +50,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ChangeV1_Email_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
+            var newEmail = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUserA;
 
             controller.SetUser(user.Id);
 
@@ -75,8 +75,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ChangeV1_Password_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = RandomNumber.CreateBase64(16),
+                CurrentPassword = RandomValues.CreateBase64String(16),
                 NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
                 NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
             };
@@ -98,8 +98,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ChangeV1_Password_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -122,12 +122,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ChangeV1_Phone_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhone = RandomNumber.CreateNumberAsString(10);
+            var newPhone = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 
@@ -146,12 +146,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ChangeV1_Phone_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhone = RandomNumber.CreateNumberAsString(10);
+            var newPhone = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 

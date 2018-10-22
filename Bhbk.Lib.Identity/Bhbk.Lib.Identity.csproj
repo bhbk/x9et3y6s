@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.20.3241" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.22.6314" />
     <PackageReference Include="CryptoHelper" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="2.2.0" />

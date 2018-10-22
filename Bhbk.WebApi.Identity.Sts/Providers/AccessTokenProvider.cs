@@ -1,8 +1,7 @@
-﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
-using Bhbk.Lib.Primitives.Enums;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -170,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.LoginProvider == BaseLib.Statics.ApiDefaultLogin).Any()
-                    || (logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLoginA)).Any() && ioc.ContextStatus == ContextType.UnitTest))
+                    || (logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLoginA)).Any() && ioc.Status == ContextType.UnitTest))
                 {
                     //check that password is valid...
                     if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)
@@ -193,8 +192,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 ioc.UserMgmt.AccessSuccessAsync(user).Wait();
 
-                var access = JwtHelper.CreateAccessTokenV1(ioc, client, audience, user).Result;
-                var refresh = JwtHelper.CreateRefreshTokenV1(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV1(ioc, client, audience, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV1(ioc, client, user).Result;
 
                 var result = new
                 {
@@ -366,7 +365,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.LoginProvider == BaseLib.Statics.ApiDefaultLogin).Any()
-                    || (ioc.ContextStatus == ContextType.UnitTest && logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLoginA)).Any()))
+                    || (ioc.Status == ContextType.UnitTest && logins.Where(x => x.LoginProvider.StartsWith(BaseLib.Statics.ApiUnitTestLoginA)).Any()))
                 {
                     //check that password is valid...
                     if (!ioc.UserMgmt.CheckPasswordAsync(user, passwordValue).Result)
@@ -389,8 +388,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 ioc.UserMgmt.AccessSuccessAsync(user).Wait();
 
-                var access = JwtHelper.CreateAccessTokenV2(ioc, client, audiences, user).Result;
-                var refresh = JwtHelper.CreatefreshTokenV2(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV2(ioc, client, audiences, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV2(ioc, client, user).Result;
 
                 var result = new
                 {

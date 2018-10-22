@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -30,12 +31,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ActivityV1_GetList_Fail_Auth()
         {
-            _data.Destroy();
-            _data.CreateDefault();
-            _data.CreateRandom(10);
+            _tests.DestroyAll();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomNumber.CreateBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "created";
@@ -54,12 +55,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ActivityV1_GetList_Fail_ParamInvalid()
         {
-            _data.Destroy();
-            _data.CreateDefault();
-            _data.CreateRandom(10);
+            _tests.DestroyAll();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
-            var access = JwtHelper.GetAccessTokenV2(_ioc,
-                BaseLib.Statics.ApiDefaultClient, BaseLib.Statics.ApiDefaultAudienceUi, BaseLib.Statics.ApiDefaultUserAdmin);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_ioc, client, new List<AppAudience> { audience }, user);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -77,12 +81,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ActivityV1_GetList_Success()
         {
-            _data.Destroy();
-            _data.CreateDefault();
-            _data.CreateRandom(10);
+            _tests.DestroyAll();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
-            var access = JwtHelper.GetAccessTokenV2(_ioc,
-                BaseLib.Statics.ApiDefaultClient, BaseLib.Statics.ApiDefaultAudienceUi, BaseLib.Statics.ApiDefaultUserAdmin);
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiDefaultUserAdmin).Single();
+
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_ioc, client, new List<AppAudience> { audience }, user);
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);

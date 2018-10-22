@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ActorId = client.ActorId;
             this.Name = client.Name;
             this.Description = client.Description ?? string.Empty;
-            this.ClientKey = client.ClientKey ?? RandomNumber.CreateBase64(32);
+            this.ClientKey = client.ClientKey ?? RandomValues.CreateBase64String(32);
             this.Enabled = client.Enabled;
             this.Created = DateTime.Now;
             this.Immutable = client.Immutable;

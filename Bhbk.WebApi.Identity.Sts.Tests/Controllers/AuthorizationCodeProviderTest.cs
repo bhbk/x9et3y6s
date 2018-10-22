@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Interop;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -21,21 +21,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
     public class AuthorizationCodeProviderTest : StartupTest
     {
         private TestServer _owin;
-        private S2STester _s2s;
+        private StsTester _sts;
 
         public AuthorizationCodeProviderTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
 
-            _s2s = new S2STester(_conf, _ioc.ContextStatus, _owin);
+            _sts = new StsTester(_conf, _owin);
         }
 
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV1_Use_Fail_NotImplemented()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -43,10 +43,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.StsAuthorizationCodeV1(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _sts.AuthorizationCodeV1(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -54,8 +54,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_ClientNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -63,12 +63,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
             _ioc.ClientMgmt.Store.Delete(client);
 
-            var check = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var check = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -76,8 +76,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_CodeNotValid()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -85,9 +85,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = RandomNumber.CreateBase64(64);
+            var code = RandomValues.CreateBase64String(64);
 
-            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -95,22 +95,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UriNotValid()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
             var redirect = new Uri("https://app.test.net/a/invalid");
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), RandomNumber.CreateBase64(64), code);
+            result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(64), code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -118,8 +118,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UserNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -127,12 +127,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
             _ioc.UserMgmt.Store.DeleteAsync(user).Wait();
 
-            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -140,8 +140,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -149,10 +149,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == BaseLib.Statics.ApiUnitTestUriALink).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-            var result = await _s2s.StsAuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -160,10 +160,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var access = (string)jwt["access_token"];
             var refresh = (string)jwt["refresh_token"];
 
-            var check = JwtHelper.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.IsValidJwtFormat(access);
             check.Should().BeTrue();
 
-            check = JwtHelper.IsValidJwtFormat(refresh);
+            check = JwtSecureProvider.IsValidJwtFormat(refresh);
             check.Should().BeTrue();
         }
     }

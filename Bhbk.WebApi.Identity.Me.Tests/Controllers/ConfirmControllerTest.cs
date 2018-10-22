@@ -27,37 +27,37 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Email_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = string.Format("{0}{1}", RandomNumber.CreateBase64(4), user.Email);
+            var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var token = await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
-                RandomNumber.CreateBase64(token.Length)) as BadRequestObjectResult;
+                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Email_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newEmail = string.Format("{0}{1}", RandomNumber.CreateBase64(4), user.Email);
+            var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var token = await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
@@ -68,37 +68,37 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Password_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPassword = RandomNumber.CreateBase64(12);
+            var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var token = await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
-                RandomNumber.CreateBase64(token.Length)) as BadRequestObjectResult;
+                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Password_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPassword = RandomNumber.CreateBase64(12);
+            var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.ContextStatus.ToString())
+            var token = await new ProtectProvider(_ioc.Status.ToString())
                 .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
@@ -109,12 +109,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_PhoneNumber_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhoneNumber = RandomNumber.CreateNumberAsString(10);
+            var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 
@@ -122,19 +122,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber,
-                RandomNumber.CreateBase64(token.Length)) as BadRequestObjectResult;
+                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [TestMethod]
         public async Task Api_Me_ConfirmV1_PhoneNumber_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
-            var newPhoneNumber = RandomNumber.CreateNumberAsString(10);
+            var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
 

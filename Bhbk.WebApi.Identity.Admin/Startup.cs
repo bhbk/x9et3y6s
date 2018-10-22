@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Core.Providers;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
@@ -26,12 +27,12 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Startup
     {
-        protected static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
-        protected static FileInfo _api = Search.DefaultPaths("appsettings-api.json");
+        protected static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext _ioc;
         protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
-        protected static IS2SJwtContext _jwt;
+        protected static IJwtContext _jwt;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
@@ -39,22 +40,22 @@ namespace Bhbk.WebApi.Identity.Admin
                 .UseSqlServer(_conf["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging();
 
-            //DRY up contexts across controllers and tasks after made thread safe...
-            _ioc = new IdentityContext(options);
-            _jwt = new S2SJwtContext(_conf, _ioc.ContextStatus);
+            //context is not thread safe yet. create new one for each background thread.
+            _ioc = new IdentityContext(options, ContextType.Live);
+            _jwt = new JwtContext(_conf, ContextType.Live);
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
             sc.AddSingleton<IIdentityContext>(_ioc);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options)));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options)));
-            sc.AddSingleton<IS2SJwtContext>(_jwt);
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options, ContextType.Live)));
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options, ContextType.Live)));
+            sc.AddSingleton<IJwtContext>(_jwt);
 
             var sp = sc.BuildServiceProvider();
 
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
             _ioc = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
             _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
-            _jwt = (IS2SJwtContext)sp.GetRequiredService<IS2SJwtContext>();
+            _jwt = (IJwtContext)sp.GetRequiredService<IJwtContext>();
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -68,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin
 
             ConfigureContext(sc);
 
-            _ioc.ClientMgmt.Store.Salt = _conf["IdentityClients:Salt"];
+            _ioc.ClientMgmt.Store.Salt = _conf["IdentityTenants:Salt"];
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -87,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
                     IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
                     ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
-                    AudienceValidator = Bhbk.Lib.Core.Validators.IdentityAudience.Multiple,
+                    AudienceValidator = Bhbk.Lib.Identity.Validators.AudienceValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,

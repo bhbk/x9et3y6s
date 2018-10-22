@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(BaseLib.Statics.MsgUserNotExist);
 
-            if (!await new ProtectProvider(IoC.ContextStatus.ToString()).ValidateAsync(email, token, user))
+            if (!await new ProtectProvider(IoC.Status.ToString()).ValidateAsync(email, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             await IoC.UserMgmt.Store.SetEmailConfirmedAsync(user, true);
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(BaseLib.Statics.MsgUserNotExist);
 
-            if (!await new ProtectProvider(IoC.ContextStatus.ToString()).ValidateAsync(password, token, user))
+            if (!await new ProtectProvider(IoC.Status.ToString()).ValidateAsync(password, token, user))
                 return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
 
             await IoC.UserMgmt.Store.SetPasswordConfirmedAsync(user, true);

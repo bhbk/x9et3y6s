@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Builder;
@@ -156,8 +155,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
                 }
 
-                var access = JwtHelper.CreateAccessTokenV1(ioc, client, audience, user).Result;
-                var refresh = JwtHelper.CreateRefreshTokenV1(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV1(ioc, client, audience, user).Result;
+                //var blah = 
+                var refresh = JwtSecureProvider.CreateRefreshTokenV1(ioc, client, user).Result;
 
                 var result = new
                 {
@@ -315,8 +315,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     }
                 }
 
-                var access = JwtHelper.CreateAccessTokenV2(ioc, client, audiences, user).Result;
-                var refresh = JwtHelper.CreatefreshTokenV2(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV2(ioc, client, audiences, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV2(ioc, client, user).Result;
 
                 var result = new
                 {

@@ -1,11 +1,11 @@
 ﻿using Bhbk.Lib.Alert.Factory;
+using Bhbk.Lib.Alert.Interop;
 using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
-using Bhbk.Lib.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -91,17 +91,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            if (IoC.ContextStatus == ContextType.Live)
+            if (IoC.Status == ContextType.Live)
             {
-                var alert = new Bhbk.Lib.Alert.Helpers.S2SClient(Conf, IoC.ContextStatus);
+                var alert = new AlertClient(Conf, IoC.Status);
 
                 if (alert == null)
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
-                var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.ContextStatus.ToString())
+                var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.Status.ToString())
                     .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
 
-                var url = UrlBuilder.UiConfirmEmail(Conf, user, code);
+                var url = LinkBuilder.ConfirmEmail(Conf, user, code);
 
                 var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
                     new EmailCreate()

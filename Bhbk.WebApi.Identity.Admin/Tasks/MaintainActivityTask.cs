@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class MaintainActivityTask : BackgroundService
     {
-        private readonly FileInfo _api = Search.DefaultPaths("appsettings-api.json");
+        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly JsonSerializerSettings _serializer;

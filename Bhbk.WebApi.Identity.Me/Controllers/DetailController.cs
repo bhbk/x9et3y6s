@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
+using System;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -21,12 +22,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         public DetailController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
             : base(conf, ioc, tasks) { }
 
-        [Route("v1/quote-of-day"), HttpGet]
-        public IActionResult GetQuoteOfDayV1()
+        [Route("v1"), HttpPut]
+        public async Task<IActionResult> GetDetailV1()
         {
-            var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
+            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
-            return Ok(task.QuoteOfDay);
+            if (user == null)
+                return NotFound(BaseLib.Statics.MsgUserNotExist);
+
+            var result = new UserFactory<AppUser>(user);
+
+            return Ok(result.Evolve());
         }
 
         [Route("v1/claims"), HttpGet]
@@ -35,6 +41,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = User.Identity as ClaimsIdentity;
 
             return Ok(user.Claims);
+        }
+
+        [Route("v1/quote-of-day"), HttpGet]
+        public IActionResult GetQuoteOfDayV1()
+        {
+            var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
+
+            return Ok(task.QuoteOfDay);
         }
 
         [Route("v1/set-password"), HttpPut]

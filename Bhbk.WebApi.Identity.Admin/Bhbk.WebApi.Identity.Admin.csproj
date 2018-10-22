@@ -5,8 +5,8 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Bhbk</Authors>
     <Company>Bhbk</Company>
-    <Description>API for Identity admin functions</Description>
-    <Copyright>Copyright 2017</Copyright>
+    <Description></Description>
+    <Copyright></Copyright>
     <PackageTags>Bhbk WebApi Identity Admin</PackageTags>
     <PackageProjectUrl>https://gitlab.com/bhbk/x9et3y6s</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bhbk.Lib.Alert" Version="2018.10.20.3241" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.20.3241" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.22.6314" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />

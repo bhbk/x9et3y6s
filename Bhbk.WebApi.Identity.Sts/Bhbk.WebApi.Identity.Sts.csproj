@@ -7,8 +7,8 @@
     <Company>Bhbk</Company>
     <Description></Description>
     <Copyright></Copyright>
-    <PackageTags></PackageTags>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageTags>Bhbk WebApi Identity Sts</PackageTags>
+    <PackageProjectUrl>https://gitlab.com/bhbk/x9et3y6s</PackageProjectUrl>
     <Version>1.0.0</Version>
   </PropertyGroup>
 
@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bhbk.Lib.Alert" Version="2018.10.20.3241" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.20.3241" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.22.6314" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />

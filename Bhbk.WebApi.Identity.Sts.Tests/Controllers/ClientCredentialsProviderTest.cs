@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Interop;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -19,25 +19,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
     public class ClientCredentialsProviderTest : StartupTest
     {
         private TestServer _owin;
-        private S2STester _s2s;
+        private StsTester _sts;
 
         public ClientCredentialsProviderTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
 
-            _s2s = new S2STester(_conf, _ioc.ContextStatus, _owin);
+            _sts = new StsTester(_conf, _owin);
         }
 
         [TestMethod]
         public async Task Api_Sts_OAuth_ClientV1_Fail_NotImplemented()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.StsClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -45,12 +45,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_ClientV2_Fail_ClientNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.StsClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
+            var result = await _sts.ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -58,12 +58,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_ClientV2_Fail_ClientSecret()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.StsClientCredentialsV2(client.Id.ToString(), RandomNumber.CreateBase64(16));
+            var result = await _sts.ClientCredentialsV2(client.Id.ToString(), RandomValues.CreateBase64String(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -71,12 +71,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_ClientV2_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
-            var result = await _s2s.StsClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }

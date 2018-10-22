@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -133,8 +133,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!audience.AppAudienceUri.Any(x => x.AbsoluteUri == redirectUri))
                 return NotFound(BaseLib.Statics.MsgUriNotExist);
 
-            var state = RandomNumber.CreateBase64(32);
-            var url = UrlBuilder.UiAuthorizationCodeRequest(Conf, client, user, redirectUri, scope, state);
+            var state = RandomValues.CreateBase64String(32);
+            var url = LinkBuilder.AuthorizationCodeRequest(Conf, client, user, redirectUri, scope, state);
 
             /*
              * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies

@@ -117,7 +117,7 @@ namespace Bhbk.Lib.Identity.Stores
             if (!user.HumanBeing)
                 user.EmailConfirmed = true;
 
-            user.SecurityStamp = RandomNumber.CreateBase64(32);
+            user.SecurityStamp = RandomValues.CreateBase64String(32);
 
             _context.AppUser.Add(user);
             _context.SaveChanges();

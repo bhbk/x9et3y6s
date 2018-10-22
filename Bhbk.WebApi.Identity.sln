@@ -25,11 +25,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitlab-ci.yml = .gitlab-ci.yml
 		build.ps1 = build.ps1
 		clean.ps1 = clean.ps1
+		db-scaffold.ps1 = db-scaffold.ps1
 	EndProjectSection
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Bhbk.Dal.Identity.Mssql", "Bhbk.Dal.Identity.Mssql\Bhbk.Dal.Identity.Mssql.sqlproj", "{B707B63B-2F49-4E67-9EAB-DD667FB8944C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity.Internal", "Bhbk.Lib.Identity.Internal\Bhbk.Lib.Identity.Internal.csproj", "{D594F163-1EBC-4647-B639-A25EA34F7677}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.Lib.Identity.Internal", "Bhbk.Lib.Identity.Internal\Bhbk.Lib.Identity.Internal.csproj", "{D594F163-1EBC-4647-B639-A25EA34F7677}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

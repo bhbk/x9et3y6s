@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 {
     public class MaintainTokensTask : BackgroundService
     {
-        private readonly FileInfo _api = Search.DefaultPaths("appsettings-api.json");
+        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly JsonSerializerSettings _serializer;

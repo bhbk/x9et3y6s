@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Primitives.Enums;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -10,9 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Helpers
+namespace Bhbk.Lib.Identity.Providers
 {
-    public class JwtHelper
+    public class JwtSecureProvider
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
             CreateAccessTokenV1(IIdentityContext ioc, AppClient client, AppAudience audience, AppUser user)
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Helpers
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
             {
                 issueDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow;
                 expireDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsAccessTokenExpire);
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Helpers
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
             {
                 issueDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow;
                 expireDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsAccessTokenExpire);
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 throw new InvalidOperationException();
 
             else
-                audienceList = string.Join(",", audiences.Select(x => x.Name.ToString()).OrderBy(x => x));
+                audienceList = string.Join(", ", audiences.Select(x => x.Name.ToString()).OrderBy(x => x));
 
             var access = new JwtSecurityToken(
                 issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Helpers
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
             {
                 issueDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow;
                 expireDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsRefreshTokenExpire);
@@ -151,7 +151,7 @@ namespace Bhbk.Lib.Identity.Helpers
         }
 
         public static async Task<string>
-            CreatefreshTokenV2(IIdentityContext ioc, AppClient client, AppUser user)
+            CreateRefreshTokenV2(IIdentityContext ioc, AppClient client, AppUser user)
         {
             if (ioc == null)
                 throw new ArgumentNullException();
@@ -163,7 +163,7 @@ namespace Bhbk.Lib.Identity.Helpers
             var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.ContextStatus == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
             {
                 issueDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow;
                 expireDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsRefreshTokenExpire);
@@ -211,22 +211,6 @@ namespace Bhbk.Lib.Identity.Helpers
                 return true;
             else
                 return false;
-        }
-
-        public static (string token, DateTime begin, DateTime end)
-            GetAccessTokenV2(IIdentityContext ioc, string clientName, string audienceName, string userName)
-        {
-            if (ioc == null)
-                throw new ArgumentNullException();
-
-            var client = ioc.ClientMgmt.Store.Get(x => x.Name == clientName).Single();
-            var audience = ioc.AudienceMgmt.Store.Get(x => x.Name == audienceName).Single();
-            var user = ioc.UserMgmt.Store.Get(x => x.Email == userName).Single();
-
-            var audiences = new List<AppAudience>();
-            audiences.Add(audience);
-
-            return CreateAccessTokenV2(ioc, client, audiences, user).Result;
         }
     }
 }

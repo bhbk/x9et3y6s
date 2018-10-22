@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Builder;
@@ -147,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //check that payload can be decrypted and validated...
-                if (!new ProtectProvider(ioc.ContextStatus.ToString()).ValidateAsync(user.PasswordHash, authorizationCodeValue, user).Result)
+                if (!new ProtectProvider(ioc.Status.ToString()).ValidateAsync(user.PasswordHash, authorizationCodeValue, user).Result)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
@@ -167,8 +166,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUriNotExist }, _serializer));
                 }
 
-                var access = JwtHelper.CreateAccessTokenV2(ioc, client, audiences, user).Result;
-                var refresh = JwtHelper.CreatefreshTokenV2(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV2(ioc, client, audiences, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV2(ioc, client, user).Result;
 
                 var result = new
                 {

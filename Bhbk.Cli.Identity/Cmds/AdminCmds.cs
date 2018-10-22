@@ -1,8 +1,8 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
-using Bhbk.Lib.Primitives.Enums;
+using Bhbk.Lib.Identity.Interop;
+using Bhbk.Lib.Core.Primitives.Enums;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -16,11 +16,12 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class AdminCmds : ConsoleCommand
     {
-        private static FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
         private static CmdType _cmdType;
         private static JwtSecurityToken _access;
-        private static S2SClient _client;
+        private static AdminClient _admin;
+        private static StsClient _sts;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));
         private static bool _create = false, _destroy = false;
 
@@ -54,7 +55,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _client = new S2SClient(_conf, ContextType.Live);
+                _admin = new AdminClient(_conf, ContextType.Live);
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
@@ -368,7 +369,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool AddUserToLogin(Guid loginID, Guid userID)
         {
-            var result = _client.AdminLoginAddUserV1(_access, loginID, userID,
+            var result = _admin.LoginAddUserV1(_access, loginID, userID,
                 new UserLoginCreate()
                 {
                     UserId = userID,
@@ -390,7 +391,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool AddUserToRole(Guid roleID, Guid userID)
         {
-            var result = _client.AdminRoleAddToUserV1(_access, roleID, userID).Result;
+            var result = _admin.RoleAddToUserV1(_access, roleID, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -403,7 +404,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckAudience(string audience, ref Guid audienceID)
         {
-            var result = _client.AdminAudienceGetV1(_access, audience).Result;
+            var result = _admin.AudienceGetV1(_access, audience).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -421,7 +422,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckClient(string client, ref Guid clientID)
         {
-            var result = _client.AdminClientGetV1(_access, client).Result;
+            var result = _admin.ClientGetV1(_access, client).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -439,7 +440,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckLogin(string login, ref Guid loginID)
         {
-            var result = _client.AdminLoginGetV1(_access, login).Result;
+            var result = _admin.LoginGetV1(_access, login).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -457,7 +458,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckRole(string role, ref Guid roleID)
         {
-            var result = _client.AdminRoleGetV1(_access, role).Result;
+            var result = _admin.RoleGetV1(_access, role).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -475,7 +476,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckUser(string user, ref Guid userID)
         {
-            var result = _client.AdminUserGetV1(_access, user).Result;
+            var result = _admin.UserGetV1(_access, user).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -493,7 +494,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private Guid CreateAudience(Guid clientID, string audience)
         {
-            var result = _client.AdminAudienceCreateV1(_access,
+            var result = _admin.AudienceCreateV1(_access,
                 new AudienceCreate()
                 {
                     ClientId = clientID,
@@ -520,7 +521,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private Guid CreateClient(string client)
         {
-            var result = _client.AdminClientCreateV1(_access,
+            var result = _admin.ClientCreateV1(_access,
                 new ClientCreate()
                 {
                     Name = client,
@@ -545,7 +546,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private Guid CreateRole(Guid audienceID, string role)
         {
-            var result = _client.AdminRoleCreateV1(_access,
+            var result = _admin.RoleCreateV1(_access,
                 new RoleCreate()
                 {
                     AudienceId = audienceID,
@@ -571,7 +572,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private Guid CreateUser(string user)
         {
-            var result = _client.AdminUserCreateV1NoConfirm(_access,
+            var result = _admin.UserCreateV1NoConfirm(_access,
                 new UserCreate()
                 {
                     Email = user,
@@ -601,7 +602,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool DeleteAudience(Guid audienceID)
         {
-            var result = _client.AdminAudienceDeleteV1(_access, audienceID).Result;
+            var result = _admin.AudienceDeleteV1(_access, audienceID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -614,7 +615,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool DeleteClient(Guid clientID)
         {
-            var result = _client.AdminClientDeleteV1(_access, clientID).Result;
+            var result = _admin.ClientDeleteV1(_access, clientID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -627,7 +628,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool DeleteRole(Guid roleID)
         {
-            var result = _client.AdminRoleDeleteV1(_access, roleID).Result;
+            var result = _admin.RoleDeleteV1(_access, roleID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -640,7 +641,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool DeleteUser(Guid userID)
         {
-            var result = _client.AdminUserDeleteV1(_access, userID).Result;
+            var result = _admin.UserDeleteV1(_access, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -653,7 +654,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool RemoveRoleFromUser(Guid roleID, Guid userID)
         {
-            var result = _client.AdminRoleRemoveFromUserV1(_access, roleID, userID).Result;
+            var result = _admin.RoleRemoveFromUserV1(_access, roleID, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -666,7 +667,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool SetPassword(Guid userID, string password)
         {
-            var result = _client.AdminUserSetPasswordV1(_access,
+            var result = _admin.UserSetPasswordV1(_access,
                 new UserAddPassword()
                 {
                     Id = userID,
@@ -739,7 +740,7 @@ namespace Bhbk.Cli.Identity.Cmds
             var password = ConsoleHelper.GetHiddenInput();
             */
 
-            var result = _client.StsAccessTokenV2(clientName, new List<string> { audienceName }, userName, password).Result;
+            var result = _sts.AccessTokenV2(clientName, new List<string> { audienceName }, userName, password).Result;
 
             if (result.IsSuccessStatusCode)
             {

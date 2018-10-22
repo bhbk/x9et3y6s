@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -35,8 +35,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_AddPassword_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -47,8 +47,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new UserAddPassword()
             {
-                NewPassword = RandomNumber.CreateBase64(16),
-                NewPasswordConfirm = RandomNumber.CreateBase64(16)
+                NewPassword = RandomValues.CreateBase64String(16),
+                NewPasswordConfirm = RandomValues.CreateBase64String(16)
             };
 
             controller.SetUser(user.Id);
@@ -63,8 +63,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_AddPassword_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -91,18 +91,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Create_Fail_InvalidEmail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new UserCreate()
             {
                 ClientId = client.Id,
-                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + RandomNumber.CreateBase64(4),
-                FirstName = RandomNumber.CreateBase64(4) + "-First",
-                LastName = RandomNumber.CreateBase64(4) + "-Last",
-                PhoneNumber = RandomNumber.CreateNumberAsString(10),
+                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + RandomValues.CreateBase64String(4),
+                FirstName = RandomValues.CreateBase64String(4) + "-First",
+                LastName = RandomValues.CreateBase64String(4) + "-Last",
+                PhoneNumber = RandomValues.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 HumanBeing = true,
             };
@@ -117,18 +117,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Create_Success_Standard()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var model = new UserCreate()
             {
                 ClientId = client.Id,
-                Email = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = RandomNumber.CreateBase64(4) + "-First",
-                LastName = RandomNumber.CreateBase64(4) + "-Last",
-                PhoneNumber = RandomNumber.CreateNumberAsString(10),
+                Email = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
+                FirstName = RandomValues.CreateBase64String(4) + "-First",
+                LastName = RandomValues.CreateBase64String(4) + "-Last",
+                PhoneNumber = RandomValues.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 HumanBeing = true,
             };
@@ -146,18 +146,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Create_Success_System()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
 
             var model = new UserCreate()
             {
-                Email = RandomNumber.CreateBase64(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = RandomNumber.CreateBase64(4) + "-First",
-                LastName = RandomNumber.CreateBase64(4) + "-Last",
-                PhoneNumber = RandomNumber.CreateNumberAsString(10),
+                Email = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
+                FirstName = RandomValues.CreateBase64String(4) + "-First",
+                LastName = RandomValues.CreateBase64String(4) + "-Last",
+                PhoneNumber = RandomValues.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 HumanBeing = false,
             };
@@ -175,8 +175,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Delete_Fail_Immutable()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -194,8 +194,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Delete_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -212,8 +212,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Get_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -228,12 +228,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetList_Fail_Auth()
         {
-            _data.Destroy();
-            _data.CreateDefault();
-            _data.CreateRandom(10);
+            _tests.DestroyAll();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomNumber.CreateBase64(32));
+            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string order = "email";
@@ -252,9 +252,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetList_Fail_ParamInvalid()
         {
-            _data.Destroy();
-            _data.CreateDefault();
-            _data.CreateRandom(10);
+            _tests.DestroyAll();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
@@ -263,7 +263,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
+            var access = JwtSecureProvider.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -281,9 +281,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetList_Success()
         {
-            _data.Destroy();
-            _data.CreateDefault();
-            _data.CreateRandom(10);
+            _tests.DestroyAll();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultClient).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiDefaultAudienceUi).Single();
@@ -292,7 +292,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtHelper.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
+            var access = JwtSecureProvider.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -319,8 +319,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetByName_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -335,8 +335,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetAudienceList_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -351,8 +351,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetLoginList_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -367,8 +367,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_GetRoleList_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -383,8 +383,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_RemovePassword_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -405,8 +405,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_RemovePassword_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -423,15 +423,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_SetPassword_Fail()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
             var model = new UserAddPassword()
             {
-                NewPassword = RandomNumber.CreateBase64(16),
-                NewPasswordConfirm = RandomNumber.CreateBase64(16)
+                NewPassword = RandomValues.CreateBase64String(16),
+                NewPasswordConfirm = RandomValues.CreateBase64String(16)
             };
 
             controller.SetUser(user.Id);
@@ -446,8 +446,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_SetPassword_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
@@ -469,8 +469,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_UserV1_Update_Success()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();

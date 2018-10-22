@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Database;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
@@ -16,7 +17,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 {
     public class StartupTest : Startup
     {
-        protected static DataHelper _data;
+        protected static Defaults _defaults;
+        protected static UnitTests _tests;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -25,21 +27,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            //DRY up contexts across controllers and tasks after made thread safe...
-            _ioc = new IdentityContext(options);
-            _jwt = new S2SJwtContext(_conf, _ioc.ContextStatus);
+            //context is not thread safe yet. create new one for each background thread.
+            _ioc = new IdentityContext(options, ContextType.UnitTest);
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
             sc.AddSingleton<IIdentityContext>(_ioc);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(new IdentityContext(options)));
-            sc.AddSingleton<IS2SJwtContext>(_jwt);
+            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(new IdentityContext(options, ContextType.UnitTest)));
 
             var sp = sc.BuildServiceProvider();
 
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
             _ioc = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
             _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
-            _jwt = (IS2SJwtContext)sp.GetRequiredService<IS2SJwtContext>();
         }
 
         public override void ConfigureServices(IServiceCollection sc)
@@ -49,7 +48,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
         public override void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
         {
-            _data = new DataHelper(_ioc);
+            _defaults = new Defaults(_ioc);
+            _tests = new UnitTests(_ioc);
 
             base.Configure(app, env, log);
         }

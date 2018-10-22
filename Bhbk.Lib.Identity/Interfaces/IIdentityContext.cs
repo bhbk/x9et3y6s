@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
-using Bhbk.Lib.Primitives.Enums;
+using Bhbk.Lib.Core.Primitives.Enums;
 using System;
 
 namespace Bhbk.Lib.Identity.Interfaces
@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Interfaces
     public interface IIdentityContext : IDisposable
     {
         AppDbContext GetContext();
-        ContextType ContextStatus { get; }
+        ContextType Status { get; }
         ActivityStore Activity { get; }
         AudienceManager AudienceMgmt { get; }
         ClientManager ClientMgmt { get; }

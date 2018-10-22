@@ -10,7 +10,7 @@ namespace Bhbk.WebApi.Identity.Sts
 {
     public class Program
     {
-        private static FileInfo _api = Search.DefaultPaths("appsettings-api.json");
+        private static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private static IConfigurationRoot _conf;
 
         public static IWebHost BuildWebHost(string[] args) =>

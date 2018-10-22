@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Interop;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -20,27 +20,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
     public class RefreshTokenProviderTest : StartupTest
     {
         private TestServer _owin;
-        private S2STester _s2s;
+        private StsTester _sts;
 
         public RefreshTokenProviderTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
 
-            _s2s = new S2STester(_conf, _ioc.ContextStatus, _owin);
+            _sts = new StsTester(_conf, _owin);
         }
 
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_AudienceDisabled()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             audience.Enabled = false;
             _ioc.AudienceMgmt.Store.Update(audience);
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -58,14 +58,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_AudienceNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _ioc.AudienceMgmt.Store.Delete(audience);
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -82,21 +82,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_AudienceUndefined()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), string.Empty, refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), string.Empty, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -104,14 +104,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_ClientDisabled()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             client.Enabled = false;
             _ioc.ClientMgmt.Store.Update(client);
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -129,14 +129,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_ClientNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _ioc.ClientMgmt.Store.Delete(client);
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -153,21 +153,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_ClientUndefined()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(string.Empty, audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(string.Empty, audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -175,8 +175,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_DateExpired()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -185,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _ioc.ConfigMgmt.Store.UnitTestsRefreshToken = true;
             _ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -195,7 +195,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -203,8 +203,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_DateIssued()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -213,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _ioc.ConfigMgmt.Store.UnitTestsRefreshToken = true;
             _ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -223,7 +223,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -231,15 +231,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_TokenNotValid()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var random = new Random();
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -247,7 +247,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, RandomNumber.CreateBase64(8)));
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -255,21 +255,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_TokenUndefined()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), string.Empty);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -277,14 +277,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_UserNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -295,7 +295,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             delete.Should().BeAssignableTo(typeof(IdentityResult));
             delete.Succeeded.Should().BeTrue();
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -303,14 +303,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Fail_UserLocked()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -324,7 +324,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             update.Should().BeAssignableTo(typeof(IdentityResult));
             update.Succeeded.Should().BeTrue();
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -332,21 +332,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Success_AudienceSingle_ById()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
+            var result = await _sts.RefreshTokenV1(client.Id.ToString(), audience.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -354,21 +354,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV1_Success_AudienceSingle_ByName()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV1(client.Name, audience.Name, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV1(client.Name, audience.Name, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV1(client.Name, audience.Name, refresh);
+            var result = await _sts.RefreshTokenV1(client.Name, audience.Name, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -376,15 +376,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_AudienceDisabled()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -396,7 +396,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             audiences = new List<string> { audience.Id.ToString() };
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -404,24 +404,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_AudienceNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            audiences = new List<string> { RandomNumber.CreateBase64(8) };
+            audiences = new List<string> { RandomValues.CreateBase64String(8) };
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -429,22 +429,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_ClientNotFound()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(RandomNumber.CreateBase64(8), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(RandomValues.CreateBase64String(8), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -452,22 +452,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_ClientUndefined()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(string.Empty, audiences, refresh);
+            var result = await _sts.RefreshTokenV2(string.Empty, audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -475,8 +475,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_DateExpired()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -486,7 +486,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _ioc.ConfigMgmt.Store.UnitTestsRefreshToken = true;
             _ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -496,7 +496,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -504,8 +504,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_DateIssued()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -515,7 +515,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _ioc.ConfigMgmt.Store.UnitTestsRefreshToken = true;
             _ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -525,7 +525,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -533,8 +533,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_TokenNotValid()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var random = new Random();
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
@@ -542,7 +542,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -550,7 +550,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh.Remove(pos, 8).Insert(pos, RandomNumber.CreateBase64(8)));
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh.Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -558,22 +558,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_TokenUndefined()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, string.Empty);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -581,15 +581,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_UserNotValid()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -600,7 +600,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             delete.Should().BeAssignableTo(typeof(IdentityResult));
             delete.Succeeded.Should().BeTrue();
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -608,15 +608,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Fail_UserLocked()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -630,7 +630,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             update.Should().BeAssignableTo(typeof(IdentityResult));
             update.Succeeded.Should().BeTrue();
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -638,8 +638,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceMultiple_ById()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -653,14 +653,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var roleB = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
             await _ioc.UserMgmt.AddToRoleAsync(user, roleB.Name);
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -668,8 +668,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceMultiple_ByName()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audienceA = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
@@ -683,14 +683,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var roleB = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleB).Single();
             await _ioc.UserMgmt.AddToRoleAsync(user, roleB.Name);
 
-            var access = await _s2s.StsAccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Name, audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Name, audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -698,22 +698,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceSingle_ById()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Id.ToString() };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -721,22 +721,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceSingle_ByName()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { audience.Name };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Name, audiences, user.Email, BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Name, audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Name, audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -744,22 +744,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_RefreshV2_Success_AudienceEmpty()
         {
-            _data.Destroy();
-            _data.CreateTest();
+            _tests.DestroyAll();
+            _tests.Create();
 
             var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
             var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
             var audiences = new List<string> { string.Empty };
             var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
 
-            var access = await _s2s.StsAccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
+            var access = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), BaseLib.Statics.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _s2s.StsRefreshTokenV2(client.Id.ToString(), audiences, refresh);
+            var result = await _sts.RefreshTokenV2(client.Id.ToString(), audiences, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }

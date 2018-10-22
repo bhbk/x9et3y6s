@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Stores
 {
     public class ConfigStore
     {
-        private FileInfo _lib = Search.DefaultPaths("appsettings-lib.json");
+        private FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private AppConfig _app { get; set; }
         private IConfigurationRoot _conf;
 
@@ -35,6 +35,7 @@ namespace Bhbk.Lib.Identity.Stores
                 _app.DefaultsAuthorizationCodeExpire = UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"]);
                 _app.DefaultsBrowserCookieExpire = UInt32.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
                 _app.DefaultsRefreshTokenExpire = UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
+                _app.DefaultsCompatibileClaimTypeNames = bool.Parse(_conf["IdentityDefaults:CompatibileClaimTypeNames"]);
                 _app.UnitTestsAccessToken = false;
                 _app.UnitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
                 _app.UnitTestsRefreshToken = false;

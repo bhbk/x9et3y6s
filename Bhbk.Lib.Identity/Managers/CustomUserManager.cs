@@ -460,7 +460,7 @@ namespace Bhbk.Lib.Identity.Managers
             var hash = PasswordHasher.HashPassword(user, newPassword);
 
             await passwordStore.SetPasswordHashAsync(user, hash, new CancellationToken());
-            await Store.SetSecurityStampAsync(user, RandomNumber.CreateBase64(32));
+            await Store.SetSecurityStampAsync(user, RandomValues.CreateBase64String(32));
 
             return IdentityResult.Success;
         }

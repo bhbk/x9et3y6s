@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext _ioc;
         private readonly IHostedService[] _tasks;
-        private readonly IS2SJwtContext _jwt;
+        private readonly IJwtContext _jwt;
 
         protected IConfigurationRoot Conf
         {
@@ -46,11 +46,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        protected IS2SJwtContext Jwt
+        protected IJwtContext Jwt
         {
             get
             {
-                return _jwt ?? (IS2SJwtContext)ControllerContext.HttpContext.RequestServices.GetService<IS2SJwtContext>();
+                return _jwt ?? (IJwtContext)ControllerContext.HttpContext.RequestServices.GetService<IJwtContext>();
             }
         }
 
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             _conf = conf;
             _ioc = ioc;
             _tasks = tasks;
-            _jwt = new S2SJwtContext(_conf, _ioc.ContextStatus);
+            _jwt = new JwtContext(_conf, _ioc.Status);
         }
 
         [NonAction]
