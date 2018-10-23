@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Providers
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
-            var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
@@ -62,7 +62,7 @@ namespace Bhbk.Lib.Identity.Providers
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
-            var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
@@ -108,7 +108,7 @@ namespace Bhbk.Lib.Identity.Providers
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
-            var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
@@ -160,7 +160,7 @@ namespace Bhbk.Lib.Identity.Providers
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
-            var keyBytes = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)

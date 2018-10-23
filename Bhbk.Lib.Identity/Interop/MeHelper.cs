@@ -1,17 +1,11 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Bhbk.Lib.Identity.Interop
 {
@@ -44,6 +38,24 @@ namespace Bhbk.Lib.Identity.Interop
             _context = ContextType.UnitTest;
             _conf = conf;
             _connect = connect.CreateClient();
+        }
+
+        public async Task<HttpResponseMessage> DetailGetV1(JwtSecurityToken jwt)
+        {
+            var endpoint = "/me/v1";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
     }
 }

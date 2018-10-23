@@ -15,15 +15,15 @@ namespace Bhbk.WebApi.Identity.Me
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseConfiguration(_conf)
+                .UseStartup<Startup>()
                 .UseKestrel(options =>
                 {
                     options.ConfigureEndpoints();
                 })
-                .UseConfiguration(_conf)
-                .UseStartup<Startup>()
                 .UseApplicationInsights()
                 .CaptureStartupErrors(true)
-                .PreferHostingUrls(false)
+                .PreferHostingUrls(true)
                 .Build();
 
         public static void Main(string[] args)

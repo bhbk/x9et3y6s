@@ -13,7 +13,8 @@
       "launchUrl": "api/identity/sts",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "ancmHostingModel": "OutOfProcess"
     },
     "Bhbk.WebApi.Identity.Sts": {
       "commandName": "Project",

@@ -76,8 +76,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> AccessTokenV2(string client, List<string> audiences, string user, string password)
@@ -99,8 +102,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
@@ -121,8 +127,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint + content);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> AuthorizationCodeRequestV2(string client, string audience, string user, string redirectUri, string scope)
@@ -142,8 +151,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint + content);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> AuthorizationCodeV1(string client, string user, string redirectUri, string code)
@@ -162,8 +174,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint + content);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> AuthorizationCodeV2(string client, string user, string redirectUri, string code)
@@ -182,8 +197,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint + content);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+
+            throw new NotSupportedException();
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
@@ -204,8 +222,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> ClientCredentialsV2(string client, string secret)
@@ -225,8 +246,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenGetListV1(JwtSecurityToken jwt, string user)
@@ -240,8 +264,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenGetListV2(JwtSecurityToken jwt, string user)
@@ -255,8 +282,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenDeleteV1(JwtSecurityToken jwt, string user, string token)
@@ -270,8 +300,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenDeleteV2(JwtSecurityToken jwt, string user, string token)
@@ -285,8 +318,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenDeleteAllV1(JwtSecurityToken jwt, string user)
@@ -300,8 +336,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenDeleteAllV2(JwtSecurityToken jwt, string user)
@@ -315,8 +354,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         //https://oauth.net/2/grant-types/refresh-token/
@@ -338,8 +380,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RefreshTokenV2(string client, List<string> audiences, string refresh)
@@ -360,8 +405,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
     }
 }

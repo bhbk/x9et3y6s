@@ -13,7 +13,8 @@
       "launchUrl": "api/identity/admin",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "ancmHostingModel": "OutOfProcess"
     },
     "Bhbk.WebApi.Identity.Admin": {
       "commandName": "Project",

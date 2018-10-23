@@ -83,10 +83,11 @@ namespace Bhbk.WebApi.Identity.Admin
                 auth.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(bearer =>
             {
+                bearer.IncludeErrorDetails = true;
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
-                    IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(x.ClientKey))),
+                    IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))),
                     ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
                     AudienceValidator = Bhbk.Lib.Identity.Validators.AudienceValidator.Multiple,
                     ValidateIssuer = true,
@@ -124,7 +125,6 @@ namespace Bhbk.WebApi.Identity.Admin
             {
                 log.AddDebug();
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
             else

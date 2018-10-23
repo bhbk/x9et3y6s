@@ -10,7 +10,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BaseLib = Bhbk.Lib.Identity;
-using System;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {

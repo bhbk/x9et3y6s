@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_UserV1_Get_Success()
+        public async Task Api_Me_DetailV1_Get_Success()
         {
             _tests.DestroyAll();
             _tests.Create();

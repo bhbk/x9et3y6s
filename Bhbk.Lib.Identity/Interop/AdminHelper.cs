@@ -70,8 +70,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> AudienceDeleteV1(JwtSecurityToken jwt, Guid audienceID)
@@ -85,7 +88,10 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> AudienceGetV1(JwtSecurityToken jwt, string audience)
@@ -99,8 +105,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> ClientCreateV1(JwtSecurityToken jwt, ClientCreate model)
@@ -117,8 +126,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> ClientDeleteV1(JwtSecurityToken jwt, Guid clientID)
@@ -132,8 +144,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> ClientGetV1(JwtSecurityToken jwt, string client)
@@ -147,8 +162,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> LoginAddUserV1(JwtSecurityToken jwt, Guid loginID, Guid userID, UserLoginCreate model)
@@ -165,8 +183,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> LoginCreateV1(JwtSecurityToken jwt, LoginCreate model)
@@ -183,8 +204,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> LoginDeleteV1(JwtSecurityToken jwt, Guid loginID)
@@ -198,8 +222,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> LoginGetV1(JwtSecurityToken jwt, string login)
@@ -213,9 +240,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RoleAddToUserV1(JwtSecurityToken jwt, Guid roleID, Guid userID)
@@ -229,8 +258,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RoleCreateV1(JwtSecurityToken jwt, RoleCreate model)
@@ -247,8 +279,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RoleDeleteV1(JwtSecurityToken jwt, Guid roleID)
@@ -262,8 +297,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RoleGetV1(JwtSecurityToken jwt, string role)
@@ -277,9 +315,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> RoleRemoveFromUserV1(JwtSecurityToken jwt, Guid roleID, Guid userID)
@@ -293,8 +333,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> UserCreateV1(JwtSecurityToken jwt, UserCreate model)
@@ -311,8 +354,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> UserCreateV1NoConfirm(JwtSecurityToken jwt, UserCreate model)
@@ -329,8 +375,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PostAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> UserDeleteV1(JwtSecurityToken jwt, Guid userID)
@@ -344,8 +393,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            return await _connect.DeleteAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> UserGetV1(JwtSecurityToken jwt, string user)
@@ -359,8 +411,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            return await _connect.GetAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
         }
 
         public async Task<HttpResponseMessage> UserSetPasswordV1(JwtSecurityToken jwt, UserAddPassword model)
@@ -377,8 +432,11 @@ namespace Bhbk.Lib.Identity.Interop
             if (_context == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            return await _connect.PutAsync(
-                string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PutAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
         }
     }
 }
