@@ -19,6 +19,13 @@ namespace Bhbk.Lib.Identity
         refresh_token,
     }
 
+    public enum LoginType
+    {
+        GenerateAccessToken,
+        GenerateRefreshToken,
+        GenerateAuthorizationCode
+    }
+
     public enum TaskType
     {
         MaintainActivity,
@@ -59,7 +66,7 @@ namespace Bhbk.Lib.Identity
         public const string ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
         public const string ApiDefaultPhone = "+00000000000";
         public const string ApiDefaultLogin = "local";
-        public const string ApiDefaultLoginKey = "sxW8wlsw1Z04heUckw";
+        public const string ApiDefaultLoginKey = "local";
         public const string ApiDefaultLoginName = "local";
         public const string ApiDefaultRoleForAdminUi = "(Built-In) Administrators";
         public const string ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
@@ -72,26 +79,26 @@ namespace Bhbk.Lib.Identity
 
         #region Configuration Constants (Unit Tests)
 
-        public const string ApiUnitTestAudienceA = "AudienceUnitTestsA";
-        public const string ApiUnitTestAudienceB = "AudienceUnitTestsB";
-        public const string ApiUnitTestClientA = "ClientUnitTestsA";
-        public const string ApiUnitTestClientB = "ClientUnitTestsB";
+        public const string ApiUnitTestAudience1 = "AudienceUnitTests1";
+        public const string ApiUnitTestAudience2 = "AudienceUnitTests2";
+        public const string ApiUnitTestClient1 = "ClientUnitTests1";
+        public const string ApiUnitTestClient2 = "ClientUnitTests2";
         public const string ApiUnitTestClaimType = "ClaimTypeUnitTests";
         public const string ApiUnitTestClaimValue = "ClaimValueUnitTests";
-        public const string ApiUnitTestLoginA = "LoginUnitTestsA";
-        public const string ApiUnitTestLoginAKey = "LoginUnitTestsAKey";
-        public const string ApiUnitTestLoginB = "LoginUnitTestsB";
-        public const string ApiUnitTestLoginBKey = "LoginUnitTestsBKey";
-        public const string ApiUnitTestRoleA = "RoleUnitTestsA";
-        public const string ApiUnitTestRoleB = "RoleUnitTestsB";
-        public const string ApiUnitTestUserA = "UserUnitTestsA@local";
-        public const string ApiUnitTestUserB = "UserUnitTestsB@local";
+        public const string ApiUnitTestLogin1 = "LoginUnitTests1";
+        public const string ApiUnitTestLogin1Key = "LoginUnitTests1Key";
+        public const string ApiUnitTestLogin2 = "LoginUnitTests2";
+        public const string ApiUnitTestLogin2Key = "LoginUnitTests2Key";
+        public const string ApiUnitTestRole1 = "RoleUnitTests1";
+        public const string ApiUnitTestRole2 = "RoleUnitTests2";
+        public const string ApiUnitTestUser1 = "unittestuser1@local";
+        public const string ApiUnitTestUser2 = "unittestuser2@local";
         public const string ApiUnitTestUserPassCurrent = "pa$$word01!";
         public const string ApiUnitTestUserPassNew = "pa$$word01!new";
-        public const string ApiUnitTestUriA = "UrlUnitTestsA";
-        public const string ApiUnitTestUriALink = "https://app.test.net/a/redirect";
-        public const string ApiUnitTestUriB = "UrlUnitTestsB";
-        public const string ApiUnitTestUriBLink = "https://app.test.net/b/redirect";
+        public const string ApiUnitTestUri1 = "UrlUnitTests1";
+        public const string ApiUnitTestUri1Link = "https://app.test.net/1/redirect";
+        public const string ApiUnitTestUri2 = "UrlUnitTests2";
+        public const string ApiUnitTestUri2Link = "https://app.test.net/2/redirect";
 
         #endregion
 

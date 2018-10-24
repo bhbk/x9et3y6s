@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
 
             model.ActorId = GetUserGUID();
-
+            
             var exists = await IoC.UserMgmt.FindByEmailAsync(model.Email);
 
             //if (exists != null)
@@ -252,15 +252,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetUsersV1([FromQuery] PagingModel model)
+        public IActionResult GetUsersV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var users = IoC.UserMgmt.Store.Get()
                 .OrderBy(model.OrderBy)
-                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
-                .Take(Convert.ToInt32(model.PageSize));
+                .Skip(model.Skip)
+                .Take(model.Take);
 
             var result = users.Select(x => new UserFactory<AppUser>(x).Evolve());
 

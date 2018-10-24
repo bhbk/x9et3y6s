@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var remove = await _ioc.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var remove = await _ioc.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
@@ -95,18 +95,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
             var model = new UserCreate()
             {
                 ClientId = client.Id,
-                Email = BaseLib.Statics.ApiUnitTestUserA + "-" + RandomValues.CreateBase64String(4),
-                FirstName = RandomValues.CreateBase64String(4) + "-First",
-                LastName = RandomValues.CreateBase64String(4) + "-Last",
+                Email = BaseLib.Statics.ApiUnitTestUser1 + "?" + RandomValues.CreateBase64String(4),
+                FirstName = "First-" + RandomValues.CreateBase64String(4),
+                LastName = "Last-" + RandomValues.CreateBase64String(4),
                 PhoneNumber = RandomValues.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 HumanBeing = true,
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -121,18 +121,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
             var model = new UserCreate()
             {
                 ClientId = client.Id,
-                Email = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = RandomValues.CreateBase64String(4) + "-First",
-                LastName = RandomValues.CreateBase64String(4) + "-Last",
+                Email = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUser1,
+                FirstName = "First-" + RandomValues.CreateBase64String(4),
+                LastName = "Last-" + RandomValues.CreateBase64String(4),
                 PhoneNumber = RandomValues.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 HumanBeing = true,
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -150,18 +150,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var model = new UserCreate()
             {
-                Email = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUserA,
-                FirstName = RandomValues.CreateBase64String(4) + "-First",
-                LastName = RandomValues.CreateBase64String(4) + "-Last",
+                Email = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUser1,
+                FirstName = "First-" + RandomValues.CreateBase64String(4),
+                LastName = "Last-" + RandomValues.CreateBase64String(4),
                 PhoneNumber = RandomValues.CreateNumberAsString(10),
                 LockoutEnabled = false,
                 HumanBeing = false,
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -179,7 +179,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             _ioc.UserMgmt.Store.SetImmutableAsync(user, true).Wait();
             controller.SetUser(user.Id);
@@ -198,7 +198,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var result = await controller.GetUserV1(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -236,14 +236,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "email";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "email";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/user/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -269,10 +269,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "email";
+            string orderBy = "email";
 
             var response = await request.GetAsync("/user/v1?"
-                + "orderBy=" + order);
+                + "orderBy=" + orderBy);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -298,14 +298,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "email";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "email";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/user/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -313,7 +313,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<UserResult>>();
             var data = ok.Should().BeAssignableTo<IEnumerable<UserResult>>().Subject;
 
-            data.Count().Should().Be(size);
+            data.Count().Should().Be(take);
         }
 
         [TestMethod]
@@ -323,7 +323,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var result = await controller.GetUserV1(user.UserName) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -339,7 +339,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var result = await controller.GetUserAudiencesV1(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -355,7 +355,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var result = await controller.GetUserLoginsV1(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -371,7 +371,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var result = await controller.GetUserRolesV1(user.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -387,7 +387,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             var remove = await _ioc.UserMgmt.RemovePasswordAsync(user);
             remove.Should().BeAssignableTo(typeof(IdentityResult));
@@ -409,7 +409,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -427,7 +427,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new UserAddPassword()
             {
                 NewPassword = RandomValues.CreateBase64String(16),
@@ -450,7 +450,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new UserAddPassword()
             {
                 NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
@@ -473,7 +473,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new UserController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new UserUpdate()
             {
                 Id = user.Id,

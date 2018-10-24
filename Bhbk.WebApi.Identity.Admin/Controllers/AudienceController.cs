@@ -96,15 +96,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetAudiencesV1([FromQuery] PagingModel model)
+        public IActionResult GetAudiencesV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var audiences = IoC.AudienceMgmt.Store.Get()
                 .OrderBy(model.OrderBy)
-                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
-                .Take(Convert.ToInt32(model.PageSize));
+                .OrderBy(model.OrderBy)
+                .Skip(model.Skip)
+                .Take(model.Take);
 
             var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).Evolve());
 

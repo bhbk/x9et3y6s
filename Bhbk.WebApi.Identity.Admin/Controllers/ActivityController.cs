@@ -23,15 +23,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public IActionResult GetActivityV1([FromQuery] PagingModel model)
+        public IActionResult GetActivityV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var activity = IoC.Activity.Get()
                 .OrderBy(model.OrderBy)
-                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
-                .Take(Convert.ToInt32(model.PageSize));
+                .Skip(model.Skip)
+                .Take(model.Take);
 
             var result = activity.Select(x => new ActivityFactory<AppActivity>(x).Evolve());
 

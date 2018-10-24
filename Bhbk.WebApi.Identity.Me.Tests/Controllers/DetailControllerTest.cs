@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new UserChangePassword()
             {
                 CurrentPassword = BaseLib.Statics.ApiUnitTestUserPassCurrent,
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new UserChangePassword()
             {
                 CurrentPassword = BaseLib.Statics.ApiUnitTestUserPassCurrent,
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 

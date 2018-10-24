@@ -5,11 +5,11 @@ cd Bhbk.Cli.Identity
 if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force }
 if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force }
 
-cd ..\Bhbk.Dal.Identity.Mssql
+cd ..\Bhbk.Lib.Identity
 if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force }
 if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force }
 
-cd ..\Bhbk.Lib.Identity
+cd ..\Bhbk.Mssql.Identity
 if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force }
 if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force }
 

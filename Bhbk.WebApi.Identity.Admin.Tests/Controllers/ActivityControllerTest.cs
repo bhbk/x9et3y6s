@@ -39,14 +39,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "created";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "created";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/activity/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -69,10 +69,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "created";
+            string orderBy = "created";
 
             var response = await request.GetAsync("/activity/v1?"
-                + "orderBy=" + order);
+                + "orderBy=" + orderBy);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -95,14 +95,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "created";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "created";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/activity/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<ActivityResult>>();
             var data = ok.Should().BeAssignableTo<IEnumerable<ActivityResult>>().Subject;
 
-            data.Count().Should().Be(size);
+            data.Count().Should().Be(take);
         }
     }
 }

@@ -120,15 +120,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetLoginsV1([FromQuery] PagingModel model)
+        public IActionResult GetLoginsV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var logins = IoC.LoginMgmt.Store.Get()
                 .OrderBy(model.OrderBy)
-                .Skip(Convert.ToInt32((model.PageNumber - 1) * model.PageSize))
-                .Take(Convert.ToInt32(model.PageSize));
+                .Skip(model.Skip)
+                .Take(model.Take);
+
 
             var result = logins.Select(x => new LoginFactory<AppLogin>(x).Evolve());
 

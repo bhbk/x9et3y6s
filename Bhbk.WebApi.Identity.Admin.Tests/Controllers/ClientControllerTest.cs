@@ -40,11 +40,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var controller = new ClientController(_conf, _ioc, _tasks);
             var model = new ClientCreate()
             {
-                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestClientA,
+                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestClient1,
                 ClientKey = RandomValues.CreateBase64String(32),
                 Enabled = true,
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -62,8 +62,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new ClientController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             _ioc.ClientMgmt.Store.SetImmutableAsync(client, true);
             controller.SetUser(user.Id);
@@ -82,8 +82,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new ClientController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new ClientController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await controller.GetClientV1(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new ClientController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await controller.GetClientV1(client.Name) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -137,14 +137,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "name";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/client/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -170,10 +170,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
+            string orderBy = "name";
 
             var response = await request.GetAsync("/client/v1?"
-                + "orderBy=" + order);
+                + "orderBy=" + orderBy);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -199,14 +199,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "name";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/client/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<ClientResult>>();
             var data = ok.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
 
-            data.Count().Should().Be(size);
+            data.Count().Should().Be(take);
         }
 
         [TestMethod]
@@ -224,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new ClientController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await controller.GetClientAudiencesV1(client.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -240,16 +240,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new ClientController(_conf, _ioc, _tasks);
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
             var model = new ClientUpdate()
             {
                 Id = client.Id,
-                Name = BaseLib.Statics.ApiUnitTestClientA + "(Updated)",
+                Name = BaseLib.Statics.ApiUnitTestClient1 + "(Updated)",
                 ClientKey = client.ClientKey,
                 Enabled = true,
                 Immutable = false
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 

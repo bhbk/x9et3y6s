@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Core.Providers;
+using Bhbk.Lib.Identity;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Builder;
@@ -7,11 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 //https://blogs.ibs.com/2017/12/19/token-based-auth-in-asp-net-core-2-part-2-refresh-tokens/
 
@@ -47,27 +47,27 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV1)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrRefreshTokenIDV1)))
+                && (context.Request.Form.ContainsKey(Statics.AttrClientIDV1)
+                    && context.Request.Form.ContainsKey(Statics.AttrAudienceIDV1)
+                    && context.Request.Form.ContainsKey(Statics.AttrGrantTypeIDV1)
+                    && context.Request.Form.ContainsKey(Statics.AttrRefreshTokenIDV1)))
             {
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV1).Value;
-                string audienceValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV1).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV1).Value;
-                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrClientIDV1).Value;
+                string audienceValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrAudienceIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrGrantTypeIDV1).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrRefreshTokenIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
                     || string.IsNullOrEmpty(audienceValue)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrRefreshTokenIDV1)
+                    || !grantTypeValue.Equals(Statics.AttrRefreshTokenIDV1)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysParamsInvalid }, _serializer));
                 }
 
                 var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
@@ -88,14 +88,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientNotExist }, _serializer));
                 }
 
                 if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientInvalid }, _serializer));
                 }
 
                 Guid audienceID;
@@ -111,14 +111,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgAudienceNotExist }, _serializer));
                 }
 
                 if (!audience.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgAudienceInvalid }, _serializer));
                 }
 
                 var refreshToken = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalidToken }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalidToken }, _serializer));
                 }
 
                 var user = ioc.UserMgmt.FindByIdAsync(refreshToken.UserId.ToString()).Result;
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserNotExist }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalid }, _serializer));
                 }
 
                 var access = JwtSecureProvider.CreateAccessTokenV1(ioc, client, audience, user).Result;
@@ -174,7 +174,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsRefreshToken.ToString(),
+                    ActivityType = LoginType.GenerateRefreshToken.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });
@@ -192,26 +192,26 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrAudienceIDV2)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrRefreshTokenIDV2)))
+                && (context.Request.Form.ContainsKey(Statics.AttrClientIDV2)
+                    && context.Request.Form.ContainsKey(Statics.AttrAudienceIDV2)
+                    && context.Request.Form.ContainsKey(Statics.AttrGrantTypeIDV2)
+                    && context.Request.Form.ContainsKey(Statics.AttrRefreshTokenIDV2)))
             {
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
-                string audienceValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAudienceIDV2).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRefreshTokenIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrClientIDV2).Value;
+                string audienceValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrAudienceIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrGrantTypeIDV2).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrRefreshTokenIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrRefreshTokenIDV2)
+                    || !grantTypeValue.Equals(Statics.AttrRefreshTokenIDV2)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysParamsInvalid }, _serializer));
                 }
 
                 var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
@@ -232,14 +232,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientNotExist }, _serializer));
                 }
 
                 if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientInvalid }, _serializer));
                 }
 
                 var refreshToken = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
@@ -250,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalidToken }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalidToken }, _serializer));
                 }
 
                 var user = ioc.UserMgmt.FindByIdAsync(refreshToken.UserId.ToString()).Result;
@@ -260,7 +260,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserNotExist }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -273,7 +273,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalid }, _serializer));
                 }
 
                 var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
@@ -300,7 +300,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceNotExist }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgAudienceNotExist }, _serializer));
                         }
 
                         if (!audience.Enabled
@@ -308,7 +308,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgAudienceInvalid }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgAudienceInvalid }, _serializer));
                         }
 
                         audiences.Add(audience);
@@ -333,7 +333,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsRefreshToken.ToString(),
+                    ActivityType = LoginType.GenerateRefreshToken.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });

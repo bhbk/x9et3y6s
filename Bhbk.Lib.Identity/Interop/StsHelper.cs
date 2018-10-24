@@ -83,6 +83,31 @@ namespace Bhbk.Lib.Identity.Interop
             throw new NotSupportedException();
         }
 
+        public async Task<HttpResponseMessage> AccessTokenV1AudienceAsIssuerToo(string audience, string user, string password)
+        {
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("client_id", audience),
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("username", user),
+                    new KeyValuePair<string, string>("password", password),
+                });
+
+            var endpoint = "/oauth/v1/access";
+
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_context == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
+        }
+
         public async Task<HttpResponseMessage> AccessTokenV2(string client, List<string> audiences, string user, string password)
         {
             var content = new FormUrlEncodedContent(new[]
@@ -160,7 +185,7 @@ namespace Bhbk.Lib.Identity.Interop
 
         public async Task<HttpResponseMessage> AuthorizationCodeV1(string client, string user, string redirectUri, string code)
         {
-            var content = HttpUtility.UrlPathEncode("?client=" + client
+            var content = HttpUtility.UrlPathEncode("?client_id=" + client
                 + "&user=" + user
                 + "&redirect_uri=" + redirectUri
                 + "&grant_type=" + "code"

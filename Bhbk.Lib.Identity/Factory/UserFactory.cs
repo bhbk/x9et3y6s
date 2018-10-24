@@ -154,7 +154,7 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid ClientId { get; set; }
 
         [Required]
-        [EmailAddress]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [DataType(DataType.PhoneNumber)]
@@ -244,9 +244,11 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid Id { get; set; }
 
         [Required]
+        [DataType(DataType.PhoneNumber)]
         public string NewPhoneNumber { get; set; }
 
         [Required]
+        [DataType(DataType.PhoneNumber)]
         public string NewPhoneNumberConfirm { get; set; }
     }
 
@@ -271,12 +273,15 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid Id { get; set; }
 
         [Required]
+        [DataType(DataType.PhoneNumber)]
         public string CurrentPhoneNumber { get; set; }
 
         [Required]
+        [DataType(DataType.PhoneNumber)]
         public string NewPhoneNumber { get; set; }
 
         [Required]
+        [DataType(DataType.PhoneNumber)]
         public string NewPhoneNumberConfirm { get; set; }
     }
 
@@ -286,12 +291,15 @@ namespace Bhbk.Lib.Identity.Factory
         public Guid Id { get; set; }
 
         [Required]
+        [DataType(DataType.EmailAddress)]
         public string CurrentEmail { get; set; }
 
         [Required]
+        [DataType(DataType.EmailAddress)]
         public string NewEmail { get; set; }
 
         [Required]
+        [DataType(DataType.EmailAddress)]
         public string NewEmailConfirm { get; set; }
     }
 

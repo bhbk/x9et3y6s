@@ -1,15 +1,14 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
@@ -44,13 +43,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (context.Request.Path.Equals("/oauth/v1/client", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV1)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientSecretIDV1)))
+                && (context.Request.Form.ContainsKey(Statics.AttrClientIDV1)
+                    && context.Request.Form.ContainsKey(Statics.AttrGrantTypeIDV1)
+                    && context.Request.Form.ContainsKey(Statics.AttrClientSecretIDV1)))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysNotImplemented }, _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysNotImplemented }, _serializer));
             }
 
             #endregion
@@ -61,24 +60,24 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             if (context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientIDV2)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || context.Request.Form.ContainsKey(BaseLib.Statics.AttrClientSecretIDV2)))
+                && (context.Request.Form.ContainsKey(Statics.AttrClientIDV2)
+                    && context.Request.Form.ContainsKey(Statics.AttrGrantTypeIDV2)
+                    && context.Request.Form.ContainsKey(Statics.AttrClientSecretIDV2)))
             {
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-                string secretValue = formValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientSecretIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrClientIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrGrantTypeIDV2).Value;
+                string secretValue = formValues.FirstOrDefault(x => x.Key == Statics.AttrClientSecretIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrClientSecretIDV2)
+                    || !grantTypeValue.Equals(Statics.AttrClientSecretIDV2)
                     || string.IsNullOrEmpty(secretValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysParamsInvalid }, _serializer));
                 }
 
                 var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
@@ -99,20 +98,20 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientNotExist }, _serializer));
                 }
 
                 if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientInvalid }, _serializer));
                 }
 
                 //provider not implemented yet...
                 context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysNotImplemented }, _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysNotImplemented }, _serializer));
             }
 
             #endregion

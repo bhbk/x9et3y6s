@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
                 new ClientCreate()
                 {
-                    Name = Statics.ApiUnitTestClientA,
+                    Name = Statics.ApiUnitTestClient1,
                     ClientKey = RandomValues.CreateBase64String(32),
                     Enabled = true,
                     Immutable = false,
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
                 new ClientCreate()
                 {
-                    Name = Statics.ApiUnitTestClientB,
+                    Name = Statics.ApiUnitTestClient2,
                     ClientKey = RandomValues.CreateBase64String(32),
                     Enabled = true,
                     Immutable = false,
@@ -51,8 +51,8 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
                 new AudienceCreate()
                 {
-                    ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestClientA).Single().Id,
-                    Name = Statics.ApiUnitTestAudienceA,
+                    ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestClient1).Single().Id,
+                    Name = Statics.ApiUnitTestAudience1,
                     AudienceType = AudienceType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = false,
@@ -61,8 +61,8 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.AudienceMgmt.CreateAsync(new AudienceFactory<AudienceCreate>(
                 new AudienceCreate()
                 {
-                    ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestClientB).Single().Id,
-                    Name = Statics.ApiUnitTestAudienceB,
+                    ClientId = _ioc.ClientMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestClient2).Single().Id,
+                    Name = Statics.ApiUnitTestAudience2,
                     AudienceType = AudienceType.server.ToString(),
                     Enabled = true,
                     Immutable = false,
@@ -72,8 +72,8 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(
                 new RoleCreate()
                 {
-                    AudienceId = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudienceA).Single().Id,
-                    Name = Statics.ApiUnitTestRoleA,
+                    AudienceId = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudience1).Single().Id,
+                    Name = Statics.ApiUnitTestRole1,
                     Enabled = true,
                     Immutable = false
                 }).Devolve());
@@ -81,8 +81,8 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.RoleMgmt.CreateAsync(new RoleFactory<RoleCreate>(
                 new RoleCreate()
                 {
-                    AudienceId = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudienceB).Single().Id,
-                    Name = Statics.ApiUnitTestRoleB,
+                    AudienceId = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudience2).Single().Id,
+                    Name = Statics.ApiUnitTestRole2,
                     Enabled = true,
                     Immutable = false
                 }).Devolve());
@@ -91,14 +91,14 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
-                    LoginProvider = Statics.ApiUnitTestLoginA,
+                    LoginProvider = Statics.ApiUnitTestLogin1,
                     Immutable = false
                 }).Devolve());
 
             await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(
                 new LoginCreate()
                 {
-                    LoginProvider = Statics.ApiUnitTestLoginB,
+                    LoginProvider = Statics.ApiUnitTestLogin2,
                     Immutable = false
                 }).Devolve());
 
@@ -106,7 +106,7 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(
                 new UserCreate()
                 {
-                    Email = Statics.ApiUnitTestUserA,
+                    Email = Statics.ApiUnitTestUser1,
                     PhoneNumber = Statics.ApiDefaultPhone,
                     FirstName = "First " + RandomValues.CreateBase64String(4),
                     LastName = "Last " + RandomValues.CreateBase64String(4),
@@ -115,7 +115,7 @@ namespace Bhbk.Lib.Identity.Database
                     Immutable = false,
                 }).Devolve(), Statics.ApiUnitTestUserPassCurrent);
 
-            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUserA).Single();
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUser1).Single();
 
             await _ioc.UserMgmt.Store.SetEmailConfirmedAsync(user, true);
             await _ioc.UserMgmt.Store.SetPasswordConfirmedAsync(user, true);
@@ -125,7 +125,7 @@ namespace Bhbk.Lib.Identity.Database
             await _ioc.UserMgmt.CreateAsync(new UserFactory<UserCreate>(
                 new UserCreate()
                 {
-                    Email = Statics.ApiUnitTestUserB,
+                    Email = Statics.ApiUnitTestUser2,
                     PhoneNumber = Statics.ApiDefaultPhone,
                     FirstName = "First " + RandomValues.CreateBase64String(4),
                     LastName = "Last " + RandomValues.CreateBase64String(4),
@@ -133,16 +133,16 @@ namespace Bhbk.Lib.Identity.Database
                     Immutable = false,
                 }).Devolve(), Statics.ApiUnitTestUserPassCurrent);
 
-            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUserB).Single();
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUser2).Single();
 
             await _ioc.UserMgmt.Store.SetEmailConfirmedAsync(user, true);
             await _ioc.UserMgmt.Store.SetPasswordConfirmedAsync(user, true);
             await _ioc.UserMgmt.Store.SetPhoneNumberConfirmedAsync(user, true);
 
             //assign roles, claims & logins to user A
-            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUserA).Single();
-            role = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestRoleA).Single();
-            login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiUnitTestLoginA).Single();
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUser1).Single();
+            role = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestRole1).Single();
+            login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiUnitTestLogin1).Single();
 
             await _ioc.UserMgmt.AddClaimAsync(user, new Claim(Statics.ApiUnitTestClaimType, Statics.ApiUnitTestClaimValue));
 
@@ -153,9 +153,9 @@ namespace Bhbk.Lib.Identity.Database
                 await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
 
             //assign roles, claims & logins to user B
-            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUserB).Single();
-            role = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestRoleB).Single();
-            login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiUnitTestLoginB).Single();
+            user = _ioc.UserMgmt.Store.Get(x => x.Email == Statics.ApiUnitTestUser2).Single();
+            role = _ioc.RoleMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestRole2).Single();
+            login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Statics.ApiUnitTestLogin2).Single();
 
             await _ioc.UserMgmt.AddClaimAsync(user, new Claim(Statics.ApiUnitTestClaimType, Statics.ApiUnitTestClaimValue));
 
@@ -166,26 +166,26 @@ namespace Bhbk.Lib.Identity.Database
                 await _ioc.UserMgmt.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
 
             //assign uris to audience A
-            audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudienceA).Single();
+            audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudience1).Single();
 
             await _ioc.AudienceMgmt.AddUriAsync(new AudienceUriFactory<AudienceUriCreate>(
                 new AudienceUriCreate()
                 {
                     AudienceId = audience.Id,
-                    Name = Statics.ApiUnitTestUriA,
-                    AbsoluteUri = Statics.ApiUnitTestUriALink,
+                    Name = Statics.ApiUnitTestUri1,
+                    AbsoluteUri = Statics.ApiUnitTestUri1Link,
                     Enabled = true,
                 }).Devolve());
 
             //assign uris to audience B
-            audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudienceB).Single();
+            audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Statics.ApiUnitTestAudience2).Single();
 
             await _ioc.AudienceMgmt.AddUriAsync(new AudienceUriFactory<AudienceUriCreate>(
                 new AudienceUriCreate()
                 {
                     AudienceId = audience.Id,
-                    Name = Statics.ApiUnitTestUriB,
-                    AbsoluteUri = Statics.ApiUnitTestUriBLink,
+                    Name = Statics.ApiUnitTestUri2,
+                    AbsoluteUri = Statics.ApiUnitTestUri2Link,
                     Enabled = true,
                 }).Devolve());
         }
@@ -199,12 +199,12 @@ namespace Bhbk.Lib.Identity.Database
                 AppRole role;
                 AppAudience audience;
 
-                var clientName = Statics.ApiUnitTestClientA + "-" + RandomValues.CreateBase64String(4);
-                var audienceName = Statics.ApiUnitTestAudienceA + "-" + RandomValues.CreateBase64String(4);
-                var roleName = Statics.ApiUnitTestRoleA + "-" + RandomValues.CreateBase64String(4);
-                var loginName = Statics.ApiUnitTestLoginA + "-" + RandomValues.CreateBase64String(4);
-                var userName = RandomValues.CreateBase64String(4) + "-" + Statics.ApiUnitTestUserA;
-                var uriName = Statics.ApiUnitTestUriA + "-" + RandomValues.CreateBase64String(4);
+                var clientName = Statics.ApiUnitTestClient1 + "-" + RandomValues.CreateBase64String(4);
+                var audienceName = Statics.ApiUnitTestAudience1 + "-" + RandomValues.CreateBase64String(4);
+                var roleName = Statics.ApiUnitTestRole1 + "-" + RandomValues.CreateBase64String(4);
+                var loginName = Statics.ApiUnitTestLogin1 + "-" + RandomValues.CreateBase64String(4);
+                var userName = RandomValues.CreateAlphaNumericString(4) + "-" + Statics.ApiUnitTestUser1;
+                var uriName = Statics.ApiUnitTestUri1 + "-" + RandomValues.CreateBase64String(4);
 
                 //create random client
                 await _ioc.ClientMgmt.CreateAsync(new ClientFactory<ClientCreate>(
@@ -251,8 +251,8 @@ namespace Bhbk.Lib.Identity.Database
                     {
                         Email = userName,
                         PhoneNumber = Statics.ApiDefaultPhone,
-                        FirstName = "First " + RandomValues.CreateBase64String(4),
-                        LastName = "Last " + RandomValues.CreateBase64String(4),
+                        FirstName = "First-" + RandomValues.CreateBase64String(4),
+                        LastName = "Last-" + RandomValues.CreateBase64String(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
@@ -282,7 +282,7 @@ namespace Bhbk.Lib.Identity.Database
                     {
                         AudienceId = audience.Id,
                         Name = uriName,
-                        AbsoluteUri = Statics.ApiUnitTestUriALink,
+                        AbsoluteUri = Statics.ApiUnitTestUri1Link,
                         Enabled = true,
                     }).Devolve());
             }

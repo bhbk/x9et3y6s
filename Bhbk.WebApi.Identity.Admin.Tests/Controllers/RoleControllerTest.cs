@@ -38,11 +38,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new RoleCreate()
             {
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestRole1,
                 Enabled = true,
             };
             var create = await _ioc.RoleMgmt.CreateAsync(new RoleFactory<AppRole>(model).Devolve());
@@ -65,8 +65,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRole1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             _ioc.RoleMgmt.Store.SetImmutableAsync(role, true);
             controller.SetUser(user.Id);
@@ -88,11 +88,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleCreate()
             {
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestRole1,
                 Enabled = true,
                 Immutable = false
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -110,8 +110,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRole1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRole1).Single();
 
             var result = await controller.GetRoleV1(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRole1).Single();
 
             var result = await controller.GetRoleV1(role.Name) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -165,14 +165,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "name";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/role/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -198,10 +198,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
+            string orderBy = "name";
 
             var response = await request.GetAsync("/role/v1?"
-                + "orderBy=" + order);
+                + "orderBy=" + orderBy);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -227,14 +227,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "name";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/role/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<RoleResult>>();
             var data = ok.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
 
-            data.Count().Should().Be(size);
+            data.Count().Should().Be(take);
         }
 
         [TestMethod]
@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRole1).Single();
 
             var result = await controller.GetRoleUsersV1(role.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -268,11 +268,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
             var model = new RoleCreate()
             {
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestRoleA,
+                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestRole1,
                 Enabled = true,
                 Immutable = false
             };
@@ -301,16 +301,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new RoleController(_conf, _ioc, _tasks);
-            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRoleA).Single();
+            var role = _ioc.RoleMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestRole1).Single();
             var model = new RoleUpdate()
             {
                 Id = role.Id,
                 AudienceId = _ioc.AudienceMgmt.Store.Get().First().Id,
-                Name = BaseLib.Statics.ApiUnitTestRoleA + "(Updated)",
+                Name = BaseLib.Statics.ApiUnitTestRole1 + "(Updated)",
                 Enabled = true,
                 Immutable = false
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 

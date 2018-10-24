@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _tests.DestroyAll();
             _tests.Create();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -48,33 +48,33 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _tests.DestroyAll();
             _tests.Create();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await _sts.ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public async Task Api_Sts_OAuth_ClientV2_Fail_ClientSecret()
         {
             _tests.DestroyAll();
             _tests.Create();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await _sts.ClientCredentialsV2(client.Id.ToString(), RandomValues.CreateBase64String(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public async Task Api_Sts_OAuth_ClientV2_Success()
         {
             _tests.DestroyAll();
             _tests.Create();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClientA).Single();
+            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestClient1).Single();
 
             var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));

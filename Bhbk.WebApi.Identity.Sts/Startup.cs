@@ -105,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
-            //sc.AddSession();
+            sc.AddSession();
             sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseStaticFiles();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
-            //app.UseSession();
+            app.UseSession();
             app.UseMvc();
 
             //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware

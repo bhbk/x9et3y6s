@@ -40,11 +40,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new AudienceCreate()
             {
                 ClientId = _ioc.ClientMgmt.Store.Get().First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
+                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestAudience1,
                 AudienceType = RandomValues.CreateBase64String(8),
                 Enabled = true,
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -59,8 +59,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new AudienceController(_conf, _ioc, _tasks);
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudience1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             _ioc.AudienceMgmt.Store.SetImmutableAsync(audience, true);
             controller.SetUser(user.Id);
@@ -82,11 +82,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new AudienceCreate()
             {
                 ClientId = _ioc.ClientMgmt.Store.Get().First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestAudienceA,
+                Name = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestAudience1,
                 AudienceType = BaseLib.AudienceType.user_agent.ToString(),
                 Enabled = true,
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -104,8 +104,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new AudienceController(_conf, _ioc, _tasks);
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudience1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -123,8 +123,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new AudienceController(_conf, _ioc, _tasks);
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudience1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -142,8 +142,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new AudienceController(_conf, _ioc, _tasks);
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudience1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -165,14 +165,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "name";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/audience/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -227,14 +227,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
-            ushort size = 3;
-            ushort page = 1;
+            string orderBy = "name";
+            ushort take = 3;
+            ushort skip = 1;
 
             var response = await request.GetAsync("/audience/v1?"
-                + "orderBy=" + order + "&"
-                + "pageSize=" + size.ToString() + "&"
-                + "pageNumber=" + page.ToString());
+                + "orderBy=" + orderBy + "&"
+                + "take=" + take.ToString() + "&"
+                + "skip=" + skip.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<AudienceResult>>();
             var data = ok.Should().BeAssignableTo<IEnumerable<AudienceResult>>().Subject;
 
-            data.Count().Should().Be(size);
+            data.Count().Should().Be(take);
         }
 
         [TestMethod]
@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new AudienceController(_conf, _ioc, _tasks);
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudience1).Single();
 
             var result = await controller.GetAudienceRolesV1(audience.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -268,16 +268,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.Create();
 
             var controller = new AudienceController(_conf, _ioc, _tasks);
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudienceA).Single();
+            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == BaseLib.Statics.ApiUnitTestAudience1).Single();
             var model = new AudienceUpdate()
             {
                 Id = audience.Id,
                 ClientId = _ioc.ClientMgmt.Store.Get().First().Id,
-                Name = BaseLib.Statics.ApiUnitTestAudienceA + "(Updated)",
+                Name = BaseLib.Statics.ApiUnitTestAudience1 + "(Updated)",
                 AudienceType = audience.AudienceType,
                 Enabled = true
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUserA).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 

@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Core.Providers;
+using Bhbk.Lib.Identity;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Builder;
@@ -6,11 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
@@ -44,14 +44,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             //check if correct v2 path, method, content and params...
             if (context.Request.Path.Equals("/oauth/v1/authorization", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
-                && (context.Request.Query.ContainsKey(BaseLib.Statics.AttrClientIDV1)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrRedirectUriIDV1)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV1)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrAuthorizeCodeIDV1)))
+                && (context.Request.Query.ContainsKey(Statics.AttrClientIDV1)
+                    && context.Request.Query.ContainsKey(Statics.AttrRedirectUriIDV1)
+                    && context.Request.Query.ContainsKey(Statics.AttrGrantTypeIDV1)
+                    && context.Request.Query.ContainsKey(Statics.AttrAuthorizeCodeIDV1)))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysNotImplemented }, _serializer));
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysNotImplemented }, _serializer));
             }
 
             #endregion
@@ -61,30 +61,30 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             //check if correct v2 path, method, content and params...
             if (context.Request.Path.Equals("/oauth/v2/authorization", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
-                && (context.Request.Query.ContainsKey(BaseLib.Statics.AttrClientIDV2)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrUserIDV2)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrRedirectUriIDV2)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrGrantTypeIDV2)
-                || context.Request.Query.ContainsKey(BaseLib.Statics.AttrAuthorizeCodeIDV2)))
+                && (context.Request.Query.ContainsKey(Statics.AttrClientIDV2)
+                    && context.Request.Query.ContainsKey(Statics.AttrUserIDV2)
+                    && context.Request.Query.ContainsKey(Statics.AttrRedirectUriIDV2)
+                    && context.Request.Query.ContainsKey(Statics.AttrGrantTypeIDV2)
+                    && context.Request.Query.ContainsKey(Statics.AttrAuthorizeCodeIDV2)))
             {
                 var urlValues = context.Request.Query;
 
-                string clientValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrClientIDV2).Value;
-                string userValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrUserIDV2).Value;
-                string redirectUriValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrRedirectUriIDV2).Value;
-                string grantTypeValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrGrantTypeIDV2).Value;
-                string authorizationCodeValue = urlValues.FirstOrDefault(x => x.Key == BaseLib.Statics.AttrAuthorizeCodeIDV2).Value;
+                string clientValue = urlValues.FirstOrDefault(x => x.Key == Statics.AttrClientIDV2).Value;
+                string userValue = urlValues.FirstOrDefault(x => x.Key == Statics.AttrUserIDV2).Value;
+                string redirectUriValue = urlValues.FirstOrDefault(x => x.Key == Statics.AttrRedirectUriIDV2).Value;
+                string grantTypeValue = urlValues.FirstOrDefault(x => x.Key == Statics.AttrGrantTypeIDV2).Value;
+                string authorizationCodeValue = urlValues.FirstOrDefault(x => x.Key == Statics.AttrAuthorizeCodeIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(redirectUriValue) || !Uri.IsWellFormedUriString(redirectUriValue, UriKind.RelativeOrAbsolute)
-                    || !grantTypeValue.Equals(BaseLib.Statics.AttrAuthorizeCodeIDV2)
+                    || !grantTypeValue.Equals(Statics.AttrAuthorizeCodeIDV2)
                     || string.IsNullOrEmpty(authorizationCodeValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgSysParamsInvalid }, _serializer));
                 }
 
                 var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
@@ -105,14 +105,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientNotExist }, _serializer));
                 }
 
                 if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgClientInvalid }, _serializer));
                 }
 
                 Guid userID;
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalid }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalid }, _serializer));
                 }
 
                 //check that payload can be decrypted and validated...
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUserInvalidToken }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUserInvalidToken }, _serializer));
                 }
 
                 //add all audiences user is member of...
@@ -163,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = BaseLib.Statics.MsgUriNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Statics.MsgUriNotExist }, _serializer));
                 }
 
                 var access = JwtSecureProvider.CreateAccessTokenV2(ioc, client, audiences, user).Result;
@@ -184,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
-                    ActivityType = ActivityType.StsAuthorizationCode.ToString(),
+                    ActivityType = LoginType.GenerateAuthorizationCode.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
                 });
