@@ -27,24 +27,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public void Api_Admin_DiagV1_GetStatus_Fail_Invalid()
         {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
+            var controller = new DiagnosticController(_conf, _uow, _tasks);
 
             var result = controller.GetStatusV1(RandomValues.CreateAlphaNumericString(8)) as BadRequestResult;
             var ok = result.Should().BeOfType<BadRequestResult>().Subject;
         }
 
         [TestMethod]
-        public async Task Api_Admin_DiagV1_GetSwagger_Success()
-        {
-            var result = await _owin.CreateClient().GetAsync("/help/index.html");
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
-
-        [TestMethod]
         public void Api_Admin_DiagV1_GetStatus_Success()
         {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
+            var controller = new DiagnosticController(_conf, _uow, _tasks);
 
             var result = controller.GetStatusV1(Enums.TaskType.MaintainActivity.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -56,9 +48,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
+        public async Task Api_Admin_DiagV1_GetSwagger_Success()
+        {
+            var result = await _owin.CreateClient().GetAsync("/help/index.html");
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [TestMethod]
         public void Api_Admin_DiagV1_GetVersion_Success()
         {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
+            var controller = new DiagnosticController(_conf, _uow, _tasks);
 
             var result = controller.GetVersionV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

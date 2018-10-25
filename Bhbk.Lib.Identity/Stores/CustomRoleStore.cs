@@ -30,7 +30,6 @@ namespace Bhbk.Lib.Identity.Stores
         public override Task<IdentityResult> CreateAsync(AppRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             _context.AppRole.Add(role);
-            _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -38,7 +37,6 @@ namespace Bhbk.Lib.Identity.Stores
         public override Task<IdentityResult> DeleteAsync(AppRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             _context.AppRole.Remove(role);
-            _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -106,7 +104,6 @@ namespace Bhbk.Lib.Identity.Stores
             role.LastUpdated = DateTime.Now;
 
             _context.Entry(role).State = EntityState.Modified;
-            _context.SaveChanges();
 
             return true;
         }
@@ -115,6 +112,10 @@ namespace Bhbk.Lib.Identity.Stores
         {
             var model = _context.AppRole.Where(x => x.Id == role.Id).Single();
 
+            /*
+             * only persist certain fields.
+             */
+
             model.Name = role.Name;
             model.Description = role.Description;
             model.Enabled = role.Enabled;
@@ -122,7 +123,6 @@ namespace Bhbk.Lib.Identity.Stores
             model.Immutable = role.Immutable;
 
             _context.Entry(model).State = EntityState.Modified;
-            _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }

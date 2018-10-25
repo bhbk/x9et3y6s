@@ -1,10 +1,12 @@
-﻿using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Stores;
+﻿using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Security.Claims;
@@ -22,16 +24,22 @@ namespace Bhbk.Lib.Identity.Providers
 
     public class ClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
     {
+        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private readonly IConfigurationRoot _conf;
         private readonly UserManager<AppUser> _userMgmt;
-        private readonly ConfigStore _conf;
 
-        public ClaimsProvider(UserManager<AppUser> userMgmt, ConfigStore conf)
+        public ClaimsProvider(UserManager<AppUser> userMgmt)
         {
             if (userMgmt == null)
                 throw new ArgumentNullException();
 
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             _userMgmt = userMgmt;
-            _conf = conf;
         }
 
         public async Task<ClaimsPrincipal> CreateAsync(AppUser user)
@@ -42,7 +50,7 @@ namespace Bhbk.Lib.Identity.Providers
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
             //check if claims compatibility enabled. means pack claim(s) with old name too.
-            if (_conf.Values.DefaultsCompatibilityModeClaims)
+            if (bool.Parse(_conf["IdentityDefaults:CompatibilityModeClaims"]))
                 foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
                     claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
 
@@ -63,7 +71,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan((int)_conf.Values.DefaultsAccessTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -85,7 +93,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan((int)_conf.Values.DefaultsRefreshTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);

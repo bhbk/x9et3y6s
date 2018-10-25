@@ -38,15 +38,15 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new IdentityContext(builder, ContextType.Live);
+                Statics.UoW = new IdentityContext(builder, ContextType.Live);
 
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = ConsoleHelper.GetHiddenInput();
-                    var hashvalue = Statics.IoC.UserMgmt.PasswordHasher.HashPassword(null, cleartext);
+                    var hashvalue = Statics.UoW.CustomUserMgr.PasswordHasher.HashPassword(null, cleartext);
 
-                    if (Statics.IoC.UserMgmt.PasswordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (Statics.UoW.CustomUserMgr.PasswordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

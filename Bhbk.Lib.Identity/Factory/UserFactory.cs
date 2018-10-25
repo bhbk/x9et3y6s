@@ -72,7 +72,22 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = user.Immutable;
         }
 
-        public AppUser Devolve()
+        public UserFactory(UserUpdate user)
+        {
+            this.Id = user.Id;
+            this.ActorId = user.ActorId;
+            this.Email = user.Email;
+            this.PhoneNumber = user.PhoneNumber;
+            this.FirstName = user.FirstName;
+            this.LastName = user.LastName;
+            this.LastUpdated = DateTime.Now;
+            this.LockoutEnabled = user.LockoutEnabled;
+            this.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
+            this.HumanBeing = user.HumanBeing;
+            this.Immutable = user.Immutable;
+        }
+
+        public AppUser ToStore()
         {
             return new AppUser
             {
@@ -108,7 +123,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public UserResult Evolve()
+        public UserResult ToClient()
         {
             return new UserResult
             {
@@ -135,17 +150,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Logins = AppUserLogin.Where(x => x.UserId == this.Id).Select(x => x.LoginId.ToString()).ToList(),
                 Roles = AppUserRole.Where(x => x.UserId == this.Id).Select(x => x.RoleId.ToString()).ToList(),
             };
-        }
-
-        public void Update(UserUpdate user)
-        {
-            this.Id = user.Id;
-            this.ActorId = user.ActorId;
-            this.FirstName = user.FirstName;
-            this.LastName = user.LastName;
-            this.LastUpdated = DateTime.Now;
-            this.LockoutEnabled = user.LockoutEnabled;
-            this.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
         }
     }
 

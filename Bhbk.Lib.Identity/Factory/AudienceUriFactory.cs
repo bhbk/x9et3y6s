@@ -29,7 +29,18 @@ namespace Bhbk.Lib.Identity.Factory
             this.Created = DateTime.Now;
         }
 
-        public AppAudienceUri Devolve()
+        public AudienceUriFactory(AudienceUriUpdate audience)
+        {
+            this.Id = audience.Id;
+            this.AudienceId = audience.AudienceId;
+            this.ActorId = audience.ActorId;
+            this.AbsoluteUri = audience.AbsoluteUri;
+            this.Enabled = audience.Enabled;
+            this.Created = audience.Created;
+            this.LastUpdated = DateTime.Now;
+        }
+
+        public AppAudienceUri ToStore()
         {
             return new AppAudienceUri
             {
@@ -43,7 +54,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public AudienceUriResult Evolve()
+        public AudienceUriResult ToClient()
         {
             return new AudienceUriResult()
             {
@@ -55,17 +66,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Created = this.Created,
                 LastUpdated = this.LastUpdated ?? null,
             };
-        }
-
-        public void Update(AudienceUriUpdate audience)
-        {
-            this.Id = audience.Id;
-            this.AudienceId = audience.AudienceId;
-            this.ActorId = audience.ActorId;
-            this.AbsoluteUri = audience.AbsoluteUri;
-            this.Enabled = audience.Enabled;
-            this.Created = audience.Created;
-            this.LastUpdated = DateTime.Now;
         }
     }
 

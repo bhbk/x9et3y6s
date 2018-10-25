@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.ExpiresUtc = refresh.ExpiresUtc;
         }
 
-        public AppUserRefresh Devolve()
+        public AppUserRefresh ToStore()
         {
             return new AppUserRefresh
             {
@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public UserRefreshResult Evolve()
+        public UserRefreshResult ToClient()
         {
             return new UserRefreshResult
             {

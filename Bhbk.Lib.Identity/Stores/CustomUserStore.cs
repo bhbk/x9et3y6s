@@ -420,6 +420,7 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
+        [Obsolete]
         public override Task SetEmailConfirmedAsync(AppUser user, bool confirmed, CancellationToken cancellationToken = default(CancellationToken))
         {
             user.EmailConfirmed = confirmed;
@@ -442,6 +443,7 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
+        [Obsolete]
         public Task SetPasswordConfirmedAsync(AppUser user, bool confirmed)
         {
             user.PasswordConfirmed = confirmed;
@@ -464,6 +466,7 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(IdentityResult.Success);
         }
 
+        [Obsolete]
         public override Task SetPhoneNumberConfirmedAsync(AppUser user, bool confirmed, CancellationToken cancellationToken = default(CancellationToken))
         {
             user.PhoneNumberConfirmed = confirmed;
@@ -501,7 +504,10 @@ namespace Bhbk.Lib.Identity.Stores
         {
             var model = _context.AppUser.Where(x => x.Id == user.Id).Single();
 
-            model.UserName = user.Email;
+            /*
+             * only persist certain fields.
+             */
+
             model.FirstName = user.FirstName;
             model.LastName = user.LastName;
             model.LockoutEnabled = user.LockoutEnabled;

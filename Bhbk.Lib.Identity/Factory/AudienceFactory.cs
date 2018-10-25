@@ -38,7 +38,20 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = audience.Immutable;
         }
 
-        public AppAudience Devolve()
+        public AudienceFactory(AudienceUpdate audience)
+        {
+            this.Id = audience.Id;
+            this.ClientId = audience.ClientId;
+            this.ActorId = audience.ActorId;
+            this.Name = audience.Name;
+            this.Description = audience.Description ?? string.Empty;
+            this.AudienceType = audience.AudienceType;
+            this.LastUpdated = DateTime.Now;
+            this.Enabled = audience.Enabled;
+            this.Immutable = audience.Immutable;
+        }
+
+        public AppAudience ToStore()
         {
             return new AppAudience
             {
@@ -56,7 +69,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public AudienceResult Evolve()
+        public AudienceResult ToClient()
         {
             return new AudienceResult()
             {
@@ -71,19 +84,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Immutable = this.Immutable,
                 Roles = AppRole.Where(x => x.AudienceId == this.Id).Select(x => x.Id.ToString()).ToList()
             };
-        }
-
-        public void Update(AudienceUpdate audience)
-        {
-            this.Id = audience.Id;
-            this.ClientId = audience.ClientId;
-            this.ActorId = audience.ActorId;
-            this.Name = audience.Name;
-            this.Description = audience.Description ?? string.Empty;
-            this.AudienceType = audience.AudienceType;
-            this.LastUpdated = DateTime.Now;
-            this.Enabled = audience.Enabled;
-            this.Immutable = audience.Immutable;
         }
     }
 

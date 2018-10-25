@@ -3,7 +3,7 @@ using System;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppActivity : IActivity
+    public partial class AppActivity : IGenericActivity
     {
 
     }

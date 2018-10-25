@@ -23,7 +23,12 @@ namespace Bhbk.Lib.Identity.Factory
 
         }
 
-        public AppUserClaim Devolve()
+        public UserClaimFactory(UserClaimUpdate claim)
+        {
+
+        }
+
+        public AppUserClaim ToStore()
         {
             return new AppUserClaim
             {
@@ -34,16 +39,11 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public Claim Evolve()
+        public Claim ToClient()
         {
             return new Claim(this.ClaimType,
                 this.ClaimValue,
                 this.ClaimValueType);
-        }
-
-        public void Update(UserClaimUpdate claim)
-        {
-
         }
     }
 

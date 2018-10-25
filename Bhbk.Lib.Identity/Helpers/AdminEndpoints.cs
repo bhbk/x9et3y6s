@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Factory;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -10,28 +10,28 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Interop
+namespace Bhbk.Lib.Identity.Helpers
 {
-    public class AdminClient : AdminHelper
+    public class AdminClient : AdminEndpoints
     {
-        public AdminClient(IConfigurationRoot conf, ContextType context)
-            : base(conf, context) { }
+        public AdminClient(IConfigurationRoot conf, ContextType situation)
+            : base(conf, situation) { }
     }
 
-    public class AdminTester : AdminHelper
+    public class AdminTester : AdminEndpoints
     {
-        public AdminTester(IConfigurationRoot conf, TestServer connect)
-            : base(conf, connect) { }
+        public AdminTester(IConfigurationRoot conf, TestServer server)
+            : base(conf, server) { }
     }
 
     //https://oauth.com/playground/
-    public class AdminHelper
+    public class AdminEndpoints
     {
         protected readonly IConfigurationRoot _conf;
-        protected readonly ContextType _context;
+        protected readonly ContextType _situation;
         protected readonly HttpClient _connect;
 
-        public AdminHelper(IConfigurationRoot conf, ContextType context)
+        public AdminEndpoints(IConfigurationRoot conf, ContextType situation)
         {
             if (conf == null)
                 throw new ArgumentNullException();
@@ -41,19 +41,19 @@ namespace Bhbk.Lib.Identity.Interop
             //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
             connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
 
-            _context = context;
+            _situation = situation;
             _conf = conf;
             _connect = new HttpClient(connect);
         }
 
-        public AdminHelper(IConfigurationRoot conf, TestServer connect)
+        public AdminEndpoints(IConfigurationRoot conf, TestServer server)
         {
             if (conf == null)
                 throw new ArgumentNullException();
 
-            _context = ContextType.UnitTest;
+            _situation = ContextType.UnitTest;
             _conf = conf;
-            _connect = connect.CreateClient();
+            _connect = server.CreateClient();
         }
 
         public async Task<HttpResponseMessage> AudienceCreateV1(JwtSecurityToken jwt, AudienceCreate model)
@@ -67,10 +67,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -85,10 +85,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
             throw new NotSupportedException();
@@ -102,10 +102,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -123,10 +123,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -141,10 +141,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -159,10 +159,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -180,10 +180,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -201,10 +201,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -219,10 +219,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -237,10 +237,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -255,10 +255,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -276,10 +276,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -294,10 +294,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -312,10 +312,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -330,10 +330,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -351,10 +351,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -372,10 +372,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
@@ -390,10 +390,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.DeleteAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -408,10 +408,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
@@ -429,10 +429,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.PostAsync(endpoint, content);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 

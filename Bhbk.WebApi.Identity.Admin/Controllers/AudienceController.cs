@@ -21,8 +21,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public AudienceController() { }
 
-        public AudienceController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public AudienceController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpPost] 
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -33,9 +33,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var check = await IoC.AudienceMgmt.FindByNameAsync(model.Name);
+            var check = await UoW.AudienceRepo.GetAsync(x => x.Name == model.Name);
 
-            if (check != null)
+            if (check.Any())
                 return BadRequest(Strings.MsgAudienceAlreadyExists);
 
             Enums.AudienceType audienceType;
@@ -44,16 +44,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(Strings.MsgAudienceInvalid);
 
             var audience = new AudienceFactory<AudienceCreate>(model);
-            var result = await IoC.AudienceMgmt.CreateAsync(audience.Devolve());
+            var result = await UoW.AudienceRepo.CreateAsync(audience.ToStore());
 
-            return Ok(audience.Evolve());
+            await UoW.CommitAsync();
+
+            return Ok(audience.ToClient());
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteAudienceV1([FromRoute] Guid audienceID)
         {
-            var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
+            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
@@ -63,8 +65,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             audience.ActorId = GetUserGUID();
 
-            if (!await IoC.AudienceMgmt.DeleteAsync(audience))
+            if (!await UoW.AudienceRepo.DeleteAsync(audience))
                 return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -72,42 +76,39 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{audienceID:guid}"), HttpGet]
         public async Task<IActionResult> GetAudienceV1([FromRoute] Guid audienceID)
         {
-            var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
+            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
             var result = new AudienceFactory<AppAudience>(audience);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1/{audienceName}"), HttpGet]
         public async Task<IActionResult> GetAudienceV1([FromRoute] string audienceName)
         {
-            var audience = await IoC.AudienceMgmt.FindByNameAsync(audienceName);
+            var audience = (await UoW.AudienceRepo.GetAsync(x => x.Name == audienceName)).SingleOrDefault();
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
             var result = new AudienceFactory<AppAudience>(audience);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetAudiencesV1([FromQuery] Paging model)
+        public async Task<IActionResult> GetAudiencesV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audiences = IoC.AudienceMgmt.Store.Get()
-                .OrderBy(model.OrderBy)
-                .OrderBy(model.OrderBy)
-                .Skip(model.Skip)
-                .Take(model.Take);
+            var audiences = await UoW.AudienceRepo.GetAsync(x => true,
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).Evolve());
+            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).ToClient());
 
             return Ok(result);
         }
@@ -115,14 +116,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{audienceID:guid}/roles"), HttpGet]
         public async Task<IActionResult> GetAudienceRolesV1([FromRoute] Guid audienceID)
         {
-            var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
+            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            var roles = await IoC.AudienceMgmt.GetRoleListAsync(audienceID);
+            var roles = await UoW.AudienceRepo.GetRoleListAsync(audienceID);
 
-            var result = roles.Select(x => new RoleFactory<AppRole>(x).Evolve()).ToList();
+            var result = roles.Select(x => new RoleFactory<AppRole>(x).ToClient()).ToList();
 
             return Ok(result);
         }
@@ -136,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var audience = await IoC.AudienceMgmt.FindByIdAsync(model.Id);
+            var audience = await UoW.AudienceRepo.GetAsync(model.Id);
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
@@ -144,12 +145,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (audience.Immutable)
                 return BadRequest(Strings.MsgAudienceImmutable);
 
-            var update = new AudienceFactory<AppAudience>(audience);
-            update.Update(model);
+            var update = new AudienceFactory<AudienceUpdate>(model);
+            var result = await UoW.AudienceRepo.UpdateAsync(update.ToStore());
 
-            var result = await IoC.AudienceMgmt.UpdateAsync(update.Devolve());
+            await UoW.CommitAsync();
 
-            return Ok(update.Evolve());
+            return Ok(update.ToClient());
         }
     }
 }

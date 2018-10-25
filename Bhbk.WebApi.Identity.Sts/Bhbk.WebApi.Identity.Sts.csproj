@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bhbk.Lib.Alert" Version="2018.10.23.7391" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.23.7391" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.24.3149" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />

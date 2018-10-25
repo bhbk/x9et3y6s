@@ -9,7 +9,7 @@
   <TargetModelProvider>
     <ProjectBasedModelProvider>
       <ProjectGuid>{b707b63b-2f49-4e67-9eab-dd667fb8944c}</ProjectGuid>
-      <Name>Bhbk.Dal.Identity.Mssql</Name>
+      <Name>Bhbk.Mssql.Identity</Name>
     </ProjectBasedModelProvider>
   </TargetModelProvider>
   <SchemaCompareSettingsService>

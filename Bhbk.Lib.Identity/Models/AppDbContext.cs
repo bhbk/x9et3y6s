@@ -144,7 +144,6 @@ namespace Bhbk.Lib.Identity.Models
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.AppRole)
                     .HasForeignKey(d => d.AudienceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AppRole_AudienceID");
             });
 

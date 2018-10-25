@@ -21,8 +21,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClientController() { }
 
-        public ClientController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public ClientController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -33,23 +33,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var check = await IoC.ClientMgmt.FindByNameAsync(model.Name);
+            var check = await UoW.ClientRepo.GetAsync(x => x.Name == model.Name);
 
-            if (check != null)
+            if (check.Any())
                 return BadRequest(Strings.MsgClientAlreadyExists);
 
             var client = new ClientFactory<ClientCreate>(model);
 
-            var result = await IoC.ClientMgmt.CreateAsync(client.Devolve());
+            var result = await UoW.ClientRepo.CreateAsync(client.ToStore());
 
-            return Ok(client.Evolve());
+            return Ok(client.ToClient());
         }
 
         [Route("v1/{clientID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteClientV1([FromRoute] Guid clientID)
         {
-            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
+            var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
@@ -59,8 +59,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             client.ActorId = GetUserGUID();
 
-            if (!await IoC.ClientMgmt.DeleteAsync(client))
+            if (!await UoW.ClientRepo.DeleteAsync(client))
                 return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -68,41 +70,39 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{clientID:guid}"), HttpGet]
         public async Task<IActionResult> GetClientV1([FromRoute] Guid clientID)
         {
-            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
+            var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
             var result = new ClientFactory<AppAudience>(client);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1/{clientName}"), HttpGet]
         public async Task<IActionResult> GetClientV1([FromRoute] string clientName)
         {
-            var client = await IoC.ClientMgmt.FindByNameAsync(clientName);
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientName)).SingleOrDefault();
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
             var result = new ClientFactory<AppAudience>(client);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetClientsV1([FromQuery] Paging model)
+        public async Task<IActionResult> GetClientsV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var clients = IoC.ClientMgmt.Store.Get()
-                .OrderBy(model.OrderBy)
-                .Skip(model.Skip)
-                .Take(model.Take);
+            var clients = await UoW.ClientRepo.GetAsync(x => true,
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = clients.Select(x => new ClientFactory<AppClient>(x).Evolve());
+            var result = clients.Select(x => new ClientFactory<AppClient>(x).ToClient());
 
             return Ok(result);
         }
@@ -110,14 +110,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{clientID:guid}/audiences"), HttpGet]
         public async Task<IActionResult> GetClientAudiencesV1([FromRoute] Guid clientID)
         {
-            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
+            var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var audiences = await IoC.ClientMgmt.GetAudiencesAsync(clientID);
+            var audiences = await UoW.ClientRepo.GetAudiencesAsync(clientID);
 
-            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).Evolve()).ToList();
+            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).ToClient()).ToList();
 
             return Ok(result);
         }
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var client = await IoC.ClientMgmt.FindByIdAsync(model.Id);
+            var client = await UoW.ClientRepo.GetAsync(model.Id);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
@@ -139,12 +139,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (client.Immutable)
                 return BadRequest(Strings.MsgClientImmutable);
 
-            var update = new ClientFactory<AppClient>(client);
-            update.Update(model);
+            var update = new ClientFactory<ClientUpdate>(model);
+            var result = await UoW.ClientRepo.UpdateAsync(update.ToStore());
 
-            var result = await IoC.ClientMgmt.UpdateAsync(update.Devolve());
+            await UoW.CommitAsync();
 
-            return Ok(update.Evolve());
+            return Ok(update.ToClient());
         }
     }
 }

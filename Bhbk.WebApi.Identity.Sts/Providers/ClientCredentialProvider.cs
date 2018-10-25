@@ -12,20 +12,20 @@ using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
-    public static class ClientCredentialsExtension
+    public static class ClientCredentialExtension
     {
-        public static IApplicationBuilder UseClientCredentialsProvider(this IApplicationBuilder app)
+        public static IApplicationBuilder UseClientCredentialProvider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<ClientCredentialsProvider>();
+            return app.UseMiddleware<ClientCredentialProvider>();
         }
     }
 
-    public class ClientCredentialsProvider
+    public class ClientCredentialProvider
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public ClientCredentialsProvider(RequestDelegate next)
+        public ClientCredentialProvider(RequestDelegate next)
         {
             _next = next;
 
@@ -63,9 +63,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
 
-                if (ioc == null)
+                if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid clientID;
@@ -73,9 +73,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
-                    client = ioc.ClientMgmt.FindByIdAsync(clientID).Result;
+                    client = uow.ClientRepo.GetAsync(clientID).Result;
                 else
-                    client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
+                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).Single();
 
                 if (client == null)
                 {

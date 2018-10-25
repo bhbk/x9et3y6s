@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     public class BaseController : Controller
     {
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext _ioc;
+        private readonly IIdentityContext<AppDbContext> _uow;
         private readonly IHostedService[] _tasks;
         private readonly IJwtContext _jwt;
 
@@ -30,11 +31,11 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
         }
 
-        protected IIdentityContext IoC
+        protected IIdentityContext<AppDbContext> UoW
         {
             get
             {
-                return _ioc ?? (IIdentityContext)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityContext>();
+                return _uow ?? (IIdentityContext<AppDbContext>)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
             }
         }
 
@@ -56,15 +57,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
         public BaseController() { }
 
-        public BaseController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
+        public BaseController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
         {
-            if (conf == null || ioc == null || tasks == null)
+            if (conf == null || uow == null || tasks == null)
                 throw new ArgumentNullException();
 
             _conf = conf;
-            _ioc = ioc;
+            _uow = uow;
             _tasks = tasks;
-            _jwt = new JwtContext(_conf, _ioc.Status);
+            _jwt = new JwtContext(_conf, _uow.Situation);
         }
 
         [NonAction]
@@ -100,8 +101,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [NonAction]
         public void SetUser(Guid userID)
         {
-            var user = IoC.UserMgmt.Store.FindByIdAsync(userID.ToString()).Result;
-            var identity = IoC.UserMgmt.ClaimProvider.CreateAsync(user).Result;
+            var user = UoW.CustomUserMgr.Store.FindByIdAsync(userID.ToString()).Result;
+            var identity = UoW.CustomUserMgr.ClaimProvider.CreateAsync(user).Result;
 
             ControllerContext.HttpContext = new DefaultHttpContext();
             ControllerContext.HttpContext.User = identity;

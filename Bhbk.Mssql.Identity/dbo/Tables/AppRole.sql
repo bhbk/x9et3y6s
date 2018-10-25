@@ -11,8 +11,10 @@
     [ConcurrencyStamp] NVARCHAR (MAX)   NULL,
     [Immutable]        BIT              CONSTRAINT [DF_AppRole_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_AppRole_ID] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_AppRole_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[AppAudience] ([Id]) ON UPDATE CASCADE
+    CONSTRAINT [FK_AppRole_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[AppAudience] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 

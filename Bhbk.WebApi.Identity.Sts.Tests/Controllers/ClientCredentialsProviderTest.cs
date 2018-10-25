@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Interop;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Primitives;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -31,10 +31,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_ClientV1_Fail_NotImplemented()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
             var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -44,10 +44,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_ClientV2_Fail_ClientNotFound()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
             var result = await _sts.ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -57,10 +57,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod, Ignore]
         public async Task Api_Sts_OAuth_ClientV2_Fail_ClientSecret()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
             var result = await _sts.ClientCredentialsV2(client.Id.ToString(), RandomValues.CreateBase64String(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -70,10 +70,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod, Ignore]
         public async Task Api_Sts_OAuth_ClientV2_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
             var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));

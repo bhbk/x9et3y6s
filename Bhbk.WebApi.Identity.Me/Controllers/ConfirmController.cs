@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -17,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public ConfirmController() { }
 
-        public ConfirmController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public ConfirmController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
 
         [Route("v1/email/{userID:guid}"), HttpPut]
@@ -27,15 +28,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            if (!await new ProtectProvider(IoC.Status.ToString()).ValidateAsync(email, token, user))
+            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(email, token, user))
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            await IoC.UserMgmt.Store.SetEmailConfirmedAsync(user, true);
+            await UoW.CustomUserMgr.Store.SetEmailConfirmedAsync(user, true);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -46,15 +49,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            if (!await new ProtectProvider(IoC.Status.ToString()).ValidateAsync(password, token, user))
+            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(password, token, user))
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            await IoC.UserMgmt.Store.SetPasswordConfirmedAsync(user, true);
+            await UoW.CustomUserMgr.Store.SetPasswordConfirmedAsync(user, true);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -65,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -73,7 +78,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            await IoC.UserMgmt.Store.SetPhoneNumberConfirmedAsync(user, true);
+            await UoW.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }

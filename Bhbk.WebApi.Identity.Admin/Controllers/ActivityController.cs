@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -18,22 +18,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ActivityController() { }
 
-        public ActivityController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public ActivityController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
-        public IActionResult GetActivityV1([FromQuery] Paging model)
+        public async Task<IActionResult> GetActivityV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var activity = IoC.Activity.Get()
-                .OrderBy(model.OrderBy)
-                .Skip(model.Skip)
-                .Take(model.Take);
+            var activity = await UoW.ActivityRepo.GetAsync(x => true, 
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = activity.Select(x => new ActivityFactory<AppActivity>(x).Evolve());
+            var result = activity.Select(x => new ActivityFactory<AppActivity>(x).ToClient());
 
             return Ok(result);
         }

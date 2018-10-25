@@ -34,20 +34,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_AddToUser_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var login = new LoginCreate()
             {
                 LoginProvider = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1
             };
-            var add = await _ioc.LoginMgmt.CreateAsync(new LoginFactory<LoginCreate>(login).Devolve());
+
+            var create = await _uow.LoginRepo.CreateAsync(new LoginFactory<LoginCreate>(login).ToStore());
+
+            await _uow.CommitAsync();
+
             var model = new UserLoginCreate()
             {
                 UserId = user.Id,
-                LoginId = add.Id,
+                LoginId = create.Id,
                 LoginProvider = login.LoginProvider,
                 ProviderDisplayName = login.LoginProvider,
                 ProviderKey = Strings.ApiUnitTestLogin1Key,
@@ -63,37 +67,41 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_Delete_Fail_Immutable()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Strings.ApiUnitTestLogin1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            _ioc.LoginMgmt.Store.SetImmutableAsync(login, true);
             controller.SetUser(user.Id);
+
+            login.Immutable = true;
+            await _uow.LoginRepo.UpdateAsync(login);
+            await _uow.CommitAsync();
 
             var result = await controller.DeleteLoginV1(login.Id) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = _ioc.LoginMgmt.Store.Get(x => x.Id == login.Id).Any();
+            var check = (await _uow.LoginRepo.GetAsync(x => x.Id == login.Id)).Any();
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Admin_LoginV1_Create_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            controller.SetUser(user.Id);
+
             var model = new LoginCreate()
             {
                 LoginProvider = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1
             };
-
-            controller.SetUser(user.Id);
 
             var result = await controller.CreateLoginV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -105,21 +113,27 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_RemoveFromUser_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-            var login = new LoginFactory<LoginCreate>(
-                new LoginCreate()
-                {
-                    LoginProvider = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1
-                }).Devolve();
-            var create = await _ioc.LoginMgmt.CreateAsync(login);
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            controller.SetUser(user.Id);
+
+            var login = await _uow.LoginRepo.CreateAsync(
+                new LoginFactory<LoginCreate>(
+                    new LoginCreate()
+                    {
+                        LoginProvider = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1
+                    }).ToStore());
+
+            await _uow.CommitAsync();
+
             var model = new UserLoginCreate()
             {
                 UserId = user.Id,
-                LoginId = create.Id,
+                LoginId = login.Id,
                 LoginProvider = login.LoginProvider,
                 ProviderDisplayName = login.LoginProvider,
                 ProviderKey = Strings.ApiUnitTestLogin1Key,
@@ -127,10 +141,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Immutable = false
             };
 
-            controller.SetUser(user.Id);
-
-            var add = await _ioc.UserMgmt.AddLoginAsync(user, 
+            var add = await _uow.CustomUserMgr.AddLoginAsync(user,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
+
+            await _uow.CommitAsync();
+
             add.Should().BeAssignableTo(typeof(IdentityResult));
             add.Succeeded.Should().BeTrue();
 
@@ -141,11 +156,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_GetById_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Strings.ApiUnitTestLogin1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
 
             var result = await controller.GetLoginV1(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -157,11 +172,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_GetByName_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Strings.ApiUnitTestLogin1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
 
             var result = await controller.GetLoginV1(login.LoginProvider) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -173,11 +188,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_GetList_Fail_Auth()
         {
-            _tests.DestroyAll();
-            _tests.CreateRandom(10);
-            _defaults.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreateRandom(10);
+            _uow.DefaultsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
+            var controller = new LoginController(_conf, _uow, _tasks);
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -198,18 +213,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_GetList_Fail_ParamInvalid()
         {
-            _tests.DestroyAll();
-            _tests.CreateRandom(10);
-            _defaults.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreateRandom(10);
+            _uow.DefaultsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiDefaultClient).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiDefaultAudienceUi).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
 
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtSecureProvider.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
+            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -227,18 +242,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_GetList_Success()
         {
-            _tests.DestroyAll();
-            _tests.CreateRandom(10);
-            _defaults.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreateRandom(10);
+            _uow.DefaultsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiDefaultClient).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiDefaultAudienceUi).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
 
             var audiences = new List<AppAudience>();
             audiences.Add(audience);
 
-            var access = JwtSecureProvider.CreateAccessTokenV2(_ioc, client, audiences, user).Result;
+            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, client, audiences, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -265,35 +280,36 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_GetUserList_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Strings.ApiUnitTestLogin1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
 
             var result = await controller.GetLoginUsersV1(login.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
             var data = ok.Value.Should().BeAssignableTo<IEnumerable<UserResult>>().Subject;
 
-            data.Count().Should().Be(_ioc.LoginMgmt.Store.GetUsers(login.Id).Count());
+            data.Count().Should().Be((await _uow.LoginRepo.GetUsersAsync(login.Id)).Count());
         }
 
         [TestMethod]
         public async Task Api_Admin_LoginV1_Update_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Strings.ApiUnitTestLogin1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            controller.SetUser(user.Id);
+
             var model = new LoginUpdate()
             {
                 Id = login.Id,
                 LoginProvider = login.LoginProvider + "(Updated)"
             };
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            controller.SetUser(user.Id);
 
             var result = await controller.UpdateLoginV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -305,19 +321,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_LoginV1_Delete_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new LoginController(_conf, _ioc, _tasks);
-            var login = _ioc.LoginMgmt.Store.Get(x => x.LoginProvider == Strings.ApiUnitTestLogin1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new LoginController(_conf, _uow, _tasks);
+            var login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
             var result = await controller.DeleteLoginV1(login.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = _ioc.LoginMgmt.Store.Get(x => x.Id == login.Id).Any();
+            var check = (await _uow.LoginRepo.GetAsync(x => x.Id == login.Id)).Any();
             check.Should().BeFalse();
         }
     }

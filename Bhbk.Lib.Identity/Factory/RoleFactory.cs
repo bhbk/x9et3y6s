@@ -39,7 +39,20 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = role.Immutable;
         }
 
-        public AppRole Devolve()
+        public RoleFactory(RoleUpdate role)
+        {
+            this.Id = role.Id;
+            this.AudienceId = role.AudienceId;
+            this.ActorId = role.ActorId;
+            this.Name = role.Name;
+            this.NormalizedName = role.Name;
+            this.Description = role.Description ?? string.Empty;
+            this.Enabled = role.Enabled;
+            this.LastUpdated = DateTime.Now;
+            this.Immutable = role.Immutable;
+        }
+
+        public AppRole ToStore()
         {
             return new AppRole
             {
@@ -58,7 +71,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public RoleResult Evolve()
+        public RoleResult ToClient()
         {
             return new RoleResult
             {
@@ -73,19 +86,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Claims = AppRoleClaim.Where(x => x.RoleId == this.Id).Select(x => x.RoleId.ToString()).ToList(),
                 Users = AppUserRole.Where(x => x.RoleId == this.Id).Select(x => x.UserId.ToString()).ToList(),
             };
-        }
-
-        public void Update(RoleUpdate role)
-        {
-            this.Id = role.Id;
-            this.AudienceId = role.AudienceId;
-            this.ActorId = role.ActorId;
-            this.Name = role.Name;
-            this.NormalizedName = role.Name;
-            this.Description = role.Description ?? string.Empty;
-            this.Enabled = role.Enabled;
-            this.LastUpdated = DateTime.Now;
-            this.Immutable = role.Immutable;
         }
     }
 

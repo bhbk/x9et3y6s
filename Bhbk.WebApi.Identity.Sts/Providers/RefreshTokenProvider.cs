@@ -69,9 +69,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
 
-                if (ioc == null)
+                if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid clientID;
@@ -79,9 +79,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
-                    client = ioc.ClientMgmt.FindByIdAsync(clientID).Result;
+                    client = uow.ClientRepo.GetAsync(clientID).Result;
                 else
-                    client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
+                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).Single();
 
                 if (client == null)
                 {
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
                 }
 
-                var refreshToken = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
+                var refreshToken = uow.CustomUserMgr.FindRefreshTokenAsync(refreshTokenValue).Result;
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
                 }
 
-                var user = ioc.UserMgmt.FindByIdAsync(refreshToken.UserId.ToString()).Result;
+                var user = uow.CustomUserMgr.FindByIdAsync(refreshToken.UserId.ToString()).Result;
 
                 //check that user exists...
                 if (user == null)
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 user.ActorId = user.Id;
 
                 //check that user is not locked...
-                if (ioc.UserMgmt.IsLockedOutAsync(user).Result
+                if (uow.CustomUserMgr.IsLockedOutAsync(user).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -131,13 +131,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var audienceList = ioc.UserMgmt.GetAudiencesAsync(user).Result;
+                var audienceList = uow.CustomUserMgr.GetAudiencesAsync(user).Result;
                 var audiences = new List<AppAudience>();
 
                 //check if audience is single, multiple or undefined...
                 if (string.IsNullOrEmpty(audienceValue))
-                    audiences = ioc.AudienceMgmt.Store.Get(x => audienceList.Contains(x.Id.ToString())
-                        && x.Enabled == true).ToList();
+                    audiences = uow.AudienceRepo.GetAsync(x => audienceList.Contains(x.Id.ToString())
+                        && x.Enabled == true).Result.ToList();
                 else
                 {
                     foreach (string entry in audienceValue.Split(","))
@@ -147,9 +147,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out audienceID))
-                            audience = ioc.AudienceMgmt.FindByIdAsync(audienceID).Result;
+                            audience = uow.AudienceRepo.GetAsync(audienceID).Result;
                         else
-                            audience = ioc.AudienceMgmt.FindByNameAsync(entry.Trim()).Result;
+                            audience = (uow.AudienceRepo.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
 
                         if (audience == null)
                         {
@@ -170,8 +170,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     }
                 }
 
-                var access = JwtSecureProvider.CreateAccessTokenV2(ioc, client, audiences, user).Result;
-                var refresh = JwtSecureProvider.CreateRefreshTokenV2(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV2(uow, client, audiences, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV2(uow, client, user).Result;
 
                 var result = new
                 {
@@ -180,11 +180,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     refresh_token = refresh,
                     user = user.Id.ToString(),
                     audience = audiences.Select(x => x.Id.ToString()),
-                    client = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                    client = client.Id.ToString() + ":" + uow.ClientRepo.Salt,
                 };
 
                 //add activity entry for login...
-                new ActivityProvider<AppActivity>(ioc.GetContext()).Commit(new AppActivity()
+                new ActivityProvider<AppActivity>(uow.Context).Commit(new AppActivity()
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
@@ -229,9 +229,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var ioc = context.RequestServices.GetRequiredService<IIdentityContext>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
 
-                if (ioc == null)
+                if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid clientID;
@@ -239,9 +239,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
-                    client = ioc.ClientMgmt.FindByIdAsync(clientID).Result;
+                    client = uow.ClientRepo.GetAsync(clientID).Result;
                 else
-                    client = ioc.ClientMgmt.FindByNameAsync(clientValue).Result;
+                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).Single();
 
                 if (client == null)
                 {
@@ -262,9 +262,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(audienceValue, out audienceID))
-                    audience = ioc.AudienceMgmt.FindByIdAsync(audienceID).Result;
+                    audience = uow.AudienceRepo.GetAsync(audienceID).Result;
                 else
-                    audience = ioc.AudienceMgmt.FindByNameAsync(audienceValue).Result;
+                    audience = (uow.AudienceRepo.GetAsync(x => x.Name == audienceValue).Result).SingleOrDefault();
 
                 if (audience == null)
                 {
@@ -280,7 +280,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgAudienceInvalid }, _serializer));
                 }
 
-                var refreshToken = ioc.UserMgmt.FindRefreshTokenAsync(refreshTokenValue).Result;
+                var refreshToken = uow.CustomUserMgr.FindRefreshTokenAsync(refreshTokenValue).Result;
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -291,7 +291,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
                 }
 
-                var user = ioc.UserMgmt.FindByIdAsync(refreshToken.UserId.ToString()).Result;
+                var user = uow.CustomUserMgr.FindByIdAsync(refreshToken.UserId.ToString()).Result;
 
                 //check that user exists...
                 if (user == null)
@@ -305,7 +305,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 user.ActorId = user.Id;
 
                 //check that user is not locked...
-                if (ioc.UserMgmt.IsLockedOutAsync(user).Result
+                if (uow.CustomUserMgr.IsLockedOutAsync(user).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -314,9 +314,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var access = JwtSecureProvider.CreateAccessTokenV1(ioc, client, audience, user).Result;
-                //var blah = 
-                var refresh = JwtSecureProvider.CreateRefreshTokenV1(ioc, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV1(uow, client, audience, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV1(uow, client, user).Result;
 
                 var result = new
                 {
@@ -325,11 +324,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     refresh_token = refresh,
                     user_id = user.Id.ToString(),
                     audience_id = audience.Id.ToString(),
-                    client_id = client.Id.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                    client_id = client.Id.ToString() + ":" + uow.ClientRepo.Salt,
                 };
 
                 //add activity entry for login...
-                new ActivityProvider<AppActivity>(ioc.GetContext()).Commit(new AppActivity()
+                new ActivityProvider<AppActivity>(uow.Context).Commit(new AppActivity()
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,

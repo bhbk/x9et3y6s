@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Interop;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
@@ -34,17 +34,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV1_Use_Fail_NotImplemented()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestAudience1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _sts.AuthorizationCodeV1(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -54,19 +54,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_ClientNotFound()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestAudience1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            _ioc.ClientMgmt.Store.Delete(client);
+            await _uow.ClientRepo.DeleteAsync(client);
 
             var check = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -76,12 +76,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_CodeNotValid()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestAudience1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
             var redirect = new Uri(url.AbsoluteUri);
@@ -95,16 +95,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UriNotValid()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestAudience1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var redirect = new Uri("https://app.test.net/a/invalid");
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -118,19 +118,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UserNotFound()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestAudience1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            _ioc.UserMgmt.Store.DeleteAsync(user).Wait();
+            _uow.CustomUserMgr.Store.DeleteAsync(user).Wait();
 
             var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -140,17 +140,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var client = _ioc.ClientMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestClient1).Single();
-            var audience = _ioc.AudienceMgmt.Store.Get(x => x.Name == Strings.ApiUnitTestAudience1).Single();
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var url = audience.AppAudienceUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
             var redirect = new Uri(url.AbsoluteUri);
-            var code = HttpUtility.UrlEncode(await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            var code = HttpUtility.UrlEncode(await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _sts.AuthorizationCodeV2(client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));

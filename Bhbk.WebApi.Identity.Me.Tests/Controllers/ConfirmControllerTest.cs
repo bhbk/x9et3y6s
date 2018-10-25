@@ -27,17 +27,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Email_Fail()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new ConfirmController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
+            var token = await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
@@ -48,17 +48,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Email_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new ConfirmController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
+            var token = await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
@@ -68,17 +68,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Password_Fail()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new ConfirmController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
+            var token = await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
@@ -89,17 +89,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Password_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new ConfirmController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(user.Id);
 
-            var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
+            var token = await new ProtectProvider(_uow.Situation.ToString())
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
@@ -109,11 +109,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_PhoneNumber_Fail()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new ConfirmController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
@@ -129,11 +129,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_PhoneNumber_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new ConfirmController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);

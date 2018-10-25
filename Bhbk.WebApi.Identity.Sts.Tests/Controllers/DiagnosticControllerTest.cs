@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public void Api_Sts_DiagV1_GetStatus_Fail_Invalid()
         {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
+            var controller = new DiagnosticController(_conf, _uow, _tasks);
 
             var result = controller.GetStatusV1(RandomValues.CreateAlphaNumericString(8)) as BadRequestResult;
             var ok = result.Should().BeOfType<BadRequestResult>().Subject;
@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public void Api_Sts_DiagV1_GetStatus_Success()
         {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
+            var controller = new DiagnosticController(_conf, _uow, _tasks);
 
             var result = controller.GetStatusV1(Enums.TaskType.MaintainTokens.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public void Api_Sts_DiagV1_GetVersion_Success()
         {
-            var controller = new DiagnosticController(_conf, _ioc, _tasks);
+            var controller = new DiagnosticController(_conf, _uow, _tasks);
 
             var result = controller.GetVersionV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;

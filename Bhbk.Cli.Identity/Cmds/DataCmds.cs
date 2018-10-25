@@ -1,6 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Identity.Database;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using ManyConsole;
@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
-using Bhbk.Lib.Core.Primitives.Enums;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
@@ -40,8 +39,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new IdentityContext(builder, ContextType.Live);
-                Defaults seed = new Defaults(Statics.IoC);
+                Statics.UoW = new IdentityContext(builder, ContextType.Live);
 
                 if (CreateDefault)
                 {
@@ -49,7 +47,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    seed.Create();
+                    Statics.UoW.DefaultsCreate();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -60,7 +58,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    seed.Destroy();
+                    Statics.UoW.DefautsDestroy();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -71,7 +69,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    seed.Destroy();
+                    Statics.UoW.DefautsDestroy();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

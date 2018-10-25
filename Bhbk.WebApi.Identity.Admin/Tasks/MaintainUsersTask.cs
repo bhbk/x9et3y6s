@@ -18,14 +18,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     {
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext _ioc;
+        private readonly IIdentityContext<AppDbContext> _uow;
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainUsersTask(IIdentityContext ioc)
+        public MaintainUsersTask(IIdentityContext<AppDbContext> uow)
         {
-            if (ioc == null)
+            if (uow == null)
                 throw new ArgumentNullException();
 
             _serializer = new JsonSerializerSettings
@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 .Build();
 
             _delay = int.Parse(_conf["Tasks:MaintainUsers:PollingDelay"]);
-            _ioc = ioc;
+            _uow = uow;
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 {
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var disabled = _ioc.UserMgmt.Store.Context.AppUser
+                    var disabled = _uow.CustomUserMgr.Store.Context.AppUser
                         .Where(x => x.LockoutEnd < DateTime.UtcNow);
                     var disabledCount = disabled.Count();
 
@@ -66,10 +66,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         {
                             entry.LockoutEnabled = false;
                             entry.LockoutEnd = null;
-                            _ioc.UserMgmt.Store.Context.Entry(entry).State = EntityState.Modified;
+                            _uow.CustomUserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
                         }
 
-                        _ioc.UserMgmt.Store.Context.SaveChanges();
+                        _uow.CustomUserMgr.Store.Context.SaveChanges();
 
                         var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                 + disabledCount.ToString() + " users with expired lock-outs.";

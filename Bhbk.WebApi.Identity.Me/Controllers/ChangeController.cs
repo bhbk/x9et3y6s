@@ -3,6 +3,7 @@ using Bhbk.Lib.Alert.Interop;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Http;
@@ -21,8 +22,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public ChangeController() { }
 
-        public ChangeController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public ChangeController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1/email"), HttpPut]
         public async Task<IActionResult> ChangeEmailV1([FromBody] UserChangeEmail model)
@@ -30,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -44,15 +45,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (model.NewEmail != model.NewEmailConfirm)
                 return BadRequest(Strings.MsgUserInvalidEmailConfirm);
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.Status.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(IoC.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), user));
 
-            if (IoC.Status == ContextType.UnitTest)
+            if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
             var url = LinkBuilder.ConfirmEmail(Conf, user, token);
 
-            var alert = new AlertClient(Conf, IoC.Status);
+            var alert = new AlertClient(Conf, UoW.Situation);
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -82,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -93,21 +94,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.CustomUserMgr.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
                 return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.Status.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(IoC.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), user));
 
-            if (IoC.Status == ContextType.UnitTest)
+            if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
             var url = LinkBuilder.ConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, IoC.Status);
+            var alert = new AlertClient(Conf, UoW.Situation);
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -137,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -156,12 +157,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
-            if (IoC.Status == ContextType.UnitTest)
+            if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
             var url = LinkBuilder.ConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, IoC.Status);
+            var alert = new AlertClient(Conf, UoW.Situation);
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

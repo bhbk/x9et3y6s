@@ -35,7 +35,20 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = login.Immutable;
         }
 
-        public AppUserLogin Devolve()
+        public UserLoginFactory(UserLoginUpdate login)
+        {
+            this.LoginId = login.LoginId;
+            this.UserId = login.UserId;
+            this.LoginProvider = login.LoginProvider;
+            this.ProviderDisplayName = login.ProviderDisplayName ?? string.Empty;
+            this.ProviderDescription = login.ProviderDescription ?? string.Empty;
+            this.ProviderKey = login.ProviderKey;
+            this.Enabled = login.Enabled;
+            this.LastUpdated = DateTime.Now;
+            this.Immutable = login.Immutable;
+        }
+
+        public AppUserLogin ToStore()
         {
             return new AppUserLogin
             {
@@ -52,7 +65,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public UserLoginResult Evolve()
+        public UserLoginResult ToClient()
         {
             return new UserLoginResult
             {
@@ -67,19 +80,6 @@ namespace Bhbk.Lib.Identity.Factory
                 LastUpdated = this.LastUpdated ?? null,
                 Immutable = this.Immutable,
             };
-        }
-
-        public void Update(UserLoginUpdate login)
-        {
-            this.LoginId = login.LoginId;
-            this.UserId = login.UserId;
-            this.LoginProvider = login.LoginProvider;
-            this.ProviderDisplayName = login.ProviderDisplayName ?? string.Empty;
-            this.ProviderDescription = login.ProviderDescription ?? string.Empty;
-            this.ProviderKey = login.ProviderKey;
-            this.Enabled = login.Enabled;
-            this.LastUpdated = DateTime.Now;
-            this.Immutable = login.Immutable;
         }
     }
 

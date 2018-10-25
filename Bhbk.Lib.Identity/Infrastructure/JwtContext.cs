@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Interop;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -13,18 +13,18 @@ namespace Bhbk.Lib.Identity.Infrastructure
     public class JwtContext : IJwtContext
     {
         private readonly IConfigurationRoot _conf;
-        private readonly ContextType _context;
+        private readonly ContextType _situation;
         private readonly StsClient _sts;
         private static JwtSecurityToken _access, _refresh;
 
-        public JwtContext(IConfigurationRoot conf, ContextType context)
+        public JwtContext(IConfigurationRoot conf, ContextType situation)
         {
             if (conf == null)
                 throw new ArgumentNullException();
 
             _conf = conf;
-            _context = context;
-            _sts = new StsClient(conf, context);
+            _situation = situation;
+            _sts = new StsClient(conf, situation);
         }
 
         public JwtSecurityToken AccessToken

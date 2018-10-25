@@ -24,7 +24,15 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = login.Immutable;
         }
 
-        public AppLogin Devolve()
+        public LoginFactory(LoginUpdate login)
+        {
+            this.Id = login.Id;
+            this.ActorId = login.ActorId;
+            this.LoginProvider = login.LoginProvider;
+            this.Immutable = login.Immutable;
+        }
+
+        public AppLogin ToStore()
         {
             return new AppLogin
             {
@@ -35,7 +43,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public LoginResult Evolve()
+        public LoginResult ToClient()
         {
             return new LoginResult
             {
@@ -43,14 +51,6 @@ namespace Bhbk.Lib.Identity.Factory
                 LoginProvider = this.LoginProvider,
                 Immutable = this.Immutable,
             };
-        }
-
-        public void Update(LoginUpdate login)
-        {
-            this.Id = login.Id;
-            this.ActorId = login.ActorId;
-            this.LoginProvider = login.LoginProvider;
-            this.Immutable = login.Immutable;
         }
     }
 

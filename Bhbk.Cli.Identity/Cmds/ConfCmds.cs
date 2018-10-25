@@ -37,7 +37,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.IoC = new IdentityContext(builder, ContextType.Live);
+                Statics.UoW = new IdentityContext(builder, ContextType.Live);
 
                 if (ReadConfig)
                 {
@@ -45,7 +45,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(Statics.IoC.ConfigStore.ToString());
+                    Console.Write(Statics.UoW.ConfigRepo.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

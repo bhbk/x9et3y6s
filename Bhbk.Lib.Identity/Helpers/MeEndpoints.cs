@@ -7,15 +7,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Interop
+namespace Bhbk.Lib.Identity.Helpers
 {
-    public class MeHelper
+    public class MeEndpoints
     {
         protected readonly IConfigurationRoot _conf;
-        protected readonly ContextType _context;
+        protected readonly ContextType _situation;
         protected readonly HttpClient _connect;
 
-        public MeHelper(IConfigurationRoot conf, ContextType context)
+        public MeEndpoints(IConfigurationRoot conf, ContextType situation)
         {
             if (conf == null)
                 throw new ArgumentNullException();
@@ -25,19 +25,19 @@ namespace Bhbk.Lib.Identity.Interop
             //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
             connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
 
-            _context = context;
+            _situation = situation;
             _conf = conf;
             _connect = new HttpClient(connect);
         }
 
-        public MeHelper(IConfigurationRoot conf, TestServer connect)
+        public MeEndpoints(IConfigurationRoot conf, TestServer server)
         {
             if (conf == null)
                 throw new ArgumentNullException();
 
-            _context = ContextType.UnitTest;
+            _situation = ContextType.UnitTest;
             _conf = conf;
-            _connect = connect.CreateClient();
+            _connect = server.CreateClient();
         }
 
         public async Task<HttpResponseMessage> DetailGetV1(JwtSecurityToken jwt)
@@ -48,10 +48,10 @@ namespace Bhbk.Lib.Identity.Interop
             _connect.DefaultRequestHeaders.Accept.Clear();
             _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_context == ContextType.UnitTest)
+            if (_situation == ContextType.UnitTest)
                 return await _connect.GetAsync(endpoint);
 
-            if (_context == ContextType.IntegrationTest || _context == ContextType.Live)
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _connect.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 

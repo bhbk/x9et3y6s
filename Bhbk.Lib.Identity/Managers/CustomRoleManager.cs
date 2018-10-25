@@ -70,7 +70,7 @@ namespace Bhbk.Lib.Identity.Managers
                 throw new ArgumentNullException();
 
             foreach (AppUser entry in list)
-                result.Add(new UserFactory<AppUser>(entry).Devolve());
+                result.Add(new UserFactory<AppUser>(entry).ToStore());
 
             return result;
         }

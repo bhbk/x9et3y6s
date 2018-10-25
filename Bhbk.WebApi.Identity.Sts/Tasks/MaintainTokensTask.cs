@@ -17,14 +17,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
     {
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext _ioc;
+        private readonly IIdentityContext<AppDbContext> _uow;
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainTokensTask(IIdentityContext ioc)
+        public MaintainTokensTask(IIdentityContext<AppDbContext> uow)
         {
-            if (ioc == null)
+            if (uow == null)
                 throw new ArgumentNullException();
 
             _serializer = new JsonSerializerSettings
@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                 .Build();
 
             _delay = int.Parse(_conf["Tasks:MaintainTokens:PollingDelay"]);
-            _ioc = ioc;
+            _uow = uow;
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -55,16 +55,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                 {
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = _ioc.UserMgmt.Store.Context.AppUserRefresh
+                    var invalid = _uow.CustomUserMgr.Store.Context.AppUserRefresh
                         .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())
                     {
                         foreach (AppUserRefresh entry in invalid.ToList())
-                            _ioc.UserMgmt.Store.Context.AppUserRefresh.Remove(entry);
+                            _uow.CustomUserMgr.Store.Context.AppUserRefresh.Remove(entry);
 
-                        _ioc.UserMgmt.Store.Context.SaveChanges();
+                        _uow.CustomUserMgr.Store.Context.SaveChanges();
 
                         var msg = typeof(MaintainTokensTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + invalidCount.ToString() + " invalid refresh tokens.";

@@ -1,10 +1,10 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Bhbk.Lib.Core.Cryptography;
 
 //TODO https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-2.1
 namespace Bhbk.Lib.Identity.Factory
@@ -37,7 +37,18 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = client.Immutable;
         }
 
-        public AppClient Devolve()
+        public ClientFactory(ClientUpdate client)
+        {
+            this.Id = client.Id;
+            this.ActorId = client.ActorId;
+            this.Name = client.Name;
+            this.Description = client.Description;
+            this.Enabled = client.Enabled;
+            this.LastUpdated = DateTime.Now;
+            this.Immutable = client.Immutable;
+        }
+
+        public AppClient ToStore()
         {
             return new AppClient
             {
@@ -54,7 +65,7 @@ namespace Bhbk.Lib.Identity.Factory
             };
         }
 
-        public ClientResult Evolve()
+        public ClientResult ToClient()
         {
             return new ClientResult
             {
@@ -68,17 +79,6 @@ namespace Bhbk.Lib.Identity.Factory
                 Immutable = this.Immutable,
                 Audiences = AppAudience.Where(x => x.ClientId == this.Id).Select(x => x.Id.ToString()).ToList(),
             };
-        }
-
-        public void Update(ClientUpdate client)
-        {
-            this.Id = client.Id;
-            this.ActorId = client.ActorId;
-            this.Name = client.Name;
-            this.Description = client.Description;
-            this.Enabled = client.Enabled;
-            this.LastUpdated = DateTime.Now;
-            this.Immutable = client.Immutable;
         }
     }
 

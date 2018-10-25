@@ -18,20 +18,20 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     {
         public DetailController() { }
 
-        public DetailController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public DetailController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetDetailV1()
         {
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
             var result = new UserFactory<AppUser>(user);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1/claims"), HttpGet]
@@ -56,12 +56,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.CustomUserMgr.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -72,15 +72,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var remove = await IoC.UserMgmt.RemovePasswordAsync(user);
+            var remove = await UoW.CustomUserMgr.RemovePasswordAsync(user);
 
             if (!remove.Succeeded)
                 return GetErrorResult(remove);
 
-            var add = await IoC.UserMgmt.AddPasswordAsync(user, model.NewPassword);
+            var add = await UoW.CustomUserMgr.AddPasswordAsync(user, model.NewPassword);
 
             if (!add.Succeeded)
                 return GetErrorResult(add);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -91,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -99,15 +101,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            bool two = await IoC.UserMgmt.GetTwoFactorEnabledAsync(user);
+            bool two = await UoW.CustomUserMgr.GetTwoFactorEnabledAsync(user);
 
             if (two == status)
                 return BadRequest(Strings.MsgUserInvalidTwoFactor);
 
-            var result = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, status);
+            var result = await UoW.CustomUserMgr.SetTwoFactorEnabledAsync(user, status);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -118,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -129,15 +133,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var update = new UserFactory<AppUser>(user);
-            update.Update(model);
-
-            var result = await IoC.UserMgmt.UpdateAsync(update.Devolve());
+            var update = new UserFactory<UserUpdate>(model);
+            var result = await UoW.CustomUserMgr.UpdateAsync(update.ToStore());
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
 
-            return Ok(update.Evolve());
+            await UoW.CommitAsync();
+
+            return Ok(update.ToClient());
         }
     }
 }

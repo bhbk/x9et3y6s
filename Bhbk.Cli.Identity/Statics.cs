@@ -22,6 +22,6 @@ namespace Bhbk.Cli.Identity
 
     internal class Statics
     {
-        internal static IdentityContext IoC;
+        internal static IdentityContext UoW;
     }
 }

@@ -2,7 +2,7 @@
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interop;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Primitives;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -20,8 +20,8 @@ namespace Bhbk.Cli.Identity.Cmds
         private static IConfigurationRoot _conf;
         private static CmdType _cmdType;
         private static JwtSecurityToken _access;
-        private static AdminClient _admin;
-        private static StsClient _sts;
+        private static AdminClient _admin = null;
+        private static StsClient _sts = null;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));
         private static bool _create = false, _destroy = false;
 
@@ -56,6 +56,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .Build();
 
                 _admin = new AdminClient(_conf, ContextType.Live);
+                _sts = new StsClient(_conf, ContextType.Live);
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");

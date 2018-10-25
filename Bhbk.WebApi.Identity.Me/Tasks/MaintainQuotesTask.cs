@@ -1,7 +1,8 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -19,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly FileInfo _qod = SearchRoots.ByAssemblyContext("appquotes.json");
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext _ioc;
+        private readonly IIdentityContext<AppDbContext> _uow;
         private readonly JsonSerializerSettings _serializer;
         private readonly HttpClient _client = new HttpClient();
         private readonly string _url = string.Empty, _output = string.Empty;
@@ -27,9 +28,9 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         public UserQuoteOfDay QuoteOfDay { get; private set; }
         public string Status { get; private set; }
 
-        public MaintainQuotesTask(IIdentityContext ioc)
+        public MaintainQuotesTask(IIdentityContext<AppDbContext> uow)
         {
-            if (ioc == null)
+            if (uow == null)
                 throw new ArgumentNullException();
 
             _serializer = new JsonSerializerSettings
@@ -45,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             _output = _qod.DirectoryName + Path.DirectorySeparatorChar + _qod.Name;
             _delay = int.Parse(_conf["Tasks:MaintainQuotes:PollingDelay"]);
             _url = _conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
-            _ioc = ioc;
+            _uow = uow;
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -59,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (_ioc.Status == ContextType.UnitTest)
+            if (_uow.Situation == ContextType.UnitTest)
                 QuoteOfDay = JsonConvert.DeserializeObject<UserQuoteOfDay>
                     (File.ReadAllText(_output));
             else

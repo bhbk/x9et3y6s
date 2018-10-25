@@ -17,14 +17,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     {
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext _ioc;
+        private readonly IIdentityContext<AppDbContext> _uow;
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
-        public MaintainActivityTask(IIdentityContext ioc)
+        public MaintainActivityTask(IIdentityContext<AppDbContext> uow)
         {
-            if (ioc == null)
+            if (uow == null)
                 throw new ArgumentNullException();
 
             _serializer = new JsonSerializerSettings
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             _delay = int.Parse(_conf["Tasks:MaintainActivity:PollingDelay"]);
             _auditable = int.Parse(_conf["Tasks:MaintainActivity:HoldAuditable"]);
             _transient = int.Parse(_conf["Tasks:MaintainActivity:HoldTransient"]);
-            _ioc = ioc;
+            _uow = uow;
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 {
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var expired = _ioc.UserMgmt.Store.Context.AppActivity
+                    var expired = _uow.CustomUserMgr.Store.Context.AppActivity
                         .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                             || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true));
 
@@ -66,9 +66,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     if (expired.Any())
                     {
                         foreach (AppActivity entry in expired.ToList())
-                            _ioc.UserMgmt.Store.Context.AppActivity.Remove(entry);
+                            _uow.CustomUserMgr.Store.Context.AppActivity.Remove(entry);
 
-                        _ioc.UserMgmt.Store.Context.SaveChanges();
+                        _uow.CustomUserMgr.Store.Context.SaveChanges();
 
                         var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + expiredCount.ToString() + " expired activity entries.";

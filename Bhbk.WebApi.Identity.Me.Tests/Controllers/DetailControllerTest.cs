@@ -29,11 +29,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_Get_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -47,11 +47,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public void Api_Me_DetailV1_GetClaimList_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -63,11 +63,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public void Api_Me_DetailV1_GetQuoteOfDay_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -79,11 +79,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_SetPassword_Fail()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var model = new UserChangePassword()
             {
                 CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
@@ -96,18 +96,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var result = await controller.SetPasswordV1(model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-            var check = await _ioc.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            var check = await _uow.CustomUserMgr.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task Api_Me_DetailV1_SetPassword_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var model = new UserChangePassword()
             {
                 CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
@@ -120,22 +120,22 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var result = await controller.SetPasswordV1(model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = await _ioc.UserMgmt.CheckPasswordAsync(user, model.NewPassword);
+            var check = await _uow.CustomUserMgr.CheckPasswordAsync(user, model.NewPassword);
             check.Should().BeTrue();
         }
 
         [TestMethod]
         public async Task Api_Me_DetailV1_TwoFactor_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
-            var status = await _ioc.UserMgmt.SetTwoFactorEnabledAsync(user, false);
+            var status = await _uow.CustomUserMgr.SetTwoFactorEnabledAsync(user, false);
             status.Should().BeAssignableTo(typeof(IdentityResult));
             status.Succeeded.Should().BeTrue();
 
@@ -146,19 +146,23 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_DetailV1_Update_Success()
         {
-            _tests.DestroyAll();
-            _tests.Create();
+            _uow.TestsDestroy();
+            _uow.TestsCreate();
 
-            var controller = new DetailController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new DetailController(_conf, _uow, _tasks);
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
             var model = new UserUpdate()
             {
                 Id = user.Id,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 FirstName = user.FirstName + "(Updated)",
-                LastName = user.LastName + "(Updated)"
+                LastName = user.LastName + "(Updated)",
+                HumanBeing = false,
+                Immutable = false,
             };
 
             var result = await controller.UpdateDetailV1(model) as OkObjectResult;

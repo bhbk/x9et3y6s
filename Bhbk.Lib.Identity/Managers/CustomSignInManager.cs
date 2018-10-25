@@ -19,6 +19,7 @@ namespace Bhbk.Lib.Identity.Managers
             ILogger<SignInManager<AppUser>> logger, IAuthenticationSchemeProvider schema)
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schema)
         {
+
         }
     }
 }

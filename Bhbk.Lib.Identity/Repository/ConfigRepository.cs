@@ -1,0 +1,99 @@
+﻿using Bhbk.Lib.Core.FileSystem;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
+
+namespace Bhbk.Lib.Identity.Repository
+{
+    public class ConfigRepository
+    {
+        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private readonly IConfigurationRoot _conf;
+        private UInt32 _defaultsAccessTokenExpire;
+        private UInt32 _defaultsAuthorizationCodeExpire;
+        private UInt32 _defaultsBrowserCookieExpire;
+        private UInt32 _defaultsRefreshTokenExpire;
+        private bool _defaultsCompatibilityModeClaims;
+        private bool _defaultsCompatibilityModeIssuer;
+        private bool _unitTestsAccessToken;
+        private bool _unitTestsRefreshToken;
+        private DateTime _unitTestsAccessTokenFakeUtcNow;
+        private DateTime _unitTestsRefreshTokenFakeUtcNow;
+
+        public ConfigRepository()
+        {
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            _defaultsAccessTokenExpire = UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]);
+            _defaultsAuthorizationCodeExpire = UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"]);
+            _defaultsBrowserCookieExpire = UInt32.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
+            _defaultsRefreshTokenExpire = UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
+            _defaultsCompatibilityModeClaims = bool.Parse(_conf["IdentityDefaults:CompatibilityModeClaims"]);
+            _defaultsCompatibilityModeIssuer = bool.Parse(_conf["IdentityDefaults:CompatibilityModeIssuer"]);
+            _unitTestsAccessToken = false;
+            _unitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
+            _unitTestsRefreshToken = false;
+            _unitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
+        }
+
+        public UInt32 DefaultsAccessTokenExpire
+        {
+            get { return _defaultsAccessTokenExpire; }
+        }
+
+        public UInt32 DefaultsAuthorizationCodeExpire
+        {
+            get { return _defaultsAuthorizationCodeExpire; }
+        }
+
+        public UInt32 DefaultsBrowserCookieExpire
+        {
+            get { return _defaultsBrowserCookieExpire; }
+        }
+
+        public UInt32 DefaultsRefreshTokenExpire
+        {
+            get { return _defaultsRefreshTokenExpire; }
+        }
+
+        public bool DefaultsCompatibilityModeClaims
+        {
+            get { return _defaultsCompatibilityModeClaims; }
+            set { _defaultsCompatibilityModeClaims = value; }
+        }
+
+        public bool DefaultsCompatibilityModeIssuer
+        {
+            get { return _defaultsCompatibilityModeIssuer; }
+            set { _defaultsCompatibilityModeIssuer = value; }
+        }
+
+        public bool UnitTestsAccessToken
+        {
+            get { return _unitTestsAccessToken; }
+            set { throw new NotImplementedException(); }
+        }
+
+        public bool UnitTestsRefreshToken
+        {
+            get { return _unitTestsRefreshToken; }
+            set { _unitTestsRefreshToken = value; }
+        }
+
+        public DateTime UnitTestsAccessTokenFakeUtcNow
+        {
+            get { return _unitTestsAccessTokenFakeUtcNow; }
+            set { _unitTestsAccessTokenFakeUtcNow = value; }
+        }
+
+        public DateTime UnitTestsRefreshTokenFakeUtcNow
+        {
+            get { return _unitTestsRefreshTokenFakeUtcNow; }
+            set { _unitTestsRefreshTokenFakeUtcNow = value; }
+        }
+    }
+}

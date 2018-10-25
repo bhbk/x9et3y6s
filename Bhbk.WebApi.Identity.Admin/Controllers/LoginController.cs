@@ -22,8 +22,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public LoginController() { }
 
-        public LoginController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public LoginController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1/{loginID:guid}/add/{userID:guid}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -32,21 +32,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
+            var login = await UoW.LoginRepo.GetAsync(loginID);
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await IoC.UserMgmt.AddLoginAsync(user,
+            var result = await UoW.CustomUserMgr.AddLoginAsync(user,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -60,23 +62,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var check = await IoC.LoginMgmt.FindByNameAsync(model.LoginProvider);
+            var check = await UoW.LoginRepo.GetAsync(x => x.LoginProvider == model.LoginProvider);
 
-            if (check != null)
+            if (check.Any())
                 return BadRequest(Strings.MsgLoginAlreadyExists);
 
             var login = new LoginFactory<LoginCreate>(model);
+            var result = await UoW.LoginRepo.CreateAsync(login.ToStore());
 
-            var result = await IoC.LoginMgmt.CreateAsync(login.Devolve());
+            await UoW.CommitAsync();
 
-            return Ok(login.Evolve());
+            return Ok(login.ToClient());
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
         {
-            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
+            var login = await UoW.LoginRepo.GetAsync(loginID);
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
@@ -86,52 +89,50 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             login.ActorId = GetUserGUID();
 
-            if (!await IoC.LoginMgmt.DeleteAsync(login))
+            if (!await UoW.LoginRepo.DeleteAsync(login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            else
-                return NoContent();
+            await UoW.CommitAsync();
+
+            return NoContent();
         }
 
         [Route("v1/{loginID:guid}"), HttpGet]
         public async Task<IActionResult> GetLoginV1([FromRoute] Guid loginID)
         {
-            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
+            var login = await UoW.LoginRepo.GetAsync(loginID);
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
             var result = new LoginFactory<AppLogin>(login);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1/{loginName}"), HttpGet]
         public async Task<IActionResult> GetLoginV1([FromRoute] string loginName)
         {
-            var login = await IoC.LoginMgmt.FindByNameAsync(loginName);
+            var login = (await UoW.LoginRepo.GetAsync(x => x.LoginProvider == loginName)).SingleOrDefault();
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
             var result = new LoginFactory<AppLogin>(login);
 
-            return Ok(result.Evolve());
+            return Ok(result.ToClient());
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetLoginsV1([FromQuery] Paging model)
+        public async Task<IActionResult> GetLoginsV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var logins = IoC.LoginMgmt.Store.Get()
-                .OrderBy(model.OrderBy)
-                .Skip(model.Skip)
-                .Take(model.Take);
+            var logins = await UoW.LoginRepo.GetAsync(x => true,
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-
-            var result = logins.Select(x => new LoginFactory<AppLogin>(x).Evolve());
+            var result = logins.Select(x => new LoginFactory<AppLogin>(x).ToClient());
 
             return Ok(result);
         }
@@ -139,14 +140,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{loginID:guid}/users"), HttpGet]
         public async Task<IActionResult> GetLoginUsersV1([FromRoute] Guid loginID)
         {
-            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
+            var login = await UoW.LoginRepo.GetAsync(loginID);
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
+            var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).Evolve());
+            var result = users.Select(x => new UserFactory<AppUser>(x).ToClient());
 
             return Ok(result);
         }
@@ -158,20 +159,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
+            var login = await UoW.LoginRepo.GetAsync(loginID);
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await IoC.UserMgmt.RemoveLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
+            var result = await UoW.CustomUserMgr.RemoveLoginAsync(user, login.LoginProvider, string.Empty);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -185,17 +188,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var login = await IoC.LoginMgmt.FindByIdAsync(model.Id);
+            var login = await UoW.LoginRepo.GetAsync(model.Id);
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var update = new LoginFactory<AppLogin>(login);
-            update.Update(model);
+            var update = new LoginFactory<LoginUpdate>(model);
+            var result = await UoW.LoginRepo.UpdateAsync(update.ToStore());
 
-            var result = await IoC.LoginMgmt.UpdateAsync(update.Devolve());
+            await UoW.CommitAsync();
 
-            return Ok(update.Evolve());
+            return Ok(update.ToClient());
         }
     }
 }

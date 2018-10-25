@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Factory
             this.Immutable = Immutable;
         }
 
-        public ActivityResult Evolve()
+        public ActivityResult ToClient()
         {
             return new ActivityResult()
             {

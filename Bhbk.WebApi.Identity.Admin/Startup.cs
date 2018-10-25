@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin
         protected static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         protected static IConfigurationRoot _conf;
-        protected static IIdentityContext _ioc;
+        protected static IIdentityContext<AppDbContext> _uow;
         protected static IJwtContext _jwt;
         protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
 
@@ -41,11 +41,11 @@ namespace Bhbk.WebApi.Identity.Admin
                 .EnableSensitiveDataLogging();
 
             //context is not thread safe yet. create new one for each background thread.
-            _ioc = new IdentityContext(options, ContextType.Live);
+            _uow = new IdentityContext(options, ContextType.Live);
             _jwt = new JwtContext(_conf, ContextType.Live);
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
-            sc.AddSingleton<IIdentityContext>(_ioc);
+            sc.AddSingleton<IIdentityContext<AppDbContext>>(_uow);
             sc.AddSingleton<IJwtContext>(_jwt);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options, ContextType.Live)));
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options, ContextType.Live)));
@@ -53,9 +53,9 @@ namespace Bhbk.WebApi.Identity.Admin
             var sp = sc.BuildServiceProvider();
 
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
-            _ioc = (IIdentityContext)sp.GetRequiredService<IIdentityContext>();
-            _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
+            _uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
             _jwt = (IJwtContext)sp.GetRequiredService<IJwtContext>();
+            _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -69,14 +69,14 @@ namespace Bhbk.WebApi.Identity.Admin
 
             ConfigureContext(sc);
 
-            _ioc.ClientMgmt.Store.Salt = _conf["IdentityTenants:Salt"];
+            _uow.ClientRepo.Salt = _conf["IdentityTenants:Salt"];
 
-            var _issuers = _ioc.ClientMgmt.Store.Get()
-                .Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt);
+            var _issuers = (_uow.ClientRepo.GetAsync().Result)
+                .Select(x => x.Name.ToString() + ":" + _uow.ClientRepo.Salt);
 
             //check if issuer compatibility enabled. means add issuer with no salt.
-            if (_ioc.ConfigStore.Values.DefaultsCompatibilityModeIssuer)
-                _issuers = _ioc.ClientMgmt.Store.Get()
+            if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                _issuers = (_uow.ClientRepo.GetAsync().Result)
                     .Select(x => x.Name.ToString())
                     .Concat(_issuers);
 
@@ -96,8 +96,8 @@ namespace Bhbk.WebApi.Identity.Admin
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuers = _issuers.ToArray(),
-                    IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))).ToArray(),
-                    ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()).ToArray(),
+                    IssuerSigningKeys = (_uow.ClientRepo.GetAsync().Result).Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))).ToArray(),
+                    ValidAudiences = (_uow.AudienceRepo.GetAsync().Result).Select(x => x.Name.ToString()).ToArray(),
                     AudienceValidator = Bhbk.Lib.Identity.Validators.AudienceValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -108,6 +108,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     ClockSkew = TimeSpan.Zero,
                 };
             });
+            sc.AddSession();
             sc.AddMvc();
             sc.AddMvc().AddMvcOptions(binder =>
             {
@@ -119,12 +120,11 @@ namespace Bhbk.WebApi.Identity.Admin
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
-            sc.AddSession();
-            sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
                 headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
+            sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
@@ -146,9 +146,9 @@ namespace Bhbk.WebApi.Identity.Admin
             app.UseAuthentication();
             app.UseSession();
             app.UseStaticFiles();
+            app.UseMvc();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
-            app.UseMvc();
         }
     }
 }

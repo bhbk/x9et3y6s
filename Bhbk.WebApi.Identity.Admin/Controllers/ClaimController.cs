@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,8 +17,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClaimController() { }
 
-        public ClaimController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public ClaimController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1/{userID:guid}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -26,20 +27,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserInvalid);
 
             else
             {
-                var result = await IoC.UserMgmt.AddClaimAsync(user, model);
+                var result = await UoW.CustomUserMgr.AddClaimAsync(user, model);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
-                else
-                    return Ok(model);
+                return Ok(model);
             }
         }
 
@@ -50,32 +50,31 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserInvalid);
             
             else
             {
-                var result = await IoC.UserMgmt.RemoveClaimAsync(user, claim);
+                var result = await UoW.CustomUserMgr.RemoveClaimAsync(user, claim);
 
                 if (!result.Succeeded)
                     return GetErrorResult(result);
 
-                else
-                    return NoContent();
+                return NoContent();
             }
         }
 
         [Route("v1/{userID:guid}"), HttpGet]
         public async Task<IActionResult> GetClaimsV1([FromRoute] Guid userID)
         {
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserInvalid);
 
-            return Ok(await IoC.UserMgmt.GetClaimsAsync(user));
+            return Ok(await UoW.CustomUserMgr.GetClaimsAsync(user));
         }
     }
 }

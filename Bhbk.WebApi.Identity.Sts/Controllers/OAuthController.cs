@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -21,20 +22,20 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public OAuthController() { }
 
-        public OAuthController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
-            : base(conf, ioc, tasks) { }
+        public OAuthController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+            : base(conf, uow, tasks) { }
 
         [Route("v1/refresh/{userID}"), HttpGet]
         [Route("v2/refresh/{userID}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
         {
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await IoC.UserMgmt.GetRefreshTokensAsync(user);
+            var result = await UoW.CustomUserMgr.GetRefreshTokensAsync(user);
 
             return Ok(result);
         }
@@ -44,20 +45,22 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid tokenID)
         {
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var token = await IoC.UserMgmt.FindRefreshTokenByIdAsync(tokenID.ToString());
+            var token = await UoW.CustomUserMgr.FindRefreshTokenByIdAsync(tokenID.ToString());
 
             if (token == null)
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            var result = await IoC.UserMgmt.RemoveRefreshTokenAsync(user, token);
+            var result = await UoW.CustomUserMgr.RemoveRefreshTokenAsync(user, token);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -67,15 +70,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
         {
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await IoC.UserMgmt.RemoveRefreshTokensAsync(user);
+            var result = await UoW.CustomUserMgr.RemoveRefreshTokensAsync(user);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
+
+            await UoW.CommitAsync();
 
             return NoContent();
         }
@@ -88,17 +93,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             [FromQuery(Name = "redirect_uri")] string redirectUri,
             [FromQuery(Name = "scope")] string scope)
         {
-            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
+            var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
+            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -114,17 +119,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             [FromQuery(Name = "redirect_uri")] string redirectUri,
             [FromQuery(Name = "scope")] string scope)
         {
-            var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
+            var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
+            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
 
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
+            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -144,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             var cookie = new CookieOptions
             {
-                Expires = DateTime.Now.AddSeconds(IoC.ConfigStore.Values.DefaultsBrowserCookieExpire),                 
+                Expires = DateTime.Now.AddSeconds(UoW.ConfigRepo.DefaultsBrowserCookieExpire),                 
             };
 
             Response.Cookies.Append("auth-code-state", state);
