@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -30,10 +30,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             if (!await new ProtectProvider(IoC.Status.ToString()).ValidateAsync(email, token, user))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserInvalidToken);
 
             await IoC.UserMgmt.Store.SetEmailConfirmedAsync(user, true);
 
@@ -49,10 +49,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             if (!await new ProtectProvider(IoC.Status.ToString()).ValidateAsync(password, token, user))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserInvalidToken);
 
             await IoC.UserMgmt.Store.SetPasswordConfirmedAsync(user, true);
 
@@ -68,10 +68,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserInvalidToken);
 
             await IoC.UserMgmt.Store.SetPhoneNumberConfirmedAsync(user, true);
 

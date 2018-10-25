@@ -31,8 +31,8 @@ namespace Bhbk.WebApi.Identity.Admin
         protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext _ioc;
-        protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
         protected static IJwtContext _jwt;
+        protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
@@ -46,9 +46,9 @@ namespace Bhbk.WebApi.Identity.Admin
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
             sc.AddSingleton<IIdentityContext>(_ioc);
+            sc.AddSingleton<IJwtContext>(_jwt);
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options, ContextType.Live)));
             sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options, ContextType.Live)));
-            sc.AddSingleton<IJwtContext>(_jwt);
 
             var sp = sc.BuildServiceProvider();
 
@@ -71,6 +71,15 @@ namespace Bhbk.WebApi.Identity.Admin
 
             _ioc.ClientMgmt.Store.Salt = _conf["IdentityTenants:Salt"];
 
+            var _issuers = _ioc.ClientMgmt.Store.Get()
+                .Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt);
+
+            //check if issuer compatibility enabled. means add issuer with no salt.
+            if (_ioc.ConfigStore.Values.DefaultsCompatibilityModeIssuer)
+                _issuers = _ioc.ClientMgmt.Store.Get()
+                    .Select(x => x.Name.ToString())
+                    .Concat(_issuers);
+
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
             sc.AddAuthentication(auth =>
@@ -86,9 +95,9 @@ namespace Bhbk.WebApi.Identity.Admin
                 bearer.IncludeErrorDetails = true;
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuers = _ioc.ClientMgmt.Store.Get().Select(x => x.Name.ToString() + ":" + _ioc.ClientMgmt.Store.Salt),
-                    IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))),
-                    ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()),
+                    ValidIssuers = _issuers.ToArray(),
+                    IssuerSigningKeys = _ioc.ClientMgmt.Store.Get().Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))).ToArray(),
+                    ValidAudiences = _ioc.AudienceMgmt.Store.Get().Select(x => x.Name.ToString()).ToArray(),
                     AudienceValidator = Bhbk.Lib.Identity.Validators.AudienceValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -123,8 +132,8 @@ namespace Bhbk.WebApi.Identity.Admin
             //order below is important...
             if (env.IsDevelopment())
             {
-                log.AddDebug();
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
             else
@@ -132,18 +141,13 @@ namespace Bhbk.WebApi.Identity.Admin
                 app.UseExceptionHandler("/error");
             }
 
-            if (_conf == null)
-                log.AddConsole();
-            else
-                log.AddConsole(_conf.GetSection("Logging"));
-
             app.UseForwardedHeaders();
             app.UseCors(policy => policy.AllowAnyOrigin());
             app.UseAuthentication();
+            app.UseSession();
             app.UseStaticFiles();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
-            app.UseSession();
             app.UseMvc();
         }
     }

@@ -45,7 +45,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(Statics.IoC.ConfigMgmt.ToString());
+                    Console.Write(Statics.IoC.ConfigStore.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

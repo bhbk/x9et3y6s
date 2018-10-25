@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -13,7 +14,6 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -35,12 +35,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.AddLoginAsync(user,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await IoC.LoginMgmt.FindByNameAsync(model.LoginProvider);
 
             if (check != null)
-                return BadRequest(BaseLib.Statics.MsgLoginAlreadyExists);
+                return BadRequest(Strings.MsgLoginAlreadyExists);
 
             var login = new LoginFactory<LoginCreate>(model);
 
@@ -79,10 +79,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             else if (login.Immutable)
-                return BadRequest(BaseLib.Statics.MsgLoginImmutable);
+                return BadRequest(Strings.MsgLoginImmutable);
 
             login.ActorId = GetUserGUID();
 
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             var result = new LoginFactory<AppLogin>(login);
 
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByNameAsync(loginName);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             var result = new LoginFactory<AppLogin>(login);
 
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             var users = await IoC.LoginMgmt.GetUsersListAsync(loginID);
 
@@ -161,12 +161,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(loginID);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.RemoveLoginAsync(user, IoC.LoginMgmt.Store.FindById(loginID).LoginProvider, string.Empty);
 
@@ -188,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = await IoC.LoginMgmt.FindByIdAsync(model.Id);
 
             if (login == null)
-                return NotFound(BaseLib.Statics.MsgLoginNotExist);
+                return NotFound(Strings.MsgLoginNotExist);
 
             var update = new LoginFactory<AppLogin>(login);
             update.Update(model);

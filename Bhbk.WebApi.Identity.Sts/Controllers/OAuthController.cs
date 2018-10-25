@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.GetRefreshTokensAsync(user);
 
@@ -47,12 +47,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var token = await IoC.UserMgmt.FindRefreshTokenByIdAsync(tokenID.ToString());
 
             if (token == null)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserInvalidToken);
 
             var result = await IoC.UserMgmt.RemoveRefreshTokenAsync(user, token);
 
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.RemoveRefreshTokensAsync(user);
 
@@ -91,17 +91,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
@@ -117,21 +117,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             //check that redirect url is valid...
             if (!audience.AppAudienceUri.Any(x => x.AbsoluteUri == redirectUri))
-                return NotFound(BaseLib.Statics.MsgUriNotExist);
+                return NotFound(Strings.MsgUriNotExist);
 
             var state = RandomValues.CreateBase64String(32);
             var url = LinkBuilder.AuthorizationCodeRequest(Conf, client, user, redirectUri, scope, state);
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             var cookie = new CookieOptions
             {
-                Expires = DateTime.Now.AddSeconds(IoC.ConfigMgmt.Store.DefaultsBrowserCookieExpire),                 
+                Expires = DateTime.Now.AddSeconds(IoC.ConfigStore.Values.DefaultsBrowserCookieExpire),                 
             };
 
             Response.Cookies.Append("auth-code-state", state);

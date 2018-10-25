@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(Strings.MsgUserInvalid);
 
             else
             {
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(Strings.MsgUserInvalid);
             
             else
             {
@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserInvalid);
+                return NotFound(Strings.MsgUserInvalid);
 
             return Ok(await IoC.UserMgmt.GetClaimsAsync(user));
         }

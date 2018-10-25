@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Managers
 {
     public partial class CustomUserManager : UserManager<AppUser>
     {
-        public readonly ConfigManager Config;
+        public readonly ConfigStore Config;
         public readonly ClaimsProvider ClaimProvider;
         public readonly PasswordHasher PasswordHasher;
         public readonly PasswordValidator PasswordValidator;
@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Managers
                 throw new ArgumentNullException();
 
             Store = store;
-            Config = new ConfigManager();
+            Config = new ConfigStore();
             ClaimProvider = new ClaimsProvider(this, Config);
             PasswordHasher = new PasswordHasher();
             PasswordValidator = new PasswordValidator();

@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Managers;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -23,9 +23,9 @@ namespace Bhbk.Lib.Identity.Providers
     public class ClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
     {
         private readonly UserManager<AppUser> _userMgmt;
-        private readonly ConfigManager _conf;
+        private readonly ConfigStore _conf;
 
-        public ClaimsProvider(UserManager<AppUser> userMgmt, ConfigManager conf)
+        public ClaimsProvider(UserManager<AppUser> userMgmt, ConfigStore conf)
         {
             if (userMgmt == null)
                 throw new ArgumentNullException();
@@ -41,12 +41,10 @@ namespace Bhbk.Lib.Identity.Providers
             foreach (string role in (await _userMgmt.GetRolesAsync(user)).ToList().OrderBy(x => x))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            //add same role claims using deprecated name. backward compatibility because microsoft...
-            if (_conf.Store.DefaultsCompatibileClaimTypeNames)
-            {
+            //check if claims compatibility enabled. means pack claim(s) with old name too.
+            if (_conf.Values.DefaultsCompatibilityModeClaims)
                 foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
                     claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
-            }
 
             foreach (Claim claim in (await _userMgmt.GetClaimsAsync(user)).ToList().OrderBy(x => x.Type))
                 claims.Add(claim);
@@ -65,7 +63,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan((int)_conf.Store.DefaultsAccessTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan((int)_conf.Values.DefaultsAccessTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -87,7 +85,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan((int)_conf.Store.DefaultsRefreshTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan((int)_conf.Values.DefaultsRefreshTokenExpire)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);

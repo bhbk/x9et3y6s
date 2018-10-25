@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -21,13 +21,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         public DetailController(IConfigurationRoot conf, IIdentityContext ioc, IHostedService[] tasks)
             : base(conf, ioc, tasks) { }
 
-        [Route("v1"), HttpPut]
+        [Route("v1"), HttpGet]
         public async Task<IActionResult> GetDetailV1()
         {
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -59,16 +59,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
+                return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
+                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
 
             if (!user.HumanBeing)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             user.ActorId = GetUserGUID();
 
@@ -94,15 +94,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (!user.HumanBeing)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             bool two = await IoC.UserMgmt.GetTwoFactorEnabledAsync(user);
 
             if (two == status)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidTwoFactor);
+                return BadRequest(Strings.MsgUserInvalidTwoFactor);
 
             var result = await IoC.UserMgmt.SetTwoFactorEnabledAsync(user, status);
 
@@ -121,13 +121,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             else if (!user.HumanBeing)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             var update = new UserFactory<AppUser>(user);
             update.Update(model);

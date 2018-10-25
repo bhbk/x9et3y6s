@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
-using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private ActivityStore _activity;
         private AudienceManager _audienceMgmt;
         private ClientManager _clientMgmt;
-        private ConfigManager _configMgmt;
+        private ConfigStore _configStore;
         private CustomRoleManager _roleMgmt;
         private CustomUserManager _userMgmt;
         private LoginManager _loginMgmt;
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _activity = new ActivityStore(_context);
             _audienceMgmt = new AudienceManager(new AudienceStore(_context));
             _clientMgmt = new ClientManager(new ClientStore(_context));
-            _configMgmt = new ConfigManager(new ConfigStore());
+            _configStore = new ConfigStore();
             _loginMgmt = new LoginManager(new LoginStore(_context));
             _roleMgmt = new CustomRoleManager(new CustomRoleStore(_context));
             _userMgmt = new CustomUserManager(new CustomUserStore(_context));
@@ -98,14 +98,14 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public ConfigManager ConfigMgmt
+        public ConfigStore ConfigStore
         {
             get
             {
-                if (_configMgmt == null)
-                    _configMgmt = new ConfigManager(new ConfigStore());
+                if (_configStore == null)
+                    _configStore = new ConfigStore();
 
-                return _configMgmt;
+                return _configStore;
             }
         }
 

@@ -1,40 +1,9 @@
 ﻿using Bhbk.Lib.Identity.Models;
 using System;
 
-namespace Bhbk.Lib.Identity
+namespace Bhbk.Lib.Identity.Primitives
 {
-    //https://tools.ietf.org/html/rfc6749#section-2.1
-    public enum AudienceType
-    {
-        user_agent,
-        native,
-        server,
-    }
-
-    public enum GrantType
-    {
-        access_token,
-        authorize_code,
-        client_credential,
-        refresh_token,
-    }
-
-    public enum LoginType
-    {
-        GenerateAccessToken,
-        GenerateRefreshToken,
-        GenerateAuthorizationCode
-    }
-
-    public enum TaskType
-    {
-        MaintainActivity,
-        MaintainQuotes,
-        MaintainTokens,
-        MaintainUsers,
-    }
-
-    public class Statics
+    public class Strings
     {
         #region Attribute Constants
 
@@ -93,8 +62,8 @@ namespace Bhbk.Lib.Identity
         public const string ApiUnitTestRole2 = "RoleUnitTests2";
         public const string ApiUnitTestUser1 = "unittestuser1@local";
         public const string ApiUnitTestUser2 = "unittestuser2@local";
-        public const string ApiUnitTestUserPassCurrent = "pa$$word01!";
-        public const string ApiUnitTestUserPassNew = "pa$$word01!new";
+        public const string ApiUnitTestUserPassCurrent = "te$tpa$$word01!";
+        public const string ApiUnitTestUserPassNew = "te$tpa$$word01!new";
         public const string ApiUnitTestUri1 = "UrlUnitTests1";
         public const string ApiUnitTestUri1Link = "https://app.test.net/1/redirect";
         public const string ApiUnitTestUri2 = "UrlUnitTests2";

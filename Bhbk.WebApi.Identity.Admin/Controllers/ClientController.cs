@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,6 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await IoC.ClientMgmt.FindByNameAsync(model.Name);
 
             if (check != null)
-                return BadRequest(BaseLib.Statics.MsgClientAlreadyExists);
+                return BadRequest(Strings.MsgClientAlreadyExists);
 
             var client = new ClientFactory<ClientCreate>(model);
 
@@ -52,10 +52,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             else if (client.Immutable)
-                return BadRequest(BaseLib.Statics.MsgClientImmutable);
+                return BadRequest(Strings.MsgClientImmutable);
 
             client.ActorId = GetUserGUID();
 
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             var result = new ClientFactory<AppAudience>(client);
 
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByNameAsync(clientName);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             var result = new ClientFactory<AppAudience>(client);
 
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(clientID);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             var audiences = await IoC.ClientMgmt.GetAudiencesAsync(clientID);
 
@@ -134,10 +134,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = await IoC.ClientMgmt.FindByIdAsync(model.Id);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             else if (client.Immutable)
-                return BadRequest(BaseLib.Statics.MsgClientImmutable);
+                return BadRequest(Strings.MsgClientImmutable);
 
             var update = new ClientFactory<AppClient>(client);
             update.Update(model);

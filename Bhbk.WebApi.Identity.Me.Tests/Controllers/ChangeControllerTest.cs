@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Factory;
+﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -7,8 +9,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
-using Bhbk.Lib.Core.Cryptography;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
@@ -30,8 +30,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
-            var newEmail = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUser1;
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var newEmail = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1;
 
             controller.SetUser(user.Id);
 
@@ -54,8 +54,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
-            var newEmail = RandomValues.CreateBase64String(4) + "-" + BaseLib.Statics.ApiUnitTestUser1;
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var newEmail = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1;
 
             controller.SetUser(user.Id);
 
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
@@ -87,8 +87,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             {
                 Id = user.Id,
                 CurrentPassword = RandomValues.CreateBase64String(16),
-                NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
+                NewPassword = Strings.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
             };
 
             var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
@@ -102,16 +102,16 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
             var model = new UserChangePassword()
             {
                 Id = user.Id,
-                CurrentPassword = BaseLib.Statics.ApiUnitTestUserPassCurrent,
-                NewPassword = BaseLib.Statics.ApiUnitTestUserPassNew,
-                NewPasswordConfirm = BaseLib.Statics.ApiUnitTestUserPassNew
+                CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
+                NewPassword = Strings.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
             };
 
             var result = await controller.ChangePasswordV1(model) as OkObjectResult;
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ChangeController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);

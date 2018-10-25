@@ -1,8 +1,9 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interop;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -10,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
@@ -295,7 +295,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                     throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\"");
                             }
 
-                            var loginName = BaseLib.Statics.ApiDefaultLogin;
+                            var loginName = Strings.ApiDefaultLogin;
                             var loginID = Guid.Empty;
 
                             if (CheckLogin(loginName, ref loginID))
@@ -374,9 +374,9 @@ namespace Bhbk.Cli.Identity.Cmds
                 {
                     UserId = userID,
                     LoginId = loginID,
-                    LoginProvider = BaseLib.Statics.ApiDefaultLogin,
-                    ProviderDisplayName = BaseLib.Statics.ApiDefaultLogin,
-                    ProviderKey = BaseLib.Statics.ApiDefaultLoginKey,
+                    LoginProvider = Strings.ApiDefaultLogin,
+                    ProviderDisplayName = Strings.ApiDefaultLogin,
+                    ProviderKey = Strings.ApiDefaultLoginKey,
                     Enabled = true,
                 }).Result;
 
@@ -510,7 +510,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == audience)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(BaseLib.Statics.MsgAudienceInvalid);
+                Console.WriteLine(Strings.MsgAudienceInvalid);
             }
 
             Console.WriteLine(result.RequestMessage
@@ -535,7 +535,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == client)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(BaseLib.Statics.MsgClientInvalid);
+                Console.WriteLine(Strings.MsgClientInvalid);
             }
 
             Console.WriteLine(result.RequestMessage
@@ -561,7 +561,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == role)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(BaseLib.Statics.MsgRoleInvalid);
+                Console.WriteLine(Strings.MsgRoleInvalid);
             }
 
             Console.WriteLine(result.RequestMessage
@@ -576,9 +576,9 @@ namespace Bhbk.Cli.Identity.Cmds
                 new UserCreate()
                 {
                     Email = user,
-                    FirstName = BaseLib.Statics.ApiDefaultFirstName,
-                    LastName = BaseLib.Statics.ApiDefaultLastName,
-                    PhoneNumber = BaseLib.Statics.ApiDefaultPhone,
+                    FirstName = Strings.ApiDefaultFirstName,
+                    LastName = Strings.ApiDefaultLastName,
+                    PhoneNumber = Strings.ApiDefaultPhone,
                     LockoutEnabled = false,
                     HumanBeing = false,
                     Immutable = false,
@@ -591,7 +591,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["email"].Value<string>() == user)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(BaseLib.Statics.MsgUserInvalid);
+                Console.WriteLine(Strings.MsgUserInvalid);
             }
 
             Console.WriteLine(result.RequestMessage

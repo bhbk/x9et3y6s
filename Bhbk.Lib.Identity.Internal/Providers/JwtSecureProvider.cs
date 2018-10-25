@@ -21,33 +21,75 @@ namespace Bhbk.Lib.Identity.Providers
                 throw new ArgumentNullException();
 
             var identity = await ioc.UserMgmt.ClaimProvider.CreateAsync(user);
+
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
+            if (ioc.Status == ContextType.UnitTest
+                && ioc.ConfigStore.Values.UnitTestsAccessToken)
             {
-                issueDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow;
-                expireDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsAccessTokenExpire);
+                issueDate = ioc.ConfigStore.Values.UnitTestsAccessTokenFakeUtcNow;
+                expireDate = ioc.ConfigStore.Values.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsAccessTokenExpire);
             }
             else
             {
                 issueDate = DateTime.UtcNow;
-                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsAccessTokenExpire);
+                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsAccessTokenExpire);
             }
 
-            var access = new JwtSecurityToken(
-                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
-                audience: audience.Name.ToString(),
-                claims: identity.Claims,
-                notBefore: issueDate,
-                expires: expireDate,
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-                );
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                    audience: audience.Name.ToString(),
+                    claims: identity.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                    ));
 
-            var result = new JwtSecurityTokenHandler().WriteToken(access);
+            return (result, issueDate, expireDate);
+        }
+
+        public static async Task<(string token, DateTime begin, DateTime end)>
+            CreateAccessTokenV1CompatibilityMode(IIdentityContext ioc, AppClient client, AppAudience audience, AppUser user)
+        {
+            if (ioc == null)
+                throw new ArgumentNullException();
+
+            var identity = await ioc.UserMgmt.ClaimProvider.CreateAsync(user);
+
+            DateTime issueDate, expireDate;
+
+            var symmetricKeyAsBase64 = client.ClientKey;
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            if (ioc.Status == ContextType.UnitTest
+                && ioc.ConfigStore.Values.UnitTestsAccessToken)
+            {
+                issueDate = ioc.ConfigStore.Values.UnitTestsAccessTokenFakeUtcNow;
+                expireDate = ioc.ConfigStore.Values.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsAccessTokenExpire);
+            }
+            else
+            {
+                //use hard coded value for expire...
+                issueDate = DateTime.UtcNow;
+                expireDate = DateTime.UtcNow.AddSeconds(86400);
+            }
+
+            //do not use issuer salt for compatibility here...
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: client.Name.ToString(),
+                    audience: audience.Name.ToString(),
+                    claims: identity.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                    ));
 
             return (result, issueDate, expireDate);
         }
@@ -59,21 +101,22 @@ namespace Bhbk.Lib.Identity.Providers
                 throw new ArgumentNullException();
 
             var identity = await ioc.UserMgmt.ClaimProvider.CreateAsync(user);
+
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsAccessToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigStore.Values.UnitTestsAccessToken)
             {
-                issueDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow;
-                expireDate = ioc.ConfigMgmt.Store.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsAccessTokenExpire);
+                issueDate = ioc.ConfigStore.Values.UnitTestsAccessTokenFakeUtcNow;
+                expireDate = ioc.ConfigStore.Values.UnitTestsAccessTokenFakeUtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsAccessTokenExpire);
             }
             else
             {
                 issueDate = DateTime.UtcNow;
-                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsAccessTokenExpire);
+                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsAccessTokenExpire);
             }
 
             string audienceList = string.Empty;
@@ -84,16 +127,15 @@ namespace Bhbk.Lib.Identity.Providers
             else
                 audienceList = string.Join(", ", audiences.Select(x => x.Name.ToString()).OrderBy(x => x));
 
-            var access = new JwtSecurityToken(
-                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
-                audience: audienceList,
-                claims: identity.Claims,
-                notBefore: issueDate,
-                expires: expireDate,
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-                );
-
-            var result = new JwtSecurityTokenHandler().WriteToken(access);
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                    audience: audienceList,
+                    claims: identity.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+                    ));
 
             return (result, issueDate, expireDate);
         }
@@ -105,33 +147,33 @@ namespace Bhbk.Lib.Identity.Providers
                 throw new ArgumentNullException();
 
             var identity = await ioc.UserMgmt.ClaimProvider.CreateRefreshAsync(user);
+
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigStore.Values.UnitTestsRefreshToken)
             {
-                issueDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow;
-                expireDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsRefreshTokenExpire);
+                issueDate = ioc.ConfigStore.Values.UnitTestsRefreshTokenFakeUtcNow;
+                expireDate = ioc.ConfigStore.Values.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsRefreshTokenExpire);
             }
             else
             {
                 issueDate = DateTime.UtcNow;
-                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsRefreshTokenExpire);
+                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsRefreshTokenExpire);
             }
 
-            var refresh = new JwtSecurityToken(
-                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
-                audience: null,
-                claims: identity.Claims,
-                notBefore: issueDate,
-                expires: expireDate,
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-                );
-
-            var result = new JwtSecurityTokenHandler().WriteToken(refresh);
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                    audience: null,
+                    claims: identity.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+                    ));
 
             var create = new UserRefreshCreate()
             {
@@ -142,9 +184,9 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var add = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).Devolve());
+            var refresh = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).Devolve());
 
-            if (!add.Succeeded)
+            if (!refresh.Succeeded)
                 throw new InvalidOperationException();
 
             return result;
@@ -157,33 +199,33 @@ namespace Bhbk.Lib.Identity.Providers
                 throw new ArgumentNullException();
 
             var identity = await ioc.UserMgmt.ClaimProvider.CreateRefreshAsync(user);
+
             DateTime issueDate, expireDate;
 
             var symmetricKeyAsBase64 = client.ClientKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (ioc.Status == ContextType.UnitTest && ioc.ConfigMgmt.Store.UnitTestsRefreshToken)
+            if (ioc.Status == ContextType.UnitTest && ioc.ConfigStore.Values.UnitTestsRefreshToken)
             {
-                issueDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow;
-                expireDate = ioc.ConfigMgmt.Store.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsRefreshTokenExpire);
+                issueDate = ioc.ConfigStore.Values.UnitTestsRefreshTokenFakeUtcNow;
+                expireDate = ioc.ConfigStore.Values.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsRefreshTokenExpire);
             }
             else
             {
                 issueDate = DateTime.UtcNow;
-                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigMgmt.Store.DefaultsRefreshTokenExpire);
+                expireDate = DateTime.UtcNow.AddSeconds(ioc.ConfigStore.Values.DefaultsRefreshTokenExpire);
             }
 
-            var refresh = new JwtSecurityToken(
-                issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
-                audience: null,
-                claims: identity.Claims,
-                notBefore: issueDate,
-                expires: expireDate,
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-                );
-
-            var result = new JwtSecurityTokenHandler().WriteToken(refresh);
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: client.Name.ToString() + ":" + ioc.ClientMgmt.Store.Salt,
+                    audience: null,
+                    claims: identity.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+                    ));
 
             var create = new UserRefreshCreate()
             {
@@ -194,9 +236,9 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var add = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).Devolve());
+            var refresh = await ioc.UserMgmt.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).Devolve());
 
-            if (!add.Succeeded)
+            if (!refresh.Succeeded)
                 throw new InvalidOperationException();
 
             return result;

@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Managers;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
-using Bhbk.Lib.Core.Primitives.Enums;
 using System;
 
 namespace Bhbk.Lib.Identity.Interfaces
@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Interfaces
         ActivityStore Activity { get; }
         AudienceManager AudienceMgmt { get; }
         ClientManager ClientMgmt { get; }
-        ConfigManager ConfigMgmt { get; }
+        ConfigStore ConfigStore { get; }
         LoginManager LoginMgmt { get; }
         CustomRoleManager RoleMgmt { get; }
         CustomUserManager UserMgmt { get; }

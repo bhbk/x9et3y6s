@@ -5,6 +5,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +18,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Web;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -39,10 +39,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
+                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
 
             user.ActorId = GetUserGUID();
 
@@ -66,15 +66,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var exists = await IoC.UserMgmt.FindByEmailAsync(model.Email);
 
             //if (exists != null)
-            //    return BadRequest(new { error = BaseLib.Statics.MsgUserAlreadyExists });
+            //    return BadRequest(new { error = Statics.MsgUserAlreadyExists });
 
             if (exists != null)
-                return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
+                return BadRequest(Strings.MsgUserAlreadyExists);
 
             var client = await IoC.ClientMgmt.FindByIdAsync(model.ClientId);
 
             if (client == null)
-                return NotFound(BaseLib.Statics.MsgClientNotExist);
+                return NotFound(Strings.MsgClientNotExist);
 
             var create = new UserFactory<UserCreate>(model);
 
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(IoC.Status.ToString())
-                    .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
+                    .GenerateAsync(user.Email, TimeSpan.FromSeconds(IoC.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
 
                 var url = LinkBuilder.ConfirmEmail(Conf, user, code);
 
@@ -112,12 +112,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         ToId = user.Id,
                         ToEmail = user.Email,
                         ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                        Subject = string.Format("{0} {1}", client.Name, BaseLib.Statics.ApiMsgConfirmNewUserSubject),
-                        HtmlContent = BaseLib.Statics.ApiTemplateConfirmNewUser(client, user, url)
+                        Subject = string.Format("{0} {1}", client.Name, Strings.ApiMsgConfirmNewUserSubject),
+                        HtmlContent = Strings.ApiTemplateConfirmNewUser(client, user, url)
                     });
 
                 if (!email.IsSuccessStatusCode)
-                    return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
+                    return BadRequest(Strings.MsgSysQueueEmailError);
             }
 
             return Ok((new UserFactory<AppUser>(user)).Evolve());
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var exists = await IoC.UserMgmt.FindByEmailAsync(model.Email);
 
             if (exists != null)
-                return BadRequest(BaseLib.Statics.MsgUserAlreadyExists);
+                return BadRequest(Strings.MsgUserAlreadyExists);
 
             var create = new UserFactory<UserCreate>(model);
 
@@ -162,10 +162,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (user.Immutable)
-                return BadRequest(BaseLib.Statics.MsgUserImmutable);
+                return BadRequest(Strings.MsgUserImmutable);
 
             user.ActorId = GetUserGUID();
 
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByEmailAsync(email);
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = new UserFactory<AppUser>(user);
 
@@ -209,7 +209,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var logins = await IoC.UserMgmt.GetLoginsAsync(user);
 
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var audiences = await IoC.UserMgmt.GetAudiencesAsync(user);
 
@@ -241,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var roles = await IoC.UserMgmt.GetRolesResultIdAsync(user);
 
@@ -277,10 +277,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (!await IoC.UserMgmt.HasPasswordAsync(user))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPassword);
+                return BadRequest(Strings.MsgUserInvalidPassword);
 
             user.ActorId = GetUserGUID();
 
@@ -302,10 +302,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
+                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
 
             user.ActorId = GetUserGUID();
 
@@ -334,10 +334,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(model.Id.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (user.Immutable)
-                return BadRequest(BaseLib.Statics.MsgUserImmutable);
+                return BadRequest(Strings.MsgUserImmutable);
 
             var update = new UserFactory<AppUser>(user);
             update.Update(model);

@@ -9,10 +9,8 @@ namespace Bhbk.Lib.Identity.Factory
         public UInt32 DefaultsAuthorizationCodeExpire { get; set; }
         public UInt32 DefaultsBrowserCookieExpire { get; set; }
         public UInt32 DefaultsRefreshTokenExpire { get; set; }
-        public bool DefaultsCompatibileClaimTypeNames { get; set; }
-        public string EndpointsAdminUrl { get; set; }
-        public string EndpointsMeUrl { get; set; }
-        public string EndpointsStsUrl { get; set; }
+        public bool DefaultsCompatibilityModeClaims { get; set; }
+        public bool DefaultsCompatibilityModeIssuer { get; set; }
         public bool UnitTestsAccessToken { get; set; }
         public DateTime UnitTestsAccessTokenFakeUtcNow { get; set; }
         public bool UnitTestsRefreshToken { get; set; }

@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -11,7 +12,6 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -33,12 +33,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.AddToRoleAsync(user, role.Name);
 
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await IoC.RoleMgmt.FindByNameAsync(model.Name);
 
             if (check != null)
-                return BadRequest(BaseLib.Statics.MsgRoleAlreadyExists);
+                return BadRequest(Strings.MsgRoleAlreadyExists);
 
             var role = new RoleFactory<RoleCreate>(model);
 
@@ -79,10 +79,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             else if (role.Immutable)
-                return BadRequest(BaseLib.Statics.MsgRoleImmutable);
+                return BadRequest(Strings.MsgRoleImmutable);
 
             role.ActorId = GetUserGUID();
 
@@ -116,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             var result = new RoleFactory<AppRole>(role);
 
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByNameAsync(roleName.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             var result = new RoleFactory<AppRole>(role);
 
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             var users = IoC.RoleMgmt.GetUsersListAsync(role);
 
@@ -161,12 +161,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(roleID.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             var user = await IoC.UserMgmt.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             var result = await IoC.UserMgmt.RemoveFromRoleAsync(user, role.Name);
 
@@ -188,10 +188,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = await IoC.RoleMgmt.FindByIdAsync(model.Id.ToString());
 
             if (role == null)
-                return NotFound(BaseLib.Statics.MsgRoleNotExist);
+                return NotFound(Strings.MsgRoleNotExist);
 
             else if (role.Immutable)
-                return BadRequest(BaseLib.Statics.MsgRoleImmutable);
+                return BadRequest(Strings.MsgRoleImmutable);
 
             var update = new RoleFactory<AppRole>(role);
             update.Update(model);

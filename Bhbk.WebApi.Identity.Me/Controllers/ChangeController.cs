@@ -1,9 +1,10 @@
 ﻿using Bhbk.Lib.Alert.Factory;
 using Bhbk.Lib.Alert.Interop;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
-using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 using System.Web;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -33,19 +33,19 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             else if (user.Email != model.CurrentEmail)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentEmail);
+                return BadRequest(Strings.MsgUserInvalidCurrentEmail);
 
             else if (model.NewEmail != model.NewEmailConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidEmailConfirm);
+                return BadRequest(Strings.MsgUserInvalidEmailConfirm);
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.Status.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(IoC.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
 
             if (IoC.Status == ContextType.UnitTest)
                 return Ok(token);
@@ -66,12 +66,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     ToId = user.Id,
                     ToEmail = user.Email,
                     ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0}", BaseLib.Statics.ApiMsgConfirmEmailSubject),
-                    HtmlContent = BaseLib.Statics.ApiTemplateConfirmEmail(user, url)
+                    Subject = string.Format("{0}", Strings.ApiMsgConfirmEmailSubject),
+                    HtmlContent = Strings.ApiTemplateConfirmEmail(user, url)
                 });
 
             if (!email.IsSuccessStatusCode)
-                return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
+                return BadRequest(Strings.MsgSysQueueEmailError);
 
             return NoContent();
         }
@@ -85,22 +85,22 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             else if (!user.HumanBeing)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             else if (!await IoC.UserMgmt.CheckPasswordAsync(user, model.CurrentPassword))
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPassword);
+                return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPasswordConfirm);
+                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(IoC.Status.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(IoC.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user));
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(IoC.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user));
 
             if (IoC.Status == ContextType.UnitTest)
                 return Ok(token);
@@ -121,12 +121,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     ToId = user.Id,
                     ToEmail = user.Email,
                     ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0}", BaseLib.Statics.ApiMsgConfirmPasswordSubject),
-                    HtmlContent = BaseLib.Statics.ApiTemplateConfirmPassword(user, url)
+                    Subject = string.Format("{0}", Strings.ApiMsgConfirmPasswordSubject),
+                    HtmlContent = Strings.ApiTemplateConfirmPassword(user, url)
                 });
 
             if (!email.IsSuccessStatusCode)
-                return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
+                return BadRequest(Strings.MsgSysQueueEmailError);
 
             return NoContent();
         }
@@ -140,19 +140,19 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = await IoC.UserMgmt.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
-                return NotFound(BaseLib.Statics.MsgUserNotExist);
+                return NotFound(Strings.MsgUserNotExist);
 
             else if (user.Id != model.Id)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             else if (!user.HumanBeing)
-                return BadRequest(BaseLib.Statics.MsgUserInvalid);
+                return BadRequest(Strings.MsgUserInvalid);
 
             else if (user.PhoneNumber != model.CurrentPhoneNumber)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidCurrentPhone);
+                return BadRequest(Strings.MsgUserInvalidCurrentPhone);
 
             else if (model.NewPhoneNumber != model.NewPhoneNumberConfirm)
-                return BadRequest(BaseLib.Statics.MsgUserInvalidPhoneConfirm);
+                return BadRequest(Strings.MsgUserInvalidPhoneConfirm);
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 });
 
             if (!email.IsSuccessStatusCode)
-                return BadRequest(BaseLib.Statics.MsgSysQueueEmailError);
+                return BadRequest(Strings.MsgSysQueueEmailError);
 
             return NoContent();
         }

@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,6 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -36,12 +36,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await IoC.AudienceMgmt.FindByNameAsync(model.Name);
 
             if (check != null)
-                return BadRequest(BaseLib.Statics.MsgAudienceAlreadyExists);
+                return BadRequest(Strings.MsgAudienceAlreadyExists);
 
-            BaseLib.AudienceType audienceType;
+            Enums.AudienceType audienceType;
 
-            if (!Enum.TryParse<BaseLib.AudienceType>(model.AudienceType, out audienceType))
-                return BadRequest(BaseLib.Statics.MsgAudienceInvalid);
+            if (!Enum.TryParse<Enums.AudienceType>(model.AudienceType, out audienceType))
+                return BadRequest(Strings.MsgAudienceInvalid);
 
             var audience = new AudienceFactory<AudienceCreate>(model);
             var result = await IoC.AudienceMgmt.CreateAsync(audience.Devolve());
@@ -56,10 +56,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             else if (audience.Immutable)
-                return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
+                return BadRequest(Strings.MsgAudienceImmutable);
 
             audience.ActorId = GetUserGUID();
 
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             var result = new AudienceFactory<AppAudience>(audience);
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByNameAsync(audienceName);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             var result = new AudienceFactory<AppAudience>(audience);
 
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(audienceID);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             var roles = await IoC.AudienceMgmt.GetRoleListAsync(audienceID);
 
@@ -139,10 +139,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audience = await IoC.AudienceMgmt.FindByIdAsync(model.Id);
 
             if (audience == null)
-                return NotFound(BaseLib.Statics.MsgAudienceNotExist);
+                return NotFound(Strings.MsgAudienceNotExist);
 
             else if (audience.Immutable)
-                return BadRequest(BaseLib.Statics.MsgAudienceImmutable);
+                return BadRequest(Strings.MsgAudienceImmutable);
 
             var update = new AudienceFactory<AppAudience>(audience);
             update.Update(model);

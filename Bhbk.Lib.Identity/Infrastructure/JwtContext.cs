@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.Interop;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Interop;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Serilog;

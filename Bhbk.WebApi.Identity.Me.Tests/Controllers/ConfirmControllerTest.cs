@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
@@ -9,7 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
@@ -31,13 +31,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(user.Id);
 
             var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
@@ -52,13 +52,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(user.Id);
 
             var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
@@ -72,13 +72,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(user.Id);
 
             var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
@@ -93,13 +93,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(user.Id);
 
             var token = await new ProtectProvider(_ioc.Status.ToString())
-                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigMgmt.Store.DefaultsAuthorizationCodeExpire), user);
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(_ioc.ConfigStore.Values.DefaultsAuthorizationCodeExpire), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             _tests.Create();
 
             var controller = new ConfirmController(_conf, _ioc, _tasks);
-            var user = _ioc.UserMgmt.Store.Get(x => x.Email == BaseLib.Statics.ApiUnitTestUser1).Single();
+            var user = _ioc.UserMgmt.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(user.Id);

@@ -83,7 +83,7 @@ namespace Bhbk.Lib.Identity.Interop
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AccessTokenV1AudienceAsIssuerToo(string audience, string user, string password)
+        public async Task<HttpResponseMessage> AccessTokenV1CompatibilityModeIssuer(string audience, string user, string password)
         {
             var content = new FormUrlEncodedContent(new[]
                 {

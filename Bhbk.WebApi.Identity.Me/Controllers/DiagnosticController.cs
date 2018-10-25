@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
-using BaseLib = Bhbk.Lib.Identity;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
-            if (name.ToLower() == BaseLib.TaskType.MaintainQuotes.ToString().ToLower())
+            if (name.ToLower() == Enums.TaskType.MaintainQuotes.ToString().ToLower())
                 return Ok(((MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask))).Status);
 
             return BadRequest();
