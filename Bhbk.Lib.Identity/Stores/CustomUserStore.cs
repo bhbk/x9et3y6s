@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -168,27 +169,23 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppUserRefresh.Where(x => x.ExpiresUtc == DateTime.UtcNow);
         }
 
-        public IQueryable<AppUser> Get()
-        {
-            return _context.AppUser.AsQueryable();
-        }
-
-        public IQueryable<AppUser> Get(Expression<Func<AppUser, bool>> filter = null,
-            Func<IQueryable<AppUser>, IOrderedQueryable<AppUser>> orderBy = null, string includes = "")
+        public IQueryable<AppUser> Get(Expression<Func<AppUser, bool>> predicates = null,
+            Func<IQueryable<AppUser>, IQueryable<AppUser>> orderBy = null,
+            Func<IQueryable<AppUser>, IIncludableQueryable<AppUser, object>> includes = null,
+            bool tracking = true)
         {
             IQueryable<AppUser> query = _context.AppUser.AsQueryable();
 
-            if (filter != null)
-                query = query.Where(filter);
+            if (predicates != null)
+                query = query.Where(predicates);
 
-            foreach (var include in includes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                query = query.Include(include);
+            if (includes != null)
+                query.Include(includes.ToString());
 
             if (orderBy != null)
                 return orderBy(query);
 
-            else
-                return query;
+            return query;
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -321,8 +318,7 @@ namespace Bhbk.Lib.Identity.Stores
             else if (_context.AppUserLogin.Any(x => x.UserId == user.Id && x.LoginId == login.Id))
                 return Task.FromResult(true);
 
-            else
-                return Task.FromResult(false);
+            return Task.FromResult(false);
         }
 
         public override Task<bool> IsInRoleAsync(AppUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
@@ -335,8 +331,7 @@ namespace Bhbk.Lib.Identity.Stores
             else if (_context.AppUserRole.Any(x => x.UserId == user.Id && x.RoleId == role.Id))
                 return Task.FromResult(true);
 
-            else
-                return Task.FromResult(false);
+            return Task.FromResult(false);
         }
 
         public override Task RemoveClaimsAsync(AppUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default(CancellationToken))
@@ -395,11 +390,8 @@ namespace Bhbk.Lib.Identity.Stores
             if (token == null)
                 throw new ArgumentNullException();
 
-            else
-            {
-                _context.AppUserRefresh.RemoveRange(token);
-                _context.SaveChanges();
-            }
+            _context.AppUserRefresh.RemoveRange(token);
+            _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -411,11 +403,8 @@ namespace Bhbk.Lib.Identity.Stores
             if (token == null)
                 throw new ArgumentNullException();
 
-            else
-            {
-                _context.AppUserRefresh.RemoveRange(token);
-                _context.SaveChanges();
-            }
+            _context.AppUserRefresh.RemoveRange(token);
+            _context.SaveChanges();
 
             return Task.FromResult(IdentityResult.Success);
         }

@@ -1,6 +1,7 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using ManyConsole;
@@ -40,6 +41,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .EnableSensitiveDataLogging();
 
                 Statics.UoW = new IdentityContext(builder, ContextType.Live);
+                Statics.DefaultData = new DefaultData(Statics.UoW);
 
                 if (CreateDefault)
                 {
@@ -47,7 +49,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    Statics.UoW.DefaultsCreate();
+                    Statics.DefaultData.Create();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -58,7 +60,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    Statics.UoW.DefautsDestroy();
+                    Statics.DefaultData.Destroy();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -69,7 +71,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    Statics.UoW.DefautsDestroy();
+                    Statics.DefaultData.Destroy();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

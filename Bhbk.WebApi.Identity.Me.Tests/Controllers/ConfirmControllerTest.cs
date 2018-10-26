@@ -27,8 +27,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Email_Fail()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ConfirmController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -48,8 +48,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Email_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ConfirmController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -68,8 +68,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Password_Fail()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ConfirmController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -89,8 +89,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_Password_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ConfirmController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -109,8 +109,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_PhoneNumber_Fail()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ConfirmController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -129,8 +129,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         [TestMethod]
         public async Task Api_Me_ConfirmV1_PhoneNumber_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ConfirmController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();

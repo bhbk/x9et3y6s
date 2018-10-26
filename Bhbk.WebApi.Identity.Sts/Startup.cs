@@ -70,14 +70,14 @@ namespace Bhbk.WebApi.Identity.Sts
 
             _uow.ClientRepo.Salt = _conf["IdentityTenants:Salt"];
 
-            var _issuers = (_uow.ClientRepo.GetAsync().Result)
+            var issuers = (_uow.ClientRepo.GetAsync().Result)
                 .Select(x => x.Name.ToString() + ":" + _uow.ClientRepo.Salt);
 
             //check if issuer compatibility enabled. means add issuer with no salt.
             if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                _issuers = (_uow.ClientRepo.GetAsync().Result)
+                issuers = (_uow.ClientRepo.GetAsync().Result)
                     .Select(x => x.Name.ToString())
-                    .Concat(_issuers);
+                    .Concat(issuers);
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 bearer.IncludeErrorDetails = true;
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuers = _issuers.ToArray(),
+                    ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = (_uow.ClientRepo.GetAsync().Result).Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))).ToArray(),
                     ValidAudiences = (_uow.AudienceRepo.GetAsync().Result).Select(x => x.Name.ToString()).ToArray(),
                     AudienceValidator = Bhbk.Lib.Identity.Validators.AudienceValidator.Multiple,

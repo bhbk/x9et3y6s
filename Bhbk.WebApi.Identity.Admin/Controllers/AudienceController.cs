@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
@@ -43,12 +42,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!Enum.TryParse<Enums.AudienceType>(model.AudienceType, out audienceType))
                 return BadRequest(Strings.MsgAudienceInvalid);
 
-            var audience = new AudienceFactory<AudienceCreate>(model);
-            var result = await UoW.AudienceRepo.CreateAsync(audience.ToStore());
+            var result = await UoW.AudienceRepo.CreateAsync(UoW.Maps.Map<AppAudience>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(audience.ToClient());
+            return Ok(UoW.Maps.Map<AudienceResult>(result));
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
@@ -81,9 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            var result = new AudienceFactory<AppAudience>(audience);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<AudienceResult>(audience));
         }
 
         [Route("v1/{audienceName}"), HttpGet]
@@ -94,9 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            var result = new AudienceFactory<AppAudience>(audience);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<AudienceResult>(audience));
         }
 
         [Route("v1"), HttpGet]
@@ -108,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = await UoW.AudienceRepo.GetAsync(x => true,
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).ToClient());
+            var result = audiences.Select(x => UoW.Maps.Map<AudienceResult>(x));
 
             return Ok(result);
         }
@@ -123,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var roles = await UoW.AudienceRepo.GetRoleListAsync(audienceID);
 
-            var result = roles.Select(x => new RoleFactory<AppRole>(x).ToClient()).ToList();
+            var result = roles.Select(x => UoW.Maps.Map<RoleResult>(x)).ToList();
 
             return Ok(result);
         }
@@ -145,12 +139,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (audience.Immutable)
                 return BadRequest(Strings.MsgAudienceImmutable);
 
-            var update = new AudienceFactory<AudienceUpdate>(model);
-            var result = await UoW.AudienceRepo.UpdateAsync(update.ToStore());
+            var result = await UoW.AudienceRepo.UpdateAsync(UoW.Maps.Map<AppAudience>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(update.ToClient());
+            return Ok(UoW.Maps.Map<AudienceResult>(result));
         }
     }
 }

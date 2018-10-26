@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -187,7 +186,7 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).ToStore());
+            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Maps.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();
@@ -240,7 +239,7 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(new UserRefreshFactory<UserRefreshCreate>(create).ToStore());
+            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Maps.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();

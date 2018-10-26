@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
@@ -38,11 +37,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check.Any())
                 return BadRequest(Strings.MsgClientAlreadyExists);
 
-            var client = new ClientFactory<ClientCreate>(model);
+            var result = await UoW.ClientRepo.CreateAsync(UoW.Maps.Map<AppClient>(model));
 
-            var result = await UoW.ClientRepo.CreateAsync(client.ToStore());
-
-            return Ok(client.ToClient());
+            return Ok(UoW.Maps.Map<ClientResult>(result));
         }
 
         [Route("v1/{clientID:guid}"), HttpDelete]
@@ -75,9 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var result = new ClientFactory<AppAudience>(client);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<ClientResult>(client));
         }
 
         [Route("v1/{clientName}"), HttpGet]
@@ -88,9 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var result = new ClientFactory<AppAudience>(client);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<ClientResult>(client));
         }
 
         [Route("v1"), HttpGet]
@@ -102,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var clients = await UoW.ClientRepo.GetAsync(x => true,
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = clients.Select(x => new ClientFactory<AppClient>(x).ToClient());
+            var result = clients.Select(x => UoW.Maps.Map<ClientResult>(x));
 
             return Ok(result);
         }
@@ -117,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var audiences = await UoW.ClientRepo.GetAudiencesAsync(clientID);
 
-            var result = audiences.Select(x => new AudienceFactory<AppAudience>(x).ToClient()).ToList();
+            var result = audiences.Select(x => UoW.Maps.Map<AudienceResult>(x)).ToList();
 
             return Ok(result);
         }
@@ -139,12 +132,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (client.Immutable)
                 return BadRequest(Strings.MsgClientImmutable);
 
-            var update = new ClientFactory<ClientUpdate>(model);
-            var result = await UoW.ClientRepo.UpdateAsync(update.ToStore());
+            var result = await UoW.ClientRepo.UpdateAsync(UoW.Maps.Map<AppClient>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(update.ToClient());
+            return Ok(UoW.Maps.Map<ClientResult>(result));
         }
     }
 }

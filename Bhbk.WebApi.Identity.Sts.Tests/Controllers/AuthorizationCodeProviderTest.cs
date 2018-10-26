@@ -34,8 +34,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV1_Use_Fail_NotImplemented()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
@@ -54,8 +54,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_ClientNotFound()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
@@ -76,8 +76,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_CodeNotValid()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
@@ -95,8 +95,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UriNotValid()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
@@ -118,8 +118,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Fail_UserNotFound()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
@@ -140,8 +140,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [TestMethod]
         public async Task Api_Sts_OAuth_AuthCodeV2_Use_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();

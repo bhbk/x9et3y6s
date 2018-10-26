@@ -1,8 +1,7 @@
 ﻿using Bhbk.Lib.Alert.Factory;
-using Bhbk.Lib.Alert.Interop;
+using Bhbk.Lib.Alert.Helpers;
 using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
@@ -65,9 +64,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             
             var exists = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
 
-            //if (exists != null)
-            //    return BadRequest(new { error = Statics.MsgUserAlreadyExists });
-
             if (exists != null)
                 return BadRequest(Strings.MsgUserAlreadyExists);
 
@@ -76,19 +72,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var create = new UserFactory<UserCreate>(model);
-
             //ignore how bit may be set in model...
-            create.HumanBeing = true;
+            model.HumanBeing = true;
 
-            var result = await UoW.CustomUserMgr.CreateAsync(create.ToStore());
+            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Maps.Map<AppUser>(model));
 
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if (!create.Succeeded)
+                return GetErrorResult(create);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(create.Id.ToString());
+            var result = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
 
-            if (user == null)
+            if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             if (UoW.Situation == ContextType.Live)
@@ -99,28 +93,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                    .GenerateAsync(user.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), user));
+                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), result));
 
-                var url = LinkBuilder.ConfirmEmail(Conf, user, code);
+                var url = LinkBuilder.ConfirmEmail(Conf, result, code);
 
                 var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
                     new EmailCreate()
                     {
-                        FromId = user.Id,
-                        FromEmail = user.Email,
-                        FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                        ToId = user.Id,
-                        ToEmail = user.Email,
-                        ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                        FromId = result.Id,
+                        FromEmail = result.Email,
+                        FromDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
+                        ToId = result.Id,
+                        ToEmail = result.Email,
+                        ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
                         Subject = string.Format("{0} {1}", client.Name, Strings.ApiMsgConfirmNewUserSubject),
-                        HtmlContent = Strings.ApiTemplateConfirmNewUser(client, user, url)
+                        HtmlContent = Strings.ApiTemplateConfirmNewUser(client, result, url)
                     });
 
                 if (!email.IsSuccessStatusCode)
                     return BadRequest(Strings.MsgSysQueueEmailError);
             }
 
-            return Ok((new UserFactory<AppUser>(user)).ToClient());
+            return Ok(UoW.Maps.Map<UserResult>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -137,22 +131,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (exists != null)
                 return BadRequest(Strings.MsgUserAlreadyExists);
 
-            var create = new UserFactory<UserCreate>(model);
-
             //ignore how bit may be set in model...
-            create.HumanBeing = false;
+            model.HumanBeing = false;
 
-            var result = await UoW.CustomUserMgr.CreateAsync(create.ToStore());
+            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Maps.Map<AppUser>(model));
 
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if (!create.Succeeded)
+                return GetErrorResult(create);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(create.Id.ToString());
+            var result = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
 
-            if (user == null)
+            if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok((new UserFactory<AppUser>(user)).ToClient());
+            return Ok(UoW.Maps.Map<UserResult>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -185,9 +177,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = new UserFactory<AppUser>(user);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<UserResult>(user));
         }
 
         [Route("v1/{email}"), HttpGet]
@@ -198,9 +188,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = new UserFactory<AppUser>(user);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<UserResult>(user));
         }
 
         [Route("v1/{userID:guid}/logins"), HttpGet]
@@ -214,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.CustomUserMgr.GetLoginsAsync(user);
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x.Id.ToString())))
-                .Select(x => new LoginFactory<AppLogin>(x).ToClient());
+                .Select(x => UoW.Maps.Map<LoginResult>(x));
 
             return Ok(result);
         }
@@ -230,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = await UoW.CustomUserMgr.GetAudiencesAsync(user);
 
             var result = (await UoW.AudienceRepo.GetAsync(x => audiences.Contains(x.Id.ToString())))
-                .Select(x => new AudienceFactory<AppAudience>(x).ToClient());
+                .Select(x => UoW.Maps.Map<AudienceResult>(x));
 
             return Ok(result);
         }
@@ -246,7 +234,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await UoW.CustomUserMgr.GetRolesResultIdAsync(user);
 
             var result = UoW.CustomRoleMgr.Store.Get(x => roles.Contains(x.Id.ToString()))
-                .Select(x => new RoleFactory<AppRole>(x).ToClient());
+                .Select(x => UoW.Maps.Map<RoleResult>(x));
 
             return Ok(result);
         }
@@ -262,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 .Skip(model.Skip)
                 .Take(model.Take);
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).ToClient());
+            var result = users.Select(x => UoW.Maps.Map<UserResult>(x));
 
             return Ok(result);
         }
@@ -339,13 +327,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (user.Immutable)
                 return BadRequest(Strings.MsgUserImmutable);
 
-            var update = new UserFactory<UserUpdate>(model);
-            var result = await UoW.CustomUserMgr.UpdateAsync(update.ToStore());
+            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Maps.Map<AppUser>(model));
 
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if (!update.Succeeded)
+                return GetErrorResult(update);
 
-            return Ok(update.ToClient());
+            var result = await UoW.CustomUserMgr.FindByIdAsync(model.Id.ToString());
+
+            if(result == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            return Ok(UoW.Maps.Map<UserResult>(result));
         }
     }
 }

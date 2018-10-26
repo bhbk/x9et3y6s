@@ -1,8 +1,8 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;

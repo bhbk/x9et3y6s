@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;

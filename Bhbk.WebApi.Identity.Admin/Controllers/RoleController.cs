@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -64,16 +64,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check != null)
                 return BadRequest(Strings.MsgRoleAlreadyExists);
 
-            var role = new RoleFactory<RoleCreate>(model);
+            var create = await UoW.CustomRoleMgr.CreateAsync(UoW.Maps.Map<AppRole>(model));
 
-            var result = await UoW.CustomRoleMgr.CreateAsync(role.ToStore());
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if (!create.Succeeded)
+                return GetErrorResult(create);
 
             await UoW.CommitAsync();
 
-            return Ok(role.ToClient());
+            var result = await UoW.CustomRoleMgr.FindByNameAsync(model.Name);
+
+            if(result == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            return Ok(UoW.Maps.Map<RoleResult>(result));
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
@@ -111,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 .Skip(model.Skip)
                 .Take(model.Take);
 
-            var result = roles.Select(x => new RoleFactory<AppRole>(x).ToClient());
+            var result = roles.Select(x => UoW.Maps.Map<RoleResult>(x));
 
             return Ok(result);
         }
@@ -124,9 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
 
-            var result = new RoleFactory<AppRole>(role);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<RoleResult>(role));
         }
 
         [Route("v1/{roleName}"), HttpGet]
@@ -137,9 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
 
-            var result = new RoleFactory<AppRole>(role);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<RoleResult>(role));
         }
 
         [Route("v1/{roleID:guid}/users"), HttpGet]
@@ -152,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = UoW.CustomRoleMgr.GetUsersListAsync(role);
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).ToClient());
+            var result = users.Select(x => UoW.Maps.Map<UserResult>(x));
 
             return Ok(result);
         }
@@ -201,15 +200,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (role.Immutable)
                 return BadRequest(Strings.MsgRoleImmutable);
 
-            var update = new RoleFactory<RoleUpdate>(model);
-            var result = await UoW.CustomRoleMgr.UpdateAsync(update.ToStore());
+            var create = await UoW.CustomRoleMgr.UpdateAsync(UoW.Maps.Map<AppRole>(model));
 
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if (!create.Succeeded)
+                return GetErrorResult(create);
 
             await UoW.CommitAsync();
 
-            return Ok(update.ToClient());
+            var result = await UoW.CustomRoleMgr.FindByNameAsync(model.Name);
+
+            return Ok(UoW.Maps.Map<RoleResult>(result));
         }
     }
 }

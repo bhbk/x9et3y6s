@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
@@ -33,8 +32,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_Create_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var model = new ClientCreate()
@@ -57,8 +56,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_Delete_Fail_Immutable()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -80,8 +79,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_Delete_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -99,8 +98,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_GetById_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -115,8 +114,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_GetByName_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -131,9 +130,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_GetList_Fail_Auth()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreateRandom(10);
-            _uow.DefaultsCreate();
+            _tests.Destroy();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
@@ -155,9 +154,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_GetList_Fail_ParamInvalid()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreateRandom(10);
-            _uow.DefaultsCreate();
+            _tests.Destroy();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).Single();
@@ -184,9 +183,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_GetList_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreateRandom(10);
-            _uow.DefaultsCreate();
+            _tests.Destroy();
+            _tests.CreateRandom(10);
+            _defaults.Create();
 
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).Single();
             var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).Single();
@@ -222,8 +221,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_GetAudienceList_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -238,8 +237,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [TestMethod]
         public async Task Api_Admin_ClientV1_Update_Success()
         {
-            _uow.TestsDestroy();
-            _uow.TestsCreate();
+            _tests.Destroy();
+            _tests.TestsCreate();
 
             var controller = new ClientController(_conf, _uow, _tasks);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();

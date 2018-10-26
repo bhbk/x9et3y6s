@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Core.Interfaces;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Repository;
@@ -10,6 +11,7 @@ namespace Bhbk.Lib.Identity.Interfaces
         where TContext : AppDbContext
     {
         TContext Context { get; }
+        IMapper Maps { get; }
         ActivityRepository ActivityRepo { get; }
         AudienceRepository AudienceRepo { get; }
         ClientRepository ClientRepo { get; }
@@ -17,11 +19,5 @@ namespace Bhbk.Lib.Identity.Interfaces
         CustomRoleManager CustomRoleMgr { get; }
         CustomUserManager CustomUserMgr { get; }
         LoginRepository LoginRepo { get; }
-
-        void DefaultsCreate();
-        void DefautsDestroy();
-        void TestsCreate();
-        void TestsCreateRandom(uint sets);
-        void TestsDestroy();
     }
 }

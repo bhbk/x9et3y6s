@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Infrastructure;
 using System;
+using Bhbk.Lib.Identity.Data;
 
 namespace Bhbk.Cli.Identity
 {
@@ -23,5 +24,6 @@ namespace Bhbk.Cli.Identity
     internal class Statics
     {
         internal static IdentityContext UoW;
+        internal static DefaultData DefaultData;
     }
 }

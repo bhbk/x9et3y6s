@@ -1,13 +1,14 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -29,9 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = new UserFactory<AppUser>(user);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<UserResult>(user));
         }
 
         [Route("v1/claims"), HttpGet]
@@ -133,15 +132,19 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var update = new UserFactory<UserUpdate>(model);
-            var result = await UoW.CustomUserMgr.UpdateAsync(update.ToStore());
+            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Maps.Map<AppUser>(model));
 
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if (!update.Succeeded)
+                return GetErrorResult(update);
 
             await UoW.CommitAsync();
 
-            return Ok(update.ToClient());
+            var result = await UoW.CustomUserMgr.FindByIdAsync(model.Id.ToString());
+
+            if(result == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            return Ok(UoW.Maps.Map<UserResult>(result));
         }
     }
 }

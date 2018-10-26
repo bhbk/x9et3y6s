@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
@@ -67,12 +66,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check.Any())
                 return BadRequest(Strings.MsgLoginAlreadyExists);
 
-            var login = new LoginFactory<LoginCreate>(model);
-            var result = await UoW.LoginRepo.CreateAsync(login.ToStore());
+            var result = await UoW.LoginRepo.CreateAsync(UoW.Maps.Map<AppLogin>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(login.ToClient());
+            return Ok(UoW.Maps.Map<LoginResult>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -105,9 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var result = new LoginFactory<AppLogin>(login);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<LoginResult>(login));
         }
 
         [Route("v1/{loginName}"), HttpGet]
@@ -118,9 +114,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var result = new LoginFactory<AppLogin>(login);
-
-            return Ok(result.ToClient());
+            return Ok(UoW.Maps.Map<LoginResult>(login));
         }
 
         [Route("v1"), HttpGet]
@@ -132,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.LoginRepo.GetAsync(x => true,
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = logins.Select(x => new LoginFactory<AppLogin>(x).ToClient());
+            var result = logins.Select(x => UoW.Maps.Map<AppLogin>(x));
 
             return Ok(result);
         }
@@ -147,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => new UserFactory<AppUser>(x).ToClient());
+            var result = users.Select(x => UoW.Maps.Map<UserResult>(x));
 
             return Ok(result);
         }
@@ -193,12 +187,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var update = new LoginFactory<LoginUpdate>(model);
-            var result = await UoW.LoginRepo.UpdateAsync(update.ToStore());
+            var result = await UoW.LoginRepo.UpdateAsync(UoW.Maps.Map<AppLogin>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(update.ToClient());
+            return Ok(UoW.Maps.Map<LoginResult>(result));
         }
     }
 }

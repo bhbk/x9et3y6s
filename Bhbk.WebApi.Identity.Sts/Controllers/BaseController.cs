@@ -18,8 +18,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         private readonly IConfigurationRoot _conf;
         private readonly IIdentityContext<AppDbContext> _uow;
-        private readonly IHostedService[] _tasks;
         private readonly IJwtContext _jwt;
+        private readonly IHostedService[] _tasks;
 
         protected IConfigurationRoot Conf
         {
@@ -37,19 +37,19 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
         }
 
+        protected IJwtContext Jwt
+        {
+            get
+            {
+                return _jwt ?? (IJwtContext)ControllerContext.HttpContext.RequestServices.GetRequiredService<IJwtContext>();
+            }
+        }
+
         protected IHostedService[] Tasks
         {
             get
             {
                 return _tasks ?? (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>();
-            }
-        }
-
-        protected IJwtContext Jwt
-        {
-            get
-            {
-                return _jwt ?? (IJwtContext)ControllerContext.HttpContext.RequestServices.GetService<IJwtContext>();
             }
         }
 

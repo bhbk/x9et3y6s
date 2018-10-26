@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,21 +62,18 @@ namespace Bhbk.Lib.Identity.Stores
             return _context.AppRole.Any(x => x.Name == roleName);
         }
 
-        public IQueryable<AppRole> Get()
-        {
-            return _context.AppRole.AsQueryable();
-        }
-
-        public IQueryable<AppRole> Get(Expression<Func<AppRole, bool>> filter = null,
-            Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orderBy = null, string includes = "")
+        public IQueryable<AppRole> Get(Expression<Func<AppRole, bool>> predicates = null,
+            Func<IQueryable<AppRole>, IQueryable<AppRole>> orderBy = null,
+            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null,
+            bool tracking = true)
         {
             IQueryable<AppRole> query = _context.AppRole.AsQueryable();
 
-            if (filter != null)
-                query = query.Where(filter);
+            if (predicates != null)
+                query = query.Where(predicates);
 
-            foreach (var include in includes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                query = query.Include(include);
+            if (includes != null)
+                query.Include(includes.ToString());
 
             if (orderBy != null)
                 return orderBy(query);

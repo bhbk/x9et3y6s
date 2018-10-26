@@ -1,6 +1,7 @@
+using AutoMapper;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Factory;
+using Bhbk.Lib.Identity.Infrastructure;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -20,6 +21,7 @@ namespace Bhbk.Lib.Identity.Models
     {
         private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
+        private static IMapper _maps;
         private static IList _fieldsExcluded, _fieldsSensitive, _tablesExcluded;
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -39,6 +41,11 @@ namespace Bhbk.Lib.Identity.Models
                 .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
+
+            _maps = new MapperConfiguration(maps =>
+            {
+                maps.AddProfile<IdentityMaps>();
+            }).CreateMapper();
 
             _fieldsExcluded = _conf.GetSection("IdentityActivity:FieldsExcluded").GetChildren().Select(x => x.Value).ToList();
             _fieldsSensitive = _conf.GetSection("IdentityActivity:FieldsSensitive").GetChildren().Select(x => x.Value).ToList();
@@ -153,7 +160,7 @@ namespace Bhbk.Lib.Identity.Models
                     }
                 }
 
-                var verify = activity.Devolve();
+                var verify = _maps.Map<AppActivity>(activity);
 
                 if(verify.OriginalValues != verify.CurrentValues)
                     activityList.Add(activity);
@@ -161,7 +168,7 @@ namespace Bhbk.Lib.Identity.Models
 
             //save entities that have all the changes
             foreach (var entry in activityList.Where(x => !x.HasTemporaryProperties))
-                AppActivity.Add(entry.Devolve());
+                AppActivity.Add(_maps.Map<AppActivity>(entry));
 
             //add to list of entries where some property values are unknown
             return activityList.Where(x => x.HasTemporaryProperties).ToList();
@@ -183,7 +190,7 @@ namespace Bhbk.Lib.Identity.Models
                         entry.CurrentValues[prop.Metadata.Name] = prop.CurrentValue;
                 }
 
-                AppActivity.Add(entry.Devolve());
+                AppActivity.Add(_maps.Map<AppActivity>(entry));
             }
 
             return SaveChangesAsync();

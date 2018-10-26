@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
@@ -16,6 +17,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 {
     public class StartupTest : Startup
     {
+        protected static DefaultData _defaults;
+        protected static TestData _tests;
+
         public override void ConfigureContext(IServiceCollection sc)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -35,6 +39,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
             _uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
             _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
+
+            _defaults = new DefaultData(_uow);
+            _tests = new TestData(_uow);
         }
 
         public override void ConfigureServices(IServiceCollection sc)

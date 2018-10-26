@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Factory;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var activity = await UoW.ActivityRepo.GetAsync(x => true, 
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = activity.Select(x => new ActivityFactory<AppActivity>(x).ToClient());
+            var result = activity.Select(x => UoW.Maps.Map<AppActivity>(x));
 
             return Ok(result);
         }

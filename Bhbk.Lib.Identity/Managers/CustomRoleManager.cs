@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Factory;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -70,7 +69,7 @@ namespace Bhbk.Lib.Identity.Managers
                 throw new ArgumentNullException();
 
             foreach (AppUser entry in list)
-                result.Add(new UserFactory<AppUser>(entry).ToStore());
+                result.Add(entry);
 
             return result;
         }
