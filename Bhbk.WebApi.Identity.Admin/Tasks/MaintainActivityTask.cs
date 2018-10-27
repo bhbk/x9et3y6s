@@ -57,18 +57,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 {
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var expired = _uow.CustomUserMgr.Store.Context.AppActivity
-                        .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
+                    var expired = await _uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                             || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true));
 
                     var expiredCount = expired.Count();
 
                     if (expired.Any())
                     {
-                        foreach (AppActivity entry in expired.ToList())
-                            _uow.CustomUserMgr.Store.Context.AppActivity.Remove(entry);
+                        foreach (var entry in expired.ToList())
+                            await _uow.ActivityRepo.DeleteAsync(entry);
 
-                        _uow.CustomUserMgr.Store.Context.SaveChanges();
+                        await _uow.CommitAsync();
 
                         var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + expiredCount.ToString() + " expired activity entries.";

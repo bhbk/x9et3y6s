@@ -66,11 +66,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check.Any())
                 return BadRequest(Strings.MsgLoginAlreadyExists);
 
-            var result = await UoW.LoginRepo.CreateAsync(UoW.Maps.Map<AppLogin>(model));
+            var result = await UoW.LoginRepo.CreateAsync(UoW.Convert.Map<AppLogin>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Maps.Map<LoginResult>(result));
+            return Ok(UoW.Convert.Map<LoginResult>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -103,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            return Ok(UoW.Maps.Map<LoginResult>(login));
+            return Ok(UoW.Convert.Map<LoginResult>(login));
         }
 
         [Route("v1/{loginName}"), HttpGet]
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            return Ok(UoW.Maps.Map<LoginResult>(login));
+            return Ok(UoW.Convert.Map<LoginResult>(login));
         }
 
         [Route("v1"), HttpGet]
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.LoginRepo.GetAsync(x => true,
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = logins.Select(x => UoW.Maps.Map<AppLogin>(x));
+            var result = logins.Select(x => UoW.Convert.Map<AppLogin>(x));
 
             return Ok(result);
         }
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => UoW.Maps.Map<UserResult>(x));
+            var result = users.Select(x => UoW.Convert.Map<UserResult>(x));
 
             return Ok(result);
         }
@@ -187,11 +187,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var result = await UoW.LoginRepo.UpdateAsync(UoW.Maps.Map<AppLogin>(model));
+            var result = await UoW.LoginRepo.UpdateAsync(UoW.Convert.Map<AppLogin>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Maps.Map<LoginResult>(result));
+            return Ok(UoW.Convert.Map<LoginResult>(result));
         }
     }
 }

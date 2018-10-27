@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var activity = await UoW.ActivityRepo.GetAsync(x => true, 
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = activity.Select(x => UoW.Maps.Map<AppActivity>(x));
+            var result = activity.Select(x => UoW.Convert.Map<AppActivity>(x));
 
             return Ok(result);
         }

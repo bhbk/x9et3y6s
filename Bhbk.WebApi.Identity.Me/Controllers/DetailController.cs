@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            return Ok(UoW.Maps.Map<UserResult>(user));
+            return Ok(UoW.Convert.Map<UserResult>(user));
         }
 
         [Route("v1/claims"), HttpGet]
@@ -132,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Maps.Map<AppUser>(model));
+            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!update.Succeeded)
                 return GetErrorResult(update);
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if(result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(UoW.Maps.Map<UserResult>(result));
+            return Ok(UoW.Convert.Map<UserResult>(result));
         }
     }
 }

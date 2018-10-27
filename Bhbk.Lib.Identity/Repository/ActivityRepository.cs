@@ -21,14 +21,16 @@ namespace Bhbk.Lib.Identity.Repository
             _context = context;
         }
 
-        public Task<AppActivity> CreateAsync(AppActivity entity)
+        public async Task<AppActivity> CreateAsync(AppActivity entity)
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
-        public Task<bool> DeleteAsync(AppActivity entity)
+        public async Task<bool> DeleteAsync(AppActivity entity)
         {
-            throw new NotImplementedException();
+            await Task.FromResult(_context.Remove(entity).Entity);
+
+            return true;
         }
 
         public Task<bool> ExistsAsync(Guid key)

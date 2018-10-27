@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                foundClient = await _uow.ClientRepo.CreateAsync(_uow.Maps.Map<AppClient>(client));
+                foundClient = await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(client));
 
                 await _uow.CommitAsync();
             }
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                foundAudienceApi = await _uow.AudienceRepo.CreateAsync(_uow.Maps.Map<AppAudience>(audience));
+                foundAudienceApi = await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(audience));
 
                 await _uow.CommitAsync();
             }
@@ -77,7 +77,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                foundAudienceUi = await _uow.AudienceRepo.CreateAsync(_uow.Maps.Map<AppAudience>(audience));
+                foundAudienceUi = await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(audience));
 
                 await _uow.CommitAsync();
             }
@@ -92,7 +92,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                foundLogin = await _uow.LoginRepo.CreateAsync(_uow.Maps.Map<AppLogin>(login));
+                foundLogin = await _uow.LoginRepo.CreateAsync(_uow.Convert.Map<AppLogin>(login));
 
                 await _uow.CommitAsync();
             }
@@ -112,7 +112,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                await _uow.CustomUserMgr.CreateAsync(_uow.Maps.Map<AppUser>(user), Strings.ApiDefaultUserPassword);
+                await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(user), Strings.ApiDefaultUserPassword);
 
                 foundUser = _uow.CustomUserMgr.Store.Get(x => x.Email == user.Email).Single();
 
@@ -133,7 +133,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                await _uow.CustomRoleMgr.CreateAsync(_uow.Maps.Map<AppRole>(role));
+                await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(role));
                 await _uow.CommitAsync();
 
                 foundRoleForAdminUi = _uow.CustomRoleMgr.Store.Get(x => x.Name == role.Name).Single();
@@ -151,7 +151,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                await _uow.CustomRoleMgr.CreateAsync(_uow.Maps.Map<AppRole>(role));
+                await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(role));
                 await _uow.CommitAsync();
 
                 foundRoleForViewerApi = _uow.CustomRoleMgr.Store.Get(x => x.Name == role.Name).Single();

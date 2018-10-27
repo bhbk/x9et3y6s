@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = true;
 
-            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Maps.Map<AppUser>(model));
+            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!create.Succeeded)
                 return GetErrorResult(create);
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return BadRequest(Strings.MsgSysQueueEmailError);
             }
 
-            return Ok(UoW.Maps.Map<UserResult>(result));
+            return Ok(UoW.Convert.Map<UserResult>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = false;
 
-            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Maps.Map<AppUser>(model));
+            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!create.Succeeded)
                 return GetErrorResult(create);
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(UoW.Maps.Map<UserResult>(result));
+            return Ok(UoW.Convert.Map<UserResult>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            return Ok(UoW.Maps.Map<UserResult>(user));
+            return Ok(UoW.Convert.Map<UserResult>(user));
         }
 
         [Route("v1/{email}"), HttpGet]
@@ -188,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            return Ok(UoW.Maps.Map<UserResult>(user));
+            return Ok(UoW.Convert.Map<UserResult>(user));
         }
 
         [Route("v1/{userID:guid}/logins"), HttpGet]
@@ -202,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.CustomUserMgr.GetLoginsAsync(user);
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x.Id.ToString())))
-                .Select(x => UoW.Maps.Map<LoginResult>(x));
+                .Select(x => UoW.Convert.Map<LoginResult>(x));
 
             return Ok(result);
         }
@@ -218,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = await UoW.CustomUserMgr.GetAudiencesAsync(user);
 
             var result = (await UoW.AudienceRepo.GetAsync(x => audiences.Contains(x.Id.ToString())))
-                .Select(x => UoW.Maps.Map<AudienceResult>(x));
+                .Select(x => UoW.Convert.Map<AudienceResult>(x));
 
             return Ok(result);
         }
@@ -234,7 +234,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await UoW.CustomUserMgr.GetRolesResultIdAsync(user);
 
             var result = UoW.CustomRoleMgr.Store.Get(x => roles.Contains(x.Id.ToString()))
-                .Select(x => UoW.Maps.Map<RoleResult>(x));
+                .Select(x => UoW.Convert.Map<RoleResult>(x));
 
             return Ok(result);
         }
@@ -250,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 .Skip(model.Skip)
                 .Take(model.Take);
 
-            var result = users.Select(x => UoW.Maps.Map<UserResult>(x));
+            var result = users.Select(x => UoW.Convert.Map<UserResult>(x));
 
             return Ok(result);
         }
@@ -327,7 +327,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (user.Immutable)
                 return BadRequest(Strings.MsgUserImmutable);
 
-            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Maps.Map<AppUser>(model));
+            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!update.Succeeded)
                 return GetErrorResult(update);
@@ -337,7 +337,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if(result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(UoW.Maps.Map<UserResult>(result));
+            return Ok(UoW.Convert.Map<UserResult>(result));
         }
     }
 }

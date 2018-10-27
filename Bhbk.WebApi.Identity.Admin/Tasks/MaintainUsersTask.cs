@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             _uow.CustomUserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
                         }
 
-                        _uow.CustomUserMgr.Store.Context.SaveChanges();
+                        await _uow.CommitAsync();
 
                         var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                 + disabledCount.ToString() + " users with expired lock-outs.";

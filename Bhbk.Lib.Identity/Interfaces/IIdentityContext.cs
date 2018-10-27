@@ -10,8 +10,7 @@ namespace Bhbk.Lib.Identity.Interfaces
     public interface IIdentityContext<TContext> : IGenericUnitOfWork
         where TContext : AppDbContext
     {
-        TContext Context { get; }
-        IMapper Maps { get; }
+        IMapper Convert { get; }
         ActivityRepository ActivityRepo { get; }
         AudienceRepository AudienceRepo { get; }
         ClientRepository ClientRepo { get; }

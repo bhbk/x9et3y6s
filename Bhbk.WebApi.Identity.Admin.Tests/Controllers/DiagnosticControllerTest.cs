@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
@@ -24,6 +26,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 .UseStartup<StartupTest>());
         }
 
+        [TestMethod, Ignore]
+        public void Api_Admin_DiagV1_CheckAutoMapper_Success()
+        {
+            Mapper.Initialize(config => config.AddProfile<IdentityMappings>());
+            Mapper.Configuration.AssertConfigurationIsValid();
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_DiagV1_CheckSwagger_Success()
+        {
+            var result = await _owin.CreateClient().GetAsync("/help/index.html");
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
         [TestMethod]
         public void Api_Admin_DiagV1_GetStatus_Fail_Invalid()
         {
@@ -45,14 +62,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             result = controller.GetStatusV1(Enums.TaskType.MaintainUsers.ToString()) as OkObjectResult;
             ok = result.Should().BeOfType<OkObjectResult>().Subject;
             data = ok.Value.Should().BeAssignableTo<string>().Subject;
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_DiagV1_GetSwagger_Success()
-        {
-            var result = await _owin.CreateClient().GetAsync("/help/index.html");
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [TestMethod]

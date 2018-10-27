@@ -42,11 +42,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!Enum.TryParse<Enums.AudienceType>(model.AudienceType, out audienceType))
                 return BadRequest(Strings.MsgAudienceInvalid);
 
-            var result = await UoW.AudienceRepo.CreateAsync(UoW.Maps.Map<AppAudience>(model));
+            var result = await UoW.AudienceRepo.CreateAsync(UoW.Convert.Map<AppAudience>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Maps.Map<AudienceResult>(result));
+            return Ok(UoW.Convert.Map<AudienceResult>(result));
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            return Ok(UoW.Maps.Map<AudienceResult>(audience));
+            return Ok(UoW.Convert.Map<AudienceResult>(audience));
         }
 
         [Route("v1/{audienceName}"), HttpGet]
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (audience == null)
                 return NotFound(Strings.MsgAudienceNotExist);
 
-            return Ok(UoW.Maps.Map<AudienceResult>(audience));
+            return Ok(UoW.Convert.Map<AudienceResult>(audience));
         }
 
         [Route("v1"), HttpGet]
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = await UoW.AudienceRepo.GetAsync(x => true,
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
 
-            var result = audiences.Select(x => UoW.Maps.Map<AudienceResult>(x));
+            var result = audiences.Select(x => UoW.Convert.Map<AudienceResult>(x));
 
             return Ok(result);
         }
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var roles = await UoW.AudienceRepo.GetRoleListAsync(audienceID);
 
-            var result = roles.Select(x => UoW.Maps.Map<RoleResult>(x)).ToList();
+            var result = roles.Select(x => UoW.Convert.Map<RoleResult>(x)).ToList();
 
             return Ok(result);
         }
@@ -139,11 +139,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (audience.Immutable)
                 return BadRequest(Strings.MsgAudienceImmutable);
 
-            var result = await UoW.AudienceRepo.UpdateAsync(UoW.Maps.Map<AppAudience>(model));
+            var result = await UoW.AudienceRepo.UpdateAsync(UoW.Convert.Map<AppAudience>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Maps.Map<AudienceResult>(result));
+            return Ok(UoW.Convert.Map<AudienceResult>(result));
         }
     }
 }

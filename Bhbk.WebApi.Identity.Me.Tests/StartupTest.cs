@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
@@ -19,6 +20,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
     {
         protected static DefaultData _defaults;
         protected static TestData _tests;
+        protected static StsClient _sts;
 
         public override void ConfigureContext(IServiceCollection sc)
         {
@@ -42,6 +44,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
             _defaults = new DefaultData(_uow);
             _tests = new TestData(_uow);
+            _sts = new StsClient(_conf, ContextType.IntegrationTest);
         }
 
         public override void ConfigureServices(IServiceCollection sc)

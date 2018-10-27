@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
     {
         private readonly AppDbContext _context;
         private readonly ContextType _situation;
-        private readonly IMapper _maps;
+        private readonly IMapper _convert;
         private readonly ActivityRepository _activityRepo;
         private readonly AudienceRepository _audienceRepo;
         private readonly ConfigRepository _configRepo;
@@ -45,9 +45,9 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             _context = context;
             _situation = status;
-            _maps = new MapperConfiguration(maps =>
+            _convert = new MapperConfiguration(config =>
             {
-                maps.AddProfile<IdentityMaps>();
+                config.AddProfile<IdentityMappings>();
             }).CreateMapper();
 
             _activityRepo = new ActivityRepository(_context);
@@ -75,11 +75,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public IMapper Maps
+        public IMapper Convert
         {
             get
             {
-                return _maps;
+                return _convert;
             }
         }
 

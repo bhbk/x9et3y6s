@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             };
 
             var create = await _uow.CustomRoleMgr.CreateAsync(
-                _uow.Maps.Map<AppRole>(
+                _uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
                         AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
@@ -291,7 +291,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             };
 
             var create = await _uow.CustomRoleMgr.CreateAsync(
-                _uow.Maps.Map<AppRole>(
+                _uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
                         AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,

@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                         foreach (AppUserRefresh entry in invalid.ToList())
                             _uow.CustomUserMgr.Store.Context.AppUserRefresh.Remove(entry);
 
-                        _uow.CustomUserMgr.Store.Context.SaveChanges();
+                        await _uow.CommitAsync();
 
                         var msg = typeof(MaintainTokensTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + invalidCount.ToString() + " invalid refresh tokens.";

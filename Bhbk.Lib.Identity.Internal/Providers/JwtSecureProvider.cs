@@ -186,7 +186,7 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Maps.Map<AppUserRefresh>(create));
+            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();
@@ -239,7 +239,7 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Maps.Map<AppUserRefresh>(create));
+            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();

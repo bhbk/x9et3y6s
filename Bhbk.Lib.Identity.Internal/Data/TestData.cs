@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Data
             AppAudience audience;
 
             //create clients
-            await _uow.ClientRepo.CreateAsync(_uow.Maps.Map<AppClient>(
+            await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(
                 new ClientCreate()
                 {
                     Name = Strings.ApiUnitTestClient1,
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = false,
                 }));
 
-            await _uow.ClientRepo.CreateAsync(_uow.Maps.Map<AppClient>(
+            await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(
                 new ClientCreate()
                 {
                     Name = Strings.ApiUnitTestClient2,
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CommitAsync();
 
             //create audiences
-            await _uow.AudienceRepo.CreateAsync(_uow.Maps.Map<AppAudience>(
+            await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(
                 new AudienceCreate()
                 {
                     ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single().Id,
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = false,
                 }));
 
-            await _uow.AudienceRepo.CreateAsync(_uow.Maps.Map<AppAudience>(
+            await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(
                 new AudienceCreate()
                 {
                     ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single().Id,
@@ -80,7 +80,7 @@ namespace Bhbk.Lib.Identity.Data
             //assign uris to audiences
             audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
 
-            await _uow.AudienceRepo.AddUriAsync(_uow.Maps.Map<AppAudienceUri>(
+            await _uow.AudienceRepo.AddUriAsync(_uow.Convert.Map<AppAudienceUri>(
                 new AudienceUriCreate()
                 {
                     AudienceId = audience.Id,
@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.Data
 
             audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single();
 
-            await _uow.AudienceRepo.AddUriAsync(_uow.Maps.Map<AppAudienceUri>(
+            await _uow.AudienceRepo.AddUriAsync(_uow.Convert.Map<AppAudienceUri>(
                 new AudienceUriCreate()
                 {
                     AudienceId = audience.Id,
@@ -103,14 +103,14 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CommitAsync();
 
             //create logins
-            await _uow.LoginRepo.CreateAsync(_uow.Maps.Map<AppLogin>(
+            await _uow.LoginRepo.CreateAsync(_uow.Convert.Map<AppLogin>(
                 new LoginCreate()
                 {
                     LoginProvider = Strings.ApiUnitTestLogin1,
                     Immutable = false
                 }));
 
-            await _uow.LoginRepo.CreateAsync(_uow.Maps.Map<AppLogin>(
+            await _uow.LoginRepo.CreateAsync(_uow.Convert.Map<AppLogin>(
                 new LoginCreate()
                 {
                     LoginProvider = Strings.ApiUnitTestLogin2,
@@ -120,7 +120,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CommitAsync();
 
             //create roles
-            await _uow.CustomRoleMgr.CreateAsync(_uow.Maps.Map<AppRole>(
+            await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                 new RoleCreate()
                 {
                     AudienceId = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single().Id,
@@ -129,7 +129,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = false
                 }));
 
-            await _uow.CustomRoleMgr.CreateAsync(_uow.Maps.Map<AppRole>(
+            await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                 new RoleCreate()
                 {
                     AudienceId = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single().Id,
@@ -141,7 +141,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CommitAsync();
 
             //create user A
-            await _uow.CustomUserMgr.CreateAsync(_uow.Maps.Map<AppUser>(
+            await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
                 new UserCreate()
                 {
                     Email = Strings.ApiUnitTestUser1,
@@ -160,7 +160,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
 
             //create user B
-            await _uow.CustomUserMgr.CreateAsync(_uow.Maps.Map<AppUser>(
+            await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
                 new UserCreate()
                 {
                     Email = Strings.ApiUnitTestUser2,
@@ -224,7 +224,7 @@ namespace Bhbk.Lib.Identity.Data
                 var uriName = Strings.ApiUnitTestUri1 + "-" + RandomValues.CreateBase64String(4);
 
                 //create random client
-                await _uow.ClientRepo.CreateAsync(_uow.Maps.Map<AppClient>(
+                await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(
                     new ClientCreate()
                     {
                         Name = clientName,
@@ -236,7 +236,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
 
                 //create random audience
-                await _uow.AudienceRepo.CreateAsync(_uow.Maps.Map<AppAudience>(
+                await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(
                     new AudienceCreate()
                     {
                         ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single().Id,
@@ -251,7 +251,7 @@ namespace Bhbk.Lib.Identity.Data
                 //assign uris to random audience
                 audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == audienceName)).Single();
 
-                await _uow.AudienceRepo.AddUriAsync(_uow.Maps.Map<AppAudienceUri>(
+                await _uow.AudienceRepo.AddUriAsync(_uow.Convert.Map<AppAudienceUri>(
                     new AudienceUriCreate()
                     {
                         AudienceId = audience.Id,
@@ -263,7 +263,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
 
                 //create random login
-                await _uow.LoginRepo.CreateAsync(_uow.Maps.Map<AppLogin>(
+                await _uow.LoginRepo.CreateAsync(_uow.Convert.Map<AppLogin>(
                     new LoginCreate()
                     {
                         LoginProvider = loginName,
@@ -273,7 +273,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
 
                 //create random role
-                await _uow.CustomRoleMgr.CreateAsync(_uow.Maps.Map<AppRole>(
+                await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
                         AudienceId = (await _uow.AudienceRepo.GetAsync(x => x.Name == audienceName)).Single().Id,
@@ -285,7 +285,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
 
                 //create random user
-                await _uow.CustomUserMgr.CreateAsync(_uow.Maps.Map<AppUser>(
+                await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
                     new UserCreate()
                     {
                         Email = userName,

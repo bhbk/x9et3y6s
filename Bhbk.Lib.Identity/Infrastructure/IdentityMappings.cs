@@ -6,9 +6,9 @@ using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public class IdentityMaps : Profile
+    public class IdentityMappings : Profile
     {
-        public IdentityMaps()
+        public IdentityMappings()
         {
             //activity models
             CreateMap<ActivityCreate, AppActivity>()

@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.Providers;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
@@ -163,14 +162,16 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 };
 
                 //add activity entry for login...
-                new ActivityProvider<AppActivity>(uow.Context).Commit(new AppActivity()
+                uow.ActivityRepo.CreateAsync(new AppActivity()
                 {
                     Id = Guid.NewGuid(),
                     ActorId = user.Id,
                     ActivityType = Enums.LoginType.GenerateAuthorizationCodeV2.ToString(),
                     Created = DateTime.Now,
                     Immutable = false
-                });
+                }).Wait();
+
+                uow.CommitAsync().Wait();
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.ContentType = "application/json";

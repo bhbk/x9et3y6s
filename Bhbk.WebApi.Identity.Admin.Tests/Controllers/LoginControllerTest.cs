@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 LoginProvider = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1
             };
 
-            var create = await _uow.LoginRepo.CreateAsync(_uow.Maps.Map<AppLogin>(login));
+            var create = await _uow.LoginRepo.CreateAsync(_uow.Convert.Map<AppLogin>(login));
 
             await _uow.CommitAsync();
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             controller.SetUser(user.Id);
 
             var login = await _uow.LoginRepo.CreateAsync(
-                _uow.Maps.Map<AppLogin>(
+                _uow.Convert.Map<AppLogin>(
                     new LoginCreate()
                     {
                         LoginProvider = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1
