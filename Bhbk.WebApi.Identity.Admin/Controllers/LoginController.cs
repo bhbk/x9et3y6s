@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -124,9 +125,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
 
             var logins = await UoW.LoginRepo.GetAsync(x => true,
-                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+                x => x.Include(y => y.AppUserLogin));
 
-            var result = logins.Select(x => UoW.Convert.Map<AppLogin>(x));
+            var result = logins.Select(x => UoW.Convert.Map<LoginResult>(x));
 
             return Ok(result);
         }

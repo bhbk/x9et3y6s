@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private readonly CustomUserManager _customUserMgr;
         private readonly ClientRepository _clientRepo;
         private readonly LoginRepository _loginRepo;
-        private UserQuoteOfDay _userQuote;
+        private UserQuotes _userQuote;
 
         public IdentityContext(DbContextOptions<AppDbContext> options, ContextType status)
             : this(new AppDbContext(options), status)
@@ -139,7 +139,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public UserQuoteOfDay UserQuote
+        public UserQuotes UserQuote
         {
             get
             {

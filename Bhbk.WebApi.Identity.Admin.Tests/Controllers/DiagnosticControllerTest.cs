@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 .UseStartup<StartupTest>());
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void Api_Admin_DiagV1_CheckAutoMapper_Success()
         {
             Mapper.Initialize(config => config.AddProfile<IdentityMappings>());

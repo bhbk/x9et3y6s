@@ -33,16 +33,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             return Ok(UoW.Convert.Map<UserResult>(user));
         }
 
-        [Route("v1/claims"), HttpGet]
-        public IActionResult GetClaimsV1()
-        {
-            var user = User.Identity as ClaimsIdentity;
-
-            return Ok(user.Claims);
-        }
-
-        [Route("v1/quote-of-day"), HttpGet]
-        public IActionResult GetQuoteOfDayV1()
+        [Route("v1/quotes"), HttpGet]
+        public IActionResult GetQuoteOfTheDayV1()
         {
             var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
 

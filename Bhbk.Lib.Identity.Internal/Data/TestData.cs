@@ -84,7 +84,6 @@ namespace Bhbk.Lib.Identity.Data
                 new AudienceUriCreate()
                 {
                     AudienceId = audience.Id,
-                    Name = Strings.ApiUnitTestUri1,
                     AbsoluteUri = Strings.ApiUnitTestUri1Link,
                     Enabled = true,
                 }));
@@ -95,7 +94,6 @@ namespace Bhbk.Lib.Identity.Data
                 new AudienceUriCreate()
                 {
                     AudienceId = audience.Id,
-                    Name = Strings.ApiUnitTestUri2,
                     AbsoluteUri = Strings.ApiUnitTestUri2Link,
                     Enabled = true,
                 }));
@@ -255,7 +253,6 @@ namespace Bhbk.Lib.Identity.Data
                     new AudienceUriCreate()
                     {
                         AudienceId = audience.Id,
-                        Name = uriName,
                         AbsoluteUri = Strings.ApiUnitTestUri1Link,
                         Enabled = true,
                     }));

@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         }
 
         [TestMethod]
-        public void Api_Me_DetailV1_GetClaimList_Success()
+        public void Api_Me_DetailV1_GetQuoteOfTheDay_Success()
         {
             _tests.Destroy();
             _tests.TestsCreate();
@@ -55,25 +55,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
             controller.SetUser(user.Id);
 
-            var result = controller.GetClaimsV1() as OkObjectResult;
+            var result = controller.GetQuoteOfTheDayV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IEnumerable<Claim>>().Subject;
-        }
-
-        [TestMethod]
-        public void Api_Me_DetailV1_GetQuoteOfDay_Success()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var controller = new DetailController(_conf, _uow, _tasks);
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            controller.SetUser(user.Id);
-
-            var result = controller.GetQuoteOfDayV1() as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserQuoteOfDay>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserQuotes>().Subject;
         }
 
         [TestMethod]

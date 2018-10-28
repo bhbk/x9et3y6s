@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -109,10 +110,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var roles = UoW.CustomRoleMgr.Store.Get()
-                .OrderBy(model.OrderBy)
-                .Skip(model.Skip)
-                .Take(model.Take);
+            var roles = UoW.CustomRoleMgr.Store.Get(x => true,
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+                x => x.Include(y => y.AppUserRole));
 
             var result = roles.Select(x => UoW.Convert.Map<RoleResult>(x));
 

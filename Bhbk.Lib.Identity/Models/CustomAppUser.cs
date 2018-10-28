@@ -14,8 +14,6 @@ namespace Bhbk.Lib.Identity.Models
 
     public abstract class UserBase
     {
-        public Guid ClientId { get; set; }
-
         [Required]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
@@ -44,6 +42,7 @@ namespace Bhbk.Lib.Identity.Models
 
     public class UserCreate : UserBase
     {
+        public Guid ClientId { get; set; }
         public Guid ActorId { get; set; }
     }
 
@@ -70,8 +69,6 @@ namespace Bhbk.Lib.Identity.Models
         public bool PasswordConfirmed { get; set; }
 
         public bool TwoFactorEnabled { get; set; }
-
-        public IList<string> Claims { get; set; }
 
         public IList<string> Roles { get; set; }
 
@@ -166,7 +163,7 @@ namespace Bhbk.Lib.Identity.Models
         public string NewEmailConfirm { get; set; }
     }
 
-    public class UserQuoteOfDay
+    public class UserQuotes
     {
         public Success success { get; set; }
         public Contents contents { get; set; }

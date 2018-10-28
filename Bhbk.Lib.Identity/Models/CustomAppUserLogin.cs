@@ -35,7 +35,10 @@ namespace Bhbk.Lib.Identity.Models
         public bool Immutable { get; set; }
     }
 
-    public class UserLoginCreate : UserLoginBase { }
+    public class UserLoginCreate : UserLoginBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class UserLoginResult : UserLoginBase
     {
@@ -48,6 +51,8 @@ namespace Bhbk.Lib.Identity.Models
 
     public class UserLoginUpdate : UserLoginBase
     {
+        public Guid ActorId { get; set; }
+
         [Required]
         public DateTime Created { get; set; }
 

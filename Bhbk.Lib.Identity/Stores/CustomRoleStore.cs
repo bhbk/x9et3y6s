@@ -73,13 +73,12 @@ namespace Bhbk.Lib.Identity.Stores
                 query = query.Where(predicates);
 
             if (includes != null)
-                query.Include(includes.ToString());
+                query = includes(query);
 
             if (orderBy != null)
                 return orderBy(query);
 
-            else
-                return query;
+            return query;
         }
 
         public IList<AppUser> GetUsersAsync(AppRole role)

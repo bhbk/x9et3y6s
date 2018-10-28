@@ -58,7 +58,11 @@ namespace Bhbk.Lib.Identity.Repository
 
         public async Task<AppClient> GetAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppClient.Where(x => x.Id == key).SingleOrDefault());
+            var client = _context.AppClient.Where(x => x.Id == key).SingleOrDefault();
+
+            _context.Entry(client).Collection(x => x.AppAudience).Load();
+
+            return await Task.FromResult(client);
         }
 
         public Task<IQueryable<AppClient>> GetAsync(string sql, params object[] parameters)
@@ -77,7 +81,7 @@ namespace Bhbk.Lib.Identity.Repository
                 query = query.Where(predicates);
 
             if (includes != null)
-                query.Include(includes.ToString());
+                query = includes(query);
 
             if (orderBy != null)
                 return await Task.FromResult(orderBy(query));

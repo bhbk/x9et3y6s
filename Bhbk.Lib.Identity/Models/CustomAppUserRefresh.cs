@@ -14,9 +14,6 @@ namespace Bhbk.Lib.Identity.Models
         public Guid ClientId { get; set; }
 
         [Required]
-        public Guid AudienceId { get; set; }
-
-        [Required]
         public Guid UserId { get; set; }
 
         [Required]
@@ -29,7 +26,10 @@ namespace Bhbk.Lib.Identity.Models
         public DateTime ExpiresUtc { get; set; }
     }
 
-    public class UserRefreshCreate : UserRefreshBase { }
+    public class UserRefreshCreate : UserRefreshBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class UserRefreshResult : UserRefreshBase
     {

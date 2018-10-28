@@ -60,7 +60,7 @@ namespace Bhbk.Lib.Identity.Repository
                 query = query.Where(predicates);
 
             if (includes != null)
-                query.Include(includes.ToString());
+                query = includes(query);
 
             if (orderBy != null)
                 return await Task.FromResult(orderBy(query));

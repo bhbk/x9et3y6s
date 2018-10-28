@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -93,7 +94,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
 
             var clients = await UoW.ClientRepo.GetAsync(x => true,
-                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take));
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+                x => x.Include(y => y.AppAudience));
 
             var result = clients.Select(x => UoW.Convert.Map<ClientResult>(x));
 

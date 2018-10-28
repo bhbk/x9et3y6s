@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -27,6 +28,8 @@ namespace Bhbk.Lib.Identity.Models
     {
         [Required]
         public Guid Id { get; set; }
+
+        public IList<string> Users { get; set; }
     }
 
     public class LoginUpdate : LoginBase

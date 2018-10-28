@@ -18,11 +18,6 @@ namespace Bhbk.Lib.Identity.Models
         public Guid ActorId { get; set; }
 
         [Required]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        [Required]
         public string AbsoluteUri { get; set; }
 
         [DefaultValue(true)]

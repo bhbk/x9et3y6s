@@ -222,9 +222,7 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-                entity.Property(e => e.ClaimType)
-                    .IsRequired()
-                    .HasMaxLength(128);
+                entity.Property(e => e.ClaimType).IsRequired();
 
                 entity.Property(e => e.ClaimValue).IsRequired();
 

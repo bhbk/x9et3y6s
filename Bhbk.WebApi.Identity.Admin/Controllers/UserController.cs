@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -245,10 +246,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var users = UoW.CustomUserMgr.Store.Get()
-                .OrderBy(model.OrderBy)
-                .Skip(model.Skip)
-                .Take(model.Take);
+            var users = UoW.CustomUserMgr.Store.Get(x => true,
+                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+                x => x.Include(y => y.AppUserLogin)
+                    .Include(y => y.AppUserRole));
 
             var result = users.Select(x => UoW.Convert.Map<UserResult>(x));
 

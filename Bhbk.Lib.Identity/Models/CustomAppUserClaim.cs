@@ -17,6 +17,12 @@ namespace Bhbk.Lib.Identity.Models
         [Required]
         public Guid UserId { get; set; }
 
+        public string ClaimIssuer { get; set; }
+
+        public string ClaimOriginalIssuer { get; set; }
+
+        public string ClaimSubject { get; set; }
+
         [Required]
         public string ClaimType { get; set; }
 
@@ -25,19 +31,16 @@ namespace Bhbk.Lib.Identity.Models
 
         public string ClaimValueType { get; set; }
 
-        public string Issuer { get; set; }
-
-        public string OriginalIssuer { get; set; }
-
-        public string Subject { get; set; }
-
         public IDictionary<string, string> Properties { get; set; }
 
         [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
-    public class UserClaimCreate : UserClaimBase { }
+    public class UserClaimCreate : UserClaimBase
+    {
+        public Guid ActorId { get; set; }
+    }
 
     public class UserClaimResult : UserClaimBase
     {
@@ -53,6 +56,8 @@ namespace Bhbk.Lib.Identity.Models
     {
         [Required]
         public Guid Id { get; set; }
+
+        public Guid ActorId { get; set; }
 
         public DateTime Created { get; set; }
 
