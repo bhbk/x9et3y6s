@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppAudienceUri
+    public partial class AppClientUri
     {
         public Guid Id { get; set; }
-        public Guid AudienceId { get; set; }
+        public Guid ClientId { get; set; }
         public Guid ActorId { get; set; }
         public string AbsoluteUri { get; set; }
         public bool Enabled { get; set; }
@@ -14,6 +14,6 @@ namespace Bhbk.Lib.Identity.Models
         public DateTime? LastUpdated { get; set; }
 
         public virtual AppUser Actor { get; set; }
-        public virtual AppAudience Audience { get; set; }
+        public virtual AppClient Client { get; set; }
     }
 }

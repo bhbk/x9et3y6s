@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Providers
 {
     public class LinkBuilder
     {
-        public static Uri AuthorizationCodeRequest(IConfigurationRoot conf, AppClient client, AppUser user, string redirectUri, string scope, string state)
+        public static Uri AuthorizationCodeRequest(IConfigurationRoot conf, AppIssuer client, AppUser user, string redirectUri, string scope, string state)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/authorization-code");
 

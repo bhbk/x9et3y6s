@@ -13,8 +13,8 @@ namespace Bhbk.Cli.Identity
 
     internal enum CmdType
     {
-        audience,
         client,
+        issuer,
         role,
         rolemap,
         user,

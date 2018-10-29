@@ -5,23 +5,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppAudience
+    public partial class AppIssuer
     {
 
     }
 
-    public abstract class AudienceBase
+    public abstract class IssuerBase
     {
-        [Required]
-        public Guid ClientId { get; set; }
-
         [Required]
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         [Required]
-        public string AudienceType { get; set; }
+        public string IssuerKey { get; set; }
 
         [Required]
         public bool Enabled { get; set; }
@@ -30,12 +27,12 @@ namespace Bhbk.Lib.Identity.Models
         public bool Immutable { get; set; }
     }
 
-    public class AudienceCreate : AudienceBase
+    public class IssuerCreate : IssuerBase
     {
         public Guid ActorId { get; set; }
     }
 
-    public class AudienceResult : AudienceBase
+    public class IssuerResult : IssuerBase
     {
         [Required]
         public Guid Id { get; set; }
@@ -44,11 +41,12 @@ namespace Bhbk.Lib.Identity.Models
 
         public Nullable<DateTime> LastUpdated { get; set; }
 
-        public IList<string> Roles { get; set; }
+        public IList<string> Clients { get; set; }
     }
 
-    public class AudienceUpdate : AudienceBase
+    public class IssuerUpdate : IssuerBase
     {
+
         [Required]
         public Guid Id { get; set; }
 

@@ -31,224 +31,224 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_AudienceDisabled()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_ClientDisabled()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            audience.Enabled = false;
-            await _uow.AudienceRepo.UpdateAsync(audience);
-            await _uow.CommitAsync();
-
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_AudienceNotFound()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = RandomValues.CreateBase64String(8);
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_AudienceUndefined()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = string.Empty;
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_ClientDisabled()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             client.Enabled = false;
             await _uow.ClientRepo.UpdateAsync(client);
+            await _uow.CommitAsync();
 
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_ClientNotFound()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_ClientNotFound()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = RandomValues.CreateBase64String(8);
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_ClientUndefined()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_ClientUndefined()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = string.Empty;
-            var audience = (await _uow.AudienceRepo.GetAsync()).First();
-            var user = _uow.CustomUserMgr.Store.Get().First();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV1(client, audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_CompatibiltyMode_Issuer()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerDisabled()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            issuer.Enabled = false;
+            await _uow.IssuerRepo.UpdateAsync(issuer);
+
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerNotFound()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = RandomValues.CreateBase64String(8);
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            var result = await _sts.AccessTokenV1(issuer, client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerUndefined()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = string.Empty;
+            var client = (await _uow.ClientRepo.GetAsync()).First();
+            var user = _uow.CustomUserMgr.Store.Get().First();
+
+            var result = await _sts.AccessTokenV1(issuer, client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_CompatibiltyMode_Issuer()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
-            var result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_UserNotFound()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserNotFound()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = RandomValues.CreateBase64String(8);
 
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user, string.Empty);
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_UserLocked()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserLocked()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
             _uow.CustomUserMgr.UpdateAsync(user).Wait();
 
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_UserUndefined()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserUndefined()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = string.Empty;
 
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user, string.Empty);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user, string.Empty);
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Fail_UserPassword()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserPassword()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var password = RandomValues.CreateBase64String(8);
 
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), password);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), password);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user.Id.ToString(), password);
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), password);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Success_Audience_ById()
+        public async Task Api_Sts_OAuth2_AccessV1_Success_Client_ById()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV1(client.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -258,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = JwtSecureProvider.IsValidJwtFormat(access);
             check.Should().BeTrue();
 
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -270,16 +270,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Success_Audience_ByName()
+        public async Task Api_Sts_OAuth2_AccessV1_Success_Client_ByName()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV1(client.Name, audience.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1(issuer.Name, client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -289,7 +289,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = JwtSecureProvider.IsValidJwtFormat(access);
             check.Should().BeTrue();
 
-            result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -301,18 +301,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV1_Success_CompatibiltyMode_Issuer()
+        public async Task Api_Sts_OAuth2_AccessV1_Success_CompatibiltyMode_Issuer()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            var result = await _sts.AccessTokenV1CompatibilityModeIssuer(audience.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -324,211 +324,211 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_AudienceDisabled_Single()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientDisabled_Multiple()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audienceA = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audienceB = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single();
-            var audiences = new List<string> { audienceA.Id.ToString(), audienceB.Id.ToString() };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clientB = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            audienceA.Enabled = false;
-            await _uow.AudienceRepo.UpdateAsync(audienceA);
-
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_AudienceDisabled_Multiple()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audienceA = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audienceB = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single();
-            var audiences = new List<string> { audienceA.Id.ToString(), audienceB.Id.ToString() };
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            if (audienceA.Id == audienceB.Id)
+            if (clientA.Id == clientB.Id)
                 Assert.Fail();
 
-            audienceA.Enabled = true;
-            audienceB.Enabled = false;
-            await _uow.AudienceRepo.UpdateAsync(audienceA);
-            await _uow.AudienceRepo.UpdateAsync(audienceB);
+            clientA.Enabled = true;
+            clientB.Enabled = false;
+            await _uow.ClientRepo.UpdateAsync(clientA);
+            await _uow.ClientRepo.UpdateAsync(clientB);
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_AudienceNotFound_Multiple()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientDisabled_Single()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString(), RandomValues.CreateBase64String(8) };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clientB = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
+            clientA.Enabled = false;
+            await _uow.ClientRepo.UpdateAsync(clientA);
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_AudienceNotFound_Single()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audiences = new List<string> { RandomValues.CreateBase64String(8) };
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_ClientDisabled()
-        {
-            _tests.Destroy();
-            _tests.TestsCreate();
-
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            client.Enabled = false;
-            await _uow.ClientRepo.UpdateAsync(client);
-
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_ClientNotFound()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientNotFound_Multiple()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = RandomValues.CreateBase64String(8);
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clients = new List<string> { client.Id.ToString(), RandomValues.CreateBase64String(8) };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client, audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_ClientUndefined()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientNotFound_Single()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = string.Empty;
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clients = new List<string> { RandomValues.CreateBase64String(8) };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client, audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_IssuerDisabled()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clients = new List<string> { client.Id.ToString() };
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            issuer.Enabled = false;
+            await _uow.IssuerRepo.UpdateAsync(issuer);
+
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_UserLocked()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_IssuerNotFound()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = RandomValues.CreateBase64String(8);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var clients = new List<string> { client.Id.ToString() };
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            var result = await _sts.AccessTokenV2(issuer, clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_IssuerUndefined()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = string.Empty;
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clients = new List<string> { client.Id.ToString() };
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            var result = await _sts.AccessTokenV2(issuer, clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserLocked()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clients = new List<string> { client.Id.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
             _uow.CustomUserMgr.UpdateAsync(user).Wait();
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_UserNotFound()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserNotFound()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var clients = new List<string> { client.Id.ToString() };
             var user = RandomValues.CreateBase64String(8);
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user, Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_UserUndefined()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserUndefined()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var clients = new List<string> { client.Id.ToString() };
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, string.Empty, Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, string.Empty, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Fail_UserPassword()
+        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserPassword()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var clients = new List<string> { client.Id.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), RandomValues.CreateBase64String(8));
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), RandomValues.CreateBase64String(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Success_AudienceSingle_ById()
+        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientSingle_ById()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Id.ToString() };
+            var clients = new List<string> { client.Id.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -540,17 +540,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Success_AudienceSingle_ByName()
+        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientSingle_ByName()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audiences = new List<string> { audience.Name };
+            var clients = new List<string> { client.Name };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client.Name, audiences, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -562,24 +562,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Success_AudienceMultiple_ById()
+        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientMultiple_ById()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audienceA = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audienceB = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single();
-            var audiences = new List<string> { audienceA.Id.ToString(), audienceB.Id.ToString() };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clientB = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            if (audienceA.Id == audienceB.Id)
+            if (clientA.Id == clientB.Id)
                 Assert.Fail();
 
             var roleB = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole2).Single();
             await _uow.CustomUserMgr.AddToRoleAsync(user, roleB.Name);
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -591,24 +591,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Success_AudienceMultiple_ByName()
+        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientMultiple_ByName()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audienceA = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-            var audienceB = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single();
-            var audiences = new List<string> { audienceA.Name.ToString(), audienceB.Name.ToString() };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clientB = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var clients = new List<string> { clientA.Name.ToString(), clientB.Name.ToString() };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            if (audienceA.Id == audienceB.Id)
+            if (clientA.Id == clientB.Id)
                 Assert.Fail();
 
             var roleB = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole2).Single();
             await _uow.CustomUserMgr.AddToRoleAsync(user, roleB.Name);
 
-            var result = await _sts.AccessTokenV2(client.Name, audiences, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -620,16 +620,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_AccessV2_Success_AudienceUndefined()
+        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientUndefined()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var audiences = new List<string> { string.Empty };
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clients = new List<string> { string.Empty };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
-            var result = await _sts.AccessTokenV2(client.Id.ToString(), audiences, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

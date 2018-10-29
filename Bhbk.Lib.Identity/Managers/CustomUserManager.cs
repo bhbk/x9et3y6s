@@ -247,12 +247,12 @@ namespace Bhbk.Lib.Identity.Managers
             return await Store.GetClaimsAsync(user);
         }
 
-        public async Task<IList<string>> GetAudiencesAsync(AppUser user)
+        public async Task<IList<string>> GetClientsAsync(AppUser user)
         {
             if (!Store.Exists(user.Id))
                 throw new ArgumentNullException();
 
-            return await Store.GetAudiencesAsync(user);
+            return await Store.GetClientsAsync(user);
         }
 
         public async Task<IList<string>> GetLoginsAsync(AppUser user)

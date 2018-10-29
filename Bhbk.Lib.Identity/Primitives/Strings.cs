@@ -7,10 +7,10 @@ namespace Bhbk.Lib.Identity.Primitives
     {
         #region Attribute Constants
 
-        public const string AttrAudienceIDV1 = "audience_id";
-        public const string AttrAudienceIDV2 = "audience";
         public const string AttrAuthorizeCodeIDV1 = "code";
         public const string AttrAuthorizeCodeIDV2 = "code";
+        public const string AttrIssuerIDV1 = "issuer_id";
+        public const string AttrIssuerIDV2 = "issuer";
         public const string AttrClientIDV1 = "client_id";
         public const string AttrClientIDV2 = "client";
         public const string AttrClientSecretIDV1 = "client_secret";
@@ -30,9 +30,9 @@ namespace Bhbk.Lib.Identity.Primitives
 
         #region Configuration Constants
 
-        public const string ApiDefaultClient = "Bhbk";
-        public const string ApiDefaultAudienceUi = "Bhbk.WebUi.Identity";
-        public const string ApiDefaultAudienceApi = "Bhbk.WebApi.Identity";
+        public const string ApiDefaultClientUi = "Bhbk.WebUi.Identity";
+        public const string ApiDefaultClientApi = "Bhbk.WebApi.Identity";
+        public const string ApiDefaultIssuer = "Bhbk";
         public const string ApiDefaultPhone = "+00000000000";
         public const string ApiDefaultLogin = "local";
         public const string ApiDefaultLoginKey = "local";
@@ -48,8 +48,8 @@ namespace Bhbk.Lib.Identity.Primitives
 
         #region Configuration Constants (Unit Tests)
 
-        public const string ApiUnitTestAudience1 = "AudienceUnitTests1";
-        public const string ApiUnitTestAudience2 = "AudienceUnitTests2";
+        public const string ApiUnitTestIssuer1 = "IssuerUnitTests1";
+        public const string ApiUnitTestIssuer2 = "IssuerUnitTests2";
         public const string ApiUnitTestClient1 = "ClientUnitTests1";
         public const string ApiUnitTestClient2 = "ClientUnitTests2";
         public const string ApiUnitTestClaimType = "ClaimTypeUnitTests";
@@ -73,14 +73,14 @@ namespace Bhbk.Lib.Identity.Primitives
 
         #region Messages
 
-        public const string MsgAudienceAlreadyExists = "Audience already exists";
-        public const string MsgAudienceImmutable = "Audience is immutable";
-        public const string MsgAudienceInvalid = "Audience is invalid or disabled";
-        public const string MsgAudienceNotExist = "Audience does not exist";
         public const string MsgClientAlreadyExists = "Client already exists";
         public const string MsgClientImmutable = "Client is immutable";
         public const string MsgClientInvalid = "Client is invalid or disabled";
         public const string MsgClientNotExist = "Client does not exist";
+        public const string MsgIssuerAlreadyExists = "Issuer already exists";
+        public const string MsgIssuerImmutable = "Issuer is immutable";
+        public const string MsgIssuerInvalid = "Issuer is invalid or disabled";
+        public const string MsgIssuerNotExist = "Issuer does not exist";
         public const string MsgLoginAlreadyExists = "Login already exists";
         public const string MsgLoginImmutable = "Login is immutable";
         public const string MsgLoginInvalid = "Login invalid or disabled";
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Primitives
             "</html>";
         }
 
-        public static string ApiTemplateConfirmNewUser(AppClient client, AppUser user, Uri link)
+        public static string ApiTemplateConfirmNewUser(AppIssuer client, AppUser user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...

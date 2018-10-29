@@ -1,15 +1,16 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 
 namespace Bhbk.Cli.Identity.Cmds
@@ -19,7 +20,7 @@ namespace Bhbk.Cli.Identity.Cmds
         private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
         private static CmdType _cmdType;
-        private static JwtSecurityToken _access;
+        private static IJwtContext _jwt;
         private static AdminClient _admin = null;
         private static StsClient _sts = null;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));
@@ -57,27 +58,76 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 _admin = new AdminClient(_conf, ContextType.Live);
                 _sts = new StsClient(_conf, ContextType.Live);
+                _jwt = new JwtContext(_conf, ContextType.Live);
+
+                for(int i = 0; i < 20; i++)
+                    System.Console.WriteLine(RandomValues.CreateBase64String(32));
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
 
                 switch (_cmdType)
                 {
-                    case CmdType.client:
-
-                        GetJWT();
+                    case CmdType.issuer:
 
                         if (_create)
                         {
+                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerID = Guid.Empty;
+
+                            if (CheckIssuer(issuerName, ref issuerID))
+                                Console.WriteLine(Environment.NewLine + "FOUND issuer \"" + issuerName + "\""
+                                    + Environment.NewLine + "\tID is " + issuerID.ToString());
+                            else
+                            {
+                                issuerID = CreateIssuer(issuerName);
+
+                                if (issuerID != Guid.Empty)
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create issuer \"" + issuerName + "\""
+                                        + Environment.NewLine + "\tID is " + issuerID.ToString());
+                                else
+                                    throw new ConsoleHelpAsException("FAILED create issuer \"" + issuerName + "\"");
+                            }
+                        }
+                        else if (_destroy)
+                        {
+                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerID = Guid.Empty;
+
+                            if (!CheckIssuer(issuerName, ref issuerID))
+                                throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
+                            else
+                            {
+                                if (DeleteIssuer(issuerID))
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy issuer \"" + issuerName + "\""
+                                        + Environment.NewLine + "\tID is " + issuerID.ToString());
+                                else
+                                    throw new ConsoleHelpAsException("FAILED destroy issuer \"" + issuerName + "\""
+                                        + Environment.NewLine + "\tID is " + issuerID.ToString());
+                            }
+                        }
+
+                        break;
+
+                    case CmdType.client:
+
+                        if (_create)
+                        {
+                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerID = Guid.Empty;
+
+                            if (!CheckIssuer(issuerName, ref issuerID))
+                                throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
+
                             var clientName = PromptForInput(CmdType.client);
                             var clientID = Guid.Empty;
 
                             if (CheckClient(clientName, ref clientID))
-                                Console.WriteLine(Environment.NewLine + "FOUND client \"" + clientName + "\""
+                                Console.WriteLine(Environment.NewLine + "FOUND client \"" + clientName
                                     + Environment.NewLine + "\tID is " + clientID.ToString());
                             else
                             {
-                                clientID = CreateClient(clientName);
+                                clientID = CreateClient(issuerID, clientName);
 
                                 if (clientID != Guid.Empty)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create client \"" + clientName + "\""
@@ -88,11 +138,17 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
+                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerID = Guid.Empty;
+
+                            if (!CheckIssuer(issuerName, ref issuerID))
+                                throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
+
                             var clientName = PromptForInput(CmdType.client);
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
-                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
+                                Console.WriteLine(Environment.NewLine + "FAILED find client \"" + clientName + "\"");
                             else
                             {
                                 if (DeleteClient(clientID))
@@ -106,72 +162,15 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.audience:
-
-                        GetJWT();
-
-                        if (_create)
-                        {
-                            var clientName = PromptForInput(CmdType.client);
-                            var clientID = Guid.Empty;
-
-                            if (!CheckClient(clientName, ref clientID))
-                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
-
-                            var audienceName = PromptForInput(CmdType.audience);
-                            var audienceID = Guid.Empty;
-
-                            if (CheckAudience(audienceName, ref audienceID))
-                                Console.WriteLine(Environment.NewLine + "FOUND audience \"" + audienceName
-                                    + Environment.NewLine + "\tID is " + audienceID.ToString());
-                            else
-                            {
-                                audienceID = CreateAudience(clientID, audienceName);
-
-                                if (audienceID != Guid.Empty)
-                                    Console.WriteLine(Environment.NewLine + "SUCCESS create audience \"" + audienceName + "\""
-                                        + Environment.NewLine + "\tID is " + audienceID.ToString());
-                                else
-                                    throw new ConsoleHelpAsException("FAILED create audience \"" + audienceName + "\"");
-                            }
-                        }
-                        else if (_destroy)
-                        {
-                            var clientName = PromptForInput(CmdType.client);
-                            var clientID = Guid.Empty;
-
-                            if (!CheckClient(clientName, ref clientID))
-                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
-
-                            var audienceName = PromptForInput(CmdType.audience);
-                            var audienceID = Guid.Empty;
-
-                            if (!CheckAudience(audienceName, ref audienceID))
-                                Console.WriteLine(Environment.NewLine + "FAILED find audience \"" + audienceName + "\"");
-                            else
-                            {
-                                if (DeleteAudience(audienceID))
-                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy audience \"" + audienceName + "\""
-                                        + Environment.NewLine + "\tID is " + audienceID.ToString());
-                                else
-                                    throw new ConsoleHelpAsException("FAILED destroy audience \"" + audienceName + "\""
-                                        + Environment.NewLine + "\tID is " + audienceID.ToString());
-                            }
-                        }
-
-                        break;
-
                     case CmdType.role:
 
-                        GetJWT();
-
                         if (_create)
                         {
-                            var audienceName = PromptForInput(CmdType.audience);
-                            var audienceID = Guid.Empty;
+                            var clientName = PromptForInput(CmdType.client);
+                            var clientID = Guid.Empty;
 
-                            if (!CheckAudience(audienceName, ref audienceID))
-                                throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
+                            if (!CheckClient(clientName, ref clientID))
+                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
                             var roleName = PromptForInput(CmdType.role);
                             var roleID = Guid.Empty;
@@ -181,7 +180,7 @@ namespace Bhbk.Cli.Identity.Cmds
                                     + Environment.NewLine + "\tID is " + roleID.ToString());
                             else
                             {
-                                roleID = CreateRole(audienceID, roleName);
+                                roleID = CreateRole(clientID, roleName);
 
                                 if (roleID != Guid.Empty)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create role \"" + roleName + "\""
@@ -192,11 +191,11 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var audienceName = PromptForInput(CmdType.audience);
-                            var audienceID = Guid.Empty;
+                            var clientName = PromptForInput(CmdType.client);
+                            var clientID = Guid.Empty;
 
-                            if (!CheckAudience(audienceName, ref audienceID))
-                                throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
+                            if (!CheckClient(clientName, ref clientID))
+                                throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
                             var roleName = PromptForInput(CmdType.role);
                             var roleID = Guid.Empty;
@@ -217,8 +216,6 @@ namespace Bhbk.Cli.Identity.Cmds
                         break;
 
                     case CmdType.rolemap:
-
-                        GetJWT();
 
                         if (_create)
                         {
@@ -275,8 +272,6 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     case CmdType.user:
 
-                        GetJWT();
-
                         if (_create)
                         {
                             var userName = PromptForInput(CmdType.user);
@@ -332,8 +327,6 @@ namespace Bhbk.Cli.Identity.Cmds
 
                     case CmdType.userpass:
 
-                        GetJWT();
-
                         if (_create)
                         {
                             var userName = PromptForInput(CmdType.user);
@@ -370,7 +363,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool AddUserToLogin(Guid loginID, Guid userID)
         {
-            var result = _admin.LoginAddUserV1(_access, loginID, userID,
+            var result = _admin.LoginAddUserV1(_jwt.AccessToken, loginID, userID,
                 new UserLoginCreate()
                 {
                     UserId = userID,
@@ -392,7 +385,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool AddUserToRole(Guid roleID, Guid userID)
         {
-            var result = _admin.RoleAddToUserV1(_access, roleID, userID).Result;
+            var result = _admin.RoleAddToUserV1(_jwt.AccessToken, roleID, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -403,27 +396,9 @@ namespace Bhbk.Cli.Identity.Cmds
             return false;
         }
 
-        private bool CheckAudience(string audience, ref Guid audienceID)
-        {
-            var result = _admin.AudienceGetV1(_access, audience).Result;
-
-            if (result.IsSuccessStatusCode)
-            {
-                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
-
-                if (content["name"].Value<string>() == audience)
-                {
-                    audienceID = Guid.Parse(content["id"].Value<string>());
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private bool CheckClient(string client, ref Guid clientID)
         {
-            var result = _admin.ClientGetV1(_access, client).Result;
+            var result = _admin.ClientGetV1(_jwt.AccessToken, client).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -439,9 +414,27 @@ namespace Bhbk.Cli.Identity.Cmds
             return false;
         }
 
+        private bool CheckIssuer(string issuer, ref Guid issuerID)
+        {
+            var result = _admin.IssuerGetV1(_jwt.AccessToken, issuer).Result;
+
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["name"].Value<string>() == issuer)
+                {
+                    issuerID = Guid.Parse(content["id"].Value<string>());
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool CheckLogin(string login, ref Guid loginID)
         {
-            var result = _admin.LoginGetV1(_access, login).Result;
+            var result = _admin.LoginGetV1(_jwt.AccessToken, login).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -459,7 +452,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckRole(string role, ref Guid roleID)
         {
-            var result = _admin.RoleGetV1(_access, role).Result;
+            var result = _admin.RoleGetV1(_jwt.AccessToken, role).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -477,7 +470,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool CheckUser(string user, ref Guid userID)
         {
-            var result = _admin.UserGetV1(_access, user).Result;
+            var result = _admin.UserGetV1(_jwt.AccessToken, user).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -493,39 +486,14 @@ namespace Bhbk.Cli.Identity.Cmds
             return false;
         }
 
-        private Guid CreateAudience(Guid clientID, string audience)
+        private Guid CreateClient(Guid issuerID, string client)
         {
-            var result = _admin.AudienceCreateV1(_access,
-                new AudienceCreate()
-                {
-                    ClientId = clientID,
-                    Name = audience,
-                    AudienceType = "server",
-                    Enabled = true,
-                }).Result;
-
-            if (result.IsSuccessStatusCode)
-            {
-                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
-
-                if (content["name"].Value<string>() == audience)
-                    return Guid.Parse(content["id"].Value<string>());
-
-                Console.WriteLine(Strings.MsgAudienceInvalid);
-            }
-
-            Console.WriteLine(result.RequestMessage
-                + Environment.NewLine + result);
-
-            return Guid.Empty;
-        }
-
-        private Guid CreateClient(string client)
-        {
-            var result = _admin.ClientCreateV1(_access,
+            var result = _admin.ClientCreateV1(_jwt.AccessToken,
                 new ClientCreate()
                 {
+                    IssuerId = issuerID,
                     Name = client,
+                    ClientType = "server",
                     Enabled = true,
                 }).Result;
 
@@ -545,12 +513,37 @@ namespace Bhbk.Cli.Identity.Cmds
             return Guid.Empty;
         }
 
-        private Guid CreateRole(Guid audienceID, string role)
+        private Guid CreateIssuer(string issuer)
         {
-            var result = _admin.RoleCreateV1(_access,
+            var result = _admin.IssuerCreateV1(_jwt.AccessToken,
+                new IssuerCreate()
+                {
+                    Name = issuer,
+                    Enabled = true,
+                }).Result;
+
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["name"].Value<string>() == issuer)
+                    return Guid.Parse(content["id"].Value<string>());
+
+                Console.WriteLine(Strings.MsgIssuerInvalid);
+            }
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return Guid.Empty;
+        }
+
+        private Guid CreateRole(Guid clientID, string role)
+        {
+            var result = _admin.RoleCreateV1(_jwt.AccessToken,
                 new RoleCreate()
                 {
-                    AudienceId = audienceID,
+                    ClientId = clientID,
                     Name = role,
                     Enabled = true,
                 }).Result;
@@ -573,7 +566,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private Guid CreateUser(string user)
         {
-            var result = _admin.UserCreateV1NoConfirm(_access,
+            var result = _admin.UserCreateV1NoConfirm(_jwt.AccessToken,
                 new UserCreate()
                 {
                     Email = user,
@@ -601,9 +594,9 @@ namespace Bhbk.Cli.Identity.Cmds
             return Guid.Empty;
         }
 
-        private bool DeleteAudience(Guid audienceID)
+        private bool DeleteClient(Guid clientID)
         {
-            var result = _admin.AudienceDeleteV1(_access, audienceID).Result;
+            var result = _admin.ClientDeleteV1(_jwt.AccessToken, clientID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -614,9 +607,9 @@ namespace Bhbk.Cli.Identity.Cmds
             return false;
         }
 
-        private bool DeleteClient(Guid clientID)
+        private bool DeleteIssuer(Guid issuerID)
         {
-            var result = _admin.ClientDeleteV1(_access, clientID).Result;
+            var result = _admin.IssuerDeleteV1(_jwt.AccessToken, issuerID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -629,7 +622,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool DeleteRole(Guid roleID)
         {
-            var result = _admin.RoleDeleteV1(_access, roleID).Result;
+            var result = _admin.RoleDeleteV1(_jwt.AccessToken, roleID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -642,7 +635,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool DeleteUser(Guid userID)
         {
-            var result = _admin.UserDeleteV1(_access, userID).Result;
+            var result = _admin.UserDeleteV1(_jwt.AccessToken, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -655,7 +648,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool RemoveRoleFromUser(Guid roleID, Guid userID)
         {
-            var result = _admin.RoleRemoveFromUserV1(_access, roleID, userID).Result;
+            var result = _admin.RoleRemoveFromUserV1(_jwt.AccessToken, roleID, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -668,7 +661,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
         private bool SetPassword(Guid userID, string password)
         {
-            var result = _admin.UserSetPasswordV1(_access,
+            var result = _admin.UserSetPasswordV1(_jwt.AccessToken,
                 new UserAddPassword()
                 {
                     Id = userID,
@@ -689,8 +682,8 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             switch (cmd)
             {
-                case CmdType.audience:
-                    Console.Write(Environment.NewLine + "ENTER audience name : ");
+                case CmdType.issuer:
+                    Console.Write(Environment.NewLine + "ENTER issuer name : ");
                     break;
 
                 case CmdType.client:
@@ -711,51 +704,6 @@ namespace Bhbk.Cli.Identity.Cmds
             }
 
             return ConsoleHelper.GetInput();
-        }
-
-        private void GetJWT()
-        {
-            var clientName = _conf["IdentityLogin:ClientName"];
-            Console.WriteLine("USED admin client name or GUID: " + clientName);
-
-            var audienceName = _conf["IdentityLogin:AudienceName"];
-            Console.WriteLine("USED admin audience name or GUID: " + audienceName);
-
-            var userName = _conf["IdentityLogin:UserName"];
-            Console.WriteLine("USED admin user name or GUID: " + userName);
-
-            var password = _conf["IdentityLogin:UserPass"];
-            Console.WriteLine("USED admin password: " + password);
-
-            /*
-            Console.WriteLine("ENTER admin client name or GUID:");
-            var clientName = ConsoleHelper.GetInput();
-
-            Console.WriteLine("ENTER admin audience name or GUID:");
-            var audienceName = ConsoleHelper.GetInput();
-
-            Console.WriteLine("ENTER admin user name or GUID:");
-            var userName = ConsoleHelper.GetInput();
-
-            Console.WriteLine("ENTER admin password:");
-            var password = ConsoleHelper.GetHiddenInput();
-            */
-
-            var result = _sts.AccessTokenV2(clientName, new List<string> { audienceName }, userName, password).Result;
-
-            if (result.IsSuccessStatusCode)
-            {
-                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
-
-                _access = new JwtSecurityToken((string)content["access_token"]);
-
-                Console.WriteLine(Environment.NewLine + "SUCCESS getting JWT from STS:\""
-                    + _conf["IdentityStsUrls:BaseApiUrl"] + _conf["IdentityStsUrls:BaseApiPath"] + "/oauth/v2/access" + "\""
-                    + Environment.NewLine + "\tJWT:\"" + _access.RawData + "\"");
-            }
-            else
-                throw new ConsoleHelpAsException("FAILED getting JWT from STS:\""
-                    + _conf["IdentityStsUrls:BaseApiUrl"] + _conf["IdentityStsUrls:BaseApiPath"] + "/oauth/v2/access" + "\"");
         }
     }
 }

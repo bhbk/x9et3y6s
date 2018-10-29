@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Providers
     public class JwtSecureProvider
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppClient client, AppAudience audience, AppUser user)
+            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             DateTime issueDate, expireDate;
 
-            var symmetricKeyAsBase64 = client.ClientKey;
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -42,8 +42,8 @@ namespace Bhbk.Lib.Identity.Providers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: client.Name.ToString() + ":" + uow.ClientRepo.Salt,
-                    audience: audience.Name.ToString(),
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    audience: client.Name.ToString(),
                     claims: identity.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, AppClient client, AppAudience audience, AppUser user)
+            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             DateTime issueDate, expireDate;
 
-            var symmetricKeyAsBase64 = client.ClientKey;
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -83,8 +83,8 @@ namespace Bhbk.Lib.Identity.Providers
             //do not use issuer salt for compatibility here...
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: client.Name.ToString(),
-                    audience: audience.Name.ToString(),
+                    issuer: issuer.Name.ToString(),
+                    audience: client.Name.ToString(),
                     claims: identity.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
@@ -95,7 +95,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppClient client, List<AppAudience> audiences, AppUser user)
+            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, List<AppClient> clients, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             DateTime issueDate, expireDate;
 
-            var symmetricKeyAsBase64 = client.ClientKey;
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -120,18 +120,18 @@ namespace Bhbk.Lib.Identity.Providers
                 expireDate = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
             }
 
-            string audienceList = string.Empty;
+            string clientList = string.Empty;
 
-            if (audiences.Count == 0)
+            if (clients.Count == 0)
                 throw new InvalidOperationException();
 
             else
-                audienceList = string.Join(", ", audiences.Select(x => x.Name.ToString()).OrderBy(x => x));
+                clientList = string.Join(", ", clients.Select(x => x.Name.ToString()).OrderBy(x => x));
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: client.Name.ToString() + ":" + uow.ClientRepo.Salt,
-                    audience: audienceList,
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    audience: clientList,
                     claims: identity.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
@@ -142,7 +142,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppClient client, AppUser user)
+            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -151,7 +151,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             DateTime issueDate, expireDate;
 
-            var symmetricKeyAsBase64 = client.ClientKey;
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -169,7 +169,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: client.Name.ToString() + ":" + uow.ClientRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
                     audience: null,
                     claims: identity.Claims,
                     notBefore: issueDate,
@@ -179,7 +179,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             var create = new UserRefreshCreate()
             {
-                ClientId = client.Id,
+                IssuerId = issuer.Id,
                 UserId = user.Id,
                 ProtectedTicket = result,
                 IssuedUtc = issueDate,
@@ -195,7 +195,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppClient client, AppUser user)
+            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -204,7 +204,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             DateTime issueDate, expireDate;
 
-            var symmetricKeyAsBase64 = client.ClientKey;
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: client.Name.ToString() + ":" + uow.ClientRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
                     audience: null,
                     claims: identity.Claims,
                     notBefore: issueDate,
@@ -232,7 +232,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             var create = new UserRefreshCreate()
             {
-                ClientId = client.Id,
+                IssuerId = issuer.Id,
                 UserId = user.Id,
                 ProtectedTicket = result,
                 IssuedUtc = issueDate,

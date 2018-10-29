@@ -28,8 +28,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="Bhbk.Lib.Alert" Version="2018.10.24.3149" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.24.3149" />
+    <PackageReference Include="Bhbk.Lib.Alert" Version="2018.10.28.2174" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2018.10.28.2174" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />

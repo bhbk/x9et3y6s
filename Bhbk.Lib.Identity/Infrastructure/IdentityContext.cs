@@ -18,11 +18,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private readonly ContextType _situation;
         private readonly IMapper _convert;
         private readonly ActivityRepository _activityRepo;
-        private readonly AudienceRepository _audienceRepo;
+        private readonly ClientRepository _clientRepo;
         private readonly ConfigRepository _configRepo;
         private readonly CustomRoleManager _customRoleMgr;
         private readonly CustomUserManager _customUserMgr;
-        private readonly ClientRepository _clientRepo;
+        private readonly IssuerRepository _issuerRepo;
         private readonly LoginRepository _loginRepo;
         private UserQuotes _userQuote;
 
@@ -51,11 +51,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }).CreateMapper();
 
             _activityRepo = new ActivityRepository(_context);
-            _audienceRepo = new AudienceRepository(_context);
             _clientRepo = new ClientRepository(_context);
             _configRepo = new ConfigRepository();
             _customRoleMgr = new CustomRoleManager(new CustomRoleStore(_context));
             _customUserMgr = new CustomUserManager(new CustomUserStore(_context));
+            _issuerRepo = new IssuerRepository(_context);
             _loginRepo = new LoginRepository(_context);
         }
 
@@ -91,14 +91,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public AudienceRepository AudienceRepo
-        {
-            get
-            {
-                return _audienceRepo;
-            }
-        }
-
         public ClientRepository ClientRepo
         {
             get
@@ -128,6 +120,14 @@ namespace Bhbk.Lib.Identity.Infrastructure
             get
             {
                 return _customUserMgr;
+            }
+        }
+
+        public IssuerRepository IssuerRepo
+        {
+            get
+            {
+                return _issuerRepo;
             }
         }
 

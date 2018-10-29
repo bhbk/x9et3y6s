@@ -17,12 +17,12 @@ using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
-    [Route("oauth")]
-    public class OAuthController : BaseController
+    [Route("oauth2")]
+    public class OAuth2Controller : BaseController
     {
-        public OAuthController() { }
+        public OAuth2Controller() { }
 
-        public OAuthController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
+        public OAuth2Controller(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
             : base(conf, uow, tasks) { }
 
         [Route("v1/refresh/{userID}"), HttpGet]
@@ -87,21 +87,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/authorization-code"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> AuthCodeRequestV1([FromQuery(Name = "client")] Guid clientID,
-            [FromQuery(Name = "audience")] Guid audienceID,
-            [FromQuery(Name = "user")] Guid userID,
+        public async Task<IActionResult> AuthCodeRequestV1([FromQuery(Name = "issuer_id")] Guid issuerID,
+            [FromQuery(Name = "client_id")] Guid clientID,
+            [FromQuery(Name = "username")] Guid userID,
             [FromQuery(Name = "redirect_uri")] string redirectUri,
             [FromQuery(Name = "scope")] string scope)
         {
+            var issuer = await UoW.IssuerRepo.GetAsync(issuerID);
+
+            if (issuer == null)
+                return NotFound(Strings.MsgIssuerNotExist);
+
             var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
-
-            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
-
-            if (audience == null)
-                return NotFound(Strings.MsgAudienceNotExist);
 
             var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
@@ -113,21 +113,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/authorization-code"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> AuthCodeRequestV2([FromQuery(Name = "client")] Guid clientID,
-            [FromQuery(Name = "audience")] Guid audienceID,
+        public async Task<IActionResult> AuthCodeRequestV2([FromQuery(Name = "issuer")] Guid issuerID,
+            [FromQuery(Name = "client")] Guid clientID,
             [FromQuery(Name = "user")] Guid userID,
             [FromQuery(Name = "redirect_uri")] string redirectUri,
             [FromQuery(Name = "scope")] string scope)
         {
+            var issuer = await UoW.IssuerRepo.GetAsync(issuerID);
+
+            if (issuer == null)
+                return NotFound(Strings.MsgIssuerNotExist);
+
             var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
-
-            var audience = await UoW.AudienceRepo.GetAsync(audienceID);
-
-            if (audience == null)
-                return NotFound(Strings.MsgAudienceNotExist);
 
             var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
@@ -135,11 +135,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgUserNotExist);
 
             //check that redirect url is valid...
-            if (!audience.AppAudienceUri.Any(x => x.AbsoluteUri == redirectUri))
+            if (!client.AppClientUri.Any(x => x.AbsoluteUri == redirectUri))
                 return NotFound(Strings.MsgUriNotExist);
 
             var state = RandomValues.CreateBase64String(32);
-            var url = LinkBuilder.AuthorizationCodeRequest(Conf, client, user, redirectUri, scope, state);
+            var url = LinkBuilder.AuthorizationCodeRequest(Conf, issuer, user, redirectUri, scope, state);
 
             /*
              * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies

@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Models
     public abstract class UserRefreshBase
     {
         [Required]
-        public Guid ClientId { get; set; }
+        public Guid IssuerId { get; set; }
 
         [Required]
         public Guid UserId { get; set; }

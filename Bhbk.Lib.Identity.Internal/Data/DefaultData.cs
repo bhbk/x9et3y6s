@@ -23,61 +23,63 @@ namespace Bhbk.Lib.Identity.Data
 
         public async void Create()
         {
-            AudienceCreate audience;
+            IssuerCreate issuer;
             ClientCreate client;
             LoginCreate login;
             RoleCreate role;
             UserCreate user;
 
-            var foundClient = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).SingleOrDefault();
+            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).SingleOrDefault();
 
-            if (foundClient == null)
+            if (foundIssuer == null)
+            {
+                issuer = new IssuerCreate()
+                {
+                    Name = Strings.ApiDefaultIssuer,
+                    IssuerKey = RandomValues.CreateBase64String(32),
+                    Enabled = true,
+                    Immutable = true,
+                };
+
+                foundIssuer = await _uow.IssuerRepo.CreateAsync(_uow.Convert.Map<AppIssuer>(issuer));
+
+                await _uow.CommitAsync();
+            }
+
+            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientApi)).SingleOrDefault();
+
+            if (foundClientApi == null)
             {
                 client = new ClientCreate()
                 {
-                    Name = Strings.ApiDefaultClient,
+                    IssuerId = foundIssuer.Id,
+                    Name = Strings.ApiDefaultClientApi,
                     ClientKey = RandomValues.CreateBase64String(32),
+                    ClientType = Enums.ClientType.server.ToString(),
                     Enabled = true,
                     Immutable = true,
                 };
 
-                foundClient = await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(client));
+                foundClientApi = await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(client));
 
                 await _uow.CommitAsync();
             }
 
-            var foundAudienceApi = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceApi)).SingleOrDefault();
+            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).SingleOrDefault();
 
-            if (foundAudienceApi == null)
+            if (foundClientUi == null)
             {
-                audience = new AudienceCreate()
+                client = new ClientCreate()
                 {
-                    ClientId = foundClient.Id,
-                    Name = Strings.ApiDefaultAudienceApi,
-                    AudienceType = Enums.AudienceType.server.ToString(),
+                    IssuerId = foundIssuer.Id,
+                    Name = Strings.ApiDefaultClientUi,
+                    ClientKey = RandomValues.CreateBase64String(32),
+                    ClientType = Enums.ClientType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = true,
                 };
 
-                foundAudienceApi = await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(audience));
-
-                await _uow.CommitAsync();
-            }
-
-            var foundAudienceUi = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).SingleOrDefault();
-
-            if (foundAudienceUi == null)
-            {
-                audience = new AudienceCreate()
-                {
-                    ClientId = foundClient.Id,
-                    Name = Strings.ApiDefaultAudienceUi,
-                    AudienceType = Enums.AudienceType.user_agent.ToString(),
-                    Enabled = true,
-                    Immutable = true,
-                };
-
-                foundAudienceUi = await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(audience));
+                foundClientUi = await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(client));
 
                 await _uow.CommitAsync();
             }
@@ -106,7 +108,7 @@ namespace Bhbk.Lib.Identity.Data
                     Email = Strings.ApiDefaultUserAdmin,
                     PhoneNumber = Strings.ApiDefaultPhone,
                     FirstName = "Identity",
-                    LastName = "Admin",
+                    LastName = "System",
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = true,
@@ -127,7 +129,7 @@ namespace Bhbk.Lib.Identity.Data
             {
                 role = new RoleCreate()
                 {
-                    AudienceId = foundAudienceUi.Id,
+                    ClientId = foundClientUi.Id,
                     Name = Strings.ApiDefaultRoleForAdminUi,
                     Enabled = true,
                     Immutable = true,
@@ -145,7 +147,7 @@ namespace Bhbk.Lib.Identity.Data
             {
                 role = new RoleCreate()
                 {
-                    AudienceId = foundAudienceApi.Id,
+                    ClientId = foundClientApi.Id,
                     Name = Strings.ApiDefaultRoleForViewerApi,
                     Enabled = true,
                     Immutable = true,
@@ -204,27 +206,27 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
             }
 
-            var audienceApi = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceApi)).SingleOrDefault();
+            var clientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientApi)).SingleOrDefault();
 
-            if (audienceApi != null)
+            if (clientApi != null)
             {
-                await _uow.AudienceRepo.DeleteAsync(audienceApi);
+                await _uow.ClientRepo.DeleteAsync(clientApi);
                 await _uow.CommitAsync();
             }
 
-            var audienceUi = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).SingleOrDefault();
+            var clientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).SingleOrDefault();
 
-            if (audienceUi != null)
+            if (clientUi != null)
             {
-                await _uow.AudienceRepo.DeleteAsync(audienceUi);
+                await _uow.ClientRepo.DeleteAsync(clientUi);
                 await _uow.CommitAsync();
             }
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).SingleOrDefault();
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).SingleOrDefault();
 
-            if (client != null)
+            if (issuer != null)
             {
-                await _uow.ClientRepo.DeleteAsync(client);
+                await _uow.IssuerRepo.DeleteAsync(issuer);
                 await _uow.CommitAsync();
             }
         }

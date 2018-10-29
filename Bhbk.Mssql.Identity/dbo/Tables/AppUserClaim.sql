@@ -16,10 +16,6 @@
 );
 
 
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_AppUserClaim]
     ON [dbo].[AppUserClaim]([Id] ASC, [UserId] ASC);

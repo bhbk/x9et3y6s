@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ClientController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
             : base(conf, uow, tasks) { }
 
-        [Route("v1"), HttpPost]
+        [Route("v1"), HttpPost] 
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> CreateClientV1([FromBody] ClientCreate model)
         {
@@ -38,7 +38,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check.Any())
                 return BadRequest(Strings.MsgClientAlreadyExists);
 
+            Enums.ClientType clientType;
+
+            if (!Enum.TryParse<Enums.ClientType>(model.ClientType, out clientType))
+                return BadRequest(Strings.MsgClientInvalid);
+
             var result = await UoW.ClientRepo.CreateAsync(UoW.Convert.Map<AppClient>(model));
+
+            await UoW.CommitAsync();
 
             return Ok(UoW.Convert.Map<ClientResult>(result));
         }
@@ -95,24 +102,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var clients = await UoW.ClientRepo.GetAsync(x => true,
                 x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
-                x => x.Include(y => y.AppAudience));
+                x => x.Include(y => y.AppRole));
 
             var result = clients.Select(x => UoW.Convert.Map<ClientResult>(x));
 
             return Ok(result);
         }
 
-        [Route("v1/{clientID:guid}/audiences"), HttpGet]
-        public async Task<IActionResult> GetClientAudiencesV1([FromRoute] Guid clientID)
+        [Route("v1/{clientID:guid}/roles"), HttpGet]
+        public async Task<IActionResult> GetClientRolesV1([FromRoute] Guid clientID)
         {
             var client = await UoW.ClientRepo.GetAsync(clientID);
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var audiences = await UoW.ClientRepo.GetAudiencesAsync(clientID);
+            var roles = await UoW.ClientRepo.GetRoleListAsync(clientID);
 
-            var result = audiences.Select(x => UoW.Convert.Map<AudienceResult>(x)).ToList();
+            var result = roles.Select(x => UoW.Convert.Map<RoleResult>(x)).ToList();
 
             return Ok(result);
         }

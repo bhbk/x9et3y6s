@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Models
     public abstract class RoleBase
     {
         [Required]
-        public Guid AudienceId { get; set; }
+        public Guid ClientId { get; set; }
 
         [Required]
         public string Name { get; set; }

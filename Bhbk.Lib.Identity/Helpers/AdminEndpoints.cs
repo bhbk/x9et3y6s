@@ -56,62 +56,6 @@ namespace Bhbk.Lib.Identity.Helpers
             _connect = server.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> AudienceCreateV1(JwtSecurityToken jwt, AudienceCreate model)
-        {
-            var content = new StringContent(
-               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-
-            var endpoint = "/audience/v1";
-
-            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _connect.DefaultRequestHeaders.Accept.Clear();
-            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ContextType.UnitTest)
-                return await _connect.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _connect.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> AudienceDeleteV1(JwtSecurityToken jwt, Guid audienceID)
-        {
-            var endpoint = "/audience/v1/" + audienceID.ToString();
-
-            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _connect.DefaultRequestHeaders.Accept.Clear();
-            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ContextType.UnitTest)
-                return await _connect.DeleteAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _connect.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> AudienceGetV1(JwtSecurityToken jwt, string audience)
-        {
-            var endpoint = "/audience/v1/" + audience;
-
-            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _connect.DefaultRequestHeaders.Accept.Clear();
-            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _connect.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            throw new NotSupportedException();
-        }
-
         public async Task<HttpResponseMessage> ClientCreateV1(JwtSecurityToken jwt, ClientCreate model)
         {
             var content = new StringContent(
@@ -145,8 +89,7 @@ namespace Bhbk.Lib.Identity.Helpers
                 return await _connect.DeleteAsync(endpoint);
 
             if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _connect.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _connect.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
             throw new NotSupportedException();
         }
@@ -154,6 +97,63 @@ namespace Bhbk.Lib.Identity.Helpers
         public async Task<HttpResponseMessage> ClientGetV1(JwtSecurityToken jwt, string client)
         {
             var endpoint = "/client/v1/" + client;
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _connect.GetAsync(endpoint);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _connect.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> IssuerCreateV1(JwtSecurityToken jwt, IssuerCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/issuer/v1";
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _connect.PostAsync(endpoint, content);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _connect.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> IssuerDeleteV1(JwtSecurityToken jwt, Guid issuerID)
+        {
+            var endpoint = "/issuer/v1/" + issuerID.ToString();
+
+            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _connect.DefaultRequestHeaders.Accept.Clear();
+            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _connect.DeleteAsync(endpoint);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _connect.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> IssuerGetV1(JwtSecurityToken jwt, string issuer)
+        {
+            var endpoint = "/issuer/v1/" + issuer;
 
             _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
             _connect.DefaultRequestHeaders.Accept.Clear();

@@ -9,8 +9,6 @@
 );
 
 
-
-
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_AppUserToken]
     ON [dbo].[AppUserToken]([Id] ASC, [UserId] ASC);

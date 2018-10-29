@@ -7,9 +7,9 @@ namespace Bhbk.Lib.Identity.Models
     public partial class AppDbContext
     {
         public virtual DbSet<AppActivity> AppActivity { get; set; }
-        public virtual DbSet<AppAudience> AppAudience { get; set; }
-        public virtual DbSet<AppAudienceUri> AppAudienceUri { get; set; }
         public virtual DbSet<AppClient> AppClient { get; set; }
+        public virtual DbSet<AppClientUri> AppClientUri { get; set; }
+        public virtual DbSet<AppIssuer> AppIssuer { get; set; }
         public virtual DbSet<AppLogin> AppLogin { get; set; }
         public virtual DbSet<AppRole> AppRole { get; set; }
         public virtual DbSet<AppRoleClaim> AppRoleClaim { get; set; }
@@ -43,18 +43,20 @@ namespace Bhbk.Lib.Identity.Models
                     .HasConstraintName("FK_AppActivity_ID");
             });
 
-            modelBuilder.Entity<AppAudience>(entity =>
+            modelBuilder.Entity<AppClient>(entity =>
             {
-                entity.HasIndex(e => e.ClientId)
-                    .HasName("IX_AppAudience_ClientID");
-
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_AppAudience_ID")
+                    .HasName("IX_AppClient_ID")
                     .IsUnique();
+
+                entity.HasIndex(e => e.IssuerId)
+                    .HasName("IX_AppClient_IssuerID");
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AudienceType)
+                entity.Property(e => e.ClientKey).IsRequired();
+
+                entity.Property(e => e.ClientType)
                     .IsRequired()
                     .HasMaxLength(64);
 
@@ -64,16 +66,16 @@ namespace Bhbk.Lib.Identity.Models
                     .IsRequired()
                     .HasMaxLength(128);
 
-                entity.HasOne(d => d.Client)
-                    .WithMany(p => p.AppAudience)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_AppAudience_ClientID");
+                entity.HasOne(d => d.Issuer)
+                    .WithMany(p => p.AppClient)
+                    .HasForeignKey(d => d.IssuerId)
+                    .HasConstraintName("FK_AppClient_IssuerID");
             });
 
-            modelBuilder.Entity<AppAudienceUri>(entity =>
+            modelBuilder.Entity<AppClientUri>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_AppAudienceUri")
+                    .HasName("IX_AppClientUri")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -81,28 +83,28 @@ namespace Bhbk.Lib.Identity.Models
                 entity.Property(e => e.AbsoluteUri).IsRequired();
 
                 entity.HasOne(d => d.Actor)
-                    .WithMany(p => p.AppAudienceUri)
+                    .WithMany(p => p.AppClientUri)
                     .HasForeignKey(d => d.ActorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AppAudienceUri_ActorID");
+                    .HasConstraintName("FK_AppClientUri_ActorID");
 
-                entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.AppAudienceUri)
-                    .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_AppAudienceUri_ID");
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.AppClientUri)
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK_AppClientUri_ID");
             });
 
-            modelBuilder.Entity<AppClient>(entity =>
+            modelBuilder.Entity<AppIssuer>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_AppClient_ID")
+                    .HasName("IX_AppIssuer_ID")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.ClientKey).IsRequired();
-
                 entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.IssuerKey).IsRequired();
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -124,8 +126,8 @@ namespace Bhbk.Lib.Identity.Models
 
             modelBuilder.Entity<AppRole>(entity =>
             {
-                entity.HasIndex(e => e.AudienceId)
-                    .HasName("IX_AppRole_AudienceID");
+                entity.HasIndex(e => e.ClientId)
+                    .HasName("IX_AppRole_ClientID");
 
                 entity.HasIndex(e => e.Id)
                     .HasName("IX_AppRole_ID")
@@ -141,10 +143,10 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.NormalizedName).HasMaxLength(128);
 
-                entity.HasOne(d => d.Audience)
+                entity.HasOne(d => d.Client)
                     .WithMany(p => p.AppRole)
-                    .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_AppRole_AudienceID");
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK_AppRole_ClientID");
             });
 
             modelBuilder.Entity<AppRoleClaim>(entity =>
@@ -273,10 +275,10 @@ namespace Bhbk.Lib.Identity.Models
 
                 entity.Property(e => e.ProtectedTicket).IsRequired();
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.AppUserRefresh)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_AppUserRefresh_ClientID");
+                    .HasForeignKey(d => d.IssuerId)
+                    .HasConstraintName("FK_AppUserRefresh_IssuerID");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AppUserRefresh)

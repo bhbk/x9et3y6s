@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_DetailV1_Get_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public void Api_Me_DetailV1_GetQuoteOfTheDay_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_DetailV1_SetPassword_Fail()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_DetailV1_SetPassword_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_DetailV1_TwoFactor_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         public async Task Api_Me_DetailV1_Update_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();

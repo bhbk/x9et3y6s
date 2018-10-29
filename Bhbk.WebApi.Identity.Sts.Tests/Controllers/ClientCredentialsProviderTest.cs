@@ -29,53 +29,57 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_ClientV1_Fail_NotImplemented()
+        public async Task Api_Sts_OAuth2_IssuerV1_Fail_NotImplemented()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            var result = await _sts.ClientCredentialsV2(issuer.Id.ToString(), client.Id.ToString(), issuer.IssuerKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth_ClientV2_Fail_ClientNotFound()
+        public async Task Api_Sts_OAuth2_IssuerV2_Fail_IssuerNotFound()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _sts.ClientCredentialsV2(Guid.NewGuid().ToString(), client.ClientKey);
+            var result = await _sts.ClientCredentialsV2(Guid.NewGuid().ToString(), client.Id.ToString(), issuer.IssuerKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [TestMethod, Ignore]
-        public async Task Api_Sts_OAuth_ClientV2_Fail_ClientSecret()
+        public async Task Api_Sts_OAuth2_IssuerV2_Fail_IssuerSecret()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _sts.ClientCredentialsV2(client.Id.ToString(), RandomValues.CreateBase64String(16));
+            var result = await _sts.ClientCredentialsV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateBase64String(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [TestMethod, Ignore]
-        public async Task Api_Sts_OAuth_ClientV2_Success()
+        public async Task Api_Sts_OAuth2_IssuerV2_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _sts.ClientCredentialsV2(client.Id.ToString(), client.ClientKey);
+            var result = await _sts.ClientCredentialsV2(issuer.Id.ToString(), client.Id.ToString(), issuer.IssuerKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }

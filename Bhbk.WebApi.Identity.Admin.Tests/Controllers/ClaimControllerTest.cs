@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_ClaimV1_Create_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new ClaimController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_ClaimV1_Delete_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new ClaimController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_ClaimV1_Get_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new ClaimController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();

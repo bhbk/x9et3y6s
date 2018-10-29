@@ -213,19 +213,19 @@ namespace Bhbk.Lib.Identity.Stores
             return Task.FromResult(_context.Users.Where(x => x.Id == user.Id).Single().PasswordHash);
         }
 
-        public Task<IList<string>> GetAudiencesAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IList<string>> GetClientsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = (IList<string>)_context.AppAudience
-                .Join(_context.AppRole, x => x.Id, y => y.AudienceId, (audience1, role1) => new {
-                    AudienceId = audience1.Id,
+            var result = (IList<string>)_context.AppClient
+                .Join(_context.AppRole, x => x.Id, y => y.ClientId, (client1, role1) => new {
+                    ClientId = client1.Id,
                     RoleId = role1.Id
                 })
                 .Join(_context.AppUserRole, x => x.RoleId, y => y.RoleId, (role2, user2) => new {
-                    AudienceId = role2.AudienceId,
+                    ClientId = role2.ClientId,
                     UserId = user2.UserId
                 })
                 .Where(x => x.UserId == user.Id)
-                .Select(x => x.AudienceId.ToString().ToLower())
+                .Select(x => x.ClientId.ToString().ToLower())
                 .Distinct()
                 .ToList();
 

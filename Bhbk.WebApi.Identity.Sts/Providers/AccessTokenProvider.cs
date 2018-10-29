@@ -44,25 +44,25 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v2/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Strings.AttrClientIDV2)
-                    && context.Request.Form.ContainsKey(Strings.AttrAudienceIDV2)
+                && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
+                    && context.Request.Form.ContainsKey(Strings.AttrClientIDV2)
                     && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV2)
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV2)
                     && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV2)))
             {
                 var formValues = context.Request.ReadFormAsync().Result;
 
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV2).Value;
                 string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV2).Value;
-                string audienceValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrAudienceIDV2).Value;
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV2).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserIDV2).Value;
                 string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserPasswordIDV2).Value;
 
                 //check for correct parameter format
-                if (string.IsNullOrEmpty(clientValue)
+                if (string.IsNullOrEmpty(issuerValue)
                     || !grantTypeValue.Equals(Strings.AttrUserPasswordIDV2)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
@@ -77,27 +77,27 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 if (uow == null)
                     throw new ArgumentNullException();
 
-                Guid clientID;
-                AppClient client;
+                Guid issuerID;
+                AppIssuer issuer;
 
                 //check if identifier is guid. resolve to guid if not.
-                if (Guid.TryParse(clientValue, out clientID))
-                    client = uow.ClientRepo.GetAsync(clientID).Result;
+                if (Guid.TryParse(issuerValue, out issuerID))
+                    issuer = uow.IssuerRepo.GetAsync(issuerID).Result;
                 else
-                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).Single();
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).Single();
 
-                if (client == null)
+                if (issuer == null)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
                 }
 
-                if (!client.Enabled)
+                if (!issuer.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
                 }
 
                 Guid userID;
@@ -130,42 +130,42 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var audienceList = uow.CustomUserMgr.GetAudiencesAsync(user).Result;
-                var audiences = new List<AppAudience>();
+                var clientList = uow.CustomUserMgr.GetClientsAsync(user).Result;
+                var clients = new List<AppClient>();
 
-                //check if audience is single, multiple or undefined...
-                if (string.IsNullOrEmpty(audienceValue))
-                    audiences = uow.AudienceRepo.GetAsync(x => audienceList.Contains(x.Id.ToString())
+                //check if client is single, multiple or undefined...
+                if (string.IsNullOrEmpty(clientValue))
+                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
                         && x.Enabled == true).Result.ToList();
                 else
                 {
-                    foreach (string entry in audienceValue.Split(","))
+                    foreach (string entry in clientValue.Split(","))
                     {
-                        Guid audienceID;
-                        AppAudience audience;
+                        Guid clientID;
+                        AppClient client;
 
                         //check if identifier is guid. resolve to guid if not.
-                        if (Guid.TryParse(entry.Trim(), out audienceID))
-                            audience = uow.AudienceRepo.GetAsync(audienceID).Result;
+                        if (Guid.TryParse(entry.Trim(), out clientID))
+                            client = uow.ClientRepo.GetAsync(clientID).Result;
                         else
-                            audience = (uow.AudienceRepo.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
+                            client = (uow.ClientRepo.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
 
-                        if (audience == null)
+                        if (client == null)
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgAudienceNotExist }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
                         }
 
-                        if (!audience.Enabled
-                            || !audienceList.Contains(audience.Id.ToString()))
+                        if (!client.Enabled
+                            || !clientList.Contains(client.Id.ToString()))
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgAudienceInvalid }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
                         }
 
-                        audiences.Add(audience);
+                        clients.Add(client);
                     }
                 }
 
@@ -206,8 +206,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 uow.CustomUserMgr.AccessSuccessAsync(user).Wait();
 
-                var access = JwtSecureProvider.CreateAccessTokenV2(uow, client, audiences, user).Result;
-                var refresh = JwtSecureProvider.CreateRefreshTokenV2(uow, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -215,8 +215,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     access_token = access.token,
                     refresh_token = refresh,
                     user = user.Id.ToString(),
-                    audience = audiences.Select(x => x.Id.ToString()),
-                    client = client.Id.ToString() + ":" + uow.ClientRepo.Salt,
+                    client = clients.Select(x => x.Id.ToString()),
+                    issuer = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
                 //add activity entry for login...
@@ -241,26 +241,26 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
-                    && context.Request.Form.ContainsKey(Strings.AttrAudienceIDV1)
+                && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
+                    && context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV1)))
             {
                 var formValues = context.Request.ReadFormAsync().Result;
 
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV1).Value;
                 string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;
-                string audienceValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrAudienceIDV1).Value;
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV1).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserIDV1).Value;
                 string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserPasswordIDV1).Value;
 
                 //check for correct parameter format
-                if (string.IsNullOrEmpty(clientValue)
-                    || string.IsNullOrEmpty(audienceValue)
+                if (string.IsNullOrEmpty(issuerValue)
+                    || string.IsNullOrEmpty(clientValue)
                     || !grantTypeValue.Equals(Strings.AttrUserPasswordIDV1)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
@@ -274,6 +274,29 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 if (uow == null)
                     throw new ArgumentNullException();
+
+                Guid issuerID;
+                AppIssuer issuer;
+
+                //check if identifier is guid. resolve to guid if not.
+                if (Guid.TryParse(issuerValue, out issuerID))
+                    issuer = uow.IssuerRepo.GetAsync(issuerID).Result;
+                else
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
+
+                if (issuer == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
+                }
+
+                if (!issuer.Enabled)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
+                }
 
                 Guid clientID;
                 AppClient client;
@@ -298,29 +321,6 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
                 }
 
-                Guid audienceID;
-                AppAudience audience;
-
-                //check if identifier is guid. resolve to guid if not.
-                if (Guid.TryParse(audienceValue, out audienceID))
-                    audience = uow.AudienceRepo.GetAsync(audienceID).Result;
-                else
-                    audience = (uow.AudienceRepo.GetAsync(x => x.Name == audienceValue).Result).SingleOrDefault();
-
-                if (audience == null)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgAudienceNotExist }, _serializer));
-                }
-
-                if (!audience.Enabled)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgAudienceInvalid }, _serializer));
-                }
-
                 Guid userID;
                 AppUser user;
 
@@ -388,8 +388,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 uow.CustomUserMgr.AccessSuccessAsync(user).Wait();
 
-                var access = JwtSecureProvider.CreateAccessTokenV1(uow, client, audience, user).Result;
-                var refresh = JwtSecureProvider.CreateRefreshTokenV1(uow, client, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV1(uow, issuer, client, user).Result;
+                var refresh = JwtSecureProvider.CreateRefreshTokenV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -397,8 +397,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     access_token = access.token,
                     refresh_token = refresh,
                     user_id = user.Id.ToString(),
-                    audience_id = audience.Id.ToString(),
-                    client_id = client.Id.ToString() + ":" + uow.ClientRepo.Salt,
+                    client_id = client.Id.ToString(),
+                    issuer_id = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
                 //add activity entry for login...
@@ -421,27 +421,27 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
             #endregion
 
-            #region v1 end-point (compatibility: audience and issuer entities mixed. no issuer salt.)
+            #region v1 end-point (compatibility: issuer and client entities mixed. no issuer salt.)
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
-                    && !context.Request.Form.ContainsKey(Strings.AttrAudienceIDV1)
+                && (!context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
+                    && context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV1)))
             {
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string audienceValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV1).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserIDV1).Value;
                 string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserPasswordIDV1).Value;
 
                 //check for correct parameter format
-                if (string.IsNullOrEmpty(audienceValue)
+                if (string.IsNullOrEmpty(clientValue)
                     || !grantTypeValue.Equals(Strings.AttrUserPasswordIDV1)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
@@ -463,35 +463,35 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 /*
                  * this is really gross but is needed for backward compatibility.
                  * 
-                 * will work because identity backed authorize filters use array of issuers, issuer keys and audiences. so basically 
+                 * will work because identity backed authorize filters use array of issuers, issuer keys and clients. so basically 
                  * we just need any valid issuer defined in configuration on resource server side.
                  * 
                  */
-                var client = uow.ClientRepo.GetAsync().Result.First();
+                var issuer = uow.IssuerRepo.GetAsync().Result.First();
 
-                Guid audienceID;
-                AppAudience audience;
+                Guid clientID;
+                AppClient client;
 
                 //check if identifier is guid. resolve to guid if not.
-                if (Guid.TryParse(audienceValue, out audienceID))
-                    audience = uow.AudienceRepo.GetAsync(audienceID).Result;
+                if (Guid.TryParse(clientValue, out clientID))
+                    client = uow.ClientRepo.GetAsync(clientID).Result;
                 else
-                    audience = (uow.AudienceRepo.GetAsync(x => x.Name == audienceValue).Result).SingleOrDefault();
+                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
 
-                if (client == null
-                    || audience == null)
+                if (issuer == null
+                    || client == null)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
                 }
 
-                if (!client.Enabled
-                    || !audience.Enabled)
+                if (!issuer.Enabled
+                    || !client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
                 }
 
                 Guid userID;
@@ -561,7 +561,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 uow.CustomUserMgr.AccessSuccessAsync(user).Wait();
 
-                var access = JwtSecureProvider.CreateAccessTokenV1CompatibilityMode(uow, client, audience, user).Result;
+                var access = JwtSecureProvider.CreateAccessTokenV1CompatibilityMode(uow, issuer, client, user).Result;
 
                 var result = new
                 {

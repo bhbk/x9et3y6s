@@ -13,12 +13,18 @@ namespace Bhbk.Lib.Identity.Models
     public abstract class ClientBase
     {
         [Required]
+        public Guid IssuerId { get; set; }
+
+        [Required]
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         [Required]
         public string ClientKey { get; set; }
+
+        [Required]
+        public string ClientType { get; set; }
 
         [Required]
         public bool Enabled { get; set; }
@@ -41,12 +47,11 @@ namespace Bhbk.Lib.Identity.Models
 
         public Nullable<DateTime> LastUpdated { get; set; }
 
-        public IList<string> Audiences { get; set; }
+        public IList<string> Roles { get; set; }
     }
 
     public class ClientUpdate : ClientBase
     {
-
         [Required]
         public Guid Id { get; set; }
 

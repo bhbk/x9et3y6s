@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppAudienceUri
+    public partial class AppClientUri
     {
 
     }
 
-    public abstract class AudienceUriBase
+    public abstract class ClientUriBase
     {
         [Required]
-        public Guid AudienceId { get; set; }
+        public Guid ClientId { get; set; }
 
         [Required]
         public Guid ActorId { get; set; }
@@ -24,9 +24,9 @@ namespace Bhbk.Lib.Identity.Models
         public bool Enabled { get; set; }
     }
 
-    public class AudienceUriCreate : AudienceUriBase { }
+    public class ClientUriCreate : ClientUriBase { }
 
-    public class AudienceUriResult : AudienceUriBase
+    public class ClientUriResult : ClientUriBase
     {
         [Required]
         public Guid Id { get; set; }
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Models
         public Nullable<DateTime> LastUpdated { get; set; }
     }
 
-    public class AudienceUriUpdate : AudienceUriBase
+    public class ClientUriUpdate : ClientUriBase
     {
         [Required]
         public Guid Id { get; set; }

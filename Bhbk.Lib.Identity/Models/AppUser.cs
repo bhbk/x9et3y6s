@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Models
         public AppUser()
         {
             AppActivity = new HashSet<AppActivity>();
-            AppAudienceUri = new HashSet<AppAudienceUri>();
+            AppClientUri = new HashSet<AppClientUri>();
             AppUserClaim = new HashSet<AppUserClaim>();
             AppUserLogin = new HashSet<AppUserLogin>();
             AppUserRefresh = new HashSet<AppUserRefresh>();
@@ -44,7 +44,7 @@ namespace Bhbk.Lib.Identity.Models
         public bool Immutable { get; set; }
 
         public virtual ICollection<AppActivity> AppActivity { get; set; }
-        public virtual ICollection<AppAudienceUri> AppAudienceUri { get; set; }
+        public virtual ICollection<AppClientUri> AppClientUri { get; set; }
         public virtual ICollection<AppUserClaim> AppUserClaim { get; set; }
         public virtual ICollection<AppUserLogin> AppUserLogin { get; set; }
         public virtual ICollection<AppUserRefresh> AppUserRefresh { get; set; }

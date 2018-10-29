@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Models
         }
 
         public Guid Id { get; set; }
-        public Guid AudienceId { get; set; }
+        public Guid ClientId { get; set; }
         public Guid? ActorId { get; set; }
         public string Name { get; set; }
         public string NormalizedName { get; set; }
@@ -23,7 +23,7 @@ namespace Bhbk.Lib.Identity.Models
         public string ConcurrencyStamp { get; set; }
         public bool Immutable { get; set; }
 
-        public virtual AppAudience Audience { get; set; }
+        public virtual AppClient Client { get; set; }
         public virtual ICollection<AppRoleClaim> AppRoleClaim { get; set; }
         public virtual ICollection<AppUserRole> AppUserRole { get; set; }
     }

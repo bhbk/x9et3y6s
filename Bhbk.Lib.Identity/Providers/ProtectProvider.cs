@@ -20,10 +20,10 @@ namespace Bhbk.Lib.Identity.Providers
             _provider = DataProtectionProvider.Create(applicationName);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppClient client)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppIssuer issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
-            var secret = string.Format("{0}/{1}/{2}", client.Id.ToString(), client.ClientKey, purpose);
+            var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
             var ciphertext = create.Protect(secret, expire);
 
             return Task.FromResult<string>(ciphertext);
@@ -38,10 +38,10 @@ namespace Bhbk.Lib.Identity.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, AppClient client)
+        public Task<bool> ValidateAsync(string purpose, string token, AppIssuer issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
-            var secret = string.Format("{0}/{1}/{2}", client.Id.ToString(), client.ClientKey, purpose);
+            var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
             string plaintext = string.Empty;
 
             try

@@ -23,22 +23,45 @@ namespace Bhbk.Lib.Identity.Data
             _uow = uow;
         }
 
-        public async void TestsCreate()
+        public async void Create()
         {
             if (_uow.Situation != ContextType.UnitTest)
                 throw new InvalidOperationException();
 
+            AppClient client;
+            AppRole role;
             AppLogin login;
             AppUser user;
-            AppRole role;
-            AppAudience audience;
+
+            //create clients
+            await _uow.IssuerRepo.CreateAsync(_uow.Convert.Map<AppIssuer>(
+                new IssuerCreate()
+                {
+                    Name = Strings.ApiUnitTestIssuer1,
+                    IssuerKey = RandomValues.CreateBase64String(32),
+                    Enabled = true,
+                    Immutable = false,
+                }));
+
+            await _uow.IssuerRepo.CreateAsync(_uow.Convert.Map<AppIssuer>(
+                new IssuerCreate()
+                {
+                    Name = Strings.ApiUnitTestIssuer2,
+                    IssuerKey = RandomValues.CreateBase64String(32),
+                    Enabled = true,
+                    Immutable = false,
+                }));
+
+            await _uow.CommitAsync();
 
             //create clients
             await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(
                 new ClientCreate()
                 {
+                    IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single().Id,
                     Name = Strings.ApiUnitTestClient1,
                     ClientKey = RandomValues.CreateBase64String(32),
+                    ClientType = Enums.ClientType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = false,
                 }));
@@ -46,54 +69,33 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(
                 new ClientCreate()
                 {
+                    IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single().Id,
                     Name = Strings.ApiUnitTestClient2,
                     ClientKey = RandomValues.CreateBase64String(32),
+                    ClientType = Enums.ClientType.server.ToString(),
                     Enabled = true,
                     Immutable = false,
                 }));
 
             await _uow.CommitAsync();
 
-            //create audiences
-            await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(
-                new AudienceCreate()
+            //assign uris to clients
+            client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+
+            await _uow.ClientRepo.AddUriAsync(_uow.Convert.Map<AppClientUri>(
+                new ClientUriCreate()
                 {
-                    ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single().Id,
-                    Name = Strings.ApiUnitTestAudience1,
-                    AudienceType = Enums.AudienceType.user_agent.ToString(),
-                    Enabled = true,
-                    Immutable = false,
-                }));
-
-            await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(
-                new AudienceCreate()
-                {
-                    ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single().Id,
-                    Name = Strings.ApiUnitTestAudience2,
-                    AudienceType = Enums.AudienceType.server.ToString(),
-                    Enabled = true,
-                    Immutable = false,
-                }));
-
-            await _uow.CommitAsync();
-
-            //assign uris to audiences
-            audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single();
-
-            await _uow.AudienceRepo.AddUriAsync(_uow.Convert.Map<AppAudienceUri>(
-                new AudienceUriCreate()
-                {
-                    AudienceId = audience.Id,
+                    ClientId = client.Id,
                     AbsoluteUri = Strings.ApiUnitTestUri1Link,
                     Enabled = true,
                 }));
 
-            audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single();
+            client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
 
-            await _uow.AudienceRepo.AddUriAsync(_uow.Convert.Map<AppAudienceUri>(
-                new AudienceUriCreate()
+            await _uow.ClientRepo.AddUriAsync(_uow.Convert.Map<AppClientUri>(
+                new ClientUriCreate()
                 {
-                    AudienceId = audience.Id,
+                    ClientId = client.Id,
                     AbsoluteUri = Strings.ApiUnitTestUri2Link,
                     Enabled = true,
                 }));
@@ -121,7 +123,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                 new RoleCreate()
                 {
-                    AudienceId = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience1)).Single().Id,
+                    ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single().Id,
                     Name = Strings.ApiUnitTestRole1,
                     Enabled = true,
                     Immutable = false
@@ -130,7 +132,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                 new RoleCreate()
                 {
-                    AudienceId = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiUnitTestAudience2)).Single().Id,
+                    ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single().Id,
                     Name = Strings.ApiUnitTestRole2,
                     Enabled = true,
                     Immutable = false
@@ -209,50 +211,51 @@ namespace Bhbk.Lib.Identity.Data
 
             for (int i = 0; i < sets; i++)
             {
+                AppClient client;
+                AppRole role;
                 AppLogin login;
                 AppUser user;
-                AppRole role;
-                AppAudience audience;
 
+                var issuerName = Strings.ApiUnitTestIssuer1 + "-" + RandomValues.CreateBase64String(4);
                 var clientName = Strings.ApiUnitTestClient1 + "-" + RandomValues.CreateBase64String(4);
-                var audienceName = Strings.ApiUnitTestAudience1 + "-" + RandomValues.CreateBase64String(4);
                 var loginName = Strings.ApiUnitTestLogin1 + "-" + RandomValues.CreateBase64String(4);
                 var roleName = Strings.ApiUnitTestRole1 + "-" + RandomValues.CreateBase64String(4);
                 var userName = RandomValues.CreateAlphaNumericString(4) + "-" + Strings.ApiUnitTestUser1;
                 var uriName = Strings.ApiUnitTestUri1 + "-" + RandomValues.CreateBase64String(4);
 
                 //create random client
+                await _uow.IssuerRepo.CreateAsync(_uow.Convert.Map<AppIssuer>(
+                    new IssuerCreate()
+                    {
+                        Name = issuerName,
+                        IssuerKey = RandomValues.CreateBase64String(32),
+                        Enabled = true,
+                        Immutable = false,
+                    }));
+
+                await _uow.CommitAsync();
+
+                //create random client
                 await _uow.ClientRepo.CreateAsync(_uow.Convert.Map<AppClient>(
                     new ClientCreate()
                     {
+                        IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == issuerName)).Single().Id,
                         Name = clientName,
                         ClientKey = RandomValues.CreateBase64String(32),
+                        ClientType = Enums.ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
                     }));
 
                 await _uow.CommitAsync();
 
-                //create random audience
-                await _uow.AudienceRepo.CreateAsync(_uow.Convert.Map<AppAudience>(
-                    new AudienceCreate()
+                //assign uris to random client
+                client = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single();
+
+                await _uow.ClientRepo.AddUriAsync(_uow.Convert.Map<AppClientUri>(
+                    new ClientUriCreate()
                     {
-                        ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single().Id,
-                        Name = audienceName,
-                        AudienceType = Enums.AudienceType.user_agent.ToString(),
-                        Enabled = true,
-                        Immutable = false,
-                    }));
-
-                await _uow.CommitAsync();
-
-                //assign uris to random audience
-                audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == audienceName)).Single();
-
-                await _uow.AudienceRepo.AddUriAsync(_uow.Convert.Map<AppAudienceUri>(
-                    new AudienceUriCreate()
-                    {
-                        AudienceId = audience.Id,
+                        ClientId = client.Id,
                         AbsoluteUri = Strings.ApiUnitTestUri1Link,
                         Enabled = true,
                     }));
@@ -273,7 +276,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
-                        AudienceId = (await _uow.AudienceRepo.GetAsync(x => x.Name == audienceName)).Single().Id,
+                        ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single().Id,
                         Name = roleName,
                         Enabled = true,
                         Immutable = false
@@ -330,13 +333,13 @@ namespace Bhbk.Lib.Identity.Data
 
             await _uow.CommitAsync();
 
-            foreach (var audience in await _uow.AudienceRepo.GetAsync())
-                await _uow.AudienceRepo.DeleteAsync(audience);
+            foreach (var client in await _uow.ClientRepo.GetAsync())
+                await _uow.ClientRepo.DeleteAsync(client);
 
             await _uow.CommitAsync();
 
-            foreach (var client in await _uow.ClientRepo.GetAsync())
-                await _uow.ClientRepo.DeleteAsync(client);
+            foreach (var issuer in await _uow.IssuerRepo.GetAsync())
+                await _uow.IssuerRepo.DeleteAsync(issuer);
 
             await _uow.CommitAsync();
         }

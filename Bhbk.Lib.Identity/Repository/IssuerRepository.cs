@@ -3,18 +3,18 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Repository
 {
-    public class ClientRepository : IGenericRepository<AppClient, Guid>
+    public class IssuerRepository : IGenericRepository<AppIssuer, Guid>
     {
         private readonly AppDbContext _context;
+        private string _salt = null;
 
-        public ClientRepository(AppDbContext context)
+        public IssuerRepository(AppDbContext context)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -22,17 +22,24 @@ namespace Bhbk.Lib.Identity.Repository
             _context = context;
         }
 
-        public async Task<AppClientUri> AddUriAsync(AppClientUri clientUri)
+        public string Salt
         {
-            return await Task.FromResult(_context.AppClientUri.Add(clientUri).Entity);
+            get
+            {
+                return _salt;
+            }
+            set
+            {
+                _salt = value;
+            }
         }
 
-        public async Task<AppClient> CreateAsync(AppClient entity)
+        public async Task<AppIssuer> CreateAsync(AppIssuer entity)
         {
             return await Task.FromResult(_context.Add(entity).Entity);
         }
 
-        public async Task<bool> DeleteAsync(AppClient entity)
+        public async Task<bool> DeleteAsync(AppIssuer entity)
         {
             await Task.FromResult(_context.Remove(entity).Entity);
 
@@ -44,26 +51,31 @@ namespace Bhbk.Lib.Identity.Repository
             return await Task.FromResult(_context.AppClient.Any(x => x.Id == key));
         }
 
-        public async Task<AppClient> GetAsync(Guid key)
+        public async Task<IQueryable<AppClient>> GetClientsAsync(Guid key)
         {
-            var client = _context.AppClient.Where(x => x.Id == key).SingleOrDefault();
+            return await Task.FromResult(_context.AppClient.Where(x => x.IssuerId == key).AsQueryable());
+        }
 
-            _context.Entry(client).Collection(x => x.AppRole).Load();
+        public async Task<AppIssuer> GetAsync(Guid key)
+        {
+            var client = _context.AppIssuer.Where(x => x.Id == key).SingleOrDefault();
+
+            _context.Entry(client).Collection(x => x.AppClient).Load();
 
             return await Task.FromResult(client);
         }
 
-        public Task<IQueryable<AppClient>> GetAsync(string sql, params object[] parameters)
+        public Task<IQueryable<AppIssuer>> GetAsync(string sql, params object[] parameters)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IQueryable<AppClient>> GetAsync(Expression<Func<AppClient, bool>> predicates = null, 
-            Func<IQueryable<AppClient>, IQueryable<AppClient>> orderBy = null, 
-            Func<IQueryable<AppClient>, IIncludableQueryable<AppClient, object>> includes = null, 
+        public async Task<IQueryable<AppIssuer>> GetAsync(Expression<Func<AppIssuer, bool>> predicates = null, 
+            Func<IQueryable<AppIssuer>, IQueryable<AppIssuer>> orderBy = null, 
+            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null, 
             bool tracking = true)
         {
-            IQueryable<AppClient> query = _context.AppClient.AsQueryable();
+            IQueryable<AppIssuer> query = _context.AppIssuer.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -77,32 +89,17 @@ namespace Bhbk.Lib.Identity.Repository
             return await Task.FromResult(query);
         }
 
-        public async Task<IList<AppRole>> GetRoleListAsync(Guid clientId)
+        public async Task<AppIssuer> UpdateAsync(AppIssuer entity)
         {
-            IList<AppRole> result = new List<AppRole>();
-            var roles = _context.AppRole.Where(x => x.ClientId == clientId);
-
-            if (roles == null)
-                throw new InvalidOperationException();
-
-            foreach (AppRole role in roles)
-                result.Add(role);
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<AppClient> UpdateAsync(AppClient entity)
-        {
-            var model = _context.AppClient.Where(x => x.Id == entity.Id).Single();
+            var model = _context.AppIssuer.Where(x => x.Id == entity.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            model.IssuerId = entity.IssuerId;
             model.Name = entity.Name;
             model.Description = entity.Description;
-            model.ClientType = entity.ClientType;
+            model.IssuerKey = entity.IssuerKey;
             model.LastUpdated = DateTime.Now;
             model.Enabled = entity.Enabled;
             model.Immutable = entity.Immutable;

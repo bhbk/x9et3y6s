@@ -68,10 +68,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (exists != null)
                 return BadRequest(Strings.MsgUserAlreadyExists);
 
-            var client = await UoW.ClientRepo.GetAsync(model.ClientId);
+            var client = await UoW.IssuerRepo.GetAsync(model.ClientId);
 
             if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
+                return NotFound(Strings.MsgIssuerNotExist);
 
             //ignore how bit may be set in model...
             model.HumanBeing = true;
@@ -208,18 +208,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{userID:guid}/audiences"), HttpGet]
-        public async Task<IActionResult> GetUserAudiencesV1([FromRoute] Guid userID)
+        [Route("v1/{userID:guid}/clients"), HttpGet]
+        public async Task<IActionResult> GetUserClientsV1([FromRoute] Guid userID)
         {
             var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var audiences = await UoW.CustomUserMgr.GetAudiencesAsync(user);
+            var clients = await UoW.CustomUserMgr.GetClientsAsync(user);
 
-            var result = (await UoW.AudienceRepo.GetAsync(x => audiences.Contains(x.Id.ToString())))
-                .Select(x => UoW.Convert.Map<AudienceResult>(x));
+            var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x.Id.ToString())))
+                .Select(x => UoW.Convert.Map<ClientResult>(x));
 
             return Ok(result);
         }

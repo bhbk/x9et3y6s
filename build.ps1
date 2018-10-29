@@ -1,5 +1,5 @@
 
-Set-Variable -Name version -Value "2018.10.24.3149"
+Set-Variable -Name version -Value "2018.10.28.2174"
 
 dotnet build "Bhbk.WebApi.Identity.sln" --configuration Release
 dotnet pack "Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" -p:PackageVersion=$version --output ".." --configuration Release -p:TargetFrameworks=netstandard2.0

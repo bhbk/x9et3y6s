@@ -43,8 +43,8 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     && _refresh.ValidFrom < DateTime.UtcNow
                     && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
-                    var result = _sts.RefreshTokenV2(_conf["IdentityLogin:ClientName"],
-                        new List<string> { _conf["IdentityLogin:AudienceName"] }, _refresh.RawData).Result;
+                    var result = _sts.RefreshTokenV2(_conf["IdentityLogin:IssuerName"],
+                        new List<string> { _conf["IdentityLogin:ClientName"] }, _refresh.RawData).Result;
 
                     if (result.IsSuccessStatusCode)
                     {
@@ -69,8 +69,8 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
                 else
                 {
-                    var result = _sts.AccessTokenV2(_conf["IdentityLogin:ClientName"],
-                        new List<string> { _conf["IdentityLogin:AudienceName"] }, _conf["IdentityLogin:UserName"], _conf["IdentityLogin:UserPass"]).Result;
+                    var result = _sts.AccessTokenV2(_conf["IdentityLogin:IssuerName"],
+                        new List<string> { _conf["IdentityLogin:ClientName"] }, _conf["IdentityLogin:UserName"], _conf["IdentityLogin:UserPass"]).Result;
 
                     if (result.IsSuccessStatusCode)
                     {

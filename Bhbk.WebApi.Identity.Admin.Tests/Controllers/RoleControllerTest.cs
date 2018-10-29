@@ -34,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_AddToUser_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new RoleCreate()
             {
-                AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
+                ClientId = (await _uow.ClientRepo.GetAsync()).First().Id,
                 Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestRole1,
                 Enabled = true,
             };
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 _uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
-                        AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
+                        ClientId = (await _uow.ClientRepo.GetAsync()).First().Id,
                         Name = model.Name,
                         Enabled = true,
                     }));
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_Delete_Fail_Immutable()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
@@ -92,12 +92,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_Create_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var model = new RoleCreate()
             {
-                AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
+                ClientId = (await _uow.ClientRepo.GetAsync()).First().Id,
                 Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestRole1,
                 Enabled = true,
                 Immutable = false
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_Delete_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_GetById_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_GetByName_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
@@ -195,14 +195,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.CreateRandom(10);
             _defaults.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).Single();
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
 
-            var audiences = new List<AppAudience>();
-            audiences.Add(audience);
+            var clients = new List<AppClient>();
+            clients.Add(client);
 
-            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, client, audiences, user).Result;
+            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, clients, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -224,14 +224,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             _tests.CreateRandom(10);
             _defaults.Create();
 
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClient)).Single();
-            var audience = (await _uow.AudienceRepo.GetAsync(x => x.Name == Strings.ApiDefaultAudienceUi)).Single();
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
 
-            var audiences = new List<AppAudience>();
-            audiences.Add(audience);
+            var clients = new List<AppClient>();
+            clients.Add(client);
 
-            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, client, audiences, user).Result;
+            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, clients, user).Result;
 
             var request = _owin.CreateClient();
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
@@ -259,7 +259,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_GetUserList_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
@@ -275,7 +275,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_RemoveFromUser_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
@@ -284,7 +284,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var model = new RoleCreate()
             {
-                AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
+                ClientId = (await _uow.ClientRepo.GetAsync()).First().Id,
                 Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestRole1,
                 Enabled = true,
                 Immutable = false
@@ -294,7 +294,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 _uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
-                        AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
+                        ClientId = (await _uow.ClientRepo.GetAsync()).First().Id,
                         Name = model.Name,
                         Enabled = true,
                         Immutable = false
@@ -322,7 +322,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public async Task Api_Admin_RoleV1_Update_Success()
         {
             _tests.Destroy();
-            _tests.TestsCreate();
+            _tests.Create();
 
             var controller = new RoleController(_conf, _uow, _tasks);
             var role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
@@ -333,7 +333,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = new RoleUpdate()
             {
                 Id = role.Id,
-                AudienceId = (await _uow.AudienceRepo.GetAsync()).First().Id,
+                ClientId = (await _uow.ClientRepo.GetAsync()).First().Id,
                 Name = Strings.ApiUnitTestRole1 + "(Updated)",
                 Enabled = true,
                 Immutable = false

@@ -16,8 +16,6 @@
 );
 
 
-
-
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_AppUserLogin]
     ON [dbo].[AppUserLogin]([UserId] ASC, [LoginId] ASC);

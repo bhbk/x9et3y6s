@@ -68,14 +68,14 @@ namespace Bhbk.WebApi.Identity.Sts
 
             ConfigureContext(sc);
 
-            _uow.ClientRepo.Salt = _conf["IdentityTenants:Salt"];
+            _uow.IssuerRepo.Salt = _conf["IdentityTenants:Salt"];
 
-            var issuers = (_uow.ClientRepo.GetAsync().Result)
-                .Select(x => x.Name.ToString() + ":" + _uow.ClientRepo.Salt);
+            var issuers = (_uow.IssuerRepo.GetAsync().Result)
+                .Select(x => x.Name.ToString() + ":" + _uow.IssuerRepo.Salt);
 
             //check if issuer compatibility enabled. means add issuer with no salt.
             if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                issuers = (_uow.ClientRepo.GetAsync().Result)
+                issuers = (_uow.IssuerRepo.GetAsync().Result)
                     .Select(x => x.Name.ToString())
                     .Concat(issuers);
 
@@ -95,9 +95,9 @@ namespace Bhbk.WebApi.Identity.Sts
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuers = issuers.ToArray(),
-                    IssuerSigningKeys = (_uow.ClientRepo.GetAsync().Result).Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.ClientKey))).ToArray(),
-                    ValidAudiences = (_uow.AudienceRepo.GetAsync().Result).Select(x => x.Name.ToString()).ToArray(),
-                    AudienceValidator = Bhbk.Lib.Identity.Validators.AudienceValidator.Multiple,
+                    IssuerSigningKeys = (_uow.IssuerRepo.GetAsync().Result).Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.IssuerKey))).ToArray(),
+                    ValidAudiences = (_uow.ClientRepo.GetAsync().Result).Select(x => x.Name.ToString()).ToArray(),
+                    AudienceValidator = Bhbk.Lib.Identity.Validators.ClientValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
@@ -149,52 +149,52 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseMiddleware<ClientCredentialProvider>();
             app.UseMiddleware<RefreshTokenProvider>();
 
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/access", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseAccessTokenProvider();
             //    });
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/access", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v2/access", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseAccessTokenProvider();
             //    });
 
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/authorization", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v1/authorization", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseAuthorizationCodeProvider();
             //    });
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/authorization", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v2/authorization", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseAuthorizationCodeProvider();
             //    });
 
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/client", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v1/client", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseClientCredentialsProvider();
             //    });
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/client", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v2/client", StringComparison.Ordinal)
             //   && context.Request.Method.Equals("POST")
             //   && context.Request.HasFormContentType, x =>
             //   {
             //       x.UseClientCredentialsProvider();
             //   });
 
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v1/refresh", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v1/refresh", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {
             //        x.UseRefreshTokenProvider();
             //    });
-            //app.MapWhen(context => context.Request.Path.Equals("/oauth/v2/refresh", StringComparison.Ordinal)
+            //app.MapWhen(context => context.Request.Path.Equals("/oauth2/v2/refresh", StringComparison.Ordinal)
             //    && context.Request.Method.Equals("POST")
             //    && context.Request.HasFormContentType, x =>
             //    {

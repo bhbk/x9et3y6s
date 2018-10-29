@@ -12,11 +12,11 @@ namespace Bhbk.Lib.Identity.Interfaces
     {
         IMapper Convert { get; }
         ActivityRepository ActivityRepo { get; }
-        AudienceRepository AudienceRepo { get; }
         ClientRepository ClientRepo { get; }
         ConfigRepository ConfigRepo { get; }
         CustomRoleManager CustomRoleMgr { get; }
         CustomUserManager CustomUserMgr { get; }
+        IssuerRepository IssuerRepo { get; }
         LoginRepository LoginRepo { get; }
     }
 }

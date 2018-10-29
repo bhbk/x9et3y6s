@@ -5,24 +5,24 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Validators
 {
-    public class AudienceValidator
+    public class ClientValidator
     {
-        public static bool Multiple(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
+        public static bool Multiple(IEnumerable<string> clients, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
-            var audienceList = new List<string>();
+            var clientList = new List<string>();
 
-            foreach (string first in audiences)
+            foreach (string first in clients)
                 foreach (string second in first.Split(','))
-                    audienceList.Add(second.Trim());
+                    clientList.Add(second.Trim());
 
-            foreach (string entry in audienceList)
+            foreach (string entry in clientList)
                 if (validationParameters.ValidAudiences.Contains(entry))
                     return true;
 
             return false;
         }
 
-        public static bool Single(string audience, SecurityToken securityToken, TokenValidationParameters validationParameters)
+        public static bool Single(string client, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
             throw new NotImplementedException();
         }

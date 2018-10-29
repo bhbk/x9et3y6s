@@ -19,144 +19,116 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {
     [TestClass]
-    public class ClientControllerTest : StartupTest
+    public class IssuerControllerTest : StartupTest
     {
         private TestServer _owin;
 
-        public ClientControllerTest()
+        public IssuerControllerTest()
         {
             _owin = new TestServer(new WebHostBuilder()
                 .UseStartup<StartupTest>());
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_Create_Fail_ClientType()
+        public async Task Api_Admin_IssuerV1_Create_Success()
         {
             _tests.Destroy();
             _tests.Create();
 
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var model = new ClientCreate()
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var model = new IssuerCreate()
             {
-                IssuerId = (await _uow.IssuerRepo.GetAsync()).First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestClient1,
-                ClientType = RandomValues.CreateBase64String(8),
+                Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestIssuer1,
+                IssuerKey = RandomValues.CreateBase64String(32),
                 Enabled = true,
             };
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
-            var result = await controller.CreateClientV1(model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_ClientV1_Delete_Fail_Immutable()
-        {
-            _tests.Destroy();
-            _tests.Create();
-
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            client.Immutable = true;
-            await _uow.ClientRepo.UpdateAsync(client);
-
-            controller.SetUser(user.Id);
-
-            var result = await controller.DeleteClientV1(client.Id) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-
-            var check = (await _uow.ClientRepo.GetAsync(x => x.Id == client.Id)).Any();
-            check.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_ClientV1_Create_Success()
-        {
-            _tests.Destroy();
-            _tests.Create();
-
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var model = new ClientCreate()
-            {
-                IssuerId = (await _uow.IssuerRepo.GetAsync()).First().Id,
-                Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestClient1,
-                ClientType = Enums.ClientType.user_agent.ToString(),
-                Enabled = true,
-            };
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            controller.SetUser(user.Id);
-
-            var result = await controller.CreateClientV1(model) as OkObjectResult;
+            var result = await controller.CreateIssuerV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_Delete_Success()
+        public async Task Api_Admin_IssuerV1_Delete_Fail_Immutable()
         {
             _tests.Destroy();
             _tests.Create();
 
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            issuer.Immutable = true;
+            await _uow.IssuerRepo.UpdateAsync(issuer);
+            await _uow.CommitAsync();
+        
+            controller.SetUser(user.Id);
+
+            var result = await controller.DeleteIssuerV1(issuer.Id) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+            var check = (await _uow.IssuerRepo.GetAsync(x => x.Id == issuer.Id)).Any();
+            check.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task Api_Admin_IssuerV1_Delete_Success()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
-            var result = await controller.DeleteClientV1(client.Id) as NoContentResult;
+            var result = await controller.DeleteIssuerV1(issuer.Id) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
 
-            var check = (await _uow.ClientRepo.GetAsync(x => x.Id == client.Id)).Any();
+            var check = (await _uow.IssuerRepo.GetAsync(x => x.Id == issuer.Id)).Any();
             check.Should().BeFalse();
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_GetById_Success()
+        public async Task Api_Admin_IssuerV1_GetById_Success()
         {
             _tests.Destroy();
             _tests.Create();
 
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
 
-            controller.SetUser(user.Id);
-
-            var result = await controller.GetClientV1(client.Id) as OkObjectResult;
+            var result = await controller.GetIssuerV1(issuer.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
 
-            data.Id.Should().Be(client.Id);
+            data.Id.Should().Be(issuer.Id);
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_GetByName_Success()
+        public async Task Api_Admin_IssuerV1_GetByName_Success()
         {
             _tests.Destroy();
             _tests.Create();
 
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
 
-            controller.SetUser(user.Id);
-
-            var result = await controller.GetClientV1(client.Name) as OkObjectResult;
+            var result = await controller.GetIssuerV1(issuer.Name) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
 
-            data.Id.Should().Be(client.Id);
+            data.Id.Should().Be(issuer.Id);
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_GetList_Fail_Auth()
+        public async Task Api_Admin_IssuerV1_GetList_Fail_Auth()
         {
             _tests.Destroy();
             _tests.CreateRandom(10);
@@ -170,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             ushort take = 3;
             ushort skip = 1;
 
-            var response = await request.GetAsync("/client/v1?"
+            var response = await request.GetAsync("/issuer/v1?"
                 + "orderBy=" + orderBy + "&"
                 + "take=" + take.ToString() + "&"
                 + "skip=" + skip.ToString());
@@ -180,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_GetList_Fail_ParamInvalid()
+        public async Task Api_Admin_IssuerV1_GetList_Fail_ParamInvalid()
         {
             _tests.Destroy();
             _tests.CreateRandom(10);
@@ -199,17 +171,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            string order = "name";
+            string orderBy = "name";
 
-            var response = await request.GetAsync("/client/v1?"
-                + "orderBy=" + order);
+            var response = await request.GetAsync("/issuer/v1?"
+                + "orderBy=" + orderBy);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_GetList_Success()
+        public async Task Api_Admin_IssuerV1_GetList_Success()
         {
             _tests.Destroy();
             _tests.CreateRandom(10);
@@ -232,7 +204,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             ushort take = 3;
             ushort skip = 1;
 
-            var response = await request.GetAsync("/client/v1?"
+            var response = await request.GetAsync("/issuer/v1?"
                 + "orderBy=" + orderBy + "&"
                 + "take=" + take.ToString() + "&"
                 + "skip=" + skip.ToString());
@@ -240,55 +212,52 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<ClientResult>>();
-            var data = ok.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
+            var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<IssuerResult>>();
+            var data = ok.Should().BeAssignableTo<IEnumerable<IssuerResult>>().Subject;
 
             data.Count().Should().Be(take);
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_GetRoleList_Success()
+        public async Task Api_Admin_IssuerV1_GetClientList_Success()
         {
             _tests.Destroy();
             _tests.Create();
 
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
 
-            var result = await controller.GetClientRolesV1(client.Id) as OkObjectResult;
+            var result = await controller.GetIssuerClientsV1(issuer.Id) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
 
-            data.Count().Should().Be((await _uow.ClientRepo.GetRoleListAsync(client.Id)).Count());
+            data.Count().Should().Be((await _uow.IssuerRepo.GetClientsAsync(issuer.Id)).Count());
         }
 
         [TestMethod]
-        public async Task Api_Admin_ClientV1_Update_Success()
+        public async Task Api_Admin_IssuerV1_Update_Success()
         {
             _tests.Destroy();
             _tests.Create();
 
-            var controller = new ClientController(_conf, _uow, _tasks);
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var controller = new IssuerController(_conf, _uow, _tasks);
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
 
-            var model = new ClientUpdate()
+            var model = new IssuerUpdate()
             {
-                IssuerId = (await _uow.IssuerRepo.GetAsync()).First().Id,
-                ActorId = user.Id,
-                Id = client.Id,
-                Name = Strings.ApiUnitTestClient1 + "(Updated)",
-                Description = client.Description ?? string.Empty,
-                ClientType = client.ClientType,
+                Id = issuer.Id,
+                Name = Strings.ApiUnitTestIssuer1 + "(Updated)",
+                IssuerKey = issuer.IssuerKey,
                 Enabled = true,
-                Immutable = client.Immutable,
+                Immutable = false
             };
 
-            var result = await controller.UpdateClientV1(model) as OkObjectResult;
+            var result = await controller.UpdateIssuerV1(model) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<ClientResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
 
             data.Name.Should().Be(model.Name);
         }
