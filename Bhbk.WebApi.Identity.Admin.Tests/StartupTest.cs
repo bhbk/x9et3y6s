@@ -6,10 +6,10 @@ using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 //http://www.dotnetcurry.com/aspnet-core/1420/integration-testing-aspnet-core
@@ -29,19 +29,26 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            //context is not thread safe yet. create new one for each background thread.
-            _uow = new IdentityContext(options, ContextType.UnitTest);
+            /*
+             * https://dotnetcoretutorials.com/2017/03/25/net-core-dependency-injection-lifetimes-explained/
+             * transient: persist for work. lot of overhead and stateless.
+             * scoped: persist for request. default for framework middlewares/controllers.
+             * singleton: persist for application execution. thread safe needed for uow/ef context.
+             */
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
-            sc.AddSingleton<IIdentityContext<AppDbContext>>(_uow);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainActivityTask(new IdentityContext(options, ContextType.UnitTest)));
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainUsersTask(new IdentityContext(options, ContextType.UnitTest)));
+            sc.AddSingleton<IHostedService>(new MaintainActivityTask(new IdentityContext(options, ContextType.UnitTest)));
+            sc.AddSingleton<IHostedService>(new MaintainUsersTask(new IdentityContext(options, ContextType.UnitTest)));
+            sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
+            {
+                return new IdentityContext(options, ContextType.UnitTest);
+            });
 
             var sp = sc.BuildServiceProvider();
 
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
+            _tasks = (IHostedService[])sp.GetServices<IHostedService>();
             _uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
-            _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
 
             _defaults = new DefaultData(_uow);
             _tests = new TestData(_uow);
@@ -53,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
             base.ConfigureServices(sc);
         }
 
-        public override void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
+        public override void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, ILoggerFactory log)
         {
             base.Configure(app, env, log);
         }

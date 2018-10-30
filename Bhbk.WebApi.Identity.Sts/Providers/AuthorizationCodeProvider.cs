@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -99,29 +100,6 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
                 }
 
-                Guid clientID;
-                AppClient client;
-
-                //check if identifier is guid. resolve to guid if not.
-                if (Guid.TryParse(clientValue, out clientID))
-                    client = uow.ClientRepo.GetAsync(clientID).Result;
-                else
-                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
-
-                if (client == null)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
-                }
-
-                if (!client.Enabled)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
-                }
-
                 Guid userID;
                 AppUser user;
 
@@ -160,10 +138,44 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
                 }
 
-                //add all clients user is member of...
                 var clientList = uow.CustomUserMgr.GetClientsAsync(user).Result;
-                var clients = (uow.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
-                    && x.Enabled == true).Result).ToList();
+                var clients = new List<AppClient>();
+
+                //check if client is single, multiple or undefined...
+                if (string.IsNullOrEmpty(clientValue))
+                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
+                        && x.Enabled == true).Result.ToList();
+                else
+                {
+                    foreach (string entry in clientValue.Split(","))
+                    {
+                        Guid clientID;
+                        AppClient client;
+
+                        //check if identifier is guid. resolve to guid if not.
+                        if (Guid.TryParse(entry.Trim(), out clientID))
+                            client = uow.ClientRepo.GetAsync(clientID).Result;
+                        else
+                            client = (uow.ClientRepo.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
+
+                        if (client == null)
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                            context.Response.ContentType = "application/json";
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                        }
+
+                        if (!client.Enabled
+                            || !clientList.Contains(client.Id.ToString()))
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                            context.Response.ContentType = "application/json";
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                        }
+
+                        clients.Add(client);
+                    }
+                }
 
                 //check that redirect url is valid...
                 if (!clients.Any(x => x.AppClientUri.Any(y => y.AbsoluteUri == redirectUriValue)))

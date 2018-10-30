@@ -68,9 +68,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (exists != null)
                 return BadRequest(Strings.MsgUserAlreadyExists);
 
-            var client = await UoW.IssuerRepo.GetAsync(model.ClientId);
+            var issuer = await UoW.IssuerRepo.GetAsync(model.IssuerId);
 
-            if (client == null)
+            if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
             //ignore how bit may be set in model...
@@ -107,8 +107,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         ToId = result.Id,
                         ToEmail = result.Email,
                         ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
-                        Subject = string.Format("{0} {1}", client.Name, Strings.ApiMsgConfirmNewUserSubject),
-                        HtmlContent = Strings.ApiTemplateConfirmNewUser(client, result, url)
+                        Subject = string.Format("{0} {1}", issuer.Name, Strings.ApiMsgConfirmNewUserSubject),
+                        HtmlContent = Strings.ApiTemplateConfirmNewUser(issuer, result, url)
                     });
 
                 if (!email.IsSuccessStatusCode)

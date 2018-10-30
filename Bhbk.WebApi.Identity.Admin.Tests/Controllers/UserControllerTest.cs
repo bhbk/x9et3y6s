@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var model = new UserCreate()
             {
-                ClientId = issuer.Id,
+                IssuerId = issuer.Id,
                 Email = Strings.ApiUnitTestUser1 + "?" + RandomValues.CreateBase64String(4),
                 FirstName = "First-" + RandomValues.CreateBase64String(4),
                 LastName = "Last-" + RandomValues.CreateBase64String(4),
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var model = new UserCreate()
             {
-                ClientId = issuer.Id,
+                IssuerId = issuer.Id,
                 Email = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1,
                 FirstName = "First-" + RandomValues.CreateBase64String(4),
                 LastName = "Last-" + RandomValues.CreateBase64String(4),

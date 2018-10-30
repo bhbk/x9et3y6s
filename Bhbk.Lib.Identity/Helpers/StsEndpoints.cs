@@ -186,10 +186,10 @@ namespace Bhbk.Lib.Identity.Helpers
         public async Task<HttpResponseMessage> AuthorizationCodeV1(string issuer, string client, string user, string redirectUri, string code)
         {
             var content = HttpUtility.UrlPathEncode("?issuer_id=" + issuer
-                + "&client_id = " + client
+                + "&client_id=" + client
                 + "&username=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&grant_type=" + "code"
+                + "&grant_type=code"
                 + "&code=" + code);
 
             var endpoint = "/oauth2/v1/authorization";
@@ -210,10 +210,10 @@ namespace Bhbk.Lib.Identity.Helpers
         public async Task<HttpResponseMessage> AuthorizationCodeV2(string issuer, string client, string user, string redirectUri, string code)
         {
             var content = HttpUtility.UrlPathEncode("?issuer=" + issuer
-                + "&client = " + client
+                + "&client=" + client
                 + "&user=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&grant_type=" + "code"
+                + "&grant_type=code"
                 + "&code=" + code);
 
             var endpoint = "/oauth2/v2/authorization";

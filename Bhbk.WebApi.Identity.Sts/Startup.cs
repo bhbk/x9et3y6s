@@ -13,12 +13,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,7 +34,8 @@ namespace Bhbk.WebApi.Identity.Sts
         protected static IConfigurationRoot _conf;
         protected static IIdentityContext<AppDbContext> _uow;
         protected static IJwtContext _jwt;
-        protected static Microsoft.Extensions.Hosting.IHostedService[] _tasks;
+        protected static IHostedService[] _tasks;
+        private IEnumerable<string> _issuers, _issuerKeys, _clients;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
@@ -40,21 +43,27 @@ namespace Bhbk.WebApi.Identity.Sts
                 .UseSqlServer(_conf["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging();
 
-            //context is not thread safe yet. create new one for each background thread.
-            _uow = new IdentityContext(options, ContextType.Live);
-            _jwt = new JwtContext(_conf, ContextType.Live);
+            /*
+             * https://dotnetcoretutorials.com/2017/03/25/net-core-dependency-injection-lifetimes-explained/
+             * transient: persist for work. lot of overhead and stateless.
+             * scoped: persist for request. default for framework middlewares/controllers.
+             * singleton: persist for application execution. thread safe needed for uow/ef context.
+             */
 
             sc.AddSingleton<IConfigurationRoot>(_conf);
-            sc.AddSingleton<IIdentityContext<AppDbContext>>(_uow);
-            sc.AddSingleton<IJwtContext>(_jwt);
-            sc.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(new MaintainTokensTask(new IdentityContext(options, ContextType.Live)));
+            sc.AddSingleton<IJwtContext>(new JwtContext(_conf, ContextType.Live));
+            sc.AddSingleton<IHostedService>(new MaintainTokensTask(new IdentityContext(options, ContextType.Live)));
+            sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
+            {
+                return new IdentityContext(options, ContextType.Live);
+            });
 
             var sp = sc.BuildServiceProvider();
 
             _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
-            _uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
             _jwt = (IJwtContext)sp.GetRequiredService<IJwtContext>();
-            _tasks = (Microsoft.Extensions.Hosting.IHostedService[])sp.GetServices<Microsoft.Extensions.Hosting.IHostedService>();
+            _tasks = (IHostedService[])sp.GetServices<IHostedService>();
+            _uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
@@ -70,14 +79,54 @@ namespace Bhbk.WebApi.Identity.Sts
 
             _uow.IssuerRepo.Salt = _conf["IdentityTenants:Salt"];
 
-            var issuers = (_uow.IssuerRepo.GetAsync().Result)
-                .Select(x => x.Name.ToString() + ":" + _uow.IssuerRepo.Salt);
+            if (_uow.Situation == ContextType.Live)
+            {
+                var allowedIssuers = _conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                    .Select(x => x.Value);
 
-            //check if issuer compatibility enabled. means add issuer with no salt.
-            if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                issuers = (_uow.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name.ToString())
-                    .Concat(issuers);
+                var allowedClients = _conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
+                    .Select(x => x.Value);
+
+                _issuers = (_uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                    .Select(x => x.Name + ":" + _uow.IssuerRepo.Salt);
+
+                _issuerKeys = (_uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                    .Select(x => x.IssuerKey);
+
+                _clients = (_uow.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
+                    .Select(x => x.Name);
+
+                //check if issuer compatibility enabled. means no env salt.
+                if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                    _issuers = (_uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                        .Select(x => x.Name).Concat(_issuers);
+
+#if DEBUG
+                //check if in debug. add value that is hard coded just for that use.
+                _issuerKeys = _issuerKeys.Concat(new[]
+                {
+                    _conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren().First().Value
+                });
+#endif
+            }
+            else if (_uow.Situation == ContextType.UnitTest)
+            {
+                _issuers = (_uow.IssuerRepo.GetAsync().Result)
+                    .Select(x => x.Name + ":" + _uow.IssuerRepo.Salt);
+
+                _issuerKeys = (_uow.IssuerRepo.GetAsync().Result)
+                    .Select(x => x.IssuerKey);
+
+                _clients = (_uow.ClientRepo.GetAsync().Result)
+                    .Select(x => x.Name);
+
+                //check if issuer compatibility enabled. means no env salt.
+                if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                    _issuers = (_uow.IssuerRepo.GetAsync().Result)
+                        .Select(x => x.Name).Concat(_issuers);
+            }
+            else
+                throw new NotSupportedException();
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -94,9 +143,9 @@ namespace Bhbk.WebApi.Identity.Sts
                 bearer.IncludeErrorDetails = true;
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuers = issuers.ToArray(),
-                    IssuerSigningKeys = (_uow.IssuerRepo.GetAsync().Result).Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x.IssuerKey))).ToArray(),
-                    ValidAudiences = (_uow.ClientRepo.GetAsync().Result).Select(x => x.Name.ToString()).ToArray(),
+                    ValidIssuers = _issuers.ToArray(),
+                    IssuerSigningKeys = _issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
+                    ValidAudiences = _clients.ToArray(),
                     AudienceValidator = Bhbk.Lib.Identity.Validators.ClientValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -122,7 +171,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
         }
 
-        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory log)
+        public virtual void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, ILoggerFactory log)
         {
             //order below is important...
             if (env.IsDevelopment())
@@ -137,7 +186,10 @@ namespace Bhbk.WebApi.Identity.Sts
             }
 
             app.UseForwardedHeaders();
-            app.UseCors(policy => policy.AllowAnyOrigin());
+            app.UseCors(policy => policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
             app.UseAuthentication();
             app.UseSession();
             app.UseStaticFiles();

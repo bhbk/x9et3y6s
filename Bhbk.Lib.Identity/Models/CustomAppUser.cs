@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Models
 
     public class UserCreate : UserBase
     {
-        public Guid ClientId { get; set; }
+        public Guid IssuerId { get; set; }
         public Guid ActorId { get; set; }
     }
 
