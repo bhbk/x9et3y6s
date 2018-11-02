@@ -9,7 +9,7 @@ dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity quiet
 rem dotnet test Bhbk.WebApi.Identity.Admin.Tests\Bhbk.WebApi.Identity.Admin.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Me.Tests\Bhbk.WebApi.Identity.Me.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
-dotnet pack Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj -p:PackageVersion=%VERSION% --output .. -p:TargetFrameworks=netstandard2.0
+dotnet pack Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj -p:PackageVersion=%VERSION% --output .. --configuration Release -p:TargetFrameworks=netstandard2.0
 dotnet publish Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2
 dotnet publish Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2
 dotnet publish Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
@@ -93,13 +94,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var clients = await UoW.IssuerRepo.GetAsync(x => true,
-                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+            Expression<Func<AppIssuer, bool>> expr;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                expr = x => true;
+            else
+                expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
+                || x.Description.ToLower().Contains(model.Filter.ToLower())
+                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+
+            var total = await UoW.IssuerRepo.Count(expr);
+            var issuers = await UoW.IssuerRepo.GetAsync(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppClient));
 
-            var result = clients.Select(x => UoW.Convert.Map<IssuerResult>(x));
+            var result = issuers.Select(x => UoW.Convert.Map<IssuerResult>(x));
 
-            return Ok(result);
+            return Ok(new { Count = total, Items = result });
         }
 
         [Route("v1/{issuerID:guid}/clients"), HttpGet]

@@ -113,6 +113,16 @@ namespace Bhbk.Lib.Identity.Repository
             return Task.FromResult(IdentityResult.Success);
         }
 
+        public async Task<int> Count(Expression<Func<AppUser, bool>> predicates = null)
+        {
+            IQueryable<AppUser> query = _context.AppUser.AsQueryable();
+
+            if (predicates != null)
+                return await query.Where(predicates).CountAsync();
+
+            return await query.CountAsync();
+        }
+
         public override Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!user.HumanBeing)

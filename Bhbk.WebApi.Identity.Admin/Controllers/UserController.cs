@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -241,19 +242,32 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetUsersV1([FromQuery] Paging model)
+        public async Task<IActionResult> GetUsersV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var users = UoW.CustomUserMgr.Store.Get(x => true,
-                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+            Expression<Func<AppUser, bool>> expr;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                expr = x => true;
+            else
+                expr = x => x.Email.ToLower().Contains(model.Filter.ToLower())
+                || x.PhoneNumber.ToLower().Contains(model.Filter.ToLower())
+                || x.FirstName.ToLower().Contains(model.Filter.ToLower())
+                || x.LastName.ToLower().Contains(model.Filter.ToLower())
+                || x.LastUpdated.ToString().ToLower().Contains(model.Filter.ToLower())
+                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+
+            var total = await UoW.CustomUserMgr.Store.Count(expr);
+            var users = UoW.CustomUserMgr.Store.Get(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserLogin)
                     .Include(y => y.AppUserRole));
 
             var result = users.Select(x => UoW.Convert.Map<UserResult>(x));
 
-            return Ok(result);
+            return Ok(new { Count = total, Items = result });
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpPut]

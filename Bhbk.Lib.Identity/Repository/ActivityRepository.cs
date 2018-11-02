@@ -21,6 +21,16 @@ namespace Bhbk.Lib.Identity.Repository
             _context = context;
         }
 
+        public async Task<int> Count(Expression<Func<AppActivity, bool>> predicates = null)
+        {
+            IQueryable<AppActivity> query = _context.AppActivity.AsQueryable();
+
+            if (predicates != null)
+                return await query.Where(predicates).CountAsync();
+
+            return await query.CountAsync();
+        }
+
         public async Task<AppActivity> CreateAsync(AppActivity entity)
         {
             return await Task.FromResult(_context.Add(entity).Entity);

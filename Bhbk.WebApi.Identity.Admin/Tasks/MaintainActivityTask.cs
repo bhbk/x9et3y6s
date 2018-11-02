@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
@@ -16,21 +17,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class MaintainActivityTask : BackgroundService
     {
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly IServiceProvider _sp;
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
-        public MaintainActivityTask(IIdentityContext<AppDbContext> uow)
+        public MaintainActivityTask(IServiceCollection sc)
         {
-            if (uow == null)
+            if (sc == null)
                 throw new ArgumentNullException();
 
-            _serializer = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
+            _sp = sc.BuildServiceProvider();
 
             _conf = new ConfigurationBuilder()
                 .SetBasePath(_api.DirectoryName)
@@ -40,7 +38,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             _delay = int.Parse(_conf["Tasks:MaintainActivity:PollingDelay"]);
             _auditable = int.Parse(_conf["Tasks:MaintainActivity:HoldAuditable"]);
             _transient = int.Parse(_conf["Tasks:MaintainActivity:HoldTransient"]);
-            _uow = uow;
+
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -55,9 +57,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 try
                 {
+                    var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var expired = await _uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
+                    var expired = await uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                             || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true));
 
                     var expiredCount = expired.Count();
@@ -65,9 +69,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     if (expired.Any())
                     {
                         foreach (var entry in expired.ToList())
-                            await _uow.ActivityRepo.DeleteAsync(entry);
+                            await uow.ActivityRepo.DeleteAsync(entry);
 
-                        await _uow.CommitAsync();
+                        await uow.CommitAsync();
 
                         var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + expiredCount.ToString() + " expired activity entries.";

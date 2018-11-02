@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
@@ -16,21 +17,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
     public class MaintainTokensTask : BackgroundService
     {
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly IServiceProvider _sp;
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainTokensTask(IIdentityContext<AppDbContext> uow)
+
+        public MaintainTokensTask(IServiceCollection sc)
         {
-            if (uow == null)
+            if (sc == null)
                 throw new ArgumentNullException();
 
-            _serializer = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
+            _sp = sc.BuildServiceProvider();
 
             _conf = new ConfigurationBuilder()
                 .SetBasePath(_api.DirectoryName)
@@ -38,7 +37,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                 .Build();
 
             _delay = int.Parse(_conf["Tasks:MaintainTokens:PollingDelay"]);
-            _uow = uow;
+
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -53,18 +56,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             {
                 try
                 {
+                    var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = _uow.CustomUserMgr.Store.Context.AppUserRefresh
+                    var invalid = uow.CustomUserMgr.Store.Context.AppUserRefresh
                         .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())
                     {
                         foreach (AppUserRefresh entry in invalid.ToList())
-                            _uow.CustomUserMgr.Store.Context.AppUserRefresh.Remove(entry);
+                            uow.CustomUserMgr.Store.Context.AppUserRefresh.Remove(entry);
 
-                        await _uow.CommitAsync();
+                        await uow.CommitAsync();
 
                         var msg = typeof(MaintainTokensTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                 + invalidCount.ToString() + " invalid refresh tokens.";

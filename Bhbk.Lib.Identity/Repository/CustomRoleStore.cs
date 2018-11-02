@@ -28,6 +28,16 @@ namespace Bhbk.Lib.Identity.Repository
             _context = context;
         }
 
+        public async Task<int> Count(Expression<Func<AppRole, bool>> predicates = null)
+        {
+            IQueryable<AppRole> query = _context.AppRole.AsQueryable();
+
+            if (predicates != null)
+                return await query.Where(predicates).CountAsync();
+
+            return await query.CountAsync();
+        }
+
         public override Task<IdentityResult> CreateAsync(AppRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             _context.AppRole.Add(role);

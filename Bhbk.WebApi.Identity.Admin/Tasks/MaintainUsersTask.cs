@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
@@ -17,21 +18,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class MaintainUsersTask : BackgroundService
     {
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly IServiceProvider _sp;
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainUsersTask(IIdentityContext<AppDbContext> uow)
+        public MaintainUsersTask(IServiceCollection sc)
         {
-            if (uow == null)
+            if (sc == null)
                 throw new ArgumentNullException();
 
-            _serializer = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
+            _sp = sc.BuildServiceProvider();
 
             _conf = new ConfigurationBuilder()
                 .SetBasePath(_api.DirectoryName)
@@ -39,7 +37,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 .Build();
 
             _delay = int.Parse(_conf["Tasks:MaintainUsers:PollingDelay"]);
-            _uow = uow;
+
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -54,9 +56,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 try
                 {
+                    var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var disabled = _uow.CustomUserMgr.Store.Context.AppUser
+                    var disabled = uow.CustomUserMgr.Store.Context.AppUser
                         .Where(x => x.LockoutEnd < DateTime.UtcNow);
                     var disabledCount = disabled.Count();
 
@@ -66,10 +70,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         {
                             entry.LockoutEnabled = false;
                             entry.LockoutEnd = null;
-                            _uow.CustomUserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
+                            uow.CustomUserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
                         }
 
-                        await _uow.CommitAsync();
+                        await uow.CommitAsync();
 
                         var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                 + disabledCount.ToString() + " users with expired lock-outs.";

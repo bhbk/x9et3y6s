@@ -29,18 +29,21 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Startup
     {
-        protected static IConfigurationRoot _conf;
-        protected static IJwtContext _jwt;
-        protected static IHostedService[] _tasks;
-        protected static IIdentityContext<AppDbContext> _uow;
         protected static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private IEnumerable<string> _issuers, _issuerKeys, _clients;
 
         public virtual void ConfigureContext(IServiceCollection sc)
         {
+            var conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(_conf["Databases:IdentityEntities"])
+                .UseSqlServer(conf["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging();
 
             /*
@@ -48,80 +51,74 @@ namespace Bhbk.WebApi.Identity.Admin
              * transient: persist for work. lot of overhead and stateless.
              * scoped: persist for request. default for framework middlewares/controllers.
              * singleton: persist for application execution. thread safe needed for uow/ef context.
+             * 
+             * order below matters...
              */
 
-            sc.AddSingleton<IConfigurationRoot>(_conf);
-            sc.AddSingleton<IJwtContext>(new JwtContext(_conf, ContextType.Live));
-            sc.AddSingleton<IHostedService>(new MaintainActivityTask(new IdentityContext(options, ContextType.Live)));
-            sc.AddSingleton<IHostedService>(new MaintainUsersTask(new IdentityContext(options, ContextType.Live)));
+            sc.AddSingleton<IConfigurationRoot>(conf);
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
             {
                 return new IdentityContext(options, ContextType.Live);
             });
-
-            var sp = sc.BuildServiceProvider();
-
-            _conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
-            _jwt = (IJwtContext)sp.GetRequiredService<IJwtContext>();
-            _tasks = (IHostedService[])sp.GetServices<IHostedService>();
-            _uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+            sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc));
+            sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc));
         }
 
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_lib.DirectoryName)
-                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
             ConfigureContext(sc);
 
-            if (_uow.Situation == ContextType.Live)
+            var sp = sc.BuildServiceProvider();
+
+            var conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
+            var uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+            var tasks = (IHostedService[])sp.GetServices<IHostedService>();
+
+            if (uow.Situation == ContextType.Live)
             {
-                var allowedIssuers = _conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                     .Select(x => x.Value);
 
-                var allowedClients = _conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
+                var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
                     .Select(x => x.Value);
 
-                _issuers = (_uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
-                    .Select(x => x.Name + ":" + _uow.IssuerRepo.Salt);
+                _issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
 
-                _issuerKeys = (_uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                _issuerKeys = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.IssuerKey);
 
-                _clients = (_uow.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
+                _clients = (uow.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name);
 
                 //check if issuer compatibility enabled. means no env salt.
-                if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                    _issuers = (_uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                if (uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                    _issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                         .Select(x => x.Name).Concat(_issuers);
 
 #if DEBUG
                 //check if in debug. add value that is hard coded just for that use.
                 _issuerKeys = _issuerKeys.Concat(new[]
                 {
-                    _conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren().First().Value
+                    conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren().First().Value
                 });
 #endif
             }
-            else if (_uow.Situation == ContextType.UnitTest)
+            else if (uow.Situation == ContextType.UnitTest)
             {
-                _issuers = (_uow.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name + ":" + _uow.IssuerRepo.Salt);
+                _issuers = (uow.IssuerRepo.GetAsync().Result)
+                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
 
-                _issuerKeys = (_uow.IssuerRepo.GetAsync().Result)
+                _issuerKeys = (uow.IssuerRepo.GetAsync().Result)
                     .Select(x => x.IssuerKey);
 
-                _clients = (_uow.ClientRepo.GetAsync().Result)
+                _clients = (uow.ClientRepo.GetAsync().Result)
                     .Select(x => x.Name);
 
                 //check if issuer compatibility enabled. means no env salt.
-                if (_uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                    _issuers = (_uow.IssuerRepo.GetAsync().Result)
+                if (uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                    _issuers = (uow.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(_issuers);
             }
             else

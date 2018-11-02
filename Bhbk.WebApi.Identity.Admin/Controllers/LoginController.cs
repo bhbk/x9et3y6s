@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
@@ -124,13 +125,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var logins = await UoW.LoginRepo.GetAsync(x => true,
-                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+            Expression<Func<AppLogin, bool>> expr;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                expr = x => true;
+            else
+                expr = x => x.LoginProvider.ToLower().Contains(model.Filter.ToLower());
+
+            var total = await UoW.LoginRepo.Count(expr);
+            var logins = await UoW.LoginRepo.GetAsync(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserLogin));
 
             var result = logins.Select(x => UoW.Convert.Map<LoginResult>(x));
 
-            return Ok(result);
+            return Ok(new { Count = total, Items = result });
         }
 
         [Route("v1/{loginID:guid}/users"), HttpGet]

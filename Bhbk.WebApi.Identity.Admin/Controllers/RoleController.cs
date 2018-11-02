@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
@@ -105,18 +106,29 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetRolesV1([FromQuery] Paging model)
+        public async Task<IActionResult> GetRolesV1([FromQuery] Paging model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var roles = UoW.CustomRoleMgr.Store.Get(x => true,
-                x => x.OrderBy(model.OrderBy).Skip(model.Skip).Take(model.Take),
+            Expression<Func<AppRole, bool>> expr;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                expr = x => true;
+            else
+                expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
+                || x.Description.ToLower().Contains(model.Filter.ToLower())
+                || x.LastUpdated.ToString().ToLower().Contains(model.Filter.ToLower())
+                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+
+            var total = await UoW.CustomRoleMgr.Store.Count(expr);
+            var roles = UoW.CustomRoleMgr.Store.Get(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserRole));
 
             var result = roles.Select(x => UoW.Convert.Map<RoleResult>(x));
 
-            return Ok(result);
+            return Ok(new { Count = total, Items = result });
         }
 
         [Route("v1/{roleID:guid}"), HttpGet]

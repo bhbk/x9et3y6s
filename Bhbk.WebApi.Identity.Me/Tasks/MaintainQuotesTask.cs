@@ -3,6 +3,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
@@ -17,7 +18,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
     public class MaintainQuotesTask : BackgroundService
     {
         private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly IServiceProvider _sp;
         private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private readonly FileInfo _qod = SearchRoots.ByAssemblyContext("appquotes.json");
         private readonly JsonSerializerSettings _serializer;
@@ -27,25 +28,26 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         public UserQuotes QuoteOfDay { get; private set; }
         public string Status { get; private set; }
 
-        public MaintainQuotesTask(IIdentityContext<AppDbContext> uow)
+        public MaintainQuotesTask(IServiceCollection sc)
         {
-            if (uow == null)
+            if (sc == null)
                 throw new ArgumentNullException();
 
-            _serializer = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
+            _sp = sc.BuildServiceProvider();
 
             _conf = new ConfigurationBuilder()
                 .SetBasePath(_api.DirectoryName)
                 .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
+
             _output = _qod.DirectoryName + Path.DirectorySeparatorChar + _qod.Name;
             _delay = int.Parse(_conf["Tasks:MaintainQuotes:PollingDelay"]);
             _url = _conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
-            _uow = uow;
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -59,7 +61,9 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (_uow.Situation == ContextType.UnitTest)
+            var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+
+            if (uow.Situation == ContextType.UnitTest)
                 QuoteOfDay = JsonConvert.DeserializeObject<UserQuotes>
                     (File.ReadAllText(_output));
             else

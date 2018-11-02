@@ -258,22 +258,28 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
             request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+            string order = "desc";
             string orderBy = "loginprovider";
-            ushort take = 3;
             ushort skip = 1;
+            ushort take = 3;
 
             var response = await request.GetAsync("/login/v1?"
+                + "filter=" + string.Empty + "&"
+                + "order=" + order + "&"
                 + "orderBy=" + orderBy + "&"
-                + "take=" + take.ToString() + "&"
-                + "skip=" + skip.ToString());
+                + "skip=" + skip.ToString() + "&"
+                + "take=" + take.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<LoginResult>>();
-            var data = ok.Should().BeAssignableTo<IEnumerable<LoginResult>>().Subject;
+            var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var data = JArray.Parse(ok["items"].ToString()).ToObject<IEnumerable<LoginResult>>();
+            var total = (int)ok["count"];
 
+            data.Should().BeAssignableTo<IEnumerable<LoginResult>>();
             data.Count().Should().Be(take);
+            total.Should().Be(await _uow.LoginRepo.Count());
         }
 
         [TestMethod]
