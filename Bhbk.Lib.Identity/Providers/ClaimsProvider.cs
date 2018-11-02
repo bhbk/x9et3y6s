@@ -24,8 +24,8 @@ namespace Bhbk.Lib.Identity.Providers
 
     public class ClaimsProvider : IUserClaimsPrincipalFactory<AppUser>
     {
-        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private readonly IConfigurationRoot _conf;
+        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private readonly UserManager<AppUser> _userMgmt;
 
         public ClaimsProvider(UserManager<AppUser> userMgmt)

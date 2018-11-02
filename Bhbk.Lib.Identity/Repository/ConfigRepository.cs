@@ -7,8 +7,8 @@ namespace Bhbk.Lib.Identity.Repository
 {
     public class ConfigRepository
     {
-        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private readonly IConfigurationRoot _conf;
+        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private UInt32 _defaultsAccessTokenExpire;
         private UInt32 _defaultsAuthorizationCodeExpire;
         private UInt32 _defaultsBrowserCookieExpire;

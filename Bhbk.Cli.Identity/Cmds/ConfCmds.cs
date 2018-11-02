@@ -13,8 +13,8 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class ConfCmds : ConsoleCommand
     {
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static bool ReadConfig = false;
 
         public ConfCmds()

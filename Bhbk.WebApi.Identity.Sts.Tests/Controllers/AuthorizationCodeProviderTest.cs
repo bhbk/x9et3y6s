@@ -160,10 +160,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var access = (string)jwt["access_token"];
             var refresh = (string)jwt["refresh_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
 
-            check = JwtSecureProvider.IsValidJwtFormat(refresh);
+            check = JwtSecureProvider.CanReadToken(refresh);
             check.Should().BeTrue();
         }
     }

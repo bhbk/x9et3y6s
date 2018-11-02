@@ -28,12 +28,12 @@ namespace Bhbk.WebApi.Identity.Me
 {
     public class Startup
     {
-        protected static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
-        protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         protected static IConfigurationRoot _conf;
-        protected static IIdentityContext<AppDbContext> _uow;
         protected static IJwtContext _jwt;
         protected static IHostedService[] _tasks;
+        protected static IIdentityContext<AppDbContext> _uow;
+        protected static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private IEnumerable<string> _issuers, _issuerKeys, _clients;
 
         public virtual void ConfigureContext(IServiceCollection sc)
@@ -75,8 +75,6 @@ namespace Bhbk.WebApi.Identity.Me
                 .Build();
 
             ConfigureContext(sc);
-
-            _uow.IssuerRepo.Salt = _conf["IdentityTenants:Salt"];
 
             if (_uow.Situation == ContextType.Live)
             {

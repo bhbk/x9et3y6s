@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Repository;
-using Bhbk.Lib.Identity.Stores;
+using Bhbk.Lib.Identity.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
@@ -14,9 +17,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public class IdentityContext : IIdentityContext<AppDbContext>
     {
-        private readonly AppDbContext _context;
+        private readonly IConfigurationRoot _conf;
         private readonly ContextType _situation;
         private readonly IMapper _convert;
+        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private readonly AppDbContext _context;
         private readonly ActivityRepository _activityRepo;
         private readonly ClientRepository _clientRepo;
         private readonly ConfigRepository _configRepo;
@@ -43,8 +48,14 @@ namespace Bhbk.Lib.Identity.Infrastructure
             if (context == null)
                 throw new ArgumentNullException();
 
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_lib.DirectoryName)
+                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                .Build();
+
             _context = context;
             _situation = status;
+
             _convert = new MapperConfiguration(config =>
             {
                 config.AddProfile<IdentityMappings>();
@@ -57,6 +68,8 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _customUserMgr = new CustomUserManager(new CustomUserStore(_context));
             _issuerRepo = new IssuerRepository(_context);
             _loginRepo = new LoginRepository(_context);
+
+            _issuerRepo.Salt = _conf["IdentityTenants:Salt"];
         }
 
         public AppDbContext Context

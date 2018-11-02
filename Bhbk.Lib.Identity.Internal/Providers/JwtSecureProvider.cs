@@ -247,15 +247,14 @@ namespace Bhbk.Lib.Identity.Providers
             return result;
         }
 
-        public static bool IsValidJwtFormat(string str)
+        public static bool CanReadToken(string jwt)
         {
-            //check if string is in jwt format.
-            var jwt = new JwtSecurityTokenHandler();
+            return new JwtSecurityTokenHandler().CanReadToken(jwt);
+        }
 
-            if (jwt.CanReadToken(str))
-                return true;
-            else
-                return false;
+        public static JwtSecurityToken ReadJwtToken(string jwt)
+        {
+            return new JwtSecurityTokenHandler().ReadJwtToken(jwt);
         }
     }
 }

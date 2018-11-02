@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.userstorebase-8
 //https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers
 
-namespace Bhbk.Lib.Identity.Stores
+namespace Bhbk.Lib.Identity.Repository
 {
     public partial class CustomUserStore : UserStore<AppUser, AppRole, AppDbContext, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppUserToken, AppRoleClaim>
     {
@@ -156,7 +156,7 @@ namespace Bhbk.Lib.Identity.Stores
 
         public Task<AppUserRefresh> FindRefreshTokenAsync(string ticket)
         {
-            return Task.FromResult(_context.AppUserRefresh.Where(x => x.ProtectedTicket == ticket).SingleOrDefault());
+            return Task.FromResult(_context.AppUserRefresh.Where(x => x.ProtectedTicket == ticket).FirstOrDefault());
         }
 
         public Task<AppUserRefresh> FindRefreshTokenByIdAsync(Guid tokenId)

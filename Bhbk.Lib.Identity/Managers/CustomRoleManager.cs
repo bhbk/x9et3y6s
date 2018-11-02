@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Stores;
+using Bhbk.Lib.Identity.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;

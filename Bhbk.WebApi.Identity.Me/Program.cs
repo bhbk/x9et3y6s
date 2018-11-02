@@ -10,8 +10,8 @@ namespace Bhbk.WebApi.Identity.Me
 {
     public class Program
     {
-        private static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
         private static IConfigurationRoot _conf;
+        private static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)

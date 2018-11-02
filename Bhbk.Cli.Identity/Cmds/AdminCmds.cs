@@ -17,10 +17,10 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class AdminCmds : ConsoleCommand
     {
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
-        private static CmdType _cmdType;
         private static IJwtContext _jwt;
+        private static CmdType _cmdType;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static AdminClient _admin = null;
         private static StsClient _sts = null;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));

@@ -19,10 +19,10 @@ namespace Bhbk.Lib.Identity.Models
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
     public partial class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
     {
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
         private static IMapper _convert;
         private static IList _fieldsExcluded, _fieldsSensitive, _tablesExcluded;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)

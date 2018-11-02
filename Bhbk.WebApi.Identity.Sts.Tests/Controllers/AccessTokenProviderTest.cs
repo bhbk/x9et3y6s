@@ -9,7 +9,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -140,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_CompatibiltyMode_Issuer()
+        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerCompatibilty()
         {
             _tests.Destroy();
             _tests.Create();
@@ -255,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
 
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
@@ -265,7 +267,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             access = (string)jwt["access_token"];
 
-            check = JwtSecureProvider.IsValidJwtFormat(access);
+            check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
         }
 
@@ -286,7 +288,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
 
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
@@ -296,12 +298,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             access = (string)jwt["access_token"];
 
-            check = JwtSecureProvider.IsValidJwtFormat(access);
+            check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
         }
 
         [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Success_CompatibiltyMode_Issuer()
+        public async Task Api_Sts_OAuth2_AccessV1_Success_IssuerCompatibilty()
         {
             _tests.Destroy();
             _tests.Create();
@@ -319,8 +321,43 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV1_Success_IssuerSalt()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            var result = await _sts.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var salt = _conf["IdentityTenants:Salt"];
+
+            salt.Should().Be(_uow.IssuerRepo.Salt);
+
+            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var access = (string)jwt["access_token"];
+            var refresh = (string)jwt["refresh_token"];
+
+            var check = JwtSecureProvider.ReadJwtToken(access).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+
+            check.Value.Split(':')[0].Should().Be(issuer.Name);
+            check.Value.Split(':')[1].Should().Be(salt);
+
+            check = JwtSecureProvider.ReadJwtToken(refresh).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+
+            check.Value.Split(':')[0].Should().Be(issuer.Name);
+            check.Value.Split(':')[1].Should().Be(salt);
         }
 
         [TestMethod]
@@ -535,7 +572,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
         }
 
@@ -557,7 +594,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
         }
 
@@ -586,7 +623,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
         }
 
@@ -615,7 +652,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
         }
 
@@ -636,8 +673,43 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
             var access = (string)jwt["access_token"];
 
-            var check = JwtSecureProvider.IsValidJwtFormat(access);
+            var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task Api_Sts_OAuth2_AccessV2_Success_IssuerSalt()
+        {
+            _tests.Destroy();
+            _tests.Create();
+
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var clients = new List<string> { string.Empty };
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            var result = await _sts.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var salt = _conf["IdentityTenants:Salt"];
+
+            salt.Should().Be(_uow.IssuerRepo.Salt);
+
+            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var access = (string)jwt["access_token"];
+            var refresh = (string)jwt["refresh_token"];
+
+            var check = JwtSecureProvider.ReadJwtToken(access).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+
+            check.Value.Split(':')[0].Should().Be(issuer.Name);
+            check.Value.Split(':')[1].Should().Be(salt);
+
+            check = JwtSecureProvider.ReadJwtToken(refresh).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+
+            check.Value.Split(':')[0].Should().Be(issuer.Name);
+            check.Value.Split(':')[1].Should().Be(salt);
         }
     }
 }

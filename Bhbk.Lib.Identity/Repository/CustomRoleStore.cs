@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolestorebase-4
 //https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers
 
-namespace Bhbk.Lib.Identity.Stores
+namespace Bhbk.Lib.Identity.Repository
 {
     public class CustomRoleStore : RoleStore<AppRole, AppDbContext, Guid>
     {

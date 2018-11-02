@@ -14,8 +14,8 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class DataCmds : ConsoleCommand
     {
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
 
         public DataCmds()

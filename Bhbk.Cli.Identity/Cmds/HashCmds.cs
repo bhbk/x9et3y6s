@@ -14,8 +14,8 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class HashCmds : ConsoleCommand
     {
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static IConfigurationRoot _conf;
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private static bool Generate = false;
 
         public HashCmds()
