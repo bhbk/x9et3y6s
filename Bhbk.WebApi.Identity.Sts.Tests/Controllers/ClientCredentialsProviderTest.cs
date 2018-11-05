@@ -1,38 +1,43 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
-    [TestClass]
-    public class ClientCredentialsProviderTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class ClientCredentialsProviderTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
-        private StsTester _sts;
+        private readonly HttpClient _client;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly StsClient _sts;
 
-        public ClientCredentialsProviderTest()
+        public ClientCredentialsProviderTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
-
-            _sts = new StsTester(_conf, _owin);
+            _client = fake.CreateClient();
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
+            _sts = new StsClient(_conf, _uow.Situation, _client);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_IssuerV1_Fail_NotImplemented()
+        [Fact]
+        public async Task Sts_OAuth2_IssuerV1_Fail_NotImplemented()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -42,11 +47,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_IssuerV2_Fail_IssuerNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_IssuerV2_Fail_IssuerNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -56,11 +61,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod, Ignore]
-        public async Task Api_Sts_OAuth2_IssuerV2_Fail_IssuerSecret()
+        [Fact(Skip = "Not Implemented")]
+        public async Task Sts_OAuth2_IssuerV2_Fail_IssuerSecret()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -70,11 +75,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
-        [TestMethod, Ignore]
-        public async Task Api_Sts_OAuth2_IssuerV2_Success()
+        [Fact(Skip = "Not Implemented")]
+        public async Task Sts_OAuth2_IssuerV2_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();

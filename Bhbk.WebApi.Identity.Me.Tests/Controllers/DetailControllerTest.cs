@@ -1,38 +1,70 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
-using System.Security.Claims;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
-    [TestClass]
-    public class DetailControllerTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class DetailControllerTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
+        private readonly HttpClient _client;
+        private readonly IServiceProvider _sp;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
 
-        public DetailControllerTest()
+        public DetailControllerTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
+            _client = fake.CreateClient();
+            _sp = fake.Server.Host.Services;
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
         }
 
-        [TestMethod]
-        public async Task Api_Me_DetailV1_Get_Success()
+        [Fact]
+        public void Me_DetailV1_GetMotD_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new DetailController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new DetailController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
+            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+
+            controller.SetUser(user.Id);
+
+            var result = controller.GetQuoteOfTheDayV1() as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserQuotes>().Subject;
+        }
+
+        [Fact]
+        public async Task Me_DetailV1_Get_Success()
+        {
+            var controller = new DetailController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
+
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
@@ -44,29 +76,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             data.Id.Should().Be(user.Id);
         }
 
-        [TestMethod]
-        public void Api_Me_DetailV1_GetQuoteOfTheDay_Success()
+        [Fact]
+        public async Task Me_DetailV1_SetPassword_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new DetailController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new DetailController(_conf, _uow, _tasks);
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
-            controller.SetUser(user.Id);
-
-            var result = controller.GetQuoteOfTheDayV1() as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserQuotes>().Subject;
-        }
-
-        [TestMethod]
-        public async Task Api_Me_DetailV1_SetPassword_Fail()
-        {
-            _tests.Destroy();
-            _tests.Create();
-
-            var controller = new DetailController(_conf, _uow, _tasks);
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var model = new UserChangePassword()
             {
@@ -84,13 +104,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             check.Should().BeFalse();
         }
 
-        [TestMethod]
-        public async Task Api_Me_DetailV1_SetPassword_Success()
+        [Fact]
+        public async Task Me_DetailV1_SetPassword_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new DetailController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new DetailController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var model = new UserChangePassword()
             {
@@ -108,13 +132,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Me_DetailV1_TwoFactor_Success()
+        [Fact]
+        public async Task Me_DetailV1_TwoFactor_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new DetailController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new DetailController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
@@ -127,13 +155,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_DetailV1_Update_Success()
+        [Fact]
+        public async Task Me_DetailV1_Update_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new DetailController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new DetailController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);

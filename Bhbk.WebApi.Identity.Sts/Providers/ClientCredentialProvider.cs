@@ -10,6 +10,9 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
+//https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+//https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write
+
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
     public static class ClientCredentialExtension
@@ -73,9 +76,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
-                    issuer = uow.IssuerRepo.GetAsync(issuerID).Result;
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
                 else
-                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).Single();
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
 
                 if (issuer == null)
                 {

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Providers;
 using Bhbk.Lib.Identity.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;

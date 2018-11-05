@@ -1,17 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identityuserclaim?view=aspnetcore-1.1
-    public partial class AppUserClaim : IdentityUserClaim<Guid>
-    {
-
-    }
-
     public abstract class UserClaimBase
     {
         [Required]

@@ -17,26 +17,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class MaintainUsersTask : BackgroundService
     {
-        private readonly IConfigurationRoot _conf;
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
+        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainUsersTask(IServiceCollection sc)
+        public MaintainUsersTask(IServiceCollection sc, IConfigurationRoot conf)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_api.DirectoryName)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
-                .Build();
-
-            _delay = int.Parse(_conf["Tasks:MaintainUsers:PollingDelay"]);
+            _delay = int.Parse(conf["Tasks:MaintainUsers:PollingDelay"]);
 
             _serializer = new JsonSerializerSettings
             {

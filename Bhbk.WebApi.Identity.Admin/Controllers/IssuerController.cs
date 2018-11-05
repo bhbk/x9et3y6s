@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -21,9 +18,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class IssuerController : BaseController
     {
         public IssuerController() { }
-
-        public IssuerController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -48,17 +42,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteIssuerV1([FromRoute] Guid issuerID)
         {
-            var client = await UoW.IssuerRepo.GetAsync(issuerID);
+            var issuer = await UoW.IssuerRepo.GetAsync(issuerID);
 
-            if (client == null)
+            if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
-            else if (client.Immutable)
+            else if (issuer.Immutable)
                 return BadRequest(Strings.MsgIssuerImmutable);
 
-            client.ActorId = GetUserGUID();
+            issuer.ActorId = GetUserGUID();
 
-            if (!await UoW.IssuerRepo.DeleteAsync(client))
+            if (!await UoW.IssuerRepo.DeleteAsync(issuer))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -66,30 +60,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{issuerID:guid}"), HttpGet]
-        public async Task<IActionResult> GetIssuerV1([FromRoute] Guid issuerID)
+        [Route("v1/{issuerValue}"), HttpGet]
+        public async Task<IActionResult> GetIssuerV1([FromRoute] string issuerValue)
         {
-            var client = await UoW.IssuerRepo.GetAsync(issuerID);
+            Guid issuerID;
+            AppIssuer issuer;
 
-            if (client == null)
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(issuerValue, out issuerID))
+                issuer = await UoW.IssuerRepo.GetAsync(issuerID);
+            else
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
+
+            if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
-            return Ok(UoW.Convert.Map<IssuerResult>(client));
+            return Ok(UoW.Convert.Map<IssuerResult>(issuer));
         }
 
-        [Route("v1/{issuerName}"), HttpGet]
-        public async Task<IActionResult> GetIssuerV1([FromRoute] string issuerName)
-        {
-            var client = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerName)).SingleOrDefault();
-
-            if (client == null)
-                return NotFound(Strings.MsgIssuerNotExist);
-
-            return Ok(UoW.Convert.Map<IssuerResult>(client));
-        }
-
-        [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetIssuerV1([FromQuery] Paging model)
+        [Route("v1/pages"), HttpPost]
+        public async Task<IActionResult> GetIssuersPageV1([FromBody] TuplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -100,25 +90,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = x => true;
             else
                 expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower())
-                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+                || x.Description.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.IssuerRepo.Count(expr);
-            var issuers = await UoW.IssuerRepo.GetAsync(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
+            var list = await UoW.IssuerRepo.GetAsync(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppClient));
 
-            var result = issuers.Select(x => UoW.Convert.Map<IssuerResult>(x));
+            var result = list.Select(x => UoW.Convert.Map<IssuerResult>(x));
 
-            return Ok(new { Count = total, Items = result });
+            return Ok(new { Count = total, List = result });
         }
 
         [Route("v1/{issuerID:guid}/clients"), HttpGet]
         public async Task<IActionResult> GetIssuerClientsV1([FromRoute] Guid issuerID)
         {
-            var client = await UoW.IssuerRepo.GetAsync(issuerID);
+            var issuer = await UoW.IssuerRepo.GetAsync(issuerID);
 
-            if (client == null)
+            if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
             var clients = await UoW.IssuerRepo.GetClientsAsync(issuerID);
@@ -137,12 +126,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var client = await UoW.IssuerRepo.GetAsync(model.Id);
+            var issuer = await UoW.IssuerRepo.GetAsync(model.Id);
 
-            if (client == null)
+            if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
-            else if (client.Immutable)
+            else if (issuer.Immutable)
                 return BadRequest(Strings.MsgIssuerImmutable);
 
             var result = await UoW.IssuerRepo.UpdateAsync(UoW.Convert.Map<AppIssuer>(model));

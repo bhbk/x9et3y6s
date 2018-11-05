@@ -17,9 +17,8 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 {
     public class MaintainQuotesTask : BackgroundService
     {
-        private readonly IConfigurationRoot _conf;
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
+        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
         private readonly FileInfo _qod = SearchRoots.ByAssemblyContext("appquotes.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly HttpClient _client = new HttpClient();
@@ -28,26 +27,20 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         public UserQuotes QuoteOfDay { get; private set; }
         public string Status { get; private set; }
 
-        public MaintainQuotesTask(IServiceCollection sc)
+        public MaintainQuotesTask(IServiceCollection sc, IConfigurationRoot conf)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_api.DirectoryName)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
-                .Build();
-
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
 
             _output = _qod.DirectoryName + Path.DirectorySeparatorChar + _qod.Name;
-            _delay = int.Parse(_conf["Tasks:MaintainQuotes:PollingDelay"]);
-            _url = _conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
+            _delay = int.Parse(conf["Tasks:MaintainQuotes:PollingDelay"]);
+            _url = conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
 
             Status = JsonConvert.SerializeObject(
                 new

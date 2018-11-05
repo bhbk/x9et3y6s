@@ -32,6 +32,7 @@ namespace Bhbk.Lib.Identity.Primitives
 
         public const string ApiDefaultClientUi = "Bhbk.WebUi.Identity";
         public const string ApiDefaultClientApi = "Bhbk.WebApi.Identity";
+        public const string ApiDefaultFormatDate = "yyyy/M/dd h:mm:s tt";
         public const string ApiDefaultIssuer = "Bhbk";
         public const string ApiDefaultPhone = "+00000000000";
         public const string ApiDefaultLogin = "local";

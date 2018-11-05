@@ -4,11 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppClientUri
-    {
-
-    }
-
     public abstract class ClientUriBase
     {
         [Required]

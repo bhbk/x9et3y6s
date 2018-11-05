@@ -2,7 +2,6 @@
 using Bhbk.Lib.Alert.Helpers;
 using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
@@ -11,8 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -26,9 +23,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class UserController : BaseController
     {
         public UserController() { }
-
-        public UserController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1/{userID:guid}/add-password"), HttpPut]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -171,21 +165,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{userID:guid}"), HttpGet]
-        public async Task<IActionResult> GetUserV1([FromRoute] Guid userID)
+        [Route("v1/{userValue}"), HttpGet]
+        public async Task<IActionResult> GetUserV1([FromBody] string userValue)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            Guid userID;
+            AppUser user;
 
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            return Ok(UoW.Convert.Map<UserResult>(user));
-        }
-
-        [Route("v1/{email}"), HttpGet]
-        public async Task<IActionResult> GetUserV1([FromRoute] string email)
-        {
-            var user = await UoW.CustomUserMgr.FindByEmailAsync(email);
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(userValue, out userID))
+                user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            else
+                user = await UoW.CustomUserMgr.FindByEmailAsync(userValue.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -241,8 +231,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetUsersV1([FromQuery] Paging model)
+        [Route("v1/pages"), HttpPost]
+        public async Task<IActionResult> GetUsersV1([FromBody] TuplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -255,19 +245,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = x => x.Email.ToLower().Contains(model.Filter.ToLower())
                 || x.PhoneNumber.ToLower().Contains(model.Filter.ToLower())
                 || x.FirstName.ToLower().Contains(model.Filter.ToLower())
-                || x.LastName.ToLower().Contains(model.Filter.ToLower())
-                || x.LastUpdated.ToString().ToLower().Contains(model.Filter.ToLower())
-                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+                || x.LastName.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.CustomUserMgr.Store.Count(expr);
-            var users = UoW.CustomUserMgr.Store.Get(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
+            var list = UoW.CustomUserMgr.Store.Get(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserLogin)
                     .Include(y => y.AppUserRole));
 
-            var result = users.Select(x => UoW.Convert.Map<UserResult>(x));
+            var result = list.Select(x => UoW.Convert.Map<UserResult>(x));
 
-            return Ok(new { Count = total, Items = result });
+            return Ok(new { Count = total, List = result });
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpPut]

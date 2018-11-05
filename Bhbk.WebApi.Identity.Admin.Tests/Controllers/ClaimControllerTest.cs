@@ -1,37 +1,52 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Xunit;
+using System;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {
-    [TestClass]
-    public class ClaimControllerTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class ClaimControllerTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
+        private readonly HttpClient _client;
+        private readonly IServiceProvider _sp;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
 
-        public ClaimControllerTest()
+        public ClaimControllerTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
+            _client = fake.CreateClient();
+            _sp = fake.Server.Host.Services;
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
         }
 
-        [TestMethod]
-        public async Task Api_Admin_ClaimV1_Create_Success()
+        [Fact]
+        public async Task Admin_ClaimV1_Create_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ClaimController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ClaimController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var claim = new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue);
 
@@ -44,15 +59,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             data.Type.Should().Be(claim.Type);
         }
 
-        [TestMethod]
-        public async Task Api_Admin_ClaimV1_Delete_Success()
+        [Fact]
+        public async Task Admin_ClaimV1_Delete_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ClaimController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ClaimController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-            var claim = new Claim(Strings.ApiUnitTestClaimType, 
+            var claim = new Claim(Strings.ApiUnitTestClaimType,
                 Strings.ApiUnitTestClaimValue + "-" + RandomValues.CreateBase64String(4));
 
             var add = await _uow.CustomUserMgr.AddClaimAsync(user, claim);
@@ -68,13 +87,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             check.Should().BeFalse();
         }
 
-        [TestMethod]
-        public async Task Api_Admin_ClaimV1_Get_Success()
+        [Fact]
+        public async Task Admin_ClaimV1_Get_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ClaimController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ClaimController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             var result = await controller.GetClaimsV1(user.Id) as OkObjectResult;

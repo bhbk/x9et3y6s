@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Core.Providers;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
@@ -20,8 +19,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -29,16 +26,15 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Startup
     {
-        protected static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
-        protected static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
-        private IEnumerable<string> _issuers, _issuerKeys, _clients;
-
-        public virtual void ConfigureContext(IServiceCollection sc)
+        public virtual void ConfigureServices(IServiceCollection sc)
         {
+            var lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+            var api = SearchRoots.ByAssemblyContext("appsettings.json");
+
             var conf = new ConfigurationBuilder()
-                .SetBasePath(_lib.DirectoryName)
-                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(lib.DirectoryName)
+                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -46,83 +42,56 @@ namespace Bhbk.WebApi.Identity.Admin
                 .UseSqlServer(conf["Databases:IdentityEntities"])
                 .EnableSensitiveDataLogging();
 
-            /*
-             * https://dotnetcoretutorials.com/2017/03/25/net-core-dependency-injection-lifetimes-explained/
-             * transient: persist for work. lot of overhead and stateless.
-             * scoped: persist for request. default for framework middlewares/controllers.
-             * singleton: persist for application execution. thread safe needed for uow/ef context.
-             * 
-             * order below matters...
-             */
-
-            sc.AddSingleton<IConfigurationRoot>(conf);
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));
+            sc.AddSingleton(conf);
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
             {
                 return new IdentityContext(options, ContextType.Live);
             });
-            sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc));
-            sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc));
-        }
-
-        public virtual void ConfigureServices(IServiceCollection sc)
-        {
-            ConfigureContext(sc);
+            sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
+            sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));
 
             var sp = sc.BuildServiceProvider();
+            var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();
 
-            var conf = (IConfigurationRoot)sp.GetRequiredService<IConfigurationRoot>();
-            var uow = (IIdentityContext<AppDbContext>)sp.GetRequiredService<IIdentityContext<AppDbContext>>();
-            var tasks = (IHostedService[])sp.GetServices<IHostedService>();
+            /*
+             * only live context allowed to run...
+             */
 
-            if (uow.Situation == ContextType.Live)
-            {
-                var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
-                    .Select(x => x.Value);
+            if (uow.Situation != ContextType.Live)
+                throw new NotSupportedException();
 
-                var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
-                    .Select(x => x.Value);
+            var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                .Select(x => x.Value);
 
-                _issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
-                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
+            var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
+                .Select(x => x.Value);
 
-                _issuerKeys = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
-                    .Select(x => x.IssuerKey);
+            var issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
 
-                _clients = (uow.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
-                    .Select(x => x.Name);
+            var issuerKeys = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                .Select(x => x.IssuerKey);
 
-                //check if issuer compatibility enabled. means no env salt.
-                if (uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                    _issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
-                        .Select(x => x.Name).Concat(_issuers);
+            var clients = (uow.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
+                .Select(x => x.Name);
+
+            /*
+             * check if issuer compatibility enabled. means no env salt.
+             */
+
+            if (uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                    .Select(x => x.Name).Concat(issuers);
 
 #if DEBUG
-                //check if in debug. add value that is hard coded just for that use.
-                _issuerKeys = _issuerKeys.Concat(new[]
-                {
-                    conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren().First().Value
-                });
+            /*
+             * check if in debug. add value that is hard coded just for that use.
+             */
+
+            issuerKeys = issuerKeys.Concat(conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
+                .Select(x => x.Value));
 #endif
-            }
-            else if (uow.Situation == ContextType.UnitTest)
-            {
-                _issuers = (uow.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
-
-                _issuerKeys = (uow.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.IssuerKey);
-
-                _clients = (uow.ClientRepo.GetAsync().Result)
-                    .Select(x => x.Name);
-
-                //check if issuer compatibility enabled. means no env salt.
-                if (uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
-                    _issuers = (uow.IssuerRepo.GetAsync().Result)
-                        .Select(x => x.Name).Concat(_issuers);
-            }
-            else
-                throw new NotSupportedException();
 
             sc.AddLogging(log => log.AddSerilog());
             sc.AddCors();
@@ -139,9 +108,9 @@ namespace Bhbk.WebApi.Identity.Admin
                 bearer.IncludeErrorDetails = true;
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuers = _issuers.ToArray(),
-                    IssuerSigningKeys = _issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
-                    ValidAudiences = _clients.ToArray(),
+                    ValidIssuers = issuers.ToArray(),
+                    IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
+                    ValidAudiences = clients.ToArray(),
                     AudienceValidator = Bhbk.Lib.Identity.Validators.ClientValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -154,10 +123,6 @@ namespace Bhbk.WebApi.Identity.Admin
             });
             sc.AddSession();
             sc.AddMvc();
-            sc.AddMvc().AddMvcOptions(binder =>
-            {
-                binder.UseBhbkPagingBinderProvider();
-            });
             sc.AddMvc().AddControllersAsServices();
             sc.AddMvc().AddJsonOptions(json =>
             {

@@ -5,11 +5,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppIssuer
-    {
-
-    }
-
     public abstract class IssuerBase
     {
         [Required]

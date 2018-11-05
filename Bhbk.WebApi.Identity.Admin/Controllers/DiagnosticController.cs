@@ -1,12 +1,8 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Primitives;
+﻿using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
@@ -18,9 +14,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class DiagnosticController : BaseController
     {
         public DiagnosticController() { }
-
-        public DiagnosticController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)

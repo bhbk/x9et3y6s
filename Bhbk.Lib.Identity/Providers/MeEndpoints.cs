@@ -7,8 +7,20 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Helpers
+namespace Bhbk.Lib.Identity.Providers
 {
+    public class MeClient : AdminEndpoints
+    {
+        public MeClient(IConfigurationRoot conf, ContextType situation)
+            : base(conf, situation) { }
+    }
+
+    public class MeTester : AdminEndpoints
+    {
+        public MeTester(IConfigurationRoot conf, TestServer server)
+            : base(conf, server) { }
+    }
+
     public class MeEndpoints
     {
         protected readonly IConfigurationRoot _conf;

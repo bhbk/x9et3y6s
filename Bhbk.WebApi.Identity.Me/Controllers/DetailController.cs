@@ -1,15 +1,11 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
@@ -18,9 +14,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     public class DetailController : BaseController
     {
         public DetailController() { }
-
-        public DetailController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetDetailV1()

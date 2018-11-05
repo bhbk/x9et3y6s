@@ -1,14 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -21,9 +17,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     public class OAuth2Controller : BaseController
     {
         public OAuth2Controller() { }
-
-        public OAuth2Controller(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1/refresh/{userID}"), HttpGet]
         [Route("v2/refresh/{userID}"), HttpGet]

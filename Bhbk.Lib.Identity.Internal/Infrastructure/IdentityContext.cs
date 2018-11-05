@@ -5,7 +5,6 @@ using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Repository;
-using Bhbk.Lib.Identity.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -56,9 +55,9 @@ namespace Bhbk.Lib.Identity.Infrastructure
             _context = context;
             _situation = status;
 
-            _convert = new MapperConfiguration(config =>
+            _convert = new MapperConfiguration(x =>
             {
-                config.AddProfile<IdentityMappings>();
+                x.AddProfile<IdentityMappings>();
             }).CreateMapper();
 
             _activityRepo = new ActivityRepository(_context);

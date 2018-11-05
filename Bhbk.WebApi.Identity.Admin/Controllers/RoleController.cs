@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -21,9 +18,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class RoleController : BaseController
     {
         public RoleController() { }
-
-        public RoleController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1/{roleID:guid}/add/{userID:guid}"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -105,8 +99,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetRolesV1([FromQuery] Paging model)
+        [Route("v1/{roleValue}"), HttpPost]
+        public async Task<IActionResult> GetRoleV1([FromBody] string roleValue)
+        {
+            Guid roleID;
+            AppRole role;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(roleValue, out roleID))
+                role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
+            else
+                role = await UoW.CustomRoleMgr.FindByNameAsync(roleValue.ToString());
+
+            if (role == null)
+                return NotFound(Strings.MsgRoleNotExist);
+
+            return Ok(UoW.Convert.Map<RoleResult>(role));
+        }
+
+        [Route("v1/pages"), HttpPost]
+        public async Task<IActionResult> GetRolesPageV1([FromBody] TuplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -117,40 +129,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = x => true;
             else
                 expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower())
-                || x.LastUpdated.ToString().ToLower().Contains(model.Filter.ToLower())
-                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+                || x.Description.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.CustomRoleMgr.Store.Count(expr);
-            var roles = UoW.CustomRoleMgr.Store.Get(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
+            var list = UoW.CustomRoleMgr.Store.Get(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserRole));
 
-            var result = roles.Select(x => UoW.Convert.Map<RoleResult>(x));
+            var result = list.Select(x => UoW.Convert.Map<RoleResult>(x));
 
-            return Ok(new { Count = total, Items = result });
-        }
-
-        [Route("v1/{roleID:guid}"), HttpGet]
-        public async Task<IActionResult> GetRoleV1([FromRoute] Guid roleID)
-        {
-            var role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
-
-            if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
-
-            return Ok(UoW.Convert.Map<RoleResult>(role));
-        }
-
-        [Route("v1/{roleName}"), HttpGet]
-        public async Task<IActionResult> GetRoleV1([FromRoute] string roleName)
-        {
-            var role = await UoW.CustomRoleMgr.FindByNameAsync(roleName.ToString());
-
-            if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
-
-            return Ok(UoW.Convert.Map<RoleResult>(role));
+            return Ok(new { Count = total, List = result });
         }
 
         [Route("v1/{roleID:guid}/users"), HttpGet]

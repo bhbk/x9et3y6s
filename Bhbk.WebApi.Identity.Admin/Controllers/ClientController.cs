@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -21,9 +18,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class ClientController : BaseController
     {
         public ClientController() { }
-
-        public ClientController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1"), HttpPost] 
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -73,10 +67,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{clientID:guid}"), HttpGet]
-        public async Task<IActionResult> GetClientV1([FromRoute] Guid clientID)
+        [Route("v1/{clientValue}"), HttpGet]
+        public async Task<IActionResult> GetClientV1([FromRoute] string clientValue)
         {
-            var client = await UoW.ClientRepo.GetAsync(clientID);
+            Guid clientID;
+            AppClient client;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(clientValue, out clientID))
+                client = await UoW.ClientRepo.GetAsync(clientID);
+            else
+                client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientValue)).SingleOrDefault();
 
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
@@ -84,19 +85,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Convert.Map<ClientResult>(client));
         }
 
-        [Route("v1/{clientName}"), HttpGet]
-        public async Task<IActionResult> GetClientV1([FromRoute] string clientName)
-        {
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientName)).SingleOrDefault();
-
-            if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
-
-            return Ok(UoW.Convert.Map<ClientResult>(client));
-        }
-
-        [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetClientsV1([FromQuery] Paging model)
+        [Route("v1/pages"), HttpPost]
+        public async Task<IActionResult> GetClientsPageV1([FromBody] TuplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -107,17 +97,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = x => true;
             else
                 expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower())
-                || x.Created.ToString().ToLower().Contains(model.Filter.ToLower());
+                || x.Description.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.ClientRepo.Count(expr);
-            var clients = await UoW.ClientRepo.GetAsync(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)).Skip(model.Skip).Take(model.Take),
+            var list = await UoW.ClientRepo.GetAsync(expr,
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppRole));
 
-            var result = clients.Select(x => UoW.Convert.Map<ClientResult>(x));
+            var result = list.Select(x => UoW.Convert.Map<ClientResult>(x));
 
-            return Ok(new { Count = total, Items = result });
+            return Ok(new { Count = total, List = result });
         }
 
         [Route("v1/{clientID:guid}/roles"), HttpGet]

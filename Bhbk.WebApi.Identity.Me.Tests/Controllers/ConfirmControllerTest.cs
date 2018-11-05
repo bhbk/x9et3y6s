@@ -1,36 +1,50 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
-    [TestClass]
-    public class ConfirmControllerTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class ConfirmControllerTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
+        private readonly HttpClient _client;
+        private readonly IServiceProvider _sp;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
 
-        public ConfirmControllerTest()
+        public ConfirmControllerTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
+            _client = fake.CreateClient();
+            _sp = fake.Server.Host.Services;
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
         }
 
-        [TestMethod]
-        public async Task Api_Me_ConfirmV1_Email_Fail()
+        [Fact]
+        public async Task Me_ConfirmV1_Email_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ConfirmController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
@@ -45,13 +59,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ConfirmV1_Email_Success()
+        [Fact]
+        public async Task Me_ConfirmV1_Email_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = this._sp;
 
-            var controller = new ConfirmController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
@@ -65,13 +83,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ConfirmV1_Password_Fail()
+        [Fact]
+        public async Task Me_ConfirmV1_Password_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = this._sp;
 
-            var controller = new ConfirmController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
@@ -86,13 +108,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ConfirmV1_Password_Success()
+        [Fact]
+        public async Task Me_ConfirmV1_Password_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = this._sp;
 
-            var controller = new ConfirmController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
@@ -106,13 +132,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ConfirmV1_PhoneNumber_Fail()
+        [Fact]
+        public async Task Me_ConfirmV1_PhoneNumber_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = this._sp;
 
-            var controller = new ConfirmController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
@@ -126,13 +156,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ConfirmV1_PhoneNumber_Success()
+        [Fact]
+        public async Task Me_ConfirmV1_PhoneNumber_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = this._sp;
 
-            var controller = new ConfirmController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 

@@ -1,12 +1,8 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Primitives;
+﻿using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 
@@ -17,10 +13,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     public class ConfirmController : BaseController
     {
         public ConfirmController() { }
-
-        public ConfirmController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
-
 
         [Route("v1/email/{userID:guid}"), HttpPut]
         public async Task<IActionResult> ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)

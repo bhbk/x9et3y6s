@@ -5,26 +5,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppClient
-    {
-
-    }
-
-    public abstract class ClientBase
+    public abstract class RoleBase
     {
         [Required]
-        public Guid IssuerId { get; set; }
+        public Guid ClientId { get; set; }
 
         [Required]
         public string Name { get; set; }
 
         public string Description { get; set; }
-
-        [Required]
-        public string ClientKey { get; set; }
-
-        [Required]
-        public string ClientType { get; set; }
 
         [Required]
         public bool Enabled { get; set; }
@@ -33,12 +22,12 @@ namespace Bhbk.Lib.Identity.Models
         public bool Immutable { get; set; }
     }
 
-    public class ClientCreate : ClientBase
+    public class RoleCreate : RoleBase
     {
         public Guid ActorId { get; set; }
     }
 
-    public class ClientResult : ClientBase
+    public class RoleResult : RoleBase
     {
         [Required]
         public Guid Id { get; set; }
@@ -47,10 +36,10 @@ namespace Bhbk.Lib.Identity.Models
 
         public Nullable<DateTime> LastUpdated { get; set; }
 
-        public IList<string> Roles { get; set; }
+        public IList<string> Users { get; set; }
     }
 
-    public class ClientUpdate : ClientBase
+    public class RoleUpdate : RoleBase
     {
         [Required]
         public Guid Id { get; set; }

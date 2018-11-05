@@ -1,16 +1,10 @@
-﻿using Bhbk.Lib.Core.Interfaces;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppActivity : IGenericActivity
-    {
-
-    }
-
     public class ActivityCreate
     {
         public EntityEntry Entry { get; }

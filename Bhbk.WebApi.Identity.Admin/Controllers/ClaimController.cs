@@ -1,11 +1,7 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
-using Bhbk.Lib.Identity.Primitives;
+﻿using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -16,9 +12,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class ClaimController : BaseController
     {
         public ClaimController() { }
-
-        public ClaimController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1/{userID:guid}"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
@@ -32,15 +25,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserInvalid);
 
-            else
-            {
-                var result = await UoW.CustomUserMgr.AddClaimAsync(user, model);
+            var result = await UoW.CustomUserMgr.AddClaimAsync(user, model);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+            if (!result.Succeeded)
+                return GetErrorResult(result);
 
-                return Ok(model);
-            }
+            return Ok(model);
         }
 
         [Route("v1/{userID:guid}"), HttpPut]
@@ -54,16 +44,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
                 return NotFound(Strings.MsgUserInvalid);
-            
-            else
-            {
-                var result = await UoW.CustomUserMgr.RemoveClaimAsync(user, claim);
 
-                if (!result.Succeeded)
-                    return GetErrorResult(result);
+            var result = await UoW.CustomUserMgr.RemoveClaimAsync(user, claim);
 
-                return NoContent();
-            }
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
+            return NoContent();
         }
 
         [Route("v1/{userID:guid}"), HttpGet]

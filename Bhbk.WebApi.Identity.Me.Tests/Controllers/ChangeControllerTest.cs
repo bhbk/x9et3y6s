@@ -1,35 +1,49 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
-    [TestClass]
-    public class ChangeControllerTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class ChangeControllerTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
+        private readonly HttpClient _client;
+        private readonly IServiceProvider _sp;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
 
-        public ChangeControllerTest()
+        public ChangeControllerTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
+            _client = fake.CreateClient();
+            _sp = fake.Server.Host.Services;
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
         }
 
-        [TestMethod]
-        public async Task Api_Me_ChangeV1_Email_Fail()
+        [Fact]
+        public async Task Me_ChangeV1_Email_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ChangeController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ChangeController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1;
 
@@ -47,13 +61,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ChangeV1_Email_Success()
+        [Fact]
+        public async Task Me_ChangeV1_Email_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ChangeController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ChangeController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newEmail = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1;
 
@@ -72,13 +90,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
-        [TestMethod]
-        public async Task Api_Me_ChangeV1_Password_Fail()
+        [Fact]
+        public async Task Me_ChangeV1_Password_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ChangeController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ChangeController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
@@ -95,13 +117,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ChangeV1_Password_Success()
+        [Fact]
+        public async Task Me_ChangeV1_Password_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ChangeController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ChangeController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             controller.SetUser(user.Id);
@@ -119,13 +145,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             var data = ok.Value.Should().BeAssignableTo<string>().Subject;
         }
 
-        [TestMethod]
-        public async Task Api_Me_ChangeV1_Phone_Fail()
+        [Fact]
+        public async Task Me_ChangeV1_Phone_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ChangeController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ChangeController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
@@ -143,13 +173,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
-        [TestMethod]
-        public async Task Api_Me_ChangeV1_Phone_Success()
+        [Fact]
+        public async Task Me_ChangeV1_Phone_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new ChangeController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new ChangeController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 

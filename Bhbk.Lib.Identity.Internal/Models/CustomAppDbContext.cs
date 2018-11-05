@@ -42,9 +42,9 @@ namespace Bhbk.Lib.Identity.Models
                 .AddEnvironmentVariables()
                 .Build();
 
-            _convert = new MapperConfiguration(config =>
+            _convert = new MapperConfiguration(x =>
             {
-                config.AddProfile<IdentityMappings>();
+                x.AddProfile<IdentityMappings>();
             }).CreateMapper();
 
             _fieldsExcluded = _conf.GetSection("IdentityActivity:FieldsExcluded").GetChildren().Select(x => x.Value).ToList();

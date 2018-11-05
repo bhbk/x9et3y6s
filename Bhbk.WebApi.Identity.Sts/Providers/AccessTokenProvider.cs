@@ -13,7 +13,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-//https://blogs.ibs.com/2017/12/12/token-based-authentication-using-asp-net-core-2-0/
+//https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+//https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {
@@ -82,9 +83,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
-                    issuer = uow.IssuerRepo.GetAsync(issuerID).Result;
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
                 else
-                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).Single();
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
 
                 if (issuer == null)
                 {
@@ -146,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out clientID))
-                            client = uow.ClientRepo.GetAsync(clientID).Result;
+                            client = (uow.ClientRepo.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
                         else
                             client = (uow.ClientRepo.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
 
@@ -280,7 +281,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
-                    issuer = uow.IssuerRepo.GetAsync(issuerID).Result;
+                    issuer = (uow.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
                 else
                     issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
 
@@ -303,7 +304,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
-                    client = uow.ClientRepo.GetAsync(clientID).Result;
+                    client = (uow.ClientRepo.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
                 else
                     client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
 
@@ -457,7 +458,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 //check if issuer compatibility mode enabled.
-                if(!uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                if (!uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
                     return _next(context);
 
                 /*

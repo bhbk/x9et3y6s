@@ -16,28 +16,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 {
     public class MaintainActivityTask : BackgroundService
     {
-        private readonly IConfigurationRoot _conf;
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings-api.json");
+        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
-        public MaintainActivityTask(IServiceCollection sc)
+        public MaintainActivityTask(IServiceCollection sc, IConfigurationRoot conf)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_api.DirectoryName)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
-                .Build();
-
-            _delay = int.Parse(_conf["Tasks:MaintainActivity:PollingDelay"]);
-            _auditable = int.Parse(_conf["Tasks:MaintainActivity:HoldAuditable"]);
-            _transient = int.Parse(_conf["Tasks:MaintainActivity:HoldTransient"]);
+            _delay = int.Parse(conf["Tasks:MaintainActivity:PollingDelay"]);
+            _auditable = int.Parse(conf["Tasks:MaintainActivity:HoldAuditable"]);
+            _transient = int.Parse(conf["Tasks:MaintainActivity:HoldTransient"]);
 
             _serializer = new JsonSerializerSettings
             {

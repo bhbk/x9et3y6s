@@ -1,41 +1,56 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {
-    [TestClass]
-    public class IssuerControllerTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class IssuerControllerTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
+        private readonly HttpClient _client;
+        private readonly IServiceProvider _sp;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly AdminClient _admin;
 
-        public IssuerControllerTest()
+        public IssuerControllerTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
+            _client = fake.CreateClient();
+            _sp = fake.Server.Host.Services;
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
+            _admin = new AdminClient(_conf, _uow.Situation, _client);
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_Create_Success()
+        [Fact]
+        public async Task Admin_IssuerV1_Create_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new IssuerController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new IssuerController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var model = new IssuerCreate()
             {
                 Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestIssuer1,
@@ -53,20 +68,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             data.Name.Should().Be(model.Name);
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_Delete_Fail_Immutable()
+        [Fact]
+        public async Task Admin_IssuerV1_Delete_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new IssuerController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new IssuerController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             issuer.Immutable = true;
             await _uow.IssuerRepo.UpdateAsync(issuer);
             await _uow.CommitAsync();
-        
+
             controller.SetUser(user.Id);
 
             var result = await controller.DeleteIssuerV1(issuer.Id) as BadRequestObjectResult;
@@ -76,13 +95,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_Delete_Success()
+        [Fact]
+        public async Task Admin_IssuerV1_Delete_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new IssuerController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new IssuerController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
@@ -95,128 +118,70 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             check.Should().BeFalse();
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_GetById_Success()
+        [Fact]
+        public async Task Admin_IssuerV1_GetList_Fail()
         {
-            _tests.Destroy();
-            _tests.Create();
-
-            var controller = new IssuerController(_conf, _uow, _tasks);
-            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-
-            var result = await controller.GetIssuerV1(issuer.Id) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
-
-            data.Id.Should().Be(issuer.Id);
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_GetByName_Success()
-        {
-            _tests.Destroy();
-            _tests.Create();
-
-            var controller = new IssuerController(_conf, _uow, _tasks);
-            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-
-            var result = await controller.GetIssuerV1(issuer.Name) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
-
-            data.Id.Should().Be(issuer.Id);
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_GetList_Fail_Auth()
-        {
-            _tests.Destroy();
-            _tests.CreateRandom(10);
-            _defaults.Create();
-
-            var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", RandomValues.CreateBase64String(32));
-            request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            string orderBy = "name";
-            ushort take = 3;
-            ushort skip = 1;
-
-            var response = await request.GetAsync("/issuer/v1?"
-                + "orderBy=" + orderBy + "&"
-                + "take=" + take.ToString() + "&"
-                + "skip=" + skip.ToString());
-
-            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        }
-
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_GetList_Fail_ParamInvalid()
-        {
-            _tests.Destroy();
-            _tests.CreateRandom(10);
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).CreateRandom(10);
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
 
-            var clients = new List<AppClient>();
-            clients.Add(client);
+            var orders = new List<Tuple<string, string>>();
+            orders.Add(new Tuple<string, string>("name", "asc"));
 
-            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, clients, user).Result;
+            var pager = new TuplePager()
+            {
+                Filter = string.Empty,
+                Orders = orders,
+            };
 
-            var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
-            request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var response = await _admin.IssuerGetPagesV1(RandomValues.CreateBase64String(32), pager);
 
-            string orderBy = "name";
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-            var response = await request.GetAsync("/issuer/v1?"
-                + "orderBy=" + orderBy);
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, new List<AppClient> { client }, user);
+
+            response = await _admin.IssuerGetPagesV1(access.token, pager);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_GetList_Success()
+        [Fact]
+        public async Task Admin_IssuerV1_GetList_Success()
         {
-            _tests.Destroy();
-            _tests.CreateRandom(10);
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).CreateRandom(10);
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
 
-            var clients = new List<AppClient>();
-            clients.Add(client);
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, new List<AppClient> { client }, user);
 
-            var access = JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, clients, user).Result;
+            var take = 3;
+            var orders = new List<Tuple<string, string>>();
+            orders.Add(new Tuple<string, string>("name", "asc"));
 
-            var request = _owin.CreateClient();
-            request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", access.token);
-            request.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            string order = "asc";
-            string orderBy = "name";
-            ushort skip = 1;
-            ushort take = 3;
-
-            var response = await request.GetAsync("/issuer/v1?"
-                + "filter=" + string.Empty + "&"
-                + "order=" + order + "&"
-                + "orderBy=" + orderBy + "&"
-                + "skip=" + skip.ToString() + "&"
-                + "take=" + take.ToString());
+            var response = await _admin.IssuerGetPagesV1(access.token,
+                new TuplePager()
+                {
+                    Filter = string.Empty,
+                    Orders = orders,
+                    Skip = 1,
+                    Take = take,
+                });
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var data = JArray.Parse(ok["items"].ToString()).ToObject<IEnumerable<IssuerResult>>();
+            var data = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<IssuerResult>>();
             var total = (int)ok["count"];
 
             data.Should().BeAssignableTo<IEnumerable<IssuerResult>>();
@@ -224,13 +189,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             total.Should().Be(await _uow.IssuerRepo.Count());
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_GetClientList_Success()
+        [Fact]
+        public async Task Admin_IssuerV1_GetListClients_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new IssuerController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new IssuerController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
 
             var result = await controller.GetIssuerClientsV1(issuer.Id) as OkObjectResult;
@@ -240,13 +209,43 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             data.Count().Should().Be((await _uow.IssuerRepo.GetClientsAsync(issuer.Id)).Count());
         }
 
-        [TestMethod]
-        public async Task Api_Admin_IssuerV1_Update_Success()
+        [Fact]
+        public async Task Admin_IssuerV1_Get_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var controller = new IssuerController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
 
-            var controller = new IssuerController(_conf, _uow, _tasks);
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
+            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+
+            var result = await controller.GetIssuerV1(issuer.Id.ToString()) as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
+
+            data.Id.Should().Be(issuer.Id);
+
+            result = await controller.GetIssuerV1(issuer.Name) as OkObjectResult;
+            ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            data = ok.Value.Should().BeAssignableTo<IssuerResult>().Subject;
+
+            data.Id.Should().Be(issuer.Id);
+        }
+
+        [Fact]
+        public async Task Admin_IssuerV1_Update_Success()
+        {
+            var controller = new IssuerController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _sp;
+
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 

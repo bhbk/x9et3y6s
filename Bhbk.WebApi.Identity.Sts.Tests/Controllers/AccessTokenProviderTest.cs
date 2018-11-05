@@ -1,11 +1,12 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,28 +16,31 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
-    [TestClass]
-    public class AccessTokenProviderTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class AccessTokenProviderTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
-        private StsTester _sts;
+        private readonly HttpClient _client;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly StsClient _sts;
 
-        public AccessTokenProviderTest()
+        public AccessTokenProviderTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
-
-            _sts = new StsTester(_conf, _owin);
+            _client = fake.CreateClient();
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
+            _sts = new StsClient(_conf, _uow.Situation, _client);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_ClientDisabled()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_ClientDisabled()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -50,16 +54,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_ClientNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_ClientNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = RandomValues.CreateBase64String(8);
@@ -69,16 +75,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_ClientUndefined()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_ClientUndefined()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = string.Empty;
@@ -88,16 +96,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerDisabled()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_IssuerDisabled()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -111,11 +121,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_IssuerNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = RandomValues.CreateBase64String(8);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -126,11 +136,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerUndefined()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_IssuerUndefined()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = string.Empty;
             var client = (await _uow.ClientRepo.GetAsync()).First();
@@ -141,13 +151,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_IssuerCompatibilty()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_IssuerCompatibilty()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
-            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
@@ -158,11 +167,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_UserNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -172,16 +181,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserLocked()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_UserLocked()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -195,16 +206,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserUndefined()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_UserUndefined()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -214,16 +227,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Fail_UserPassword()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Fail_UserPassword()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -235,16 +250,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), password);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Success_Client_ById()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Success_Client_ById()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -260,6 +277,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -271,11 +290,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Success_Client_ByName()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Success_Client_ByName()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -291,6 +310,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = JwtSecureProvider.CanReadToken(access);
             check.Should().BeTrue();
 
+            _uow.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
+
             result = await _sts.AccessTokenV1CompatibilityModeIssuer(client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -302,11 +323,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Success_IssuerCompatibilty()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Success_IssuerCompatibilty()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -325,11 +346,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV1_Success_IssuerSalt()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV1_Success_IssuerSalt()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -360,11 +381,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Value.Split(':')[1].Should().Be(salt);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientDisabled_Multiple()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_ClientDisabled_Multiple()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -373,7 +394,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             if (clientA.Id == clientB.Id)
-                Assert.Fail();
+                return;
 
             clientA.Enabled = true;
             clientB.Enabled = false;
@@ -385,11 +406,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientDisabled_Single()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_ClientDisabled_Single()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -405,11 +426,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientNotFound_Multiple()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_ClientNotFound_Multiple()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -421,11 +442,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_ClientNotFound_Single()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_ClientNotFound_Single()
         {
-            _tests.Destroy();
-            _tests.Create();
+            var _sts = new StsClient(_conf, _uow.Situation, _client);
+
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { RandomValues.CreateBase64String(8) };
@@ -436,11 +459,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_IssuerDisabled()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_IssuerDisabled()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -455,11 +478,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_IssuerNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_IssuerNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = RandomValues.CreateBase64String(8);
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -471,11 +494,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_IssuerUndefined()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_IssuerUndefined()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = string.Empty;
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -487,11 +510,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserLocked()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_UserLocked()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -507,11 +530,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_UserNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -523,11 +546,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserUndefined()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_UserUndefined()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -538,11 +561,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Fail_UserPassword()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Fail_UserPassword()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -554,11 +577,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientSingle_ById()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ById()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -576,11 +599,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientSingle_ByName()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ByName()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -598,11 +621,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientMultiple_ById()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientMultiple_ById()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -611,7 +634,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             if (clientA.Id == clientB.Id)
-                Assert.Fail();
+                return;
 
             var roleB = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole2).Single();
             await _uow.CustomUserMgr.AddToRoleAsync(user, roleB.Name);
@@ -627,11 +650,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientMultiple_ByName()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientMultiple_ByName()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clientA = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -640,7 +663,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
 
             if (clientA.Id == clientB.Id)
-                Assert.Fail();
+                return;
 
             var roleB = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole2).Single();
             await _uow.CustomUserMgr.AddToRoleAsync(user, roleB.Name);
@@ -656,11 +679,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Success_ClientUndefined()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientUndefined()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { string.Empty };
@@ -677,11 +700,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.Should().BeTrue();
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_AccessV2_Success_IssuerSalt()
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_IssuerSalt()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { string.Empty };

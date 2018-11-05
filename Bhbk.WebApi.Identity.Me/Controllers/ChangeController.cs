@@ -1,15 +1,12 @@
 ﻿using Bhbk.Lib.Alert.Factory;
 using Bhbk.Lib.Alert.Helpers;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 using System.Web;
@@ -20,9 +17,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     public class ChangeController : BaseController
     {
         public ChangeController() { }
-
-        public ChangeController(IConfigurationRoot conf, IIdentityContext<AppDbContext> uow, IHostedService[] tasks)
-            : base(conf, uow, tasks) { }
 
         [Route("v1/email"), HttpPut]
         public async Task<IActionResult> ChangeEmailV1([FromBody] UserChangeEmail model)

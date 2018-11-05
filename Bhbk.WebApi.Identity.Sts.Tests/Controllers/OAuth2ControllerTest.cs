@@ -1,9 +1,11 @@
-﻿using Bhbk.Lib.Identity.Helpers;
+﻿using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -13,28 +15,31 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
-    [TestClass]
-    public class OAuth2ControllerTest : StartupTest
+    [Collection("NoParallelExecute")]
+    public class OAuth2ControllerTest : IClassFixture<StartupTest>
     {
-        private TestServer _owin;
-        private StsTester _sts;
+        private readonly HttpClient _client;
+        private readonly IConfigurationRoot _conf;
+        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly StsClient _sts;
 
-        public OAuth2ControllerTest()
+        public OAuth2ControllerTest(StartupTest fake)
         {
-            _owin = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupTest>());
-
-            _sts = new StsTester(_conf, _owin);
+            _client = fake.CreateClient();
+            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
+            _sts = new StsClient(_conf, _uow.Situation, _client);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV1_GetList_Fail_Auth()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_GetList_Fail_Auth()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -49,15 +54,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _sts.RefreshTokenGetListV1(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV1_GetList_Success()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_GetList_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
@@ -75,11 +80,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV1_RevokeAll_Fail_Auth()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_RevokeAll_Fail_Auth()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -94,15 +99,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _sts.RefreshTokenDeleteAllV1(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV1_RevokeAll_Success()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_RevokeAll_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
@@ -125,11 +130,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV1_RevokeOne_Fail_Auth()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_RevokeOne_Fail_Auth()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -145,15 +150,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _sts.RefreshTokenDeleteV1(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV1_RevokeOne_Success()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_RevokeOne_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
@@ -176,11 +181,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV2_GetList_Fail_Auth()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_GetList_Fail_Auth()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { string.Empty };
@@ -195,15 +200,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _sts.RefreshTokenGetListV2(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV2_GetList_Success()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_GetList_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var clients = new List<string> { string.Empty };
@@ -221,11 +226,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV2_RevokeAll_Fail_Auth()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_RevokeAll_Fail_Auth()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { string.Empty };
@@ -240,15 +245,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _sts.RefreshTokenDeleteAllV2(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV2_RevokeAll_Success()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_RevokeAll_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var clients = new List<string> { string.Empty };
@@ -271,11 +276,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV2_RevokeOne_Fail_Auth()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_RevokeOne_Fail_Auth()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { string.Empty };
@@ -291,15 +296,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var result = await _sts.RefreshTokenDeleteV2(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RefreshV2_RevokeOne_Success()
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_RevokeOne_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
-            _defaults.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
+            new DefaultData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var clients = new List<string> { string.Empty };
@@ -322,11 +327,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RequestCodeV1_Fail_NotImplemented()
+        [Fact]
+        public async Task Sts_OAuth2_RequestCodeV1_Fail_NotImplemented()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -339,11 +344,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RequestCodeV2_Fail_ClientNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_RequestCodeV2_Fail_ClientNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -356,11 +361,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RequestCodeV2_Fail_IssuerNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_RequestCodeV2_Fail_IssuerNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -373,11 +378,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RequestCodeV2_Fail_UriNotValid()
+        [Fact]
+        public async Task Sts_OAuth2_RequestCodeV2_Fail_UriNotValid()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -390,11 +395,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod]
-        public async Task Api_Sts_OAuth2_RequestCodeV2_Fail_UserNotFound()
+        [Fact]
+        public async Task Sts_OAuth2_RequestCodeV2_Fail_UserNotFound()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -407,11 +412,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [TestMethod, Ignore]
-        public async Task Api_Sts_OAuth2_RequestCodeV2_Success()
+        [Fact(Skip = "Not Implemented")]
+        public async Task Sts_OAuth2_RequestCodeV2_Success()
         {
-            _tests.Destroy();
-            _tests.Create();
+            new TestData(_uow).Destroy();
+            new TestData(_uow).Create();
 
             var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
