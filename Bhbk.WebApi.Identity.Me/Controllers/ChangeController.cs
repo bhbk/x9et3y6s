@@ -1,13 +1,14 @@
 ﻿using Bhbk.Lib.Alert.Factory;
 using Bhbk.Lib.Alert.Helpers;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -24,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -44,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = LinkBuilder.ConfirmEmail(Conf, user, token);
+            var url = UrlBuilder.ConfirmEmail(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 
@@ -76,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -87,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            else if (!await UoW.UserMgr.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserRepo.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -99,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = LinkBuilder.ConfirmPassword(Conf, user, token);
+            var url = UrlBuilder.ConfirmPassword(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 
@@ -131,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -153,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = LinkBuilder.ConfirmPassword(Conf, user, token);
+            var url = UrlBuilder.ConfirmPassword(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 

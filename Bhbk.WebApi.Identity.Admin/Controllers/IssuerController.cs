@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +21,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IssuerController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> CreateIssuerV1([FromBody] IssuerCreate model)
         {
             if (!ModelState.IsValid)
@@ -35,14 +36,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var result = await UoW.IssuerRepo.CreateAsync(UoW.Convert.Map<AppIssuer>(model));
 
-            return Ok(UoW.Convert.Map<IssuerResult>(result));
+            return Ok(UoW.Convert.Map<IssuerModel>(result));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> DeleteIssuerV1([FromRoute] Guid issuerID)
         {
-            var issuer = await UoW.IssuerRepo.GetAsync(issuerID);
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
             if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
@@ -67,18 +68,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             AppIssuer issuer;
 
             if (Guid.TryParse(issuerValue, out issuerID))
-                issuer = await UoW.IssuerRepo.GetAsync(issuerID);
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
             else
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
 
             if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
-            return Ok(UoW.Convert.Map<IssuerResult>(issuer));
+            return Ok(UoW.Convert.Map<IssuerModel>(issuer));
         }
 
         [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetIssuersPageV1([FromBody] TuplePager model)
+        public async Task<IActionResult> GetIssuersPageV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -96,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppClient));
 
-            var result = list.Select(x => UoW.Convert.Map<IssuerResult>(x));
+            var result = list.Select(x => UoW.Convert.Map<IssuerModel>(x));
 
             return Ok(new { Count = total, List = result });
         }
@@ -104,20 +105,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{issuerID:guid}/clients"), HttpGet]
         public async Task<IActionResult> GetIssuerClientsV1([FromRoute] Guid issuerID)
         {
-            var issuer = await UoW.IssuerRepo.GetAsync(issuerID);
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
             if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
             var clients = await UoW.IssuerRepo.GetClientsAsync(issuerID);
 
-            var result = clients.Select(x => UoW.Convert.Map<ClientResult>(x)).ToList();
+            var result = clients.Select(x => UoW.Convert.Map<ClientModel>(x)).ToList();
 
             return Ok(result);
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Roles = "(Built-In) Administrators")]
+        [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> UpdateIssuerV1([FromBody] IssuerUpdate model)
         {
             if (!ModelState.IsValid)
@@ -125,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var issuer = await UoW.IssuerRepo.GetAsync(model.Id);
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
@@ -137,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Convert.Map<IssuerResult>(result));
+            return Ok(UoW.Convert.Map<IssuerModel>(result));
         }
     }
 }

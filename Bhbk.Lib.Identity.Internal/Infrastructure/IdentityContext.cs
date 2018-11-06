@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using Bhbk.Lib.Identity.Maps;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
@@ -21,8 +23,8 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private readonly ConfigRepository _configRepo;
         private readonly IssuerRepository _issuerRepo;
         private readonly LoginRepository _loginRepo;
-        private readonly RoleManagerExt _roleMgr;
-        private readonly UserManagerExt _userMgr;
+        private readonly RoleRepository _roleRepo;
+        private readonly UserRepository _userRepo;
         private UserQuotes _userQuote;
 
         public IdentityContext(DbContextOptions<AppDbContext> options, ContextType situation, IConfigurationRoot conf)
@@ -49,18 +51,20 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             _convert = new MapperConfiguration(x =>
             {
-                x.AddProfile<IdentityMappings>();
+                x.AddProfile<ClientMaps>();
+                x.AddProfile<IssuerMaps>();
+                x.AddProfile<LoginMaps>();
+                x.AddProfile<RoleMaps>();
+                x.AddProfile<UserMaps>();
             }).CreateMapper();
 
-            _activityRepo = new ActivityRepository(_context);
-            _clientRepo = new ClientRepository(_context);
-            _configRepo = new ConfigRepository(conf);
-            _issuerRepo = new IssuerRepository(_context);
-            _loginRepo = new LoginRepository(_context);
-            _roleMgr = new RoleManagerExt(new RoleStoreExt(_context));
-            _userMgr = new UserManagerExt(new UserStoreExt(_context));
-
-            _issuerRepo.Salt = conf["IdentityTenants:Salt"];
+            _activityRepo = new ActivityRepository(_context, _situation);
+            _clientRepo = new ClientRepository(_context, _situation);
+            _configRepo = new ConfigRepository(conf, _situation);
+            _issuerRepo = new IssuerRepository(_context, _situation, conf["IdentityTenants:Salt"]);
+            _loginRepo = new LoginRepository(_context, _situation);
+            _roleRepo = new RoleRepository(_context, _situation);
+            _userRepo = new UserRepository(_context, _situation, conf);
         }
 
         public AppDbContext Context
@@ -127,19 +131,19 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public RoleManagerExt RoleMgr
+        public RoleRepository RoleRepo
         {
             get
             {
-                return _roleMgr;
+                return _roleRepo;
             }
         }
 
-        public UserManagerExt UserMgr
+        public UserRepository UserRepo
         {
             get
             {
-                return _userMgr;
+                return _userRepo;
             }
         }
 

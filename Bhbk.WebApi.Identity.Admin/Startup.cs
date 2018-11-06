@@ -3,7 +3,7 @@ using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -40,8 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 .Build();
 
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(conf["Databases:IdentityEntities"])
-                .EnableSensitiveDataLogging();
+                .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             sc.AddSingleton(conf);
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
@@ -122,6 +121,11 @@ namespace Bhbk.WebApi.Identity.Admin
                     ClockSkew = TimeSpan.Zero,
                 };
             });
+            sc.AddAuthorization(auth =>
+                auth.AddPolicy("AdministratorPolicy", policy =>
+                {
+                    policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
+                }));
             sc.AddSession();
             sc.AddMvc();
             sc.AddMvc().AddControllersAsServices();

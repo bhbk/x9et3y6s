@@ -1,4 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
@@ -37,10 +39,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             client.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(client);
+            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(client));
             await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
@@ -64,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = RandomValues.CreateBase64String(8);
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -87,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = string.Empty;
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -108,9 +110,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync()).First();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             issuer.Enabled = false;
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
@@ -136,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = RandomValues.CreateBase64String(8);
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -153,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = string.Empty;
             var client = (await _factory.UoW.ClientRepo.GetAsync()).First();
-            var user = (await _factory.UoW.UserMgr.GetAsync()).First();
+            var user = (await _factory.UoW.UserRepo.GetAsync()).First();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -193,11 +195,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
-            await _factory.UoW.UserMgr.UpdateAsync(user);
+            await _factory.UoW.UserRepo.UpdateAsync(user);
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -243,7 +245,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var password = RandomValues.CreateBase64String(8);
 
@@ -268,7 +270,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -276,11 +278,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV1>();
+            check.Should().BeAssignableTo<JwtV1>();
 
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+
+            var salt = _factory.Conf["IdentityTenants:Salt"];
+            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
@@ -288,11 +298,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            access = (string)jwt["access_token"];
+            var ok_legacy = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check_legacy = ok_legacy.ToObject<JwtV1Legacy>();
+            check_legacy.Should().BeAssignableTo<JwtV1Legacy>();
 
-            check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
+            JwtProvider.CanReadToken(check_legacy.access_token).Should().BeTrue();
+
+            var claims_legacy = JwtProvider.ReadJwtToken(check_legacy.access_token).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims_legacy.Value.Should().Be(Strings.ApiUnitTestIssuer1);
         }
 
         [Fact]
@@ -303,7 +317,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -311,11 +325,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV1>();
+            check.Should().BeAssignableTo<JwtV1>();
 
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+
+            var salt = _factory.Conf["IdentityTenants:Salt"];
+            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
@@ -323,48 +345,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            access = (string)jwt["access_token"];
+            var ok_legacy = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check_legacy = ok_legacy.ToObject<JwtV1Legacy>();
+            check_legacy.Should().BeAssignableTo<JwtV1Legacy>();
 
-            check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
-        }
+            JwtProvider.CanReadToken(check_legacy.access_token).Should().BeTrue();
 
-        [Fact]
-        public async Task Sts_OAuth2_AccessV1_Success_IssuerSalt()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
-
-            var result = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var salt = _factory.Conf["IdentityTenants:Salt"];
-
-            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
-
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
-            var refresh = (string)jwt["refresh_token"];
-
-            var check = JwtSecureProvider.ReadJwtToken(access).Claims
+            var claims_legacy = JwtProvider.ReadJwtToken(check_legacy.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-
-            check.Value.Split(':')[0].Should().Be(issuer.Name);
-            check.Value.Split(':')[1].Should().Be(salt);
-
-            check = JwtSecureProvider.ReadJwtToken(refresh).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-
-            check.Value.Split(':')[0].Should().Be(issuer.Name);
-            check.Value.Split(':')[1].Should().Be(salt);
+            claims_legacy.Value.Should().Be(Strings.ApiUnitTestIssuer1);
         }
 
         [Fact]
@@ -377,15 +366,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clientA = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clientB = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             if (clientA.Id == clientB.Id)
                 return;
 
             clientA.Enabled = true;
             clientB.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(clientA);
-            await _factory.UoW.ClientRepo.UpdateAsync(clientB);
+            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(clientA));
+            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(clientB));
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -402,10 +391,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clientA = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clientB = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             clientA.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(clientA);
+            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(clientA));
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -421,7 +410,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString(), RandomValues.CreateBase64String(8) };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -436,7 +425,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var clients = new List<string> { RandomValues.CreateBase64String(8) };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -452,7 +441,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             issuer.Enabled = false;
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
@@ -471,7 +460,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = RandomValues.CreateBase64String(8);
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer, clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -487,7 +476,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = string.Empty;
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer, clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -503,11 +492,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
-            _factory.UoW.UserMgr.UpdateAsync(user).Wait();
+            _factory.UoW.UserRepo.UpdateAsync(user).Wait();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -554,7 +543,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), RandomValues.CreateBase64String(8));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -562,47 +551,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ById()
+        public async Task Sts_OAuth2_AccessV2_Success_ClientEmpty()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var clients = new List<string> { string.Empty };
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV2>();
+            check.Should().BeAssignableTo<JwtV2>();
 
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
-        }
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
 
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ByName()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            var salt = _factory.Conf["IdentityTenants:Salt"];
+            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var clients = new List<string> { client.Name };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
-
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
         }
 
         [Fact]
@@ -615,23 +589,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clientA = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clientB = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             if (clientA.Id == clientB.Id)
                 return;
 
-            var role = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserMgr.AddToRoleAsync(user, role.Name);
+            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
+            await _factory.UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV2>();
+            check.Should().BeAssignableTo<JwtV2>();
 
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+
+            var salt = _factory.Conf["IdentityTenants:Salt"];
+            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
         }
 
         [Fact]
@@ -644,79 +627,92 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clientA = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clientB = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var clients = new List<string> { clientA.Name.ToString(), clientB.Name.ToString() };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             if (clientA.Id == clientB.Id)
                 return;
 
-            var role = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserMgr.AddToRoleAsync(user, role.Name);
+            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
+            await _factory.UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV2>();
+            check.Should().BeAssignableTo<JwtV2>();
 
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientUndefined()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var clients = new List<string> { string.Empty };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
-
-            var check = JwtSecureProvider.CanReadToken(access);
-            check.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_IssuerSalt()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var clients = new List<string> { string.Empty };
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
-
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var jwt = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var access = (string)jwt["access_token"];
-            var refresh = (string)jwt["refresh_token"];
-
-            var check = JwtSecureProvider.ReadJwtToken(access).Claims
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
+        }
 
-            check.Value.Split(':')[0].Should().Be(issuer.Name);
-            check.Value.Split(':')[1].Should().Be(salt);
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ById()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-            check = JwtSecureProvider.ReadJwtToken(refresh).Claims
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clients = new List<string> { client.Id.ToString() };
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV2>();
+            check.Should().BeAssignableTo<JwtV2>();
+
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+
+            var salt = _factory.Conf["IdentityTenants:Salt"];
+            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
+        }
 
-            check.Value.Split(':')[0].Should().Be(issuer.Name);
-            check.Value.Split(':')[1].Should().Be(salt);
+        [Fact]
+        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ByName()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var clients = new List<string> { client.Name };
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            var check = ok.ToObject<JwtV2>();
+            check.Should().BeAssignableTo<JwtV2>();
+
+            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+
+            var salt = _factory.Conf["IdentityTenants:Salt"];
+            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+
+            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            claims.Value.Split(':')[1].Should().Be(salt);
         }
     }
 }

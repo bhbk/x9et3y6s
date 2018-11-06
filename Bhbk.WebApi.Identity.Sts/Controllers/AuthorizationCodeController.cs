@@ -1,5 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -52,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgIssuerNotExist);
 
             Guid clientID;
-            AppClient client;
+            ClientModel client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -68,9 +70,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = (await UoW.UserMgr.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
             else
-                user = (await UoW.UserMgr.GetAsync(x => x.Email == userValue)).SingleOrDefault();
+                user = (await UoW.UserRepo.GetAsync(x => x.Email == userValue)).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -110,9 +112,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
+                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
             else
-                user = await UoW.UserMgr.FindByEmailAsync(userValue);
+                user = (await UoW.UserRepo.GetAsync(x => x.Email == userValue)).SingleOrDefault();
 
             if (user == null)
                 return BadRequest(Strings.MsgUserInvalid);
@@ -122,17 +124,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check that user is confirmed...
             //check that user is not locked...
-            if (await UoW.UserMgr.IsLockedOutAsync(user)
+            if (await UoW.UserRepo.IsLockedOutAsync(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
                 return BadRequest(Strings.MsgUserInvalid);
 
             //check that payload can be decrypted and validated...
             if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(user.PasswordHash, authorizationCodeValue, user))
-                return BadRequest(Strings.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserTokenInvalid);
 
-            var clientList = await UoW.UserMgr.GetClientsAsync(user);
-            var clients = new List<AppClient>();
+            var clientList = await UoW.UserRepo.GetClientsAsync(user);
+            var clients = new List<ClientModel>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(clientValue))
@@ -143,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in clientValue.Split(","))
                 {
                     Guid clientID;
-                    AppClient client;
+                    ClientModel client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -163,29 +165,37 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check that redirect url is valid...
-            if (!clients.Any(x => x.AppClientUri.Any(y => y.AbsoluteUri == redirectUriValue)))
+            var validUrl = false;
+
+            foreach (var entry in clients)
+            {
+                var urls = await UoW.ClientRepo.GetUriListAsync(entry.Id);
+
+                if (urls.Any(x => x.AbsoluteUri == redirectUriValue))
+                    validUrl = true;
+            }
+
+            if (!validUrl)
                 return NotFound(Strings.MsgUriNotExist);
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(UoW, issuer, clients, user);
-            var refresh = await JwtSecureProvider.CreateRefreshTokenV2(UoW, issuer, user);
+            var access = await JwtProvider.CreateAccessTokenV2(UoW, issuer, clients, user);
+            var refresh = await JwtProvider.CreateRefreshTokenV2(UoW, issuer, user);
 
-            var result = new
+            var result = new JwtV2
             {
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
                 user = user.Id.ToString(),
-                client = clients.Select(x => x.Id.ToString()),
+                client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
             };
 
             //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new AppActivity()
+            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
-                Id = Guid.NewGuid(),
                 ActorId = user.Id,
                 ActivityType = Enums.LoginType.GenerateAuthorizationCodeV2.ToString(),
-                Created = DateTime.Now,
                 Immutable = false
             });
 
@@ -215,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgIssuerNotExist);
 
             Guid clientID;
-            AppClient client;
+            ClientModel client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -231,19 +241,19 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = (await UoW.UserMgr.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
             else
-                user = (await UoW.UserMgr.GetAsync(x => x.Email == userValue)).SingleOrDefault();
+                user = (await UoW.UserRepo.GetAsync(x => x.Email == userValue)).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
             //check that redirect url is valid...
-            if (!client.AppClientUri.Any(x => x.AbsoluteUri == redirectUriValue))
+            if (!(await UoW.ClientRepo.GetUriListAsync(client.Id)).Any(x => x.AbsoluteUri == redirectUriValue))
                 return NotFound(Strings.MsgUriNotExist);
 
             var state = RandomValues.CreateBase64String(32);
-            var url = LinkBuilder.AuthorizationCodeRequest(Conf, issuer, user, redirectUriValue, scopeValue, state);
+            var url = UrlBuilder.AuthorizationCodeRequest(Conf, issuer, user, redirectUriValue, scopeValue, state);
 
             /*
              * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies

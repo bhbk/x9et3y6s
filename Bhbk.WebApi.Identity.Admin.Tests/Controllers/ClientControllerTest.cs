@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
@@ -41,9 +42,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             var response = await _endpoints.Client_CreateV1(access.token, new ClientCreate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -55,9 +56,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             response = await _endpoints.Client_CreateV1(access.token, new ClientCreate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -72,9 +73,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
 
             var create = new ClientCreate()
             {
@@ -91,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var check = ok.ToObject<ClientResult>();
+            var check = ok.ToObject<ClientModel>();
         }
 
         [Fact]
@@ -106,9 +107,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             var response = await _endpoints.Client_DeleteV1(access.token, Guid.NewGuid());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -120,9 +121,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             response = await _endpoints.Client_DeleteV1(access.token, Guid.NewGuid());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -131,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = (await _factory.UoW.ClientRepo.GetAsync()).First();
             model.Immutable = true;
 
-            await _factory.UoW.ClientRepo.UpdateAsync(model);
+            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(model));
 
             response = await _endpoints.Client_DeleteV1(access.token, model.Id);
 
@@ -147,10 +148,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
             var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             var response = await _endpoints.Client_DeleteV1(access.token, model.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -168,17 +169,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
             var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             var response = await _endpoints.Client_GetV1(access.token, model.Id.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var check = ok.ToObject<ClientResult>();
+            var check = ok.ToObject<ClientModel>();
 
             response = await _endpoints.Client_GetV1(access.token, model.Name);
 
@@ -186,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            check = ok.ToObject<ClientResult>();
+            check = ok.ToObject<ClientModel>();
         }
 
         [Fact]
@@ -198,15 +199,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
 
             var take = 3;
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("name", "asc"));
 
-            var model = new TuplePager()
+            var model = new CascadePager()
             {
                 Filter = string.Empty,
                 Orders = orders,
@@ -220,10 +221,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ClientResult>>();
+            var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ClientModel>>();
             var count = (int)ok["count"];
 
-            list.Should().BeAssignableTo<IEnumerable<ClientResult>>();
+            list.Should().BeAssignableTo<IEnumerable<ClientModel>>();
             list.Count().Should().Be(take);
 
             count.Should().Be(await _factory.UoW.ClientRepo.Count());
@@ -241,9 +242,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             var response = await _endpoints.Client_UpdateV1(access.token, new ClientUpdate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -255,9 +256,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
             response = await _endpoints.Client_UpdateV1(access.token, new ClientUpdate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -272,9 +273,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
 
             var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             model.Name += "(Updated)";
@@ -285,7 +286,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var check = ok.ToObject<ClientResult>();
+            var check = ok.ToObject<ClientModel>();
 
             check.Name.Should().Be(model.Name);
         }

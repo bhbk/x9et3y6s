@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -57,9 +57,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [NonAction]
         public void SetUser(Guid userID)
         {
-            var user = UoW.UserMgr.Store.FindByIdAsync(userID.ToString()).Result;
+            var user = (UoW.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
 
-            ControllerContext.HttpContext.User = UoW.UserMgr.ClaimProvider.CreateAsync(user).Result;
+            ControllerContext.HttpContext.User = UoW.UserRepo.claimProvider.CreateAsync(user).Result;
         }
     }
 }

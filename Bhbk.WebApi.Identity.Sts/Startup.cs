@@ -3,9 +3,10 @@ using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -40,8 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 .Build();
 
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(conf["Databases:IdentityEntities"])
-                .EnableSensitiveDataLogging();
+                .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             sc.AddSingleton(conf);
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
@@ -50,6 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));
+            sc.AddTransient<IAuthorizationRequirement, UserPolicyRequirement>();
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();
@@ -121,6 +122,18 @@ namespace Bhbk.WebApi.Identity.Sts
                     ClockSkew = TimeSpan.Zero,
                 };
             });
+            sc.AddAuthorization(auth =>
+                auth.AddPolicy("AdministratorPolicy", policy =>
+                {
+                    policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
+                }));
+            sc.AddAuthorization(auth =>
+                auth.AddPolicy("ServicePolicy", policy =>
+                {
+                    policy.RequireRole("Bhbk.WebApi.Identity(System)");
+                }));
+            sc.AddAuthorization(auth =>
+                auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new UserPolicyRequirement())));
             sc.AddSession();
             sc.AddMvc();
             sc.AddMvc().AddControllersAsServices();

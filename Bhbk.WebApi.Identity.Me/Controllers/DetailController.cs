@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -18,12 +19,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetDetailV1()
         {
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            return Ok(UoW.Convert.Map<UserResult>(user));
+            return Ok(UoW.Convert.Map<UserModel>(user));
         }
 
         [Route("v1/quotes"), HttpGet]
@@ -40,12 +41,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (!await UoW.UserMgr.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserRepo.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -56,12 +57,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var remove = await UoW.UserMgr.RemovePasswordAsync(user);
+            var remove = await UoW.UserRepo.RemovePasswordAsync(user);
 
             if (!remove.Succeeded)
                 return GetErrorResult(remove);
 
-            var add = await UoW.UserMgr.AddPasswordAsync(user, model.NewPassword);
+            var add = await UoW.UserRepo.AddPasswordAsync(user, model.NewPassword);
 
             if (!add.Succeeded)
                 return GetErrorResult(add);
@@ -77,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -85,15 +86,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            bool two = await UoW.UserMgr.GetTwoFactorEnabledAsync(user);
-
-            if (two == status)
+            if (user.TwoFactorEnabled == status)
                 return BadRequest(Strings.MsgUserInvalidTwoFactor);
 
-            var result = await UoW.UserMgr.SetTwoFactorEnabledAsync(user, status);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            var result = await UoW.UserRepo.SetTwoFactorEnabledAsync(user, status);
 
             await UoW.CommitAsync();
 
@@ -106,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -117,19 +113,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var update = await UoW.UserMgr.UpdateAsync(UoW.Convert.Map<AppUser>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Convert.Map<AppUser>(model));
 
-            if (!update.Succeeded)
-                return GetErrorResult(update);
+            if (result == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
-            var result = await UoW.UserMgr.FindByIdAsync(model.Id.ToString());
-
-            if(result == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            return Ok(UoW.Convert.Map<UserResult>(result));
+            return Ok(UoW.Convert.Map<UserModel>(result));
         }
     }
 }

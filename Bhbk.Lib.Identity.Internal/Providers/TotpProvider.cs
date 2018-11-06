@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.AspNetCore.Identity;
 using OtpNet;
 using System.Text;

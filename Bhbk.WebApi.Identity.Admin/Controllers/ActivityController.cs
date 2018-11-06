@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.DomainModels.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -17,27 +17,25 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ActivityController() { }
 
         [Route("v1/pages"), HttpPost]
-        [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> GetActivityPageV1([FromBody] TuplePager model)
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> GetActivityPageV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<AppActivity, bool>> expr;
+            Expression<Func<ActivityModel, bool>> preds;
+            Expression<Func<ActivityModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
 
             if (string.IsNullOrEmpty(model.Filter))
-                expr = x => true;
+                preds = x => true;
             else
-                expr = x => x.ActivityType.ToLower().Contains(model.Filter.ToLower())
+                preds = x => x.ActivityType.ToLower().Contains(model.Filter.ToLower())
                 || x.TableName.ToLower().Contains(model.Filter.ToLower())
                 || x.OriginalValues.ToLower().Contains(model.Filter.ToLower())
                 || x.CurrentValues.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.ActivityRepo.Count(expr);
-            var list = await UoW.ActivityRepo.GetAsync(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take));
-
-            var result = list.Select(x => UoW.Convert.Map<AppActivity>(x));
+            var total = await UoW.ActivityRepo.Count(preds);
+            var result = await UoW.ActivityRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
 
             return Ok(new { Count = total, List = result });
         }

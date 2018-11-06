@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
 using CryptoHelper;
 using Microsoft.AspNetCore.Identity;
 

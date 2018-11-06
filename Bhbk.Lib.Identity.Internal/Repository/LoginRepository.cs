@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -13,14 +14,16 @@ namespace Bhbk.Lib.Identity.Repository
 {
     public class LoginRepository : IGenericRepository<AppLogin, Guid>
     {
+        private readonly ContextType _situation;
         private readonly AppDbContext _context;
 
-        public LoginRepository(AppDbContext context)
+        public LoginRepository(AppDbContext context, ContextType situation)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
+            _situation = situation;
         }
 
         public async Task<int> Count(Expression<Func<AppLogin, bool>> predicates = null)
@@ -50,20 +53,14 @@ namespace Bhbk.Lib.Identity.Repository
             return await Task.FromResult(_context.AppLogin.Any(x => x.Id == key));
         }
 
-        public async Task<AppLogin> GetAsync(Guid key)
-        {
-            return await Task.FromResult(_context.AppLogin.Where(x => x.Id == key).SingleOrDefault());
-        }
-
-        public Task<IQueryable<AppLogin>> GetAsync(string sql, params object[] parameters)
+        public Task<IQueryable<AppLogin>> GetAsync(params object[] parameters)
         {
             throw new NotImplementedException();
         }
 
         public async Task<IQueryable<AppLogin>> GetAsync(Expression<Func<AppLogin, bool>> predicates = null,
             Func<IQueryable<AppLogin>, IQueryable<AppLogin>> orderBy = null,
-            Func<IQueryable<AppLogin>, IIncludableQueryable<AppLogin, object>> includes = null,
-            bool tracking = true)
+            Func<IQueryable<AppLogin>, IIncludableQueryable<AppLogin, object>> includes = null)
         {
             var query = _context.AppLogin.AsQueryable();
 

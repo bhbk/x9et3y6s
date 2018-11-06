@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.WebApi.Identity.Me.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.WebApi.Identity.Sts.Tests", "Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj", "{EDA28DD0-D73B-488F-B017-E03BDEA993EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity.Internal.Tests", "Bhbk.Lib.Identity.Internal.Tests\Bhbk.Lib.Identity.Internal.Tests.csproj", "{5D0C77B4-9C2B-415C-89E5-2CB752B3227B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{EDA28DD0-D73B-488F-B017-E03BDEA993EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDA28DD0-D73B-488F-B017-E03BDEA993EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDA28DD0-D73B-488F-B017-E03BDEA993EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0C77B4-9C2B-415C-89E5-2CB752B3227B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0C77B4-9C2B-415C-89E5-2CB752B3227B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0C77B4-9C2B-415C-89E5-2CB752B3227B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0C77B4-9C2B-415C-89E5-2CB752B3227B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

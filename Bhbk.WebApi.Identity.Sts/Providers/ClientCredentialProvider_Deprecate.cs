@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

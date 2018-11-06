@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
@@ -40,10 +41,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.Activity_GetV1(access.token, new TuplePager());
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
+            var response = await _endpoints.Activity_GetV1(access.token, new CascadePager());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -54,14 +55,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
 
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("created", "desc"));
 
-            var model = new TuplePager()
+            var model = new CascadePager()
             {
                 Filter = string.Empty,
                 Orders = orders,
@@ -82,15 +83,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<ClientModel> { client }, user);
 
             var take = 3;
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("created", "desc"));
 
-            var model = new TuplePager()
+            var model = new CascadePager()
             {
                 Filter = string.Empty,
                 Orders = orders,
@@ -104,10 +105,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ActivityResult>>();
+            var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ActivityModel>>();
             var count = (int)ok["count"];
 
-            list.Should().BeAssignableTo<IEnumerable<ActivityResult>>();
+            list.Should().BeAssignableTo<IEnumerable<ActivityModel>>();
             list.Count().Should().Be(take);
 
             count.Should().Be(await _factory.UoW.ActivityRepo.Count());

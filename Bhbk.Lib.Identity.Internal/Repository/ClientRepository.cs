@@ -1,7 +1,11 @@
-﻿using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Identity.Models;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Core.Interfaces;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Maps;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +14,26 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Repository
 {
-    public class ClientRepository : IGenericRepository<AppClient, Guid>
+    public class ClientRepository : IGenericRepository<ClientCreate, ClientModel, ClientUpdate, Guid>
     {
+        private readonly ContextType _situation;
+        private readonly IMapper _convert;
         private readonly AppDbContext _context;
 
-        public ClientRepository(AppDbContext context)
+        public ClientRepository(AppDbContext context, ContextType situation)
         {
             if (context == null)
                 throw new NullReferenceException();
 
+            _convert = new MapperConfiguration(x =>
+            {
+                x.AddProfile<ClientMaps>();
+                x.AddProfile<RoleMaps>();
+                x.AddExpressionMapping();
+            }).CreateMapper();
+
             _context = context;
+            _situation = situation;
         }
 
         public async Task<AppClientUri> AddUriAsync(AppClientUri clientUri)
@@ -27,97 +41,107 @@ namespace Bhbk.Lib.Identity.Repository
             return await Task.FromResult(_context.AppClientUri.Add(clientUri).Entity);
         }
 
-        public async Task<int> Count(Expression<Func<AppClient, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<ClientModel, bool>> predicates = null)
         {
             var query = _context.AppClient.AsQueryable();
 
             if (predicates != null)
-                return await query.Where(predicates).CountAsync();
+                return await query.Where(_convert.MapExpression<Expression<Func<AppClient, bool>>>(predicates)).CountAsync();
 
             return await query.CountAsync();
         }
 
-        public async Task<AppClient> CreateAsync(AppClient entity)
+        public async Task<ClientModel> CreateAsync(ClientCreate model)
         {
-            return await Task.FromResult(_context.Add(entity).Entity);
+            var entity = _convert.Map<AppClient>(model);
+            var result = _context.Add(entity).Entity;
+
+            return await Task.FromResult(_convert.Map<ClientModel>(result));
         }
 
-        public async Task<bool> DeleteAsync(AppClient entity)
+        public async Task<bool> DeleteAsync(Guid key)
         {
-            await Task.FromResult(_context.Remove(entity).Entity);
+            var entity = _context.AppClient.Where(x => x.Id == key).Single();
 
-            return true;
+            try
+            {
+                await Task.FromResult(_context.Remove(entity).Entity);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public async Task<bool> ExistsAsync(Guid key)
-        {
-            return await Task.FromResult(_context.AppClient.Any(x => x.Id == key));
-        }
-
-        public async Task<AppClient> GetAsync(Guid key)
-        {
-            var client = _context.AppClient.Where(x => x.Id == key).SingleOrDefault();
-
-            return await Task.FromResult(client);
-        }
-
-        public Task<IQueryable<AppClient>> GetAsync(string sql, params object[] parameters)
+        public Task<bool> ExistsAsync(Guid key)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IQueryable<AppClient>> GetAsync(Expression<Func<AppClient, bool>> predicates = null, 
-            Func<IQueryable<AppClient>, IQueryable<AppClient>> orderBy = null, 
-            Func<IQueryable<AppClient>, IIncludableQueryable<AppClient, object>> includes = null, 
-            bool tracking = true)
+        public Task<IEnumerable<ClientModel>> GetAsync(params object[] parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<ClientModel>> GetAsync(Expression<Func<ClientModel, bool>> predicates = null,
+            Expression<Func<ClientModel, object>> orders = null,
+            Expression<Func<ClientModel, object>> includes = null,
+            int? skip = null,
+            int? take = null)
         {
             var query = _context.AppClient.AsQueryable();
+            var preds = _convert.MapExpression<Expression<Func<AppClient, bool>>>(predicates);
+            var ords = _convert.MapExpression<Expression<Func<AppClient, object>>>(orders);
+            var incs = _convert.MapExpression<Expression<Func<AppClient, object>>>(includes);
 
             if (predicates != null)
-                query = query.Where(predicates);
+                query = query.Where(preds);
+
+            if (orders != null)
+                query = query.OrderBy(ords)?
+                    .Skip(skip.Value)?
+                    .Take(take.Value);
 
             if (includes != null)
-                query = includes(query);
+                query = query.Include(incs);
 
-            if (orderBy != null)
-                return await Task.FromResult(orderBy(query));
-
-            return await Task.FromResult(query);
+            return await Task.FromResult(_convert.Map<IEnumerable<ClientModel>>(query));
         }
 
-        public async Task<IList<AppRole>> GetRoleListAsync(Guid clientId)
+        public async Task<IEnumerable<RoleModel>> GetRoleListAsync(Guid key)
         {
-            var result = new List<AppRole>();
-            var roles = _context.AppRole.Where(x => x.ClientId == clientId);
+            var result = _context.AppRole.Where(x => x.ClientId == key).ToList();
 
-            if (roles == null)
-                throw new InvalidOperationException();
-
-            foreach (AppRole role in roles)
-                result.Add(role);
-
-            return await Task.FromResult(result);
+            return await Task.FromResult(_convert.Map<IEnumerable<RoleModel>>(result));
         }
 
-        public async Task<AppClient> UpdateAsync(AppClient entity)
+        public async Task<IEnumerable<ClientUriModel>> GetUriListAsync(Guid key)
         {
-            var model = _context.AppClient.Where(x => x.Id == entity.Id).Single();
+            var result = _context.AppClientUri.Where(x => x.ClientId == key).ToList();
+
+            return await Task.FromResult(_convert.Map<IEnumerable<ClientUriModel>>(result));
+        }
+
+        public async Task<ClientModel> UpdateAsync(ClientUpdate model)
+        {
+            var entity = _context.AppClient.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            model.IssuerId = entity.IssuerId;
-            model.Name = entity.Name;
-            model.Description = entity.Description;
-            model.ClientType = entity.ClientType;
-            model.LastUpdated = DateTime.Now;
-            model.Enabled = entity.Enabled;
-            model.Immutable = entity.Immutable;
+            entity.IssuerId = model.IssuerId;
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.ClientType = model.ClientType;
+            entity.LastUpdated = DateTime.Now;
+            entity.Enabled = model.Enabled;
+            entity.Immutable = model.Immutable;
 
-            _context.Entry(model).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(model).Entity);
+            return await Task.FromResult(_convert.Map<ClientModel>(_context.Update(entity).Entity));
         }
     }
 }

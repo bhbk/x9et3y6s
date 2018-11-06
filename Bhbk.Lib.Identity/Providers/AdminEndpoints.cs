@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.DomainModels.Admin;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -56,7 +56,7 @@ namespace Bhbk.Lib.Identity.Providers
             _http = server.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -133,7 +133,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Client_GetV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Client_GetV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -250,7 +250,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -370,7 +370,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Login_GetV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Login_GetV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -487,7 +487,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_GetV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Role_GetV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -703,7 +703,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> User_GetV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");

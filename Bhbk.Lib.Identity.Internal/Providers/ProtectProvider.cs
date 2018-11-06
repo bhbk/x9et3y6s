@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.AspNetCore.DataProtection;
 using System;
 using System.Security.Cryptography;

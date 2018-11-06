@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
-using Microsoft.EntityFrameworkCore;
+using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +7,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,19 +50,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var disabled = uow.UserMgr.Store.Context.AppUser
-                        .Where(x => x.LockoutEnd < DateTime.UtcNow);
-
+                    var disabled = (await uow.UserRepo.GetAsync(x => x.LockoutEnd < DateTime.UtcNow)).ToList();
                     var disabledCount = disabled.Count();
 
                     if (disabled.Any())
                     {
                         foreach (AppUser entry in disabled.ToList())
-                        {
-                            entry.LockoutEnabled = false;
-                            entry.LockoutEnd = null;
-                            uow.UserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
-                        }
+                            await uow.UserRepo.DeleteAsync(entry);
 
                         await uow.CommitAsync();
 

@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Bhbk.Lib.Identity.DomainModels.Admin
+{
+    public abstract class ClientBase
+    {
+        public Guid ActorId { get; set; }
+
+        [Required]
+        public Guid IssuerId { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        [Required]
+        public string ClientKey { get; set; }
+
+        [Required]
+        public string ClientType { get; set; }
+
+        [Required]
+        public bool Enabled { get; set; }
+
+        [DefaultValue(false)]
+        public bool Immutable { get; set; }
+    }
+
+    public class ClientCreate : ClientBase
+    {
+
+    }
+
+    public class ClientModel : ClientBase
+    {
+        [Required]
+        public Guid Id { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public Nullable<DateTime> LastUpdated { get; set; }
+
+        public ICollection<string> Roles { get; set; }
+    }
+
+    public class ClientUpdate : ClientBase
+    {
+        [Required]
+        public Guid Id { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public Nullable<DateTime> LastUpdated { get; set; }
+    }
+}

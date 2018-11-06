@@ -1,12 +1,13 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Datasets;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -64,6 +65,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
                 sc.AddSingleton<IIdentityContext<AppDbContext>>(new IdentityContext(options, ContextType.UnitTest, conf));
                 sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
+                sc.AddTransient<IAuthorizationRequirement, UserPolicyRequirement>();
 
                 var sp = sc.BuildServiceProvider();
 
@@ -127,6 +129,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                         ClockSkew = TimeSpan.Zero,
                     };
                 });
+                sc.AddAuthorization(auth =>
+                    auth.AddPolicy("AdministratorPolicy", policy =>
+                    {
+                        policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
+                    }));
+                sc.AddAuthorization(auth =>
+                    auth.AddPolicy("ServicePolicy", policy =>
+                    {
+                        policy.RequireRole("Bhbk.WebApi.Identity(System)");
+                    }));
+                sc.AddAuthorization(auth =>
+                    auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new UserPolicyRequirement())));
                 sc.AddMvc();
                 sc.AddMvc().AddControllersAsServices();
                 sc.AddMvc().AddJsonOptions(json =>

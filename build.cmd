@@ -6,6 +6,7 @@ set /p VERSION=< .\version.tmp
 
 dotnet restore Bhbk.WebApi.Identity.sln --no-cache --verbosity quiet
 dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity quiet
+rem dotnet test Bhbk.Lib.Identity.Internal.Tests\Bhbk.Lib.Identity.Internal.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Admin.Tests\Bhbk.WebApi.Identity.Admin.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Me.Tests\Bhbk.WebApi.Identity.Me.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\

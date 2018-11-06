@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Repository;
 
 namespace Bhbk.Lib.Identity.Interfaces
@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Interfaces
         ConfigRepository ConfigRepo { get; }
         IssuerRepository IssuerRepo { get; }
         LoginRepository LoginRepo { get; }
-        RoleManagerExt RoleMgr { get; }
-        UserManagerExt UserMgr { get; }
+        RoleRepository RoleRepo { get; }
+        UserRepository UserRepo { get; }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Datasets;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -128,6 +128,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                         ClockSkew = TimeSpan.Zero,
                     };
                 });
+                sc.AddAuthorization(auth =>
+                    auth.AddPolicy("AdministratorPolicy", policy =>
+                    {
+                        policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
+                    }));
                 sc.AddMvc();
                 sc.AddMvc().AddControllersAsServices();
                 sc.AddMvc().AddJsonOptions(json =>

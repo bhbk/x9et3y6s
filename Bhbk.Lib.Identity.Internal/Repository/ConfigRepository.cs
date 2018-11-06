@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Bhbk.Lib.Identity.Repository
 {
     public class ConfigRepository
     {
+        private readonly ContextType _situation;
         private UInt32 _defaultsAccessTokenExpire;
         private UInt32 _defaultsAuthorizationCodeExpire;
         private UInt32 _defaultsBrowserCookieExpire;
@@ -16,8 +18,9 @@ namespace Bhbk.Lib.Identity.Repository
         private DateTime _unitTestsAccessTokenFakeUtcNow;
         private DateTime _unitTestsRefreshTokenFakeUtcNow;
 
-        public ConfigRepository(IConfigurationRoot conf)
+        public ConfigRepository(IConfigurationRoot conf, ContextType situation)
         {
+            _situation = situation;
             _defaultsAccessTokenExpire = UInt32.Parse(conf["IdentityDefaults:AccessTokenExpire"]);
             _defaultsAuthorizationCodeExpire = UInt32.Parse(conf["IdentityDefaults:AuthorizationCodeExpire"]);
             _defaultsBrowserCookieExpire = UInt32.Parse(conf["IdentityDefaults:BrowserCookieExpire"]);

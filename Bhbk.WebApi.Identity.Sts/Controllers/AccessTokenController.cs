@@ -1,5 +1,7 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -37,7 +39,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && string.IsNullOrEmpty(submit.issuer_id))
             {
                 //really gross but needed for backward compatibility. can be lame if more than one issuer.
-                issuer = (await UoW.IssuerRepo.GetAsync()).First();
+                if (UoW.Situation == ContextType.Live || UoW.Situation == ContextType.IntegrationTest)
+                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                        .Select(i => i.Value).First())).SingleOrDefault();
+                else
+                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).SingleOrDefault();
             }
             else
             {
@@ -55,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            AppClient client;
+            ClientModel client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -74,9 +80,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.username, out userID))
-                user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
+                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
             else
-                user = await UoW.UserMgr.FindByEmailAsync(submit.username);
+                user = (await UoW.UserRepo.GetAsync(x => x.Email == submit.username)).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -86,12 +92,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check that user is confirmed...
             //check that user is not locked...
-            if (await UoW.UserMgr.IsLockedOutAsync(user)
+            if (await UoW.UserRepo.IsLockedOutAsync(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var loginList = await UoW.UserMgr.GetLoginsAsync(user);
+            var loginList = await UoW.UserRepo.GetLoginsAsync(user);
             var logins = await UoW.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString()));
 
             //check that login provider exists...
@@ -99,15 +105,29 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgLoginNotExist);
 
             //check if login provider is local...
-            //check if login provider is transient for unit/integration test...
-            else if (logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any() && UoW.Situation == ContextType.UnitTest))
+            else if ((UoW.Situation == ContextType.Live || UoW.Situation == ContextType.IntegrationTest)
+                && logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
-                if (!await UoW.UserMgr.CheckPasswordAsync(user, submit.password))
+                if (!await UoW.UserRepo.CheckPasswordAsync(user, submit.password))
                 {
                     //adjust counter(s) for login failure...
-                    await UoW.UserMgr.AccessFailedAsync(user);
+                    await UoW.UserRepo.AccessFailedAsync(user);
+
+                    return BadRequest(Strings.MsgUserInvalid);
+                }
+            }
+
+            //check if login provider is transient for unit/integration test...
+            else if (UoW.Situation == ContextType.UnitTest
+                && logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin 
+                    || x.LoginProvider.Contains(Strings.ApiUnitTestLogin1) || x.LoginProvider.Contains(Strings.ApiUnitTestLogin2)).Any())
+            {
+                //check that password is valid...
+                if (!await UoW.UserRepo.CheckPasswordAsync(user, submit.password))
+                {
+                    //adjust counter(s) for login failure...
+                    await UoW.UserRepo.AccessFailedAsync(user);
 
                     return BadRequest(Strings.MsgUserInvalid);
                 }
@@ -116,14 +136,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgLoginInvalid);
 
             //adjust counter(s) for login success...
-            await UoW.UserMgr.AccessSuccessAsync(user);
+            await UoW.UserRepo.AccessSuccessAsync(user);
 
             if (UoW.ConfigRepo.DefaultsCompatibilityModeIssuer
                 && string.IsNullOrEmpty(submit.issuer_id))
             {
-                var access = await JwtSecureProvider.CreateAccessTokenV1CompatibilityMode(UoW, issuer, client, user);
+                var access = await JwtProvider.CreateAccessTokenV1CompatibilityMode(UoW, issuer, client, user);
 
-                var result = new
+                var result = new JwtV1Legacy()
                 {
                     token_type = "bearer",
                     access_token = access.token,
@@ -131,12 +151,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 };
 
                 //add activity entry for login...
-                await UoW.ActivityRepo.CreateAsync(new AppActivity()
+                await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    Id = Guid.NewGuid(),
                     ActorId = user.Id,
                     ActivityType = Enums.LoginType.GenerateAccessTokenV1CompatibilityMode.ToString(),
-                    Created = DateTime.Now,
                     Immutable = false
                 });
 
@@ -146,10 +164,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                var access = await JwtSecureProvider.CreateAccessTokenV1(UoW, issuer, client, user);
-                var refresh = await JwtSecureProvider.CreateRefreshTokenV1(UoW, issuer, user);
+                var access = await JwtProvider.CreateAccessTokenV1(UoW, issuer, client, user);
+                var refresh = await JwtProvider.CreateRefreshTokenV1(UoW, issuer, user);
 
-                var result = new
+                var result = new JwtV1()
                 {
                     token_type = "bearer",
                     access_token = access.token,
@@ -160,12 +178,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 };
 
                 //add activity entry for login...
-                await UoW.ActivityRepo.CreateAsync(new AppActivity()
+                await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    Id = Guid.NewGuid(),
                     ActorId = user.Id,
                     ActivityType = Enums.LoginType.GenerateAccessTokenV1.ToString(),
-                    Created = DateTime.Now,
                     Immutable = false
                 });
 
@@ -205,9 +221,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.user, out userID))
-                user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
+                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
             else
-                user = await UoW.UserMgr.FindByEmailAsync(submit.user);
+                user = (await UoW.UserRepo.GetAsync(x => x.Email == submit.user)).SingleOrDefault();
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -217,13 +233,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check that user is confirmed...
             //check that user is not locked...
-            if (await UoW.UserMgr.IsLockedOutAsync(user)
+            if (await UoW.UserRepo.IsLockedOutAsync(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var clientList = await UoW.UserMgr.GetClientsAsync(user);
-            var clients = new List<AppClient>();
+            var clientList = await UoW.UserRepo.GetClientsAsync(user);
+            var clients = new List<ClientModel>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
@@ -234,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in submit.client.Split(","))
                 {
                     Guid clientID;
-                    AppClient client;
+                    ClientModel client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -253,7 +269,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            var loginList = await UoW.UserMgr.GetLoginsAsync(user);
+            var loginList = await UoW.UserRepo.GetLoginsAsync(user);
             var logins = (await UoW.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString()))).ToList();
 
             //check that login provider exists...
@@ -261,15 +277,29 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgLoginNotExist);
 
             //check if login provider is local...
-            //check if login provider is transient for unit/integration test...
-            else if (logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any()
-                || (UoW.Situation == ContextType.UnitTest && logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any()))
+            else if ((UoW.Situation == ContextType.Live || UoW.Situation == ContextType.IntegrationTest)
+                && logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
-                if (!await UoW.UserMgr.CheckPasswordAsync(user, submit.password))
+                if (!await UoW.UserRepo.CheckPasswordAsync(user, submit.password))
                 {
                     //adjust counter(s) for login failure...
-                    await UoW.UserMgr.AccessFailedAsync(user);
+                    await UoW.UserRepo.AccessFailedAsync(user);
+
+                    return BadRequest(Strings.MsgUserInvalid);
+                }
+            }
+
+            //check if login provider is transient for unit/integration test...
+            else if (UoW.Situation == ContextType.UnitTest
+                && logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin
+                    || x.LoginProvider.Contains(Strings.ApiUnitTestLogin1) || x.LoginProvider.Contains(Strings.ApiUnitTestLogin2)).Any())
+            {
+                //check that password is valid...
+                if (!await UoW.UserRepo.CheckPasswordAsync(user, submit.password))
+                {
+                    //adjust counter(s) for login failure...
+                    await UoW.UserRepo.AccessFailedAsync(user);
 
                     return BadRequest(Strings.MsgUserInvalid);
                 }
@@ -278,28 +308,26 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgLoginInvalid);
 
             //adjust counter(s) for login success...
-            await UoW.UserMgr.AccessSuccessAsync(user);
+            await UoW.UserRepo.AccessSuccessAsync(user);
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(UoW, issuer, clients, user);
-            var refresh = await JwtSecureProvider.CreateRefreshTokenV2(UoW, issuer, user);
+            var access = await JwtProvider.CreateAccessTokenV2(UoW, issuer, clients, user);
+            var refresh = await JwtProvider.CreateRefreshTokenV2(UoW, issuer, user);
 
-            var result = new
+            var result = new JwtV2()
             {
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
                 user = user.Id.ToString(),
-                client = clients.Select(x => x.Id.ToString()),
+                client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
             };
 
             //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new AppActivity()
+            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
-                Id = Guid.NewGuid(),
                 ActorId = user.Id,
                 ActivityType = Enums.LoginType.GenerateAccessTokenV2.ToString(),
-                Created = DateTime.Now,
                 Immutable = false
             });
 

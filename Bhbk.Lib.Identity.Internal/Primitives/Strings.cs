@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
 using System;
 
 namespace Bhbk.Lib.Identity.Primitives
@@ -38,8 +38,8 @@ namespace Bhbk.Lib.Identity.Primitives
         public const string ApiDefaultLogin = "local";
         public const string ApiDefaultLoginKey = "local";
         public const string ApiDefaultLoginName = "local";
-        public const string ApiDefaultRoleForAdminUi = "(Built-In) Administrators";
-        public const string ApiDefaultRoleForViewerApi = "(Built-In) Viewers";
+        public const string ApiDefaultRoleForAdmin = "Bhbk.WebApi.Identity(Admins)";
+        public const string ApiDefaultRoleForUser = "Bhbk.WebApi.Identity(Users)";
         public const string ApiDefaultUserAdmin = "root@local";
         public const string ApiDefaultUserPassword = "pa$$word01!";
         public const string ApiDefaultFirstName = "System";
@@ -113,7 +113,7 @@ namespace Bhbk.Lib.Identity.Primitives
         public const string MsgUserInvalidPassword = "User password invalid";
         public const string MsgUserInvalidPasswordConfirm = "User new password does not match confirm password";
         public const string MsgUserInvalidPhoneConfirm = "User new phone does not match confirm phone";
-        public const string MsgUserInvalidToken = "User token is invalid";
+        public const string MsgUserTokenInvalid = "User token is invalid";
         public const string MsgUserInvalidTwoFactor = "User two factor is invalid";
 
         #endregion

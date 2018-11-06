@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
                 controller.SetUser(user.Id);
 
@@ -52,13 +52,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
                 controller.SetUser(user.Id);
 
                 var result = await controller.GetDetailV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
 
                 data.Id.Should().Be(user.Id);
             }
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var model = new UserChangePassword()
                 {
                     CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 var result = await controller.SetPasswordV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-                var check = await _factory.UoW.UserMgr.CheckPasswordAsync(user, model.NewPassword);
+                var check = await _factory.UoW.UserRepo.CheckPasswordAsync(user, model.NewPassword);
                 check.Should().BeFalse();
             }
         }
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var model = new UserChangePassword()
                 {
                     CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 var result = await controller.SetPasswordV1(model) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
 
-                var check = await _factory.UoW.UserMgr.CheckPasswordAsync(user, model.NewPassword);
+                var check = await _factory.UoW.UserRepo.CheckPasswordAsync(user, model.NewPassword);
                 check.Should().BeTrue();
             }
         }
@@ -130,13 +130,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
                 controller.SetUser(user.Id);
 
-                var status = await _factory.UoW.UserMgr.SetTwoFactorEnabledAsync(user, false);
-                status.Should().BeAssignableTo(typeof(IdentityResult));
-                status.Succeeded.Should().BeTrue();
+                var status = await _factory.UoW.UserRepo.SetTwoFactorEnabledAsync(user, false);
+                status.Should().BeAssignableTo(typeof(AppUser));
 
                 var result = await controller.SetTwoFactorV1(true) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
@@ -153,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
                 controller.SetUser(user.Id);
 
@@ -170,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var result = await controller.UpdateDetailV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
 
                 data.FirstName.Should().Be(model.FirstName);
                 data.LastName.Should().Be(model.LastName);

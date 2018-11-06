@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -16,66 +18,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     public class RefreshTokenController : BaseController
     {
         public RefreshTokenController() { }
-
-        [Route("v1/refresh/{userID}"), HttpGet]
-        [Route("v2/refresh/{userID}"), HttpGet]
-        [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
-        {
-            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
-
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            var result = await UoW.UserMgr.GetRefreshTokensAsync(user);
-
-            return Ok(result);
-        }
-
-        [Route("v1/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
-        [Route("v2/refresh/{userID}/revoke/{tokenID}"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid tokenID)
-        {
-            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
-
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            var token = await UoW.UserMgr.FindRefreshTokenByIdAsync(tokenID.ToString());
-
-            if (token == null)
-                return BadRequest(Strings.MsgUserInvalidToken);
-
-            var result = await UoW.UserMgr.RemoveRefreshTokenAsync(user, token);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
-        [Route("v1/refresh/{userID}/revoke"), HttpDelete]
-        [Route("v2/refresh/{userID}/revoke"), HttpDelete]
-        [Authorize(Roles = "(Built-In) Administrators")]
-        public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
-        {
-            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
-
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            var result = await UoW.UserMgr.RemoveRefreshTokensAsync(user);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
 
         [Route("v1/refresh"), HttpPost]
         [AllowAnonymous]
@@ -100,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            AppClient client;
+            ClientModel client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -114,14 +56,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!client.Enabled)
                 return BadRequest(Strings.MsgClientInvalid);
 
-            var refreshToken = await UoW.UserMgr.FindRefreshTokenAsync(submit.refresh_token);
+            var refreshToken = (await UoW.UserRepo.GetRefreshTokensAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
 
             if (refreshToken == null
                 || refreshToken.IssuedUtc >= DateTime.UtcNow
                 || refreshToken.ExpiresUtc <= DateTime.UtcNow)
-                return BadRequest(Strings.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserTokenInvalid);
 
-            var user = await UoW.UserMgr.FindByIdAsync(refreshToken.UserId.ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == refreshToken.UserId)).SingleOrDefault();
 
             //check that user exists...
             if (user == null)
@@ -131,15 +73,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             //check that user is not locked...
-            if (await UoW.UserMgr.IsLockedOutAsync(user)
+            if (await UoW.UserRepo.IsLockedOutAsync(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var access = await JwtSecureProvider.CreateAccessTokenV1(UoW, issuer, client, user);
-            var refresh = await JwtSecureProvider.CreateRefreshTokenV1(UoW, issuer, user);
+            var access = await JwtProvider.CreateAccessTokenV1(UoW, issuer, client, user);
+            var refresh = await JwtProvider.CreateRefreshTokenV1(UoW, issuer, user);
 
-            var result = new
+            var result = new JwtV1()
             {
                 token_type = "bearer",
                 access_token = access.token,
@@ -150,12 +92,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             };
 
             //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new AppActivity()
+            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
-                Id = Guid.NewGuid(),
                 ActorId = user.Id,
                 ActivityType = Enums.LoginType.GenerateRefreshTokenV1.ToString(),
-                Created = DateTime.Now,
                 Immutable = false
             });
 
@@ -186,14 +126,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!issuer.Enabled)
                 return BadRequest(Strings.MsgIssuerInvalid);
 
-            var refreshToken = await UoW.UserMgr.FindRefreshTokenAsync(submit.refresh_token);
+            var refreshToken = (await UoW.UserRepo.GetRefreshTokensAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
 
             if (refreshToken == null
                 || refreshToken.IssuedUtc >= DateTime.UtcNow
                 || refreshToken.ExpiresUtc <= DateTime.UtcNow)
-                return BadRequest(Strings.MsgUserInvalidToken);
+                return BadRequest(Strings.MsgUserTokenInvalid);
 
-            var user = await UoW.UserMgr.FindByIdAsync(refreshToken.UserId.ToString());
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == refreshToken.UserId)).SingleOrDefault();
 
             //check that user exists...
             if (user == null)
@@ -203,13 +143,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             //check that user is not locked...
-            if (await UoW.UserMgr.IsLockedOutAsync(user)
+            if (await UoW.UserRepo.IsLockedOutAsync(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var clientList = await UoW.UserMgr.GetClientsAsync(user);
-            var clients = new List<AppClient>();
+            var clientList = await UoW.UserRepo.GetClientsAsync(user);
+            var clients = new List<ClientModel>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
@@ -220,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in submit.client.Split(","))
                 {
                     Guid clientID;
-                    AppClient client;
+                    ClientModel client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -239,32 +179,98 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(UoW, issuer, clients, user);
-            var refresh = await JwtSecureProvider.CreateRefreshTokenV2(UoW, issuer, user);
+            var access = await JwtProvider.CreateAccessTokenV2(UoW, issuer, clients, user);
+            var refresh = await JwtProvider.CreateRefreshTokenV2(UoW, issuer, user);
 
-            var result = new
+            var result = new JwtV2()
             {
                 token_type = "bearer",
                 access_token = access.token,
                 refresh_token = refresh,
                 user = user.Id.ToString(),
-                client = clients.Select(x => x.Id.ToString()),
+                client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
             };
 
             //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new AppActivity()
+            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
-                Id = Guid.NewGuid(),
                 ActorId = user.Id,
                 ActivityType = Enums.LoginType.GenerateRefreshTokenV2.ToString(),
-                Created = DateTime.Now,
                 Immutable = false
             });
 
             await UoW.CommitAsync();
 
             return Ok(result);
+        }
+
+        [Route("v1/refresh/{userID}"), HttpGet]
+        [Route("v2/refresh/{userID}"), HttpGet]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+                return NotFound(Strings.MsgUserNotExist);
+
+            var list = await UoW.UserRepo.GetRefreshTokensAsync(x => x.UserId == userID);
+
+            var result = list.Select(x => UoW.Convert.Map<UserRefreshModel>(x));
+
+            return Ok(result);
+        }
+
+        [Route("v1/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
+        [Route("v2/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+                return NotFound(Strings.MsgUserNotExist);
+
+            var refresh = (await UoW.UserRepo.GetRefreshTokensAsync((AppUserRefresh x) => x.Id == refreshID)).SingleOrDefault();
+
+            if (refresh == null)
+                return NotFound(Strings.MsgUserTokenInvalid);
+
+            //if (user.Id == refresh.UserId)
+            //    return NotFound(Strings.MsgUserTokenInvalid);
+
+            var result = await UoW.UserRepo.RemoveRefreshTokenAsync(refresh);
+
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
+        [Route("v1/refresh/{userID}/revoke"), HttpDelete]
+        [Route("v2/refresh/{userID}/revoke"), HttpDelete]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+                return NotFound(Strings.MsgUserNotExist);
+
+            var result = await UoW.UserRepo.RemoveRefreshTokensAsync(user);
+
+            if (!result.Succeeded)
+                return GetErrorResult(result);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
         }
     }
 }

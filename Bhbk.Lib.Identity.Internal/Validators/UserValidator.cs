@@ -1,14 +1,17 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Bhbk.Lib.Identity.Repository;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
-    public sealed class UserValidator : IUserValidator<AppUser>
+    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuservalidator-1
+
+    public sealed class UserValidator
     {
-        public Task<IdentityResult> ValidateAsync(UserManager<AppUser> manager, AppUser user)
+        public Task<IdentityResult> ValidateAsync(UserRepository repo, AppUser user)
         {
             var errors = new List<IdentityError>();
             var describer = new IdentityErrorDescriber();

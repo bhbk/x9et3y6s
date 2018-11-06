@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     if (expired.Any())
                     {
                         foreach (var entry in expired.ToList())
-                            await uow.ActivityRepo.DeleteAsync(entry);
+                            await uow.ActivityRepo.DeleteAsync(entry.Id);
 
                         await uow.CommitAsync();
 

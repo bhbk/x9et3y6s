@@ -14,7 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2018.11.4.2334" />
+    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="1.0.4" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2018.11.5.2332" />
     <PackageReference Include="CryptoHelper" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="2.2.0" />

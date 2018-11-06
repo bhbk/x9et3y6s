@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
                 controller.SetUser(user.Id);
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
                 controller.SetUser(user.Id);
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var newPassword = RandomValues.CreateBase64String(12);
 
                 controller.SetUser(user.Id);
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var newPassword = RandomValues.CreateBase64String(12);
 
                 controller.SetUser(user.Id);
@@ -130,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
                 controller.SetUser(user.Id);
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
                 var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
                 controller.SetUser(user.Id);

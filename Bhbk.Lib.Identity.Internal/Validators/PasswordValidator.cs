@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,14 +8,15 @@ using System.Threading.Tasks;
 namespace Bhbk.Lib.Identity.Infrastructure
 {
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.ipasswordvalidator-1?view=aspnetcore-2.0
-    public sealed class PasswordValidator : IPasswordValidator<AppUser>
+
+    public sealed class PasswordValidator
     {
         private readonly Regex _number = new Regex(@"[0-9]+");
         private readonly Regex _lower = new Regex(@"[a-z]+");
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
 
-        public Task<IdentityResult> ValidateAsync(UserManager<AppUser> manager, AppUser user, string password)
+        public Task<IdentityResult> ValidateAsync(UserRepository repo, AppUser user, string password)
         {
             List<IdentityError> errors = new List<IdentityError>();
 

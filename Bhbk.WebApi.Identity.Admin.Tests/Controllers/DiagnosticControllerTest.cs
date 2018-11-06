@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Maps;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
@@ -22,13 +22,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         public DiagnosticControllerTest(StartupTest factory)
         {
             _factory = factory;
-        }
-
-        [Fact]
-        public void Admin_DiagV1_CheckAutoMapper_Success()
-        {
-            Mapper.Initialize(x => x.AddProfile<IdentityMappings>());
-            Mapper.Configuration.AssertConfigurationIsValid();
         }
 
         [Fact]

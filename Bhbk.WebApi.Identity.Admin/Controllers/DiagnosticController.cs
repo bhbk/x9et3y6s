@@ -10,7 +10,6 @@ using System.Reflection;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("diagnostic")]
-    [AllowAnonymous]
     public class DiagnosticController : BaseController
     {
         public DiagnosticController() { }

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,14 +50,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = uow.UserMgr.Store.Context.AppUserRefresh
-                        .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
+                    var invalid = (await uow.UserRepo.GetRefreshTokensAsync(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow)).ToList();
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())
                     {
                         foreach (AppUserRefresh entry in invalid.ToList())
-                            uow.UserMgr.Store.Context.AppUserRefresh.Remove(entry);
+                            await uow.UserRepo.RemoveRefreshTokenAsync(entry);
 
                         await uow.CommitAsync();
 

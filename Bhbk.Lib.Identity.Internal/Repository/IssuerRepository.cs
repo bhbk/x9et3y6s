@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Identity.Models;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.EntityModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -11,15 +12,18 @@ namespace Bhbk.Lib.Identity.Repository
 {
     public class IssuerRepository : IGenericRepository<AppIssuer, Guid>
     {
+        private readonly ContextType _situation;
         private readonly AppDbContext _context;
-        private string _salt = null;
+        private readonly string _salt;
 
-        public IssuerRepository(AppDbContext context)
+        public IssuerRepository(AppDbContext context, ContextType situation, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
+            _situation = situation;
+            _salt = salt;
         }
 
         public string Salt
@@ -27,10 +31,6 @@ namespace Bhbk.Lib.Identity.Repository
             get
             {
                 return _salt;
-            }
-            set
-            {
-                _salt = value;
             }
         }
 
@@ -61,27 +61,14 @@ namespace Bhbk.Lib.Identity.Repository
             return await Task.FromResult(_context.AppClient.Any(x => x.Id == key));
         }
 
-        public async Task<IQueryable<AppClient>> GetClientsAsync(Guid key)
-        {
-            return await Task.FromResult(_context.AppClient.Where(x => x.IssuerId == key).AsQueryable());
-        }
-
-        public async Task<AppIssuer> GetAsync(Guid key)
-        {
-            var client = _context.AppIssuer.Where(x => x.Id == key).SingleOrDefault();
-
-            return await Task.FromResult(client);
-        }
-
-        public Task<IQueryable<AppIssuer>> GetAsync(string sql, params object[] parameters)
+        public Task<IQueryable<AppIssuer>> GetAsync(params object[] parameters)
         {
             throw new NotImplementedException();
         }
 
         public async Task<IQueryable<AppIssuer>> GetAsync(Expression<Func<AppIssuer, bool>> predicates = null, 
             Func<IQueryable<AppIssuer>, IQueryable<AppIssuer>> orderBy = null, 
-            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null, 
-            bool tracking = true)
+            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null)
         {
             var query = _context.AppIssuer.AsQueryable();
 
@@ -95,6 +82,11 @@ namespace Bhbk.Lib.Identity.Repository
                 return await Task.FromResult(orderBy(query));
 
             return await Task.FromResult(query);
+        }
+
+        public async Task<IQueryable<AppClient>> GetClientsAsync(Guid key)
+        {
+            return await Task.FromResult(_context.AppClient.Where(x => x.IssuerId == key).AsQueryable());
         }
 
         public async Task<AppIssuer> UpdateAsync(AppIssuer entity)

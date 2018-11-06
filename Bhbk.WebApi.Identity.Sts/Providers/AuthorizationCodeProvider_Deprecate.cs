@@ -1,5 +1,6 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Models;
+﻿using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Builder;
@@ -111,9 +112,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
-                    user = uow.UserMgr.FindByIdAsync(userID.ToString()).Result;
+                    user = (uow.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
                 else
-                    user = uow.UserMgr.FindByEmailAsync(userValue).Result;
+                    user = (uow.UserRepo.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
 
                 if (user == null)
                 {
@@ -127,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserMgr.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -141,11 +142,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserTokenInvalid }, _serializer));
                 }
 
-                var clientList = uow.UserMgr.GetClientsAsync(user).Result;
-                var clients = new List<AppClient>();
+                var clientList = uow.UserRepo.GetClientsAsync(user).Result;
+                var clients = new List<ClientModel>();
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
@@ -156,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     foreach (string entry in clientValue.Split(","))
                     {
                         Guid clientID;
-                        AppClient client;
+                        ClientModel client;
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out clientID))
@@ -184,15 +185,25 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //check that redirect url is valid...
-                if (!clients.Any(x => x.AppClientUri.Any(y => y.AbsoluteUri == redirectUriValue)))
+                var validUrl = false;
+
+                foreach (var entry in clients)
+                {
+                    var urls = uow.ClientRepo.GetUriListAsync(entry.Id).Result;
+
+                    if (urls.Any(x => x.AbsoluteUri == redirectUriValue))
+                        validUrl = true;
+                }
+
+                if (!validUrl)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUriNotExist }, _serializer));
                 }
 
-                var access = JwtSecureProvider.CreateAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtSecureProvider.CreateRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtProvider.CreateAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtProvider.CreateRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -205,12 +216,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 };
 
                 //add activity entry for login...
-                uow.ActivityRepo.CreateAsync(new AppActivity()
+                uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    Id = Guid.NewGuid(),
                     ActorId = user.Id,
                     ActivityType = Enums.LoginType.GenerateAuthorizationCodeV2.ToString(),
-                    Created = DateTime.Now,
                     Immutable = false
                 }).Wait();
 
