@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var result = await UoW.CustomUserMgr.AddPasswordAsync(user, model.NewPassword);
+            var result = await UoW.UserMgr.AddPasswordAsync(user, model.NewPassword);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -57,8 +57,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
 
             model.ActorId = GetUserGUID();
-            
-            var exists = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
+
+            var exists = await UoW.UserMgr.FindByEmailAsync(model.Email);
 
             if (exists != null)
                 return BadRequest(Strings.MsgUserAlreadyExists);
@@ -71,12 +71,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = true;
 
-            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Convert.Map<AppUser>(model));
+            var create = await UoW.UserMgr.CreateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!create.Succeeded)
                 return GetErrorResult(create);
 
-            var result = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
+            var result = await UoW.UserMgr.FindByEmailAsync(model.Email);
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var exists = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
+            var exists = await UoW.UserMgr.FindByEmailAsync(model.Email);
 
             if (exists != null)
                 return BadRequest(Strings.MsgUserAlreadyExists);
@@ -130,12 +130,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = false;
 
-            var create = await UoW.CustomUserMgr.CreateAsync(UoW.Convert.Map<AppUser>(model));
+            var create = await UoW.UserMgr.CreateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!create.Succeeded)
                 return GetErrorResult(create);
 
-            var result = await UoW.CustomUserMgr.FindByEmailAsync(model.Email);
+            var result = await UoW.UserMgr.FindByEmailAsync(model.Email);
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -143,11 +143,31 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Convert.Map<UserResult>(result));
         }
 
+        [Route("v1/{userID:guid}/claim"), HttpPost]
+        [Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IActionResult> CreateUserClaimV1([FromRoute] Guid userID, [FromBody] UserClaimCreate model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return NotFound(Strings.MsgUserInvalid);
+
+            //var result = await UoW.UserMgr.AddClaimAsync(user, model);
+
+            //if (!result.Succeeded)
+            //    return GetErrorResult(result);
+
+            return Ok(model);
+        }
+
         [Route("v1/{userID:guid}"), HttpDelete]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteUserV1([FromRoute] Guid userID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -157,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var result = await UoW.CustomUserMgr.DeleteAsync(user);
+            var result = await UoW.UserMgr.DeleteAsync(user);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -165,17 +185,37 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
+        [Route("v1/{userID:guid}/{claimID:guid}"), HttpDelete]
+        [Authorize(Roles = "(Built-In) Administrators")]
+        public async Task<IActionResult> DeleteUserClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return NotFound(Strings.MsgUserInvalid);
+
+            //var result = await UoW.UserMgr.RemoveClaimAsync(user, claim);
+
+            //if (!result.Succeeded)
+            //    return GetErrorResult(result);
+
+            return NoContent();
+        }
+
         [Route("v1/{userValue}"), HttpGet]
-        public async Task<IActionResult> GetUserV1([FromBody] string userValue)
+        public async Task<IActionResult> GetUserV1([FromRoute] string userValue)
         {
             Guid userID;
             AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+                user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
             else
-                user = await UoW.CustomUserMgr.FindByEmailAsync(userValue.ToString());
+                user = await UoW.UserMgr.FindByEmailAsync(userValue.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -183,31 +223,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Convert.Map<UserResult>(user));
         }
 
-        [Route("v1/{userID:guid}/logins"), HttpGet]
-        public async Task<IActionResult> GetUserLoginsV1([FromRoute] Guid userID)
+        [Route("v1/{userID:guid}/claims"), HttpGet]
+        public async Task<IActionResult> GetUserClaimsV1([FromRoute] Guid userID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+                return NotFound(Strings.MsgUserInvalid);
 
-            var logins = await UoW.CustomUserMgr.GetLoginsAsync(user);
-
-            var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x.Id.ToString())))
-                .Select(x => UoW.Convert.Map<LoginResult>(x));
-
-            return Ok(result);
+            return Ok(await UoW.UserMgr.GetClaimsAsync(user));
         }
 
         [Route("v1/{userID:guid}/clients"), HttpGet]
         public async Task<IActionResult> GetUserClientsV1([FromRoute] Guid userID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var clients = await UoW.CustomUserMgr.GetClientsAsync(user);
+            var clients = await UoW.UserMgr.GetClientsAsync(user);
 
             var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x.Id.ToString())))
                 .Select(x => UoW.Convert.Map<ClientResult>(x));
@@ -215,17 +250,33 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/{userID:guid}/roles"), HttpGet]
-        public async Task<IActionResult> GetUserRolesV1([FromRoute] Guid userID)
+        [Route("v1/{userID:guid}/logins"), HttpGet]
+        public async Task<IActionResult> GetUserLoginsV1([FromRoute] Guid userID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var roles = await UoW.CustomUserMgr.GetRolesResultIdAsync(user);
+            var logins = await UoW.UserMgr.GetLoginsAsync(user);
 
-            var result = UoW.CustomRoleMgr.Store.Get(x => roles.Contains(x.Id.ToString()))
+            var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x.Id.ToString())))
+                .Select(x => UoW.Convert.Map<LoginResult>(x));
+
+            return Ok(result);
+        }
+
+        [Route("v1/{userID:guid}/roles"), HttpGet]
+        public async Task<IActionResult> GetUserRolesV1([FromRoute] Guid userID)
+        {
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
+
+            if (user == null)
+                return NotFound(Strings.MsgUserNotExist);
+
+            var roles = await UoW.UserMgr.GetRolesResultIdAsync(user);
+
+            var result = (await UoW.RoleMgr.GetAsync(x => roles.Contains(x.Id.ToString())))
                 .Select(x => UoW.Convert.Map<RoleResult>(x));
 
             return Ok(result);
@@ -247,8 +298,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.FirstName.ToLower().Contains(model.Filter.ToLower())
                 || x.LastName.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.CustomUserMgr.Store.Count(expr);
-            var list = UoW.CustomUserMgr.Store.Get(expr,
+            var total = await UoW.UserMgr.Count(expr);
+            var list = await UoW.UserMgr.GetAsync(expr,
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserLogin)
                     .Include(y => y.AppUserRole));
@@ -258,24 +309,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(new { Count = total, List = result });
         }
 
-        [Route("v1/{userID:guid}/remove-password"), HttpPut]
+        [Route("v1/{userID:guid}/remove-password"), HttpGet]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RemovePasswordV1([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (!await UoW.CustomUserMgr.HasPasswordAsync(user))
+            else if (!await UoW.UserMgr.HasPasswordAsync(user))
                 return BadRequest(Strings.MsgUserInvalidPassword);
 
             user.ActorId = GetUserGUID();
 
-            var result = await UoW.CustomUserMgr.RemovePasswordAsync(user);
+            var result = await UoW.UserMgr.RemovePasswordAsync(user);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -290,7 +341,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -300,12 +351,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var remove = await UoW.CustomUserMgr.RemovePasswordAsync(user);
+            var remove = await UoW.UserMgr.RemovePasswordAsync(user);
 
             if (!remove.Succeeded)
                 return GetErrorResult(remove);
 
-            var add = await UoW.CustomUserMgr.AddPasswordAsync(user, model.NewPassword);
+            var add = await UoW.UserMgr.AddPasswordAsync(user, model.NewPassword);
 
             if (!add.Succeeded)
                 return GetErrorResult(add);
@@ -322,7 +373,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(model.Id.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(model.Id.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -330,14 +381,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (user.Immutable)
                 return BadRequest(Strings.MsgUserImmutable);
 
-            var update = await UoW.CustomUserMgr.UpdateAsync(UoW.Convert.Map<AppUser>(model));
+            var update = await UoW.UserMgr.UpdateAsync(UoW.Convert.Map<AppUser>(model));
 
             if (!update.Succeeded)
                 return GetErrorResult(update);
 
-            var result = await UoW.CustomUserMgr.FindByIdAsync(model.Id.ToString());
+            var result = await UoW.UserMgr.FindByIdAsync(model.Id.ToString());
 
-            if(result == null)
+            if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             return Ok(UoW.Convert.Map<UserResult>(result));

@@ -23,12 +23,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.CustomUserMgr.GetRefreshTokensAsync(user);
+            var result = await UoW.UserMgr.GetRefreshTokensAsync(user);
 
             return Ok(result);
         }
@@ -38,17 +38,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid tokenID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var token = await UoW.CustomUserMgr.FindRefreshTokenByIdAsync(tokenID.ToString());
+            var token = await UoW.UserMgr.FindRefreshTokenByIdAsync(tokenID.ToString());
 
             if (token == null)
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            var result = await UoW.CustomUserMgr.RemoveRefreshTokenAsync(user, token);
+            var result = await UoW.UserMgr.RemoveRefreshTokenAsync(user, token);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -63,12 +63,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
         {
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.CustomUserMgr.RemoveRefreshTokensAsync(user);
+            var result = await UoW.UserMgr.RemoveRefreshTokensAsync(user);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -96,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);

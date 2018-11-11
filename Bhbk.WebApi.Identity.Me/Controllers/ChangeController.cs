@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            else if (!await UoW.CustomUserMgr.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserMgr.CheckPasswordAsync(user, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(GetUserGUID().ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(GetUserGUID().ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);

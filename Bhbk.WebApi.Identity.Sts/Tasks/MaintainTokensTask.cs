@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +15,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
     public class MaintainTokensTask : BackgroundService
     {
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
@@ -53,14 +50,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = uow.CustomUserMgr.Store.Context.AppUserRefresh
+                    var invalid = uow.UserMgr.Store.Context.AppUserRefresh
                         .Where(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow);
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())
                     {
                         foreach (AppUserRefresh entry in invalid.ToList())
-                            uow.CustomUserMgr.Store.Context.AppUserRefresh.Remove(entry);
+                            uow.UserMgr.Store.Context.AppUserRefresh.Remove(entry);
 
                         await uow.CommitAsync();
 

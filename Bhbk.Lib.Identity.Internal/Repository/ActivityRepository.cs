@@ -23,7 +23,7 @@ namespace Bhbk.Lib.Identity.Repository
 
         public async Task<int> Count(Expression<Func<AppActivity, bool>> predicates = null)
         {
-            IQueryable<AppActivity> query = _context.AppActivity.AsQueryable();
+            var query = _context.AppActivity.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Repository
             Func<IQueryable<AppActivity>, IIncludableQueryable<AppActivity, object>> includes = null, 
             bool tracking = true)
         {
-            IQueryable<AppActivity> query = _context.AppActivity.AsQueryable();
+            var query = _context.AppActivity.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);

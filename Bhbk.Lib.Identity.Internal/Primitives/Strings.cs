@@ -50,9 +50,13 @@ namespace Bhbk.Lib.Identity.Primitives
         #region Configuration Constants (Unit Tests)
 
         public const string ApiUnitTestIssuer1 = "IssuerUnitTests1";
+        public const string ApiUnitTestIssuer1Key = "IssuerUnitTests1Key";
         public const string ApiUnitTestIssuer2 = "IssuerUnitTests2";
+        public const string ApiUnitTestIssuer2Key = "IssuerUnitTests2Key";
         public const string ApiUnitTestClient1 = "ClientUnitTests1";
+        public const string ApiUnitTestClient1Key = "ClientUnitTests1Key";
         public const string ApiUnitTestClient2 = "ClientUnitTests2";
+        public const string ApiUnitTestClient2Key = "ClientUnitTests2Key";
         public const string ApiUnitTestClaimType = "ClaimTypeUnitTests";
         public const string ApiUnitTestClaimValue = "ClaimValueUnitTests";
         public const string ApiUnitTestLogin1 = "LoginUnitTests1";

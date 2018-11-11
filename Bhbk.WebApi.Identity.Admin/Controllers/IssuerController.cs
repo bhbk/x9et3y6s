@@ -66,7 +66,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             Guid issuerID;
             AppIssuer issuer;
 
-            //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(issuerValue, out issuerID))
                 issuer = await UoW.IssuerRepo.GetAsync(issuerID);
             else

@@ -8,14 +8,15 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data
 {
-    public class TestData
+    public class GenerateTestData
     {
         private readonly IIdentityContext<AppDbContext> _uow;
 
-        public TestData(IIdentityContext<AppDbContext> uow)
+        public GenerateTestData(IIdentityContext<AppDbContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -23,7 +24,7 @@ namespace Bhbk.Lib.Identity.Data
             _uow = uow;
         }
 
-        public async void Create()
+        public async Task CreateAsync()
         {
             if (_uow.Situation != ContextType.UnitTest)
                 throw new InvalidOperationException();
@@ -33,12 +34,12 @@ namespace Bhbk.Lib.Identity.Data
             AppLogin login;
             AppUser user;
 
-            //create clients
+            //create issuers
             await _uow.IssuerRepo.CreateAsync(_uow.Convert.Map<AppIssuer>(
                 new IssuerCreate()
                 {
                     Name = Strings.ApiUnitTestIssuer1,
-                    IssuerKey = RandomValues.CreateBase64String(32),
+                    IssuerKey = Strings.ApiUnitTestIssuer1Key,
                     Enabled = true,
                     Immutable = false,
                 }));
@@ -47,7 +48,7 @@ namespace Bhbk.Lib.Identity.Data
                 new IssuerCreate()
                 {
                     Name = Strings.ApiUnitTestIssuer2,
-                    IssuerKey = RandomValues.CreateBase64String(32),
+                    IssuerKey = Strings.ApiUnitTestIssuer2Key,
                     Enabled = true,
                     Immutable = false,
                 }));
@@ -60,7 +61,7 @@ namespace Bhbk.Lib.Identity.Data
                 {
                     IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single().Id,
                     Name = Strings.ApiUnitTestClient1,
-                    ClientKey = RandomValues.CreateBase64String(32),
+                    ClientKey = Strings.ApiUnitTestClient1Key,
                     ClientType = Enums.ClientType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = false,
@@ -71,7 +72,7 @@ namespace Bhbk.Lib.Identity.Data
                 {
                     IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single().Id,
                     Name = Strings.ApiUnitTestClient2,
-                    ClientKey = RandomValues.CreateBase64String(32),
+                    ClientKey = Strings.ApiUnitTestClient2Key,
                     ClientType = Enums.ClientType.server.ToString(),
                     Enabled = true,
                     Immutable = false,
@@ -120,7 +121,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CommitAsync();
 
             //create roles
-            await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
+            await _uow.RoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                 new RoleCreate()
                 {
                     ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single().Id,
@@ -129,7 +130,7 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = false
                 }));
 
-            await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
+            await _uow.RoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                 new RoleCreate()
                 {
                     ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single().Id,
@@ -141,7 +142,7 @@ namespace Bhbk.Lib.Identity.Data
             await _uow.CommitAsync();
 
             //create user A
-            await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
+            await _uow.UserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
                 new UserCreate()
                 {
                     Email = Strings.ApiUnitTestUser1,
@@ -153,14 +154,14 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = false,
                 }), Strings.ApiUnitTestUserPassCurrent);
 
-            user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            user = (await _uow.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            await _uow.CustomUserMgr.Store.SetEmailConfirmedAsync(user, true);
-            await _uow.CustomUserMgr.Store.SetPasswordConfirmedAsync(user, true);
-            await _uow.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
+            await _uow.UserMgr.Store.SetEmailConfirmedAsync(user, true);
+            await _uow.UserMgr.Store.SetPasswordConfirmedAsync(user, true);
+            await _uow.UserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
 
             //create user B
-            await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
+            await _uow.UserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
                 new UserCreate()
                 {
                     Email = Strings.ApiUnitTestUser2,
@@ -171,40 +172,42 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = false,
                 }), Strings.ApiUnitTestUserPassCurrent);
 
-            user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser2).Single();
+            user = (await _uow.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            await _uow.CustomUserMgr.Store.SetEmailConfirmedAsync(user, true);
-            await _uow.CustomUserMgr.Store.SetPasswordConfirmedAsync(user, true);
-            await _uow.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
+            await _uow.UserMgr.Store.SetEmailConfirmedAsync(user, true);
+            await _uow.UserMgr.Store.SetPasswordConfirmedAsync(user, true);
+            await _uow.UserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
 
             //assign roles, claims & logins to user A
-            user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-            role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole1).Single();
+            user = (await _uow.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            role = (await _uow.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole1)).Single();
             login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin1)).Single();
 
-            await _uow.CustomUserMgr.AddClaimAsync(user, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
+            await _uow.UserMgr.AddClaimAsync(user, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
 
-            if (!await _uow.CustomUserMgr.IsInRoleAsync(user, role.Name))
-                await _uow.CustomUserMgr.AddToRoleAsync(user, role.Name);
+            if (!await _uow.UserMgr.IsInRoleAsync(user, role.Name))
+                await _uow.UserMgr.AddToRoleAsync(user, role.Name);
 
-            if (!await _uow.CustomUserMgr.IsInLoginAsync(user, login.LoginProvider))
-                await _uow.CustomUserMgr.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+            if (!await _uow.UserMgr.IsInLoginAsync(user, login.LoginProvider))
+                await _uow.UserMgr.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
 
             //assign roles, claims & logins to user B
-            user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser2).Single();
-            role = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiUnitTestRole2).Single();
+            user = (await _uow.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            role = (await _uow.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
             login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiUnitTestLogin2)).Single();
 
-            await _uow.CustomUserMgr.AddClaimAsync(user, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
+            await _uow.UserMgr.AddClaimAsync(user, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
 
-            if (!await _uow.CustomUserMgr.IsInRoleAsync(user, role.Name))
-                await _uow.CustomUserMgr.AddToRoleAsync(user, role.Name);
+            if (!await _uow.UserMgr.IsInRoleAsync(user, role.Name))
+                await _uow.UserMgr.AddToRoleAsync(user, role.Name);
 
-            if (!await _uow.CustomUserMgr.IsInLoginAsync(user, login.LoginProvider))
-                await _uow.CustomUserMgr.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+            if (!await _uow.UserMgr.IsInLoginAsync(user, login.LoginProvider))
+                await _uow.UserMgr.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+
+            await _uow.CommitAsync();
         }
 
-        public async void CreateRandom(uint sets)
+        public async Task CreateRandomAsync(uint sets)
         {
             if (_uow.Situation != ContextType.UnitTest)
                 throw new InvalidOperationException();
@@ -228,7 +231,7 @@ namespace Bhbk.Lib.Identity.Data
                     new IssuerCreate()
                     {
                         Name = issuerName,
-                        IssuerKey = RandomValues.CreateBase64String(32),
+                        IssuerKey = Strings.ApiUnitTestIssuer1Key,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -241,7 +244,7 @@ namespace Bhbk.Lib.Identity.Data
                     {
                         IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == issuerName)).Single().Id,
                         Name = clientName,
-                        ClientKey = RandomValues.CreateBase64String(32),
+                        ClientKey = Strings.ApiUnitTestClient1Key,
                         ClientType = Enums.ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -273,7 +276,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
 
                 //create random role
-                await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
+                await _uow.RoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(
                     new RoleCreate()
                     {
                         ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single().Id,
@@ -285,7 +288,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
 
                 //create random user
-                await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
+                await _uow.UserMgr.CreateAsync(_uow.Convert.Map<AppUser>(
                     new UserCreate()
                     {
                         Email = userName,
@@ -298,47 +301,71 @@ namespace Bhbk.Lib.Identity.Data
                     }), Strings.ApiUnitTestUserPassCurrent);
 
                 //assign roles, claims & logins to random user
-                user = _uow.CustomUserMgr.Store.Get(x => x.Email == userName).Single();
-                role = _uow.CustomRoleMgr.Store.Get(x => x.Name == roleName).Single();
+                user = (await _uow.UserMgr.GetAsync(x => x.Email == userName)).Single();
+                role = (await _uow.RoleMgr.GetAsync(x => x.Name == roleName)).Single();
                 login = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == loginName)).Single();
 
-                await _uow.CustomUserMgr.Store.SetEmailConfirmedAsync(user, true);
-                await _uow.CustomUserMgr.Store.SetPasswordConfirmedAsync(user, true);
-                await _uow.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
-                await _uow.CustomUserMgr.AddClaimAsync(user, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
+                await _uow.UserMgr.Store.SetEmailConfirmedAsync(user, true);
+                await _uow.UserMgr.Store.SetPasswordConfirmedAsync(user, true);
+                await _uow.UserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
+                await _uow.UserMgr.AddClaimAsync(user, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
 
-                if (!await _uow.CustomUserMgr.IsInRoleAsync(user, role.Name))
-                    await _uow.CustomUserMgr.AddToRoleAsync(user, role.Name);
+                if (!await _uow.UserMgr.IsInRoleAsync(user, role.Name))
+                    await _uow.UserMgr.AddToRoleAsync(user, role.Name);
 
-                if (!await _uow.CustomUserMgr.IsInLoginAsync(user, login.LoginProvider))
-                    await _uow.CustomUserMgr.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+                if (!await _uow.UserMgr.IsInLoginAsync(user, login.LoginProvider))
+                    await _uow.UserMgr.AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
+
+                await _uow.CommitAsync();
             }
         }
 
-        public async void Destroy()
+        public async Task DestroyAsync()
         {
             if (_uow.Situation != ContextType.UnitTest)
                 throw new InvalidOperationException();
 
-            foreach (var user in _uow.CustomUserMgr.Store.Get())
-                await _uow.CustomUserMgr.DeleteAsync(user);
+            var users = await _uow.UserMgr.GetAsync(x => x.Email.Contains(Strings.ApiUnitTestUser1)
+                || x.Email.Contains(Strings.ApiUnitTestUser2));
 
-            foreach (var role in _uow.CustomRoleMgr.Store.Get())
-                await _uow.CustomRoleMgr.DeleteAsync(role);
+            foreach(var user in users)
+            {
+                var userRoles = await _uow.UserMgr.GetRolesAsync(user);
+
+                await _uow.UserMgr.RemoveFromRolesAsync(user, userRoles.ToArray());
+                await _uow.UserMgr.DeleteAsync(user);
+            }
 
             await _uow.CommitAsync();
 
-            foreach (var login in await _uow.LoginRepo.GetAsync())
+            var roles = await _uow.RoleMgr.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestRole1)
+                || x.Name.Contains(Strings.ApiUnitTestRole2));
+
+            foreach(var role in roles)
+                await _uow.RoleMgr.DeleteAsync(role);
+
+            await _uow.CommitAsync();
+
+            var logins = await _uow.LoginRepo.GetAsync(x => x.LoginProvider.Contains(Strings.ApiUnitTestLogin1)
+                || x.LoginProvider.Contains(Strings.ApiUnitTestLogin2));
+
+            foreach(var login in logins)
                 await _uow.LoginRepo.DeleteAsync(login);
 
             await _uow.CommitAsync();
 
-            foreach (var client in await _uow.ClientRepo.GetAsync())
+            var clients = await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestClient1)
+                || x.Name.Contains(Strings.ApiUnitTestClient2));
+
+            foreach(var client in clients)
                 await _uow.ClientRepo.DeleteAsync(client);
 
             await _uow.CommitAsync();
 
-            foreach (var issuer in await _uow.IssuerRepo.GetAsync())
+            var issuers = await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestIssuer1)
+                || x.Name.Contains(Strings.ApiUnitTestIssuer2));
+
+            foreach(var issuer in issuers)
                 await _uow.IssuerRepo.DeleteAsync(issuer);
 
             await _uow.CommitAsync();

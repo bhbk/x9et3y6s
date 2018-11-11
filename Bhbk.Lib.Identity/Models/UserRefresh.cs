@@ -3,11 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models
 {
-    public partial class AppUserRefresh
-    {
-
-    }
-
     public abstract class UserRefreshBase
     {
         [Required]
@@ -15,9 +10,6 @@ namespace Bhbk.Lib.Identity.Models
 
         [Required]
         public Guid UserId { get; set; }
-
-        [Required]
-        public string ProtectedTicket { get; set; }
 
         [Required]
         public DateTime IssuedUtc { get; set; }
@@ -29,6 +21,9 @@ namespace Bhbk.Lib.Identity.Models
     public class UserRefreshCreate : UserRefreshBase
     {
         public Guid ActorId { get; set; }
+
+        [Required]
+        public string ProtectedTicket { get; set; }
     }
 
     public class UserRefreshResult : UserRefreshBase

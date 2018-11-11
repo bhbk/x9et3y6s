@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Managers;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Infrastructure
@@ -16,44 +13,39 @@ namespace Bhbk.Lib.Identity.Infrastructure
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public class IdentityContext : IIdentityContext<AppDbContext>
     {
-        private readonly IConfigurationRoot _conf;
         private readonly ContextType _situation;
         private readonly IMapper _convert;
-        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private readonly AppDbContext _context;
         private readonly ActivityRepository _activityRepo;
         private readonly ClientRepository _clientRepo;
         private readonly ConfigRepository _configRepo;
-        private readonly CustomRoleManager _customRoleMgr;
-        private readonly CustomUserManager _customUserMgr;
         private readonly IssuerRepository _issuerRepo;
         private readonly LoginRepository _loginRepo;
+        private readonly RoleManagerExt _roleMgr;
+        private readonly UserManagerExt _userMgr;
         private UserQuotes _userQuote;
 
-        public IdentityContext(DbContextOptions<AppDbContext> options, ContextType status)
-            : this(new AppDbContext(options), status)
+        public IdentityContext(DbContextOptions<AppDbContext> options, ContextType situation, IConfigurationRoot conf)
+            : this(new AppDbContext(options, conf), situation, conf)
         {
+
         }
 
-        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType status)
-            : this(new AppDbContext(optionsBuilder.Options), status)
+        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType situation, IConfigurationRoot conf)
+            : this(new AppDbContext(optionsBuilder.Options, conf), situation, conf)
         {
+
         }
 
-        private IdentityContext(AppDbContext context, ContextType status)
+        private IdentityContext(AppDbContext context, ContextType situation, IConfigurationRoot conf)
         {
             _disposed = false;
 
             if (context == null)
                 throw new ArgumentNullException();
 
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_lib.DirectoryName)
-                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
-                .Build();
-
             _context = context;
-            _situation = status;
+            _situation = situation;
 
             _convert = new MapperConfiguration(x =>
             {
@@ -62,13 +54,13 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             _activityRepo = new ActivityRepository(_context);
             _clientRepo = new ClientRepository(_context);
-            _configRepo = new ConfigRepository();
-            _customRoleMgr = new CustomRoleManager(new CustomRoleStore(_context));
-            _customUserMgr = new CustomUserManager(new CustomUserStore(_context));
+            _configRepo = new ConfigRepository(conf);
             _issuerRepo = new IssuerRepository(_context);
             _loginRepo = new LoginRepository(_context);
+            _roleMgr = new RoleManagerExt(new RoleStoreExt(_context));
+            _userMgr = new UserManagerExt(new UserStoreExt(_context));
 
-            _issuerRepo.Salt = _conf["IdentityTenants:Salt"];
+            _issuerRepo.Salt = conf["IdentityTenants:Salt"];
         }
 
         public AppDbContext Context
@@ -119,22 +111,6 @@ namespace Bhbk.Lib.Identity.Infrastructure
             }
         }
 
-        public CustomRoleManager CustomRoleMgr
-        {
-            get
-            {
-                return _customRoleMgr;
-            }
-        }
-
-        public CustomUserManager CustomUserMgr
-        {
-            get
-            {
-                return _customUserMgr;
-            }
-        }
-
         public IssuerRepository IssuerRepo
         {
             get
@@ -148,6 +124,22 @@ namespace Bhbk.Lib.Identity.Infrastructure
             get
             {
                 return _loginRepo;
+            }
+        }
+
+        public RoleManagerExt RoleMgr
+        {
+            get
+            {
+                return _roleMgr;
+            }
+        }
+
+        public UserManagerExt UserMgr
+        {
+            get
+            {
+                return _userMgr;
             }
         }
 

@@ -26,17 +26,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
+            var role = await UoW.RoleMgr.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.CustomUserMgr.AddToRoleAsync(user, role.Name);
+            var result = await UoW.UserMgr.AddToRoleAsync(user, role.Name);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -55,19 +55,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var check = await UoW.CustomRoleMgr.FindByNameAsync(model.Name);
+            var check = await UoW.RoleMgr.FindByNameAsync(model.Name);
 
             if (check != null)
                 return BadRequest(Strings.MsgRoleAlreadyExists);
 
-            var create = await UoW.CustomRoleMgr.CreateAsync(UoW.Convert.Map<AppRole>(model));
+            var create = await UoW.RoleMgr.CreateAsync(UoW.Convert.Map<AppRole>(model));
 
             if (!create.Succeeded)
                 return GetErrorResult(create);
 
             await UoW.CommitAsync();
 
-            var result = await UoW.CustomRoleMgr.FindByNameAsync(model.Name);
+            var result = await UoW.RoleMgr.FindByNameAsync(model.Name);
 
             if(result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> DeleteRoleV1([FromRoute] Guid roleID)
         {
-            var role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
+            var role = await UoW.RoleMgr.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             role.ActorId = GetUserGUID();
 
-            var result = await UoW.CustomRoleMgr.DeleteAsync(role);
+            var result = await UoW.RoleMgr.DeleteAsync(role);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -99,17 +99,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{roleValue}"), HttpPost]
-        public async Task<IActionResult> GetRoleV1([FromBody] string roleValue)
+        [Route("v1/{roleValue}"), HttpGet]
+        public async Task<IActionResult> GetRoleV1([FromRoute] string roleValue)
         {
             Guid roleID;
             AppRole role;
 
-            //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(roleValue, out roleID))
-                role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
+                role = await UoW.RoleMgr.FindByIdAsync(roleID.ToString());
             else
-                role = await UoW.CustomRoleMgr.FindByNameAsync(roleValue.ToString());
+                role = await UoW.RoleMgr.FindByNameAsync(roleValue.ToString());
 
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
@@ -131,8 +130,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.CustomRoleMgr.Store.Count(expr);
-            var list = UoW.CustomRoleMgr.Store.Get(expr,
+            var total = await UoW.RoleMgr.Count(expr);
+            var list = await UoW.RoleMgr.GetAsync(expr,
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
                 x => x.Include(y => y.AppUserRole));
 
@@ -144,12 +143,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{roleID:guid}/users"), HttpGet]
         public async Task<IActionResult> GetRoleUsersV1([FromRoute] Guid roleID)
         {
-            var role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
+            var role = await UoW.RoleMgr.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
 
-            var users = UoW.CustomRoleMgr.GetUsersListAsync(role);
+            var users = UoW.RoleMgr.GetUsersListAsync(role);
 
             var result = users.Select(x => UoW.Convert.Map<UserResult>(x));
 
@@ -163,17 +162,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = await UoW.CustomRoleMgr.FindByIdAsync(roleID.ToString());
+            var role = await UoW.RoleMgr.FindByIdAsync(roleID.ToString());
 
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.CustomUserMgr.RemoveFromRoleAsync(user, role.Name);
+            var result = await UoW.UserMgr.RemoveFromRoleAsync(user, role.Name);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -192,7 +191,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var role = await UoW.CustomRoleMgr.FindByIdAsync(model.Id.ToString());
+            var role = await UoW.RoleMgr.FindByIdAsync(model.Id.ToString());
 
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
@@ -200,14 +199,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (role.Immutable)
                 return BadRequest(Strings.MsgRoleImmutable);
 
-            var create = await UoW.CustomRoleMgr.UpdateAsync(UoW.Convert.Map<AppRole>(model));
+            var create = await UoW.RoleMgr.UpdateAsync(UoW.Convert.Map<AppRole>(model));
 
             if (!create.Succeeded)
                 return GetErrorResult(create);
 
             await UoW.CommitAsync();
 
-            var result = await UoW.CustomRoleMgr.FindByNameAsync(model.Name);
+            var result = await UoW.RoleMgr.FindByNameAsync(model.Name);
 
             return Ok(UoW.Convert.Map<RoleResult>(result));
         }

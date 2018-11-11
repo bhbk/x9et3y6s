@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace Bhbk.Lib.Identity.Repository
 
         public async Task<int> Count(Expression<Func<AppLogin, bool>> predicates = null)
         {
-            IQueryable<AppLogin> query = _context.AppLogin.AsQueryable();
+            var query = _context.AppLogin.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -64,13 +65,15 @@ namespace Bhbk.Lib.Identity.Repository
             Func<IQueryable<AppLogin>, IIncludableQueryable<AppLogin, object>> includes = null,
             bool tracking = true)
         {
-            IQueryable<AppLogin> query = _context.AppLogin.AsQueryable();
+            var query = _context.AppLogin.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
 
             if (includes != null)
                 query = includes(query);
+
+            query.Include("AppUserLogin.User").Load();
 
             if (orderBy != null)
                 return await Task.FromResult(orderBy(query));

@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data
 {
-    public class DefaultData
+    public class GenerateDefaultData
     {
         private readonly IIdentityContext<AppDbContext> _uow;
 
-        public DefaultData(IIdentityContext<AppDbContext> uow)
+        public GenerateDefaultData(IIdentityContext<AppDbContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -21,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data
             _uow = uow;
         }
 
-        public async void Create()
+        public async Task CreateAsync()
         {
             IssuerCreate issuer;
             ClientCreate client;
@@ -99,7 +100,7 @@ namespace Bhbk.Lib.Identity.Data
                 await _uow.CommitAsync();
             }
 
-            var foundUser = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).SingleOrDefault();
+            var foundUser = (await _uow.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).SingleOrDefault();
 
             if (foundUser == null)
             {
@@ -114,16 +115,16 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                await _uow.CustomUserMgr.CreateAsync(_uow.Convert.Map<AppUser>(user), Strings.ApiDefaultUserPassword);
+                await _uow.UserMgr.CreateAsync(_uow.Convert.Map<AppUser>(user), Strings.ApiDefaultUserPassword);
 
-                foundUser = _uow.CustomUserMgr.Store.Get(x => x.Email == user.Email).Single();
+                foundUser = (await _uow.UserMgr.GetAsync(x => x.Email == user.Email)).Single();
 
-                await _uow.CustomUserMgr.Store.SetEmailConfirmedAsync(foundUser, true);
-                await _uow.CustomUserMgr.Store.SetPasswordConfirmedAsync(foundUser, true);
-                await _uow.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(foundUser, true);
+                await _uow.UserMgr.Store.SetEmailConfirmedAsync(foundUser, true);
+                await _uow.UserMgr.Store.SetPasswordConfirmedAsync(foundUser, true);
+                await _uow.UserMgr.Store.SetPhoneNumberConfirmedAsync(foundUser, true);
             }
 
-            var foundRoleForAdminUi = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiDefaultRoleForAdminUi).SingleOrDefault();
+            var foundRoleForAdminUi = (await _uow.RoleMgr.GetAsync(x => x.Name == Strings.ApiDefaultRoleForAdminUi)).SingleOrDefault();
 
             if (foundRoleForAdminUi == null)
             {
@@ -135,13 +136,13 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(role));
+                await _uow.RoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(role));
                 await _uow.CommitAsync();
 
-                foundRoleForAdminUi = _uow.CustomRoleMgr.Store.Get(x => x.Name == role.Name).Single();
+                foundRoleForAdminUi = (await _uow.RoleMgr.GetAsync(x => x.Name == role.Name)).Single();
             }
 
-            var foundRoleForViewerApi = _uow.CustomRoleMgr.Store.Get(x => x.Name == Strings.ApiDefaultRoleForViewerApi).SingleOrDefault();
+            var foundRoleForViewerApi = (await _uow.RoleMgr.GetAsync(x => x.Name == Strings.ApiDefaultRoleForViewerApi)).SingleOrDefault();
 
             if (foundRoleForViewerApi == null)
             {
@@ -153,48 +154,48 @@ namespace Bhbk.Lib.Identity.Data
                     Immutable = true,
                 };
 
-                await _uow.CustomRoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(role));
+                await _uow.RoleMgr.CreateAsync(_uow.Convert.Map<AppRole>(role));
                 await _uow.CommitAsync();
 
-                foundRoleForViewerApi = _uow.CustomRoleMgr.Store.Get(x => x.Name == role.Name).Single();
+                foundRoleForViewerApi = (await _uow.RoleMgr.GetAsync(x => x.Name == role.Name)).Single();
             }
 
-            if (!await _uow.CustomUserMgr.IsInLoginAsync(foundUser, Strings.ApiDefaultLogin))
-                await _uow.CustomUserMgr.AddLoginAsync(foundUser,
+            if (!await _uow.UserMgr.IsInLoginAsync(foundUser, Strings.ApiDefaultLogin))
+                await _uow.UserMgr.AddLoginAsync(foundUser,
                     new UserLoginInfo(Strings.ApiDefaultLogin, Strings.ApiDefaultLoginKey, Strings.ApiDefaultLoginName));
 
-            if (!await _uow.CustomUserMgr.IsInRoleAsync(foundUser, foundRoleForAdminUi.Name))
-                await _uow.CustomUserMgr.AddToRoleAsync(foundUser, foundRoleForAdminUi.Name);
+            if (!await _uow.UserMgr.IsInRoleAsync(foundUser, foundRoleForAdminUi.Name))
+                await _uow.UserMgr.AddToRoleAsync(foundUser, foundRoleForAdminUi.Name);
 
-            if (!await _uow.CustomUserMgr.IsInRoleAsync(foundUser, foundRoleForViewerApi.Name))
-                await _uow.CustomUserMgr.AddToRoleAsync(foundUser, foundRoleForViewerApi.Name);
+            if (!await _uow.UserMgr.IsInRoleAsync(foundUser, foundRoleForViewerApi.Name))
+                await _uow.UserMgr.AddToRoleAsync(foundUser, foundRoleForViewerApi.Name);
         }
 
-        public async void Destroy()
+        public async Task DestroyAsync()
         {
-            var user = await _uow.CustomUserMgr.FindByNameAsync(Strings.ApiDefaultUserAdmin + "@local");
+            var user = await _uow.UserMgr.FindByNameAsync(Strings.ApiDefaultUserAdmin + "@local");
 
             if (user != null)
             {
-                var roles = await _uow.CustomUserMgr.GetRolesAsync(user);
+                var roles = await _uow.UserMgr.GetRolesAsync(user);
 
-                await _uow.CustomUserMgr.RemoveFromRolesAsync(user, roles.ToArray());
-                await _uow.CustomUserMgr.DeleteAsync(user);
+                await _uow.UserMgr.RemoveFromRolesAsync(user, roles.ToArray());
+                await _uow.UserMgr.DeleteAsync(user);
             }
 
-            var roleAdmin = await _uow.CustomRoleMgr.FindByNameAsync(Strings.ApiDefaultRoleForAdminUi);
+            var roleAdmin = await _uow.RoleMgr.FindByNameAsync(Strings.ApiDefaultRoleForAdminUi);
 
             if (roleAdmin != null)
             {
-                await _uow.CustomRoleMgr.DeleteAsync(roleAdmin);
+                await _uow.RoleMgr.DeleteAsync(roleAdmin);
                 await _uow.CommitAsync();
             }
 
-            var roleViewer = await _uow.CustomRoleMgr.FindByNameAsync(Strings.ApiDefaultRoleForViewerApi);
+            var roleViewer = await _uow.RoleMgr.FindByNameAsync(Strings.ApiDefaultRoleForViewerApi);
 
             if (roleViewer != null)
             {
-                await _uow.CustomRoleMgr.DeleteAsync(roleViewer);
+                await _uow.RoleMgr.DeleteAsync(roleViewer);
                 await _uow.CommitAsync();
             }
 

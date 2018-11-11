@@ -1,14 +1,10 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 
 namespace Bhbk.Lib.Identity.Repository
 {
     public class ConfigRepository
     {
-        private readonly IConfigurationRoot _conf;
-        private readonly FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
         private UInt32 _defaultsAccessTokenExpire;
         private UInt32 _defaultsAuthorizationCodeExpire;
         private UInt32 _defaultsBrowserCookieExpire;
@@ -17,27 +13,21 @@ namespace Bhbk.Lib.Identity.Repository
         private bool _defaultsCompatibilityModeIssuer;
         private bool _unitTestsAccessToken;
         private bool _unitTestsRefreshToken;
-        private DateTime _unitTestsAccessTokenFakeUtcNow;
-        private DateTime _unitTestsRefreshTokenFakeUtcNow;
+        private DateTime _unitTestsAccessTokenfactoryUtcNow;
+        private DateTime _unitTestsRefreshTokenfactoryUtcNow;
 
-        public ConfigRepository()
+        public ConfigRepository(IConfigurationRoot conf)
         {
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_lib.DirectoryName)
-                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            _defaultsAccessTokenExpire = UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]);
-            _defaultsAuthorizationCodeExpire = UInt32.Parse(_conf["IdentityDefaults:AuthorizationCodeExpire"]);
-            _defaultsBrowserCookieExpire = UInt32.Parse(_conf["IdentityDefaults:BrowserCookieExpire"]);
-            _defaultsRefreshTokenExpire = UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]);
-            _defaultsCompatibilityModeClaims = bool.Parse(_conf["IdentityDefaults:CompatibilityModeClaims"]);
-            _defaultsCompatibilityModeIssuer = bool.Parse(_conf["IdentityDefaults:CompatibilityModeIssuer"]);
+            _defaultsAccessTokenExpire = UInt32.Parse(conf["IdentityDefaults:AccessTokenExpire"]);
+            _defaultsAuthorizationCodeExpire = UInt32.Parse(conf["IdentityDefaults:AuthorizationCodeExpire"]);
+            _defaultsBrowserCookieExpire = UInt32.Parse(conf["IdentityDefaults:BrowserCookieExpire"]);
+            _defaultsRefreshTokenExpire = UInt32.Parse(conf["IdentityDefaults:RefreshTokenExpire"]);
+            _defaultsCompatibilityModeClaims = bool.Parse(conf["IdentityDefaults:CompatibilityModeClaims"]);
+            _defaultsCompatibilityModeIssuer = bool.Parse(conf["IdentityDefaults:CompatibilityModeIssuer"]);
             _unitTestsAccessToken = false;
-            _unitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
+            _unitTestsAccessTokenfactoryUtcNow = DateTime.UtcNow;
             _unitTestsRefreshToken = false;
-            _unitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
+            _unitTestsRefreshTokenfactoryUtcNow = DateTime.UtcNow;
         }
 
         public UInt32 DefaultsAccessTokenExpire
@@ -84,16 +74,16 @@ namespace Bhbk.Lib.Identity.Repository
             set { _unitTestsRefreshToken = value; }
         }
 
-        public DateTime UnitTestsAccessTokenFakeUtcNow
+        public DateTime UnitTestsAccessTokenfactoryUtcNow
         {
-            get { return _unitTestsAccessTokenFakeUtcNow; }
-            set { _unitTestsAccessTokenFakeUtcNow = value; }
+            get { return _unitTestsAccessTokenfactoryUtcNow; }
+            set { _unitTestsAccessTokenfactoryUtcNow = value; }
         }
 
-        public DateTime UnitTestsRefreshTokenFakeUtcNow
+        public DateTime UnitTestsRefreshTokenfactoryUtcNow
         {
-            get { return _unitTestsRefreshTokenFakeUtcNow; }
-            set { _unitTestsRefreshTokenFakeUtcNow = value; }
+            get { return _unitTestsRefreshTokenfactoryUtcNow; }
+            set { _unitTestsRefreshTokenfactoryUtcNow = value; }
         }
     }
 }

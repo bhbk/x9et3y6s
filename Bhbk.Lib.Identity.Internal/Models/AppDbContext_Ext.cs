@@ -1,5 +1,4 @@
 using AutoMapper;
-using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,26 +20,21 @@ namespace Bhbk.Lib.Identity.Models
         private static IConfigurationRoot _conf;
         private static IMapper _convert;
         private static IList _fieldsExcluded, _fieldsSensitive, _tablesExcluded;
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
 
-        public AppDbContext(DbContextOptions<AppDbContext> options)
+        public AppDbContext(DbContextOptions<AppDbContext> options, IConfigurationRoot conf)
         : base(options)
         {
+            _conf = conf;
         }
 
-        public AppDbContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder)
+        public AppDbContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, IConfigurationRoot conf)
         : base(optionsBuilder.Options)
         {
+            _conf = conf;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_lib.DirectoryName)
-                .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
             _convert = new MapperConfiguration(x =>
             {
                 x.AddProfile<IdentityMappings>();

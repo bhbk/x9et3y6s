@@ -13,11 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings-lib.json" />
+    <None Remove="libsettings.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings-lib.json">
+    <Content Include="libsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>false</Pack>
     </Content>

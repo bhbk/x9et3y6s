@@ -32,12 +32,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.CustomUserMgr.AddLoginAsync(user,
+            var result = await UoW.UserMgr.AddLoginAsync(user,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
 
             if (!result.Succeeded)
@@ -159,12 +159,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.CustomUserMgr.RemoveLoginAsync(user, login.LoginProvider, string.Empty);
+            var result = await UoW.UserMgr.RemoveLoginAsync(user, login.LoginProvider, string.Empty);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);

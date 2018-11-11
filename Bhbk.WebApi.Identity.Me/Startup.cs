@@ -28,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Me
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+            var lib = SearchRoots.ByAssemblyContext("libsettings.json");
             var api = SearchRoots.ByAssemblyContext("appsettings.json");
 
             var conf = new ConfigurationBuilder()
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton(conf);
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
             {
-                return new IdentityContext(options, ContextType.Live);
+                return new IdentityContext(options, ContextType.Live, conf);
             });
             sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));

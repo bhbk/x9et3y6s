@@ -3,12 +3,10 @@ using Bhbk.Lib.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,11 +16,11 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Repository
 {
-    public partial class CustomUserStore : UserStore<AppUser, AppRole, AppDbContext, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppUserToken, AppRoleClaim>
+    public partial class UserStoreExt : UserStore<AppUser, AppRole, AppDbContext, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppUserToken, AppRoleClaim>
     {
         private readonly AppDbContext _context;
 
-        public CustomUserStore(AppDbContext context, IdentityErrorDescriber describer = null)
+        public UserStoreExt(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)
         {
             if (context == null)
@@ -113,16 +111,6 @@ namespace Bhbk.Lib.Identity.Repository
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public async Task<int> Count(Expression<Func<AppUser, bool>> predicates = null)
-        {
-            IQueryable<AppUser> query = _context.AppUser.AsQueryable();
-
-            if (predicates != null)
-                return await query.Where(predicates).CountAsync();
-
-            return await query.CountAsync();
-        }
-
         public override Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!user.HumanBeing)
@@ -177,25 +165,6 @@ namespace Bhbk.Lib.Identity.Repository
         public IQueryable<AppUserRefresh> FindRefreshTokensAsync()
         {
             return _context.AppUserRefresh.Where(x => x.ExpiresUtc == DateTime.UtcNow);
-        }
-
-        public IQueryable<AppUser> Get(Expression<Func<AppUser, bool>> predicates = null,
-            Func<IQueryable<AppUser>, IQueryable<AppUser>> orderBy = null,
-            Func<IQueryable<AppUser>, IIncludableQueryable<AppUser, object>> includes = null,
-            bool tracking = true)
-        {
-            IQueryable<AppUser> query = _context.AppUser.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orderBy != null)
-                return orderBy(query);
-
-            return query;
         }
 
         public override Task<IList<Claim>> GetClaimsAsync(AppUser user, CancellationToken cancellationToken = default(CancellationToken))

@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Models
 
         public Nullable<DateTime> LastUpdated { get; set; }
 
-        public IList<string> Users { get; set; }
+        public ICollection<string> Users { get; set; }
     }
 
     public class RoleUpdate : RoleBase

@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.CustomUserMgr.ClaimProvider.CreateAsync(user);
+            var identity = await uow.UserMgr.ClaimProvider.CreateAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -31,8 +31,8 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow.Situation == ContextType.UnitTest
                 && uow.ConfigRepo.UnitTestsAccessToken)
             {
-                issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
-                expireDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+                issueDate = uow.ConfigRepo.UnitTestsAccessTokenfactoryUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsAccessTokenfactoryUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
             }
             else
             {
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.CustomUserMgr.ClaimProvider.CreateAsync(user);
+            var identity = await uow.UserMgr.ClaimProvider.CreateAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -70,8 +70,8 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow.Situation == ContextType.UnitTest
                 && uow.ConfigRepo.UnitTestsAccessToken)
             {
-                issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
-                expireDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+                issueDate = uow.ConfigRepo.UnitTestsAccessTokenfactoryUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsAccessTokenfactoryUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
             }
             else
             {
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.CustomUserMgr.ClaimProvider.CreateAsync(user);
+            var identity = await uow.UserMgr.ClaimProvider.CreateAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -111,8 +111,8 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow.Situation == ContextType.UnitTest 
                 && uow.ConfigRepo.UnitTestsAccessToken)
             {
-                issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
-                expireDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+                issueDate = uow.ConfigRepo.UnitTestsAccessTokenfactoryUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsAccessTokenfactoryUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
             }
             else
             {
@@ -147,7 +147,7 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.CustomUserMgr.ClaimProvider.CreateRefreshAsync(user);
+            var identity = await uow.UserMgr.ClaimProvider.CreateRefreshAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -158,8 +158,8 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow.Situation == ContextType.UnitTest 
                 && uow.ConfigRepo.UnitTestsRefreshToken)
             {
-                issueDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow;
-                expireDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsRefreshTokenExpire);
+                issueDate = uow.ConfigRepo.UnitTestsRefreshTokenfactoryUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsRefreshTokenfactoryUtcNow.AddSeconds(uow.ConfigRepo.DefaultsRefreshTokenExpire);
             }
             else
             {
@@ -186,7 +186,7 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
+            var refresh = await uow.UserMgr.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();
@@ -200,7 +200,7 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.CustomUserMgr.ClaimProvider.CreateRefreshAsync(user);
+            var identity = await uow.UserMgr.ClaimProvider.CreateRefreshAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -211,8 +211,8 @@ namespace Bhbk.Lib.Identity.Providers
             if (uow.Situation == ContextType.UnitTest 
                 && uow.ConfigRepo.UnitTestsRefreshToken)
             {
-                issueDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow;
-                expireDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsRefreshTokenExpire);
+                issueDate = uow.ConfigRepo.UnitTestsRefreshTokenfactoryUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsRefreshTokenfactoryUtcNow.AddSeconds(uow.ConfigRepo.DefaultsRefreshTokenExpire);
             }
             else
             {
@@ -239,7 +239,7 @@ namespace Bhbk.Lib.Identity.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.CustomUserMgr.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
+            var refresh = await uow.UserMgr.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();

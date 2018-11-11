@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Models
 
         public Nullable<DateTime> LastUpdated { get; set; }
 
-        public IList<string> Roles { get; set; }
+        public ICollection<string> Roles { get; set; }
     }
 
     public class ClientUpdate : ClientBase

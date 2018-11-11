@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ClientController() { }
 
-        [Route("v1"), HttpPost] 
+        [Route("v1"), HttpPost]
         [Authorize(Roles = "(Built-In) Administrators")]
         public async Task<IActionResult> CreateClientV1([FromBody] ClientCreate model)
         {
@@ -73,7 +73,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             Guid clientID;
             AppClient client;
 
-            //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
                 client = await UoW.ClientRepo.GetAsync(clientID);
             else

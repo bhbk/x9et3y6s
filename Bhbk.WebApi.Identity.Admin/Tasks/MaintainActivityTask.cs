@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +15,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class MaintainActivityTask : BackgroundService
     {
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }

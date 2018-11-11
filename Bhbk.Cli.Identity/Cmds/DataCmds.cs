@@ -15,7 +15,7 @@ namespace Bhbk.Cli.Identity.Cmds
     public class DataCmds : ConsoleCommand
     {
         private static IConfigurationRoot _conf;
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("libsettings.json");
         private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
 
         public DataCmds()
@@ -40,8 +40,8 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.UoW = new IdentityContext(builder, ContextType.Live);
-                Statics.DefaultData = new DefaultData(Statics.UoW);
+                Statics.UoW = new IdentityContext(builder, ContextType.Live, _conf);
+                Statics.DefaultData = new GenerateDefaultData(Statics.UoW);
 
                 if (CreateDefault)
                 {
@@ -49,7 +49,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    Statics.DefaultData.Create();
+                    Statics.DefaultData.CreateAsync();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -60,7 +60,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    Statics.DefaultData.Destroy();
+                    Statics.DefaultData.DestroyAsync();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -71,7 +71,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    Statics.DefaultData.Destroy();
+                    Statics.DefaultData.DestroyAsync();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

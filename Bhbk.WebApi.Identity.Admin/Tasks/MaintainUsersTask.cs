@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +16,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
     public class MaintainUsersTask : BackgroundService
     {
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly int _delay;
         public string Status { get; private set; }
@@ -53,8 +50,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var disabled = uow.CustomUserMgr.Store.Context.AppUser
+                    var disabled = uow.UserMgr.Store.Context.AppUser
                         .Where(x => x.LockoutEnd < DateTime.UtcNow);
+
                     var disabledCount = disabled.Count();
 
                     if (disabled.Any())
@@ -63,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         {
                             entry.LockoutEnabled = false;
                             entry.LockoutEnd = null;
-                            uow.CustomUserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
+                            uow.UserMgr.Store.Context.Entry(entry).State = EntityState.Modified;
                         }
 
                         await uow.CommitAsync();

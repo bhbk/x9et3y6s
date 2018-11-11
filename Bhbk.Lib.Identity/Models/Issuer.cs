@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Models
 
         public Nullable<DateTime> LastUpdated { get; set; }
 
-        public IList<string> Clients { get; set; }
+        public ICollection<string> Clients { get; set; }
     }
 
     public class IssuerUpdate : IssuerBase

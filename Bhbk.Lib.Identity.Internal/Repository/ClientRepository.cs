@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Repository
 
         public async Task<int> Count(Expression<Func<AppClient, bool>> predicates = null)
         {
-            IQueryable<AppClient> query = _context.AppClient.AsQueryable();
+            var query = _context.AppClient.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -58,8 +58,6 @@ namespace Bhbk.Lib.Identity.Repository
         {
             var client = _context.AppClient.Where(x => x.Id == key).SingleOrDefault();
 
-            _context.Entry(client).Collection(x => x.AppRole).Load();
-
             return await Task.FromResult(client);
         }
 
@@ -73,7 +71,7 @@ namespace Bhbk.Lib.Identity.Repository
             Func<IQueryable<AppClient>, IIncludableQueryable<AppClient, object>> includes = null, 
             bool tracking = true)
         {
-            IQueryable<AppClient> query = _context.AppClient.AsQueryable();
+            var query = _context.AppClient.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -89,7 +87,7 @@ namespace Bhbk.Lib.Identity.Repository
 
         public async Task<IList<AppRole>> GetRoleListAsync(Guid clientId)
         {
-            IList<AppRole> result = new List<AppRole>();
+            var result = new List<AppRole>();
             var roles = _context.AppRole.Where(x => x.ClientId == clientId);
 
             if (roles == null)

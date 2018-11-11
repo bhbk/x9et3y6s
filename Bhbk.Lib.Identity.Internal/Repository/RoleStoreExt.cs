@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,27 +13,17 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Repository
 {
-    public class CustomRoleStore : RoleStore<AppRole, AppDbContext, Guid>
+    public class RoleStoreExt : RoleStore<AppRole, AppDbContext, Guid>
     {
         private readonly AppDbContext _context;
 
-        public CustomRoleStore(AppDbContext context, IdentityErrorDescriber describer = null)
+        public RoleStoreExt(AppDbContext context, IdentityErrorDescriber describer = null)
             : base(context, describer)
         {
             if (context == null)
                 throw new ArgumentNullException();
 
             _context = context;
-        }
-
-        public async Task<int> Count(Expression<Func<AppRole, bool>> predicates = null)
-        {
-            IQueryable<AppRole> query = _context.AppRole.AsQueryable();
-
-            if (predicates != null)
-                return await query.Where(predicates).CountAsync();
-
-            return await query.CountAsync();
         }
 
         public override Task<IdentityResult> CreateAsync(AppRole role, CancellationToken cancellationToken = default(CancellationToken))
@@ -72,28 +60,9 @@ namespace Bhbk.Lib.Identity.Repository
             return _context.AppRole.Any(x => x.Name == roleName);
         }
 
-        public IQueryable<AppRole> Get(Expression<Func<AppRole, bool>> predicates = null,
-            Func<IQueryable<AppRole>, IQueryable<AppRole>> orderBy = null,
-            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null,
-            bool tracking = true)
-        {
-            IQueryable<AppRole> query = _context.AppRole.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orderBy != null)
-                return orderBy(query);
-
-            return query;
-        }
-
         public IList<AppUser> GetUsersAsync(AppRole role)
         {
-            IList<AppUser> result = new List<AppUser>();
+            var result = new List<AppUser>();
             var list = _context.AppUserRole.Where(x => x.RoleId == role.Id).AsQueryable();
 
             if (list == null)

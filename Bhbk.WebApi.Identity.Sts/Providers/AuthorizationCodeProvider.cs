@@ -108,9 +108,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
-                    user = uow.CustomUserMgr.FindByIdAsync(userID.ToString()).Result;
+                    user = uow.UserMgr.FindByIdAsync(userID.ToString()).Result;
                 else
-                    user = uow.CustomUserMgr.FindByEmailAsync(userValue).Result;
+                    user = uow.UserMgr.FindByEmailAsync(userValue).Result;
 
                 if (user == null)
                 {
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.CustomUserMgr.IsLockedOutAsync(user).Result
+                if (uow.UserMgr.IsLockedOutAsync(user).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
                 }
 
-                var clientList = uow.CustomUserMgr.GetClientsAsync(user).Result;
+                var clientList = uow.UserMgr.GetClientsAsync(user).Result;
                 var clients = new List<AppClient>();
 
                 //check if client is single, multiple or undefined...

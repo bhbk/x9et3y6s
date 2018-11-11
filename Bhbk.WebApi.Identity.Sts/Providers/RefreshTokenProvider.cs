@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
                 }
 
-                var refreshToken = uow.CustomUserMgr.FindRefreshTokenAsync(refreshTokenValue).Result;
+                var refreshToken = uow.UserMgr.FindRefreshTokenAsync(refreshTokenValue).Result;
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
                 }
 
-                var user = uow.CustomUserMgr.FindByIdAsync(refreshToken.UserId.ToString()).Result;
+                var user = uow.UserMgr.FindByIdAsync(refreshToken.UserId.ToString()).Result;
 
                 //check that user exists...
                 if (user == null)
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 user.ActorId = user.Id;
 
                 //check that user is not locked...
-                if (uow.CustomUserMgr.IsLockedOutAsync(user).Result
+                if (uow.UserMgr.IsLockedOutAsync(user).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var clientList = uow.CustomUserMgr.GetClientsAsync(user).Result;
+                var clientList = uow.UserMgr.GetClientsAsync(user).Result;
                 var clients = new List<AppClient>();
 
                 //check if client is single, multiple or undefined...
@@ -282,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
                 }
 
-                var refreshToken = uow.CustomUserMgr.FindRefreshTokenAsync(refreshTokenValue).Result;
+                var refreshToken = uow.UserMgr.FindRefreshTokenAsync(refreshTokenValue).Result;
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -293,7 +293,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalidToken }, _serializer));
                 }
 
-                var user = uow.CustomUserMgr.FindByIdAsync(refreshToken.UserId.ToString()).Result;
+                var user = uow.UserMgr.FindByIdAsync(refreshToken.UserId.ToString()).Result;
 
                 //check that user exists...
                 if (user == null)
@@ -307,7 +307,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 user.ActorId = user.Id;
 
                 //check that user is not locked...
-                if (uow.CustomUserMgr.IsLockedOutAsync(user).Result
+                if (uow.UserMgr.IsLockedOutAsync(user).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {

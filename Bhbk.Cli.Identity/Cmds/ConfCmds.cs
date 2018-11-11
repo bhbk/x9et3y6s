@@ -14,7 +14,7 @@ namespace Bhbk.Cli.Identity.Cmds
     public class ConfCmds : ConsoleCommand
     {
         private static IConfigurationRoot _conf;
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("appsettings-lib.json");
+        private static FileInfo _lib = SearchRoots.ByAssemblyContext("libsettings.json");
         private static bool ReadConfig = false;
 
         public ConfCmds()
@@ -37,7 +37,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .UseSqlServer(_conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.UoW = new IdentityContext(builder, ContextType.Live);
+                Statics.UoW = new IdentityContext(builder, ContextType.Live, _conf);
 
                 if (ReadConfig)
                 {

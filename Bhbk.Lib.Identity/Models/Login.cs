@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Models
         [Required]
         public Guid Id { get; set; }
 
-        public IList<string> Users { get; set; }
+        public ICollection<string> Users { get; set; }
     }
 
     public class LoginUpdate : LoginBase

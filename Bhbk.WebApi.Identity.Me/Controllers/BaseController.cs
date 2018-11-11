@@ -57,9 +57,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [NonAction]
         public void SetUser(Guid userID)
         {
-            var user = UoW.CustomUserMgr.Store.FindByIdAsync(userID.ToString()).Result;
+            var user = UoW.UserMgr.Store.FindByIdAsync(userID.ToString()).Result;
 
-            ControllerContext.HttpContext.User = UoW.CustomUserMgr.ClaimProvider.CreateAsync(user).Result;
+            ControllerContext.HttpContext.User = UoW.UserMgr.ClaimProvider.CreateAsync(user).Result;
         }
     }
 }

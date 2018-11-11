@@ -15,11 +15,9 @@ namespace Bhbk.Lib.Identity.Models
         public string PhoneNumber { get; set; }
 
         [Required]
-        [RegularExpression(@"^[\w\s-`']+$", ErrorMessage = "Special characters are not allowed (except - and `).")]
         public string FirstName { get; set; }
 
         [Required]
-        [RegularExpression(@"^[\w\s-`']+$", ErrorMessage = "Special characters are not allowed (except - and `).")]
         public string LastName { get; set; }
 
         public DateTime Created { get; set; }
@@ -36,11 +34,13 @@ namespace Bhbk.Lib.Identity.Models
     public class UserCreate : UserBase
     {
         public Guid IssuerId { get; set; }
+
         public Guid ActorId { get; set; }
     }
 
     public class UserResult : UserBase
     {
+        [Required]
         public Guid Id { get; set; }
 
         public bool EmailConfirmed { get; set; }
@@ -63,9 +63,9 @@ namespace Bhbk.Lib.Identity.Models
 
         public bool TwoFactorEnabled { get; set; }
 
-        public IList<string> Roles { get; set; }
+        public ICollection<string> Roles { get; set; }
 
-        public IList<string> Logins { get; set; }
+        public ICollection<string> Logins { get; set; }
     }
 
     public class UserUpdate : UserBase
@@ -75,7 +75,6 @@ namespace Bhbk.Lib.Identity.Models
 
         public Guid ActorId { get; set; }
 
-        [Required]
         public Nullable<DateTimeOffset> LockoutEnd { get; set; }
     }
 
@@ -159,6 +158,7 @@ namespace Bhbk.Lib.Identity.Models
     public class UserQuotes
     {
         public Success success { get; set; }
+
         public Contents contents { get; set; }
 
         public class Contents
@@ -169,13 +169,21 @@ namespace Bhbk.Lib.Identity.Models
         public class Quote
         {
             public string quote { get; set; }
+
             public string length { get; set; }
+
             public string author { get; set; }
+
             public List<string> tags { get; set; }
+
             public string category { get; set; }
+
             public string date { get; set; }
+
             public string title { get; set; }
+
             public string background { get; set; }
+
             public string id { get; set; }
         }
 

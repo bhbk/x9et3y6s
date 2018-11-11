@@ -1,7 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Data;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
@@ -10,8 +8,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -23,501 +19,496 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 {
-    [Collection("NoParallelExecute")]
-    public class UserControllerTest : IClassFixture<StartupTest>
+    [Collection("AdminTestCollection")]
+    public class UserControllerTest
     {
+        private readonly StartupTest _factory;
         private readonly HttpClient _client;
-        private readonly IServiceProvider _sp;
-        private readonly IConfigurationRoot _conf;
-        private readonly IIdentityContext<AppDbContext> _uow;
-        private readonly AdminClient _admin;
+        private readonly AdminClient _endpoints;
 
-        public UserControllerTest(StartupTest fake)
+        public UserControllerTest(StartupTest factory)
         {
-            _client = fake.CreateClient();
-            _sp = fake.Server.Host.Services;
-            _conf = fake.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
-            _uow = fake.Server.Host.Services.GetRequiredService<IIdentityContext<AppDbContext>>();
-            _admin = new AdminClient(_conf, _uow.Situation, _client);
+            _factory = factory;
+            _client = _factory.CreateClient();
+            _endpoints = new AdminClient(_factory.Conf, _factory.UoW.Situation, _client);
+        }
+
+        [Fact(Skip = "NotImplemented")]
+        public async Task Admin_UserV1_AddClaim_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
         }
 
         [Fact]
         public async Task Admin_UserV1_AddPassword_Fail()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            var remove = await _uow.CustomUserMgr.RemovePasswordAsync(user);
-            remove.Should().BeAssignableTo(typeof(IdentityResult));
-            remove.Succeeded.Should().BeTrue();
-
-            var model = new UserAddPassword()
+            using (var owin = _factory.CreateClient())
             {
-                NewPassword = RandomValues.CreateBase64String(16),
-                NewPasswordConfirm = RandomValues.CreateBase64String(16)
-            };
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            controller.SetUser(user.Id);
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var result = await controller.AddPasswordV1(user.Id, model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+                var remove = await _factory.UoW.UserMgr.RemovePasswordAsync(user);
+                remove.Should().BeAssignableTo(typeof(IdentityResult));
+                remove.Succeeded.Should().BeTrue();
 
-            var check = await _uow.CustomUserMgr.HasPasswordAsync(user);
-            check.Should().BeFalse();
+                var model = new UserAddPassword()
+                {
+                    NewPassword = RandomValues.CreateBase64String(16),
+                    NewPasswordConfirm = RandomValues.CreateBase64String(16)
+                };
+
+                controller.SetUser(user.Id);
+
+                var result = await controller.AddPasswordV1(user.Id, model) as BadRequestObjectResult;
+                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                var check = await _factory.UoW.UserMgr.HasPasswordAsync(user);
+                check.Should().BeFalse();
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_AddPassword_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            var remove = await _uow.CustomUserMgr.RemovePasswordAsync(user);
-            remove.Should().BeAssignableTo(typeof(IdentityResult));
-            remove.Succeeded.Should().BeTrue();
-
-            var model = new UserAddPassword()
+            using (var owin = _factory.CreateClient())
             {
-                NewPassword = Strings.ApiUnitTestUserPassNew,
-                NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
-            };
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            controller.SetUser(user.Id);
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var result = await controller.AddPasswordV1(user.Id, model) as NoContentResult;
-            result.Should().BeAssignableTo(typeof(NoContentResult));
+                var remove = await _factory.UoW.UserMgr.RemovePasswordAsync(user);
+                remove.Should().BeAssignableTo(typeof(IdentityResult));
+                remove.Succeeded.Should().BeTrue();
 
-            var check = await _uow.CustomUserMgr.CheckPasswordAsync(user, model.NewPassword);
-            check.Should().BeTrue();
+                var model = new UserAddPassword()
+                {
+                    NewPassword = Strings.ApiUnitTestUserPassNew,
+                    NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
+                };
+
+                controller.SetUser(user.Id);
+
+                var result = await controller.AddPasswordV1(user.Id, model) as NoContentResult;
+                result.Should().BeAssignableTo(typeof(NoContentResult));
+
+                var check = await _factory.UoW.UserMgr.CheckPasswordAsync(user, model.NewPassword);
+                check.Should().BeTrue();
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_Create_Fail()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+            /*
+             * check security...
+             */
 
-            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var model = new UserCreate()
-            {
-                IssuerId = issuer.Id,
-                Email = Strings.ApiUnitTestUser1 + "?" + RandomValues.CreateBase64String(4),
-                FirstName = "First-" + RandomValues.CreateBase64String(4),
-                LastName = "Last-" + RandomValues.CreateBase64String(4),
-                PhoneNumber = RandomValues.CreateNumberAsString(10),
-                LockoutEnabled = false,
-                HumanBeing = true,
-            };
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            controller.SetUser(user.Id);
-
-            var result = await controller.CreateUserV1(model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-        }
-
-        [Fact]
-        public async Task Admin_UserV1_Create_Success()
-        {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            controller.SetUser(user.Id);
-
-            var result = await controller.CreateUserV1NoConfirm(
-                new UserCreate()
-                {
-                    Email = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1,
-                    FirstName = "First-" + RandomValues.CreateBase64String(4),
-                    LastName = "Last-" + RandomValues.CreateBase64String(4),
-                    PhoneNumber = RandomValues.CreateNumberAsString(10),
-                    LockoutEnabled = false,
-                    HumanBeing = true,
-                }) as OkObjectResult;
-
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
-
-            result = await controller.CreateUserV1(
-                new UserCreate()
-                {
-                    IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single().Id,
-                    Email = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1,
-                    FirstName = "First-" + RandomValues.CreateBase64String(4),
-                    LastName = "Last-" + RandomValues.CreateBase64String(4),
-                    PhoneNumber = RandomValues.CreateNumberAsString(10),
-                    LockoutEnabled = false,
-                    HumanBeing = false,
-                }) as OkObjectResult;
-
-            ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
-        }
-
-        [Fact]
-        public async Task Admin_UserV1_Delete_Fail()
-        {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            _uow.CustomUserMgr.Store.SetImmutableAsync(user, true).Wait();
-            controller.SetUser(user.Id);
-
-            var result = await controller.DeleteUserV1(user.Id) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-
-            var check = _uow.CustomUserMgr.Store.Get(x => x.Id == user.Id).Any();
-            check.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task Admin_UserV1_Delete_Success()
-        {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            controller.SetUser(user.Id);
-
-            var result = await controller.DeleteUserV1(user.Id) as NoContentResult;
-            result.Should().BeAssignableTo(typeof(NoContentResult));
-
-            var check = _uow.CustomUserMgr.Store.Get(x => x.Id == user.Id).Any();
-            check.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task Admin_UserV1_Get_Success()
-        {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-
-            var result = await controller.GetUserV1(user.Id.ToString()) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
-
-            data.Id.Should().Be(user.Id);
-
-            result = await controller.GetUserV1(user.Email) as OkObjectResult;
-            ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
-
-            data.Id.Should().Be(user.Id);
-        }
-
-        [Fact]
-        public async Task Admin_UserV1_GetList_Fail()
-        {
-            new TestData(_uow).Destroy();
-            new TestData(_uow).CreateRandom(10);
-            new DefaultData(_uow).Create();
-
-            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
-
-            var orders = new List<Tuple<string, string>>();
-            orders.Add(new Tuple<string, string>("email", "asc"));
-
-            var pager = new TuplePager()
-            {
-                Filter = string.Empty,
-                Orders = orders,
-            };
-
-            var response = await _admin.UserGetPagesV1(RandomValues.CreateBase64String(32), pager);
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.UserCreateV1(access.token, new UserCreate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, new List<AppClient> { client }, user);
+            /*
+             * check model and/or action...
+             */
 
-            response = await _admin.UserGetPagesV1(access.token, pager);
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+
+            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            response = await _endpoints.UserCreateV1(access.token, new UserCreate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
-        public async Task Admin_UserV1_GetList_Success()
+        public async Task Admin_UserV1_Create_Success()
         {
-            new TestData(_uow).Destroy();
-            new TestData(_uow).CreateRandom(10);
-            new DefaultData(_uow).Create();
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-            var issuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiDefaultUserAdmin).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await JwtSecureProvider.CreateAccessTokenV2(_uow, issuer, new List<AppClient> { client }, user);
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            var take = 3;
-            var orders = new List<Tuple<string, string>>();
-            orders.Add(new Tuple<string, string>("email", "asc"));
+            var create = new UserCreate()
+            {
+                Email = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1,
+                FirstName = "First-" + RandomValues.CreateBase64String(4),
+                LastName = "Last-" + RandomValues.CreateBase64String(4),
+                PhoneNumber = RandomValues.CreateNumberAsString(10),
+                LockoutEnabled = false,
+                HumanBeing = true,
+            };
 
-            var response = await _admin.UserGetPagesV1(access.token,
-                new TuplePager()
-                {
-                    Filter = string.Empty,
-                    Orders = orders,
-                    Skip = 1,
-                    Take = take,
-                });
+            var response = await _endpoints.UserCreateV1NoConfirm(access.token, create);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var data = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<UserResult>>();
-            var total = (int)ok["count"];
+            var check = ok.ToObject<UserResult>();
 
-            data.Should().BeAssignableTo<IEnumerable<UserResult>>();
-            data.Count().Should().Be(take);
-            total.Should().Be(await _uow.CustomUserMgr.Store.Count());
+            create = new UserCreate()
+            {
+                IssuerId = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single().Id,
+                Email = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser1,
+                FirstName = "First-" + RandomValues.CreateBase64String(4),
+                LastName = "Last-" + RandomValues.CreateBase64String(4),
+                PhoneNumber = RandomValues.CreateNumberAsString(10),
+                LockoutEnabled = false,
+                HumanBeing = false,
+            };
+
+            response = await _endpoints.UserCreateV1(access.token, create);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            check = ok.ToObject<UserResult>();
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_Delete_Fail()
+        {
+            using (var owin = _factory.CreateClient())
+            {
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+                await _factory.UoW.UserMgr.Store.SetImmutableAsync(user, true);
+                controller.SetUser(user.Id);
+
+                var result = await controller.DeleteUserV1(user.Id) as BadRequestObjectResult;
+                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                var check = (await _factory.UoW.UserMgr.GetAsync(x => x.Id == user.Id)).Any();
+                check.Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_Delete_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+
+            var model = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.UserDeleteV1(access.token, model.Id);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            var check = (await _factory.UoW.UserMgr.GetAsync(x => x.Id == model.Id)).Any();
+            check.Should().BeFalse();
+        }
+
+        [Fact(Skip = "NotImplemented")]
+        public async Task Admin_UserV1_DeleteClaim_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_Get_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            {
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+                var result = await controller.GetUserV1(user.Id.ToString()) as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+
+                data.Id.Should().Be(user.Id);
+
+                result = await controller.GetUserV1(user.Email) as OkObjectResult;
+                ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+
+                data.Id.Should().Be(user.Id);
+            }
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_GetList_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateRandomAsync(10);
+
+                var admin = new AdminClient(_factory.Conf, _factory.UoW.Situation, owin);
+
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+
+                var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+
+                var take = 3;
+                var orders = new List<Tuple<string, string>>();
+                orders.Add(new Tuple<string, string>("email", "asc"));
+
+                var response = await admin.UserGetPagesV1(access.token,
+                    new TuplePager()
+                    {
+                        Filter = string.Empty,
+                        Orders = orders,
+                        Skip = 1,
+                        Take = take,
+                    });
+
+                response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+                var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+                var data = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<UserResult>>();
+                var total = (int)ok["count"];
+
+                data.Should().BeAssignableTo<IEnumerable<UserResult>>();
+                data.Count().Should().Be(take);
+                total.Should().Be(await _factory.UoW.UserMgr.Count());
+            }
+        }
+
+        [Fact(Skip = "NotImplemented")]
+        public async Task Admin_UserV1_GetListClaims_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
         }
 
         [Fact]
         public async Task Admin_UserV1_GetListClients_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            using (var owin = _factory.CreateClient())
+            {
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+                var result = await controller.GetUserClientsV1(user.Id) as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
 
-            var result = await controller.GetUserClientsV1(user.Id) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
-
-            data.Count().Should().Be((await _uow.CustomUserMgr.Store.GetClientsAsync(user)).Count());
+                data.Count().Should().Be((await _factory.UoW.UserMgr.GetClientsAsync(user)).Count());
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_GetListLogins_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            using (var owin = _factory.CreateClient())
+            {
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+                var result = await controller.GetUserLoginsV1(user.Id) as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<IEnumerable<LoginResult>>().Subject;
 
-            var result = await controller.GetUserLoginsV1(user.Id) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IEnumerable<LoginResult>>().Subject;
-
-            data.Count().Should().Be((await _uow.CustomUserMgr.Store.GetLoginsAsync(user)).Count());
+                data.Count().Should().Be((await _factory.UoW.UserMgr.GetLoginsAsync(user)).Count());
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_GetListRoles_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            using (var owin = _factory.CreateClient())
+            {
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+                var result = await controller.GetUserRolesV1(user.Id) as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
 
-            var result = await controller.GetUserRolesV1(user.Id) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
-
-            data.Count().Should().Be((await _uow.CustomUserMgr.Store.GetRolesResultIdAsync(user)).Count());
+                data.Count().Should().Be((await _factory.UoW.UserMgr.GetRolesResultIdAsync(user)).Count());
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_RemovePassword_Fail()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+            /*
+             * check security...
+             */
 
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var remove = await _uow.CustomUserMgr.RemovePasswordAsync(user);
-            remove.Should().BeAssignableTo(typeof(IdentityResult));
-            remove.Succeeded.Should().BeTrue();
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.UserRemovePasswordV1(access.token, Guid.NewGuid());
 
-            controller.SetUser(user.Id);
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
-            var result = await controller.RemovePasswordV1(user.Id) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+            /*
+             * check model and/or action...
+             */
 
-            var check = await _uow.CustomUserMgr.HasPasswordAsync(user);
-            check.Should().BeFalse();
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+
+            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            response = await _endpoints.UserRemovePasswordV1(access.token, Guid.NewGuid());
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task Admin_UserV1_RemovePassword_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var model = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.UserRemovePasswordV1(access.token, model.Id);
 
-            controller.SetUser(user.Id);
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var result = await controller.RemovePasswordV1(user.Id) as NoContentResult;
-            result.Should().BeAssignableTo(typeof(NoContentResult));
-
-            var check = await _uow.CustomUserMgr.HasPasswordAsync(user);
+            var check = await _factory.UoW.UserMgr.HasPasswordAsync(model);
             check.Should().BeFalse();
         }
 
         [Fact]
         public async Task Admin_UserV1_SetPassword_Fail()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-            var model = new UserAddPassword()
+            using (var owin = _factory.CreateClient())
             {
-                NewPassword = RandomValues.CreateBase64String(16),
-                NewPasswordConfirm = RandomValues.CreateBase64String(16)
-            };
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            controller.SetUser(user.Id);
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var model = new UserAddPassword()
+                {
+                    NewPassword = RandomValues.CreateBase64String(16),
+                    NewPasswordConfirm = RandomValues.CreateBase64String(16)
+                };
 
-            var result = await controller.SetPasswordV1(user.Id, model) as BadRequestObjectResult;
-            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+                controller.SetUser(user.Id);
 
-            var check = await _uow.CustomUserMgr.CheckPasswordAsync(user, model.NewPassword);
-            check.Should().BeFalse();
+                var result = await controller.SetPasswordV1(user.Id, model) as BadRequestObjectResult;
+                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                var check = await _factory.UoW.UserMgr.CheckPasswordAsync(user, model.NewPassword);
+                check.Should().BeFalse();
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_SetPassword_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
-
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
-
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
-            var model = new UserAddPassword()
+            using (var owin = _factory.CreateClient())
             {
-                NewPassword = Strings.ApiUnitTestUserPassNew,
-                NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
-            };
+                var controller = new UserController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            controller.SetUser(user.Id);
+                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+                var model = new UserAddPassword()
+                {
+                    NewPassword = Strings.ApiUnitTestUserPassNew,
+                    NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
+                };
 
-            var result = await controller.SetPasswordV1(user.Id, model) as NoContentResult;
-            result.Should().BeAssignableTo(typeof(NoContentResult));
+                controller.SetUser(user.Id);
 
-            var check = await _uow.CustomUserMgr.CheckPasswordAsync(user, model.NewPassword);
-            check.Should().BeTrue();
+                var result = await controller.SetPasswordV1(user.Id, model) as NoContentResult;
+                result.Should().BeAssignableTo(typeof(NoContentResult));
+
+                var check = await _factory.UoW.UserMgr.CheckPasswordAsync(user, model.NewPassword);
+                check.Should().BeTrue();
+            }
         }
 
         [Fact]
         public async Task Admin_UserV1_Update_Success()
         {
-            var controller = new UserController();
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _sp;
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-            new TestData(_uow).Destroy();
-            new TestData(_uow).Create();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var user = _uow.CustomUserMgr.Store.Get(x => x.Email == Strings.ApiUnitTestUser1).Single();
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            controller.SetUser(user.Id);
+            var model = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            model.FirstName += "(Updated)";
 
-            var model = new UserUpdate()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                FirstName = user.FirstName + "(Updated)",
-                LastName = user.LastName + "(Updated)",
-                LockoutEnabled = false,
-                LockoutEnd = DateTime.Now.AddDays(30),
-                HumanBeing = false,
-                Immutable = false,
-            };
+            var response = await _endpoints.UserUpdateV1(access.token, _factory.UoW.Convert.Map<UserUpdate>(model));
 
-            var result = await controller.UpdateUserV1(model) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            data.FirstName.Should().Be(model.FirstName);
-            data.LastName.Should().Be(model.LastName);
+            var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var check = ok.ToObject<UserResult>();
+
+            check.FirstName.Should().Be(model.FirstName);
         }
     }
 }

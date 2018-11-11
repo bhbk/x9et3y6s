@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 .ForMember(dest => dest.AppUserLogin, src => src.Ignore());
             CreateMap<AppLogin, LoginResult>()
                 .ForMember(dest => dest.Users, src => src.MapFrom(val => val.AppUserLogin.Where(x => x.LoginId == val.Id)
-                    .ToDictionary(x => x.UserId, x => x.User.Email)));
+                    .ToDictionary(x => x.User.Id, x => x.User.Email)));
             CreateMap<LoginUpdate, AppLogin>()
                 .ForMember(dest => dest.AppUserLogin, src => src.Ignore());
 
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 .ForMember(dest => dest.AppUserRole, src => src.Ignore());
             CreateMap<AppRole, RoleResult>()
                 .ForMember(dest => dest.Users, src => src.MapFrom(val => val.AppUserRole.Where(x => x.RoleId == val.Id)
-                    .ToDictionary(x => x.UserId, x => x.User.Email)));
+                    .ToDictionary(x => x.User.Id, x => x.User.Email)));
             CreateMap<RoleUpdate, AppRole>()
                 .ForMember(dest => dest.NormalizedName, src => src.MapFrom(val => val.Name))
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
@@ -128,14 +128,15 @@ namespace Bhbk.Lib.Identity.Infrastructure
                 .ForMember(dest => dest.Logins, src => src.MapFrom(val => val.AppUserLogin.Where(x => x.UserId == val.Id)
                     .ToDictionary(x => x.LoginId, x => x.LoginProvider)))
                 .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.AppUserRole.Where(x => x.UserId == val.Id)
-                    .ToDictionary(x => x.RoleId, x => x.Role.Name)));
+                    .ToDictionary(x => x.Role.Id, x => x.Role.Name)));
             CreateMap<UserUpdate, AppUser>()
                 .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.Email))
-                .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => false))
+                .ForMember(dest => dest.EmailConfirmed, src => src.Ignore())
                 .ForMember(dest => dest.NormalizedUserName, src => src.MapFrom(val => val.Email))
                 .ForMember(dest => dest.NormalizedEmail, src => src.MapFrom(val => val.Email))
-                .ForMember(dest => dest.PhoneNumberConfirmed, src => src.MapFrom(val => false))
+                .ForMember(dest => dest.PhoneNumberConfirmed, src => src.Ignore())
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
+                .ForMember(dest => dest.LockoutEnd, src => src.Ignore())
                 .ForMember(dest => dest.LastLoginFailure, src => src.Ignore())
                 .ForMember(dest => dest.LastLoginSuccess, src => src.Ignore())
                 .ForMember(dest => dest.AccessFailedCount, src => src.Ignore())

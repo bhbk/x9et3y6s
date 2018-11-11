@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Repository
 
         public async Task<int> Count(Expression<Func<AppIssuer, bool>> predicates = null)
         {
-            IQueryable<AppIssuer> query = _context.AppIssuer.AsQueryable();
+            var query = _context.AppIssuer.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -70,8 +70,6 @@ namespace Bhbk.Lib.Identity.Repository
         {
             var client = _context.AppIssuer.Where(x => x.Id == key).SingleOrDefault();
 
-            _context.Entry(client).Collection(x => x.AppClient).Load();
-
             return await Task.FromResult(client);
         }
 
@@ -85,7 +83,7 @@ namespace Bhbk.Lib.Identity.Repository
             Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null, 
             bool tracking = true)
         {
-            IQueryable<AppIssuer> query = _context.AppIssuer.AsQueryable();
+            var query = _context.AppIssuer.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);

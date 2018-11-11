@@ -2,29 +2,33 @@
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Providers;
-using Bhbk.Lib.Identity.Repository;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
 
-namespace Bhbk.Lib.Identity.Managers
+namespace Bhbk.Lib.Identity.Repository
 {
-    public partial class CustomUserManager : UserManager<AppUser>
+    public partial class UserManagerExt : UserManager<AppUser>
     {
         public readonly ClaimsProvider ClaimProvider;
         public readonly PasswordHasher PasswordHasher;
         public readonly PasswordValidator PasswordValidator;
-        public readonly CustomUserStore Store;
+        public readonly UserStoreExt Store;
         public readonly UserValidator UserValidator;
 
-        public CustomUserManager(CustomUserStore store,
+        public UserManagerExt(UserStoreExt store,
             IOptions<IdentityOptions> options = null,
             IPasswordHasher<AppUser> passwordHasher = null,
             IEnumerable<IUserValidator<AppUser>> userValidators = null,
@@ -170,6 +174,16 @@ namespace Bhbk.Lib.Identity.Managers
             return false;
         }
 
+        public async Task<int> Count(Expression<Func<AppUser, bool>> predicates = null)
+        {
+            var query = Store.Context.AppUser.AsQueryable();
+
+            if (predicates != null)
+                return await query.Where(predicates).CountAsync();
+
+            return await query.CountAsync();
+        }
+
         public override async Task<IdentityResult> CreateAsync(AppUser user)
         {
             if (Store.Exists(user.Id))
@@ -237,6 +251,27 @@ namespace Bhbk.Lib.Identity.Managers
                 throw new InvalidOperationException();
 
             return await Store.FindRefreshTokenByIdAsync(result);
+        }
+
+        public async Task<IQueryable<AppUser>> GetAsync(Expression<Func<AppUser, bool>> predicates = null,
+            Func<IQueryable<AppUser>, IQueryable<AppUser>> orderBy = null,
+            Func<IQueryable<AppUser>, IIncludableQueryable<AppUser, object>> includes = null,
+            bool tracking = true)
+        {
+            var query = Store.Context.AppUser.AsQueryable();
+
+            if (predicates != null)
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            query.Include("AppUserRole.Role").Load();
+
+            if (orderBy != null)
+                return await Task.FromResult(orderBy(query));
+
+            return await Task.FromResult(query);
         }
 
         public override async Task<IList<Claim>> GetClaimsAsync(AppUser user)

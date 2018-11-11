@@ -20,7 +20,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -28,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(email, token, user))
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            await UoW.CustomUserMgr.Store.SetEmailConfirmedAsync(user, true);
+            await UoW.UserMgr.Store.SetEmailConfirmedAsync(user, true);
 
             await UoW.CommitAsync();
 
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(password, token, user))
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            await UoW.CustomUserMgr.Store.SetPasswordConfirmedAsync(user, true);
+            await UoW.UserMgr.Store.SetPasswordConfirmedAsync(user, true);
 
             await UoW.CommitAsync();
 
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await UoW.CustomUserMgr.FindByIdAsync(userID.ToString());
+            var user = await UoW.UserMgr.FindByIdAsync(userID.ToString());
 
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
                 return BadRequest(Strings.MsgUserInvalidToken);
 
-            await UoW.CustomUserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
+            await UoW.UserMgr.Store.SetPhoneNumberConfirmedAsync(user, true);
 
             await UoW.CommitAsync();
 
