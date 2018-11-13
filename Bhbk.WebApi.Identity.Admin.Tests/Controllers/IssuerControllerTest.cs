@@ -3,10 +3,7 @@ using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Providers;
-using Bhbk.WebApi.Identity.Admin.Controllers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -170,15 +167,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var model = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.IssuerGetV1(access.token, issuer.Id.ToString());
+            var response = await _endpoints.IssuerGetV1(access.token, model.Id.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<IssuerResult>();
+
+            response = await _endpoints.IssuerGetV1(access.token, model.Name);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            check = ok.ToObject<IssuerResult>();
         }
 
         [Fact]
@@ -186,7 +192,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
-            await _factory.TestData.CreateRandomAsync(10);
+            await _factory.TestData.CreateRandomAsync(3);
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
@@ -222,8 +228,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [Fact(Skip = "NotImplemented")]
         public async Task Admin_IssuerV1_Update_Fail()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
 
         }
 

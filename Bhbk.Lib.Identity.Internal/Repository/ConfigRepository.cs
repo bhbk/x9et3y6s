@@ -13,8 +13,8 @@ namespace Bhbk.Lib.Identity.Repository
         private bool _defaultsCompatibilityModeIssuer;
         private bool _unitTestsAccessToken;
         private bool _unitTestsRefreshToken;
-        private DateTime _unitTestsAccessTokenfactoryUtcNow;
-        private DateTime _unitTestsRefreshTokenfactoryUtcNow;
+        private DateTime _unitTestsAccessTokenFakeUtcNow;
+        private DateTime _unitTestsRefreshTokenFakeUtcNow;
 
         public ConfigRepository(IConfigurationRoot conf)
         {
@@ -25,9 +25,9 @@ namespace Bhbk.Lib.Identity.Repository
             _defaultsCompatibilityModeClaims = bool.Parse(conf["IdentityDefaults:CompatibilityModeClaims"]);
             _defaultsCompatibilityModeIssuer = bool.Parse(conf["IdentityDefaults:CompatibilityModeIssuer"]);
             _unitTestsAccessToken = false;
-            _unitTestsAccessTokenfactoryUtcNow = DateTime.UtcNow;
+            _unitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
             _unitTestsRefreshToken = false;
-            _unitTestsRefreshTokenfactoryUtcNow = DateTime.UtcNow;
+            _unitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
         }
 
         public UInt32 DefaultsAccessTokenExpire
@@ -74,16 +74,16 @@ namespace Bhbk.Lib.Identity.Repository
             set { _unitTestsRefreshToken = value; }
         }
 
-        public DateTime UnitTestsAccessTokenfactoryUtcNow
+        public DateTime UnitTestsAccessTokenFakeUtcNow
         {
-            get { return _unitTestsAccessTokenfactoryUtcNow; }
-            set { _unitTestsAccessTokenfactoryUtcNow = value; }
+            get { return _unitTestsAccessTokenFakeUtcNow; }
+            set { _unitTestsAccessTokenFakeUtcNow = value; }
         }
 
-        public DateTime UnitTestsRefreshTokenfactoryUtcNow
+        public DateTime UnitTestsRefreshTokenFakeUtcNow
         {
-            get { return _unitTestsRefreshTokenfactoryUtcNow; }
-            set { _unitTestsRefreshTokenfactoryUtcNow = value; }
+            get { return _unitTestsRefreshTokenFakeUtcNow; }
+            set { _unitTestsRefreshTokenFakeUtcNow = value; }
         }
     }
 }

@@ -33,7 +33,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
-            await _factory.TestData.CreateRandomAsync(10);
 
             /*
              * check security...
@@ -79,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
-            await _factory.TestData.CreateRandomAsync(10);
+            await _factory.TestData.CreateRandomAsync(3);
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();

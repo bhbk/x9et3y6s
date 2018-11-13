@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/access", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v2/access-old", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/access-old", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
@@ -425,7 +425,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point (compatibility: issuer and client entities mixed. no issuer salt.)
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/access-old", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (!context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)

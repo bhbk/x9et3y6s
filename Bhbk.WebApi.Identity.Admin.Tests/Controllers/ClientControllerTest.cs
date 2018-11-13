@@ -169,15 +169,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.ClientGetV1(access.token, client.Id.ToString());
+            var response = await _endpoints.ClientGetV1(access.token, model.Id.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<ClientResult>();
+
+            response = await _endpoints.ClientGetV1(access.token, model.Name);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            check = ok.ToObject<ClientResult>();
         }
 
         [Fact]
@@ -185,7 +194,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
-            await _factory.TestData.CreateRandomAsync(10);
+            await _factory.TestData.CreateRandomAsync(3);
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
@@ -223,8 +232,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [Fact(Skip = "NotImplemented")]
         public async Task Admin_ClientV1_Update_Fail()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
 
         }
 

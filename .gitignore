@@ -256,8 +256,8 @@ ServiceFabricBackup/
 *.bim_*.settings
 *.rptproj.rsuser
 
-# Microsoft factorys
-factorysAssemblies/
+# Microsoft Fakes
+FakesAssemblies/
 
 # GhostDoc plugin setting file
 *.GhostDoc.xml
@@ -287,8 +287,8 @@ _Pvt_Extensions
 .paket/paket.exe
 paket-files/
 
-# factory - F# Make
-.factory/
+# FAKE - F# Make
+.fake/
 
 # JetBrains Rider
 .idea/

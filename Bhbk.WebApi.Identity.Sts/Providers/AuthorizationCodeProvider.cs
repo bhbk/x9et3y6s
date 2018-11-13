@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/authorization", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v2/authorization-old", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
                 && (context.Request.Query.ContainsKey(Strings.AttrIssuerIDV2)
                     && context.Request.Query.ContainsKey(Strings.AttrClientIDV2)
@@ -223,7 +223,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/authorization", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/authorization-old", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
                 && (context.Request.Query.ContainsKey(Strings.AttrIssuerIDV1)
                     && context.Request.Query.ContainsKey(Strings.AttrClientIDV1)

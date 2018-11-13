@@ -36,8 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [Fact(Skip = "NotImplemented")]
         public async Task Admin_UserV1_AddClaim_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+
         }
 
         [Fact]
@@ -192,24 +191,46 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [Fact]
         public async Task Admin_UserV1_Delete_Fail()
         {
-            using (var owin = _factory.CreateClient())
-            {
-                var controller = new UserController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            /*
+             * check security...
+             */
 
-                await _factory.UoW.UserMgr.Store.SetImmutableAsync(user, true);
-                controller.SetUser(user.Id);
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-                var result = await controller.DeleteUserV1(user.Id) as BadRequestObjectResult;
-                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.UserDeleteV1(access.token, Guid.NewGuid());
 
-                var check = (await _factory.UoW.UserMgr.GetAsync(x => x.Id == user.Id)).Any();
-                check.Should().BeTrue();
-            }
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+            /*
+             * check model and/or action...
+             */
+
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+
+            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            response = await _endpoints.UserDeleteV1(access.token, Guid.NewGuid());
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            var model = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            model.Immutable = true;
+
+            await _factory.UoW.UserMgr.UpdateAsync(model);
+
+            response = await _endpoints.UserDeleteV1(access.token, model.Id);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
@@ -237,82 +258,80 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         [Fact(Skip = "NotImplemented")]
         public async Task Admin_UserV1_DeleteClaim_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+
         }
 
         [Fact]
         public async Task Admin_UserV1_Get_Success()
         {
-            using (var owin = _factory.CreateClient())
-            {
-                var controller = new UserController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var model = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-                var result = await controller.GetUserV1(user.Id.ToString()) as OkObjectResult;
-                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.UserGetV1(access.token, model.Id.ToString());
 
-                data.Id.Should().Be(user.Id);
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-                result = await controller.GetUserV1(user.Email) as OkObjectResult;
-                ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                data = ok.Value.Should().BeAssignableTo<UserResult>().Subject;
+            var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var check = ok.ToObject<UserResult>();
 
-                data.Id.Should().Be(user.Id);
-            }
+            response = await _endpoints.UserGetV1(access.token, model.Email);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            check = ok.ToObject<UserResult>();
         }
 
         [Fact]
         public async Task Admin_UserV1_GetList_Success()
         {
-            using (var owin = _factory.CreateClient())
-            {
-                await _factory.TestData.CreateRandomAsync(10);
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+            await _factory.TestData.CreateRandomAsync(3);
 
-                var admin = new AdminClient(_factory.Conf, _factory.UoW.Situation, owin);
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-                var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-                var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var take = 3;
+            var orders = new List<Tuple<string, string>>();
+            orders.Add(new Tuple<string, string>("email", "asc"));
 
-                var take = 3;
-                var orders = new List<Tuple<string, string>>();
-                orders.Add(new Tuple<string, string>("email", "asc"));
+            var response = await _endpoints.UserGetPagesV1(access.token,
+                new TuplePager()
+                {
+                    Filter = string.Empty,
+                    Orders = orders,
+                    Skip = 1,
+                    Take = take,
+                });
 
-                var response = await admin.UserGetPagesV1(access.token,
-                    new TuplePager()
-                    {
-                        Filter = string.Empty,
-                        Orders = orders,
-                        Skip = 1,
-                        Take = take,
-                    });
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-                response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var data = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<UserResult>>();
+            var total = (int)ok["count"];
 
-                var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-                var data = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<UserResult>>();
-                var total = (int)ok["count"];
-
-                data.Should().BeAssignableTo<IEnumerable<UserResult>>();
-                data.Count().Should().Be(take);
-                total.Should().Be(await _factory.UoW.UserMgr.Count());
-            }
+            data.Should().BeAssignableTo<IEnumerable<UserResult>>();
+            data.Count().Should().Be(take);
+            total.Should().Be(await _factory.UoW.UserMgr.Count());
         }
 
         [Fact(Skip = "NotImplemented")]
         public async Task Admin_UserV1_GetListClaims_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+
         }
 
         [Fact]
@@ -329,9 +348,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
                 var result = await controller.GetUserClientsV1(user.Id) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
+                var list = ok.Value.Should().BeAssignableTo<IEnumerable<ClientResult>>().Subject;
 
-                data.Count().Should().Be((await _factory.UoW.UserMgr.GetClientsAsync(user)).Count());
+                list.Count().Should().Be((await _factory.UoW.UserMgr.GetClientsAsync(user)).Count());
             }
         }
 
@@ -349,9 +368,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
                 var result = await controller.GetUserLoginsV1(user.Id) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<IEnumerable<LoginResult>>().Subject;
+                var list = ok.Value.Should().BeAssignableTo<IEnumerable<LoginResult>>().Subject;
 
-                data.Count().Should().Be((await _factory.UoW.UserMgr.GetLoginsAsync(user)).Count());
+                list.Count().Should().Be((await _factory.UoW.UserMgr.GetLoginsAsync(user)).Count());
             }
         }
 
@@ -369,9 +388,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
                 var result = await controller.GetUserRolesV1(user.Id) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
+                var list = ok.Value.Should().BeAssignableTo<IEnumerable<RoleResult>>().Subject;
 
-                data.Count().Should().Be((await _factory.UoW.UserMgr.GetRolesResultIdAsync(user)).Count());
+                list.Count().Should().Be((await _factory.UoW.UserMgr.GetRolesResultIdAsync(user)).Count());
             }
         }
 
