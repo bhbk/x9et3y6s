@@ -18,6 +18,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class AuthorizationCodeController : BaseController
     {
+        public AuthorizationCodeController() { }
+
         [Route("v1/authorization"), HttpGet]
         [AllowAnonymous]
         public IActionResult AuthCodeV1([FromQuery(Name = "issuer_id")] string issuerValue,

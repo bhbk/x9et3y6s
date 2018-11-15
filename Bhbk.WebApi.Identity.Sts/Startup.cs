@@ -4,7 +4,6 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.WebApi.Identity.Sts.Providers;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +20,7 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace Bhbk.WebApi.Identity.Sts
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 return new IdentityContext(options, ContextType.Live, conf);
             });
             sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();
@@ -159,12 +159,10 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseSession();
             app.UseStaticFiles();
 
-            //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
-
-            app.UseMiddleware<AccessTokenProvider>();
-            app.UseMiddleware<AuthorizationCodeProvider>();
-            app.UseMiddleware<ClientCredentialProvider>();
-            app.UseMiddleware<RefreshTokenProvider>();
+            //app.UseMiddleware<AccessTokenProvider_Deprecate>();
+            //app.UseMiddleware<AuthorizationCodeProvider_Deprecate>();
+            //app.UseMiddleware<ClientCredentialProvider_Deprecate>();
+            //app.UseMiddleware<RefreshTokenProvider_Deprecate>();
 
             app.UseMvc();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);

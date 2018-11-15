@@ -14,11 +14,8 @@ namespace Bhbk.Lib.Identity.Providers
 {
     public class StsClient : StsEndpoints
     {
-        public StsClient(IConfigurationRoot conf, ContextType situation)
-            : base(conf, situation) { }
-
         public StsClient(IConfigurationRoot conf, ContextType situation, HttpClient http)
-    : base(conf, situation, http) { }
+            : base(conf, situation, http) { }
     }
 
     public class StsTester : StsEndpoints
@@ -33,21 +30,6 @@ namespace Bhbk.Lib.Identity.Providers
         protected readonly IConfigurationRoot _conf;
         protected readonly ContextType _situation;
         protected readonly HttpClient _http;
-
-        public StsEndpoints(IConfigurationRoot conf, ContextType situation)
-        {
-            if (conf == null)
-                throw new ArgumentNullException();
-
-            var connect = new HttpClientHandler();
-
-            //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-            connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-            _situation = situation;
-            _conf = conf;
-            _http = new HttpClient(connect);
-        }
 
         public StsEndpoints(IConfigurationRoot conf, ContextType situation, HttpClient http)
         {
@@ -75,7 +57,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/password/
-        public async Task<HttpResponseMessage> AccessTokenV1(string issuer, string client, string user, string password)
+        public async Task<HttpResponseMessage> AccessToken_GenerateV1(string issuer, string client, string user, string password)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -101,7 +83,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AccessTokenV1CompatibilityModeIssuer(string client, string user, string password)
+        public async Task<HttpResponseMessage> AccessToken_GenerateV1_CompatibilityModeIssuer(string client, string user, string password)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -126,7 +108,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AccessTokenV2(string issuer, List<string> clients, string user, string password)
+        public async Task<HttpResponseMessage> AccessToken_GenerateV2(string issuer, List<string> clients, string user, string password)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -153,7 +135,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
-        public async Task<HttpResponseMessage> AuthorizationCodeRequestV1(string issuer, string client, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> AuthorizationCode_RequestV1(string issuer, string client, string user, string redirectUri, string scope)
         {
             string content = HttpUtility.UrlPathEncode("?issuer_id=" + issuer
                 + "&client_id=" + client
@@ -177,7 +159,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCodeRequestV2(string issuer, string client, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> AuthorizationCode_RequestV2(string issuer, string client, string user, string redirectUri, string scope)
         {
             string content = HttpUtility.UrlPathEncode("?issuer=" + issuer
                 + "&client=" + client
@@ -201,7 +183,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCodeV1(string issuer, string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> AuthorizationCode_GenerateV1(string issuer, string client, string user, string redirectUri, string code)
         {
             var content = HttpUtility.UrlPathEncode("?issuer_id=" + issuer
                 + "&client_id=" + client
@@ -225,7 +207,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCodeV2(string issuer, string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> AuthorizationCode_GenerateV2(string issuer, string client, string user, string redirectUri, string code)
         {
             var content = HttpUtility.UrlPathEncode("?issuer=" + issuer
                 + "&client=" + client
@@ -250,7 +232,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
-        public async Task<HttpResponseMessage> ClientCredentialsV1(string issuer, string client, string secret)
+        public async Task<HttpResponseMessage> ClientCredentials_GenerateV1(string issuer, string client, string secret)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -275,7 +257,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCredentialsV2(string issuer, string client, string secret)
+        public async Task<HttpResponseMessage> ClientCredentials_GenerateV2(string issuer, string client, string secret)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -300,7 +282,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenGetListV1(JwtSecurityToken jwt, string user)
+        public async Task<HttpResponseMessage> RefreshToken_GetListV1(JwtSecurityToken jwt, string user)
         {
             var endpoint = "/oauth2/v1/refresh/" + user;
 
@@ -318,7 +300,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenGetListV2(JwtSecurityToken jwt, string user)
+        public async Task<HttpResponseMessage> RefreshToken_GetListV2(JwtSecurityToken jwt, string user)
         {
             var endpoint = "/oauth2/v2/refresh/" + user;
 
@@ -336,7 +318,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenDeleteV1(JwtSecurityToken jwt, string user, string token)
+        public async Task<HttpResponseMessage> RefreshToken_DeleteV1(JwtSecurityToken jwt, string user, string token)
         {
             var endpoint = "/oauth2/v1/refresh/" + user + "/revoke/" + token;
 
@@ -354,7 +336,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenDeleteV2(JwtSecurityToken jwt, string user, string token)
+        public async Task<HttpResponseMessage> RefreshToken_DeleteV2(JwtSecurityToken jwt, string user, string token)
         {
             var endpoint = "/oauth2/v2/refresh/" + user + "/revoke/" + token;
 
@@ -372,7 +354,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenDeleteAllV1(JwtSecurityToken jwt, string user)
+        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV1(JwtSecurityToken jwt, string user)
         {
             var endpoint = "/oauth2/v1/refresh/" + user + "/revoke";
 
@@ -390,7 +372,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenDeleteAllV2(JwtSecurityToken jwt, string user)
+        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV2(JwtSecurityToken jwt, string user)
         {
             var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
 
@@ -409,7 +391,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/refresh-token/
-        public async Task<HttpResponseMessage> RefreshTokenV1(string issuer, string client, string refresh)
+        public async Task<HttpResponseMessage> RefreshToken_GenerateV1(string issuer, string client, string refresh)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -434,7 +416,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshTokenV2(string issuer, List<string> clients, string refresh)
+        public async Task<HttpResponseMessage> RefreshToken_GenerateV2(string issuer, List<string> clients, string refresh)
         {
             var content = new FormUrlEncodedContent(new[]
                 {

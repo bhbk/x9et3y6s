@@ -16,6 +16,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class AccessTokenController : BaseController
     {
+        public AccessTokenController() { }
+
         [Route("v1/access"), HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> GenerateAccessTokenV1([FromForm] AccessTokenV1 submit)

@@ -22,16 +22,16 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
     {
         public static IApplicationBuilder UseAccessTokenProvider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AccessTokenProvider>();
+            return app.UseMiddleware<AccessTokenProvider_Deprecate>();
         }
     }
 
-    public class AccessTokenProvider
+    public class AccessTokenProvider_Deprecate
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AccessTokenProvider(RequestDelegate next)
+        public AccessTokenProvider_Deprecate(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/access-old", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v2/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
@@ -54,6 +54,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV2)
                     && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV2)))
             {
+                //logic below ported from middleware to controller so open api (swagger) can do its job easier...
+                throw new InvalidOperationException();
+
                 var formValues = context.Request.ReadFormAsync().Result;
 
                 string issuerValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV2).Value;
@@ -242,7 +245,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/access-old", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
@@ -251,6 +254,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV1)))
             {
+                //logic below ported from middleware to controller so open api (swagger) can do its job easier...
+                throw new InvalidOperationException();
+
                 var formValues = context.Request.ReadFormAsync().Result;
 
                 string issuerValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV1).Value;
@@ -425,7 +431,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point (compatibility: issuer and client entities mixed. no issuer salt.)
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/access-old", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.Ordinal)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (!context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
@@ -434,6 +440,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV1)))
             {
+                //logic below ported from middleware to controller so open api (swagger) can do its job easier...
+                throw new InvalidOperationException();
+
                 var formValues = context.Request.ReadFormAsync().Result;
 
                 string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;

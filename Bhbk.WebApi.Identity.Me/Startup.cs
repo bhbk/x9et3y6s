@@ -20,6 +20,7 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace Bhbk.WebApi.Identity.Me
@@ -48,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me
                 return new IdentityContext(options, ContextType.Live, conf);
             });
             sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();

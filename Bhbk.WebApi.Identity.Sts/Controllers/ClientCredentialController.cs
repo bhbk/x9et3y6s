@@ -14,6 +14,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class ClientCredentialController : BaseController
     {
+        public ClientCredentialController() { }
+
         [Route("v1/client"), HttpPost]
         [AllowAnonymous]
         public IActionResult GenerateClientCredentialV1([FromForm] ClientCredentialV1 submit)

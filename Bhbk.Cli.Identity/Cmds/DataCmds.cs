@@ -8,14 +8,12 @@ using ManyConsole;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
     public class DataCmds : ConsoleCommand
     {
         private static IConfigurationRoot _conf;
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("libsettings.json");
         private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
 
         public DataCmds()
@@ -31,9 +29,11 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
+                var lib = SearchRoots.ByAssemblyContext("libsettings.json");
+
                 _conf = new ConfigurationBuilder()
-                    .SetBasePath(_lib.DirectoryName)
-                    .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                    .SetBasePath(lib.DirectoryName)
+                    .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()

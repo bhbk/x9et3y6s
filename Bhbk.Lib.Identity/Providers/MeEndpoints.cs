@@ -11,8 +11,8 @@ namespace Bhbk.Lib.Identity.Providers
 {
     public class MeClient : AdminEndpoints
     {
-        public MeClient(IConfigurationRoot conf, ContextType situation)
-            : base(conf, situation) { }
+        public MeClient(IConfigurationRoot conf, ContextType situation, HttpClient http)
+            : base(conf, situation, http) { }
     }
 
     public class MeTester : AdminEndpoints
@@ -25,9 +25,9 @@ namespace Bhbk.Lib.Identity.Providers
     {
         protected readonly IConfigurationRoot _conf;
         protected readonly ContextType _situation;
-        protected readonly HttpClient _connect;
+        protected readonly HttpClient _http;
 
-        public MeEndpoints(IConfigurationRoot conf, ContextType situation)
+        public MeEndpoints(IConfigurationRoot conf, ContextType situation, HttpClient http)
         {
             if (conf == null)
                 throw new ArgumentNullException();
@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Providers
 
             _situation = situation;
             _conf = conf;
-            _connect = new HttpClient(connect);
+            _http = http;
         }
 
         public MeEndpoints(IConfigurationRoot conf, TestServer server)
@@ -49,22 +49,22 @@ namespace Bhbk.Lib.Identity.Providers
 
             _situation = ContextType.UnitTest;
             _conf = conf;
-            _connect = server.CreateClient();
+            _http = server.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> DetailGetV1(JwtSecurityToken jwt)
+        public async Task<HttpResponseMessage> Detail_GetV1(JwtSecurityToken jwt)
         {
             var endpoint = "/me/v1";
 
-            _connect.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _connect.DefaultRequestHeaders.Accept.Clear();
-            _connect.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ContextType.UnitTest)
-                return await _connect.GetAsync(endpoint);
+                return await _http.GetAsync(endpoint);
 
             if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _connect.GetAsync(
+                return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
             throw new NotSupportedException();

@@ -14,7 +14,6 @@ namespace Bhbk.Cli.Identity.Cmds
     public class ConfCmds : ConsoleCommand
     {
         private static IConfigurationRoot _conf;
-        private static FileInfo _lib = SearchRoots.ByAssemblyContext("libsettings.json");
         private static bool ReadConfig = false;
 
         public ConfCmds()
@@ -28,9 +27,11 @@ namespace Bhbk.Cli.Identity.Cmds
         {
             try
             {
+                var lib = SearchRoots.ByAssemblyContext("libsettings.json");
+
                 _conf = new ConfigurationBuilder()
-                    .SetBasePath(_lib.DirectoryName)
-                    .AddJsonFile(_lib.Name, optional: false, reloadOnChange: true)
+                    .SetBasePath(lib.DirectoryName)
+                    .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()

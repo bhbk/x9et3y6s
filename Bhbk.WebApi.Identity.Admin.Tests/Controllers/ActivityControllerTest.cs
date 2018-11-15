@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.ActivityGetPagesV1(access.token, new TuplePager());
+            var response = await _endpoints.Activity_GetV1(access.token, new TuplePager());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Orders = orders,
             };
 
-            response = await _endpoints.ActivityGetPagesV1(access.token, model);
+            response = await _endpoints.Activity_GetV1(access.token, model);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Take = take,
             };
 
-            var response = await _endpoints.ActivityGetPagesV1(access.token, model);
+            var response = await _endpoints.Activity_GetV1(access.token, model);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);

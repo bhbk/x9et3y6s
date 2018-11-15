@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -15,12 +14,8 @@ namespace Bhbk.Lib.Identity.Providers
 {
     public class AdminClient : AdminEndpoints
     {
-        public AdminClient(IConfigurationRoot conf, ContextType situation)
-            : base(conf, situation) { }
-
-
         public AdminClient(IConfigurationRoot conf, ContextType situation, HttpClient http)
-    : base(conf, situation, http) { }
+            : base(conf, situation, http) { }
     }
 
     public class AdminTester : AdminEndpoints
@@ -35,21 +30,6 @@ namespace Bhbk.Lib.Identity.Providers
         protected readonly IConfigurationRoot _conf;
         protected readonly ContextType _situation;
         protected readonly HttpClient _http;
-
-        public AdminEndpoints(IConfigurationRoot conf, ContextType situation)
-        {
-            if (conf == null)
-                throw new ArgumentNullException();
-
-            var connect = new HttpClientHandler();
-
-            //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-            connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
-
-            _situation = situation;
-            _conf = conf;
-            _http = new HttpClient(connect);
-        }
 
         public AdminEndpoints(IConfigurationRoot conf, ContextType situation, HttpClient http)
         {
@@ -76,7 +56,7 @@ namespace Bhbk.Lib.Identity.Providers
             _http = server.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> ActivityGetPagesV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, TuplePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -97,7 +77,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCreateV1(string jwt, ClientCreate model)
+        public async Task<HttpResponseMessage> Client_CreateV1(string jwt, ClientCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -118,7 +98,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientDeleteV1(string jwt, Guid clientID)
+        public async Task<HttpResponseMessage> Client_DeleteV1(string jwt, Guid clientID)
         {
             var endpoint = "/client/v1/" + clientID.ToString();
 
@@ -135,7 +115,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientGetV1(string jwt, string client)
+        public async Task<HttpResponseMessage> Client_GetV1(string jwt, string client)
         {
             var endpoint = "/client/v1/" + client;
 
@@ -153,7 +133,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientGetPagesV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Client_GetV1(string jwt, TuplePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -174,7 +154,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientUpdateV1(string jwt, ClientUpdate model)
+        public async Task<HttpResponseMessage> Client_UpdateV1(string jwt, ClientUpdate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -195,7 +175,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> IssuerCreateV1(string jwt, IssuerCreate model)
+        public async Task<HttpResponseMessage> Issuer_CreateV1(string jwt, IssuerCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -216,7 +196,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> IssuerDeleteV1(string jwt, Guid issuerID)
+        public async Task<HttpResponseMessage> Issuer_DeleteV1(string jwt, Guid issuerID)
         {
             var endpoint = "/issuer/v1/" + issuerID.ToString();
 
@@ -234,25 +214,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> IssuerGetV1(string jwt, string issuer)
-        {
-            var endpoint = "/issuer/v1/" + issuer;
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _http.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> IssuerGetClientsV1(string jwt, string issuer)
+        public async Task<HttpResponseMessage> Issuer_GetClientsV1(string jwt, string issuer)
         {
             var endpoint = "/issuer/v1/" + issuer + "/clients";
 
@@ -270,7 +232,25 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> IssuerGetPagesV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, string issuer)
+        {
+            var endpoint = "/issuer/v1/" + issuer;
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, TuplePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -291,7 +271,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> IssuerUpdateV1(string jwt, IssuerUpdate model)
+        public async Task<HttpResponseMessage> Issuer_UpdateV1(string jwt, IssuerUpdate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -312,7 +292,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> LoginAddUserV1(string jwt, Guid loginID, Guid userID, UserLoginCreate model)
+        public async Task<HttpResponseMessage> Login_AddUserV1(string jwt, Guid loginID, Guid userID, UserLoginCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -333,7 +313,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> LoginCreateV1(string jwt, LoginCreate model)
+        public async Task<HttpResponseMessage> Login_CreateV1(string jwt, LoginCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -354,7 +334,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> LoginDeleteV1(string jwt, Guid loginID)
+        public async Task<HttpResponseMessage> Login_DeleteV1(string jwt, Guid loginID)
         {
             var endpoint = "/login/v1/" + loginID.ToString();
 
@@ -372,7 +352,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> LoginGetV1(string jwt, string login)
+        public async Task<HttpResponseMessage> Login_GetV1(string jwt, string login)
         {
             var endpoint = "/login/v1/" + login;
 
@@ -390,7 +370,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> LoginGetPagesV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Login_GetV1(string jwt, TuplePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -411,7 +391,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> LoginUpdateV1(string jwt, LoginUpdate model)
+        public async Task<HttpResponseMessage> Login_UpdateV1(string jwt, LoginUpdate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -432,7 +412,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleAddToUserV1(string jwt, Guid roleID, Guid userID)
+        public async Task<HttpResponseMessage> Role_AddToUserV1(string jwt, Guid roleID, Guid userID)
         {
             var endpoint = "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString();
 
@@ -450,7 +430,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleCreateV1(string jwt, RoleCreate model)
+        public async Task<HttpResponseMessage> Role_CreateV1(string jwt, RoleCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -471,7 +451,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleDeleteV1(string jwt, Guid roleID)
+        public async Task<HttpResponseMessage> Role_DeleteV1(string jwt, Guid roleID)
         {
             var endpoint = "/role/v1/" + roleID.ToString();
 
@@ -489,7 +469,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleGetV1(string jwt, string role)
+        public async Task<HttpResponseMessage> Role_GetV1(string jwt, string role)
         {
             var endpoint = "/role/v1/" + role;
 
@@ -507,7 +487,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleGetPagesV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> Role_GetV1(string jwt, TuplePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -528,7 +508,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleRemoveFromUserV1(string jwt, Guid roleID, Guid userID)
+        public async Task<HttpResponseMessage> Role_RemoveFromUserV1(string jwt, Guid roleID, Guid userID)
         {
             var endpoint = "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString();
 
@@ -546,7 +526,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RoleUpdateV1(string jwt, RoleUpdate model)
+        public async Task<HttpResponseMessage> Role_UpdateV1(string jwt, RoleUpdate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -567,7 +547,28 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserClaimCreateV1(string jwt, UserClaimCreate model)
+        public async Task<HttpResponseMessage> User_AddPasswordV1(string jwt, Guid userID, UserAddPassword model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/user/v1/" + userID.ToString() + "/add-password";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _http.PutAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_CreateClaimV1(string jwt, UserClaimCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -588,7 +589,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserCreateV1(string jwt, UserCreate model)
+        public async Task<HttpResponseMessage> User_CreateV1(string jwt, UserCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -609,7 +610,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserCreateV1NoConfirm(string jwt, UserCreate model)
+        public async Task<HttpResponseMessage> User_CreateV1NoConfirm(string jwt, UserCreate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -630,7 +631,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserDeleteV1(string jwt, Guid userID)
+        public async Task<HttpResponseMessage> User_DeleteV1(string jwt, Guid userID)
         {
             var endpoint = "/user/v1/" + userID.ToString();
 
@@ -648,7 +649,43 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserGetV1(string jwt, string user)
+        public async Task<HttpResponseMessage> User_GetClientsV1(string jwt, string user)
+        {
+            var endpoint = "/user/v1/" + user + "/clients";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_GetLoginsV1(string jwt, string user)
+        {
+            var endpoint = "/user/v1/" + user + "/logins";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_GetV1(string jwt, string user)
         {
             var endpoint = "/user/v1/" + user;
 
@@ -666,7 +703,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserGetPagesV1(string jwt, TuplePager model)
+        public async Task<HttpResponseMessage> User_GetV1(string jwt, TuplePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -687,7 +724,25 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserRemovePasswordV1(string jwt, Guid userID)
+        public async Task<HttpResponseMessage> User_GetRolesV1(string jwt, string user)
+        {
+            var endpoint = "/user/v1/" + user + "/roles";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ContextType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_RemovePasswordV1(string jwt, Guid userID)
         {
             var endpoint = "/user/v1/" + userID.ToString() + "/remove-password";
 
@@ -705,19 +760,19 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserSetPasswordV1(string jwt, UserAddPassword model)
+        public async Task<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, UserAddPassword model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/user/v1/" + model.Id.ToString() + "/set-password";
+            var endpoint = "/user/v1/" + userID.ToString() + "/set-password";
 
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
+                return await _http.PutAsync(endpoint, content);
 
             if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
                 return await _http.PutAsync(
@@ -726,7 +781,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> UserUpdateV1(string jwt, UserUpdate model)
+        public async Task<HttpResponseMessage> User_UpdateV1(string jwt, UserUpdate model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");

@@ -5,7 +5,6 @@ using Bhbk.Lib.Identity.Data;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Models;
-using Bhbk.WebApi.Identity.Sts.Providers;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -153,12 +152,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 app.UseStaticFiles();
                 app.UseMvc();
 
-                //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
-
-                app.UseMiddleware<AccessTokenProvider>();
-                app.UseMiddleware<AuthorizationCodeProvider>();
-                app.UseMiddleware<ClientCredentialProvider>();
-                app.UseMiddleware<RefreshTokenProvider>();
+                //app.UseMiddleware<AccessTokenProvider_Deprecate>();
+                //app.UseMiddleware<AuthorizationCodeProvider_Deprecate>();
+                //app.UseMiddleware<ClientCredentialProvider_Deprecate>();
+                //app.UseMiddleware<RefreshTokenProvider_Deprecate>();
 
                 app.UseSwagger(SwaggerOptions.ConfigureSwagger);
                 app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);

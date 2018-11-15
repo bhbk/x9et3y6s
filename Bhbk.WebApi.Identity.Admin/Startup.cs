@@ -20,6 +20,7 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace Bhbk.WebApi.Identity.Admin
@@ -49,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin
             });
             sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();

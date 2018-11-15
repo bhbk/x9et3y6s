@@ -1,12 +1,13 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Providers;
 using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 
 namespace Bhbk.Lib.Identity.Infrastructure
 {
@@ -17,14 +18,14 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private readonly StsClient _sts;
         private static JwtSecurityToken _access, _refresh;
 
-        public JwtContext(IConfigurationRoot conf, ContextType situation)
+        public JwtContext(IConfigurationRoot conf, ContextType situation, HttpClient http)
         {
             if (conf == null)
                 throw new ArgumentNullException();
 
             _conf = conf;
             _situation = situation;
-            _sts = new StsClient(conf, situation);
+            _sts = new StsClient(conf, situation, http);
         }
 
         public JwtSecurityToken AccessToken
@@ -43,7 +44,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     && _refresh.ValidFrom < DateTime.UtcNow
                     && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
-                    var result = _sts.RefreshTokenV2(_conf["IdentityLogin:IssuerName"],
+                    var result = _sts.RefreshToken_GenerateV2(_conf["IdentityLogin:IssuerName"],
                         new List<string> { _conf["IdentityLogin:ClientName"] }, _refresh.RawData).Result;
 
                     if (result.IsSuccessStatusCode)
@@ -69,7 +70,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
                 else
                 {
-                    var result = _sts.AccessTokenV2(_conf["IdentityLogin:IssuerName"],
+                    var result = _sts.AccessToken_GenerateV2(_conf["IdentityLogin:IssuerName"],
                         new List<string> { _conf["IdentityLogin:ClientName"] }, _conf["IdentityLogin:UserName"], _conf["IdentityLogin:UserPass"]).Result;
 
                     if (result.IsSuccessStatusCode)

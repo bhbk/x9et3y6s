@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             client.Enabled = false;
             await _factory.UoW.ClientRepo.UpdateAsync(client);
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.DeleteAsync(client);
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -90,14 +90,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), string.Empty, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), string.Empty, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             issuer.Enabled = false;
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -137,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -147,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.DeleteAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -162,14 +162,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(string.Empty, client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(string.Empty, client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _factory.UoW.ConfigRepo.UnitTestsRefreshToken = true;
             _factory.UoW.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -197,7 +197,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -215,7 +215,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _factory.UoW.ConfigRepo.UnitTestsRefreshToken = true;
             _factory.UoW.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -241,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -249,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh.Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -264,14 +264,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -286,7 +286,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -297,7 +297,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             delete.Should().BeAssignableTo(typeof(IdentityResult));
             delete.Succeeded.Should().BeTrue();
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -312,7 +312,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -326,7 +326,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             update.Should().BeAssignableTo(typeof(IdentityResult));
             update.Succeeded.Should().BeTrue();
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -341,14 +341,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
-            var result = await _endpoints.RefreshTokenGetListV1(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_GetListV1(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -363,14 +363,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
-            var result = await _endpoints.RefreshTokenGetListV1(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_GetListV1(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -385,14 +385,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
-            var result = await _endpoints.RefreshTokenDeleteAllV1(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteAllV1(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -407,7 +407,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -415,11 +415,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).Single();
 
-            var result = await _endpoints.RefreshTokenDeleteAllV1(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteAllV1(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh.ProtectedTicket);
+            var check = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh.ProtectedTicket);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -434,7 +434,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -442,7 +442,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).Single();
 
-            var result = await _endpoints.RefreshTokenDeleteV1(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteV1(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -457,7 +457,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -465,11 +465,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).First();
 
-            var result = await _endpoints.RefreshTokenDeleteV1(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteV1(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh.ProtectedTicket);
+            var check = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh.ProtectedTicket);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -484,14 +484,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -506,14 +506,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV1(issuer.Name, client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV1(issuer.Name, client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV1(issuer.Name, client.Name, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Name, client.Name, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -529,7 +529,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -541,7 +541,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             clients = new List<string> { client.Id.ToString() };
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -557,7 +557,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -566,7 +566,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             clients = new List<string> { RandomValues.CreateBase64String(8) };
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -582,14 +582,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(RandomValues.CreateBase64String(8), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(RandomValues.CreateBase64String(8), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -605,14 +605,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(string.Empty, clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(string.Empty, clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -631,7 +631,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _factory.UoW.ConfigRepo.UnitTestsRefreshToken = true;
             _factory.UoW.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -641,7 +641,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -660,7 +660,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             _factory.UoW.ConfigRepo.UnitTestsRefreshToken = true;
             _factory.UoW.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -670,7 +670,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -687,7 +687,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -695,7 +695,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var refresh = (string)jwt["refresh_token"];
             var pos = random.Next(refresh.Length - 8);
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh.Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh.Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -711,14 +711,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, string.Empty);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -734,7 +734,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -745,7 +745,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             delete.Should().BeAssignableTo(typeof(IdentityResult));
             delete.Succeeded.Should().BeTrue();
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -761,7 +761,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -775,7 +775,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             update.Should().BeAssignableTo(typeof(IdentityResult));
             update.Succeeded.Should().BeTrue();
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -790,14 +790,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
-            var result = await _endpoints.RefreshTokenGetListV2(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_GetListV2(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -812,14 +812,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiDefaultUserPassword);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiDefaultUserPassword);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
-            var result = await _endpoints.RefreshTokenGetListV2(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_GetListV2(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -834,14 +834,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var bearer = (string)jwt["access_token"];
 
-            var result = await _endpoints.RefreshTokenDeleteAllV2(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteAllV2(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -856,7 +856,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiDefaultUserPassword);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiDefaultUserPassword);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -864,11 +864,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).First();
 
-            var result = await _endpoints.RefreshTokenDeleteAllV2(new JwtSecurityToken(bearer), user.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteAllV2(new JwtSecurityToken(bearer), user.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh.ProtectedTicket);
+            var check = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh.ProtectedTicket);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -883,7 +883,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -891,7 +891,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).First();
 
-            var result = await _endpoints.RefreshTokenDeleteV2(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteV2(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -906,7 +906,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiDefaultUserPassword);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Email, Strings.ApiDefaultUserPassword);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -914,11 +914,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var bearer = (string)jwt["access_token"];
             var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).First();
 
-            var result = await _endpoints.RefreshTokenDeleteV2(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
+            var result = await _endpoints.RefreshToken_DeleteV2(new JwtSecurityToken(bearer), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh.ProtectedTicket);
+            var check = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh.ProtectedTicket);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -941,14 +941,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var roleB = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
             await _factory.UoW.UserMgr.AddToRoleAsync(user, roleB.Name);
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -971,14 +971,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var roleB = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
             await _factory.UoW.UserMgr.AddToRoleAsync(user, roleB.Name);
 
-            var access = await _endpoints.AccessTokenV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Name, clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Name, clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -994,14 +994,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -1017,14 +1017,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Name };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Name, clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Name, clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -1039,14 +1039,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { string.Empty };
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await _endpoints.AccessTokenV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             access.Should().BeAssignableTo(typeof(HttpResponseMessage));
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var jwt = JObject.Parse(await access.Content.ReadAsStringAsync());
             var refresh = (string)jwt["refresh_token"];
 
-            var result = await _endpoints.RefreshTokenV2(issuer.Id.ToString(), clients, refresh);
+            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, refresh);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }

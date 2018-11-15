@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = client.AppClientUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
 
-            var result = await _endpoints.AuthorizationCodeRequestV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
+            var result = await _endpoints.AuthorizationCode_RequestV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            var result = await _endpoints.AuthorizationCodeV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _endpoints.AuthorizationCode_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = client.AppClientUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
 
-            var result = await _endpoints.AuthorizationCodeRequestV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
+            var result = await _endpoints.AuthorizationCode_RequestV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = client.AppClientUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
 
-            var result = await _endpoints.AuthorizationCodeRequestV2(Guid.NewGuid().ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
+            var result = await _endpoints.AuthorizationCode_RequestV2(Guid.NewGuid().ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = new Uri("https://app.test.net/a/invalid");
 
-            var result = await _endpoints.AuthorizationCodeRequestV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
+            var result = await _endpoints.AuthorizationCode_RequestV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = client.AppClientUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
 
-            var result = await _endpoints.AuthorizationCodeRequestV2(issuer.Id.ToString(), client.Id.ToString(), user.ToString(), url.AbsoluteUri, "all");
+            var result = await _endpoints.AuthorizationCode_RequestV2(issuer.Id.ToString(), client.Id.ToString(), user.ToString(), url.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = client.AppClientUri.Where(x => x.AbsoluteUri == Strings.ApiUnitTestUri1Link).Single();
 
-            var result = await _endpoints.AuthorizationCodeRequestV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
+            var result = await _endpoints.AuthorizationCode_RequestV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "all");
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
 
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            var check = await _endpoints.AuthorizationCodeV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var check = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -202,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var redirect = new Uri(url.AbsoluteUri);
             var code = RandomValues.CreateBase64String(64);
 
-            var result = await _endpoints.AuthorizationCodeV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -221,11 +221,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            var result = await _endpoints.AuthorizationCodeV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            result = await _endpoints.AuthorizationCodeV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(64), code);
+            result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(64), code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -248,7 +248,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            var result = await _endpoints.AuthorizationCodeV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
                 .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            var result = await _endpoints.AuthorizationCodeV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
+            var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

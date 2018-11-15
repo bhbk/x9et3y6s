@@ -13,17 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="libsettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="libsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <Pack>false</Pack>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Bhbk.Lib.Core" Version="2018.11.4.2334" />
     <PackageReference Include="CryptoHelper" Version="3.0.2" />
@@ -50,6 +39,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="libsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Pack>false</Pack>
+    </None>
   </ItemGroup>
 
 </Project>

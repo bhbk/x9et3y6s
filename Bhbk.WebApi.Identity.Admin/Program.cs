@@ -11,7 +11,6 @@ namespace Bhbk.WebApi.Identity.Admin
     public class Program
     {
         private static IConfigurationRoot _conf;
-        private static FileInfo _api = SearchRoots.ByAssemblyContext("appsettings.json");
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
@@ -28,16 +27,18 @@ namespace Bhbk.WebApi.Identity.Admin
 
         public static void Main(string[] args)
         {
+            var api = SearchRoots.ByAssemblyContext("appsettings.json");
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .WriteTo.LiterateConsole()
-                .WriteTo.RollingFile(_api.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
+                .WriteTo.RollingFile(api.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
             _conf = new ConfigurationBuilder()
-                .SetBasePath(_api.DirectoryName)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(api.DirectoryName)
+                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
                 .Build();
 
             BuildWebHost(args).Run();

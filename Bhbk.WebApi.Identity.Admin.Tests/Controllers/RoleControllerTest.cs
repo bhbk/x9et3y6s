@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole1)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.RoleAddToUserV1(access.token, model.Id, user.Id);
+            var response = await _endpoints.Role_AddToUserV1(access.token, model.Id, user.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.RoleCreateV1(access.token, new RoleCreate());
+            var response = await _endpoints.Role_CreateV1(access.token, new RoleCreate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
             access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            response = await _endpoints.RoleCreateV1(access.token, new RoleCreate());
+            response = await _endpoints.Role_CreateV1(access.token, new RoleCreate());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 Immutable = false
             };
 
-            var response = await _endpoints.RoleCreateV1(access.token, create);
+            var response = await _endpoints.Role_CreateV1(access.token, create);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.RoleDeleteV1(access.token, Guid.NewGuid());
+            var response = await _endpoints.Role_DeleteV1(access.token, Guid.NewGuid());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
             access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            response = await _endpoints.RoleDeleteV1(access.token, Guid.NewGuid());
+            response = await _endpoints.Role_DeleteV1(access.token, Guid.NewGuid());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -158,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.RoleDeleteV1(access.token, model.Id);
+            var response = await _endpoints.Role_DeleteV1(access.token, model.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -179,7 +179,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.RoleGetV1(access.token, model.Id.ToString());
+            var response = await _endpoints.Role_GetV1(access.token, model.Id.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<RoleResult>();
 
-            response = await _endpoints.RoleGetV1(access.token, model.Name);
+            response = await _endpoints.Role_GetV1(access.token, model.Name);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -213,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("name", "asc"));
 
-            var response = await _endpoints.RoleGetPagesV1(access.token,
+            var response = await _endpoints.Role_GetV1(access.token,
                 new TuplePager()
                 {
                     Filter = string.Empty,
@@ -246,10 +246,45 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiDefaultRoleForViewerApi)).Single();
 
             var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.RoleRemoveFromUserV1(access.token, model.Id, user.Id);
+            var response = await _endpoints.Role_RemoveFromUserV1(access.token, model.Id, user.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task Admin_RoleV1_Update_Fail()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            /*
+             * check security...
+             */
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var response = await _endpoints.Role_UpdateV1(access.token, new RoleUpdate());
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+            /*
+             * check model and/or action...
+             */
+
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserMgr.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+
+            access = await JwtSecureProvider.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            response = await _endpoints.Role_UpdateV1(access.token, new RoleUpdate());
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
@@ -267,7 +302,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var model = (await _factory.UoW.RoleMgr.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
             model.Name += "(Updated)";
 
-            var response = await _endpoints.RoleUpdateV1(access.token, _factory.UoW.Convert.Map<RoleUpdate>(model));
+            var response = await _endpoints.Role_UpdateV1(access.token, _factory.UoW.Convert.Map<RoleUpdate>(model));
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);

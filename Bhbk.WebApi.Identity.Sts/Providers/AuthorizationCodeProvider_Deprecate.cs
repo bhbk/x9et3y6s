@@ -21,16 +21,16 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
     {
         public static IApplicationBuilder UseAuthorizationCodeProvider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AuthorizationCodeProvider>();
+            return app.UseMiddleware<AuthorizationCodeProvider_Deprecate>();
         }
     }
 
-    public class AuthorizationCodeProvider
+    public class AuthorizationCodeProvider_Deprecate
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AuthorizationCodeProvider(RequestDelegate next)
+        public AuthorizationCodeProvider_Deprecate(RequestDelegate next)
         {
             _next = next;
 
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/authorization-old", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v2/authorization", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
                 && (context.Request.Query.ContainsKey(Strings.AttrIssuerIDV2)
                     && context.Request.Query.ContainsKey(Strings.AttrClientIDV2)
@@ -54,6 +54,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Query.ContainsKey(Strings.AttrGrantTypeIDV2)
                     && context.Request.Query.ContainsKey(Strings.AttrAuthorizeCodeIDV2)))
             {
+                //logic below ported from middleware to controller so open api (swagger) can do its job easier...
+                throw new InvalidOperationException();
+
                 var urlValues = context.Request.Query;
 
                 string issuerValue = urlValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV2).Value;
@@ -223,7 +226,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
             #region v1 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/authorization-old", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/authorization", StringComparison.Ordinal)
                 && context.Request.Method.Equals("GET")
                 && (context.Request.Query.ContainsKey(Strings.AttrIssuerIDV1)
                     && context.Request.Query.ContainsKey(Strings.AttrClientIDV1)
@@ -231,6 +234,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Query.ContainsKey(Strings.AttrGrantTypeIDV1)
                     && context.Request.Query.ContainsKey(Strings.AttrAuthorizeCodeIDV1)))
             {
+                //logic below ported from middleware to controller so open api (swagger) can do its job easier...
+                throw new InvalidOperationException();
+
                 context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysNotImplemented }, _serializer));

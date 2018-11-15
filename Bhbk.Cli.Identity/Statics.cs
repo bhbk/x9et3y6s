@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Data;
+using Bhbk.Lib.Identity.Infrastructure;
 using System;
-using Bhbk.Lib.Identity.Data;
 
 namespace Bhbk.Cli.Identity
 {

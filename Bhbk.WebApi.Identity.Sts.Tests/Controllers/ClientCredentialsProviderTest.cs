@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentialsV2(issuer.Id.ToString(), client.Id.ToString(), issuer.IssuerKey);
+            var result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), issuer.IssuerKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentialsV2(Guid.NewGuid().ToString(), client.Id.ToString(), issuer.IssuerKey);
+            var result = await _endpoints.ClientCredentials_GenerateV2(Guid.NewGuid().ToString(), client.Id.ToString(), issuer.IssuerKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentialsV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateBase64String(16));
+            var result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateBase64String(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentialsV2(issuer.Id.ToString(), client.Id.ToString(), issuer.IssuerKey);
+            var result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), issuer.IssuerKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
