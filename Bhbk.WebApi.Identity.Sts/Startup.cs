@@ -1,9 +1,11 @@
-﻿using Bhbk.Lib.Core.FileSystem;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -43,10 +45,17 @@ namespace Bhbk.WebApi.Identity.Sts
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
+            var mapper = new MapperConfiguration(x =>
+            {
+                x.AddProfile<IdentityMaps>();
+                x.AddExpressionMapping();
+            }).CreateMapper();
+
+            sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
             {
-                return new IdentityContext(options, ContextType.Live, conf);
+                return new IdentityContext(options, ContextType.Live, conf, mapper);
             });
             sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));

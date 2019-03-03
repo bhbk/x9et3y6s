@@ -1,10 +1,12 @@
-﻿using Bhbk.Lib.Core.FileSystem;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Datasets;
-using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Internal.Datasets;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -55,6 +57,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
+                var mapper = new MapperConfiguration(x =>
+                {
+                    x.AddProfile<IdentityMaps>();
+                    x.AddExpressionMapping();
+                }).CreateMapper();
+
+                sc.AddSingleton(mapper);
                 sc.AddSingleton(conf);
 
                 /*
@@ -62,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityContext<AppDbContext>>(new IdentityContext(options, ContextType.UnitTest, conf));
+                sc.AddSingleton<IIdentityContext<AppDbContext>>(new IdentityContext(options, ContextType.UnitTest, conf, mapper));
                 sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
                 sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
 

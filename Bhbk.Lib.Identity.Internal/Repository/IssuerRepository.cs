@@ -1,28 +1,33 @@
-﻿using Bhbk.Lib.Core.Interfaces;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repository
+namespace Bhbk.Lib.Identity.Internal.Repository
 {
-    public class IssuerRepository : IGenericRepository<AppIssuer, Guid>
+    public class IssuerRepository : IGenericRepository<IssuerCreate, IssuerModel, Guid>
     {
         private readonly ContextType _situation;
+        private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly string _salt;
 
-        public IssuerRepository(AppDbContext context, ContextType situation, string salt)
+        public IssuerRepository(AppDbContext context, ContextType situation, IMapper mapper, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
+            _mapper = mapper;
             _salt = salt;
         }
 
@@ -34,79 +39,110 @@ namespace Bhbk.Lib.Identity.Repository
             }
         }
 
-        public async Task<int> Count(Expression<Func<AppIssuer, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<IssuerModel, bool>> predicates = null)
         {
             var query = _context.AppIssuer.AsQueryable();
 
             if (predicates != null)
-                return await query.Where(predicates).CountAsync();
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppIssuer, bool>>>(predicates);
+                return await query.Where(preds).CountAsync();
+            }
 
             return await query.CountAsync();
         }
 
-        public async Task<AppIssuer> CreateAsync(AppIssuer entity)
+        public async Task<IssuerModel> CreateAsync(IssuerCreate model)
         {
-            return await Task.FromResult(_context.Add(entity).Entity);
+            var entity = _mapper.Map<AppIssuer>(model);
+            var result = _context.Add(entity).Entity;
+
+            return await Task.FromResult(_mapper.Map<IssuerModel>(result));
         }
 
-        public async Task<bool> DeleteAsync(AppIssuer entity)
+        public async Task<bool> DeleteAsync(Guid key)
         {
-            await Task.FromResult(_context.Remove(entity).Entity);
+            var entity = _context.AppIssuer.Where(x => x.Id == key).Single();
 
-            return true;
+            try
+            {
+                await Task.FromResult(_context.Remove(entity).Entity);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public async Task<bool> ExistsAsync(Guid key)
-        {
-            return await Task.FromResult(_context.AppClient.Any(x => x.Id == key));
-        }
-
-        public Task<IQueryable<AppIssuer>> GetAsync(params object[] parameters)
+        public Task<bool> ExistsAsync(Guid key)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IQueryable<AppIssuer>> GetAsync(Expression<Func<AppIssuer, bool>> predicates = null, 
-            Func<IQueryable<AppIssuer>, IQueryable<AppIssuer>> orderBy = null, 
-            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null)
+        public Task<IEnumerable<IssuerModel>> GetAsync(params object[] parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<IssuerModel>> GetAsync(Expression<Func<IssuerModel, bool>> predicates = null,
+            Expression<Func<IssuerModel, object>> orders = null,
+            Expression<Func<IssuerModel, object>> includes = null,
+            int? skip = null,
+            int? take = null)
         {
             var query = _context.AppIssuer.AsQueryable();
 
             if (predicates != null)
-                query = query.Where(predicates);
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppIssuer, bool>>>(predicates);
+                query = query.Where(preds);
+            }
 
-            if (includes != null)
-                query = includes(query);
+            if (orders != null)
+            {
+                var ords = _mapper.MapExpression<Expression<Func<AppIssuer, object>>>(orders);
+                query = query.OrderBy(ords)?
+                        .Skip(skip.Value)?
+                        .Take(take.Value);
+            }
 
-            if (orderBy != null)
-                return await Task.FromResult(orderBy(query));
+            query = query.Include("AppClient");
 
-            return await Task.FromResult(query);
+            //if (includes != null)
+            //{
+            //    var incs = _mapper.MapExpression<Expression<Func<AppIssuer, object>>>(includes);
+            //    query = query.Include(incs);
+            //}
+
+            return await Task.FromResult(_mapper.Map<IEnumerable<IssuerModel>>(query));
         }
 
-        public async Task<IQueryable<AppClient>> GetClientsAsync(Guid key)
+        public async Task<IEnumerable<ClientModel>> GetClientsAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppClient.Where(x => x.IssuerId == key).AsQueryable());
+            var result = _context.AppClient.Where(x => x.IssuerId == key).AsQueryable();
+
+            return await Task.FromResult(_mapper.Map<IEnumerable<ClientModel>>(result));
         }
 
-        public async Task<AppIssuer> UpdateAsync(AppIssuer entity)
+        public async Task<IssuerModel> UpdateAsync(IssuerModel model)
         {
-            var model = _context.AppIssuer.Where(x => x.Id == entity.Id).Single();
+            var entity = _context.AppIssuer.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            model.Name = entity.Name;
-            model.Description = entity.Description;
-            model.IssuerKey = entity.IssuerKey;
-            model.LastUpdated = DateTime.Now;
-            model.Enabled = entity.Enabled;
-            model.Immutable = entity.Immutable;
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.IssuerKey = model.IssuerKey;
+            entity.LastUpdated = DateTime.Now;
+            entity.Enabled = model.Enabled;
+            entity.Immutable = model.Immutable;
 
-            _context.Entry(model).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(model).Entity);
+            return await Task.FromResult(_mapper.Map<IssuerModel>(_context.Update(entity).Entity));
         }
     }
 }

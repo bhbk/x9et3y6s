@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Repository;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Repository;
 
-namespace Bhbk.Lib.Identity.Interfaces
+namespace Bhbk.Lib.Identity.Internal.Interfaces
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public interface IIdentityContext<TContext> : IGenericUnitOfWork

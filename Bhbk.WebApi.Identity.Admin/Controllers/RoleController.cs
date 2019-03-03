@@ -1,12 +1,10 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -37,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            var result = await UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -61,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check != null)
                 return BadRequest(Strings.MsgRoleAlreadyExists);
 
-            var create = await UoW.RoleRepo.CreateAsync(UoW.Convert.Map<AppRole>(model));
+            var create = await UoW.RoleRepo.CreateAsync(model);
 
             await UoW.CommitAsync();
 
@@ -70,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if(result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(UoW.Convert.Map<RoleModel>(result));
+            return Ok(result);
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
@@ -87,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             role.ActorId = GetUserGUID();
 
-            if (!await UoW.RoleRepo.DeleteAsync(role))
+            if (!await UoW.RoleRepo.DeleteAsync(role.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -99,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetRoleV1([FromRoute] string roleValue)
         {
             Guid roleID;
-            AppRole role;
+            RoleModel role;
 
             if (Guid.TryParse(roleValue, out roleID))
                 role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
@@ -109,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (role == null)
                 return NotFound(Strings.MsgRoleNotExist);
 
-            return Ok(UoW.Convert.Map<RoleModel>(role));
+            return Ok(role);
         }
 
         [Route("v1/pages"), HttpPost]
@@ -118,20 +116,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<AppRole, bool>> expr;
+            Expression<Func<RoleModel, bool>> preds;
+            Expression<Func<RoleModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
 
             if (string.IsNullOrEmpty(model.Filter))
-                expr = x => true;
+                preds = x => true;
             else
-                expr = x => x.Name.ToLower().Contains(model.Filter.ToLower())
+                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.RoleRepo.Count(expr);
-            var list = await UoW.RoleRepo.GetAsync(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
-                x => x.Include(y => y.AppUserRole));
-
-            var result = list.Select(x => UoW.Convert.Map<RoleModel>(x));
+            var total = await UoW.RoleRepo.Count(preds);
+            var result = await UoW.RoleRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
 
             return Ok(new { Count = total, List = result });
         }
@@ -146,9 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.RoleRepo.GetUsersListAsync(role);
 
-            var result = users.Select(x => UoW.Convert.Map<UserModel>(x));
-
-            return Ok(result);
+            return Ok(users);
         }
 
         [Route("v1/{roleID:guid}/remove/{userID:guid}"), HttpGet]
@@ -168,7 +161,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.RemoveFromRoleAsync(user, role.Name);
+            var result = await UoW.UserRepo.RemoveFromRoleAsync(user.Id, role.Name);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -180,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> UpdateRoleV1([FromBody] RoleUpdate model)
+        public async Task<IActionResult> UpdateRoleV1([FromBody] RoleModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -195,11 +188,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (role.Immutable)
                 return BadRequest(Strings.MsgRoleImmutable);
 
-            var result = await UoW.RoleRepo.UpdateAsync(UoW.Convert.Map<AppRole>(model));
+            var result = await UoW.RoleRepo.UpdateAsync(model);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Convert.Map<RoleModel>(result));
+            return Ok(result);
         }
     }
 }

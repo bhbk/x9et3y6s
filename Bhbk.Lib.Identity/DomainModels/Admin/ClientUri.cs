@@ -30,14 +30,4 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public Nullable<DateTime> LastUpdated { get; set; }
     }
-
-    public class ClientUriUpdate : ClientUriBase
-    {
-        [Required]
-        public Guid Id { get; set; }
-
-        public DateTime Created { get; set; }
-
-        public Nullable<DateTime> LastUpdated { get; set; }
-    }
 }

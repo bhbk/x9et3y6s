@@ -1,15 +1,18 @@
-﻿using Bhbk.Lib.Core.Interfaces;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repository
+namespace Bhbk.Lib.Identity.Internal.Repository
 {
     /*
      * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -18,70 +21,99 @@ namespace Bhbk.Lib.Identity.Repository
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : IGenericRepository<AppRole, Guid>
+    public class RoleRepository : IGenericRepository<RoleCreate, RoleModel, Guid>
     {
         private readonly ContextType _situation;
+        private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public RoleRepository(AppDbContext context, ContextType situation)
+        public RoleRepository(AppDbContext context, ContextType situation, IMapper mapper)
         {
             _context = context;
             _situation = situation;
+            _mapper = mapper;
         }
 
-        public async Task<AppRole> CreateAsync(AppRole entity)
-        {
-            return await Task.FromResult(_context.Add(entity).Entity);
-        }
-
-        public async Task<int> Count(Expression<Func<AppRole, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<RoleModel, bool>> predicates = null)
         {
             var query = _context.AppRole.AsQueryable();
 
             if (predicates != null)
-                return await query.Where(predicates).CountAsync();
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppRole, bool>>>(predicates);
+                return await query.Where(preds).CountAsync();
+            }
 
             return await query.CountAsync();
         }
 
-        public async Task<bool> DeleteAsync(AppRole entity)
+        public async Task<RoleModel> CreateAsync(RoleCreate model)
         {
-            await Task.FromResult(_context.Remove(entity).Entity);
+            var entity = _mapper.Map<AppRole>(model);
+            var result = _context.Add(entity).Entity;
 
-            return true;
+            return await Task.FromResult(_mapper.Map<RoleModel>(result));
         }
 
-        public async Task<bool> ExistsAsync(Guid key)
+        public async Task<bool> DeleteAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppRole.Any(x => x.Id == key));
+            var entity = _context.AppRole.Where(x => x.Id == key).Single();
+
+            try
+            {
+                await Task.FromResult(_context.Remove(entity).Entity);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public Task<IQueryable<AppRole>> GetAsync(params object[] parameters)
+        public Task<bool> ExistsAsync(Guid key)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IQueryable<AppRole>> GetAsync(Expression<Func<AppRole, bool>> predicates = null,
-            Func<IQueryable<AppRole>, IQueryable<AppRole>> orderBy = null,
-            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null)
+        public Task<IEnumerable<RoleModel>> GetAsync(params object[] parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<RoleModel>> GetAsync(Expression<Func<RoleModel, bool>> predicates = null,
+            Expression<Func<RoleModel, object>> orders = null,
+            Expression<Func<RoleModel, object>> includes = null,
+            int? skip = null,
+            int? take = null)
         {
             var query = _context.AppRole.AsQueryable();
 
             if (predicates != null)
-                query = query.Where(predicates);
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppRole, bool>>>(predicates);
+                query = query.Where(preds);
+            }
 
-            if (includes != null)
-                query = includes(query);
+            if (orders != null)
+            {
+                var ords = _mapper.MapExpression<Expression<Func<AppRole, object>>>(orders);
+                query = query.OrderBy(ords)?
+                        .Skip(skip.Value)?
+                        .Take(take.Value);
+            }
 
             query.Include("AppUserRole.User").Load();
 
-            if (orderBy != null)
-                return await Task.FromResult(orderBy(query));
+            //if (includes != null)
+            //{
+            //    var incs = _mapper.MapExpression<Expression<Func<AppRole, object>>>(includes);
+            //    query = query.Include(incs);
+            //}
 
-            return await Task.FromResult(query);
+            return await Task.FromResult(_mapper.Map<IEnumerable<RoleModel>>(query));
         }
 
-        public async Task<IList<AppUser>> GetUsersListAsync(AppRole role)
+        public async Task<IList<AppUser>> GetUsersListAsync(RoleModel role)
         {
             var result = new List<AppUser>();
             var list = _context.AppUserRole.Where(x => x.RoleId == role.Id).AsQueryable();
@@ -95,23 +127,23 @@ namespace Bhbk.Lib.Identity.Repository
             return await Task.FromResult(result);
         }
 
-        public async Task<AppRole> UpdateAsync(AppRole role)
+        public async Task<RoleModel> UpdateAsync(RoleModel model)
         {
-            var model = _context.AppRole.Where(x => x.Id == role.Id).Single();
+            var entity = _context.AppRole.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            model.Name = role.Name;
-            model.Description = role.Description;
-            model.Enabled = role.Enabled;
-            model.LastUpdated = DateTime.Now;
-            model.Immutable = role.Immutable;
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.Enabled = model.Enabled;
+            entity.LastUpdated = DateTime.Now;
+            entity.Immutable = model.Immutable;
 
-            _context.Entry(model).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(model).Entity);
+            return await Task.FromResult(_mapper.Map<RoleModel>(_context.Update(entity).Entity));
         }
     }
 }

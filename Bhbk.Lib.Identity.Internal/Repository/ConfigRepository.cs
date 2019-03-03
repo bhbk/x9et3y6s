@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 
-namespace Bhbk.Lib.Identity.Repository
+namespace Bhbk.Lib.Identity.Internal.Repository
 {
     public class ConfigRepository
     {

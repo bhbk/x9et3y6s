@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Bhbk.Lib.Identity.EntityModels
+namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
     public partial class AppIssuer
     {

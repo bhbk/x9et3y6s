@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
     public class UserPolicyHandler : AuthorizationHandler<UserPolicyRequirement>
     {

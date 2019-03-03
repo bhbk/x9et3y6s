@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -11,12 +11,12 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
-    public class JwtProvider
+    public class JwtBuilder
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, ClientModel client, AppUser user)
+            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, IssuerModel issuer, ClientModel client, UserModel user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -56,7 +56,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, AppIssuer issuer, ClientModel client, AppUser user)
+            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, IssuerModel issuer, ClientModel client, UserModel user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -97,7 +97,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, List<ClientModel> clients, AppUser user)
+            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, IssuerModel issuer, List<ClientModel> clients, UserModel user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
+            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, IssuerModel issuer, UserModel user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -198,7 +198,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
+            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, IssuerModel issuer, UserModel user)
         {
             if (uow == null)
                 throw new ArgumentNullException();

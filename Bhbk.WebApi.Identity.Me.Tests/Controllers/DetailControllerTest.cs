@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -87,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 var result = await controller.SetPasswordV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-                var check = await _factory.UoW.UserRepo.CheckPasswordAsync(user, model.NewPassword);
+                var check = await _factory.UoW.UserRepo.CheckPasswordAsync(user.Id, model.NewPassword);
                 check.Should().BeFalse();
             }
         }
@@ -115,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 var result = await controller.SetPasswordV1(model) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
 
-                var check = await _factory.UoW.UserRepo.CheckPasswordAsync(user, model.NewPassword);
+                var check = await _factory.UoW.UserRepo.CheckPasswordAsync(user.Id, model.NewPassword);
                 check.Should().BeTrue();
             }
         }
@@ -134,8 +133,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 controller.SetUser(user.Id);
 
-                var status = await _factory.UoW.UserRepo.SetTwoFactorEnabledAsync(user, false);
-                status.Should().BeAssignableTo(typeof(AppUser));
+                var status = await _factory.UoW.UserRepo.SetTwoFactorEnabledAsync(user.Id, false);
+                status.Should().BeTrue();
 
                 var result = await controller.SetTwoFactorV1(true) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
@@ -156,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 controller.SetUser(user.Id);
 
-                var model = new UserUpdate()
+                var model = new UserModel()
                 {
                     Id = user.Id,
                     Email = user.Email,

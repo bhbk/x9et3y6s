@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (!await UoW.UserRepo.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -57,12 +56,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var remove = await UoW.UserRepo.RemovePasswordAsync(user);
+            var remove = await UoW.UserRepo.RemovePasswordAsync(user.Id);
 
             if (!remove.Succeeded)
                 return GetErrorResult(remove);
 
-            var add = await UoW.UserRepo.AddPasswordAsync(user, model.NewPassword);
+            var add = await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword);
 
             if (!add.Succeeded)
                 return GetErrorResult(add);
@@ -89,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user.TwoFactorEnabled == status)
                 return BadRequest(Strings.MsgUserInvalidTwoFactor);
 
-            var result = await UoW.UserRepo.SetTwoFactorEnabledAsync(user, status);
+            var result = await UoW.UserRepo.SetTwoFactorEnabledAsync(user.Id, status);
 
             await UoW.CommitAsync();
 
@@ -97,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpPut]
-        public async Task<IActionResult> UpdateDetailV1([FromBody] UserUpdate model)
+        public async Task<IActionResult> UpdateDetailV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -113,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Convert.Map<AppUser>(model));
+            var result = await UoW.UserRepo.UpdateAsync(model);
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

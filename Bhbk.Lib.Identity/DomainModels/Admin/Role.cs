@@ -40,14 +40,4 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public ICollection<string> Users { get; set; }
     }
-
-    public class RoleUpdate : RoleBase
-    {
-        [Required]
-        public Guid Id { get; set; }
-
-        public DateTime Created { get; set; }
-
-        public Nullable<DateTime> LastUpdated { get; set; }
-    }
 }

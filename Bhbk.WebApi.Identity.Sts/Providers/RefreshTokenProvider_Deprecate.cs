@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                IssuerModel issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 user.ActorId = user.Id;
 
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var clientList = uow.UserRepo.GetClientsAsync(user).Result;
+                var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
                 var clients = new List<ClientModel>();
 
                 //check if client is single, multiple or undefined...
@@ -174,8 +174,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     }
                 }
 
-                var access = JwtProvider.CreateAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtProvider.CreateRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.CreateAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.CreateRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                IssuerModel issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -312,7 +312,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 user.ActorId = user.Id;
 
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -321,8 +321,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var access = JwtProvider.CreateAccessTokenV1(uow, issuer, client, user).Result;
-                var refresh = JwtProvider.CreateRefreshTokenV1(uow, issuer, user).Result;
+                var access = JwtBuilder.CreateAccessTokenV1(uow, issuer, client, user).Result;
+                var refresh = JwtBuilder.CreateRefreshTokenV1(uow, issuer, user).Result;
 
                 var result = new
                 {

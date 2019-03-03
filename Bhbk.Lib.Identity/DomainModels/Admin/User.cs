@@ -61,19 +61,13 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public bool PasswordConfirmed { get; set; }
 
+        public string SecurityStamp { get; set; }
+
         public bool TwoFactorEnabled { get; set; }
 
         public ICollection<string> Roles { get; set; }
 
         public ICollection<string> Logins { get; set; }
-    }
-
-    public class UserUpdate : UserBase
-    {
-        [Required]
-        public Guid Id { get; set; }
-
-        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
     }
 
     public class UserAddPassword

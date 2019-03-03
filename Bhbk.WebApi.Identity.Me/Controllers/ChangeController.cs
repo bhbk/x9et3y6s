@@ -2,8 +2,8 @@
 using Bhbk.Lib.Alert.Helpers;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = UrlBuilder.ConfirmEmail(Conf, user, token);
+            var url = LinkBuilder.ConfirmEmail(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            else if (!await UoW.UserRepo.CheckPasswordAsync(user, model.CurrentPassword))
+            else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword))
                 return BadRequest(Strings.MsgUserInvalidCurrentPassword);
 
             else if (model.NewPassword != model.NewPasswordConfirm)
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = UrlBuilder.ConfirmPassword(Conf, user, token);
+            var url = LinkBuilder.ConfirmPassword(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = UrlBuilder.ConfirmPassword(Conf, user, token);
+            var url = LinkBuilder.ConfirmPassword(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 

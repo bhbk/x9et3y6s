@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -89,6 +89,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            /*
+             * tidbits below need enhancment, just tinkering...
+             */
+
             Expression<Func<ClientModel, bool>> preds;
             Expression<Func<ClientModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
 
@@ -114,14 +118,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var roles = await UoW.ClientRepo.GetRoleListAsync(clientID);
 
-            var result = roles.Select(x => UoW.Convert.Map<RoleModel>(x)).ToList();
-
-            return Ok(result);
+            return Ok(roles);
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> UpdateClientV1([FromBody] ClientUpdate model)
+        public async Task<IActionResult> UpdateClientV1([FromBody] ClientModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

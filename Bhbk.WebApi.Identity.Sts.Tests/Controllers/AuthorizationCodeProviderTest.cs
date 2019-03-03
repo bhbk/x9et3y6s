@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var redirect = new Uri(url.AbsoluteUri);
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _endpoints.AuthorizationCode_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -187,9 +187,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var redirect = new Uri(url.AbsoluteUri);
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
-            await _factory.UoW.IssuerRepo.DeleteAsync(issuer);
+            await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
             await _factory.UoW.CommitAsync();
 
             var check = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
@@ -230,7 +230,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var redirect = new Uri("https://app.test.net/a/invalid");
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -251,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            await _factory.UoW.UserRepo.DeleteAsync(user);
+            await _factory.UoW.UserRepo.DeleteAsync(user.Id);
             await _factory.UoW.CommitAsync();
 
             var url = (await _factory.UoW.ClientRepo.GetUriListAsync(client.Id))
@@ -259,7 +259,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var redirect = new Uri(url.AbsoluteUri);
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -281,7 +281,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var redirect = new Uri(url.AbsoluteUri);
             var code = HttpUtility.UrlEncode(await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.PasswordHash, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user));
 
             var result = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), redirect.AbsoluteUri, code);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -291,10 +291,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var access = (string)jwt["access_token"];
             var refresh = (string)jwt["refresh_token"];
 
-            var check = JwtProvider.CanReadToken(access);
+            var check = JwtBuilder.CanReadToken(access);
             check.Should().BeTrue();
 
-            check = JwtProvider.CanReadToken(refresh);
+            check = JwtBuilder.CanReadToken(refresh);
             check.Should().BeTrue();
         }
     }

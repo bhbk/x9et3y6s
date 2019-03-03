@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -37,15 +36,6 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
     }
 
     public class UserLoginModel : UserLoginBase
-    {
-        [Required]
-        public DateTime Created { get; set; }
-
-        [Required]
-        public Nullable<DateTime> LastUpdated { get; set; }
-    }
-
-    public class UserLoginUpdate : UserLoginBase
     {
         [Required]
         public DateTime Created { get; set; }

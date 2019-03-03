@@ -1,6 +1,5 @@
-﻿using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Repository;
-using Microsoft.AspNetCore.Identity;
+﻿using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.Repository;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -10,11 +9,16 @@ using System.Linq.Dynamic.Core;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
-    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1?view=aspnetcore-2.2
+    /*
+     * moving away from microsoft constructs for identity implementation because of un-needed additional 
+     * layers of complexity, and limitations, for the simple operations needing to be performed.
+     * 
+     * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1
+     */
 
-    public class UserClaimFactory : IUserClaimsPrincipalFactory<AppUser>
+    public class UserClaimFactory
     {
         private readonly IConfigurationRoot _conf;
         private readonly UserRepository _repo;
@@ -28,11 +32,11 @@ namespace Bhbk.Lib.Identity.Providers
             _conf = conf;
         }
 
-        public async Task<ClaimsPrincipal> CreateAsync(AppUser user)
+        public async Task<ClaimsPrincipal> CreateAsync(UserModel user)
         {
             var claims = new List<Claim>();
 
-            foreach (string role in (await _repo.GetRolesAsync(user)).ToList().OrderBy(x => x))
+            foreach (string role in (await _repo.GetRolesAsync(user.Id)).ToList().OrderBy(x => x))
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
             //check if claims compatibility enabled. means pack claim(s) with old name too.
@@ -40,7 +44,7 @@ namespace Bhbk.Lib.Identity.Providers
                 foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
                     claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
 
-            foreach (Claim claim in (await _repo.GetClaimsAsync(user)).ToList().OrderBy(x => x.Type))
+            foreach (Claim claim in (await _repo.GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(claim);
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
@@ -65,7 +69,7 @@ namespace Bhbk.Lib.Identity.Providers
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> CreateRefreshAsync(AppUser user)
+        public async Task<ClaimsPrincipal> CreateRefreshAsync(UserModel user)
         {
             var claims = new List<Claim>();
 

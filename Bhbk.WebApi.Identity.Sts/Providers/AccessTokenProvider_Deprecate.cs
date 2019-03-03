@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                IssuerModel issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 Guid userID;
-                AppUser user;
+                UserModel user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var clientList = uow.UserRepo.GetClientsAsync(user).Result;
+                var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
                 var clients = new List<ClientModel>();
 
                 //check if client is single, multiple or undefined...
@@ -174,7 +174,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     }
                 }
 
-                var loginList = uow.UserRepo.GetLoginsAsync(user).Result;
+                var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
                 var logins = uow.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString())).Result.ToList();
 
                 //check that login provider exists...
@@ -191,10 +191,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     || (uow.Situation == ContextType.UnitTest && logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any()))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.CheckPasswordAsync(user, passwordValue).Result)
+                    if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.UserRepo.AccessFailedAsync(user).Wait();
+                        uow.UserRepo.AccessFailedAsync(user.Id).Wait();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -209,10 +209,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //adjust counter(s) for login success...
-                uow.UserRepo.AccessSuccessAsync(user).Wait();
+                uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtProvider.CreateAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtProvider.CreateRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.CreateAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.CreateRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -282,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                IssuerModel issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 Guid userID;
-                AppUser user;
+                UserModel user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -348,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -357,7 +357,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var loginList = uow.UserRepo.GetLoginsAsync(user).Result;
+                var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
                 var logins = uow.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString())).Result;
 
                 //check that login provider exists...
@@ -374,10 +374,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     || (logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ContextType.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.CheckPasswordAsync(user, passwordValue).Result)
+                    if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.UserRepo.AccessFailedAsync(user).Wait();
+                        uow.UserRepo.AccessFailedAsync(user.Id).Wait();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -392,10 +392,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //adjust counter(s) for login success...
-                uow.UserRepo.AccessSuccessAsync(user).Wait();
+                uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtProvider.CreateAccessTokenV1(uow, issuer, client, user).Result;
-                var refresh = JwtProvider.CreateRefreshTokenV1(uow, issuer, user).Result;
+                var access = JwtBuilder.CreateAccessTokenV1(uow, issuer, client, user).Result;
+                var refresh = JwtBuilder.CreateRefreshTokenV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -502,7 +502,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 Guid userID;
-                AppUser user;
+                UserModel user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -522,7 +522,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -531,7 +531,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
                 }
 
-                var loginList = uow.UserRepo.GetLoginsAsync(user).Result;
+                var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
                 var logins = uow.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString())).Result;
 
                 //check that login provider exists...
@@ -548,10 +548,10 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     || (logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ContextType.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.CheckPasswordAsync(user, passwordValue).Result)
+                    if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.UserRepo.AccessFailedAsync(user).Wait();
+                        uow.UserRepo.AccessFailedAsync(user.Id).Wait();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -566,9 +566,9 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //adjust counter(s) for login success...
-                uow.UserRepo.AccessSuccessAsync(user).Wait();
+                uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtProvider.CreateAccessTokenV1CompatibilityMode(uow, issuer, client, user).Result;
+                var access = JwtBuilder.CreateAccessTokenV1CompatibilityMode(uow, issuer, client, user).Result;
 
                 var result = new
                 {

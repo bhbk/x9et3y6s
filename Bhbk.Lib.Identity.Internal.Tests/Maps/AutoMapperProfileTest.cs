@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Maps;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.Maps
@@ -11,12 +11,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Maps
         {
             Mapper.Initialize(x =>
             {
-                x.AddProfile<ActivityMaps>();
-                x.AddProfile<ClientMaps>();
-                x.AddProfile<IssuerMaps>();
-                x.AddProfile<LoginMaps>();
-                x.AddProfile<RoleMaps>();
-                x.AddProfile<UserMaps>();
+                x.AddProfile<IdentityMaps>();
             });
             Mapper.Configuration.AssertConfigurationIsValid();
         }

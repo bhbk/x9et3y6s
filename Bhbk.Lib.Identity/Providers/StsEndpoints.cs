@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
     public class StsClient : StsEndpoints
     {

@@ -46,14 +46,4 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public Nullable<DateTime> LastUpdated { get; set; }
     }
-
-    public class UserClaimUpdate : UserClaimBase
-    {
-        [Required]
-        public Guid Id { get; set; }
-
-        public DateTime Created { get; set; }
-
-        public Nullable<DateTime> LastUpdated { get; set; }
-    }
 }

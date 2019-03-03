@@ -1,11 +1,11 @@
-﻿using Bhbk.Lib.Identity.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Bhbk.Lib.Identity.Repository;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Internal.Validators
 {
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuservalidator-1
 

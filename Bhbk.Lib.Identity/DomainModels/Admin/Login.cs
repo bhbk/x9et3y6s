@@ -28,10 +28,4 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public ICollection<string> Users { get; set; }
     }
-
-    public class LoginUpdate : LoginBase
-    {
-        [Required]
-        public Guid Id { get; set; }
-    }
 }

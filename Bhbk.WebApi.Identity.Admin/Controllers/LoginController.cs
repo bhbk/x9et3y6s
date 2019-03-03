@@ -1,13 +1,11 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.EntityModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -38,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.AddLoginAsync(user,
+            var result = await UoW.UserRepo.AddLoginAsync(user.Id,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
 
             if (!result.Succeeded)
@@ -63,11 +61,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (check.Any())
                 return BadRequest(Strings.MsgLoginAlreadyExists);
 
-            var result = await UoW.LoginRepo.CreateAsync(UoW.Convert.Map<AppLogin>(model));
+            var result = await UoW.LoginRepo.CreateAsync(model);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Convert.Map<LoginModel>(result));
+            return Ok(result);
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -84,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             login.ActorId = GetUserGUID();
 
-            if (!await UoW.LoginRepo.DeleteAsync(login))
+            if (!await UoW.LoginRepo.DeleteAsync(login.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -96,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetLoginV1([FromRoute] string loginValue)
         {
             Guid loginID;
-            AppLogin login;
+            LoginModel login;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
@@ -107,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            return Ok(UoW.Convert.Map<LoginModel>(login));
+            return Ok(login);
         }
 
         [Route("v1/pages"), HttpPost]
@@ -116,19 +114,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<AppLogin, bool>> expr;
+            /*
+             * tidbits below need enhancment, just tinkering...
+             */
+
+            Expression<Func<LoginModel, bool>> preds;
+            Expression<Func<LoginModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
 
             if (string.IsNullOrEmpty(model.Filter))
-                expr = x => true;
+                preds = x => true;
             else
-                expr = x => x.LoginProvider.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.LoginProvider.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.LoginRepo.Count(expr);
-            var list = await UoW.LoginRepo.GetAsync(expr,
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)).Skip(model.Skip).Take(model.Take),
-                x => x.Include(y => y.AppUserLogin));
-
-            var result = list.Select(x => UoW.Convert.Map<LoginModel>(x));
+            var total = await UoW.LoginRepo.Count(preds);
+            var result = await UoW.LoginRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
 
             return Ok(new { Count = total, List = result });
         }
@@ -165,7 +164,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.RemoveLoginAsync(user, login.LoginProvider, string.Empty);
+            var result = await UoW.UserRepo.RemoveLoginAsync(user.Id, login.LoginProvider, string.Empty);
 
             if (!result.Succeeded)
                 return GetErrorResult(result);
@@ -177,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> UpdateLoginV1([FromBody] LoginUpdate model)
+        public async Task<IActionResult> UpdateLoginV1([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -189,11 +188,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var result = await UoW.LoginRepo.UpdateAsync(UoW.Convert.Map<AppLogin>(model));
+            var result = await UoW.LoginRepo.UpdateAsync(model);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Convert.Map<LoginModel>(result));
+            return Ok(result);
         }
     }
 }

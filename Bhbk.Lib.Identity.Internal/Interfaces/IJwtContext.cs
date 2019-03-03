@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Bhbk.Lib.Identity.Interfaces
+namespace Bhbk.Lib.Identity.Internal.Interfaces
 {
     public interface IJwtContext
     {

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +11,7 @@ using System.Linq.Dynamic.Core;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
     public class ClientClaimFactory
     {

@@ -1,12 +1,13 @@
-﻿using Bhbk.Lib.Identity.EntityModels;
+﻿using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.Extensions.Configuration;
 using System;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
-    public class UrlBuilder
+    public class LinkBuilder
     {
-        public static Uri AuthorizationCodeRequest(IConfigurationRoot conf, AppIssuer client, AppUser user, string redirectUri, string scope, string state)
+        public static Uri AuthorizationCodeRequest(IConfigurationRoot conf, IssuerModel client, UserModel user, string redirectUri, string scope, string state)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/authorization-code");
 
@@ -18,7 +19,7 @@ namespace Bhbk.Lib.Identity.Providers
                 + "&state=" + state);
         }
 
-        public static Uri ConfirmEmail(IConfigurationRoot conf, AppUser user, string code)
+        public static Uri ConfirmEmail(IConfigurationRoot conf, UserModel user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");
 
@@ -26,7 +27,7 @@ namespace Bhbk.Lib.Identity.Providers
                 + "&code=" + code);
         }
 
-        public static Uri ConfirmPassword(IConfigurationRoot conf, AppUser user, string code)
+        public static Uri ConfirmPassword(IConfigurationRoot conf, UserModel user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-password");
 

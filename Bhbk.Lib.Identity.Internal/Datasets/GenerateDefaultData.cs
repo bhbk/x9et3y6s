@@ -1,15 +1,15 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Datasets
+namespace Bhbk.Lib.Identity.Internal.Datasets
 {
     public class GenerateDefaultData
     {
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Datasets
                     Immutable = true,
                 };
 
-                foundIssuer = await _uow.IssuerRepo.CreateAsync(_uow.Convert.Map<AppIssuer>(issuer));
+                foundIssuer = await _uow.IssuerRepo.CreateAsync(issuer);
 
                 await _uow.CommitAsync();
             }
@@ -96,7 +96,7 @@ namespace Bhbk.Lib.Identity.Datasets
                     Immutable = true,
                 };
 
-                foundLogin = await _uow.LoginRepo.CreateAsync(_uow.Convert.Map<AppLogin>(login));
+                foundLogin = await _uow.LoginRepo.CreateAsync(login);
 
                 await _uow.CommitAsync();
             }
@@ -116,14 +116,14 @@ namespace Bhbk.Lib.Identity.Datasets
                     Immutable = true,
                 };
 
-                await _uow.UserRepo.CreateAsync(_uow.Convert.Map<AppUser>(user), Strings.ApiDefaultUserPassword);
+                await _uow.UserRepo.CreateAsync(user, Strings.ApiDefaultUserPassword);
                 await _uow.CommitAsync();
 
                 foundUser = (await _uow.UserRepo.GetAsync(x => x.Email == user.Email)).Single();
 
-                await _uow.UserRepo.SetConfirmedEmailAsync(foundUser, true);
-                await _uow.UserRepo.SetConfirmedPasswordAsync(foundUser, true);
-                await _uow.UserRepo.SetConfirmedPhoneNumberAsync(foundUser, true);
+                await _uow.UserRepo.SetConfirmedEmailAsync(foundUser.Id, true);
+                await _uow.UserRepo.SetConfirmedPasswordAsync(foundUser.Id, true);
+                await _uow.UserRepo.SetConfirmedPhoneNumberAsync(foundUser.Id, true);
                 await _uow.CommitAsync();
             }
 
@@ -139,7 +139,7 @@ namespace Bhbk.Lib.Identity.Datasets
                     Immutable = true,
                 };
 
-                await _uow.RoleRepo.CreateAsync(_uow.Convert.Map<AppRole>(role));
+                await _uow.RoleRepo.CreateAsync(role);
                 await _uow.CommitAsync();
 
                 foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == role.Name)).Single();
@@ -157,21 +157,21 @@ namespace Bhbk.Lib.Identity.Datasets
                     Immutable = true,
                 };
 
-                await _uow.RoleRepo.CreateAsync(_uow.Convert.Map<AppRole>(role));
+                await _uow.RoleRepo.CreateAsync(role);
                 await _uow.CommitAsync();
 
                 foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == role.Name)).Single();
             }
 
-            if (!await _uow.UserRepo.IsInLoginAsync(foundUser, Strings.ApiDefaultLogin))
-                await _uow.UserRepo.AddLoginAsync(foundUser,
+            if (!await _uow.UserRepo.IsInLoginAsync(foundUser.Id, Strings.ApiDefaultLogin))
+                await _uow.UserRepo.AddLoginAsync(foundUser.Id,
                     new UserLoginInfo(Strings.ApiDefaultLogin, Strings.ApiDefaultLoginKey, Strings.ApiDefaultLoginName));
 
-            if (!await _uow.UserRepo.IsInRoleAsync(foundUser, foundRoleForAdmin.Name))
-                await _uow.UserRepo.AddToRoleAsync(foundUser, foundRoleForAdmin.Name);
+            if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Name))
+                await _uow.UserRepo.AddToRoleAsync(foundUser.Id, foundRoleForAdmin.Name);
 
-            if (!await _uow.UserRepo.IsInRoleAsync(foundUser, foundRoleForUser.Name))
-                await _uow.UserRepo.AddToRoleAsync(foundUser, foundRoleForUser.Name);
+            if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForUser.Name))
+                await _uow.UserRepo.AddToRoleAsync(foundUser.Id, foundRoleForUser.Name);
         }
 
         public async Task DestroyAsync()
@@ -180,12 +180,12 @@ namespace Bhbk.Lib.Identity.Datasets
 
             if (user != null)
             {
-                var roles = await _uow.UserRepo.GetRolesAsync(user);
+                var roles = await _uow.UserRepo.GetRolesAsync(user.Id);
 
-                await _uow.UserRepo.RemoveFromRolesAsync(user, roles.ToArray());
+                await _uow.UserRepo.RemoveFromRolesAsync(user.Id, roles.ToArray());
                 await _uow.CommitAsync();
 
-                await _uow.UserRepo.DeleteAsync(user);
+                await _uow.UserRepo.DeleteAsync(user.Id);
                 await _uow.CommitAsync();
             }
 
@@ -193,7 +193,7 @@ namespace Bhbk.Lib.Identity.Datasets
 
             if (roleAdmin != null)
             {
-                await _uow.RoleRepo.DeleteAsync(roleAdmin);
+                await _uow.RoleRepo.DeleteAsync(roleAdmin.Id);
                 await _uow.CommitAsync();
             }
 
@@ -201,7 +201,7 @@ namespace Bhbk.Lib.Identity.Datasets
 
             if (roleUser != null)
             {
-                await _uow.RoleRepo.DeleteAsync(roleUser);
+                await _uow.RoleRepo.DeleteAsync(roleUser.Id);
                 await _uow.CommitAsync();
             }
 
@@ -209,7 +209,7 @@ namespace Bhbk.Lib.Identity.Datasets
 
             if (loginLocal != null)
             {
-                await _uow.LoginRepo.DeleteAsync(loginLocal);
+                await _uow.LoginRepo.DeleteAsync(loginLocal.Id);
                 await _uow.CommitAsync();
             }
 
@@ -233,7 +233,7 @@ namespace Bhbk.Lib.Identity.Datasets
 
             if (issuer != null)
             {
-                await _uow.IssuerRepo.DeleteAsync(issuer);
+                await _uow.IssuerRepo.DeleteAsync(issuer.Id);
                 await _uow.CommitAsync();
             }
         }

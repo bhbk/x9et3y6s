@@ -1,6 +1,5 @@
-﻿using Bhbk.Lib.Identity.Primitives;
+﻿using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.WebApi.Identity.Sts.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Linq;

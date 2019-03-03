@@ -40,15 +40,4 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public ICollection<string> Clients { get; set; }
     }
-
-    public class IssuerUpdate : IssuerBase
-    {
-
-        [Required]
-        public Guid Id { get; set; }
-
-        public DateTime Created { get; set; }
-
-        public Nullable<DateTime> LastUpdated { get; set; }
-    }
 }

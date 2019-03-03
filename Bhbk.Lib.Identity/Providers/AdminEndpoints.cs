@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
     public class AdminClient : AdminEndpoints
     {
@@ -154,7 +154,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Client_UpdateV1(string jwt, ClientUpdate model)
+        public async Task<HttpResponseMessage> Client_UpdateV1(string jwt, ClientModel model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -271,7 +271,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Issuer_UpdateV1(string jwt, IssuerUpdate model)
+        public async Task<HttpResponseMessage> Issuer_UpdateV1(string jwt, IssuerModel model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -391,7 +391,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Login_UpdateV1(string jwt, LoginUpdate model)
+        public async Task<HttpResponseMessage> Login_UpdateV1(string jwt, LoginModel model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -526,7 +526,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_UpdateV1(string jwt, RoleUpdate model)
+        public async Task<HttpResponseMessage> Role_UpdateV1(string jwt, RoleModel model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -781,7 +781,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_UpdateV1(string jwt, UserUpdate model)
+        public async Task<HttpResponseMessage> User_UpdateV1(string jwt, UserModel model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");

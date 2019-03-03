@@ -1,7 +1,7 @@
 using AutoMapper;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Maps;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.EntityModels
+namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
     //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
     public partial class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
@@ -22,25 +22,22 @@ namespace Bhbk.Lib.Identity.EntityModels
         private static IMapper _convert;
         private static IList _fieldsExcluded, _fieldsSensitive, _tablesExcluded;
 
-        public AppDbContext(DbContextOptions<AppDbContext> options, IConfigurationRoot conf)
+        public AppDbContext(DbContextOptions<AppDbContext> options, IConfigurationRoot conf, IMapper mapper)
         : base(options)
         {
             _conf = conf;
+            _convert = mapper;
         }
 
-        public AppDbContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, IConfigurationRoot conf)
+        public AppDbContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, IConfigurationRoot conf, IMapper mapper)
         : base(optionsBuilder.Options)
         {
             _conf = conf;
+            _convert = mapper;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            _convert = new MapperConfiguration(x =>
-            {
-                x.AddProfile<ActivityMaps>();
-            }).CreateMapper();
-
             _fieldsExcluded = _conf.GetSection("IdentityActivity:FieldsExcluded").GetChildren().Select(x => x.Value).ToList();
             _fieldsSensitive = _conf.GetSection("IdentityActivity:FieldsSensitive").GetChildren().Select(x => x.Value).ToList();
             _tablesExcluded = _conf.GetSection("IdentityActivity:TablesExcluded").GetChildren().Select(x => x.Value).ToList();

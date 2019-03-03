@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bhbk.Lib.Identity.Primitives
+namespace Bhbk.Lib.Identity.Internal.Primitives
 {
     public class Enums
     {

@@ -1,22 +1,21 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Repository;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using Bhbk.Lib.Identity.Maps;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Infrastructure
+namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public class IdentityContext : IIdentityContext<AppDbContext>
     {
         private readonly ContextType _situation;
-        private readonly IMapper _convert;
+        private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly ActivityRepository _activityRepo;
         private readonly ClientRepository _clientRepo;
@@ -27,19 +26,19 @@ namespace Bhbk.Lib.Identity.Infrastructure
         private readonly UserRepository _userRepo;
         private UserQuotes _userQuote;
 
-        public IdentityContext(DbContextOptions<AppDbContext> options, ContextType situation, IConfigurationRoot conf)
-            : this(new AppDbContext(options, conf), situation, conf)
+        public IdentityContext(DbContextOptions<AppDbContext> options, ContextType situation, IConfigurationRoot conf, IMapper mapper)
+            : this(new AppDbContext(options, conf, mapper), situation, conf, mapper)
         {
 
         }
 
-        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType situation, IConfigurationRoot conf)
-            : this(new AppDbContext(optionsBuilder.Options, conf), situation, conf)
+        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType situation, IConfigurationRoot conf, IMapper mapper)
+            : this(new AppDbContext(optionsBuilder.Options, conf, mapper), situation, conf, mapper)
         {
 
         }
 
-        private IdentityContext(AppDbContext context, ContextType situation, IConfigurationRoot conf)
+        private IdentityContext(AppDbContext context, ContextType situation, IConfigurationRoot conf, IMapper mapper)
         {
             _disposed = false;
 
@@ -48,23 +47,15 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
             _context = context;
             _situation = situation;
+            _mapper = mapper;
 
-            _convert = new MapperConfiguration(x =>
-            {
-                x.AddProfile<ClientMaps>();
-                x.AddProfile<IssuerMaps>();
-                x.AddProfile<LoginMaps>();
-                x.AddProfile<RoleMaps>();
-                x.AddProfile<UserMaps>();
-            }).CreateMapper();
-
-            _activityRepo = new ActivityRepository(_context, _situation);
-            _clientRepo = new ClientRepository(_context, _situation);
+            _activityRepo = new ActivityRepository(_context, _situation, _mapper);
+            _clientRepo = new ClientRepository(_context, _situation, _mapper);
             _configRepo = new ConfigRepository(conf, _situation);
-            _issuerRepo = new IssuerRepository(_context, _situation, conf["IdentityTenants:Salt"]);
-            _loginRepo = new LoginRepository(_context, _situation);
-            _roleRepo = new RoleRepository(_context, _situation);
-            _userRepo = new UserRepository(_context, _situation, conf);
+            _issuerRepo = new IssuerRepository(_context, _situation, mapper, conf["IdentityTenants:Salt"]);
+            _loginRepo = new LoginRepository(_context, _situation, mapper);
+            _roleRepo = new RoleRepository(_context, _situation, mapper);
+            _userRepo = new UserRepository(_context, _situation, conf, mapper);
         }
 
         public AppDbContext Context
@@ -87,7 +78,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
         {
             get
             {
-                return _convert;
+                return _mapper;
             }
         }
 

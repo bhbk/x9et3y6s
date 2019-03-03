@@ -3,8 +3,7 @@ using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Maps;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,27 +11,22 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repository
+namespace Bhbk.Lib.Identity.Internal.Repository
 {
     public class ActivityRepository : IGenericRepository<ActivityCreate, ActivityModel, Guid>
     {
         private readonly ContextType _situation;
-        private readonly IMapper _convert;
+        private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public ActivityRepository(AppDbContext context, ContextType situation)
+        public ActivityRepository(AppDbContext context, ContextType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
 
-            _convert = new MapperConfiguration(x =>
-            {
-                x.AddProfile<ActivityMaps>();
-                x.AddExpressionMapping();
-            }).CreateMapper();
-
             _context = context;
             _situation = situation;
+            _mapper = mapper;
         }
 
         public async Task<int> Count(Expression<Func<ActivityModel, bool>> predicates = null)
@@ -40,17 +34,20 @@ namespace Bhbk.Lib.Identity.Repository
             var query = _context.AppActivity.AsQueryable();
 
             if (predicates != null)
-                return await query.Where(_convert.MapExpression<Expression<Func<AppActivity, bool>>>(predicates)).CountAsync();
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppActivity, bool>>>(predicates);
+                return await query.Where(_mapper.MapExpression<Expression<Func<AppActivity, bool>>>(predicates)).CountAsync();
+            }
 
             return await query.CountAsync();
         }
 
         public async Task<ActivityModel> CreateAsync(ActivityCreate model)
         {
-            var entity = _convert.Map<AppActivity>(model);
+            var entity = _mapper.Map<AppActivity>(model);
             var result = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_convert.Map<ActivityModel>(result));
+            return await Task.FromResult(_mapper.Map<ActivityModel>(result));
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -85,22 +82,33 @@ namespace Bhbk.Lib.Identity.Repository
             int? take = null)
         {
             var query = _context.AppActivity.AsQueryable();
-            var preds = _convert.MapExpression<Expression<Func<AppActivity, bool>>>(predicates);
-            var ords = _convert.MapExpression<Expression<Func<AppActivity, object>>>(orders);
-            var incs = _convert.MapExpression<Expression<Func<AppActivity, object>>>(includes);
 
             if (predicates != null)
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppActivity, bool>>>(predicates);
                 query = query.Where(preds);
+            }
 
             if (orders != null)
-                query = query.OrderBy(ords)?
+            {
+                var ords = _mapper.MapExpression<Expression<Func<AppActivity, object>>>(orders);
+                query = query.OrderBy(ords) ?
                     .Skip(skip.Value)?
                     .Take(take.Value);
+            }
 
             if (includes != null)
+            {
+                var incs = _mapper.MapExpression<Expression<Func<AppActivity, object>>>(includes);
                 query = query.Include(incs);
+            }
 
-            return await Task.FromResult(_convert.Map<IEnumerable<ActivityModel>>(query));
+            return await Task.FromResult(_mapper.Map<IEnumerable<ActivityModel>>(query));
+        }
+
+        public Task<ActivityModel> UpdateAsync(ActivityModel entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

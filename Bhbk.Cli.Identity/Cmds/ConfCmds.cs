@@ -1,19 +1,19 @@
-﻿using Bhbk.Cli.Identity.Helpers;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.EntityModels;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using ManyConsole;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 
 namespace Bhbk.Cli.Identity.Cmds
 {
     public class ConfCmds : ConsoleCommand
     {
-        private static IConfigurationRoot _conf;
         private static bool ReadConfig = false;
 
         public ConfCmds()
@@ -29,16 +29,22 @@ namespace Bhbk.Cli.Identity.Cmds
             {
                 var lib = SearchRoots.ByAssemblyContext("libsettings.json");
 
-                _conf = new ConfigurationBuilder()
+                var conf = new ConfigurationBuilder()
                     .SetBasePath(lib.DirectoryName)
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseSqlServer(_conf["Databases:IdentityEntities"])
+                    .UseSqlServer(conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                Statics.UoW = new IdentityContext(builder, ContextType.Live, _conf);
+                var mapper = new MapperConfiguration(x =>
+                {
+                    x.AddProfile<IdentityMaps>();
+                    x.AddExpressionMapping();
+                }).CreateMapper();
+
+                Statics.UoW = new IdentityContext(builder, ContextType.Live, conf, mapper);
 
                 if (ReadConfig)
                 {

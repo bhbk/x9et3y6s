@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Bhbk.Lib.Identity.EntityModels
+namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
     public partial class AppDbContext
     {

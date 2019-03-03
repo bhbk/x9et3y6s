@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+﻿using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(email, token, user))
                 return BadRequest(Strings.MsgUserTokenInvalid);
 
-            await UoW.UserRepo.SetConfirmedEmailAsync(user, true);
+            await UoW.UserRepo.SetConfirmedEmailAsync(user.Id, true);
 
             await UoW.CommitAsync();
 
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(password, token, user))
                 return BadRequest(Strings.MsgUserTokenInvalid);
 
-            await UoW.UserRepo.SetConfirmedPasswordAsync(user, true);
+            await UoW.UserRepo.SetConfirmedPasswordAsync(user.Id, true);
 
             await UoW.CommitAsync();
 
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
                 return BadRequest(Strings.MsgUserTokenInvalid);
 
-            await UoW.UserRepo.SetConfirmedPhoneNumberAsync(user, true);
+            await UoW.UserRepo.SetConfirmedPhoneNumberAsync(user.Id, true);
 
             await UoW.CommitAsync();
 

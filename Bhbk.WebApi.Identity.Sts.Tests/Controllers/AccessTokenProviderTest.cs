@@ -1,8 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -42,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             client.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(client));
+            await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
@@ -116,6 +115,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             issuer.Enabled = false;
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
+            await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
 
@@ -282,12 +282,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV1>();
             check.Should().BeAssignableTo<JwtV1>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);
@@ -302,9 +302,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check_legacy = ok_legacy.ToObject<JwtV1Legacy>();
             check_legacy.Should().BeAssignableTo<JwtV1Legacy>();
 
-            JwtProvider.CanReadToken(check_legacy.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check_legacy.access_token).Should().BeTrue();
 
-            var claims_legacy = JwtProvider.ReadJwtToken(check_legacy.access_token).Claims
+            var claims_legacy = JwtBuilder.ReadJwtToken(check_legacy.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims_legacy.Value.Should().Be(Strings.ApiUnitTestIssuer1);
         }
@@ -329,12 +329,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV1>();
             check.Should().BeAssignableTo<JwtV1>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);
@@ -349,9 +349,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check_legacy = ok_legacy.ToObject<JwtV1Legacy>();
             check_legacy.Should().BeAssignableTo<JwtV1Legacy>();
 
-            JwtProvider.CanReadToken(check_legacy.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check_legacy.access_token).Should().BeTrue();
 
-            var claims_legacy = JwtProvider.ReadJwtToken(check_legacy.access_token).Claims
+            var claims_legacy = JwtBuilder.ReadJwtToken(check_legacy.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims_legacy.Value.Should().Be(Strings.ApiUnitTestIssuer1);
         }
@@ -373,8 +373,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             clientA.Enabled = true;
             clientB.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(clientA));
-            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(clientB));
+            await _factory.UoW.ClientRepo.UpdateAsync(clientA);
+            await _factory.UoW.ClientRepo.UpdateAsync(clientB);
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -394,7 +394,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             clientA.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(clientA));
+            await _factory.UoW.ClientRepo.UpdateAsync(clientA);
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -445,6 +445,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             issuer.Enabled = false;
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
+            await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -568,12 +569,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);
@@ -595,7 +596,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
             await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
@@ -606,12 +607,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);
@@ -633,7 +634,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
             await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
@@ -644,12 +645,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);
@@ -674,12 +675,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);
@@ -704,12 +705,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var claims = JwtProvider.ReadJwtToken(check.access_token).Claims
+            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
             claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
             claims.Value.Split(':')[1].Should().Be(salt);

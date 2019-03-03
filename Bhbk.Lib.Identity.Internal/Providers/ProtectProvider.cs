@@ -1,13 +1,10 @@
-﻿using Bhbk.Lib.Identity.EntityModels;
+﻿using Bhbk.Lib.Identity.DomainModels.Admin;
 using Microsoft.AspNetCore.DataProtection;
 using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-//https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/consumer-apis/overview
-//https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/non-di-scenarios
-
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Internal.Providers
 {
     //https://andrewlock.net/implementing-custom-token-providers-for-passwordless-authentication-in-asp-net-core-identity/
 
@@ -20,7 +17,7 @@ namespace Bhbk.Lib.Identity.Providers
             _provider = DataProtectionProvider.Create(applicationName);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppIssuer issuer)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, IssuerModel issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -29,7 +26,7 @@ namespace Bhbk.Lib.Identity.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppUser user)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, UserModel user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);
@@ -38,7 +35,7 @@ namespace Bhbk.Lib.Identity.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, AppIssuer issuer)
+        public Task<bool> ValidateAsync(string purpose, string token, IssuerModel issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -60,7 +57,7 @@ namespace Bhbk.Lib.Identity.Providers
             return Task.FromResult<bool>(false);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, AppUser user)
+        public Task<bool> ValidateAsync(string purpose, string token, UserModel user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);

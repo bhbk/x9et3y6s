@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                IssuerModel issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 Guid userID;
-                AppUser user;
+                UserModel user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user).Result
+                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -138,14 +138,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 //check that payload can be decrypted and validated...
-                if (!new ProtectProvider(uow.Situation.ToString()).ValidateAsync(user.PasswordHash, authorizationCodeValue, user).Result)
+                if (!new ProtectProvider(uow.Situation.ToString()).ValidateAsync(user.SecurityStamp, authorizationCodeValue, user).Result)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserTokenInvalid }, _serializer));
                 }
 
-                var clientList = uow.UserRepo.GetClientsAsync(user).Result;
+                var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
                 var clients = new List<ClientModel>();
 
                 //check if client is single, multiple or undefined...
@@ -202,8 +202,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUriNotExist }, _serializer));
                 }
 
-                var access = JwtProvider.CreateAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtProvider.CreateRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.CreateAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.CreateRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {

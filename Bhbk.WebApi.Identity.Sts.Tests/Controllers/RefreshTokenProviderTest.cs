@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -51,7 +51,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
             client.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(client));
+
+            await _factory.UoW.ClientRepo.UpdateAsync(client);
 
             var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -126,6 +127,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
             issuer.Enabled = false;
+
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
@@ -152,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            await _factory.UoW.IssuerRepo.DeleteAsync(issuer);
+            await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
             await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
@@ -297,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var delete = await _factory.UoW.UserRepo.DeleteAsync(user);
+            var delete = await _factory.UoW.UserRepo.DeleteAsync(user.Id);
             delete.Should().BeTrue();
 
             await _factory.UoW.CommitAsync();
@@ -329,7 +331,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
             var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(AppUser));
+            update.Should().BeAssignableTo(typeof(UserModel));
 
             await _factory.UoW.CommitAsync();
 
@@ -535,7 +537,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV1>();
             check.Should().BeAssignableTo<JwtV1>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
 
         [Fact]
@@ -565,7 +567,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV1>();
             check.Should().BeAssignableTo<JwtV1>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
 
         [Fact]
@@ -588,7 +590,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
             client.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(_factory.UoW.Convert.Map<ClientUpdate>(client));
+
+            await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
             clients = new List<string> { client.Id.ToString() };
@@ -799,7 +802,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var delete = await _factory.UoW.UserRepo.DeleteAsync(user);
+            var delete = await _factory.UoW.UserRepo.DeleteAsync(user.Id);
             delete.Should().BeTrue();
 
             await _factory.UoW.CommitAsync();
@@ -832,7 +835,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
             var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(AppUser));
+            update.Should().BeAssignableTo(typeof(UserModel));
 
             await _factory.UoW.CommitAsync();
 
@@ -1008,7 +1011,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var refresh = user.AppUserRefresh.Where(x => x.UserId == user.Id).First();
+            var refresh = (await _factory.UoW.UserRepo.GetRefreshTokensAsync(x => x.UserId == user.Id)).First();
 
             var result = await _endpoints.RefreshToken_DeleteV2(new JwtSecurityToken((string)ok["access_token"]), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -1035,7 +1038,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole1)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
             await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
@@ -1055,7 +1058,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
 
         [Fact]
@@ -1074,7 +1077,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole1)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
             await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
@@ -1094,7 +1097,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
 
         [Fact]
@@ -1125,7 +1128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
 
         [Fact]
@@ -1156,7 +1159,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
 
         [Fact]
@@ -1186,7 +1189,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var check = ok.ToObject<JwtV2>();
             check.Should().BeAssignableTo<JwtV2>();
 
-            JwtProvider.CanReadToken(check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
         }
     }
 }

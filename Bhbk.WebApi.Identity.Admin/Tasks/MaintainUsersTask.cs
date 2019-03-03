@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,8 +55,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                     if (disabled.Any())
                     {
-                        foreach (AppUser entry in disabled.ToList())
-                            await uow.UserRepo.DeleteAsync(entry);
+                        foreach (var entry in disabled.ToList())
+                            await uow.UserRepo.DeleteAsync(entry.Id);
 
                         await uow.CommitAsync();
 

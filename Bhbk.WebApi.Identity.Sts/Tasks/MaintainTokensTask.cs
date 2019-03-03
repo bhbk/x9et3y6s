@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,8 +55,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     if (invalid.Any())
                     {
-                        foreach (AppUserRefresh entry in invalid.ToList())
-                            await uow.UserRepo.RemoveRefreshTokenAsync(entry);
+                        foreach (var entry in invalid.ToList())
+                            await uow.UserRepo.RemoveRefreshTokenAsync(entry.Id);
 
                         await uow.CommitAsync();
 

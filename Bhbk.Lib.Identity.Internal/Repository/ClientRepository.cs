@@ -3,8 +3,7 @@ using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.EntityModels;
-using Bhbk.Lib.Identity.Maps;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,28 +11,22 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repository
+namespace Bhbk.Lib.Identity.Internal.Repository
 {
-    public class ClientRepository : IGenericRepository<ClientCreate, ClientModel, ClientUpdate, Guid>
+    public class ClientRepository : IGenericRepository<ClientCreate, ClientModel, Guid>
     {
         private readonly ContextType _situation;
-        private readonly IMapper _convert;
+        private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public ClientRepository(AppDbContext context, ContextType situation)
+        public ClientRepository(AppDbContext context, ContextType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
 
-            _convert = new MapperConfiguration(x =>
-            {
-                x.AddProfile<ClientMaps>();
-                x.AddProfile<RoleMaps>();
-                x.AddExpressionMapping();
-            }).CreateMapper();
-
             _context = context;
             _situation = situation;
+            _mapper = mapper;
         }
 
         public async Task<AppClientUri> AddUriAsync(AppClientUri clientUri)
@@ -46,17 +39,20 @@ namespace Bhbk.Lib.Identity.Repository
             var query = _context.AppClient.AsQueryable();
 
             if (predicates != null)
-                return await query.Where(_convert.MapExpression<Expression<Func<AppClient, bool>>>(predicates)).CountAsync();
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppClient, bool>>>(predicates);
+                return await query.Where(preds).CountAsync();
+            }
 
             return await query.CountAsync();
         }
 
         public async Task<ClientModel> CreateAsync(ClientCreate model)
         {
-            var entity = _convert.Map<AppClient>(model);
+            var entity = _mapper.Map<AppClient>(model);
             var result = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_convert.Map<ClientModel>(result));
+            return await Task.FromResult(_mapper.Map<ClientModel>(result));
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -91,39 +87,47 @@ namespace Bhbk.Lib.Identity.Repository
             int? take = null)
         {
             var query = _context.AppClient.AsQueryable();
-            var preds = _convert.MapExpression<Expression<Func<AppClient, bool>>>(predicates);
-            var ords = _convert.MapExpression<Expression<Func<AppClient, object>>>(orders);
-            var incs = _convert.MapExpression<Expression<Func<AppClient, object>>>(includes);
 
             if (predicates != null)
+            {
+                var preds = _mapper.MapExpression<Expression<Func<AppClient, bool>>>(predicates);
                 query = query.Where(preds);
+            }
 
             if (orders != null)
+            {
+                var ords = _mapper.MapExpression<Expression<Func<AppClient, object>>>(orders);
                 query = query.OrderBy(ords)?
-                    .Skip(skip.Value)?
-                    .Take(take.Value);
+                        .Skip(skip.Value)?
+                        .Take(take.Value);
+            }
 
-            if (includes != null)
-                query = query.Include(incs);
+            query = query.Include("AppRole");
 
-            return await Task.FromResult(_convert.Map<IEnumerable<ClientModel>>(query));
+            //if (includes != null)
+            //{
+            //    var incs = _mapper.MapExpression<Expression<Func<AppClient, object>>>(includes);
+            //    query = query.Include(incs);
+            //}
+
+            return await Task.FromResult(_mapper.Map<IEnumerable<ClientModel>>(query));
         }
 
         public async Task<IEnumerable<RoleModel>> GetRoleListAsync(Guid key)
         {
             var result = _context.AppRole.Where(x => x.ClientId == key).ToList();
 
-            return await Task.FromResult(_convert.Map<IEnumerable<RoleModel>>(result));
+            return await Task.FromResult(_mapper.Map<IEnumerable<RoleModel>>(result));
         }
 
         public async Task<IEnumerable<ClientUriModel>> GetUriListAsync(Guid key)
         {
             var result = _context.AppClientUri.Where(x => x.ClientId == key).ToList();
 
-            return await Task.FromResult(_convert.Map<IEnumerable<ClientUriModel>>(result));
+            return await Task.FromResult(_mapper.Map<IEnumerable<ClientUriModel>>(result));
         }
 
-        public async Task<ClientModel> UpdateAsync(ClientUpdate model)
+        public async Task<ClientModel> UpdateAsync(ClientModel model)
         {
             var entity = _context.AppClient.Where(x => x.Id == model.Id).Single();
 
@@ -141,7 +145,7 @@ namespace Bhbk.Lib.Identity.Repository
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_convert.Map<ClientModel>(_context.Update(entity).Entity));
+            return await Task.FromResult(_mapper.Map<ClientModel>(_context.Update(entity).Entity));
         }
     }
 }

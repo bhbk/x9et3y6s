@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Datasets;
-using Bhbk.Lib.Identity.Infrastructure;
+﻿using Bhbk.Lib.Identity.Internal.Datasets;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using System;
 
 namespace Bhbk.Cli.Identity
