@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -45,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = LinkBuilder.ConfirmEmail(Conf, user, token);
+            var url = UrlBuilder.ConfirmEmail(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 
@@ -100,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = LinkBuilder.ConfirmPassword(Conf, user, token);
+            var url = UrlBuilder.ConfirmPassword(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 
@@ -154,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.Situation == ContextType.UnitTest)
                 return Ok(token);
 
-            var url = LinkBuilder.ConfirmPassword(Conf, user, token);
+            var url = UrlBuilder.ConfirmPassword(Conf, user, token);
 
             var alert = new AlertClient(Conf, UoW.Situation);
 

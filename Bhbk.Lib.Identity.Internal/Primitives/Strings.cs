@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
 using System;
 
 namespace Bhbk.Lib.Identity.Internal.Primitives
@@ -128,7 +127,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         //https://htmlformatter.com/, https://www.freeformatter.com/java-dotnet-escape.html
 
-        public static string ApiTemplateConfirmEmail(UserModel user, Uri link)
+        public static string ApiTemplateConfirmEmail(AppUser user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -178,7 +177,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             "</html>";
         }
 
-        public static string ApiTemplateConfirmPassword(UserModel user, Uri link)
+        public static string ApiTemplateConfirmPassword(AppUser user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -228,7 +227,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             "</html>";
         }
 
-        public static string ApiTemplateConfirmNewUser(IssuerModel client, UserModel user, Uri link)
+        public static string ApiTemplateConfirmNewUser(AppIssuer issuer, AppUser user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.AspNetCore.Identity;
 using OtpNet;
 using System.Text;
@@ -8,8 +8,8 @@ namespace Bhbk.Lib.Identity.Internal.Providers
 {
     public class TotpProvider
     {
-        public int _length;
-        public int _expire;
+        private readonly int _length;
+        private readonly int _expire;
 
         public TotpProvider(int length, int expire)
         {
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _expire = expire;
         }
 
-        public Task<string> GenerateAsync(string purpose, UserModel user)
+        public Task<string> GenerateAsync(string purpose, AppUser user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);
@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(code.ComputeTotp());
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, UserModel user)
+        public Task<bool> ValidateAsync(string purpose, string token, AppUser user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);

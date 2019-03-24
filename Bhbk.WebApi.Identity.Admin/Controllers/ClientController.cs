@@ -1,11 +1,14 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -41,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<ClientModel>(result));
         }
 
         [Route("v1/{clientID:guid}"), HttpDelete]
@@ -70,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClientV1([FromRoute] string clientValue)
         {
             Guid clientID;
-            ClientModel client;
+            AppClient client;
 
             if (Guid.TryParse(clientValue, out clientID))
                 client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
@@ -80,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (client == null)
                 return NotFound(Strings.MsgClientNotExist);
 
-            return Ok(client);
+            return Ok(UoW.Transform.Map<ClientModel>(client));
         }
 
         [Route("v1/pages"), HttpPost]
@@ -93,8 +96,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<ClientModel, bool>> preds;
-            Expression<Func<ClientModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
+            Expression<Func<AppClient, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -103,9 +105,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.ClientRepo.Count(preds);
-            var result = await UoW.ClientRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
+            var result = await UoW.ClientRepo.GetAsync(preds, 
+                x => x.Include(r => r.AppRole), 
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
+                model.Skip, 
+                model.Take);
 
-            return Ok(new { Count = total, List = result });
+            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClientModel>>(result) });
         }
 
         [Route("v1/{clientID:guid}/roles"), HttpGet]
@@ -138,11 +144,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (client.Immutable)
                 return BadRequest(Strings.MsgClientImmutable);
 
-            var result = await UoW.ClientRepo.UpdateAsync(model);
+            var result = await UoW.ClientRepo.UpdateAsync(UoW.Transform.Map<AppClient>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<ClientModel>(result));
         }
     }
 }

@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -65,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<LoginModel>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -94,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetLoginV1([FromRoute] string loginValue)
         {
             Guid loginID;
-            LoginModel login;
+            AppLogin login;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
@@ -105,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            return Ok(login);
+            return Ok(UoW.Transform.Map<LoginModel>(login));
         }
 
         [Route("v1/pages"), HttpPost]
@@ -118,8 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<LoginModel, bool>> preds;
-            Expression<Func<LoginModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
+            Expression<Func<AppLogin, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -127,9 +129,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 preds = x => x.LoginProvider.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.LoginRepo.Count(preds);
-            var result = await UoW.LoginRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
+            var result = await UoW.LoginRepo.GetAsync(preds, 
+                x => x.Include(l => l.AppUserLogin), 
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
+                model.Skip, 
+                model.Take);
 
-            return Ok(new { Count = total, List = result });
+            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<LoginModel>>(result) });
         }
 
         [Route("v1/{loginID:guid}/users"), HttpGet]
@@ -142,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => UoW.Convert.Map<UserModel>(x));
+            var result = users.Select(x => UoW.Transform.Map<UserModel>(x));
 
             return Ok(result);
         }
@@ -188,11 +194,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var result = await UoW.LoginRepo.UpdateAsync(model);
+            var result = await UoW.LoginRepo.UpdateAsync(UoW.Transform.Map<AppLogin>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<LoginModel>(result));
         }
     }
 }

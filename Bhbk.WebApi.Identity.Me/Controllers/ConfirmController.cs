@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

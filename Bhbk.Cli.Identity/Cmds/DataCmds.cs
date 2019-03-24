@@ -43,7 +43,7 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMaps>();
+                    x.AddProfile<IdentityMappings>();
                     x.AddExpressionMapping();
                 }).CreateMapper();
 
@@ -56,7 +56,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    Statics.DefaultData.CreateAsync();
+                    Statics.DefaultData.CreateAsync().Wait();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -67,7 +67,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    Statics.DefaultData.DestroyAsync();
+                    Statics.DefaultData.DestroyAsync().Wait();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -78,7 +78,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    Statics.DefaultData.DestroyAsync();
+                    Statics.DefaultData.DestroyAsync().Wait();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

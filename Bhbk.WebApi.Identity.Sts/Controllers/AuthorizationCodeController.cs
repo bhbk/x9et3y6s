@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -41,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             [FromQuery(Name = "scope")] string scopeValue)
         {
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(issuerValue, out issuerID))
@@ -53,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgIssuerNotExist);
 
             Guid clientID;
-            ClientModel client;
+            AppClient client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -65,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgClientNotExist);
 
             Guid userID;
-            UserModel user;
+            AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -92,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgSysParamsInvalid);
 
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(issuerValue, out issuerID))
@@ -107,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid userID;
-            UserModel user;
+            AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -133,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserTokenInvalid);
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<ClientModel>();
+            var clients = new List<AppClient>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(clientValue))
@@ -144,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in clientValue.Split(","))
                 {
                     Guid clientID;
-                    ClientModel client;
+                    AppClient client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -212,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             [FromQuery(Name = "scope")] string scopeValue)
         {
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(issuerValue, out issuerID))
@@ -224,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgIssuerNotExist);
 
             Guid clientID;
-            ClientModel client;
+            AppClient client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -236,7 +237,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgClientNotExist);
 
             Guid userID;
-            UserModel user;
+            AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -252,7 +253,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgUriNotExist);
 
             var state = RandomValues.CreateBase64String(32);
-            var url = LinkBuilder.AuthorizationCodeRequest(Conf, issuer, user, redirectUriValue, scopeValue, state);
+            var url = UrlBuilder.AuthorizationCodeRequest(Conf, client, user, redirectUriValue, scopeValue, state);
 
             /*
              * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies

@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer_id, out issuerID))
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            ClientModel client;
+            AppClient client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserInvalid);
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<ClientModel>();
+            var clients = new List<AppClient>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in submit.client.Split(","))
                 {
                     Guid clientID;
-                    ClientModel client;
+                    AppClient client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -218,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             var list = await UoW.UserRepo.GetRefreshTokensAsync(x => x.UserId == userID);
 
-            var result = list.Select(x => UoW.Convert.Map<UserRefreshModel>(x));
+            var result = list.Select(x => UoW.Transform.Map<UserRefreshModel>(x));
 
             return Ok(result);
         }
@@ -234,7 +234,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var refresh = (await UoW.UserRepo.GetRefreshTokensAsync((AppUserRefresh x) => x.Id == refreshID)).SingleOrDefault();
+            var refresh = (await UoW.UserRepo.GetRefreshTokensAsync(x => x.Id == refreshID)).SingleOrDefault();
 
             if (refresh == null)
                 return NotFound(Strings.MsgUserTokenInvalid);

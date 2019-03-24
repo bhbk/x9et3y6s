@@ -16,12 +16,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     public class JwtBuilder
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, IssuerModel issuer, ClientModel client, UserModel user)
+            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.claimProvider.CreateAsync(user);
+            var identity = await uow.UserRepo.CreateClaimsAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -56,12 +56,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, IssuerModel issuer, ClientModel client, UserModel user)
+            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.claimProvider.CreateAsync(user);
+            var identity = await uow.UserRepo.CreateClaimsAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -97,12 +97,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, IssuerModel issuer, List<ClientModel> clients, UserModel user)
+            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, List<AppClient> clients, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.claimProvider.CreateAsync(user);
+            var identity = await uow.UserRepo.CreateClaimsAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -145,12 +145,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, IssuerModel issuer, UserModel user)
+            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.claimProvider.CreateRefreshAsync(user);
+            var identity = await uow.UserRepo.CreateClaimsRefreshAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -189,7 +189,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.UserRepo.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
+            var refresh = await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();
@@ -198,12 +198,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, IssuerModel issuer, UserModel user)
+            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.claimProvider.CreateRefreshAsync(user);
+            var identity = await uow.UserRepo.CreateClaimsRefreshAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -242,7 +242,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.UserRepo.AddRefreshTokenAsync(uow.Convert.Map<AppUserRefresh>(create));
+            var refresh = await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create));
 
             if (!refresh.Succeeded)
                 throw new InvalidOperationException();

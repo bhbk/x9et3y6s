@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMaps>();
+                    x.AddProfile<IdentityMappings>();
                     x.AddExpressionMapping();
                 }).CreateMapper();
 

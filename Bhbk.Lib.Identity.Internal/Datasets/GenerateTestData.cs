@@ -30,10 +30,10 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             if (_uow.Situation != ContextType.UnitTest)
                 throw new InvalidOperationException();
 
-            ClientModel client;
-            RoleModel role;
-            LoginModel login;
-            UserModel user;
+            AppClient client;
+            AppRole role;
+            AppLogin login;
+            AppUser user;
 
             //create issuers
             await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
@@ -80,23 +80,21 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             //assign uris to clients
             client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            await _uow.ClientRepo.AddUriAsync(_uow.Convert.Map<AppClientUri>(
-                new ClientUriCreate()
-                {
-                    ClientId = client.Id,
-                    AbsoluteUri = Strings.ApiUnitTestUri1Link,
-                    Enabled = true,
-                }));
+            await _uow.ClientRepo.AddUriAsync(new ClientUriCreate()
+            {
+                ClientId = client.Id,
+                AbsoluteUri = Strings.ApiUnitTestUri1Link,
+                Enabled = true,
+            });
 
             client = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
 
-            await _uow.ClientRepo.AddUriAsync(_uow.Convert.Map<AppClientUri>(
-                new ClientUriCreate()
-                {
-                    ClientId = client.Id,
-                    AbsoluteUri = Strings.ApiUnitTestUri2Link,
-                    Enabled = true,
-                }));
+            await _uow.ClientRepo.AddUriAsync(new ClientUriCreate()
+            {
+                ClientId = client.Id,
+                AbsoluteUri = Strings.ApiUnitTestUri2Link,
+                Enabled = true,
+            });
 
             await _uow.CommitAsync();
 
@@ -213,10 +211,10 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             for (int i = 0; i < sets; i++)
             {
-                ClientModel client;
-                RoleModel role;
-                LoginModel login;
-                UserModel user;
+                AppClient client;
+                AppRole role;
+                AppLogin login;
+                AppUser user;
 
                 var issuerName = Strings.ApiUnitTestIssuer1 + "-" + RandomValues.CreateBase64String(4);
                 var clientName = Strings.ApiUnitTestClient1 + "-" + RandomValues.CreateBase64String(4);
@@ -252,13 +250,12 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 //assign uris to random client
                 client = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single();
 
-                await _uow.ClientRepo.AddUriAsync(_uow.Convert.Map<AppClientUri>(
-                    new ClientUriCreate()
-                    {
-                        ClientId = client.Id,
-                        AbsoluteUri = Strings.ApiUnitTestUri1Link,
-                        Enabled = true,
-                    }));
+                await _uow.ClientRepo.AddUriAsync(new ClientUriCreate()
+                {
+                    ClientId = client.Id,
+                    AbsoluteUri = Strings.ApiUnitTestUri1Link,
+                    Enabled = true,
+                });
 
                 await _uow.CommitAsync();
 

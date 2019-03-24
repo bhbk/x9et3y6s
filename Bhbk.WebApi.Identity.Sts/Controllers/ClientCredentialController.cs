@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Sts;
+﻿using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public async Task<IActionResult> GenerateClientCredentialV2([FromForm] ClientCredentialV2 submit)
         {
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))

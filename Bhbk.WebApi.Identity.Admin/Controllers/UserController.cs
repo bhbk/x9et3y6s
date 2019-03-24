@@ -3,13 +3,16 @@ using Bhbk.Lib.Alert.Helpers;
 using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -89,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), result));
 
-                var url = LinkBuilder.ConfirmEmail(Conf, result, code);
+                var url = UrlBuilder.ConfirmEmail(Conf, result, code);
 
                 var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
                     new EmailCreate()
@@ -108,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return BadRequest(Strings.MsgSysQueueEmailError);
             }
 
-            return Ok(UoW.Convert.Map<UserModel>(result));
+            return Ok(UoW.Transform.Map<UserModel>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -135,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<UserModel>(result));
         }
 
         [Route("v1/{userID:guid}/claim"), HttpPost]
@@ -154,6 +157,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //if (!result.Succeeded)
             //    return GetErrorResult(result);
+
+            throw new NotImplementedException();
 
             return Ok(model);
         }
@@ -204,7 +209,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetUserV1([FromRoute] string userValue)
         {
             Guid userID;
-            UserModel user;
+            AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -215,7 +220,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            return Ok(UoW.Convert.Map<UserModel>(user));
+            return Ok(UoW.Transform.Map<UserModel>(user));
         }
 
         [Route("v1/{userID:guid}/claims"), HttpGet]
@@ -240,7 +245,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var clients = await UoW.UserRepo.GetClientsAsync(user.Id);
 
             var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x.Id.ToString())))
-                .Select(x => UoW.Convert.Map<ClientModel>(x));
+                .Select(x => UoW.Transform.Map<ClientModel>(x));
 
             return Ok(result);
         }
@@ -256,7 +261,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.UserRepo.GetLoginsAsync(user.Id);
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x.Id.ToString())))
-                .Select(x => UoW.Convert.Map<LoginModel>(x));
+                .Select(x => UoW.Transform.Map<LoginModel>(x));
 
             return Ok(result);
         }
@@ -272,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await UoW.UserRepo.GetRolesAsync_Deprecate(user.Id);
 
             var result = (await UoW.RoleRepo.GetAsync(x => roles.Contains(x.Id.ToString())))
-                .Select(x => UoW.Convert.Map<RoleModel>(x));
+                .Select(x => UoW.Transform.Map<RoleModel>(x));
 
             return Ok(result);
         }
@@ -283,8 +288,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<UserModel, bool>> preds;
-            Expression<Func<UserModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
+            /*
+             * tidbits below need enhancment, just tinkering...
+             */
+
+            Expression<Func<AppUser, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -295,9 +303,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.LastName.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.UserRepo.Count(preds);
-            var result = await UoW.UserRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
+            var result = await UoW.UserRepo.GetAsync(preds, 
+                x => x.Include(r => r.AppUserRole), 
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
+                model.Skip, 
+                model.Take);
 
-            return Ok(new { Count = total, List = result });
+            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<UserModel>>(result) });
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpGet]
@@ -376,11 +388,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (user.Immutable)
                 return BadRequest(Strings.MsgUserImmutable);
 
-            var result = await UoW.UserRepo.UpdateAsync(model);
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<AppUser>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<UserModel>(result));
         }
     }
 }

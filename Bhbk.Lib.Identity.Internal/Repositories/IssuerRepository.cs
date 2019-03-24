@@ -5,20 +5,23 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Repository
+namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class IssuerRepository : IGenericRepository<IssuerCreate, IssuerModel, Guid>
+    public class IssuerRepository : IGenericRepository<IssuerCreate, AppIssuer, Guid>
     {
         private readonly ContextType _situation;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly string _salt;
+
+        public string Salt { get => _salt; }
 
         public IssuerRepository(AppDbContext context, ContextType situation, IMapper mapper, string salt)
         {
@@ -31,15 +34,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             _salt = salt;
         }
 
-        public string Salt
-        {
-            get
-            {
-                return _salt;
-            }
-        }
-
-        public async Task<int> Count(Expression<Func<IssuerModel, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<AppIssuer, bool>> predicates = null)
         {
             var query = _context.AppIssuer.AsQueryable();
 
@@ -52,12 +47,12 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await query.CountAsync();
         }
 
-        public async Task<IssuerModel> CreateAsync(IssuerCreate model)
+        public async Task<AppIssuer> CreateAsync(IssuerCreate model)
         {
             var entity = _mapper.Map<AppIssuer>(model);
             var result = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<IssuerModel>(result));
+            return await Task.FromResult(_mapper.Map<AppIssuer>(result));
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -75,57 +70,45 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             }
         }
 
-        public Task<bool> ExistsAsync(Guid key)
+        public async Task<bool> ExistsAsync(Guid key)
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(_context.AppIssuer.Any(x => x.Id == key));
         }
 
-        public Task<IEnumerable<IssuerModel>> GetAsync(params object[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<IssuerModel>> GetAsync(Expression<Func<IssuerModel, bool>> predicates = null,
-            Expression<Func<IssuerModel, object>> orders = null,
-            Expression<Func<IssuerModel, object>> includes = null,
-            int? skip = null,
+        public async Task<IEnumerable<AppIssuer>> GetAsync(Expression<Func<AppIssuer, bool>> predicates = null, 
+            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null, 
+            Func<IQueryable<AppIssuer>, IOrderedQueryable<AppIssuer>> orders = null, 
+            int? skip = null, 
             int? take = null)
         {
             var query = _context.AppIssuer.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppIssuer, bool>>>(predicates);
-                query = query.Where(preds);
-            }
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            //query = query.Include(x => x.AppClient);
 
             if (orders != null)
             {
-                var ords = _mapper.MapExpression<Expression<Func<AppIssuer, object>>>(orders);
-                query = query.OrderBy(ords)?
-                        .Skip(skip.Value)?
-                        .Take(take.Value);
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
             }
 
-            query = query.Include("AppClient");
-
-            //if (includes != null)
-            //{
-            //    var incs = _mapper.MapExpression<Expression<Func<AppIssuer, object>>>(includes);
-            //    query = query.Include(incs);
-            //}
-
-            return await Task.FromResult(_mapper.Map<IEnumerable<IssuerModel>>(query));
+            return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<ClientModel>> GetClientsAsync(Guid key)
+        public async Task<IEnumerable<AppClient>> GetClientsAsync(Guid key)
         {
             var result = _context.AppClient.Where(x => x.IssuerId == key).AsQueryable();
 
-            return await Task.FromResult(_mapper.Map<IEnumerable<ClientModel>>(result));
+            return await Task.FromResult(result);
         }
 
-        public async Task<IssuerModel> UpdateAsync(IssuerModel model)
+        public async Task<AppIssuer> UpdateAsync(AppIssuer model)
         {
             var entity = _context.AppIssuer.Where(x => x.Id == model.Id).Single();
 
@@ -142,7 +125,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<IssuerModel>(_context.Update(entity).Entity));
+            return await Task.FromResult(_mapper.Map<AppIssuer>(_context.Update(entity).Entity));
         }
     }
 }

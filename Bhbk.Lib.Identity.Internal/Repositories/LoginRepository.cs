@@ -5,6 +5,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,9 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Repository
+namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class LoginRepository : IGenericRepository<LoginCreate, LoginModel, Guid>
+    public class LoginRepository : IGenericRepository<LoginCreate, AppLogin, Guid>
     {
         private readonly ContextType _situation;
         private readonly IMapper _mapper;
@@ -30,7 +31,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             _mapper = mapper;
         }
 
-        public async Task<int> Count(Expression<Func<LoginModel, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<AppLogin, bool>> predicates = null)
         {
             var query = _context.AppLogin.AsQueryable();
 
@@ -43,12 +44,12 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await query.CountAsync();
         }
 
-        public async Task<LoginModel> CreateAsync(LoginCreate model)
+        public async Task<AppLogin> CreateAsync(LoginCreate model)
         {
             var entity = _mapper.Map<AppLogin>(model);
             var result = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<LoginModel>(result));
+            return await Task.FromResult(_mapper.Map<AppLogin>(result));
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -66,47 +67,35 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             }
         }
 
-        public Task<bool> ExistsAsync(Guid key)
+        public async Task<bool> ExistsAsync(Guid key)
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(_context.AppLogin.Any(x => x.Id == key));
         }
 
-        public Task<IEnumerable<LoginModel>> GetAsync(params object[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<LoginModel>> GetAsync(Expression<Func<LoginModel, bool>> predicates = null,
-            Expression<Func<LoginModel, object>> orders = null,
-            Expression<Func<LoginModel, object>> includes = null,
-            int? skip = null,
+        public async Task<IEnumerable<AppLogin>> GetAsync(Expression<Func<AppLogin, bool>> predicates = null, 
+            Func<IQueryable<AppLogin>, IIncludableQueryable<AppLogin, object>> includes = null, 
+            Func<IQueryable<AppLogin>, IOrderedQueryable<AppLogin>> orders = null, 
+            int? skip = null, 
             int? take = null)
         {
             var query = _context.AppLogin.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppLogin, bool>>>(predicates);
-                query = query.Where(preds);
-            }
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            //query = query.Include(x => x.AppUserLogin);
 
             if (orders != null)
             {
-                var ords = _mapper.MapExpression<Expression<Func<AppLogin, object>>>(orders);
-                query = query.OrderBy(ords)?
-                        .Skip(skip.Value)?
-                        .Take(take.Value);
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
             }
 
-            query = query.Include("AppUserLogin.User");
-
-            //if (includes != null)
-            //{
-            //    var incs = _mapper.MapExpression<Expression<Func<AppLogin, object>>>(includes);
-            //    query = query.Include(incs);
-            //}
-
-            return await Task.FromResult(_mapper.Map<IEnumerable<LoginModel>>(query));
+            return await Task.FromResult(query);
         }
 
         public async Task<IQueryable<AppUser>> GetUsersAsync(Guid key)
@@ -124,7 +113,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await Task.FromResult(_context.AppUser.Where(x => result.Contains(x.Id.ToString())));
         }
 
-        public async Task<LoginModel> UpdateAsync(LoginModel model)
+        public async Task<AppLogin> UpdateAsync(AppLogin model)
         {
             var entity = _context.AppLogin.Where(x => x.Id == model.Id).Single();
 
@@ -137,7 +126,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<LoginModel>(_context.Update(entity).Entity));
+            return await Task.FromResult(_mapper.Map<AppLogin>(_context.Update(entity).Entity));
         }
     }
 }

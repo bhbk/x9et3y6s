@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -32,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound();
 
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             if (UoW.ConfigRepo.DefaultsCompatibilityModeIssuer
                 && string.IsNullOrEmpty(submit.issuer_id))
@@ -60,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            ClientModel client;
+            AppClient client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -75,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgClientInvalid);
 
             Guid userID;
-            UserModel user;
+            AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.username, out userID))
@@ -201,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgSysParamsInvalid);
 
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))
@@ -216,7 +217,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid userID;
-            UserModel user;
+            AppUser user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.user, out userID))
@@ -238,7 +239,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserInvalid);
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<ClientModel>();
+            var clients = new List<AppClient>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
@@ -249,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in submit.client.Split(","))
                 {
                     Guid clientID;
-                    ClientModel client;
+                    AppClient client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))

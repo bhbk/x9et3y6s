@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         {
             var user = (UoW.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
 
-            ControllerContext.HttpContext.User = UoW.UserRepo.claimProvider.CreateAsync(user).Result;
+            ControllerContext.HttpContext.User = UoW.UserRepo.CreateClaimsAsync(user).Result;
         }
     }
 }

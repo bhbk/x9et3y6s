@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
-    public class IdentityMaps : Profile
+    public class IdentityMappings : Profile
     {
-        public IdentityMaps()
+        public IdentityMappings()
         {
             //activity models
             CreateMap<ActivityCreate, AppActivity>()
@@ -22,8 +22,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now));
 
             CreateMap<ActivityModel, AppActivity>()
-                .ForMember(dest => dest.Actor, src => src.Ignore())
-                .ReverseMap();
+                .ForMember(dest => dest.Actor, src => src.Ignore());
 
             //client models
             CreateMap<ClientCreate, AppClient>()
@@ -67,6 +66,10 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.Clients, src => src.MapFrom(val => val.AppClient
                     .ToDictionary(x => x.Id, x => x.Name)));
 
+            CreateMap<IssuerModel, AppIssuer>()
+                .ForMember(dest => dest.AppClient, src => src.Ignore())
+                .ForMember(dest => dest.AppUserRefresh, src => src.Ignore());
+
             //login models
             CreateMap<LoginCreate, AppLogin>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
@@ -75,6 +78,9 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             CreateMap<AppLogin, LoginModel>()
                 .ForMember(dest => dest.Users, src => src.MapFrom(val => val.AppUserLogin.Where(x => x.LoginId == val.Id)
                     .ToDictionary(x => x.User.Id, x => x.User.Email)));
+
+            CreateMap<LoginModel, AppLogin>()
+                .ForMember(dest => dest.AppUserLogin, src => src.Ignore());
 
             //role models
             CreateMap<RoleCreate, AppRole>()
@@ -91,6 +97,13 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             CreateMap<AppRole, RoleModel>()
                 .ForMember(dest => dest.Users, src => src.MapFrom(val => val.AppUserRole.Where(x => x.RoleId == val.Id)
                     .ToDictionary(x => x.User.Id, x => x.User.Email)));
+
+            CreateMap<RoleModel, AppRole>()
+                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
+                .ForMember(dest => dest.NormalizedName, src => src.Ignore())
+                .ForMember(dest => dest.AppRoleClaim, src => src.Ignore())
+                .ForMember(dest => dest.AppUserRole, src => src.Ignore());
 
             //user models
             CreateMap<UserCreate, AppUser>()

@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
             var mapper = new MapperConfiguration(x =>
             {
-                x.AddProfile<IdentityMaps>();
+                x.AddProfile<IdentityMappings>();
                 x.AddExpressionMapping();
             }).CreateMapper();
 
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));
-            sc.AddTransient<IAuthorizationRequirement, UserPolicyRequirement>();
+            sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     policy.RequireRole("Bhbk.WebApi.Identity(System)");
                 }));
             sc.AddAuthorization(auth =>
-                auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new UserPolicyRequirement())));
+                auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new AuthorizeUsersRequirement())));
             sc.AddSession();
             sc.AddMvc();
             sc.AddMvc().AddControllersAsServices();

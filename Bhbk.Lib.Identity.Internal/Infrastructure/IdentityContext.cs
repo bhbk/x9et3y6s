@@ -3,7 +3,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Interfaces;
-using Bhbk.Lib.Identity.Internal.Repository;
+using Bhbk.Lib.Identity.Internal.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -27,13 +27,13 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         private UserQuotes _userQuote;
 
         public IdentityContext(DbContextOptions<AppDbContext> options, ContextType situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new AppDbContext(options, conf, mapper), situation, conf, mapper)
+            : this(new AppDbContext(options), situation, conf, mapper)
         {
 
         }
 
         public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new AppDbContext(optionsBuilder.Options, conf, mapper), situation, conf, mapper)
+            : this(new AppDbContext(optionsBuilder.Options), situation, conf, mapper)
         {
 
         }
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             _mapper = mapper;
 
             _activityRepo = new ActivityRepository(_context, _situation, _mapper);
-            _clientRepo = new ClientRepository(_context, _situation, _mapper);
+            _clientRepo = new ClientRepository(_context, _situation, conf, _mapper);
             _configRepo = new ConfigRepository(conf, _situation);
             _issuerRepo = new IssuerRepository(_context, _situation, mapper, conf["IdentityTenants:Salt"]);
             _loginRepo = new LoginRepository(_context, _situation, mapper);
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             }
         }
 
-        public IMapper Convert
+        public IMapper Transform
         {
             get
             {
@@ -156,6 +156,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         }
 
         #region IDisposable Support
+
         private bool _disposed = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)

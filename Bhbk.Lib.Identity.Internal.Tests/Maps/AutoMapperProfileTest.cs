@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Maps
         {
             Mapper.Initialize(x =>
             {
-                x.AddProfile<IdentityMaps>();
+                x.AddProfile<IdentityMappings>();
             });
             Mapper.Configuration.AssertConfigurationIsValid();
         }

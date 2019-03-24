@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Repository;
+using Bhbk.Lib.Identity.Internal.Repositories;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;

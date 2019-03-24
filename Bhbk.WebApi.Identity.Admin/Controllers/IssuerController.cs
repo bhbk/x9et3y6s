@@ -1,11 +1,14 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -34,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var result = await UoW.IssuerRepo.CreateAsync(model);
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<IssuerModel>(result));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
@@ -63,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetIssuerV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
-            IssuerModel issuer;
+            AppIssuer issuer;
 
             if (Guid.TryParse(issuerValue, out issuerID))
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
@@ -73,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (issuer == null)
                 return NotFound(Strings.MsgIssuerNotExist);
 
-            return Ok(issuer);
+            return Ok(UoW.Transform.Map<IssuerModel>(issuer));
         }
 
         [Route("v1/pages"), HttpPost]
@@ -86,8 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<IssuerModel, bool>> preds;
-            Expression<Func<IssuerModel, object>> ords = x => string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2);
+            Expression<Func<AppIssuer, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -96,9 +98,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.IssuerRepo.Count(preds);
-            var result = await UoW.IssuerRepo.GetAsync(preds, ords, null, model.Skip, model.Take);
+            var result = await UoW.IssuerRepo.GetAsync(preds,
+                x => x.Include(c => c.AppClient), 
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
+                model.Skip, 
+                model.Take);
 
-            return Ok(new { Count = total, List = result });
+            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<IssuerModel>>(result) });
         }
 
         [Route("v1/{issuerID:guid}/clients"), HttpGet]
@@ -131,11 +137,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (issuer.Immutable)
                 return BadRequest(Strings.MsgIssuerImmutable);
 
-            var result = await UoW.IssuerRepo.UpdateAsync(model);
+            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Transform.Map<AppIssuer>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(result);
+            return Ok(UoW.Transform.Map<IssuerModel>(result));
         }
     }
 }

@@ -331,7 +331,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
             var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(UserModel));
+            update.Should().BeAssignableTo(typeof(AppUser));
 
             await _factory.UoW.CommitAsync();
 
@@ -835,7 +835,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
             var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(UserModel));
+            update.Should().BeAssignableTo(typeof(AppUser));
 
             await _factory.UoW.CommitAsync();
 

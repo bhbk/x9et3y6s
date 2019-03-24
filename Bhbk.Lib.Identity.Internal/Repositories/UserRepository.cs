@@ -5,7 +5,6 @@ using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Internal.Validators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +12,14 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Repository
+namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     /*
      * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -28,13 +28,13 @@ namespace Bhbk.Lib.Identity.Internal.Repository
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : IGenericRepository<UserCreate, UserModel, Guid>
+    public class UserRepository : IGenericRepository<UserCreate, AppUser, Guid>
     {
         private readonly ContextType _situation;
+        private readonly IConfigurationRoot _conf;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly PasswordValidator _pv;
-        public readonly UserClaimFactory claimProvider;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
@@ -42,10 +42,10 @@ namespace Bhbk.Lib.Identity.Internal.Repository
         {
             _context = context;
             _situation = situation;
+            _conf = conf;
             _mapper = mapper;
             _pv = new PasswordValidator();
 
-            claimProvider = new UserClaimFactory(this, conf);
             passwordHasher = new PasswordHasher();
             userValidator = new UserValidator();
         }
@@ -195,7 +195,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return false;
         }
 
-        public async Task<int> Count(Expression<Func<UserModel, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<AppUser, bool>> predicates = null)
         {
             var query = _context.AppUser.AsQueryable();
 
@@ -221,17 +221,17 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await Task.FromResult(_context.Add(model).Entity);
         }
 
-        public async Task<UserModel> CreateAsync(UserCreate model)
+        public async Task<AppUser> CreateAsync(UserCreate model)
         {
             var entity = _mapper.Map<AppUser>(model);
             var create = await CreateAsync(entity);
 
             _context.SaveChanges();
 
-            return await Task.FromResult(_mapper.Map<UserModel>(create));
+            return await Task.FromResult(_mapper.Map<AppUser>(create));
         }
 
-        public async Task<UserModel> CreateAsync(UserCreate model, string password)
+        public async Task<AppUser> CreateAsync(UserCreate model, string password)
         {
             var entity = _mapper.Map<AppUser>(model);
             var create = await CreateAsync(entity);
@@ -240,7 +240,80 @@ namespace Bhbk.Lib.Identity.Internal.Repository
 
             await UpdatePassword(entity, password);
 
-            return await Task.FromResult(_mapper.Map<UserModel>(create));
+            return await Task.FromResult(_mapper.Map<AppUser>(create));
+        }
+
+        public async Task<ClaimsPrincipal> CreateClaimsAsync(AppUser user)
+        {
+            /*
+             * moving away from microsoft constructs for identity implementation because of un-needed additional 
+             * layers of complexity, and limitations, for the simple operations needing to be performed.
+             * 
+             * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1
+             */
+
+            var claims = new List<Claim>();
+
+            foreach (string role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x))
+                claims.Add(new Claim(ClaimTypes.Role, role));
+
+            //check if claims compatibility enabled. means pack claim(s) with old name too.
+            if (bool.Parse(_conf["IdentityDefaults:CompatibilityModeClaims"]))
+                foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
+                    claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
+
+            foreach (Claim claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
+                claims.Add(claim);
+
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
+            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
+
+            //not before timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //issued at timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //expire on timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            var identity = new ClaimsIdentity(claims, "JWT");
+            var result = new ClaimsPrincipal(identity);
+
+            return await Task.Run(() => result);
+        }
+
+        public async Task<ClaimsPrincipal> CreateClaimsRefreshAsync(AppUser user)
+        {
+            /*
+             * moving away from microsoft constructs for identity implementation because of un-needed additional 
+             * layers of complexity, and limitations, for the simple operations needing to be performed.
+             * 
+             * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1
+             */
+
+            var claims = new List<Claim>();
+
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+
+            //not before timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //issued at timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //expire on timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            var identity = new ClaimsIdentity(claims, "JWT");
+            var result = new ClaimsPrincipal(identity);
+
+            return await Task.Run(() => result);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -266,47 +339,35 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await Task.FromResult(_context.AppUser.Any(x => x.Id == key));
         }
 
-        public Task<IEnumerable<UserModel>> GetAsync(params object[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<UserModel>> GetAsync(Expression<Func<UserModel, bool>> predicates = null,
-            Expression<Func<UserModel, object>> orders = null,
-            Expression<Func<UserModel, object>> includes = null,
+        public async Task<IEnumerable<AppUser>> GetAsync(Expression<Func<AppUser, bool>> predicates = null,
+            Func<IQueryable<AppUser>, IIncludableQueryable<AppUser, object>> includes = null,
+            Func<IQueryable<AppUser>, IOrderedQueryable<AppUser>> orders = null,
             int? skip = null,
             int? take = null)
         {
             var query = _context.AppUser.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppUser, bool>>>(predicates);
-                query = query.Where(preds);
-            }
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            //query = query.Include(x => x.AppUserRole);
 
             if (orders != null)
             {
-                var ords = _mapper.MapExpression<Expression<Func<AppUser, object>>>(orders);
-                query = query.OrderBy(ords)?
-                        .Skip(skip.Value)?
-                        .Take(take.Value);
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
             }
 
-            query = query.Include("AppUserRole.Role");
-
-            //if (includes != null)
-            //{
-            //    var incs = _mapper.MapExpression<Expression<Func<AppUser, object>>>(includes);
-            //    query = query.Include(incs);
-            //}
-
-            return await Task.FromResult(_mapper.Map<IEnumerable<UserModel>>(query));
+            return await Task.FromResult(query);
         }
 
         public async Task<IQueryable<AppUserRefresh>> GetRefreshTokensAsync(Expression<Func<AppUserRefresh, bool>> predicates = null,
-            Func<IQueryable<AppUserRefresh>, IQueryable<AppUserRefresh>> orderBy = null,
-            Func<IQueryable<AppUserRefresh>, IIncludableQueryable<AppUserRefresh, object>> includes = null)
+            Func<IQueryable<AppUserRefresh>, IIncludableQueryable<AppUserRefresh, object>> includes = null,
+            Func<IQueryable<AppUserRefresh>, IQueryable<AppUserRefresh>> orderBy = null)
         {
             var query = _context.AppUserRefresh.AsQueryable();
 
@@ -446,7 +507,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
                     entity.LockoutEnabled = false;
                     entity.LockoutEnd = null;
 
-                    await UpdateAsync(_mapper.Map<UserModel>(entity));
+                    await UpdateAsync(_mapper.Map<AppUser>(entity));
 
                     return false;
                 }
@@ -456,7 +517,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             else
             {
                 entity.LockoutEnd = null;
-                await UpdateAsync(_mapper.Map<UserModel>(entity));
+                await UpdateAsync(_mapper.Map<AppUser>(entity));
 
                 return false;
             }
@@ -644,7 +705,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await Task.FromResult(true);
         }
 
-        public async Task<UserModel> UpdateAsync(UserModel model)
+        public async Task<AppUser> UpdateAsync(AppUser model)
         {
             var user = _mapper.Map<AppUser>(model);
             var check = await userValidator.ValidateAsync(this, user);
@@ -667,7 +728,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<UserModel>(entity));
+            return await Task.FromResult(_mapper.Map<AppUser>(entity));
         }
 
         internal async Task<bool> UpdatePassword(AppUser entity, string password)

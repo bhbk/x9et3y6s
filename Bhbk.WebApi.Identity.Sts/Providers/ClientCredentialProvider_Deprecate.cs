@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Builder;
@@ -76,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                IssuerModel issuer;
+                AppIssuer issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))

@@ -5,6 +5,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Repository
+namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     /*
      * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -21,7 +22,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : IGenericRepository<RoleCreate, RoleModel, Guid>
+    public class RoleRepository : IGenericRepository<RoleCreate, AppRole, Guid>
     {
         private readonly ContextType _situation;
         private readonly IMapper _mapper;
@@ -34,7 +35,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             _mapper = mapper;
         }
 
-        public async Task<int> Count(Expression<Func<RoleModel, bool>> predicates = null)
+        public async Task<int> Count(Expression<Func<AppRole, bool>> predicates = null)
         {
             var query = _context.AppRole.AsQueryable();
 
@@ -47,12 +48,12 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await query.CountAsync();
         }
 
-        public async Task<RoleModel> CreateAsync(RoleCreate model)
+        public async Task<AppRole> CreateAsync(RoleCreate model)
         {
             var entity = _mapper.Map<AppRole>(model);
             var result = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<RoleModel>(result));
+            return await Task.FromResult(_mapper.Map<AppRole>(result));
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -70,53 +71,41 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             }
         }
 
-        public Task<bool> ExistsAsync(Guid key)
+        public async Task<bool> ExistsAsync(Guid key)
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(_context.AppRole.Any(x => x.Id == key));
         }
 
-        public Task<IEnumerable<RoleModel>> GetAsync(params object[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<RoleModel>> GetAsync(Expression<Func<RoleModel, bool>> predicates = null,
-            Expression<Func<RoleModel, object>> orders = null,
-            Expression<Func<RoleModel, object>> includes = null,
-            int? skip = null,
+        public async Task<IEnumerable<AppRole>> GetAsync(Expression<Func<AppRole, bool>> predicates = null, 
+            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null, 
+            Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orders = null, 
+            int? skip = null, 
             int? take = null)
         {
             var query = _context.AppRole.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppRole, bool>>>(predicates);
-                query = query.Where(preds);
-            }
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            //query = query.Include(x => x.AppUserRole);
 
             if (orders != null)
             {
-                var ords = _mapper.MapExpression<Expression<Func<AppRole, object>>>(orders);
-                query = query.OrderBy(ords)?
-                        .Skip(skip.Value)?
-                        .Take(take.Value);
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
             }
 
-            query.Include("AppUserRole.User").Load();
-
-            //if (includes != null)
-            //{
-            //    var incs = _mapper.MapExpression<Expression<Func<AppRole, object>>>(includes);
-            //    query = query.Include(incs);
-            //}
-
-            return await Task.FromResult(_mapper.Map<IEnumerable<RoleModel>>(query));
+            return await Task.FromResult(query);
         }
 
-        public async Task<IList<AppUser>> GetUsersListAsync(RoleModel role)
+        public async Task<IList<AppUser>> GetUsersListAsync(Guid key)
         {
             var result = new List<AppUser>();
-            var list = _context.AppUserRole.Where(x => x.RoleId == role.Id).AsQueryable();
+            var list = _context.AppUserRole.Where(x => x.RoleId == key).AsQueryable();
 
             if (list == null)
                 throw new InvalidOperationException();
@@ -127,7 +116,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
             return await Task.FromResult(result);
         }
 
-        public async Task<RoleModel> UpdateAsync(RoleModel model)
+        public async Task<AppRole> UpdateAsync(AppRole model)
         {
             var entity = _context.AppRole.Where(x => x.Id == model.Id).Single();
 
@@ -143,7 +132,7 @@ namespace Bhbk.Lib.Identity.Internal.Repository
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<RoleModel>(_context.Update(entity).Entity));
+            return await Task.FromResult(_mapper.Map<AppRole>(_context.Update(entity).Entity));
         }
     }
 }

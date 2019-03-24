@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Repository;
+using Bhbk.Lib.Identity.Internal.Repositories;
 
 namespace Bhbk.Lib.Identity.Internal.Interfaces
 {
@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Internal.Interfaces
     public interface IIdentityContext<TContext> : IGenericUnitOfWork
         where TContext : AppDbContext
     {
-        IMapper Convert { get; }
+        IMapper Transform { get; }
         ActivityRepository ActivityRepo { get; }
         ClientRepository ClientRepo { get; }
         ConfigRepository ConfigRepo { get; }
