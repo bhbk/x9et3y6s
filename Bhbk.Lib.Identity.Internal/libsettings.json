@@ -7,34 +7,6 @@
       "Microsoft": "Information"
     }
   },
-  "IdentityActivity": {
-    "FieldsExcluded": [
-      "ActorId",
-      "AccessSuccessCount",
-      "AccessFailedCount",
-      "ConcurrencyStamp",
-      "LastUpdated",
-      "LastLoginFailure",
-      "LastLoginSuccess",
-      "SecurityStamp"
-    ],
-    "FieldsSensitive": [
-      "IssuerKey",
-      "ClientKey",
-      "ProviderKey",
-      "PasswordHash",
-      "ProtectedTicket"
-    ],
-    "TablesExcluded": [
-      "AppActivity",
-      "AppRoleClaim",
-      "AppUserClaim",
-      "AppUserLogin",
-      "AppUserRefresh",
-      "AppUserRole",
-      "AppUserToken"
-    ]
-  },
   "IdentityDefaults": {
     "AccessTokenExpire": "600",
     "AuthorizationCodeExpire": "600",

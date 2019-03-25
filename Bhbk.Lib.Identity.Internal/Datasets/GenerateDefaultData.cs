@@ -167,11 +167,11 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.UserRepo.AddLoginAsync(foundUser.Id,
                     new UserLoginInfo(Strings.ApiDefaultLogin, Strings.ApiDefaultLoginKey, Strings.ApiDefaultLoginName));
 
-            if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Name))
-                await _uow.UserRepo.AddToRoleAsync(foundUser.Id, foundRoleForAdmin.Name);
+            if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Id))
+                await _uow.UserRepo.AddToRoleAsync(foundUser, foundRoleForAdmin);
 
-            if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForUser.Name))
-                await _uow.UserRepo.AddToRoleAsync(foundUser.Id, foundRoleForUser.Name);
+            if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForUser.Id))
+                await _uow.UserRepo.AddToRoleAsync(foundUser, foundRoleForUser);
         }
 
         public async Task DestroyAsync()
@@ -182,7 +182,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             {
                 var roles = await _uow.UserRepo.GetRolesAsync(user.Id);
 
-                await _uow.UserRepo.RemoveFromRolesAsync(user.Id, roles.ToArray());
+                await _uow.UserRepo.RemoveFromRolesAsync(user, roles);
                 await _uow.CommitAsync();
 
                 await _uow.UserRepo.DeleteAsync(user.Id);

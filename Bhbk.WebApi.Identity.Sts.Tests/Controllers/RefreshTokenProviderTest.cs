@@ -1011,7 +1011,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var refresh = (await _factory.UoW.UserRepo.GetRefreshTokensAsync(x => x.UserId == user.Id)).First();
+            var refresh = (await _factory.UoW.UserRepo.GetRefreshAsync(x => x.UserId == user.Id)).First();
 
             var result = await _endpoints.RefreshToken_DeleteV2(new JwtSecurityToken((string)ok["access_token"]), user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -1038,7 +1038,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole1)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
             await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
@@ -1077,7 +1077,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole1)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
             await _factory.UoW.CommitAsync();
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;

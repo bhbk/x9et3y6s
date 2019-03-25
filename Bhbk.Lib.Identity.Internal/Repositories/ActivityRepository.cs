@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _mapper = mapper;
         }
 
-        public async Task<int> Count(Expression<Func<AppActivity, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<AppActivity, bool>> predicates = null)
         {
             var query = _context.AppActivity.AsQueryable();
 

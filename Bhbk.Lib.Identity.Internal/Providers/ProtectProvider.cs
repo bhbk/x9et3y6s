@@ -12,9 +12,9 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     {
         private IDataProtectionProvider _provider;
 
-        public ProtectProvider(string applicationName)
+        public ProtectProvider(string appName)
         {
-            _provider = DataProtectionProvider.Create(applicationName);
+            _provider = DataProtectionProvider.Create(appName);
         }
 
         public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppIssuer issuer)

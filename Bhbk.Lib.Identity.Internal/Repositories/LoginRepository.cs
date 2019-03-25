@@ -31,15 +31,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _mapper = mapper;
         }
 
-        public async Task<int> Count(Expression<Func<AppLogin, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<AppLogin, bool>> predicates = null)
         {
             var query = _context.AppLogin.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppLogin, bool>>>(predicates);
-                return await query.Where(preds).CountAsync();
-            }
+                return await query.Where(predicates).CountAsync();
 
             return await query.CountAsync();
         }

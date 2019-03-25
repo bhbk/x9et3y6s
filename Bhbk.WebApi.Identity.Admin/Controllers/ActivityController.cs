@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.OriginalValues.ToLower().Contains(model.Filter.ToLower())
                 || x.CurrentValues.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.ActivityRepo.Count(preds);
+            var total = await UoW.ActivityRepo.CountAsync(preds);
 
             var result = await UoW.ActivityRepo.GetAsync(preds, null, 
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), model.Skip, model.Take);

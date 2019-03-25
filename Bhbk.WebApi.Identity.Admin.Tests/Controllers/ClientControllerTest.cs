@@ -227,7 +227,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             list.Should().BeAssignableTo<IEnumerable<ClientModel>>();
             list.Count().Should().Be(take);
 
-            count.Should().Be(await _factory.UoW.ClientRepo.Count());
+            count.Should().Be(await _factory.UoW.ClientRepo.CountAsync());
         }
 
         [Fact]

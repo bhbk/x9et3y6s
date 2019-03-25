@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(clientValue))
-                clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
+                clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x)
                     && x.Enabled == true)).ToList();
             else
             {
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         return NotFound(Strings.MsgClientNotExist);
 
                     if (!client.Enabled
-                        || !clientList.Contains(client.Id.ToString()))
+                        || !clientList.Contains(client))
                         return BadRequest(Strings.MsgClientInvalid);
 
                     clients.Add(client);

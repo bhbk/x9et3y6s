@@ -35,15 +35,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _mapper = mapper;
         }
 
-        public async Task<int> Count(Expression<Func<AppRole, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<AppRole, bool>> predicates = null)
         {
             var query = _context.AppRole.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppRole, bool>>>(predicates);
-                return await query.Where(preds).CountAsync();
-            }
+                return await query.Where(predicates).CountAsync();
 
             return await query.CountAsync();
         }

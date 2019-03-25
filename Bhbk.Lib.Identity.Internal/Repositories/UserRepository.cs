@@ -34,9 +34,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
-        private readonly PasswordValidator _pv;
-        public readonly PasswordHasher passwordHasher;
-        public readonly UserValidator userValidator;
+        private readonly PasswordValidator _validator;
+        public readonly PasswordHasher HashPassword;
+        public readonly UserValidator ValidateUser;
 
         public UserRepository(AppDbContext context, ContextType situation, IConfigurationRoot conf, IMapper mapper)
         {
@@ -44,10 +44,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _situation = situation;
             _conf = conf;
             _mapper = mapper;
-            _pv = new PasswordValidator();
+            _validator = new PasswordValidator();
 
-            passwordHasher = new PasswordHasher();
-            userValidator = new UserValidator();
+            HashPassword = new PasswordHasher();
+            ValidateUser = new UserValidator();
         }
 
         public async Task<bool> AccessFailedAsync(Guid key)
@@ -86,12 +86,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
-        public async Task<IdentityResult> AddClaimAsync(Guid key, Claim claims)
+        public async Task<bool> AddClaimAsync(Guid key, Claim claim)
         {
             var entity = _context.AppUser.Where(x => x.Id == key).Single();
 
             var list = new List<Claim>();
-            list.Add(claims);
+            list.Add(claim);
 
             foreach (Claim entry in list)
             {
@@ -106,10 +106,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 _context.AppUserClaim.Add(model);
             }
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> AddLoginAsync(Guid key, UserLoginInfo info)
+        public async Task<bool> AddLoginAsync(Guid key, UserLoginInfo info)
         {
             var user = _context.AppUser.Where(x => x.Id == key).Single();
             var login = _context.AppLogin.Where(x => x.LoginProvider == info.LoginProvider).Single();
@@ -129,60 +129,53 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.AppUserLogin.Add(result);
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> AddPasswordAsync(Guid key, string password)
+        public async Task<bool> AddPasswordAsync(Guid key, string password)
         {
             var entity = _context.AppUser.Where(x => x.Id == key).Single();
 
             if (!string.IsNullOrEmpty(entity.PasswordHash))
                 throw new InvalidOperationException();
 
-            if (!await UpdatePassword(entity, password))
-                return IdentityResult.Failed();
-
-            return IdentityResult.Success;
+            return await UpdatePassword(entity, password);
         }
 
-        public async Task<IdentityResult> AddRefreshTokenAsync(AppUserRefresh refresh)
+        public async Task<bool> AddRefreshTokenAsync(AppUserRefresh token)
         {
-            var list = _context.AppUserRefresh.Where(x => x.UserId == refresh.UserId
+            var tokens = _context.AppUserRefresh.Where(x => x.UserId == token.UserId
                 && x.IssuedUtc > DateTime.UtcNow
                 && x.ExpiresUtc < DateTime.UtcNow);
 
-            if (list != null)
-                _context.AppUserRefresh.RemoveRange(list);
+            if (tokens != null)
+                _context.AppUserRefresh.RemoveRange(tokens);
 
-            _context.AppUserRefresh.Add(refresh);
+            _context.AppUserRefresh.Add(token);
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> AddToRoleAsync(Guid key, string roleName)
+        public async Task<bool> AddToRoleAsync(AppUser user, AppRole role)
         {
-            var user = _context.AppUser.Where(x => x.Id == key).Single();
-            var role = _context.AppRole.Where(x => x.Name == roleName).SingleOrDefault();
+            _context.AppUserRole.Add(
+                new AppUserRole()
+                {
+                    UserId = user.Id,
+                    RoleId = role.Id,
+                    Created = DateTime.Now,
+                    Immutable = false
+                });
 
-            var result = new AppUserRole()
-            {
-                UserId = user.Id,
-                RoleId = role.Id,
-                Created = DateTime.Now,
-                Immutable = false
-            };
-
-            _context.AppUserRole.Add(result);
-
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> AddToRolesAsync(Guid key, IEnumerable<string> roles)
+        public async Task<bool> AddToRolesAsync(AppUser user, IEnumerable<AppRole> roles)
         {
-            foreach (string role in roles)
-                await AddToRoleAsync(key, role);
+            foreach (var role in roles)
+                await AddToRoleAsync(user, role);
 
-            return IdentityResult.Success;
+            return await Task.FromResult(true);
         }
 
         public async Task<bool> CheckPasswordAsync(Guid key, string password)
@@ -195,30 +188,27 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return false;
         }
 
-        public async Task<int> Count(Expression<Func<AppUser, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<AppUser, bool>> predicates = null)
         {
             var query = _context.AppUser.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppUser, bool>>>(predicates);
-                return await query.Where(preds).CountAsync();
-            }
+                return await query.Where(predicates).CountAsync();
 
             return await query.CountAsync();
         }
 
-        internal async Task<AppUser> CreateAsync(AppUser model)
+        internal async Task<AppUser> CreateAsync(AppUser user)
         {
-            var check = await userValidator.ValidateAsync(this, model);
+            var check = await ValidateUser.ValidateAsync(user);
 
             if (!check.Succeeded)
                 throw new InvalidOperationException();
 
-            if (!model.HumanBeing)
-                model.EmailConfirmed = true;
+            if (!user.HumanBeing)
+                user.EmailConfirmed = true;
 
-            return await Task.FromResult(_context.Add(model).Entity);
+            return await Task.FromResult(_context.Add(user).Entity);
         }
 
         public async Task<AppUser> CreateAsync(UserCreate model)
@@ -240,10 +230,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             await UpdatePassword(entity, password);
 
-            return await Task.FromResult(_mapper.Map<AppUser>(create));
+            return await Task.FromResult(create);
         }
 
-        public async Task<ClaimsPrincipal> CreateClaimsAsync(AppUser user)
+        public async Task<ClaimsPrincipal> CreateAccessAsync(AppUser user)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -254,8 +244,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             var claims = new List<Claim>();
 
-            foreach (string role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x))
-                claims.Add(new Claim(ClaimTypes.Role, role));
+            foreach (var role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x.Name))
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
             //check if claims compatibility enabled. means pack claim(s) with old name too.
             if (bool.Parse(_conf["IdentityDefaults:CompatibilityModeClaims"]))
@@ -287,7 +277,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> CreateClaimsRefreshAsync(AppUser user)
+        public async Task<ClaimsPrincipal> CreateRefreshAsync(AppUser user)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -365,9 +355,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IQueryable<AppUserRefresh>> GetRefreshTokensAsync(Expression<Func<AppUserRefresh, bool>> predicates = null,
+        public async Task<IEnumerable<AppUserRefresh>> GetRefreshAsync(Expression<Func<AppUserRefresh, bool>> predicates = null,
             Func<IQueryable<AppUserRefresh>, IIncludableQueryable<AppUserRefresh, object>> includes = null,
-            Func<IQueryable<AppUserRefresh>, IQueryable<AppUserRefresh>> orderBy = null)
+            Func<IQueryable<AppUserRefresh>, IOrderedQueryable<AppUserRefresh>> orderBy = null)
         {
             var query = _context.AppUserRefresh.AsQueryable();
 
@@ -383,7 +373,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IList<Claim>> GetClaimsAsync(Guid key)
+        public async Task<IEnumerable<Claim>> GetClaimsAsync(Guid key)
         {
             var result = new List<Claim>();
             var map = _context.AppUserClaim.Where(x => x.UserId == key);
@@ -403,94 +393,83 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(result);
         }
 
-        public async Task<IList<string>> GetClientsAsync(Guid key)
+        public async Task<IEnumerable<AppClient>> GetClientsAsync(Guid key)
         {
-            var result = (IList<string>)_context.AppClient
-                .Join(_context.AppRole, x => x.Id, y => y.ClientId, (client1, role1) => new {
-                    ClientId = client1.Id,
-                    RoleId = role1.Id
-                })
-                .Join(_context.AppUserRole, x => x.RoleId, y => y.RoleId, (role2, user2) => new {
-                    ClientId = role2.ClientId,
-                    UserId = user2.UserId
-                })
-                .Where(x => x.UserId == key)
-                .Select(x => x.ClientId.ToString().ToLower())
-                .Distinct()
-                .ToList();
+            var result = _context.AppClient.Where(x => x.AppRole.Any(y => y.AppUserRole.Any(z => z.UserId == key))).ToList();
+
+            //var result = (IList<string>)_context.AppClient
+            //    .Join(_context.AppRole, x => x.Id, y => y.ClientId, (client1, role1) => new {
+            //        ClientId = client1.Id,
+            //        RoleId = role1.Id
+            //    })
+            //    .Join(_context.AppUserRole, x => x.RoleId, y => y.RoleId, (role2, user2) => new {
+            //        ClientId = role2.ClientId,
+            //        UserId = user2.UserId
+            //    })
+            //    .Where(x => x.UserId == key)
+            //    .Select(x => x.ClientId.ToString().ToLower())
+            //    .Distinct()
+            //    .ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IList<string>> GetLoginsAsync(Guid key)
+        public async Task<IEnumerable<AppLogin>> GetLoginsAsync(Guid key)
         {
-            var result = (IList<string>)_context.AppLogin
-                .Join(_context.AppUserLogin, x => x.Id, y => y.LoginId, (login1, user1) => new {
-                    LoginId = login1.Id,
-                    UserId = user1.UserId
-                })
-                .Where(x => x.UserId == key)
-                .Select(x => x.LoginId.ToString().ToLower())
-                .Distinct()
-                .ToList();
+            var result = _context.AppLogin.Where(x => x.AppUserLogin.Any(y => y.UserId == key)).ToList();
+
+            //var result = (IList<string>)_context.AppLogin
+            //    .Join(_context.AppUserLogin, x => x.Id, y => y.LoginId, (login1, user1) => new {
+            //        LoginId = login1.Id,
+            //        UserId = user1.UserId
+            //    })
+            //    .Where(x => x.UserId == key)
+            //    .Select(x => x.LoginId.ToString().ToLower())
+            //    .Distinct()
+            //    .ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IList<string>> GetRolesAsync(Guid key)
+        public async Task<IEnumerable<AppRole>> GetRolesAsync(Guid key)
         {
-            var result = (IList<string>)_context.AppRole
-                .Join(_context.AppUserRole, x => x.Id, y => y.RoleId, (role1, user1) => new {
-                    UserId = user1.UserId,
-                    RoleId = role1.Id,
-                    RoleName = role1.Name
-                })
-                .Where(x => x.UserId == key)
-                .Select(x => x.RoleName.ToString())
-                .Distinct()
-                .ToList();
+            var result = _context.AppRole.Where(x => x.AppUserRole.Any(y => y.UserId == key)).ToList();
+
+            //var result = (IList<string>)_context.AppRole
+            //    .Join(_context.AppUserRole, x => x.Id, y => y.RoleId, (role1, user1) => new {
+            //        UserId = user1.UserId,
+            //        RoleId = role1.Id,
+            //        RoleName = role1.Name
+            //    })
+            //    .Where(x => x.UserId == key)
+            //    .Select(x => x.RoleName.ToString())
+            //    .Distinct()
+            //    .ToList();
 
             return await Task.FromResult(result);
         }
 
-        [System.Obsolete]
-        public async Task<IList<string>> GetRolesAsync_Deprecate(Guid key)
+        public async Task<bool> IsInLoginAsync(Guid userKey, string loginKey)
         {
-            var result = (IList<string>)_context.AppRole
-                .Join(_context.AppUserRole, x => x.Id, y => y.RoleId, (role1, user1) => new {
-                    UserId = user1.UserId,
-                    RoleId = role1.Id,
-                    RoleName = role1.Name
-                })
-                .Where(x => x.UserId == key)
-                .Select(x => x.RoleId.ToString())
-                .Distinct()
-                .ToList();
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<bool> IsInLoginAsync(Guid key, string loginName)
-        {
-            var login = _context.AppLogin.Where(x => x.LoginProvider == loginName).SingleOrDefault();
+            var login = _context.AppLogin.Where(x => x.LoginProvider == loginKey).SingleOrDefault();
 
             if (login == null)
                 throw new ArgumentNullException();
 
-            else if (_context.AppUserLogin.Any(x => x.UserId == key && x.LoginId == login.Id))
+            else if (_context.AppUserLogin.Any(x => x.UserId == userKey && x.LoginId == login.Id))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
         }
 
-        public async Task<bool> IsInRoleAsync(Guid key, string roleName)
+        public async Task<bool> IsInRoleAsync(Guid userKey, Guid roleKey)
         {
-            var role = _context.AppRole.Where(x => x.Name == roleName).SingleOrDefault();
+            var role = _context.AppRole.Where(x => x.Id == roleKey).SingleOrDefault();
 
             if (role == null)
                 throw new ArgumentNullException();
 
-            else if (_context.AppUserRole.Any(x => x.UserId == key && x.RoleId == role.Id))
+            else if (_context.AppUserRole.Any(x => x.UserId == userKey && x.RoleId == role.Id))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -536,7 +515,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemoveClaimAsync(Guid key, Claim claim)
+        public async Task<bool> RemoveClaimAsync(Guid key, Claim claim)
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(claim);
@@ -553,10 +532,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 _context.AppUserClaim.Remove(result);
             }
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemoveLoginAsync(Guid key, string loginProvider, string providerKey)
+        public async Task<bool> RemoveLoginAsync(Guid key, string loginProvider, string providerKey)
         {
             var login = _context.AppUserLogin.Where(x => x.LoginProvider == loginProvider).SingleOrDefault();
 
@@ -567,32 +546,27 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.AppUserLogin.Remove(result);
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemoveFromRoleAsync(Guid key, string roleName)
+        public async Task<bool> RemoveFromRoleAsync(AppUser user, AppRole role)
         {
-            var role = _context.Roles.Where(x => x.Name == roleName).SingleOrDefault();
-
-            if (role == null)
-                throw new ArgumentNullException();
-
-            var result = _context.AppUserRole.Where(x => x.UserId == key && x.RoleId == role.Id).Single();
+            var result = _context.AppUserRole.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
             _context.AppUserRole.Remove(result);
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemoveFromRolesAsync(Guid key, IEnumerable<string> roles)
+        public async Task<bool> RemoveFromRolesAsync(AppUser user, IEnumerable<AppRole> roles)
         {
-            foreach (string role in roles)
-                await RemoveFromRoleAsync(key, role);
+            foreach (var role in roles)
+                await RemoveFromRoleAsync(user, role);
 
-            return IdentityResult.Success;
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemoveRefreshTokenAsync(Guid key)
+        public async Task<bool> RemoveRefreshTokenAsync(Guid key)
         {
             var token = _context.AppUserRefresh.Where(x => x.Id == key);
 
@@ -601,10 +575,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.AppUserRefresh.RemoveRange(token);
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemoveRefreshTokensAsync(Guid key)
+        public async Task<bool> RemoveRefreshTokensAsync(Guid key)
         {
             var tokens = _context.AppUserRefresh.Where(x => x.UserId == key);
 
@@ -613,16 +587,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.AppUserRefresh.RemoveRange(tokens);
 
-            return await Task.FromResult(IdentityResult.Success);
+            return await Task.FromResult(true);
         }
 
-        public async Task<IdentityResult> RemovePasswordAsync(Guid key)
+        public async Task<bool> RemovePasswordAsync(Guid key)
         {
             var entity = _context.AppUser.Where(x => x.Id == key).Single();
 
-            await SetPasswordHashAsync(entity, null);
-
-            return IdentityResult.Success;
+            return await SetPasswordHashAsync(entity, null);
         }
 
         public async Task<bool> SetConfirmedEmailAsync(Guid key, bool confirmed)
@@ -673,22 +645,22 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        internal async Task<bool> SetPasswordHashAsync(AppUser entity, string passwordHash)
+        internal async Task<bool> SetPasswordHashAsync(AppUser user, string passwordHash)
         {
-            entity.PasswordHash = passwordHash;
-            entity.LastUpdated = DateTime.Now;
+            user.PasswordHash = passwordHash;
+            user.LastUpdated = DateTime.Now;
 
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             return await Task.FromResult(true);
         }
 
-        internal async Task<bool> SetSecurityStampAsync(AppUser entity, string stamp)
+        internal async Task<bool> SetSecurityStampAsync(AppUser user, string stamp)
         {
-            entity.SecurityStamp = stamp;
-            entity.LastUpdated = DateTime.Now;
+            user.SecurityStamp = stamp;
+            user.LastUpdated = DateTime.Now;
 
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             return await Task.FromResult(true);
         }
@@ -708,7 +680,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         public async Task<AppUser> UpdateAsync(AppUser model)
         {
             var user = _mapper.Map<AppUser>(model);
-            var check = await userValidator.ValidateAsync(this, user);
+            var check = await ValidateUser.ValidateAsync(user);
 
             if (!check.Succeeded)
                 throw new InvalidOperationException();
@@ -731,23 +703,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_mapper.Map<AppUser>(entity));
         }
 
-        internal async Task<bool> UpdatePassword(AppUser entity, string password)
+        internal async Task<bool> UpdatePassword(AppUser user, string password)
         {
-            if (_pv == null)
+            if (_validator == null)
                 throw new NotSupportedException();
 
-            var result = await _pv.ValidateAsync(this, entity, password);
+            var result = await _validator.ValidateAsync(user, password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
 
-            if (passwordHasher == null)
+            if (HashPassword == null)
                 throw new NotSupportedException();
 
-            var hash = passwordHasher.HashPassword(entity, password);
+            var hash = HashPassword.HashPassword(user, password);
 
-            if (!await SetPasswordHashAsync(entity, hash)
-                || !await SetSecurityStampAsync(entity, RandomValues.CreateBase64String(32)))
+            if (!await SetPasswordHashAsync(user, hash)
+                || !await SetSecurityStampAsync(user, RandomValues.CreateBase64String(32)))
                 return false;
 
             return true;
@@ -765,10 +737,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         internal async Task<PasswordVerificationResult> VerifyPasswordAsync(AppUser user, string password)
         {
-            if (passwordHasher == null)
+            if (HashPassword == null)
                 throw new NotSupportedException();
 
-            if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
+            if (HashPassword.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
                 return PasswordVerificationResult.Success;
 
             return await Task.FromResult(PasswordVerificationResult.Failed);

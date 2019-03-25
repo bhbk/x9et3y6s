@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             list.Should().BeAssignableTo<IEnumerable<LoginModel>>();
             list.Count().Should().Be(take);
-            count.Should().Be(await _factory.UoW.IssuerRepo.Count());
+            count.Should().Be(await _factory.UoW.IssuerRepo.CountAsync());
         }
 
         [Fact]
@@ -290,11 +290,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var add = await _factory.UoW.UserRepo.AddLoginAsync(user.Id,
                 new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
+            add.Should().BeTrue();
 
             await _factory.UoW.CommitAsync();
-
-            add.Should().BeAssignableTo(typeof(IdentityResult));
-            add.Succeeded.Should().BeTrue();
 
             var result = await controller.RemoveLoginFromUserV1(model.LoginId, model.UserId) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));

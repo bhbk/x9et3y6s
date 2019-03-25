@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = (await uow.UserRepo.GetRefreshTokensAsync(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow)).ToList();
+                    var invalid = (await uow.UserRepo.GetRefreshAsync(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow)).ToList();
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())

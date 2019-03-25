@@ -44,15 +44,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_mapper.Map<AppClientUri>(result));
         }
 
-        public async Task<int> Count(Expression<Func<AppClient, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<AppClient, bool>> predicates = null)
         {
             var query = _context.AppClient.AsQueryable();
 
             if (predicates != null)
-            {
-                var preds = _mapper.MapExpression<Expression<Func<AppClient, bool>>>(predicates);
-                return await query.Where(preds).CountAsync();
-            }
+                return await query.Where(predicates).CountAsync();
 
             return await query.CountAsync();
         }
@@ -65,7 +62,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_mapper.Map<AppClient>(result));
         }
 
-        public async Task<ClaimsPrincipal> CreateClaimsAsync(AppClient client)
+        public async Task<ClaimsPrincipal> CreateAccessAsync(AppClient client)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -94,7 +91,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> CreateClaimsRefreshAsync(AppClient client)
+        public async Task<ClaimsPrincipal> CreateRefreshAsync(AppClient client)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 

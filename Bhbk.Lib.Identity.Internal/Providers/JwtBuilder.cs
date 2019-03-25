@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateClaimsAsync(user);
+            var identity = await uow.UserRepo.CreateAccessAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateClaimsAsync(user);
+            var identity = await uow.UserRepo.CreateAccessAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateClaimsAsync(user);
+            var identity = await uow.UserRepo.CreateAccessAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -150,7 +150,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateClaimsRefreshAsync(user);
+            var identity = await uow.UserRepo.CreateRefreshAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -189,9 +189,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create));
-
-            if (!refresh.Succeeded)
+            if(!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
                 throw new InvalidOperationException();
 
             return result;
@@ -203,7 +201,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateClaimsRefreshAsync(user);
+            var identity = await uow.UserRepo.CreateRefreshAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -242,9 +240,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 ExpiresUtc = expireDate
             };
 
-            var refresh = await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create));
-
-            if (!refresh.Succeeded)
+            if(!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
                 throw new InvalidOperationException();
 
             return result;

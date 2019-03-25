@@ -596,7 +596,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
             await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
@@ -634,7 +634,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 return;
 
             var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
+            await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
             await _factory.UoW.CommitAsync();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);

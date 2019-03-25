@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
-                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
+                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x)
                         && x.Enabled == true).Result.ToList();
                 else
                 {
@@ -173,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         }
 
                         if (!client.Enabled
-                            || !clientList.Contains(client.Id.ToString()))
+                            || !clientList.Contains(client))
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                             context.Response.ContentType = "application/json";

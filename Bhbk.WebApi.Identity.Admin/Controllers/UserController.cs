@@ -43,10 +43,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var result = await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if(!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
@@ -244,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var clients = await UoW.UserRepo.GetClientsAsync(user.Id);
 
-            var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x.Id.ToString())))
+            var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x)))
                 .Select(x => UoW.Transform.Map<ClientModel>(x));
 
             return Ok(result);
@@ -260,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var logins = await UoW.UserRepo.GetLoginsAsync(user.Id);
 
-            var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x.Id.ToString())))
+            var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x)))
                 .Select(x => UoW.Transform.Map<LoginModel>(x));
 
             return Ok(result);
@@ -274,9 +272,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var roles = await UoW.UserRepo.GetRolesAsync_Deprecate(user.Id);
+            var roles = await UoW.UserRepo.GetRolesAsync(user.Id);
 
-            var result = (await UoW.RoleRepo.GetAsync(x => roles.Contains(x.Id.ToString())))
+            var result = (await UoW.RoleRepo.GetAsync(x => roles.Contains(x)))
                 .Select(x => UoW.Transform.Map<RoleModel>(x));
 
             return Ok(result);
@@ -302,7 +300,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.FirstName.ToLower().Contains(model.Filter.ToLower())
                 || x.LastName.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.UserRepo.Count(preds);
+            var total = await UoW.UserRepo.CountAsync(preds);
             var result = await UoW.UserRepo.GetAsync(preds, 
                 x => x.Include(r => r.AppUserRole), 
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
@@ -329,10 +327,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var result = await UoW.UserRepo.RemovePasswordAsync(user.Id);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if(!await UoW.UserRepo.RemovePasswordAsync(user.Id))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
@@ -356,15 +352,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            var remove = await UoW.UserRepo.RemovePasswordAsync(user.Id);
+            if(!await UoW.UserRepo.RemovePasswordAsync(user.Id))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
-            if (!remove.Succeeded)
-                return GetErrorResult(remove);
-
-            var add = await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword);
-
-            if (!add.Succeeded)
-                return GetErrorResult(add);
+            if(!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 

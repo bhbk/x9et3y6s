@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.IssuerRepo.Count(preds);
+            var total = await UoW.IssuerRepo.CountAsync(preds);
             var result = await UoW.IssuerRepo.GetAsync(preds,
                 x => x.Include(c => c.AppClient), 
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 

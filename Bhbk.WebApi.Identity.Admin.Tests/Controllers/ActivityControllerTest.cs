@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             list.Should().BeAssignableTo<IEnumerable<ActivityModel>>();
             list.Count().Should().Be(take);
 
-            count.Should().Be(await _factory.UoW.ActivityRepo.Count());
+            count.Should().Be(await _factory.UoW.ActivityRepo.CountAsync());
         }
     }
 }

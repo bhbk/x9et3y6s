@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserInvalid);
 
             var loginList = await UoW.UserRepo.GetLoginsAsync(user.Id);
-            var logins = await UoW.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString()));
+            var logins = await UoW.LoginRepo.GetAsync(x => loginList.Contains(x));
 
             //check that login provider exists...
             if (loginList == null)
@@ -243,7 +243,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
-                clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
+                clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x)
                     && x.Enabled == true)).ToList();
             else
             {
@@ -262,7 +262,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         return NotFound(Strings.MsgClientNotExist);
 
                     if (!client.Enabled
-                        || !clientList.Contains(client.Id.ToString()))
+                        || !clientList.Contains(client))
                         return BadRequest(Strings.MsgClientInvalid);
 
                     clients.Add(client);
@@ -270,7 +270,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var loginList = await UoW.UserRepo.GetLoginsAsync(user.Id);
-            var logins = (await UoW.LoginRepo.GetAsync(x => loginList.Contains(x.Id.ToString()))).ToList();
+            var logins = (await UoW.LoginRepo.GetAsync(x => loginList.Contains(x))).ToList();
 
             //check that login provider exists...
             if (loginList == null)

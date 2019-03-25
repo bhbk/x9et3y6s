@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Repositories;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,11 +6,16 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Validators
 {
-    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuservalidator-1
+    /*
+     * moving away from microsoft constructs for identity implementation because of un-needed additional 
+     * layers of complexity, and limitations, for the simple operations needing to be performed.
+     * 
+     * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuservalidator-1
+     */
 
     public sealed class UserValidator
     {
-        public Task<IdentityResult> ValidateAsync(UserRepository repo, AppUser user)
+        public Task<IdentityResult> ValidateAsync(AppUser user)
         {
             var errors = new List<IdentityError>();
             var describer = new IdentityErrorDescriber();

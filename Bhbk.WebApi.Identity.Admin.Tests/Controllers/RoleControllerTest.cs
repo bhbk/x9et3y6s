@@ -232,7 +232,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             list.Should().BeAssignableTo<IEnumerable<RoleModel>>();
             list.Count().Should().Be(take);
-            count.Should().Be(await _factory.UoW.RoleRepo.Count());
+            count.Should().Be(await _factory.UoW.RoleRepo.CountAsync());
         }
 
         [Fact]

@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
                 }
 
-                var refreshToken = (uow.UserRepo.GetRefreshTokensAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
+                var refreshToken = (uow.UserRepo.GetRefreshAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
-                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x.Id.ToString())
+                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x)
                         && x.Enabled == true).Result.ToList();
                 else
                 {
@@ -163,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         }
 
                         if (!client.Enabled
-                            || !clientList.Contains(client.Id.ToString()))
+                            || !clientList.Contains(client))
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                             context.Response.ContentType = "application/json";
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
                 }
 
-                var refreshToken = (uow.UserRepo.GetRefreshTokensAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
+                var refreshToken = (uow.UserRepo.GetRefreshAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow

@@ -86,8 +86,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
             var remove = await _factory.UoW.UserRepo.RemovePasswordAsync(model.Id);
-            remove.Should().BeAssignableTo(typeof(IdentityResult));
-            remove.Succeeded.Should().BeTrue();
+            remove.Should().BeTrue();
 
             var response = await _endpoints.User_AddPasswordV1(access.token, model.Id,
                 new UserAddPassword()
@@ -326,7 +325,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             list.Should().BeAssignableTo<IEnumerable<UserModel>>();
             list.Count().Should().Be(take);
-            count.Should().Be(await _factory.UoW.UserRepo.Count());
+            count.Should().Be(await _factory.UoW.UserRepo.CountAsync());
         }
 
         [Fact(Skip = "NotImplemented")]
@@ -398,7 +397,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var ok = JArray.Parse(await response.Content.ReadAsStringAsync()).ToObject<IEnumerable<RoleModel>>();
 
-            ok.Count().Should().Be((await _factory.UoW.UserRepo.GetRolesAsync_Deprecate(user.Id)).Count());
+            ok.Count().Should().Be((await _factory.UoW.UserRepo.GetRolesAsync(user.Id)).Count());
         }
 
         [Fact]

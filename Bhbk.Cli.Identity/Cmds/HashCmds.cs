@@ -51,9 +51,9 @@ namespace Bhbk.Cli.Identity.Cmds
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = ConsoleHelper.GetHiddenInput();
-                    var hashvalue = Statics.UoW.UserRepo.passwordHasher.HashPassword(null, cleartext);
+                    var hashvalue = Statics.UoW.UserRepo.HashPassword.HashPassword(null, cleartext);
 
-                    if (Statics.UoW.UserRepo.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (Statics.UoW.UserRepo.HashPassword.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

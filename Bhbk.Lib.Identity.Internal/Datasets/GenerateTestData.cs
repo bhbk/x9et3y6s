@@ -180,8 +180,8 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.UserRepo.AddClaimAsync(user.Id, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
 
-            if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Name))
-                await _uow.UserRepo.AddToRoleAsync(user.Id, role.Name);
+            if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Id))
+                await _uow.UserRepo.AddToRoleAsync(user, role);
 
             if (!await _uow.UserRepo.IsInLoginAsync(user.Id, login.LoginProvider))
                 await _uow.UserRepo.AddLoginAsync(user.Id, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
@@ -195,8 +195,8 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.UserRepo.AddClaimAsync(user.Id, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
 
-            if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Name))
-                await _uow.UserRepo.AddToRoleAsync(user.Id, role.Name);
+            if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Id))
+                await _uow.UserRepo.AddToRoleAsync(user, role);
 
             if (!await _uow.UserRepo.IsInLoginAsync(user.Id, login.LoginProvider))
                 await _uow.UserRepo.AddLoginAsync(user.Id, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
@@ -303,8 +303,8 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.UserRepo.SetConfirmedPhoneNumberAsync(user.Id, true);
                 await _uow.UserRepo.AddClaimAsync(user.Id, new Claim(Strings.ApiUnitTestClaimType, Strings.ApiUnitTestClaimValue));
 
-                if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Name))
-                    await _uow.UserRepo.AddToRoleAsync(user.Id, role.Name);
+                if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Id))
+                    await _uow.UserRepo.AddToRoleAsync(user, role);
 
                 if (!await _uow.UserRepo.IsInLoginAsync(user.Id, login.LoginProvider))
                     await _uow.UserRepo.AddLoginAsync(user.Id, new UserLoginInfo(login.LoginProvider, login.LoginProvider, "local"));
@@ -325,7 +325,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             {
                 var userRoles = await _uow.UserRepo.GetRolesAsync(user.Id);
 
-                await _uow.UserRepo.RemoveFromRolesAsync(user.Id, userRoles.ToArray());
+                await _uow.UserRepo.RemoveFromRolesAsync(user, userRoles);
                 await _uow.UserRepo.DeleteAsync(user.Id);
             }
 

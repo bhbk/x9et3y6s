@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Repositories;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Validators
 {
-    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.ipasswordvalidator-1?view=aspnetcore-2.0
+    /*
+     * moving away from microsoft constructs for identity implementation because of un-needed additional 
+     * layers of complexity, and limitations, for the simple operations needing to be performed.
+     * 
+     * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.ipasswordvalidator-1?view=aspnetcore-2.0
+     */
 
     public sealed class PasswordValidator
     {
@@ -16,7 +20,7 @@ namespace Bhbk.Lib.Identity.Internal.Validators
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
 
-        public Task<IdentityResult> ValidateAsync(UserRepository repo, AppUser user, string password)
+        public Task<IdentityResult> ValidateAsync(AppUser user, string password)
         {
             List<IdentityError> errors = new List<IdentityError>();
 

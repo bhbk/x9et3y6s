@@ -39,11 +39,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.AddLoginAsync(user.Id,
-                new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName));
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if(!await UoW.UserRepo.AddLoginAsync(user.Id,
+                new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName)))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
@@ -128,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else
                 preds = x => x.LoginProvider.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.LoginRepo.Count(preds);
+            var total = await UoW.LoginRepo.CountAsync(preds);
             var result = await UoW.LoginRepo.GetAsync(preds, 
                 x => x.Include(l => l.AppUserLogin), 
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
@@ -170,10 +168,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.RemoveLoginAsync(user.Id, login.LoginProvider, string.Empty);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if(!await UoW.UserRepo.RemoveLoginAsync(user.Id, login.LoginProvider, string.Empty))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 

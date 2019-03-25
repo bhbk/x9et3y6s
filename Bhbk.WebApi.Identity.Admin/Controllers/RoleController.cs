@@ -38,10 +38,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.AddToRoleAsync(user.Id, role.Name);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if(!await UoW.UserRepo.AddToRoleAsync(user, role))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
@@ -131,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.RoleRepo.Count(preds);
+            var total = await UoW.RoleRepo.CountAsync(preds);
             var result = await UoW.RoleRepo.GetAsync(preds, 
                 x => x.Include(r => r.AppUserRole), 
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
@@ -171,10 +169,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var result = await UoW.UserRepo.RemoveFromRoleAsync(user.Id, role.Name);
-
-            if (!result.Succeeded)
-                return GetErrorResult(result);
+            if(!await UoW.UserRepo.RemoveFromRoleAsync(user, role))
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 

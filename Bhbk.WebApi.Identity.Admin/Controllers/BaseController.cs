@@ -1,8 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,29 +22,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public BaseController() { }
 
         [NonAction]
-        protected IActionResult GetErrorResult(IdentityResult result)
-        {
-            if (result == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            if (!result.Succeeded)
-            {
-                if (result.Errors != null)
-                {
-                    foreach (IdentityError error in result.Errors)
-                        ModelState.AddModelError(error.Code, error.Description);
-                }
-
-                if (ModelState.IsValid)
-                    return BadRequest();
-
-                return BadRequest(ModelState);
-            }
-
-            return null;
-        }
-
-        [NonAction]
         protected Guid GetUserGUID()
         {
             var claims = ControllerContext.HttpContext.User.Identity as ClaimsIdentity;
@@ -59,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         {
             var user = (UoW.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
 
-            ControllerContext.HttpContext.User = UoW.UserRepo.CreateClaimsAsync(user).Result;
+            ControllerContext.HttpContext.User = UoW.UserRepo.CreateAccessAsync(user).Result;
         }
     }
 }
