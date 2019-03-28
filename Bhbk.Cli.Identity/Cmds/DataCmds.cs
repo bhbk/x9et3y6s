@@ -47,7 +47,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     x.AddExpressionMapping();
                 }).CreateMapper();
 
-                Statics.UoW = new IdentityContext(builder, ContextType.Live, conf, mapper);
+                Statics.UoW = new IdentityContext(builder, ExecutionType.Live, conf, mapper);
                 Statics.DefaultData = new GenerateDefaultData(Statics.UoW);
 
                 if (CreateDefault)

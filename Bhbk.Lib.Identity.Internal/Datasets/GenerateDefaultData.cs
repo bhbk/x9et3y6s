@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -86,14 +85,16 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.CommitAsync();
             }
 
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiDefaultLogin)).SingleOrDefault();
+            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Strings.ApiDefaultLogin)).SingleOrDefault();
 
             if (foundLogin == null)
             {
                 login = new LoginCreate()
                 {
-                    LoginProvider = Strings.ApiDefaultLogin,
-                    Immutable = true,
+                    Name = Strings.ApiDefaultLogin,
+                    LoginKey = Strings.ApiUnitTestLogin1Key,
+                    Enabled = true,
+                    Immutable = false,
                 };
 
                 foundLogin = await _uow.LoginRepo.CreateAsync(login);
@@ -163,9 +164,8 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == role.Name)).Single();
             }
 
-            if (!await _uow.UserRepo.IsInLoginAsync(foundUser.Id, Strings.ApiDefaultLogin))
-                await _uow.UserRepo.AddLoginAsync(foundUser.Id,
-                    new UserLoginInfo(Strings.ApiDefaultLogin, Strings.ApiDefaultLoginKey, Strings.ApiDefaultLoginName));
+            if (!await _uow.UserRepo.IsInLoginAsync(foundUser.Id, foundLogin.Id))
+                await _uow.UserRepo.AddToLoginAsync(foundUser, foundLogin);
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRoleForAdmin.Id))
                 await _uow.UserRepo.AddToRoleAsync(foundUser, foundRoleForAdmin);
@@ -182,7 +182,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             {
                 var roles = await _uow.UserRepo.GetRolesAsync(user.Id);
 
-                await _uow.UserRepo.RemoveFromRolesAsync(user, roles);
+                foreach (var role in roles)
+                    await _uow.UserRepo.RemoveFromRoleAsync(user, role);
+
                 await _uow.CommitAsync();
 
                 await _uow.UserRepo.DeleteAsync(user.Id);
@@ -205,7 +207,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.CommitAsync();
             }
 
-            var loginLocal = (await _uow.LoginRepo.GetAsync(x => x.LoginProvider == Strings.ApiDefaultLogin)).SingleOrDefault();
+            var loginLocal = (await _uow.LoginRepo.GetAsync(x => x.Name == Strings.ApiDefaultLogin)).SingleOrDefault();
 
             if (loginLocal != null)
             {

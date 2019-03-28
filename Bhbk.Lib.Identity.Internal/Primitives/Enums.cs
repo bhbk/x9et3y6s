@@ -37,6 +37,8 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             MaintainQuotes,
             MaintainTokens,
             MaintainUsers,
+            QueueEmails,
+            QueueTexts
         }
     }
 }

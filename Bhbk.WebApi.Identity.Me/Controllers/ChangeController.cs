@@ -1,17 +1,17 @@
-﻿using Bhbk.Lib.Alert.Factory;
-using Bhbk.Lib.Alert.Helpers;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Alert;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
-using Bhbk.Lib.Identity.Internal.EntityModels;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -43,17 +43,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
                 .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), user));
 
-            if (UoW.Situation == ContextType.UnitTest)
+            if (UoW.Situation == ExecutionType.UnitTest)
                 return Ok(token);
 
             var url = UrlBuilder.ConfirmEmail(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Situation);
+            var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
+            var email = await alert.Enqueue_EmailV1(Jwt.AccessToken.ToString(),
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -98,17 +98,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
                 .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), user));
 
-            if (UoW.Situation == ContextType.UnitTest)
+            if (UoW.Situation == ExecutionType.UnitTest)
                 return Ok(token);
 
             var url = UrlBuilder.ConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Situation);
+            var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var email = await alert.EnqueueEmailV1(Jwt.AccessToken,
+            var email = await alert.Enqueue_EmailV1(Jwt.AccessToken.ToString(),
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -152,17 +152,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
-            if (UoW.Situation == ContextType.UnitTest)
+            if (UoW.Situation == ExecutionType.UnitTest)
                 return Ok(token);
 
             var url = UrlBuilder.ConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Situation);
+            var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var email = await alert.EnqueueTextV1(Jwt.AccessToken,
+            var email = await alert.Enqueue_TextV1(Jwt.AccessToken.ToString(),
                 new TextCreate()
                 {
                     FromId = user.Id,

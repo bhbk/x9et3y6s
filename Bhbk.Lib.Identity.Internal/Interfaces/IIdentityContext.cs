@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Internal.Interfaces
     {
         IMapper Transform { get; }
         ActivityRepository ActivityRepo { get; }
+        ClaimRepository ClaimRepo { get; }
         ClientRepository ClientRepo { get; }
         ConfigRepository ConfigRepo { get; }
         IssuerRepository IssuerRepo { get; }

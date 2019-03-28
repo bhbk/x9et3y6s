@@ -4,8 +4,8 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -32,9 +32,42 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
         }
 
         [Fact(Skip = "NotImplemented")]
-        public async Task Admin_UserV1_AddClaim_Success()
+        public async Task Admin_UserV1_AddToClaim_Success()
         {
 
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_AddToLogin_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+
+            var login = await _factory.UoW.LoginRepo.CreateAsync(
+                new LoginCreate()
+                {
+                    Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1,
+                    LoginKey = Strings.ApiUnitTestLogin1Key,
+                    Enabled = true,
+                    Immutable = false,
+                });
+
+            await _factory.UoW.CommitAsync();
+
+            var response = await _endpoints.User_AddToLoginV1(access.token, user1.Id, login.Id);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            var check = await _factory.UoW.UserRepo.IsInLoginAsync(user1.Id, login.Id);
+            check.Should().BeTrue();
         }
 
         [Fact]
@@ -81,25 +114,25 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-            var model = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            var remove = await _factory.UoW.UserRepo.RemovePasswordAsync(model.Id);
+            var remove = await _factory.UoW.UserRepo.RemovePasswordAsync(user1.Id);
             remove.Should().BeTrue();
 
-            var response = await _endpoints.User_AddPasswordV1(access.token, model.Id,
+            var response = await _endpoints.User_AddPasswordV1(access.token, user1.Id,
                 new UserAddPassword()
                 {
-                    Id = model.Id,
+                    Id = user1.Id,
                     NewPassword = Strings.ApiUnitTestUserPassNew,
-                    NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
+                    NewPasswordConfirm = Strings.ApiUnitTestUserPassNew,
                 });
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _factory.UoW.UserRepo.IsPasswordSetAsync(model.Id);
+            var check = await _factory.UoW.UserRepo.IsPasswordSetAsync(user1.Id);
             check.Should().BeTrue();
         }
 
@@ -222,12 +255,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            var model = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-            model.Immutable = true;
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            user1.Immutable = true;
 
-            await _factory.UoW.UserRepo.UpdateAsync(model);
+            await _factory.UoW.UserRepo.UpdateAsync(user1);
 
-            response = await _endpoints.User_DeleteV1(access.token, model.Id);
+            response = await _endpoints.User_DeleteV1(access.token, user1.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -242,23 +275,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-
-            var model = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.User_DeleteV1(access.token, model.Id);
+            var response = await _endpoints.User_DeleteV1(access.token, user1.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = (await _factory.UoW.UserRepo.GetAsync(x => x.Id == model.Id)).Any();
+            var check = (await _factory.UoW.UserRepo.GetAsync(x => x.Id == user1.Id)).Any();
             check.Should().BeFalse();
-        }
-
-        [Fact(Skip = "NotImplemented")]
-        public async Task Admin_UserV1_DeleteClaim_Success()
-        {
-
         }
 
         [Fact]
@@ -400,6 +426,50 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             ok.Count().Should().Be((await _factory.UoW.UserRepo.GetRolesAsync(user.Id)).Count());
         }
 
+        [Fact(Skip = "NotImplemented")]
+        public async Task Admin_UserV1_RemoveFromClaim_Success()
+        {
+
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_RemoveFromLogin_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+
+            var login = await _factory.UoW.LoginRepo.CreateAsync(
+                new LoginCreate()
+                {
+                    Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestLogin1,
+                    LoginKey = Strings.ApiUnitTestLogin1Key,
+                    Enabled = true,
+                    Immutable = false,
+                });
+
+            await _factory.UoW.CommitAsync();
+
+            var add = await _factory.UoW.UserRepo.AddToLoginAsync(user1, login);
+            add.Should().BeTrue();
+
+            await _factory.UoW.CommitAsync();
+
+            var response = await _endpoints.User_RemoveFromLoginV1(access.token, user1.Id, login.Id);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            var check = await _factory.UoW.UserRepo.IsInLoginAsync(user1.Id, login.Id);
+            check.Should().BeFalse();
+        }
+
         [Fact]
         public async Task Admin_UserV1_RemovePassword_Fail()
         {
@@ -444,15 +514,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-            var model = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.User_RemovePasswordV1(access.token, model.Id);
+            var response = await _endpoints.User_RemovePasswordV1(access.token, user1.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _factory.UoW.UserRepo.IsPasswordSetAsync(model.Id);
+            var check = await _factory.UoW.UserRepo.IsPasswordSetAsync(user1.Id);
             check.Should().BeFalse();
         }
 
@@ -567,10 +637,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            var model = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-            model.FirstName += "(Updated)";
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            user1.FirstName += "(Updated)";
 
-            var response = await _endpoints.User_UpdateV1(access.token, _factory.UoW.Transform.Map<UserModel>(model));
+            var response = await _endpoints.User_UpdateV1(access.token, _factory.UoW.Transform.Map<UserModel>(user1));
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -578,7 +648,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<UserModel>();
 
-            check.FirstName.Should().Be(model.FirstName);
+            check.FirstName.Should().Be(user1.FirstName);
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public DateTime? LastUpdated { get; set; }
+        public bool Immutable { get; set; }
 
         public virtual AppUser Actor { get; set; }
         public virtual AppClient Client { get; set; }

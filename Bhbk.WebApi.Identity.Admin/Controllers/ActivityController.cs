@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var total = await UoW.ActivityRepo.CountAsync(preds);
 
-            var result = await UoW.ActivityRepo.GetAsync(preds, null, 
+            var result = await UoW.ActivityRepo.GetAsync(preds, null,
                 x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), model.Skip, model.Take);
 
             //Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> ords = x => GenerateOrders(model.Orders);
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
                 if (sortExpressions[i].Item2 == "asc")
                 {
-                    if(i == 1)
+                    if (i == 1)
                         orderedQuery.OrderBy(expression);
                     else
                         orderedQuery.ThenBy(expression);

@@ -15,7 +15,6 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public Guid ClientId { get; set; }
         public Guid? ActorId { get; set; }
         public string Name { get; set; }
-        public string NormalizedName { get; set; }
         public string Description { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }

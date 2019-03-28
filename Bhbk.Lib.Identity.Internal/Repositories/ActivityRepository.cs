@@ -15,11 +15,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ActivityRepository : IGenericRepository<ActivityCreate, AppActivity, Guid>
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public ActivityRepository(AppDbContext context, ContextType situation, IMapper mapper)
+        public ActivityRepository(AppDbContext context, ExecutionType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -67,10 +67,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.AppActivity.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppActivity>> GetAsync(Expression<Func<AppActivity, bool>> predicates = null, 
-            Func<IQueryable<AppActivity>, IIncludableQueryable<AppActivity, object>> includes = null, 
-            Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> orders = null, 
-            int? skip = null, 
+        public async Task<IEnumerable<AppActivity>> GetAsync(Expression<Func<AppActivity, bool>> predicates = null,
+            Func<IQueryable<AppActivity>, IIncludableQueryable<AppActivity, object>> includes = null,
+            Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> orders = null,
+            int? skip = null,
             int? take = null)
         {
             var query = _context.AppActivity.AsQueryable();

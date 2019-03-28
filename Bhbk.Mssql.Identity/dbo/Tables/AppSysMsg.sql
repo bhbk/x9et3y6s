@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[SystemError] (
+﻿CREATE TABLE [dbo].[AppSysMsg] (
     [ErrorID]        NUMERIC (18)   IDENTITY (1, 1) NOT NULL,
     [ErrorDate]      DATETIME       NOT NULL,
     [ErrorNumber]    INT            NOT NULL,

@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[AppUserToken] (
+﻿CREATE TABLE [dbo].[AppUserCode] (
     [Id]         UNIQUEIDENTIFIER NOT NULL,
     [UserId]     UNIQUEIDENTIFIER NOT NULL,
     [Code]       NVARCHAR (MAX)   NOT NULL,
@@ -11,5 +11,5 @@
 
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_AppUserToken]
-    ON [dbo].[AppUserToken]([Id] ASC, [UserId] ASC);
+    ON [dbo].[AppUserCode]([Id] ASC, [UserId] ASC);
 

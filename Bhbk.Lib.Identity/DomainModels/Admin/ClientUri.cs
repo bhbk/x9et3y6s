@@ -17,9 +17,15 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         [DefaultValue(true)]
         public bool Enabled { get; set; }
+
+        [DefaultValue(false)]
+        public bool Immutable { get; set; }
     }
 
-    public class ClientUriCreate : ClientUriBase { }
+    public class ClientUriCreate : ClientUriBase
+    {
+
+    }
 
     public class ClientUriModel : ClientUriBase
     {

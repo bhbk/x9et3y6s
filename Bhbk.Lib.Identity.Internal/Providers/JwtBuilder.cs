@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ContextType.UnitTest
+            if (uow.Situation == ExecutionType.UnitTest
                 && uow.ConfigRepo.UnitTestsAccessToken)
             {
                 issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
@@ -75,7 +75,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ContextType.UnitTest
+            if (uow.Situation == ExecutionType.UnitTest
                 && uow.ConfigRepo.UnitTestsAccessToken)
             {
                 issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
@@ -116,7 +116,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ContextType.UnitTest
+            if (uow.Situation == ExecutionType.UnitTest
                 && uow.ConfigRepo.UnitTestsAccessToken)
             {
                 issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
@@ -158,7 +158,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ContextType.UnitTest 
+            if (uow.Situation == ExecutionType.UnitTest
                 && uow.ConfigRepo.UnitTestsRefreshToken)
             {
                 issueDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow;
@@ -189,7 +189,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 ExpiresUtc = expireDate
             };
 
-            if(!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
+            if (!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
                 throw new InvalidOperationException();
 
             return result;
@@ -209,7 +209,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ContextType.UnitTest 
+            if (uow.Situation == ExecutionType.UnitTest
                 && uow.ConfigRepo.UnitTestsRefreshToken)
             {
                 issueDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow;
@@ -240,7 +240,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 ExpiresUtc = expireDate
             };
 
-            if(!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
+            if (!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
                 throw new InvalidOperationException();
 
             return result;

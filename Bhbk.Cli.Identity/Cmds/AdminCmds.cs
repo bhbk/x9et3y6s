@@ -3,10 +3,10 @@ using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -57,11 +57,11 @@ namespace Bhbk.Cli.Identity.Cmds
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _admin = new AdminClient(_conf, ContextType.Live, new HttpClient());
-                _sts = new StsClient(_conf, ContextType.Live, new HttpClient());
-                _jwt = new JwtContext(_conf, ContextType.Live, new HttpClient());
+                _admin = new AdminClient(_conf, ExecutionType.Live, new HttpClient());
+                _sts = new StsClient(_conf, ExecutionType.Live, new HttpClient());
+                _jwt = new JwtContext(_conf, ExecutionType.Live, new HttpClient());
 
-                for(int i = 0; i < 20; i++)
+                for (int i = 0; i < 20; i++)
                     System.Console.WriteLine(RandomValues.CreateBase64String(32));
 
                 if (_create == false && _destroy == false)
@@ -158,6 +158,47 @@ namespace Bhbk.Cli.Identity.Cmds
                                 else
                                     throw new ConsoleHelpAsException("FAILED destroy client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + clientID.ToString());
+                            }
+                        }
+
+                        break;
+
+                    case CmdType.login:
+
+                        if (_create)
+                        {
+                            var loginName = PromptForInput(CmdType.login);
+                            var loginID = Guid.Empty;
+
+                            if (CheckLogin(loginName, ref loginID))
+                                Console.WriteLine(Environment.NewLine + "FOUND login \"" + loginName
+                                    + Environment.NewLine + "\tID is " + loginID.ToString());
+                            else
+                            {
+                                loginID = CreateLogin(loginName);
+
+                                if (loginID != Guid.Empty)
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create login \"" + loginName + "\""
+                                        + Environment.NewLine + "\tID is " + loginID.ToString());
+                                else
+                                    throw new ConsoleHelpAsException("FAILED create login \"" + loginName + "\"");
+                            }
+                        }
+                        else if (_destroy)
+                        {
+                            var loginName = PromptForInput(CmdType.login);
+                            var loginID = Guid.Empty;
+
+                            if (!CheckLogin(loginName, ref loginID))
+                                Console.WriteLine(Environment.NewLine + "FAILED find login \"" + loginName + "\"");
+                            else
+                            {
+                                if (DeleteLogin(loginID))
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy login \"" + loginName + "\""
+                                        + Environment.NewLine + "\tID is " + loginID.ToString());
+                                else
+                                    throw new ConsoleHelpAsException("FAILED destroy login \"" + loginName + "\""
+                                        + Environment.NewLine + "\tID is " + loginID.ToString());
                             }
                         }
 
@@ -301,7 +342,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             else
                                 throw new ConsoleHelpAsException("FAILED find login \"" + loginName + "\"");
 
-                            if (AddUserToLogin(loginID, userID))
+                            if (AddUserToLogin(userID, loginID))
                                 Console.WriteLine(Environment.NewLine + "SUCCESS add login \"" + loginName + "\" to user \"" + userName + "\"");
                             else
                                 throw new ConsoleHelpAsException("FAILED add login \"" + loginName + "\" to user \"" + userName + "\"");
@@ -362,18 +403,9 @@ namespace Bhbk.Cli.Identity.Cmds
             }
         }
 
-        private bool AddUserToLogin(Guid loginID, Guid userID)
+        private bool AddUserToLogin(Guid userID, Guid loginID)
         {
-            var result = _admin.Login_AddUserV1(_jwt.AccessToken.RawData, loginID, userID,
-                new UserLoginCreate()
-                {
-                    UserId = userID,
-                    LoginId = loginID,
-                    LoginProvider = Strings.ApiDefaultLogin,
-                    ProviderDisplayName = Strings.ApiDefaultLogin,
-                    ProviderKey = Strings.ApiDefaultLoginKey,
-                    Enabled = true,
-                }).Result;
+            var result = _admin.User_AddToLoginV1(_jwt.AccessToken.RawData, userID, loginID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -441,7 +473,7 @@ namespace Bhbk.Cli.Identity.Cmds
             {
                 var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
 
-                if (content["loginProvider"].Value<string>() == login)
+                if (content["name"].Value<string>() == login)
                 {
                     loginID = Guid.Parse(content["id"].Value<string>());
                     return true;
@@ -539,6 +571,31 @@ namespace Bhbk.Cli.Identity.Cmds
             return Guid.Empty;
         }
 
+        private Guid CreateLogin(string login)
+        {
+            var result = _admin.Login_CreateV1(_jwt.AccessToken.RawData,
+                new LoginCreate()
+                {
+                    Name = login,
+                    Enabled = true,
+                }).Result;
+
+            if (result.IsSuccessStatusCode)
+            {
+                var content = JObject.Parse(result.Content.ReadAsStringAsync().Result);
+
+                if (content["name"].Value<string>() == login)
+                    return Guid.Parse(content["id"].Value<string>());
+
+                Console.WriteLine(Strings.MsgLoginInvalid);
+            }
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return Guid.Empty;
+        }
+
         private Guid CreateRole(Guid clientID, string role)
         {
             var result = _admin.Role_CreateV1(_jwt.AccessToken.RawData,
@@ -611,6 +668,19 @@ namespace Bhbk.Cli.Identity.Cmds
         private bool DeleteIssuer(Guid issuerID)
         {
             var result = _admin.Issuer_DeleteV1(_jwt.AccessToken.RawData, issuerID).Result;
+
+            if (result.IsSuccessStatusCode)
+                return true;
+
+            Console.WriteLine(result.RequestMessage
+                + Environment.NewLine + result);
+
+            return false;
+        }
+
+        private bool DeleteLogin(Guid loginID)
+        {
+            var result = _admin.Login_DeleteV1(_jwt.AccessToken.RawData, loginID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;

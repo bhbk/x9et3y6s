@@ -57,10 +57,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             user.ActorId = GetUserGUID();
 
-            if(!await UoW.UserRepo.RemovePasswordAsync(user.Id))
+            if (!await UoW.UserRepo.RemovePasswordAsync(user.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            if(!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
+            if (!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user.TwoFactorEnabled == status)
                 return BadRequest(Strings.MsgUserInvalidTwoFactor);
 
-            if(!await UoW.UserRepo.SetTwoFactorEnabledAsync(user.Id, status))
+            if (!await UoW.UserRepo.SetTwoFactorEnabledAsync(user.Id, status))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

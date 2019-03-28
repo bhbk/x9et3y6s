@@ -4,6 +4,7 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -148,15 +149,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-            var model = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+
+            var issuer2 = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.Issuer_DeleteV1(access.token, model.Id);
+            var response = await _endpoints.Issuer_DeleteV1(access.token, issuer2.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Id == model.Id)).Any();
+            var check = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Id == issuer2.Id)).Any();
             check.Should().BeFalse();
         }
 
@@ -169,10 +171,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-            var model = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+
+            var issuer1 = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.Issuer_GetV1(access.token, model.Id.ToString());
+            var response = await _endpoints.Issuer_GetV1(access.token, issuer1.Id.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -180,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<IssuerModel>();
 
-            response = await _endpoints.Issuer_GetV1(access.token, model.Name);
+            response = await _endpoints.Issuer_GetV1(access.token, issuer1.Name);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -226,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             list.Count().Should().Be(take);
             count.Should().Be(await _factory.UoW.IssuerRepo.CountAsync());
         }
-        
+
         [Fact]
         public async Task Admin_IssuerV1_Update_Fail()
         {
@@ -274,10 +277,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            var model = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            model.Name += "(Updated)";
+            var issuer2 = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            issuer2.Name += "(Updated)";
 
-            var response = await _endpoints.Issuer_UpdateV1(access.token, _factory.UoW.Transform.Map<IssuerModel>(model));
+            var response = await _endpoints.Issuer_UpdateV1(access.token, _factory.UoW.Transform.Map<IssuerModel>(issuer2));
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -285,7 +288,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<IssuerModel>();
 
-            check.Name.Should().Be(model.Name);
+            check.Name.Should().Be(issuer2.Name);
         }
     }
 }

@@ -24,6 +24,24 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             CreateMap<ActivityModel, AppActivity>()
                 .ForMember(dest => dest.Actor, src => src.Ignore());
 
+            //claim models
+            CreateMap<ClaimCreate, AppClaim>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
+                .ForMember(dest => dest.Actor, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.AppRoleClaim, src => src.Ignore())
+                .ForMember(dest => dest.AppUserClaim, src => src.Ignore());
+
+            CreateMap<ClaimModel, AppClaim>()
+                .ForMember(dest => dest.Actor, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.AppRoleClaim, src => src.Ignore())
+                .ForMember(dest => dest.AppUserClaim, src => src.Ignore());
+
+            CreateMap<AppClaim, ClaimModel>();
+
             //client models
             CreateMap<ClientCreate, AppClient>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
@@ -59,6 +77,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
+                .ForMember(dest => dest.AppClaim, src => src.Ignore())
                 .ForMember(dest => dest.AppClient, src => src.Ignore())
                 .ForMember(dest => dest.AppUserRefresh, src => src.Ignore());
 
@@ -67,12 +86,16 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                     .ToDictionary(x => x.Id, x => x.Name)));
 
             CreateMap<IssuerModel, AppIssuer>()
+                .ForMember(dest => dest.AppClaim, src => src.Ignore())
                 .ForMember(dest => dest.AppClient, src => src.Ignore())
                 .ForMember(dest => dest.AppUserRefresh, src => src.Ignore());
 
             //login models
             CreateMap<LoginCreate, AppLogin>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+                .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.AppUserLogin, src => src.Ignore());
 
             CreateMap<AppLogin, LoginModel>()
@@ -85,7 +108,6 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             //role models
             CreateMap<RoleCreate, AppRole>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.NormalizedName, src => src.MapFrom(val => val.Name))
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
@@ -101,17 +123,13 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             CreateMap<RoleModel, AppRole>()
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
-                .ForMember(dest => dest.NormalizedName, src => src.Ignore())
                 .ForMember(dest => dest.AppRoleClaim, src => src.Ignore())
                 .ForMember(dest => dest.AppUserRole, src => src.Ignore());
 
             //user models
             CreateMap<UserCreate, AppUser>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.Email))
-                .ForMember(dest => dest.NormalizedUserName, src => src.MapFrom(val => val.Email))
                 .ForMember(dest => dest.Email, src => src.MapFrom(val => val.Email))
-                .ForMember(dest => dest.NormalizedEmail, src => src.MapFrom(val => val.Email))
                 .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => false))
                 .ForMember(dest => dest.PhoneNumberConfirmed, src => src.MapFrom(val => false))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
@@ -127,51 +145,31 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
                 .ForMember(dest => dest.TwoFactorEnabled, src => src.MapFrom(val => false))
                 .ForMember(dest => dest.AppActivity, src => src.Ignore())
+                .ForMember(dest => dest.AppClaim, src => src.Ignore())
                 .ForMember(dest => dest.AppClientUri, src => src.Ignore())
                 .ForMember(dest => dest.AppUserClaim, src => src.Ignore())
+                .ForMember(dest => dest.AppUserCode, src => src.Ignore())
                 .ForMember(dest => dest.AppUserLogin, src => src.Ignore())
                 .ForMember(dest => dest.AppUserRefresh, src => src.Ignore())
-                .ForMember(dest => dest.AppUserRole, src => src.Ignore())
-                .ForMember(dest => dest.AppUserToken, src => src.Ignore());
+                .ForMember(dest => dest.AppUserRole, src => src.Ignore());
 
             CreateMap<AppUser, UserModel>()
                 .ForMember(dest => dest.Logins, src => src.MapFrom(val => val.AppUserLogin.Where(x => x.UserId == val.Id)
-                    .ToDictionary(x => x.LoginId, x => x.LoginProvider)))
+                    .ToDictionary(x => x.LoginId, x => x.Login.Name)))
                 .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.AppUserRole.Where(x => x.UserId == val.Id)
                     .ToDictionary(x => x.Role.Id, x => x.Role.Name)));
 
             CreateMap<UserModel, AppUser>()
-                .ForMember(dest => dest.UserName, src => src.Ignore())
-                .ForMember(dest => dest.NormalizedUserName, src => src.Ignore())
-                .ForMember(dest => dest.NormalizedEmail, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
                 .ForMember(dest => dest.AppActivity, src => src.Ignore())
+                .ForMember(dest => dest.AppClaim, src => src.Ignore())
                 .ForMember(dest => dest.AppClientUri, src => src.Ignore())
                 .ForMember(dest => dest.AppUserClaim, src => src.Ignore())
                 .ForMember(dest => dest.AppUserLogin, src => src.Ignore())
+                .ForMember(dest => dest.AppUserCode, src => src.Ignore())
                 .ForMember(dest => dest.AppUserRefresh, src => src.Ignore())
-                .ForMember(dest => dest.AppUserRole, src => src.Ignore())
-                .ForMember(dest => dest.AppUserToken, src => src.Ignore());
-
-            //user claim models
-            CreateMap<UserClaimCreate, AppUserClaim>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.User, src => src.Ignore());
-
-            CreateMap<AppUserClaim, UserClaimModel>()
-                .ForMember(dest => dest.Properties, src => src.Ignore());
-
-            //user login models
-            CreateMap<UserLoginCreate, AppUserLogin>()
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.Login, src => src.Ignore())
-                .ForMember(dest => dest.User, src => src.Ignore());
-
-            CreateMap<AppUserLogin, UserLoginModel>();
+                .ForMember(dest => dest.AppUserRole, src => src.Ignore());
 
             //user refresh models
             CreateMap<UserRefreshCreate, AppUserRefresh>()

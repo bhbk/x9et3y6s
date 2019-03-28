@@ -49,16 +49,18 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         #region Configuration Constants (Unit Tests)
 
-        public const string ApiUnitTestIssuer1 = "IssuerUnitTests1";
-        public const string ApiUnitTestIssuer1Key = "IssuerUnitTests1Key";
-        public const string ApiUnitTestIssuer2 = "IssuerUnitTests2";
-        public const string ApiUnitTestIssuer2Key = "IssuerUnitTests2Key";
         public const string ApiUnitTestClient1 = "ClientUnitTests1";
         public const string ApiUnitTestClient1Key = "ClientUnitTests1Key";
         public const string ApiUnitTestClient2 = "ClientUnitTests2";
         public const string ApiUnitTestClient2Key = "ClientUnitTests2Key";
-        public const string ApiUnitTestClaimType = "ClaimTypeUnitTests";
-        public const string ApiUnitTestClaimValue = "ClaimValueUnitTests";
+        public const string ApiUnitTestClaim1 = "ClaimUnitTests1";
+        public const string ApiUnitTestClaim2 = "ClaimUnitTests2";
+        public const string ApiUnitTestEmailContent = "EmailUnitTestsContent";
+        public const string ApiUnitTestEmailSubject = "EmailUnitTestsSubject";
+        public const string ApiUnitTestIssuer1 = "IssuerUnitTests1";
+        public const string ApiUnitTestIssuer1Key = "IssuerUnitTests1Key";
+        public const string ApiUnitTestIssuer2 = "IssuerUnitTests2";
+        public const string ApiUnitTestIssuer2Key = "IssuerUnitTests2Key";
         public const string ApiUnitTestLogin1 = "LoginUnitTests1";
         public const string ApiUnitTestLogin1Key = "LoginUnitTests1Key";
         public const string ApiUnitTestLogin2 = "LoginUnitTests2";
@@ -66,7 +68,9 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string ApiUnitTestRole1 = "RoleUnitTests1";
         public const string ApiUnitTestRole2 = "RoleUnitTests2";
         public const string ApiUnitTestUser1 = "unittestuser1@local";
+        public const string ApiUnitTestUser1Phone = "+00000000000";
         public const string ApiUnitTestUser2 = "unittestuser2@local";
+        public const string ApiUnitTestUser2Phone = "+00000000000";
         public const string ApiUnitTestUserPassCurrent = "te$tpa$$word01!";
         public const string ApiUnitTestUserPassNew = "te$tpa$$word01!new";
         public const string ApiUnitTestUri1 = "UrlUnitTests1";
@@ -78,6 +82,10 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         #region Messages
 
+        public const string MsgClaimAlreadyExists = "Claim already exists";
+        public const string MsgClaimImmutable = "Claim is immutable";
+        public const string MsgClaimInvalid = "Claim is invalid or disabled";
+        public const string MsgClaimNotExist = "Claim does not exist";
         public const string MsgClientAlreadyExists = "Client already exists";
         public const string MsgClientImmutable = "Client is immutable";
         public const string MsgClientInvalid = "Client is invalid or disabled";

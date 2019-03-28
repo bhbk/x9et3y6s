@@ -15,6 +15,7 @@ namespace Bhbk.Cli.Identity
     {
         client,
         issuer,
+        login,
         role,
         rolemap,
         user,

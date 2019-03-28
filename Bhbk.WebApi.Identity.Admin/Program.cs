@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Identity.Admin
             WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(_conf)
                 .UseStartup<Startup>()
-                .UseKestrel(options => 
+                .UseKestrel(options =>
                 {
                     options.ConfigureEndpoints();
                 })

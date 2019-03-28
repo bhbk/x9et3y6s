@@ -187,8 +187,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
-                else if (logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any()
-                    || (uow.Situation == ContextType.UnitTest && logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any()))
+                else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
+                    || (uow.Situation == ExecutionType.UnitTest && logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1)).Any()))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -370,8 +370,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
-                else if (logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any()
-                    || (logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ContextType.UnitTest))
+                else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
+                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ExecutionType.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -544,8 +544,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
-                else if (logins.Where(x => x.LoginProvider == Strings.ApiDefaultLogin).Any()
-                    || (logins.Where(x => x.LoginProvider.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ContextType.UnitTest))
+                else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
+                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ExecutionType.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)

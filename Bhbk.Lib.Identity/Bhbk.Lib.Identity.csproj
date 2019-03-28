@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.1.0" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="2.0.2" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2019.3.24.1140" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2019.3.28.28" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="2.2.0" />
@@ -22,8 +22,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DomainModels\Me\" />
   </ItemGroup>
 
 </Project>

@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClientV1([FromRoute] string clientValue)
         {
             Guid clientID;
-            AppClient client;
+            AppClient client = null;
 
             if (Guid.TryParse(clientValue, out clientID))
                 client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
@@ -105,10 +105,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.ClientRepo.CountAsync(preds);
-            var result = await UoW.ClientRepo.GetAsync(preds, 
-                x => x.Include(r => r.AppRole), 
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
-                model.Skip, 
+            var result = await UoW.ClientRepo.GetAsync(preds,
+                x => x.Include(r => r.AppRole),
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                model.Skip,
                 model.Take);
 
             return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClientModel>>(result) });

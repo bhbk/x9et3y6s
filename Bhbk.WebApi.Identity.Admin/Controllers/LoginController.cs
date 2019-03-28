@@ -4,7 +4,6 @@ using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -22,32 +21,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public LoginController() { }
 
-        [Route("v1/{loginID:guid}/add/{userID:guid}"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> AddLoginToUserV1([FromRoute] Guid loginID, [FromRoute] Guid userID, [FromBody] UserLoginCreate model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
-
-            if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            if(!await UoW.UserRepo.AddLoginAsync(user.Id,
-                new UserLoginInfo(model.LoginProvider, model.ProviderKey, model.ProviderDisplayName)))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> CreateLoginV1([FromBody] LoginCreate model)
@@ -57,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var check = await UoW.LoginRepo.GetAsync(x => x.LoginProvider == model.LoginProvider);
+            var check = await UoW.LoginRepo.GetAsync(x => x.Name == model.Name);
 
             if (check.Any())
                 return BadRequest(Strings.MsgLoginAlreadyExists);
@@ -95,13 +68,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetLoginV1([FromRoute] string loginValue)
         {
             Guid loginID;
-            AppLogin login;
+            AppLogin login = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
                 login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
             else
-                login = (await UoW.LoginRepo.GetAsync(x => x.LoginProvider == loginValue)).SingleOrDefault();
+                login = (await UoW.LoginRepo.GetAsync(x => x.Name == loginValue)).SingleOrDefault();
 
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
@@ -124,13 +97,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.LoginProvider.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower());
 
             var total = await UoW.LoginRepo.CountAsync(preds);
-            var result = await UoW.LoginRepo.GetAsync(preds, 
-                x => x.Include(l => l.AppUserLogin), 
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
-                model.Skip, 
+            var result = await UoW.LoginRepo.GetAsync(preds,
+                x => x.Include(l => l.AppUserLogin),
+                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                model.Skip,
                 model.Take);
 
             return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<LoginModel>>(result) });
@@ -149,31 +122,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var result = users.Select(x => UoW.Transform.Map<UserModel>(x));
 
             return Ok(result);
-        }
-
-        [Route("v1/{loginID:guid}/remove/{userID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> RemoveLoginFromUserV1([FromRoute] Guid loginID, [FromRoute] Guid userID)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
-
-            if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            if(!await UoW.UserRepo.RemoveLoginAsync(user.Id, login.LoginProvider, string.Empty))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
         }
 
         [Route("v1"), HttpPut]

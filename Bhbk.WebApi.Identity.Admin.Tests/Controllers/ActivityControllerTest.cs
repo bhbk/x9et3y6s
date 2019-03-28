@@ -4,6 +4,7 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -64,13 +65,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("created", "desc"));
 
-            var model = new CascadePager()
-            {
-                Filter = string.Empty,
-                Orders = orders,
-            };
-
-            response = await _endpoints.Activity_GetV1(access.token, model);
+            response = await _endpoints.Activity_GetV1(access.token,
+                new CascadePager()
+                {
+                    Filter = string.Empty,
+                    Orders = orders,
+                });
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -93,15 +93,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("created", "asc"));
 
-            var model = new CascadePager()
-            {
-                Filter = string.Empty,
-                Orders = orders,
-                Skip = 1,
-                Take = take,
-            };
-
-            for(int i = 0; i <= take; i++)
+            for (int i = 0; i <= take; i++)
                 await _factory.UoW.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     ActorId = user.Id,
@@ -111,7 +103,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             await _factory.UoW.CommitAsync();
 
-            var response = await _endpoints.Activity_GetV1(access.token, model);
+            var response = await _endpoints.Activity_GetV1(access.token,
+                new CascadePager()
+                {
+                    Filter = string.Empty,
+                    Orders = orders,
+                    Skip = 1,
+                    Take = take,
+                });
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);

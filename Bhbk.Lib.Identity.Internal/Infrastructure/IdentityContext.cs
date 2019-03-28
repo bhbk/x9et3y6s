@@ -14,10 +14,11 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public class IdentityContext : IIdentityContext<AppDbContext>
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly ActivityRepository _activityRepo;
+        private readonly ClaimRepository _claimRepo;
         private readonly ClientRepository _clientRepo;
         private readonly ConfigRepository _configRepo;
         private readonly IssuerRepository _issuerRepo;
@@ -26,19 +27,19 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         private readonly UserRepository _userRepo;
         private UserQuotes _userQuote;
 
-        public IdentityContext(DbContextOptions<AppDbContext> options, ContextType situation, IConfigurationRoot conf, IMapper mapper)
+        public IdentityContext(DbContextOptions<AppDbContext> options, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
             : this(new AppDbContext(options), situation, conf, mapper)
         {
 
         }
 
-        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ContextType situation, IConfigurationRoot conf, IMapper mapper)
+        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
             : this(new AppDbContext(optionsBuilder.Options), situation, conf, mapper)
         {
 
         }
 
-        private IdentityContext(AppDbContext context, ContextType situation, IConfigurationRoot conf, IMapper mapper)
+        private IdentityContext(AppDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
         {
             _disposed = false;
 
@@ -50,6 +51,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             _mapper = mapper;
 
             _activityRepo = new ActivityRepository(_context, _situation, _mapper);
+            _claimRepo = new ClaimRepository(_context, _situation, _mapper);
             _clientRepo = new ClientRepository(_context, _situation, conf, _mapper);
             _configRepo = new ConfigRepository(conf, _situation);
             _issuerRepo = new IssuerRepository(_context, _situation, mapper, conf["IdentityTenants:Salt"]);
@@ -66,7 +68,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             }
         }
 
-        public ContextType Situation
+        public ExecutionType Situation
         {
             get
             {
@@ -87,6 +89,14 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             get
             {
                 return _activityRepo;
+            }
+        }
+
+        public ClaimRepository ClaimRepo
+        {
+            get
+            {
+                return _claimRepo;
             }
         }
 

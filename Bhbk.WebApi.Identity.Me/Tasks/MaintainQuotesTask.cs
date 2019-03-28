@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         {
             var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
 
-            if (uow.Situation == ContextType.UnitTest)
+            if (uow.Situation == ExecutionType.UnitTest)
                 QuoteOfDay = JsonConvert.DeserializeObject<UserQuotes>
                     (File.ReadAllText(_output));
             else

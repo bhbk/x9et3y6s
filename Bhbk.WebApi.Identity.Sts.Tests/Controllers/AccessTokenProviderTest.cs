@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
@@ -16,14 +15,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class IssuerRepository : IGenericRepository<IssuerCreate, AppIssuer, Guid>
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private readonly string _salt;
 
         public string Salt { get => _salt; }
 
-        public IssuerRepository(AppDbContext context, ContextType situation, IMapper mapper, string salt)
+        public IssuerRepository(AppDbContext context, ExecutionType situation, IMapper mapper, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -72,10 +71,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.AppIssuer.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppIssuer>> GetAsync(Expression<Func<AppIssuer, bool>> predicates = null, 
-            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null, 
-            Func<IQueryable<AppIssuer>, IOrderedQueryable<AppIssuer>> orders = null, 
-            int? skip = null, 
+        public async Task<IEnumerable<AppIssuer>> GetAsync(Expression<Func<AppIssuer, bool>> predicates = null,
+            Func<IQueryable<AppIssuer>, IIncludableQueryable<AppIssuer, object>> includes = null,
+            Func<IQueryable<AppIssuer>, IOrderedQueryable<AppIssuer>> orders = null,
+            int? skip = null,
             int? take = null)
         {
             var query = _context.AppIssuer.AsQueryable();

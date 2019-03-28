@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
     {
         public AppIssuer()
         {
+            AppClaim = new HashSet<AppClaim>();
             AppClient = new HashSet<AppClient>();
             AppUserRefresh = new HashSet<AppUserRefresh>();
         }
@@ -21,6 +22,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 
+        public virtual ICollection<AppClaim> AppClaim { get; set; }
         public virtual ICollection<AppClient> AppClient { get; set; }
         public virtual ICollection<AppUserRefresh> AppUserRefresh { get; set; }
     }

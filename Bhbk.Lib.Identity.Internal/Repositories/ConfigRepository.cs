@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ConfigRepository
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private UInt32 _defaultsAccessTokenExpire;
         private UInt32 _defaultsAuthorizationCodeExpire;
         private UInt32 _defaultsBrowserCookieExpire;
@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private DateTime _unitTestsAccessTokenFakeUtcNow;
         private DateTime _unitTestsRefreshTokenFakeUtcNow;
 
-        public ConfigRepository(IConfigurationRoot conf, ContextType situation)
+        public ConfigRepository(IConfigurationRoot conf, ExecutionType situation)
         {
             _situation = situation;
             _defaultsAccessTokenExpire = UInt32.Parse(conf["IdentityDefaults:AccessTokenExpire"]);

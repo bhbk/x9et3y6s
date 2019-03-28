@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -10,50 +9,41 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Providers
+namespace Bhbk.Lib.Identity.Providers
 {
     public class AdminClient : AdminEndpoints
     {
-        public AdminClient(IConfigurationRoot conf, ContextType situation, HttpClient http)
+        public AdminClient(IConfigurationRoot conf, ExecutionType situation, HttpClient http)
             : base(conf, situation, http) { }
-    }
-
-    public class AdminTester : AdminEndpoints
-    {
-        public AdminTester(IConfigurationRoot conf, TestServer server)
-            : base(conf, server) { }
     }
 
     //https://oauth.com/playground/
     public class AdminEndpoints
     {
         protected readonly IConfigurationRoot _conf;
-        protected readonly ContextType _situation;
+        protected readonly ExecutionType _situation;
         protected readonly HttpClient _http;
 
-        public AdminEndpoints(IConfigurationRoot conf, ContextType situation, HttpClient http)
+        public AdminEndpoints(IConfigurationRoot conf, ExecutionType situation, HttpClient http)
         {
             if (conf == null)
                 throw new ArgumentNullException();
-
-            var connect = new HttpClientHandler();
-
-            //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
-            connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
 
             _situation = situation;
             _conf = conf;
-            _http = http;
-        }
 
-        public AdminEndpoints(IConfigurationRoot conf, TestServer server)
-        {
-            if (conf == null)
-                throw new ArgumentNullException();
+            if (situation == ExecutionType.Live)
+            {
+                var connect = new HttpClientHandler();
 
-            _situation = ContextType.UnitTest;
-            _conf = conf;
-            _http = server.CreateClient();
+                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
+                connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+
+                _http = new HttpClient(connect);
+            }
+
+            if (situation == ExecutionType.UnitTest)
+                _http = http;
         }
 
         public async Task<HttpResponseMessage> Activity_GetV1(string jwt, CascadePager model)
@@ -67,12 +57,110 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Claim_CreateV1(string jwt, ClaimCreate model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/claim/v1";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Claim_DeleteV1(string jwt, Guid claimID)
+        {
+            var endpoint = "/claim/v1/" + claimID.ToString();
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, string claim)
+        {
+            var endpoint = "/claim/v1/" + claim;
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, CascadePager model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/claim/v1/pages";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Claim_UpdateV1(string jwt, ClaimModel model)
+        {
+            var content = new StringContent(
+               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+            var endpoint = "/claim/v1";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.PutAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -88,12 +176,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -106,11 +194,11 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -123,12 +211,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -144,12 +232,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -165,12 +253,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -186,12 +274,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -204,12 +292,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -222,12 +310,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -240,12 +328,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -261,12 +349,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -282,33 +370,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> Login_AddUserV1(string jwt, Guid loginID, Guid userID, UserLoginCreate model)
-        {
-            var content = new StringContent(
-               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-
-            var endpoint = "/login/v1/" + loginID.ToString() + "/add/" + userID.ToString();
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _http.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -324,12 +391,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -342,12 +409,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -360,12 +427,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -381,12 +448,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -402,12 +469,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -420,12 +487,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -441,12 +508,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -459,12 +526,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -477,12 +544,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -498,12 +565,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -516,12 +583,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -537,12 +604,30 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_AddToLoginV1(string jwt, Guid userID, Guid loginID)
+        {
+            var endpoint = "/user/v1/" + userID.ToString() + "/add-to-login/" + loginID.ToString();
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -558,33 +643,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> User_CreateClaimV1(string jwt, UserClaimCreate model)
-        {
-            var content = new StringContent(
-               JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-
-            var endpoint = "/user/v1/" + model.UserId + "/claim";
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
-                return await _http.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -600,12 +664,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -621,12 +685,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -639,12 +703,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.DeleteAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -657,12 +721,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -675,12 +739,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -693,12 +757,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -714,12 +778,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PostAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -732,12 +796,30 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_RemoveFromLoginV1(string jwt, Guid userID, Guid loginID)
+        {
+            var endpoint = "/user/v1/" + userID.ToString() + "/remove-from-login/" + loginID.ToString();
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -750,12 +832,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -771,12 +853,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -792,12 +874,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ContextType.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            if (_situation == ContextType.IntegrationTest || _situation == ContextType.Live)
+            if (_situation == ExecutionType.Live)
                 return await _http.PutAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
         }

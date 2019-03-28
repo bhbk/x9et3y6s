@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;

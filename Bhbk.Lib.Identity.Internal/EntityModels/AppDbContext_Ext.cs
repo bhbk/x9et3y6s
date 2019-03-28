@@ -4,21 +4,25 @@ using System;
 
 namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
-    //https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
-    public partial class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
+    /*
+     * moving away from microsoft constructs for identity implementation because of un-needed additional 
+     * layers of complexity, and limitations, for the simple operations needing to be performed.
+     * 
+     * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
+     */
+
+    public partial class AppDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options) { }
+            : base(options)
+        {
+
+        }
 
         public AppDbContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder)
-            : base(optionsBuilder.Options) { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            : base(optionsBuilder.Options)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
 
-            }
         }
     }
 }

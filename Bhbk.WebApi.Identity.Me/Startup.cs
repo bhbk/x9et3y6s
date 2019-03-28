@@ -3,6 +3,8 @@ using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Interfaces;
@@ -54,10 +56,10 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton(conf);
             sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
             {
-                return new IdentityContext(options, ContextType.Live, conf, mapper);
+                return new IdentityContext(options, ExecutionType.Live, conf, mapper);
             });
             sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ContextType.Live, new HttpClient()));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();
@@ -66,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me
              * only live context allowed to run...
              */
 
-            if (uow.Situation != ContextType.Live)
+            if (uow.Situation != ExecutionType.Live)
                 throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()

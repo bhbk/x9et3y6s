@@ -1,5 +1,5 @@
 ﻿
-CREATE PROCEDURE [dbo].[uspSystem_PostRefreshTasks]
+CREATE PROCEDURE [dbo].[uspSys_ExDelete]
     @DatabaseUser			VARCHAR(255)
    ,@DatabaseSid			VARCHAR(255)
    
@@ -44,7 +44,7 @@ BEGIN
 */  -----------------------------------------------------------------------------------------------
 
     BEGIN CATCH
-		EXEC uspSystem_ErrorCreate;
+		EXEC uspSys_ExCreate;
         IF XACT_STATE() = -1
             ROLLBACK TRANSACTION;
         THROW;

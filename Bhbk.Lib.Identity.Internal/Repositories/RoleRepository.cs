@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
@@ -24,11 +23,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class RoleRepository : IGenericRepository<RoleCreate, AppRole, Guid>
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public RoleRepository(AppDbContext context, ContextType situation, IMapper mapper)
+        public RoleRepository(AppDbContext context, ExecutionType situation, IMapper mapper)
         {
             _context = context;
             _situation = situation;
@@ -73,10 +72,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.AppRole.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppRole>> GetAsync(Expression<Func<AppRole, bool>> predicates = null, 
-            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null, 
-            Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orders = null, 
-            int? skip = null, 
+        public async Task<IEnumerable<AppRole>> GetAsync(Expression<Func<AppRole, bool>> predicates = null,
+            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null,
+            Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orders = null,
+            int? skip = null,
             int? take = null)
         {
             var query = _context.AppRole.AsQueryable();

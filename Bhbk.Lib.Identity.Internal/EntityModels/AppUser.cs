@@ -8,21 +8,19 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public AppUser()
         {
             AppActivity = new HashSet<AppActivity>();
+            AppClaim = new HashSet<AppClaim>();
             AppClientUri = new HashSet<AppClientUri>();
             AppUserClaim = new HashSet<AppUserClaim>();
+            AppUserCode = new HashSet<AppUserCode>();
             AppUserLogin = new HashSet<AppUserLogin>();
             AppUserRefresh = new HashSet<AppUserRefresh>();
             AppUserRole = new HashSet<AppUserRole>();
-            AppUserToken = new HashSet<AppUserToken>();
         }
 
         public Guid Id { get; set; }
         public Guid? ActorId { get; set; }
-        public string UserName { get; set; }
         public string Email { get; set; }
         public bool EmailConfirmed { get; set; }
-        public string NormalizedUserName { get; set; }
-        public string NormalizedEmail { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
@@ -44,11 +42,12 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public bool Immutable { get; set; }
 
         public virtual ICollection<AppActivity> AppActivity { get; set; }
+        public virtual ICollection<AppClaim> AppClaim { get; set; }
         public virtual ICollection<AppClientUri> AppClientUri { get; set; }
         public virtual ICollection<AppUserClaim> AppUserClaim { get; set; }
+        public virtual ICollection<AppUserCode> AppUserCode { get; set; }
         public virtual ICollection<AppUserLogin> AppUserLogin { get; set; }
         public virtual ICollection<AppUserRefresh> AppUserRefresh { get; set; }
         public virtual ICollection<AppUserRole> AppUserRole { get; set; }
-        public virtual ICollection<AppUserToken> AppUserToken { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
@@ -20,12 +19,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ClientRepository : IGenericRepository<ClientCreate, AppClient, Guid>
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public ClientRepository(AppDbContext context, ContextType situation, IConfigurationRoot conf, IMapper mapper)
+        public ClientRepository(AppDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -140,10 +139,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.AppClient.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppClient>> GetAsync(Expression<Func<AppClient, bool>> predicates = null, 
-            Func<IQueryable<AppClient>, IIncludableQueryable<AppClient, object>> includes = null, 
-            Func<IQueryable<AppClient>, IOrderedQueryable<AppClient>> orders = null, 
-            int? skip = null, 
+        public async Task<IEnumerable<AppClient>> GetAsync(Expression<Func<AppClient, bool>> predicates = null,
+            Func<IQueryable<AppClient>, IIncludableQueryable<AppClient, object>> includes = null,
+            Func<IQueryable<AppClient>, IOrderedQueryable<AppClient>> orders = null,
+            int? skip = null,
             int? take = null)
         {
             var query = _context.AppClient.AsQueryable();

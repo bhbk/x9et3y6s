@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
@@ -17,11 +16,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class LoginRepository : IGenericRepository<LoginCreate, AppLogin, Guid>
     {
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public LoginRepository(AppDbContext context, ContextType situation, IMapper mapper)
+        public LoginRepository(AppDbContext context, ExecutionType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -118,7 +117,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
              * only persist certain fields.
              */
 
-            entity.LoginProvider = model.LoginProvider;
+            entity.Name = model.Name;
             entity.Immutable = model.Immutable;
 
             _context.Entry(entity).State = EntityState.Modified;

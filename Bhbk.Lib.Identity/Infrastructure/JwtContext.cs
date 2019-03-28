@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Interfaces;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Interfaces;
+using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -9,16 +9,16 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 
-namespace Bhbk.Lib.Identity.Internal.Infrastructure
+namespace Bhbk.Lib.Identity.Infrastructure
 {
     public class JwtContext : IJwtContext
     {
         private readonly IConfigurationRoot _conf;
-        private readonly ContextType _situation;
+        private readonly ExecutionType _situation;
         private readonly StsClient _sts;
         private static JwtSecurityToken _access, _refresh;
 
-        public JwtContext(IConfigurationRoot conf, ContextType situation, HttpClient http)
+        public JwtContext(IConfigurationRoot conf, ExecutionType situation, HttpClient http)
         {
             if (conf == null)
                 throw new ArgumentNullException();
@@ -56,7 +56,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
 
                         Log.Information(typeof(JwtContext).Name + " success using JWT refresh_token on " + DateTime.Now.ToString()
                             + ". JWT \"access_token\" valid from:" + _access.ValidFrom.ToLocalTime().ToString() + " to:" + _access.ValidTo.ToLocalTime().ToString()
-                            + ". JWT \"refresh_token\" valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString()+ ".");
+                            + ". JWT \"refresh_token\" valid from:" + _refresh.ValidFrom.ToLocalTime().ToString() + " to:" + _refresh.ValidTo.ToLocalTime().ToString() + ".");
 
                         return _access;
                     }

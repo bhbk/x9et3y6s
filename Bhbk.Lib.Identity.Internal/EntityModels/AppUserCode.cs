@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
-    public partial class AppUserToken
+    public partial class AppUserCode
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

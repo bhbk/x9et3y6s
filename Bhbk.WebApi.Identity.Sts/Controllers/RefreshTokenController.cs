@@ -244,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //if (user.Id == refresh.UserId)
             //    return NotFound(Strings.MsgUserTokenInvalid);
 
-            if(!await UoW.UserRepo.RemoveRefreshTokenAsync(refresh.Id))
+            if (!await UoW.UserRepo.RemoveRefreshTokenAsync(refresh.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -263,7 +263,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            if(!await UoW.UserRepo.RemoveRefreshTokensAsync(user.Id))
+            if (!await UoW.UserRepo.RemoveRefreshTokensAsync(user.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

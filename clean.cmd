@@ -18,6 +18,15 @@ cd ..\Bhbk.Lib.Identity.Internal.Tests
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 
+cd ..\Bhbk.WebApi.Alert
+powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
+powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
+powershell -command "& { if (Test-Path .\*.log) { Remove-Item .\*.log -Recurse -Force } }"
+
+cd ..\Bhbk.WebApi.Alert.Tests
+powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
+powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
+
 cd ..\Bhbk.Mssql.Identity
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"

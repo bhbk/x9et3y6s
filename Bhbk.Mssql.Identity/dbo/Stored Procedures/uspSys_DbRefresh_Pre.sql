@@ -1,7 +1,5 @@
 ﻿
-CREATE PROCEDURE [dbo].[uspSystem_ErrorDelete]
-    @DatabaseUser			VARCHAR(255)
-   ,@DatabaseSid			VARCHAR(255)
+CREATE PROCEDURE [dbo].[uspSys_DbRefresh_Pre]
    
 AS
 BEGIN
@@ -44,7 +42,7 @@ BEGIN
 */  -----------------------------------------------------------------------------------------------
 
     BEGIN CATCH
-		EXEC uspSystem_ErrorCreate;
+		EXEC uspSys_ExCreate;
         IF XACT_STATE() = -1
             ROLLBACK TRANSACTION;
         THROW;

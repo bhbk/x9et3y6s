@@ -1,5 +1,5 @@
 ﻿
-CREATE PROCEDURE [dbo].[uspSystem_ErrorCreate]
+CREATE PROCEDURE [dbo].[uspSys_ExCreate]
 
 AS
 BEGIN
@@ -29,7 +29,7 @@ BEGIN
         ,@ErrorLine = ERROR_LINE()
         ,@ErrorMessage = ERROR_MESSAGE()
 
-      INSERT INTO SystemError
+      INSERT INTO AppSysMsg
       (
          ErrorDate
         ,ErrorNumber

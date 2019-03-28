@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
-    public partial class SystemError
+    public partial class AppSysMsg
     {
         public decimal ErrorId { get; set; }
         public DateTime ErrorDate { get; set; }
