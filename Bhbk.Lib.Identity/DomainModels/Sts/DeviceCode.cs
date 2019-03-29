@@ -3,35 +3,29 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
 {
-    public class ClientCredentialV1
+    public class DeviceCodeV1
     {
-        [Required]
-        public string issuer_id { get; set; }
-
         [Required]
         public string client_id { get; set; }
 
         [Required]
-        public string client_secret { get; set; }
+        public string device_code { get; set; }
 
         [Required]
-        [RegularExpression("client_secret")]
+        [RegularExpression("device_code")]
         public string grant_type { get; set; }
     }
 
-    public class ClientCredentialV2
+    public class DeviceCodeV2
     {
-        [Required]
-        public string issuer { get; set; }
-
         [Required]
         public string client { get; set; }
 
         [Required]
-        public string client_secret { get; set; }
+        public string device_code { get; set; }
 
         [Required]
-        [RegularExpression("client_secret")]
+        [RegularExpression("device_code")]
         public string grant_type { get; set; }
     }
 }

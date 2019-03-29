@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var result = controller.GetStatusV1(Enums.TaskType.MaintainTokens.ToString()) as OkObjectResult;
+                var result = controller.GetStatusV1(TaskType.MaintainTokens.ToString()) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
             }

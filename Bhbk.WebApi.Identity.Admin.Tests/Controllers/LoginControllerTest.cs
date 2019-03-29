@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
@@ -128,6 +128,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            var model = (await _factory.UoW.LoginRepo.GetAsync()).First();
+            model.Immutable = true;
+
+            await _factory.UoW.LoginRepo.UpdateAsync(model);
+            await _factory.UoW.CommitAsync();
+
+            response = await _endpoints.Login_DeleteV1(access.token, model.Id);
+
+            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]

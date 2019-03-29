@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -33,7 +35,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await UoW.LoginRepo.GetAsync(x => x.Name == model.Name);
 
             if (check.Any())
-                return BadRequest(Strings.MsgLoginAlreadyExists);
+            {
+                ModelState.AddModelError(MsgType.LoginAlreadyExists.ToString(), Strings.MsgLoginAlreadyExists);
+                return BadRequest(ModelState);
+            }
 
             var result = await UoW.LoginRepo.CreateAsync(model);
 
@@ -49,7 +54,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
             if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
+            {
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"loginID: { loginID }");
+                return NotFound(ModelState);
+            }
 
             else if (login.Immutable)
                 return BadRequest(Strings.MsgLoginImmutable);
@@ -99,14 +107,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else
                 preds = x => x.Name.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.LoginRepo.CountAsync(preds);
-            var result = await UoW.LoginRepo.GetAsync(preds,
-                x => x.Include(l => l.AppUserLogin),
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
-                model.Skip,
-                model.Take);
+            try
+            {
+                var total = await UoW.LoginRepo.CountAsync(preds);
+                var result = await UoW.LoginRepo.GetAsync(preds,
+                    x => x.Include(l => l.AppUserLogin),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    model.Skip,
+                    model.Take);
 
-            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<LoginModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<LoginModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+                return BadRequest(ModelState);
+            }
         }
 
         [Route("v1/{loginID:guid}/users"), HttpGet]

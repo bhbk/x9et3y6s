@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Microsoft.Extensions.Configuration;

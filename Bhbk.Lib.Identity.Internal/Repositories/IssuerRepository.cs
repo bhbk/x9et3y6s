@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -16,20 +17,20 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class IssuerRepository : IGenericRepository<IssuerCreate, AppIssuer, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _mapper;
+        private readonly IMapper _transform;
         private readonly AppDbContext _context;
         private readonly string _salt;
 
         public string Salt { get => _salt; }
 
-        public IssuerRepository(AppDbContext context, ExecutionType situation, IMapper mapper, string salt)
+        public IssuerRepository(AppDbContext context, ExecutionType situation, IMapper transform, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
-            _mapper = mapper;
+            _transform = transform;
             _salt = salt;
         }
 
@@ -45,18 +46,26 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<AppIssuer> CreateAsync(IssuerCreate model)
         {
-            var entity = _mapper.Map<AppIssuer>(model);
-            var result = _context.Add(entity).Entity;
+            var entity = _transform.Map<AppIssuer>(model);
+            var create = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<AppIssuer>(result));
+            return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
         {
             var entity = _context.AppIssuer.Where(x => x.Id == key).Single();
 
+            var claims = _context.AppClaim.Where(x => x.IssuerId == key);
+            var clients = _context.AppClient.Where(x => x.IssuerId == key);
+            var roles = _context.AppRole.Where(x => x.Client.IssuerId == key);
+
             try
             {
+                _context.RemoveRange(claims);
+                _context.RemoveRange(clients);
+                _context.RemoveRange(roles);
+
                 await Task.FromResult(_context.Remove(entity).Entity);
                 return true;
             }
@@ -121,7 +130,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<AppIssuer>(_context.Update(entity).Entity));
+            return await Task.FromResult(_transform.Map<AppIssuer>(_context.Update(entity).Entity));
         }
     }
 }

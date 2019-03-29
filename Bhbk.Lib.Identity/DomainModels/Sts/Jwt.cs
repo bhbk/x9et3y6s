@@ -27,13 +27,10 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         [Required]
         public string refresh_token { get; set; }
 
-        [Required]
         public string issuer_id { get; set; }
 
-        [Required]
         public string client_id { get; set; }
 
-        [Required]
         public string user_id { get; set; }
     }
 
@@ -48,13 +45,10 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         [Required]
         public string refresh_token { get; set; }
 
-        [Required]
         public string issuer { get; set; }
 
-        [Required]
         public IList client { get; set; }
 
-        [Required]
         public string user { get; set; }
     }
 }

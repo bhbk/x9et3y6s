@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+
+/*
+ * https://oauth.net/2/grant-types/password/
+ */
+
+/*
+ * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+ * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
@@ -141,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (UoW.ConfigRepo.DefaultsCompatibilityModeIssuer
                 && string.IsNullOrEmpty(submit.issuer_id))
             {
-                var access = await JwtBuilder.CreateAccessTokenV1CompatibilityMode(UoW, issuer, client, user);
+                var access = await JwtBuilder.CreateAccessTokenV1Legacy(UoW, issuer, client, user);
 
                 var result = new JwtV1Legacy()
                 {
@@ -154,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     ActorId = user.Id,
-                    ActivityType = Enums.LoginType.GenerateAccessTokenV1CompatibilityMode.ToString(),
+                    ActivityType = LoginType.GenerateAccessTokenV1Legacy.ToString(),
                     Immutable = false
                 });
 
@@ -181,7 +193,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     ActorId = user.Id,
-                    ActivityType = Enums.LoginType.GenerateAccessTokenV1.ToString(),
+                    ActivityType = LoginType.GenerateAccessTokenV1.ToString(),
                     Immutable = false
                 });
 
@@ -327,7 +339,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
                 ActorId = user.Id,
-                ActivityType = Enums.LoginType.GenerateAccessTokenV2.ToString(),
+                ActivityType = LoginType.GenerateAccessTokenV2.ToString(),
                 Immutable = false
             });
 

@@ -3,6 +3,7 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,17 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Threading.Tasks;
+
+/*
+ * https://oauth.net/2/grant-types/authorization-code/
+ */
+
+/*
+ * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+ * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
@@ -195,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
                 ActorId = user.Id,
-                ActivityType = Enums.LoginType.GenerateAuthorizationCodeV2.ToString(),
+                ActivityType = LoginType.GenerateAuthorizationCodeV2.ToString(),
                 Immutable = false
             });
 

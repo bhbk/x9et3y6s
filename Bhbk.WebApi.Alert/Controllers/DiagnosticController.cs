@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives;
+﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -16,10 +16,10 @@ namespace Bhbk.WebApi.Alert.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
-            if (name.ToLower() == Enums.TaskType.QueueEmails.ToString().ToLower())
+            if (name.ToLower() == TaskType.QueueEmails.ToString().ToLower())
                 return Ok(((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask))).Status);
 
-            if (name.ToLower() == Enums.TaskType.QueueTexts.ToString().ToLower())
+            if (name.ToLower() == TaskType.QueueTexts.ToString().ToLower())
                 return Ok(((QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask))).Status);
 
             return BadRequest();

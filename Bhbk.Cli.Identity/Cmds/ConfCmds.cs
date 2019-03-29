@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
@@ -41,7 +40,6 @@ namespace Bhbk.Cli.Identity.Cmds
                 var mapper = new MapperConfiguration(x =>
                 {
                     x.AddProfile<IdentityMappings>();
-                    x.AddExpressionMapping();
                 }).CreateMapper();
 
                 Statics.UoW = new IdentityContext(builder, ExecutionType.Live, conf, mapper);

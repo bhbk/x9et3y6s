@@ -1,9 +1,9 @@
-CREATE TABLE [dbo].[AppClient] (
+﻿CREATE TABLE [dbo].[AppClient] (
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [IssuerId]    UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
-    [Name]        NVARCHAR (128)   NOT NULL,
-    [Description] NVARCHAR (256)   NULL,
+    [Name]        NVARCHAR (MAX)   NOT NULL,
+    [Description] NVARCHAR (MAX)   NULL,
     [ClientKey]   NVARCHAR (MAX)   NOT NULL,
     [ClientType]  NVARCHAR (64)    NOT NULL,
     [Enabled]     BIT              CONSTRAINT [DF_AppAudience_Enabled] DEFAULT ((0)) NOT NULL,
@@ -11,8 +11,14 @@ CREATE TABLE [dbo].[AppClient] (
     [LastUpdated] DATETIME2 (7)    NULL,
     [Immutable]   BIT              CONSTRAINT [DF_AppAudience_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_AppClient_ID] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_AppClient_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[AppIssuer] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT [FK_AppClient_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[AppIssuer] ([Id])
 );
+
+
+
+
+
+
 
 
 

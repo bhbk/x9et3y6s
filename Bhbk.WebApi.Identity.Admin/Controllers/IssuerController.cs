@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -33,7 +35,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await UoW.IssuerRepo.GetAsync(x => x.Name == model.Name);
 
             if (check.Any())
-                return BadRequest(Strings.MsgIssuerAlreadyExists);
+            {
+                ModelState.AddModelError(MsgType.IssuerAlreadyExists.ToString(), Strings.MsgIssuerAlreadyExists);
+                return BadRequest(ModelState);
+            }
 
             var result = await UoW.IssuerRepo.CreateAsync(model);
 
@@ -47,7 +52,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
+            {
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"issuerID: { issuerID }");
+                return NotFound(ModelState);
+            }
 
             else if (issuer.Immutable)
                 return BadRequest(Strings.MsgIssuerImmutable);
@@ -97,14 +105,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.IssuerRepo.CountAsync(preds);
-            var result = await UoW.IssuerRepo.GetAsync(preds,
-                x => x.Include(c => c.AppClient),
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
-                model.Skip,
-                model.Take);
+            try
+            {
+                var total = await UoW.IssuerRepo.CountAsync(preds);
+                var result = await UoW.IssuerRepo.GetAsync(preds,
+                    x => x.Include(c => c.AppClient),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    model.Skip,
+                    model.Take);
 
-            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<IssuerModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
         }
 
         [Route("v1/{issuerID:guid}/clients"), HttpGet]

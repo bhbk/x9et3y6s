@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
     {
         public AppClient()
         {
+            AppClientRefresh = new HashSet<AppClientRefresh>();
             AppClientUri = new HashSet<AppClientUri>();
             AppRole = new HashSet<AppRole>();
         }
@@ -24,6 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public bool Immutable { get; set; }
 
         public virtual AppIssuer Issuer { get; set; }
+        public virtual ICollection<AppClientRefresh> AppClientRefresh { get; set; }
         public virtual ICollection<AppClientUri> AppClientUri { get; set; }
         public virtual ICollection<AppRole> AppRole { get; set; }
     }

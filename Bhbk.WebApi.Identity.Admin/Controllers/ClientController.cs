@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -33,11 +35,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var check = await UoW.ClientRepo.GetAsync(x => x.Name == model.Name);
 
             if (check.Any())
-                return BadRequest(Strings.MsgClientAlreadyExists);
+            {
+                ModelState.AddModelError(MsgType.ClientAlreadyExists.ToString(), Strings.MsgClientAlreadyExists);
+                return BadRequest(ModelState);
+            }
 
-            Enums.ClientType clientType;
+            ClientType clientType;
 
-            if (!Enum.TryParse<Enums.ClientType>(model.ClientType, out clientType))
+            if (!Enum.TryParse<ClientType>(model.ClientType, out clientType))
                 return BadRequest(Strings.MsgClientInvalid);
 
             var result = await UoW.ClientRepo.CreateAsync(model);
@@ -54,7 +59,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
             if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
+            {
+                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"clientID: { clientID }");
+                return NotFound(ModelState);
+            }
 
             else if (client.Immutable)
                 return BadRequest(Strings.MsgClientImmutable);
@@ -104,14 +112,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
                 || x.Description.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.ClientRepo.CountAsync(preds);
-            var result = await UoW.ClientRepo.GetAsync(preds,
-                x => x.Include(r => r.AppRole),
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
-                model.Skip,
-                model.Take);
+            try
+            {
+                var total = await UoW.ClientRepo.CountAsync(preds);
+                var result = await UoW.ClientRepo.GetAsync(preds,
+                    x => x.Include(r => r.AppRole),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    model.Skip,
+                    model.Take);
 
-            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClientModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClientModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
         }
 
         [Route("v1/{clientID:guid}/roles"), HttpGet]

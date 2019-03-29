@@ -15,6 +15,8 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string AttrClientIDV2 = "client";
         public const string AttrClientSecretIDV1 = "client_secret";
         public const string AttrClientSecretIDV2 = "client_secret";
+        public const string AttrDeviceCodeIDV1 = "device_code";
+        public const string AttrDeviceCodeIDV2 = "device_code";
         public const string AttrGrantTypeIDV1 = "grant_type";
         public const string AttrGrantTypeIDV2 = "grant_type";
         public const string AttrRedirectUriIDV1 = "redirect_uri";
@@ -82,6 +84,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         #region Messages
 
+        public const string MsgActivityNotExist = "Activity does not exist";
         public const string MsgClaimAlreadyExists = "Claim already exists";
         public const string MsgClaimImmutable = "Claim is immutable";
         public const string MsgClaimInvalid = "Claim is invalid or disabled";
@@ -106,14 +109,13 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string MsgSysParamsInvalid = "One or more parameters invalid";
         public const string MsgSysQueueEmailError = "Fail to queue email message for delivery";
         public const string MsgSysQueueSmsError = "Fail to queue SMS message for delivery";
-        public const string MsgUserAlreadyExists = "User already exists";
-        public const string MsgUserImmutable = "User is immutable";
-        public const string MsgUserInvalid = "User is invalid, locked or disabled.";
-        public const string MsgUserNotExist = "User does not exist";
         public const string MsgUriAlreadyExists = "Uri already exists";
         public const string MsgUriImmutable = "Uri is immutable";
         public const string MsgUriInvalid = "Uri is invalid or disabled.";
         public const string MsgUriNotExist = "Uri does not exist";
+        public const string MsgUserAlreadyExists = "User already exists";
+        public const string MsgUserImmutable = "User is immutable";
+        public const string MsgUserInvalid = "User is invalid, locked or disabled.";
         public const string MsgUserInvalidCurrentEmail = "User current email incorrect";
         public const string MsgUserInvalidCurrentPassword = "User current password incorrect";
         public const string MsgUserInvalidCurrentPhone = "User current phone incorrect";
@@ -123,6 +125,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string MsgUserInvalidPhoneConfirm = "User new phone does not match confirm phone";
         public const string MsgUserTokenInvalid = "User token is invalid";
         public const string MsgUserInvalidTwoFactor = "User two factor is invalid";
+        public const string MsgUserNotExist = "User does not exist";
 
         #endregion
 

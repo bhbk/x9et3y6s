@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
@@ -162,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var email = await alert.Enqueue_TextV1(Jwt.AccessToken.ToString(),
+            var text = await alert.Enqueue_TextV1(Jwt.AccessToken.ToString(),
                 new TextCreate()
                 {
                     FromId = user.Id,
@@ -172,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     Body = token
                 });
 
-            if (!email.IsSuccessStatusCode)
+            if (!text.IsSuccessStatusCode)
                 return BadRequest(Strings.MsgSysQueueEmailError);
 
             return NoContent();

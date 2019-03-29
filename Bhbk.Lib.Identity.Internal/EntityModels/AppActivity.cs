@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
     public partial class AppActivity
     {
         public Guid Id { get; set; }
-        public Guid ActorId { get; set; }
+        public Guid? ActorId { get; set; }
         public string ActivityType { get; set; }
         public string TableName { get; set; }
         public string KeyValues { get; set; }

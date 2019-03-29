@@ -1,9 +1,10 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Alert;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -83,10 +85,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var exists = (await UoW.UserRepo.GetAsync(x => x.Email == model.Email)).SingleOrDefault();
+            var check = (await UoW.UserRepo.GetAsync(x => x.Email == model.Email));
 
-            if (exists != null)
-                return BadRequest(Strings.MsgUserAlreadyExists);
+            if (check.Any())
+            {
+                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), Strings.MsgUserAlreadyExists);
+                return BadRequest(ModelState);
+            }
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == model.IssuerId)).SingleOrDefault();
 
@@ -144,10 +149,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var exists = (await UoW.UserRepo.GetAsync(x => x.Email == model.Email)).SingleOrDefault();
+            var check = (await UoW.UserRepo.GetAsync(x => x.Email == model.Email));
 
-            if (exists != null)
-                return BadRequest(Strings.MsgUserAlreadyExists);
+            if (check.Any())
+            {
+                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), Strings.MsgUserAlreadyExists);
+                return BadRequest(ModelState);
+            }
 
             //ignore how bit may be set in model...
             model.HumanBeing = false;
@@ -162,28 +170,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<UserModel>(result));
         }
 
-        [Route("v1/{userID:guid}/claim"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> CreateUserClaimV1([FromRoute] Guid userID, [FromBody] ClaimCreate model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-                return NotFound(Strings.MsgUserInvalid);
-
-            //var result = await UoW.UserMgr.AddClaimAsync(user, model);
-
-            //if (!result.Succeeded)
-            //    return GetErrorResult(result);
-
-            throw new NotImplementedException();
-
-            return Ok(model);
-        }
-
         [Route("v1/{userID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> DeleteUserV1([FromRoute] Guid userID)
@@ -191,7 +177,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"userID: { userID }");
+                return NotFound(ModelState);
+            }
 
             else if (user.Immutable)
                 return BadRequest(Strings.MsgUserImmutable);
@@ -202,26 +191,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
-        [Route("v1/{userID:guid}/{claimID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> DeleteUserClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-                return NotFound(Strings.MsgUserInvalid);
-
-            //var result = await UoW.UserMgr.RemoveClaimAsync(user, claim);
-
-            //if (!result.Succeeded)
-            //    return GetErrorResult(result);
 
             return NoContent();
         }
@@ -304,7 +273,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetUsersV1([FromBody] CascadePager model)
+        public async Task<IActionResult> GetUsersPageV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -323,14 +292,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.FirstName.ToLower().Contains(model.Filter.ToLower())
                 || x.LastName.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.UserRepo.CountAsync(preds);
-            var result = await UoW.UserRepo.GetAsync(preds,
-                x => x.Include(r => r.AppUserRole),
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
-                model.Skip,
-                model.Take);
+            try
+            {
+                var total = await UoW.UserRepo.CountAsync(preds);
+                var result = await UoW.UserRepo.GetAsync(preds,
+                    x => x.Include(r => r.AppUserRole),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    model.Skip,
+                    model.Take);
 
-            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<UserModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
         }
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]

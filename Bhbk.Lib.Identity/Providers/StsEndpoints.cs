@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -272,110 +271,53 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshToken_GetListV1(JwtSecurityToken jwt, string user)
+        //https://oauth.net/2/grant-types/device-code/
+        public async Task<HttpResponseMessage> DeviceCode_GenerateV1(string issuer, string client, string code)
         {
-            var endpoint = "/oauth2/v1/refresh/" + user;
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("issuer_id", issuer),
+                    new KeyValuePair<string, string>("client_id", client),
+                    new KeyValuePair<string, string>("device_code", code),
+                    new KeyValuePair<string, string>("grant_type", "device_code")
+                });
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            var endpoint = "/oauth2/v1/device";
+
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ExecutionType.Live)
-                return await _http.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+                return await _http.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_situation == ExecutionType.UnitTest)
-                return await _http.GetAsync(endpoint);
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshToken_GetListV2(JwtSecurityToken jwt, string user)
+        public async Task<HttpResponseMessage> DeviceCode_GenerateV2(string issuer, string client, string code)
         {
-            var endpoint = "/oauth2/v2/refresh/" + user;
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("issuer", issuer),
+                    new KeyValuePair<string, string>("client", client),
+                    new KeyValuePair<string, string>("device_code", code),
+                    new KeyValuePair<string, string>("grant_type", "device_code")
+                });
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
+            var endpoint = "/oauth2/v2/device";
+
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ExecutionType.Live)
-                return await _http.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+                return await _http.PostAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_situation == ExecutionType.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteV1(JwtSecurityToken jwt, string user, string token)
-        {
-            var endpoint = "/oauth2/v1/refresh/" + user + "/revoke/" + token;
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _http.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteV2(JwtSecurityToken jwt, string user, string token)
-        {
-            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke/" + token;
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _http.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV1(JwtSecurityToken jwt, string user)
-        {
-            var endpoint = "/oauth2/v1/refresh/" + user + "/revoke";
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _http.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV2(JwtSecurityToken jwt, string user)
-        {
-            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt.RawData);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _http.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _http.DeleteAsync(endpoint);
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -427,6 +369,114 @@ namespace Bhbk.Lib.Identity.Providers
 
             if (_situation == ExecutionType.UnitTest)
                 return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_GetListV1(string jwt, string user)
+        {
+            var endpoint = "/oauth2/v1/refresh/" + user;
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_GetListV2(string jwt, string user)
+        {
+            var endpoint = "/oauth2/v2/refresh/" + user;
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_DeleteV1(string jwt, string user)
+        {
+            var endpoint = "/oauth2/v1/refresh/" + user + "/revoke";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_DeleteV1(string jwt, string user, string token)
+        {
+            var endpoint = "/oauth2/v1/refresh/" + user + "/revoke/" + token;
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_DeleteV2(string jwt, string user)
+        {
+            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_DeleteV2(string jwt, string user, string token)
+        {
+            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke/" + token;
+
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _http.DeleteAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
         }

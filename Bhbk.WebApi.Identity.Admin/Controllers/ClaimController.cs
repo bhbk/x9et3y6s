@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -33,7 +35,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 && x.Type == model.Type);
 
             if (check.Any())
-                return BadRequest(Strings.MsgClaimAlreadyExists);
+            {
+                ModelState.AddModelError(MsgType.ClaimAlreadyExists.ToString(), Strings.MsgClaimAlreadyExists);
+                return BadRequest(ModelState);
+            }
 
             var result = await UoW.ClaimRepo.CreateAsync(model);
 
@@ -42,14 +47,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<ClaimModel>(result));
         }
 
-        [Route("v1/{clientID:guid}"), HttpDelete]
+        [Route("v1/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> DeleteClaimV1([FromRoute] Guid clientID)
+        public async Task<IActionResult> DeleteClaimV1([FromRoute] Guid claimID)
         {
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
 
             if (claim == null)
-                return NotFound(Strings.MsgClaimNotExist);
+            {
+                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"claimID: { claimID }");
+                return NotFound(ModelState);
+            }
 
             else if (claim.Immutable)
                 return BadRequest(Strings.MsgClaimImmutable);
@@ -64,17 +72,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{clientValue}"), HttpGet]
-        public async Task<IActionResult> GetClaimV1([FromRoute] string clientValue)
+        [Route("v1/{claimValue}"), HttpGet]
+        public async Task<IActionResult> GetClaimV1([FromRoute] string claimValue)
         {
             Guid claimID;
             AppClaim claim = null;
 
-            if (Guid.TryParse(clientValue, out claimID))
+            if (Guid.TryParse(claimValue, out claimID))
                 claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
 
             if (claim == null)
-                return NotFound(Strings.MsgClaimNotExist);
+            {
+                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"claimID: { claimValue }");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<ClaimModel>(claim));
         }
@@ -98,14 +109,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.Value.ToLower().Contains(model.Filter.ToLower())
                 || x.ValueType.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.ClaimRepo.CountAsync(preds);
-            var result = await UoW.ClaimRepo.GetAsync(preds,
-                null,
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
-                model.Skip,
-                model.Take);
+            try
+            {
+                var total = await UoW.ClaimRepo.CountAsync(preds);
+                var result = await UoW.ClaimRepo.GetAsync(preds,
+                    null,
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    model.Skip,
+                    model.Take);
 
-            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClaimModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
         }
 
         [Route("v1"), HttpPut]

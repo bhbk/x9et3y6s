@@ -9,6 +9,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         {
             AppClaim = new HashSet<AppClaim>();
             AppClient = new HashSet<AppClient>();
+            AppClientRefresh = new HashSet<AppClientRefresh>();
             AppUserRefresh = new HashSet<AppUserRefresh>();
         }
 
@@ -24,6 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
 
         public virtual ICollection<AppClaim> AppClaim { get; set; }
         public virtual ICollection<AppClient> AppClient { get; set; }
+        public virtual ICollection<AppClientRefresh> AppClientRefresh { get; set; }
         public virtual ICollection<AppUserRefresh> AppUserRefresh { get; set; }
     }
 }

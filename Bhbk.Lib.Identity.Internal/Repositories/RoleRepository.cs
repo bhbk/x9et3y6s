@@ -24,14 +24,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class RoleRepository : IGenericRepository<RoleCreate, AppRole, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _mapper;
+        private readonly IMapper _transform;
         private readonly AppDbContext _context;
 
-        public RoleRepository(AppDbContext context, ExecutionType situation, IMapper mapper)
+        public RoleRepository(AppDbContext context, ExecutionType situation, IMapper transform)
         {
             _context = context;
             _situation = situation;
-            _mapper = mapper;
+            _transform = transform;
         }
 
         public async Task<int> CountAsync(Expression<Func<AppRole, bool>> predicates = null)
@@ -46,10 +46,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<AppRole> CreateAsync(RoleCreate model)
         {
-            var entity = _mapper.Map<AppRole>(model);
-            var result = _context.Add(entity).Entity;
+            var entity = _transform.Map<AppRole>(model);
+            var create = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<AppRole>(result));
+            return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -128,7 +128,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<AppRole>(_context.Update(entity).Entity));
+            return await Task.FromResult(_transform.Map<AppRole>(_context.Update(entity).Entity));
         }
     }
 }

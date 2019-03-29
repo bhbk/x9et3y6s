@@ -10,8 +10,16 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-//https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
-//https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write
+/*
+ * https://oauth.net/2/grant-types/client-credentials/
+ */
+
+/*
+ * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+ * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ */
 
 namespace Bhbk.WebApi.Identity.Sts.Providers
 {

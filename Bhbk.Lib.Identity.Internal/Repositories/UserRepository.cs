@@ -33,9 +33,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _transform;
         private readonly AppDbContext _context;
-        private readonly PasswordValidator _validator;
-        public readonly PasswordHasher HashPassword;
-        public readonly UserValidator ValidateUser;
+        private readonly PasswordValidator _passwordValidator;
+        public readonly PasswordHasher passwordHasher;
+        public readonly UserValidator userValidator;
 
         public UserRepository(AppDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
         {
@@ -43,10 +43,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _situation = situation;
             _conf = conf;
             _transform = transform;
-            _validator = new PasswordValidator();
+            _passwordValidator = new PasswordValidator();
 
-            HashPassword = new PasswordHasher();
-            ValidateUser = new UserValidator();
+            passwordHasher = new PasswordHasher();
+            userValidator = new UserValidator();
         }
 
         public async Task<bool> AccessFailedAsync(Guid key)
@@ -93,20 +93,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 throw new InvalidOperationException();
 
             return await UpdatePassword(entity, password);
-        }
-
-        public async Task<bool> AddRefreshTokenAsync(AppUserRefresh token)
-        {
-            var tokens = _context.AppUserRefresh.Where(x => x.UserId == token.UserId
-                && x.IssuedUtc > DateTime.UtcNow
-                && x.ExpiresUtc < DateTime.UtcNow);
-
-            if (tokens != null)
-                _context.AppUserRefresh.RemoveRange(tokens);
-
-            _context.AppUserRefresh.Add(token);
-
-            return await Task.FromResult(true);
         }
 
         public async Task<bool> AddToClaimAsync(AppUser user, AppClaim claim)
@@ -173,7 +159,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         internal async Task<AppUser> CreateAsync(AppUser user)
         {
-            var check = await ValidateUser.ValidateAsync(user);
+            var check = await userValidator.ValidateAsync(user);
 
             if (!check.Succeeded)
                 throw new InvalidOperationException();
@@ -191,7 +177,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.SaveChanges();
 
-            return await Task.FromResult(_transform.Map<AppUser>(create));
+            return await Task.FromResult(create);
         }
 
         public async Task<AppUser> CreateAsync(UserCreate model, string password)
@@ -206,7 +192,43 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<ClaimsPrincipal> CreateAccessAsync(AppUser user)
+        public async Task<AppUserRefresh> CreateRefreshAsync(UserRefreshCreate model)
+        {
+            var entity = _transform.Map<AppUserRefresh>(model);
+            var create = _context.Add(entity).Entity;
+        
+            return await Task.FromResult(create);
+        }
+
+        public async Task<bool> DeleteAsync(Guid key)
+        {
+            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+
+            var activity = _context.AppActivity.Where(x => x.ActorId == key);
+            var claims = _context.AppClaim.Where(x => x.ActorId == key);
+            var logins = _context.AppLogin.Where(x => x.ActorId == key);
+
+            try
+            {
+                _context.RemoveRange(activity);
+                _context.RemoveRange(claims);
+                _context.RemoveRange(logins);
+
+                await Task.FromResult(_context.Remove(entity).Entity);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> ExistsAsync(Guid key)
+        {
+            return await Task.FromResult(_context.AppUser.Any(x => x.Id == key));
+        }
+
+        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(AppUser user)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -250,15 +272,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> CreateRefreshAsync(AppUser user)
+        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(AppUser user)
         {
-            /*
-             * moving away from microsoft constructs for identity implementation because of un-needed additional 
-             * layers of complexity, and limitations, for the simple operations needing to be performed.
-             * 
-             * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1
-             */
-
             var claims = new List<Claim>();
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
@@ -277,29 +292,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var result = new ClaimsPrincipal(identity);
 
             return await Task.Run(() => result);
-        }
-
-        public async Task<bool> DeleteAsync(Guid key)
-        {
-            if (!await ExistsAsync(key))
-                throw new NullReferenceException();
-
-            var entity = _context.AppUser.Where(x => x.Id == key).SingleOrDefault();
-
-            try
-            {
-                await Task.FromResult(_context.Remove(entity).Entity);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> ExistsAsync(Guid key)
-        {
-            return await Task.FromResult(_context.AppUser.Any(x => x.Id == key));
         }
 
         public async Task<IEnumerable<AppUser>> GetAsync(Expression<Func<AppUser, bool>> predicates = null,
@@ -481,9 +473,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveRefreshTokensAsync(Guid key)
+        public async Task<bool> RemoveRefreshTokensAsync(AppUser user)
         {
-            var tokens = _context.AppUserRefresh.Where(x => x.UserId == key);
+            var tokens = _context.AppUserRefresh.Where(x => x.UserId == user.Id);
 
             if (tokens == null)
                 throw new ArgumentNullException();
@@ -583,7 +575,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         public async Task<AppUser> UpdateAsync(AppUser model)
         {
             var user = _transform.Map<AppUser>(model);
-            var check = await ValidateUser.ValidateAsync(user);
+            var check = await userValidator.ValidateAsync(user);
 
             if (!check.Succeeded)
                 throw new InvalidOperationException();
@@ -608,18 +600,18 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         internal async Task<bool> UpdatePassword(AppUser user, string password)
         {
-            if (_validator == null)
+            if (_passwordValidator == null)
                 throw new NotSupportedException();
 
-            var result = await _validator.ValidateAsync(user, password);
+            var result = await _passwordValidator.ValidateAsync(user, password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
 
-            if (HashPassword == null)
+            if (passwordHasher == null)
                 throw new NotSupportedException();
 
-            var hash = HashPassword.HashPassword(user, password);
+            var hash = passwordHasher.HashPassword(user, password);
 
             if (!await SetPasswordHashAsync(user, hash)
                 || !await SetSecurityStampAsync(user, RandomValues.CreateBase64String(32)))
@@ -640,10 +632,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         internal async Task<PasswordVerificationResult> VerifyPasswordAsync(AppUser user, string password)
         {
-            if (HashPassword == null)
+            if (passwordHasher == null)
                 throw new NotSupportedException();
 
-            if (HashPassword.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
+            if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
                 return PasswordVerificationResult.Success;
 
             return await Task.FromResult(PasswordVerificationResult.Failed);

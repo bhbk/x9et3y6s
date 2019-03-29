@@ -32,8 +32,7 @@ namespace Bhbk.WebApi.Alert
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
-                .WriteTo.LiterateConsole()
-                .WriteTo.RollingFile(api.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
+                .WriteTo.RollingFile(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
             _conf = new ConfigurationBuilder()

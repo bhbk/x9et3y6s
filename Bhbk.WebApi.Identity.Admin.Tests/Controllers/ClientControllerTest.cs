@@ -1,8 +1,9 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
@@ -83,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
                 IssuerId = (await _factory.UoW.IssuerRepo.GetAsync()).First().Id,
                 Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestClient1,
                 ClientKey = RandomValues.CreateAlphaNumericString(32),
-                ClientType = Enums.ClientType.user_agent.ToString(),
+                ClientType = ClientType.user_agent.ToString(),
                 Enabled = true,
             };
 
@@ -130,12 +131,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            var model = (await _factory.UoW.ClientRepo.GetAsync()).First();
-            model.Immutable = true;
+            var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            client1.Immutable = true;
 
-            await _factory.UoW.ClientRepo.UpdateAsync(model);
+            await _factory.UoW.ClientRepo.UpdateAsync(client1);
+            await _factory.UoW.CommitAsync();
 
-            response = await _endpoints.Client_DeleteV1(access.token, model.Id);
+            response = await _endpoints.Client_DeleteV1(access.token, client1.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -150,15 +152,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-            var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.Client_DeleteV1(access.token, model.Id);
+            var response = await _endpoints.Client_DeleteV1(access.token, client1.Id);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = (await _factory.UoW.ClientRepo.GetAsync(x => x.Id == model.Id)).Any();
+            var check = (await _factory.UoW.ClientRepo.GetAsync(x => x.Id == client1.Id)).Any();
             check.Should().BeFalse();
         }
 
@@ -171,10 +173,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-            var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var client2 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
-            var response = await _endpoints.Client_GetV1(access.token, model.Id.ToString());
+            var response = await _endpoints.Client_GetV1(access.token, client2.Id.ToString());
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -182,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<ClientModel>();
 
-            response = await _endpoints.Client_GetV1(access.token, model.Name);
+            response = await _endpoints.Client_GetV1(access.token, client2.Name);
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -278,10 +280,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            var model = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            model.Name += "(Updated)";
+            var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            client1.Name += "(Updated)";
 
-            var response = await _endpoints.Client_UpdateV1(access.token, _factory.UoW.Transform.Map<ClientModel>(model));
+            var response = await _endpoints.Client_UpdateV1(access.token, _factory.UoW.Transform.Map<ClientModel>(client1));
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -289,7 +291,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<ClientModel>();
 
-            check.Name.Should().Be(model.Name);
+            check.Name.Should().Be(client1.Name);
         }
     }
 }

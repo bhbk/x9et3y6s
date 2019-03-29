@@ -32,8 +32,7 @@ namespace Bhbk.WebApi.Identity.Me
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
-                .WriteTo.LiterateConsole()
-                .WriteTo.RollingFile(api.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
+                .WriteTo.RollingFile(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
             _conf = new ConfigurationBuilder()

@@ -17,17 +17,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class ClaimRepository : IGenericRepository<ClaimCreate, AppClaim, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _mapper;
+        private readonly IMapper _transform;
         private readonly AppDbContext _context;
 
-        public ClaimRepository(AppDbContext context, ExecutionType situation, IMapper mapper)
+        public ClaimRepository(AppDbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
-            _mapper = mapper;
+            _transform = transform;
         }
 
         public async Task<int> CountAsync(Expression<Func<AppClaim, bool>> predicates = null)
@@ -42,10 +42,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<AppClaim> CreateAsync(ClaimCreate model)
         {
-            var entity = _mapper.Map<AppClaim>(model);
-            var result = _context.Add(entity).Entity;
+            var entity = _transform.Map<AppClaim>(model);
+            var create = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<AppClaim>(result));
+            return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -109,7 +109,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_mapper.Map<AppClaim>(_context.Update(entity).Entity));
+            return await Task.FromResult(_transform.Map<AppClaim>(_context.Update(entity).Entity));
         }
     }
 }

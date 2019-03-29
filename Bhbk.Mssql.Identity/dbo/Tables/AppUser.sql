@@ -1,10 +1,10 @@
 ﻿CREATE TABLE [dbo].[AppUser] (
     [Id]                   UNIQUEIDENTIFIER   NOT NULL,
     [ActorId]              UNIQUEIDENTIFIER   NULL,
-    [Email]                NVARCHAR (128)     NOT NULL,
+    [Email]                NVARCHAR (MAX)     NOT NULL,
     [EmailConfirmed]       BIT                CONSTRAINT [DF_AppUser_EmailConfirmed] DEFAULT ((0)) NOT NULL,
-    [FirstName]            NVARCHAR (128)     NOT NULL,
-    [LastName]             NVARCHAR (128)     NOT NULL,
+    [FirstName]            NVARCHAR (MAX)     NOT NULL,
+    [LastName]             NVARCHAR (MAX)     NOT NULL,
     [PhoneNumber]          NVARCHAR (16)      NULL,
     [PhoneNumberConfirmed] BIT                CONSTRAINT [DF_AppUser_PhoneNumberConfirmed] DEFAULT ((0)) NULL,
     [Created]              DATETIME2 (7)      NOT NULL,
@@ -24,6 +24,8 @@
     [Immutable]            BIT                CONSTRAINT [DF_AppUser_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_AppUser_ID] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

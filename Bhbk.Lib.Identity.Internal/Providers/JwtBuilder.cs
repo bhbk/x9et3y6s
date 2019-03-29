@@ -16,52 +16,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     public class JwtBuilder
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
+            CreateAccessTokenV1Legacy(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateAccessAsync(user);
-
-            var symmetricKeyAsBase64 = issuer.IssuerKey;
-            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
-            var signingKey = new SymmetricSecurityKey(keyBytes);
-
-            var issueDate = DateTime.UtcNow;
-            var expireDate = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
-
-            /*
-             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
-             * because this is gross. prefer removal of test check below and muck with clock in test context. 
-             */
-
-            if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsAccessToken)
-            {
-                issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
-                expireDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
-            }
-
-            var result = new JwtSecurityTokenHandler().WriteToken(
-                new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
-                    audience: client.Name.ToString(),
-                    claims: identity.Claims,
-                    notBefore: issueDate,
-                    expires: expireDate,
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-                    ));
-
-            return (result, issueDate, expireDate);
-        }
-
-        public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1CompatibilityMode(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
-        {
-            if (uow == null)
-                throw new ArgumentNullException();
-
-            var identity = await uow.UserRepo.CreateAccessAsync(user);
+            var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -87,10 +47,90 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 new JwtSecurityToken(
                     issuer: issuer.Name.ToString(),
                     audience: client.Name.ToString(),
-                    claims: identity.Claims,
+                    claims: principal.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                    ));
+
+            return (result, issueDate, expireDate);
+        }
+
+        public static async Task<(string token, DateTime begin, DateTime end)>
+            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
+        {
+            if (uow == null)
+                throw new ArgumentNullException();
+
+            var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
+
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            var issueDate = DateTime.UtcNow;
+            var expireDate = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+
+            /*
+             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
+             * because this is gross. prefer removal of test check below and muck with clock in test context. 
+             */
+
+            if (uow.Situation == ExecutionType.UnitTest
+                && uow.ConfigRepo.UnitTestsAccessToken)
+            {
+                issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+            }
+
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    audience: client.Name.ToString(),
+                    claims: principal.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                    ));
+
+            return (result, issueDate, expireDate);
+        }
+
+        public static async Task<(string token, DateTime begin, DateTime end)>
+            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client)
+        {
+            if (uow == null)
+                throw new ArgumentNullException();
+
+            var principal = await uow.ClientRepo.GenerateAccessTokenAsync(client);
+
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            var issueDate = DateTime.UtcNow;
+            var expireDate = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+
+            /*
+             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
+             * because this is gross. prefer removal of test check below and muck with clock in test context. 
+             */
+
+            if (uow.Situation == ExecutionType.UnitTest
+                && uow.ConfigRepo.UnitTestsAccessToken)
+            {
+                issueDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsAccessTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsAccessTokenExpire);
+            }
+
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    audience: client.Name.ToString(),
+                    claims: principal.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
             return (result, issueDate, expireDate);
@@ -102,7 +142,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateAccessAsync(user);
+            var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -135,7 +175,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 new JwtSecurityToken(
                     issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
                     audience: clientList,
-                    claims: identity.Claims,
+                    claims: principal.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
@@ -145,12 +185,12 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
+            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client)
         {
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateRefreshAsync(user);
+            var principal = await uow.ClientRepo.GenerateRefreshTokenAsync(client);
 
             DateTime issueDate, expireDate;
 
@@ -174,22 +214,75 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 new JwtSecurityToken(
                     issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
                     audience: null,
-                    claims: identity.Claims,
+                    claims: principal.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            var create = new UserRefreshCreate()
-            {
-                IssuerId = issuer.Id,
-                UserId = user.Id,
-                ProtectedTicket = result,
-                IssuedUtc = issueDate,
-                ExpiresUtc = expireDate
-            };
+            var refresh = await uow.ClientRepo.CreateRefreshAsync(
+                new ClientRefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    ProtectedTicket = result,
+                    IssuedUtc = issueDate,
+                    ExpiresUtc = expireDate
+                });
 
-            if (!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
+            if (refresh == null)
+                throw new InvalidOperationException();
+
+            return result;
+        }
+
+        public static async Task<string>
+            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
+        {
+            if (uow == null)
+                throw new ArgumentNullException();
+
+            var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
+
+            DateTime issueDate, expireDate;
+
+            var symmetricKeyAsBase64 = issuer.IssuerKey;
+            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            if (uow.Situation == ExecutionType.UnitTest
+                && uow.ConfigRepo.UnitTestsRefreshToken)
+            {
+                issueDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow;
+                expireDate = uow.ConfigRepo.UnitTestsRefreshTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsRefreshTokenExpire);
+            }
+            else
+            {
+                issueDate = DateTime.UtcNow;
+                expireDate = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsRefreshTokenExpire);
+            }
+
+            var result = new JwtSecurityTokenHandler().WriteToken(
+                new JwtSecurityToken(
+                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    audience: null,
+                    claims: principal.Claims,
+                    notBefore: issueDate,
+                    expires: expireDate,
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                    ));
+
+            var refresh = await uow.UserRepo.CreateRefreshAsync(
+                new UserRefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    UserId = user.Id,
+                    ProtectedTicket = result,
+                    IssuedUtc = issueDate,
+                    ExpiresUtc = expireDate
+                });
+
+            if(refresh == null)
                 throw new InvalidOperationException();
 
             return result;
@@ -201,7 +294,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             if (uow == null)
                 throw new ArgumentNullException();
 
-            var identity = await uow.UserRepo.CreateRefreshAsync(user);
+            var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
             DateTime issueDate, expireDate;
 
@@ -225,22 +318,23 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 new JwtSecurityToken(
                     issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
                     audience: null,
-                    claims: identity.Claims,
+                    claims: principal.Claims,
                     notBefore: issueDate,
                     expires: expireDate,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            var create = new UserRefreshCreate()
-            {
-                IssuerId = issuer.Id,
-                UserId = user.Id,
-                ProtectedTicket = result,
-                IssuedUtc = issueDate,
-                ExpiresUtc = expireDate
-            };
+            var refresh = await uow.UserRepo.CreateRefreshAsync(
+                new UserRefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    UserId = user.Id,
+                    ProtectedTicket = result,
+                    IssuedUtc = issueDate,
+                    ExpiresUtc = expireDate
+                });
 
-            if (!await uow.UserRepo.AddRefreshTokenAsync(uow.Transform.Map<AppUserRefresh>(create)))
+            if (refresh == null)
                 throw new InvalidOperationException();
 
             return result;

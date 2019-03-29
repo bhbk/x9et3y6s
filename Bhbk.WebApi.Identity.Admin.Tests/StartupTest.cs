@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
@@ -60,7 +59,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                 var mapper = new MapperConfiguration(x =>
                 {
                     x.AddProfile<IdentityMappings>();
-                    x.AddExpressionMapping();
                 }).CreateMapper();
 
                 sc.AddSingleton(mapper);

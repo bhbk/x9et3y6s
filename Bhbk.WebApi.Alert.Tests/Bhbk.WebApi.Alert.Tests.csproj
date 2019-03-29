@@ -22,6 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Internal\Bhbk.Lib.Identity.Internal.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
     <ProjectReference Include="..\Bhbk.WebApi.Alert\Bhbk.WebApi.Alert.csproj" />
   </ItemGroup>
 

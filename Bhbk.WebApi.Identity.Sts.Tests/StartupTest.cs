@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
@@ -61,7 +60,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 var mapper = new MapperConfiguration(x =>
                 {
                     x.AddProfile<IdentityMappings>();
-                    x.AddExpressionMapping();
                 }).CreateMapper();
 
                 sc.AddSingleton(mapper);
@@ -144,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                         policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
                     }));
                 sc.AddAuthorization(auth =>
-                    auth.AddPolicy("ServicePolicy", policy =>
+                    auth.AddPolicy("SystemPolicy", policy =>
                     {
                         policy.RequireRole("Bhbk.WebApi.Identity(System)");
                     }));

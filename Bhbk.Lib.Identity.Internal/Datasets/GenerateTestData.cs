@@ -4,9 +4,8 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using System;
-using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Datasets
@@ -36,7 +35,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             AppUser user1, user2;
             AppClaim claim1, claim2;
 
-            //create issuers
+            //create test issuers
             issuer1 = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
             {
                 Name = Strings.ApiUnitTestIssuer1,
@@ -55,7 +54,47 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.CommitAsync();
 
-            //create claims
+            //create test clients
+            client1 = await _uow.ClientRepo.CreateAsync(new ClientCreate()
+            {
+                IssuerId = issuer1.Id,
+                Name = Strings.ApiUnitTestClient1,
+                ClientKey = Strings.ApiUnitTestClient1Key,
+                ClientType = ClientType.user_agent.ToString(),
+                Enabled = true,
+                Immutable = false,
+            });
+
+            client2 = await _uow.ClientRepo.CreateAsync(new ClientCreate()
+            {
+                IssuerId = issuer2.Id,
+                Name = Strings.ApiUnitTestClient2,
+                ClientKey = Strings.ApiUnitTestClient2Key,
+                ClientType = ClientType.server.ToString(),
+                Enabled = true,
+                Immutable = false,
+            });
+
+            await _uow.CommitAsync();
+
+            //assign test client uris
+            uri1 = await _uow.ClientRepo.CreateUriAsync(new ClientUriCreate()
+            {
+                ClientId = client1.Id,
+                AbsoluteUri = Strings.ApiUnitTestUri1Link,
+                Enabled = true,
+            });
+
+            uri2 = await _uow.ClientRepo.CreateUriAsync(new ClientUriCreate()
+            {
+                ClientId = client2.Id,
+                AbsoluteUri = Strings.ApiUnitTestUri2Link,
+                Enabled = true,
+            });
+
+            await _uow.CommitAsync();
+
+            //create test claims
             claim1 = await _uow.ClaimRepo.CreateAsync(new ClaimCreate()
             {
                 IssuerId = issuer1.Id,
@@ -74,47 +113,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.CommitAsync();
 
-            //create clients
-            client1 = await _uow.ClientRepo.CreateAsync(new ClientCreate()
-            {
-                IssuerId = issuer1.Id,
-                Name = Strings.ApiUnitTestClient1,
-                ClientKey = Strings.ApiUnitTestClient1Key,
-                ClientType = Enums.ClientType.user_agent.ToString(),
-                Enabled = true,
-                Immutable = false,
-            });
-
-            client2 = await _uow.ClientRepo.CreateAsync(new ClientCreate()
-            {
-                IssuerId = issuer2.Id,
-                Name = Strings.ApiUnitTestClient2,
-                ClientKey = Strings.ApiUnitTestClient2Key,
-                ClientType = Enums.ClientType.server.ToString(),
-                Enabled = true,
-                Immutable = false,
-            });
-
-            await _uow.CommitAsync();
-
-            //assign uris to clients
-            uri1 = await _uow.ClientRepo.AddUriAsync(new ClientUriCreate()
-            {
-                ClientId = client1.Id,
-                AbsoluteUri = Strings.ApiUnitTestUri1Link,
-                Enabled = true,
-            });
-
-            uri2 = await _uow.ClientRepo.AddUriAsync(new ClientUriCreate()
-            {
-                ClientId = client2.Id,
-                AbsoluteUri = Strings.ApiUnitTestUri2Link,
-                Enabled = true,
-            });
-
-            await _uow.CommitAsync();
-
-            //create logins
+            //create test logins
             login1 = await _uow.LoginRepo.CreateAsync(new LoginCreate()
             {
                 Name = Strings.ApiUnitTestLogin1,
@@ -129,7 +128,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.CommitAsync();
 
-            //create roles
+            //create test roles
             role1 = await _uow.RoleRepo.CreateAsync(new RoleCreate()
             {
                 ClientId = client1.Id,
@@ -148,7 +147,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.CommitAsync();
 
-            //create user 1
+            //create test user 1
             user1 = await _uow.UserRepo.CreateAsync(new UserCreate()
             {
                 Email = Strings.ApiUnitTestUser1,
@@ -160,14 +159,12 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 Immutable = false,
             }, Strings.ApiUnitTestUserPassCurrent);
 
-            await _uow.CommitAsync();
-
             await _uow.UserRepo.SetConfirmedEmailAsync(user1.Id, true);
             await _uow.UserRepo.SetConfirmedPasswordAsync(user1.Id, true);
             await _uow.UserRepo.SetConfirmedPhoneNumberAsync(user1.Id, true);
             await _uow.CommitAsync();
 
-            //create user 2
+            //create test user 2
             user2 = await _uow.UserRepo.CreateAsync(new UserCreate()
             {
                 Email = Strings.ApiUnitTestUser2,
@@ -177,8 +174,6 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 LockoutEnabled = false,
                 Immutable = false,
             }, Strings.ApiUnitTestUserPassCurrent);
-
-            await _uow.CommitAsync();
 
             await _uow.UserRepo.SetConfirmedEmailAsync(user2.Id, true);
             await _uow.UserRepo.SetConfirmedPasswordAsync(user2.Id, true);
@@ -192,8 +187,8 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             if (!await _uow.UserRepo.IsInLoginAsync(user1.Id, login1.Id))
                 await _uow.UserRepo.AddToLoginAsync(user1, login1);
 
-            //if (!await _uow.UserRepo.IsInClaimAsync(user1.Id, claim1.Id))
-            //    await _uow.UserRepo.AddToClaimAsync(user1, claim1);
+            if (!await _uow.UserRepo.IsInClaimAsync(user1.Id, claim1.Id))
+                await _uow.UserRepo.AddToClaimAsync(user1, claim1);
 
             await _uow.CommitAsync();
 
@@ -204,8 +199,8 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             if (!await _uow.UserRepo.IsInLoginAsync(user2.Id, login2.Id))
                 await _uow.UserRepo.AddToLoginAsync(user2, login2);
 
-            //if (!await _uow.UserRepo.IsInClaimAsync(user2.Id, claim2.Id))
-            //    await _uow.UserRepo.AddToClaimAsync(user2, claim2);
+            if (!await _uow.UserRepo.IsInClaimAsync(user2.Id, claim2.Id))
+                await _uow.UserRepo.AddToClaimAsync(user2, claim2);
 
             await _uow.CommitAsync();
         }
@@ -217,22 +212,18 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             for (int i = 0; i < sets; i++)
             {
+                AppIssuer issuer;
                 AppClient client;
+                AppClientUri uri;
                 AppRole role;
                 AppLogin login;
                 AppUser user;
+                AppClaim claim;
 
-                var issuerName = Strings.ApiUnitTestIssuer1 + "-" + RandomValues.CreateBase64String(4);
-                var clientName = Strings.ApiUnitTestClient1 + "-" + RandomValues.CreateBase64String(4);
-                var loginName = Strings.ApiUnitTestLogin1 + "-" + RandomValues.CreateBase64String(4);
-                var roleName = Strings.ApiUnitTestRole1 + "-" + RandomValues.CreateBase64String(4);
-                var userName = RandomValues.CreateAlphaNumericString(4) + "-" + Strings.ApiUnitTestUser1;
-                var uriName = Strings.ApiUnitTestUri1 + "-" + RandomValues.CreateBase64String(4);
-
-                //create random client
-                await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
+                //create random issuer
+                issuer = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
                 {
-                    Name = issuerName,
+                    Name = Strings.ApiUnitTestIssuer1 + "-" + RandomValues.CreateBase64String(4),
                     IssuerKey = Strings.ApiUnitTestIssuer1Key,
                     Enabled = true,
                     Immutable = false,
@@ -241,22 +232,20 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.CommitAsync();
 
                 //create random client
-                await _uow.ClientRepo.CreateAsync(new ClientCreate()
+                client = await _uow.ClientRepo.CreateAsync(new ClientCreate()
                 {
-                    IssuerId = (await _uow.IssuerRepo.GetAsync(x => x.Name == issuerName)).Single().Id,
-                    Name = clientName,
+                    IssuerId = issuer.Id,
+                    Name = Strings.ApiUnitTestClient1 + "-" + RandomValues.CreateBase64String(4),
                     ClientKey = Strings.ApiUnitTestClient1Key,
-                    ClientType = Enums.ClientType.user_agent.ToString(),
+                    ClientType = ClientType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = false,
                 });
 
                 await _uow.CommitAsync();
 
-                //assign uris to random client
-                client = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single();
-
-                await _uow.ClientRepo.AddUriAsync(new ClientUriCreate()
+                //assign random uri to random client
+                uri = await _uow.ClientRepo.CreateUriAsync(new ClientUriCreate()
                 {
                     ClientId = client.Id,
                     AbsoluteUri = Strings.ApiUnitTestUri1Link,
@@ -265,10 +254,21 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
                 await _uow.CommitAsync();
 
-                //create random login
-                await _uow.LoginRepo.CreateAsync(new LoginCreate()
+                //create random claim
+                claim = await _uow.ClaimRepo.CreateAsync(new ClaimCreate()
                 {
-                    Name = loginName,
+                    IssuerId = issuer.Id,
+                    Type = Strings.ApiUnitTestClaim1 + "-" + RandomValues.CreateBase64String(4),
+                    Value = RandomValues.CreateBase64String(8),
+                    Immutable = false,
+                });
+
+                await _uow.CommitAsync();
+
+                //create random login
+                login = await _uow.LoginRepo.CreateAsync(new LoginCreate()
+                {
+                    Name = Strings.ApiUnitTestLogin1 + "-" + RandomValues.CreateBase64String(4),
                     LoginKey = Strings.ApiUnitTestLogin1Key,
                     Enabled = true,
                     Immutable = false,
@@ -277,10 +277,10 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.CommitAsync();
 
                 //create random role
-                await _uow.RoleRepo.CreateAsync(new RoleCreate()
+                role = await _uow.RoleRepo.CreateAsync(new RoleCreate()
                 {
-                    ClientId = (await _uow.ClientRepo.GetAsync(x => x.Name == clientName)).Single().Id,
-                    Name = roleName,
+                    ClientId = client.Id,
+                    Name = Strings.ApiUnitTestRole1 + "-" + RandomValues.CreateBase64String(4),
                     Enabled = true,
                     Immutable = false,
                 });
@@ -288,9 +288,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.CommitAsync();
 
                 //create random user
-                await _uow.UserRepo.CreateAsync(new UserCreate()
+                user = await _uow.UserRepo.CreateAsync(new UserCreate()
                 {
-                    Email = userName,
+                    Email = RandomValues.CreateAlphaNumericString(4) + "-" + Strings.ApiUnitTestUser1,
                     PhoneNumber = Strings.ApiDefaultPhone,
                     FirstName = "First-" + RandomValues.CreateBase64String(4),
                     LastName = "Last-" + RandomValues.CreateBase64String(4),
@@ -299,22 +299,20 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                     Immutable = false,
                 }, Strings.ApiUnitTestUserPassCurrent);
 
-                await _uow.CommitAsync();
-
                 //assign roles, claims & logins to random user
-                user = (await _uow.UserRepo.GetAsync(x => x.Email == userName)).Single();
-                role = (await _uow.RoleRepo.GetAsync(x => x.Name == roleName)).Single();
-                login = (await _uow.LoginRepo.GetAsync(x => x.Name == loginName)).Single();
-
                 await _uow.UserRepo.SetConfirmedEmailAsync(user.Id, true);
                 await _uow.UserRepo.SetConfirmedPasswordAsync(user.Id, true);
                 await _uow.UserRepo.SetConfirmedPhoneNumberAsync(user.Id, true);
+                await _uow.CommitAsync();
 
                 if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Id))
                     await _uow.UserRepo.AddToRoleAsync(user, role);
 
                 if (!await _uow.UserRepo.IsInLoginAsync(user.Id, login.Id))
                     await _uow.UserRepo.AddToLoginAsync(user, login);
+
+                if (!await _uow.UserRepo.IsInClaimAsync(user.Id, claim.Id))
+                    await _uow.UserRepo.AddToClaimAsync(user, claim);
 
                 await _uow.CommitAsync();
             }
@@ -325,21 +323,25 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             if (_uow.Situation != ExecutionType.UnitTest)
                 throw new InvalidOperationException();
 
+            //delete test users
             var users = await _uow.UserRepo.GetAsync(x => x.Email.Contains(Strings.ApiUnitTestUser1)
                 || x.Email.Contains(Strings.ApiUnitTestUser2));
 
             foreach (var user in users)
-            {
-                var userRoles = await _uow.UserRepo.GetRolesAsync(user.Id);
-
-                foreach (var role in userRoles)
-                    await _uow.UserRepo.RemoveFromRoleAsync(user, role);
-
                 await _uow.UserRepo.DeleteAsync(user.Id);
-            }
 
             await _uow.CommitAsync();
 
+            //delete test claims
+            var claims = await _uow.ClaimRepo.GetAsync(x => x.Type.Contains(Strings.ApiUnitTestClaim1)
+                || x.Type.Contains(Strings.ApiUnitTestClaim2));
+
+            foreach (var claim in claims)
+                await _uow.ClaimRepo.DeleteAsync(claim.Id);
+
+            await _uow.CommitAsync();
+
+            //delete test roles
             var roles = await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestRole1)
                 || x.Name.Contains(Strings.ApiUnitTestRole2));
 
@@ -348,6 +350,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.CommitAsync();
 
+            //delete test logins
             var logins = await _uow.LoginRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestLogin1)
                 || x.Name.Contains(Strings.ApiUnitTestLogin2));
 
@@ -356,14 +359,19 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             await _uow.CommitAsync();
 
+            //delete test clients
             var clients = await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestClient1)
                 || x.Name.Contains(Strings.ApiUnitTestClient2));
 
             foreach (var client in clients)
+            {
+                await _uow.ClientRepo.RemoveRefreshTokensAsync(client);
                 await _uow.ClientRepo.DeleteAsync(client.Id);
+            }
 
             await _uow.CommitAsync();
 
+            //delete test issuers
             var issuers = await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestIssuer1)
                 || x.Name.Contains(Strings.ApiUnitTestIssuer2));
 

@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         {
             AppActivity = new HashSet<AppActivity>();
             AppClaim = new HashSet<AppClaim>();
-            AppClientUri = new HashSet<AppClientUri>();
+            AppLogin = new HashSet<AppLogin>();
             AppUserClaim = new HashSet<AppUserClaim>();
             AppUserCode = new HashSet<AppUserCode>();
             AppUserLogin = new HashSet<AppUserLogin>();
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
 
         public virtual ICollection<AppActivity> AppActivity { get; set; }
         public virtual ICollection<AppClaim> AppClaim { get; set; }
-        public virtual ICollection<AppClientUri> AppClientUri { get; set; }
+        public virtual ICollection<AppLogin> AppLogin { get; set; }
         public virtual ICollection<AppUserClaim> AppUserClaim { get; set; }
         public virtual ICollection<AppUserCode> AppUserCode { get; set; }
         public virtual ICollection<AppUserLogin> AppUserLogin { get; set; }

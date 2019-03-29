@@ -1,8 +1,8 @@
-CREATE TABLE [dbo].[AppIssuer] (
+﻿CREATE TABLE [dbo].[AppIssuer] (
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
-    [Name]        NVARCHAR (128)   NOT NULL,
-    [Description] NVARCHAR (256)   NULL,
+    [Name]        NVARCHAR (MAX)   NOT NULL,
+    [Description] NVARCHAR (MAX)   NULL,
     [IssuerKey]   NVARCHAR (MAX)   NOT NULL,
     [Enabled]     BIT              NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
@@ -10,6 +10,10 @@ CREATE TABLE [dbo].[AppIssuer] (
     [Immutable]   BIT              NOT NULL,
     CONSTRAINT [PK_AppIssuer_ID] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
+
+
 
 
 

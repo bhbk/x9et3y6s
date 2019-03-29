@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
@@ -42,7 +41,6 @@ namespace Bhbk.Cli.Identity.Cmds
                 var mapper = new MapperConfiguration(x =>
                 {
                     x.AddProfile<IdentityMappings>();
-                    x.AddExpressionMapping();
                 }).CreateMapper();
 
                 Statics.UoW = new IdentityContext(builder, ExecutionType.Live, conf, mapper);
@@ -51,9 +49,9 @@ namespace Bhbk.Cli.Identity.Cmds
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = ConsoleHelper.GetHiddenInput();
-                    var hashvalue = Statics.UoW.UserRepo.HashPassword.HashPassword(null, cleartext);
+                    var hashvalue = Statics.UoW.UserRepo.passwordHasher.HashPassword(null, cleartext);
 
-                    if (Statics.UoW.UserRepo.HashPassword.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (Statics.UoW.UserRepo.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

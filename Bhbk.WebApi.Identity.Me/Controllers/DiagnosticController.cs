@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives;
+﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
-            if (name.ToLower() == Enums.TaskType.MaintainQuotes.ToString().ToLower())
+            if (name.ToLower() == TaskType.MaintainQuotes.ToString().ToLower())
                 return Ok(((MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask))).Status);
 
             return BadRequest();

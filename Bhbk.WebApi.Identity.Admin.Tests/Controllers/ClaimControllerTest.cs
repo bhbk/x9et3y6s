@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
@@ -286,7 +286,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
 
-            var claim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.IssuerId == issuer.Id && x.Immutable == false)).First();
+            var claim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
             claim.Value += "(Updated)";
 
             var response = await _endpoints.Claim_UpdateV1(access.token, _factory.UoW.Transform.Map<ClaimModel>(claim));

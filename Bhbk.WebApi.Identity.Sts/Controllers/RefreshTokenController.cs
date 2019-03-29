@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+
+/*
+ * https://oauth.net/2/grant-types/refresh-token/
+ */
+
+/*
+ * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+ * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
@@ -97,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
                 ActorId = user.Id,
-                ActivityType = Enums.LoginType.GenerateRefreshTokenV1.ToString(),
+                ActivityType = LoginType.GenerateRefreshTokenV1.ToString(),
                 Immutable = false
             });
 
@@ -198,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
             {
                 ActorId = user.Id,
-                ActivityType = Enums.LoginType.GenerateRefreshTokenV2.ToString(),
+                ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
                 Immutable = false
             });
 
@@ -231,20 +243,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var token = (await UoW.UserRepo.GetRefreshAsync(x => x.UserId == userID 
+                && x.Id == refreshID)).SingleOrDefault();
 
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            var refresh = (await UoW.UserRepo.GetRefreshAsync(x => x.Id == refreshID)).SingleOrDefault();
-
-            if (refresh == null)
+            if (token == null)
                 return NotFound(Strings.MsgUserTokenInvalid);
 
-            //if (user.Id == refresh.UserId)
-            //    return NotFound(Strings.MsgUserTokenInvalid);
-
-            if (!await UoW.UserRepo.RemoveRefreshTokenAsync(refresh.Id))
+            if (!await UoW.UserRepo.RemoveRefreshTokenAsync(token.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -263,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            if (!await UoW.UserRepo.RemoveRefreshTokensAsync(user.Id))
+            if (!await UoW.UserRepo.RemoveRefreshTokensAsync(user))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

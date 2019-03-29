@@ -20,6 +20,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 
+        public virtual AppUser Actor { get; set; }
         public virtual ICollection<AppUserLogin> AppUserLogin { get; set; }
     }
 }

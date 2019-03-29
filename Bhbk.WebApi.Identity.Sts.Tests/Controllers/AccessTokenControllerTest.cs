@@ -18,13 +18,13 @@ using Xunit;
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
     [Collection("StsTestCollection")]
-    public class AccessTokenProviderTest
+    public class AccessTokenControllerTest
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
         private readonly StsClient _endpoints;
 
-        public AccessTokenProviderTest(StartupTest factory)
+        public AccessTokenControllerTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
@@ -264,7 +264,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AccessV1_Success_Client_ById()
+        public async Task Sts_OAuth2_AccessV1_Success()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -311,54 +311,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AccessV1_Success_Client_ByName()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = false;
-
-            var result = await _endpoints.AccessToken_GenerateV1(issuer.Name, client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check = ok.ToObject<JwtV1>();
-            check.Should().BeAssignableTo<JwtV1>();
-
-            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
-
-            var salt = _factory.Conf["IdentityTenants:Salt"];
-            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
-
-            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
-            claims.Value.Split(':')[1].Should().Be(salt);
-
-            _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
-
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Name, user.Email, Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok_legacy = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check_legacy = ok_legacy.ToObject<JwtV1Legacy>();
-            check_legacy.Should().BeAssignableTo<JwtV1Legacy>();
-
-            JwtBuilder.CanReadToken(check_legacy.access_token).Should().BeTrue();
-
-            var claims_legacy = JwtBuilder.ReadJwtToken(check_legacy.access_token).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            claims_legacy.Value.Should().Be(Strings.ApiUnitTestIssuer1);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Fail_ClientDisabled_Multiple()
+        public async Task Sts_OAuth2_AccessV2_Fail_ClientDisabled()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -383,27 +336,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AccessV2_Fail_ClientDisabled_Single()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var clientA = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var clientB = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { clientA.Id.ToString(), clientB.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            clientA.Enabled = false;
-            await _factory.UoW.ClientRepo.UpdateAsync(clientA);
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Fail_ClientNotFound_Multiple()
+        public async Task Sts_OAuth2_AccessV2_Fail_ClientNotFound()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -411,21 +344,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var clients = new List<string> { client.Id.ToString(), RandomValues.CreateBase64String(8) };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Fail_ClientNotFound_Single()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var clients = new List<string> { RandomValues.CreateBase64String(8) };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
             var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
@@ -582,7 +500,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientMultiple_ById()
+        public async Task Sts_OAuth2_AccessV2_Success_ClientMultiple()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -620,75 +538,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientMultiple_ByName()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var clientA = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var clientB = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { clientA.Name.ToString(), clientB.Name.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            if (clientA.Id == clientB.Id)
-                return;
-
-            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
-            await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check = ok.ToObject<JwtV2>();
-            check.Should().BeAssignableTo<JwtV2>();
-
-            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
-
-            var salt = _factory.Conf["IdentityTenants:Salt"];
-            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
-
-            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
-            claims.Value.Split(':')[1].Should().Be(salt);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ById()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check = ok.ToObject<JwtV2>();
-            check.Should().BeAssignableTo<JwtV2>();
-
-            JwtBuilder.CanReadToken(check.access_token).Should().BeTrue();
-
-            var salt = _factory.Conf["IdentityTenants:Salt"];
-            salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
-
-            var claims = JwtBuilder.ReadJwtToken(check.access_token).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
-            claims.Value.Split(':')[1].Should().Be(salt);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle_ByName()
+        public async Task Sts_OAuth2_AccessV2_Success_ClientSingle()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -698,7 +548,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var clients = new List<string> { client.Name };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var result = await _endpoints.AccessToken_GenerateV2(issuer.Name, clients, user.Email, Strings.ApiUnitTestUserPassCurrent);
+            var result = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -25,6 +27,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            /*
+             * tidbits below need enhancment, just tinkering...
+             */
+
             Expression<Func<AppActivity, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
@@ -35,15 +41,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 || x.OriginalValues.ToLower().Contains(model.Filter.ToLower())
                 || x.CurrentValues.ToLower().Contains(model.Filter.ToLower());
 
-            var total = await UoW.ActivityRepo.CountAsync(preds);
+            try
+            {
+                var total = await UoW.ActivityRepo.CountAsync(preds);
+                var result = await UoW.ActivityRepo.GetAsync(preds, 
+                    null,
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), 
+                    model.Skip, 
+                    model.Take);
 
-            var result = await UoW.ActivityRepo.GetAsync(preds, null,
-                x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)), model.Skip, model.Take);
+                //Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> ords = x => GenerateOrders(model.Orders);
+                //var result = await UoW.ActivityRepo.GetAsync(preds, null, ords, model.Skip, model.Take);
 
-            //Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> ords = x => GenerateOrders(model.Orders);
-            //var result = await UoW.ActivityRepo.GetAsync(preds, null, ords, model.Skip, model.Take);
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
 
-            return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
+                return BadRequest(ModelState);
+            }
         }
 
         public IOrderedQueryable<AppActivity> GenerateOrders(List<Tuple<string, string>> sortExpressions)
