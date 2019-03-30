@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
 {
     public class UrlBuilder
     {
-        public static Uri AuthorizationCodeRequest(IConfigurationRoot conf, AppClient client, AppUser user, string redirectUri, string scope, string state)
+        public static Uri AuthorizationCodeRequest(IConfigurationRoot conf, TClients client, TUsers user, string redirectUri, string scope, string state)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/authorization-code");
 
@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 + "&state=" + state);
         }
 
-        public static Uri ConfirmEmail(IConfigurationRoot conf, AppUser user, string code)
+        public static Uri ConfirmEmail(IConfigurationRoot conf, TUsers user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");
 
@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 + "&code=" + code);
         }
 
-        public static Uri ConfirmPassword(IConfigurationRoot conf, AppUser user, string code)
+        public static Uri ConfirmPassword(IConfigurationRoot conf, TUsers user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-password");
 
@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 + "&code=" + code);
         }
 
-        public static Uri ConfirmPhone(IConfigurationRoot conf, AppUser user, string code)
+        public static Uri ConfirmPhone(IConfigurationRoot conf, TUsers user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-phone");
 

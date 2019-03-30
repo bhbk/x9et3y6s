@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _provider = DataProtectionProvider.Create(appName);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppIssuer issuer)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, TIssuers issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, AppUser user)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, TUsers user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, AppIssuer issuer)
+        public Task<bool> ValidateAsync(string purpose, string token, TIssuers issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<bool>(false);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, AppUser user)
+        public Task<bool> ValidateAsync(string purpose, string token, TUsers user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);

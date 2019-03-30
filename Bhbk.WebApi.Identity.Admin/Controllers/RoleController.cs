@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetRoleV1([FromRoute] string roleValue)
         {
             Guid roleID;
-            AppRole role = null;
+            TRoles role = null;
 
             if (Guid.TryParse(roleValue, out roleID))
                 role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppRole, bool>> preds;
+            Expression<Func<TRoles, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.RoleRepo.CountAsync(preds);
                 var result = await UoW.RoleRepo.GetAsync(preds,
-                    x => x.Include(r => r.AppUserRole),
+                    x => x.Include(r => r.TUserRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
@@ -211,7 +211,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (role.Immutable)
                 return BadRequest(Strings.MsgRoleImmutable);
 
-            var result = await UoW.RoleRepo.UpdateAsync(UoW.Transform.Map<AppRole>(model));
+            var result = await UoW.RoleRepo.UpdateAsync(UoW.Transform.Map<TRoles>(model));
 
             await UoW.CommitAsync();
 

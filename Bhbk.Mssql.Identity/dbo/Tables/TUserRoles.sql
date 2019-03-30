@@ -1,0 +1,16 @@
+﻿CREATE TABLE [dbo].[TUserRoles] (
+    [UserId]    UNIQUEIDENTIFIER NOT NULL,
+    [RoleId]    UNIQUEIDENTIFIER NOT NULL,
+    [ActorId]   UNIQUEIDENTIFIER NULL,
+    [Created]   DATETIME2 (7)    NOT NULL,
+    [Immutable] BIT              NOT NULL,
+    CONSTRAINT [PK_TUserRoles] PRIMARY KEY CLUSTERED ([UserId] ASC, [RoleId] ASC),
+    CONSTRAINT [FK_TUserRoles_RoleID] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[TRoles] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT [FK_TUserRoles_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[TUsers] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TUserRoles]
+    ON [dbo].[TUserRoles]([UserId] ASC, [RoleId] ASC);
+

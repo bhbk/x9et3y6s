@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 /*
  * https://oauth.net/2/grant-types/authorization-code/
+ * https://www.oauth.com/playground/authorization-code.html
  */
 
 /*
@@ -34,27 +35,16 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public AuthorizationCodeController() { }
 
-        [Route("v1/authorization"), HttpGet]
-        [AllowAnonymous]
-        public IActionResult AuthCodeV1([FromQuery(Name = "issuer_id")] string issuerValue,
-            [FromQuery(Name = "client_id")] string clientValue,
-            [FromQuery(Name = "username")] string userValue,
-            [FromQuery(Name = "redirect_uri")] string redirectUriValue,
-            [FromQuery(Name = "scope")] string scopeValue)
-        {
-            return StatusCode((int)HttpStatusCode.NotImplemented);
-        }
-
         [Route("v1/authorization-code"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> AuthCodeRequestV1([FromQuery(Name = "issuer_id")] string issuerValue,
+        public async Task<IActionResult> GetAuthCodeV1([FromQuery(Name = "issuer_id")] string issuerValue,
             [FromQuery(Name = "client_id")] string clientValue,
             [FromQuery(Name = "username")] string userValue,
             [FromQuery(Name = "redirect_uri")] string redirectUri,
             [FromQuery(Name = "scope")] string scopeValue)
         {
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(issuerValue, out issuerID))
@@ -66,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgIssuerNotExist);
 
             Guid clientID;
-            AppClient client;
+            TClients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(clientValue, out clientID))
@@ -78,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(Strings.MsgClientNotExist);
 
             Guid userID;
-            AppUser user;
+            TUsers user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -92,20 +82,103 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
+        [Route("v2/authorization-code"), HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAuthCodeV2([FromQuery(Name = "issuer")] string issuerValue,
+            [FromQuery(Name = "client")] string clientValue,
+            [FromQuery(Name = "user")] string userValue,
+            [FromQuery(Name = "redirect_uri")] string redirectUriValue,
+            [FromQuery(Name = "scope")] string scopeValue)
+        {
+            Guid issuerID;
+            TIssuers issuer;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(issuerValue, out issuerID))
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+            else
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
+
+            if (issuer == null)
+                return NotFound(Strings.MsgIssuerNotExist);
+
+            Guid clientID;
+            TClients client;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(clientValue, out clientID))
+                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            else
+                client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientValue)).SingleOrDefault();
+
+            if (client == null)
+                return NotFound(Strings.MsgClientNotExist);
+
+            Guid userID;
+            TUsers user;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(userValue, out userID))
+                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            else
+                user = (await UoW.UserRepo.GetAsync(x => x.Email == userValue)).SingleOrDefault();
+
+            if (user == null)
+                return NotFound(Strings.MsgUserNotExist);
+
+            //check that redirect url is valid...
+            if (!(await UoW.ClientRepo.GetUriListAsync(client.Id)).Any(x => x.AbsoluteUri == redirectUriValue))
+                return NotFound(Strings.MsgUriNotExist);
+
+            var state = RandomValues.CreateBase64String(32);
+            var url = UrlBuilder.AuthorizationCodeRequest(Conf, client, user, redirectUriValue, scopeValue, state);
+
+            /*
+             * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies
+             * 
+             * do some more stuff here...
+             */
+
+            var cookie = new CookieOptions
+            {
+                Expires = DateTime.Now.AddSeconds(UoW.ConfigRepo.DefaultsBrowserCookieExpire),
+            };
+
+            Response.Cookies.Append("auth-code-state", state);
+            Response.Cookies.Append("auth-code-url", url.AbsoluteUri);
+
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
+        [Route("v1/authorization"), HttpGet]
+        [AllowAnonymous]
+        public IActionResult UseAuthCodeV1([FromQuery(Name = "issuer_id")] string issuerValue,
+            [FromQuery(Name = "client_id")] string clientValue,
+            [FromQuery(Name = "username")] string userValue,
+            [FromQuery(Name = "redirect_uri")] string redirectUriValue,
+            [FromQuery(Name = "grant_type")] string grantTypeValue,
+            [FromQuery(Name = "code")] string authCodeValue)
+        {
+            if (!grantTypeValue.Equals(Strings.AttrAuthorizeCodeIDV1))
+                return BadRequest(Strings.MsgSysParamsInvalid);
+
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
         [Route("v2/authorization"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> AuthCodeV2([FromQuery(Name = "issuer")] string issuerValue,
+        public async Task<IActionResult> UseAuthCodeV2([FromQuery(Name = "issuer")] string issuerValue,
              [FromQuery(Name = "client")] string clientValue,
              [FromQuery(Name = "user")] string userValue,
              [FromQuery(Name = "redirect_uri")] string redirectUriValue,
              [FromQuery(Name = "grant_type")] string grantTypeValue,
-             [FromQuery(Name = "code")] string authorizationCodeValue)
+             [FromQuery(Name = "code")] string authCodeValue)
         {
             if (!grantTypeValue.Equals(Strings.AttrAuthorizeCodeIDV2))
                 return BadRequest(Strings.MsgSysParamsInvalid);
 
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(issuerValue, out issuerID))
@@ -120,7 +193,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid userID;
-            AppUser user;
+            TUsers user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -142,11 +215,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserInvalid);
 
             //check that payload can be decrypted and validated...
-            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(user.SecurityStamp, authorizationCodeValue, user))
+            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(user.SecurityStamp, authCodeValue, user))
                 return BadRequest(Strings.MsgUserTokenInvalid);
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<AppClient>();
+            var clients = new List<TClients>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(clientValue))
@@ -157,7 +230,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in clientValue.Split(","))
                 {
                     Guid clientID;
-                    AppClient client;
+                    TClients client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -214,74 +287,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             await UoW.CommitAsync();
 
             return Ok(result);
-        }
-
-        [Route("v2/authorization-code"), HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> AuthCodeRequestV2([FromQuery(Name = "issuer")] string issuerValue,
-            [FromQuery(Name = "client")] string clientValue,
-            [FromQuery(Name = "user")] string userValue,
-            [FromQuery(Name = "redirect_uri")] string redirectUriValue,
-            [FromQuery(Name = "scope")] string scopeValue)
-        {
-            Guid issuerID;
-            AppIssuer issuer;
-
-            //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(issuerValue, out issuerID))
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
-            else
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
-
-            if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
-
-            Guid clientID;
-            AppClient client;
-
-            //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(clientValue, out clientID))
-                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
-            else
-                client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientValue)).SingleOrDefault();
-
-            if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
-
-            Guid userID;
-            AppUser user;
-
-            //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(userValue, out userID))
-                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-            else
-                user = (await UoW.UserRepo.GetAsync(x => x.Email == userValue)).SingleOrDefault();
-
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            //check that redirect url is valid...
-            if (!(await UoW.ClientRepo.GetUriListAsync(client.Id)).Any(x => x.AbsoluteUri == redirectUriValue))
-                return NotFound(Strings.MsgUriNotExist);
-
-            var state = RandomValues.CreateBase64String(32);
-            var url = UrlBuilder.AuthorizationCodeRequest(Conf, client, user, redirectUriValue, scopeValue, state);
-
-            /*
-             * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies
-             * 
-             * do some more stuff here...
-             */
-
-            var cookie = new CookieOptions
-            {
-                Expires = DateTime.Now.AddSeconds(UoW.ConfigRepo.DefaultsBrowserCookieExpire),
-            };
-
-            Response.Cookies.Append("auth-code-state", state);
-            Response.Cookies.Append("auth-code-url", url.AbsoluteUri);
-
-            return StatusCode((int)HttpStatusCode.NotImplemented);
         }
     }
 }

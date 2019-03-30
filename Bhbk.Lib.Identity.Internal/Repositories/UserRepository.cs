@@ -27,17 +27,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : IGenericRepository<UserCreate, AppUser, Guid>
+    public class UserRepository : IGenericRepository<UserCreate, TUsers, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _transform;
-        private readonly AppDbContext _context;
+        private readonly DatabaseContext _context;
         private readonly PasswordValidator _passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(AppDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
+        public UserRepository(DatabaseContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
         {
             _context = context;
             _situation = situation;
@@ -51,7 +51,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> AccessFailedAsync(Guid key)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).SingleOrDefault();
+            var entity = _context.TUsers.Where(x => x.Id == key).SingleOrDefault();
 
             entity.LastLoginFailure = DateTime.Now;
             entity.AccessFailedCount++;
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> AccessSuccessAsync(Guid key)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             entity.LastLoginSuccess = DateTime.Now;
             entity.AccessSuccessCount++;
@@ -87,7 +87,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> AddPasswordAsync(Guid key, string password)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             if (!string.IsNullOrEmpty(entity.PasswordHash))
                 throw new InvalidOperationException();
@@ -95,10 +95,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await UpdatePassword(entity, password);
         }
 
-        public async Task<bool> AddToClaimAsync(AppUser user, AppClaim claim)
+        public async Task<bool> AddToClaimAsync(TUsers user, TClaims claim)
         {
-            _context.AppUserClaim.Add(
-                new AppUserClaim()
+            _context.TUserClaims.Add(
+                new TUserClaims()
                 {
                     UserId = user.Id,
                     ClaimId = claim.Id,
@@ -109,10 +109,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddToLoginAsync(AppUser user, AppLogin login)
+        public async Task<bool> AddToLoginAsync(TUsers user, TLogins login)
         {
-            _context.AppUserLogin.Add(
-                new AppUserLogin()
+            _context.TUserLogins.Add(
+                new TUserLogins()
                 {
                     UserId = user.Id,
                     LoginId = login.Id,
@@ -123,10 +123,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddToRoleAsync(AppUser user, AppRole role)
+        public async Task<bool> AddToRoleAsync(TUsers user, TRoles role)
         {
-            _context.AppUserRole.Add(
-                new AppUserRole()
+            _context.TUserRoles.Add(
+                new TUserRoles()
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
@@ -139,7 +139,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> CheckPasswordAsync(Guid key, string password)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             if (await VerifyPasswordAsync(entity, password) != PasswordVerificationResult.Failed)
                 return true;
@@ -147,9 +147,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return false;
         }
 
-        public async Task<int> CountAsync(Expression<Func<AppUser, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<TUsers, bool>> predicates = null)
         {
-            var query = _context.AppUser.AsQueryable();
+            var query = _context.TUsers.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -157,7 +157,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        internal async Task<AppUser> CreateAsync(AppUser user)
+        internal async Task<TUsers> CreateAsync(TUsers user)
         {
             var check = await userValidator.ValidateAsync(user);
 
@@ -170,9 +170,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.Add(user).Entity);
         }
 
-        public async Task<AppUser> CreateAsync(UserCreate model)
+        public async Task<TUsers> CreateAsync(UserCreate model)
         {
-            var entity = _transform.Map<AppUser>(model);
+            var entity = _transform.Map<TUsers>(model);
             var create = await CreateAsync(entity);
 
             _context.SaveChanges();
@@ -180,9 +180,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<AppUser> CreateAsync(UserCreate model, string password)
+        public async Task<TUsers> CreateAsync(UserCreate model, string password)
         {
-            var entity = _transform.Map<AppUser>(model);
+            var entity = _transform.Map<TUsers>(model);
             var create = await CreateAsync(entity);
 
             _context.SaveChanges();
@@ -192,43 +192,38 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<AppUserRefresh> CreateRefreshAsync(UserRefreshCreate model)
-        {
-            var entity = _transform.Map<AppUserRefresh>(model);
-            var create = _context.Add(entity).Entity;
-        
-            return await Task.FromResult(create);
-        }
-
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
-            var activity = _context.AppActivity.Where(x => x.ActorId == key);
-            var claims = _context.AppClaim.Where(x => x.ActorId == key);
-            var logins = _context.AppLogin.Where(x => x.ActorId == key);
+            var activity = _context.TActivities.Where(x => x.ActorId == key);
+            var claims = _context.TClaims.Where(x => x.ActorId == key);
+            var logins = _context.TLogins.Where(x => x.ActorId == key);
+            var refreshes = _context.TRefreshes.Where(x => x.UserId == key);
 
             try
             {
                 _context.RemoveRange(activity);
                 _context.RemoveRange(claims);
                 _context.RemoveRange(logins);
+                _context.RemoveRange(refreshes);
 
-                await Task.FromResult(_context.Remove(entity).Entity);
-                return true;
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
             }
             catch (Exception)
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppUser.Any(x => x.Id == key));
+            return await Task.FromResult(_context.TUsers.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(AppUser user)
+        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(TUsers user)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -247,7 +242,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
                     claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
 
-            foreach (AppClaim claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
+            foreach (TClaims claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
@@ -272,7 +267,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(AppUser user)
+        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(TUsers user)
         {
             var claims = new List<Claim>();
 
@@ -294,13 +289,13 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<IEnumerable<AppUser>> GetAsync(Expression<Func<AppUser, bool>> predicates = null,
-            Func<IQueryable<AppUser>, IIncludableQueryable<AppUser, object>> includes = null,
-            Func<IQueryable<AppUser>, IOrderedQueryable<AppUser>> orders = null,
+        public async Task<IEnumerable<TUsers>> GetAsync(Expression<Func<TUsers, bool>> predicates = null,
+            Func<IQueryable<TUsers>, IIncludableQueryable<TUsers, object>> includes = null,
+            Func<IQueryable<TUsers>, IOrderedQueryable<TUsers>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.AppUser.AsQueryable();
+            var query = _context.TUsers.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -308,7 +303,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             if (includes != null)
                 query = includes(query);
 
-            //query = query.Include(x => x.AppUserRole);
+            //query = query.Include(x => x.UserRoles);
 
             if (orders != null)
             {
@@ -320,48 +315,48 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<AppUserRefresh>> GetRefreshAsync(Expression<Func<AppUserRefresh, bool>> predicates = null,
-            Func<IQueryable<AppUserRefresh>, IIncludableQueryable<AppUserRefresh, object>> includes = null,
-            Func<IQueryable<AppUserRefresh>, IOrderedQueryable<AppUserRefresh>> orderBy = null)
+        //public async Task<IEnumerable<Refreshes>> GetRefreshAsync(Expression<Func<Refreshes, bool>> predicates = null,
+        //    Func<IQueryable<Refreshes>, IIncludableQueryable<Refreshes, object>> includes = null,
+        //    Func<IQueryable<Refreshes>, IOrderedQueryable<Refreshes>> orderBy = null)
+        //{
+        //    var query = _context.Refreshes.AsQueryable();
+
+        //    if (predicates != null)
+        //        query = query.Where(predicates);
+
+        //    if (includes != null)
+        //        query = includes(query);
+
+        //    if (orderBy != null)
+        //        return await Task.FromResult(orderBy(query));
+
+        //    return await Task.FromResult(query);
+        //}
+
+        public async Task<IEnumerable<TClaims>> GetClaimsAsync(Guid key)
         {
-            var query = _context.AppUserRefresh.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orderBy != null)
-                return await Task.FromResult(orderBy(query));
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<AppClaim>> GetClaimsAsync(Guid key)
-        {
-            var result = _context.AppClaim.Where(x => x.AppUserClaim.Any(y => y.UserId == key)).ToList();
+            var result = _context.TClaims.Where(x => x.TUserClaims.Any(y => y.UserId == key)).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<AppClient>> GetClientsAsync(Guid key)
+        public async Task<IEnumerable<TClients>> GetClientsAsync(Guid key)
         {
-            var result = _context.AppClient.Where(x => x.AppRole.Any(y => y.AppUserRole.Any(z => z.UserId == key))).ToList();
+            var result = _context.TClients.Where(x => x.TRoles.Any(y => y.TUserRoles.Any(z => z.UserId == key))).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<AppLogin>> GetLoginsAsync(Guid key)
+        public async Task<IEnumerable<TLogins>> GetLoginsAsync(Guid key)
         {
-            var result = _context.AppLogin.Where(x => x.AppUserLogin.Any(y => y.UserId == key)).ToList();
+            var result = _context.TLogins.Where(x => x.TUserLogins.Any(y => y.UserId == key)).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<AppRole>> GetRolesAsync(Guid key)
+        public async Task<IEnumerable<TRoles>> GetRolesAsync(Guid key)
         {
-            var result = _context.AppRole.Where(x => x.AppUserRole.Any(y => y.UserId == key)).ToList();
+            var result = _context.TRoles.Where(x => x.TUserRoles.Any(y => y.UserId == key)).ToList();
 
             return await Task.FromResult(result);
         }
@@ -372,7 +367,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
              * TODO need to add check for role based claims...
              */
 
-            if (_context.AppUserClaim.Any(x => x.UserId == userKey && x.ClaimId == claimKey))
+            if (_context.TUserClaims.Any(x => x.UserId == userKey && x.ClaimId == claimKey))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -380,7 +375,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> IsInLoginAsync(Guid userKey, Guid loginKey)
         {
-            if (_context.AppUserLogin.Any(x => x.UserId == userKey && x.LoginId == loginKey))
+            if (_context.TUserLogins.Any(x => x.UserId == userKey && x.LoginId == loginKey))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -388,7 +383,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> IsInRoleAsync(Guid userKey, Guid roleKey)
         {
-            if (_context.AppUserRole.Any(x => x.UserId == userKey && x.RoleId == roleKey))
+            if (_context.TUserRoles.Any(x => x.UserId == userKey && x.RoleId == roleKey))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -396,7 +391,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> IsLockedOutAsync(Guid key)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).SingleOrDefault();
+            var entity = _context.TUsers.Where(x => x.Id == key).SingleOrDefault();
 
             if (entity.LockoutEnabled)
             {
@@ -405,7 +400,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                     entity.LockoutEnabled = false;
                     entity.LockoutEnd = null;
 
-                    await UpdateAsync(_transform.Map<AppUser>(entity));
+                    await UpdateAsync(_transform.Map<TUsers>(entity));
 
                     return false;
                 }
@@ -415,7 +410,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             else
             {
                 entity.LockoutEnd = null;
-                await UpdateAsync(_transform.Map<AppUser>(entity));
+                await UpdateAsync(_transform.Map<TUsers>(entity));
 
                 return false;
             }
@@ -423,7 +418,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> IsPasswordSetAsync(Guid key)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).SingleOrDefault();
+            var entity = _context.TUsers.Where(x => x.Id == key).SingleOrDefault();
 
             if (entity == null)
                 return await Task.FromResult(false);
@@ -434,67 +429,43 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveFromClaimAsync(AppUser user, AppClaim claim)
+        public async Task<bool> RemoveFromClaimAsync(TUsers user, TClaims claim)
         {
-            var result = _context.AppUserClaim.Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
+            var result = _context.TUserClaims.Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
 
-            _context.AppUserClaim.Remove(result);
+            _context.TUserClaims.Remove(result);
 
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveFromLoginAsync(AppUser user, AppLogin login)
+        public async Task<bool> RemoveFromLoginAsync(TUsers user, TLogins login)
         {
-            var result = _context.AppUserLogin.Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
+            var result = _context.TUserLogins.Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
 
-            _context.AppUserLogin.Remove(result);
+            _context.TUserLogins.Remove(result);
 
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveFromRoleAsync(AppUser user, AppRole role)
+        public async Task<bool> RemoveFromRoleAsync(TUsers user, TRoles role)
         {
-            var result = _context.AppUserRole.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
+            var result = _context.TUserRoles.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
-            _context.AppUserRole.Remove(result);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> RemoveRefreshTokenAsync(Guid key)
-        {
-            var token = _context.AppUserRefresh.Where(x => x.Id == key);
-
-            if (token == null)
-                throw new ArgumentNullException();
-
-            _context.AppUserRefresh.RemoveRange(token);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> RemoveRefreshTokensAsync(AppUser user)
-        {
-            var tokens = _context.AppUserRefresh.Where(x => x.UserId == user.Id);
-
-            if (tokens == null)
-                throw new ArgumentNullException();
-
-            _context.AppUserRefresh.RemoveRange(tokens);
+            _context.TUserRoles.Remove(result);
 
             return await Task.FromResult(true);
         }
 
         public async Task<bool> RemovePasswordAsync(Guid key)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             return await SetPasswordHashAsync(entity, null);
         }
 
         public async Task<bool> SetConfirmedEmailAsync(Guid key, bool confirmed)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             entity.EmailConfirmed = confirmed;
             entity.LastUpdated = DateTime.Now;
@@ -506,7 +477,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> SetConfirmedPasswordAsync(Guid key, bool confirmed)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             entity.PasswordConfirmed = confirmed;
             entity.LastUpdated = DateTime.Now;
@@ -518,7 +489,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> SetConfirmedPhoneNumberAsync(Guid key, bool confirmed)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             entity.PhoneNumberConfirmed = confirmed;
             entity.LastUpdated = DateTime.Now;
@@ -530,7 +501,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> SetImmutableAsync(Guid key, bool enabled)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             entity.Immutable = enabled;
             entity.LastUpdated = DateTime.Now;
@@ -540,7 +511,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        internal async Task<bool> SetPasswordHashAsync(AppUser user, string passwordHash)
+        internal async Task<bool> SetPasswordHashAsync(TUsers user, string passwordHash)
         {
             user.PasswordHash = passwordHash;
             user.LastUpdated = DateTime.Now;
@@ -550,7 +521,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        internal async Task<bool> SetSecurityStampAsync(AppUser user, string stamp)
+        internal async Task<bool> SetSecurityStampAsync(TUsers user, string stamp)
         {
             user.SecurityStamp = stamp;
             user.LastUpdated = DateTime.Now;
@@ -562,7 +533,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> SetTwoFactorEnabledAsync(Guid key, bool enabled)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             entity.TwoFactorEnabled = enabled;
             entity.LastUpdated = DateTime.Now;
@@ -572,15 +543,15 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<AppUser> UpdateAsync(AppUser model)
+        public async Task<TUsers> UpdateAsync(TUsers model)
         {
-            var user = _transform.Map<AppUser>(model);
+            var user = _transform.Map<TUsers>(model);
             var check = await userValidator.ValidateAsync(user);
 
             if (!check.Succeeded)
                 throw new InvalidOperationException();
 
-            var entity = _context.AppUser.Where(x => x.Id == user.Id).Single();
+            var entity = _context.TUsers.Where(x => x.Id == user.Id).Single();
 
             /*
              * only persist certain fields.
@@ -595,10 +566,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_transform.Map<AppUser>(entity));
+            return await Task.FromResult(_context.Update(entity).Entity);
         }
 
-        internal async Task<bool> UpdatePassword(AppUser user, string password)
+        internal async Task<bool> UpdatePassword(TUsers user, string password)
         {
             if (_passwordValidator == null)
                 throw new NotSupportedException();
@@ -622,7 +593,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> UpdatePassword(Guid key, string password)
         {
-            var entity = _context.AppUser.Where(x => x.Id == key).Single();
+            var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
             if (!await UpdatePassword(entity, password))
                 return false;
@@ -630,7 +601,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return true;
         }
 
-        internal async Task<PasswordVerificationResult> VerifyPasswordAsync(AppUser user, string password)
+        internal async Task<PasswordVerificationResult> VerifyPasswordAsync(TUsers user, string password)
         {
             if (passwordHasher == null)
                 throw new NotSupportedException();

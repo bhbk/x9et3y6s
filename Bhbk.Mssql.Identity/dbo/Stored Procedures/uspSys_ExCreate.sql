@@ -29,7 +29,7 @@ BEGIN
         ,@ErrorLine = ERROR_LINE()
         ,@ErrorMessage = ERROR_MESSAGE()
 
-      INSERT INTO AppSysMsg
+      INSERT INTO TExceptions
       (
          ErrorDate
         ,ErrorNumber

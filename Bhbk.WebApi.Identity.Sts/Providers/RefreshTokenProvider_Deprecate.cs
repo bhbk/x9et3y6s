@@ -82,13 +82,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                TIssuers issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
                 }
 
-                var refreshToken = (uow.UserRepo.GetRefreshAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
+                var refreshToken = (uow.RefreshRepo.GetAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
-                var clients = new List<AppClient>();
+                var clients = new List<TClients>();
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     foreach (string entry in clientValue.Split(","))
                     {
                         Guid clientID;
-                        AppClient client;
+                        TClients client;
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out clientID))
@@ -245,13 +245,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                TIssuers issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -274,7 +274,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 Guid clientID;
-                AppClient client;
+                TClients client;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
                 }
 
-                var refreshToken = (uow.UserRepo.GetRefreshAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
+                var refreshToken = (uow.RefreshRepo.GetAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
 
                 if (refreshToken == null
                     || refreshToken.IssuedUtc >= DateTime.UtcNow

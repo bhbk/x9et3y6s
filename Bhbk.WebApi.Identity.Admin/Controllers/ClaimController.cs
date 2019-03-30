@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClaimV1([FromRoute] string claimValue)
         {
             Guid claimID;
-            AppClaim claim = null;
+            TClaims claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
                 claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppClaim, bool>> preds;
+            Expression<Func<TClaims, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (claim.Immutable)
                 return BadRequest(Strings.MsgClaimImmutable);
 
-            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Transform.Map<AppClaim>(model));
+            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Transform.Map<TClaims>(model));
 
             await UoW.CommitAsync();
 

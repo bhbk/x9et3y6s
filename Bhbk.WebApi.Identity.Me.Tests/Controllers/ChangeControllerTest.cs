@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var model = new UserChangeEmail()
                 {
-                    Id = user.Id,
+                    UserId = user.Id,
                     CurrentEmail = RandomValues.CreateBase64String(4),
                     NewEmail = newEmail,
                     NewEmailConfirm = newEmail
@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var model = new UserChangeEmail()
                 {
-                    Id = user.Id,
+                    UserId = user.Id,
                     CurrentEmail = user.Email,
                     NewEmail = newEmail,
                     NewEmailConfirm = newEmail
@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var model = new UserChangePassword()
                 {
-                    Id = user.Id,
+                    UserId = user.Id,
                     CurrentPassword = RandomValues.CreateBase64String(16),
                     NewPassword = Strings.ApiUnitTestUserPassNew,
                     NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var model = new UserChangePassword()
                 {
-                    Id = user.Id,
+                    UserId = user.Id,
                     CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
                     NewPassword = Strings.ApiUnitTestUserPassNew,
                     NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var model = new UserChangePhone()
                 {
-                    Id = user.Id,
+                    UserId = user.Id,
                     CurrentPhoneNumber = newPhone,
                     NewPhoneNumber = user.PhoneNumber,
                     NewPhoneNumberConfirm = user.PhoneNumber
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var model = new UserChangePhone()
                 {
-                    Id = user.Id,
+                    UserId = user.Id,
                     CurrentPhoneNumber = user.PhoneNumber,
                     NewPhoneNumber = newPhone,
                     NewPhoneNumberConfirm = newPhone

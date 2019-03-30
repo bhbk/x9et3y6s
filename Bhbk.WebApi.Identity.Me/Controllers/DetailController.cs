@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else if (!user.HumanBeing)
                 return BadRequest(Strings.MsgUserInvalid);
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<AppUser>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<TUsers>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

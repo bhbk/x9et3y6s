@@ -6,6 +6,9 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
     public class DeviceCodeV1
     {
         [Required]
+        public string issuer_id { get; set; }
+
+        [Required]
         public string client_id { get; set; }
 
         [Required]
@@ -18,6 +21,9 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
 
     public class DeviceCodeV2
     {
+        [Required]
+        public string issuer { get; set; }
+
         [Required]
         public string client { get; set; }
 

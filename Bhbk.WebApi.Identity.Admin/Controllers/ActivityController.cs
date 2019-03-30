@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppActivity, bool>> preds;
+            Expression<Func<TActivities, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip, 
                     model.Take);
 
-                //Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> ords = x => GenerateOrders(model.Orders);
+                //Func<IQueryable<Activities>, IOrderedQueryable<Activities>> ords = x => GenerateOrders(model.Orders);
                 //var result = await UoW.ActivityRepo.GetAsync(preds, null, ords, model.Skip, model.Take);
 
                 return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
@@ -63,17 +63,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        public IOrderedQueryable<AppActivity> GenerateOrders(List<Tuple<string, string>> sortExpressions)
+        public IOrderedQueryable<TActivities> GenerateOrders(List<Tuple<string, string>> sortExpressions)
         {
             if ((sortExpressions == null) || (sortExpressions.Count <= 0))
                 return null;
 
-            IEnumerable<AppActivity> query = Enumerable.Empty<AppActivity>();
-            IOrderedEnumerable<AppActivity> orderedQuery = Enumerable.Empty<AppActivity>().OrderBy(x => x);
+            IEnumerable<TActivities> query = Enumerable.Empty<TActivities>();
+            IOrderedEnumerable<TActivities> orderedQuery = Enumerable.Empty<TActivities>().OrderBy(x => x);
 
             for (int i = 1; i < sortExpressions.Count; i++)
             {
-                Func<AppActivity, object> expression = x => x.GetType()
+                Func<TActivities, object> expression = x => x.GetType()
                     .GetProperty(sortExpressions[i].Item1)
                     .GetValue(x);
 

@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetIssuerV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
-            AppIssuer issuer = null;
+            TIssuers issuer = null;
 
             if (Guid.TryParse(issuerValue, out issuerID))
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppIssuer, bool>> preds;
+            Expression<Func<TIssuers, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.IssuerRepo.CountAsync(preds);
                 var result = await UoW.IssuerRepo.GetAsync(preds,
-                    x => x.Include(c => c.AppClient),
+                    x => x.Include(c => c.TClients),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (issuer.Immutable)
                 return BadRequest(Strings.MsgIssuerImmutable);
 
-            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Transform.Map<AppIssuer>(model));
+            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Transform.Map<TIssuers>(model));
 
             await UoW.CommitAsync();
 

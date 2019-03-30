@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (user.Id != model.Id)
+            else if (user.Id != model.UserId)
                 return BadRequest(Strings.MsgUserInvalid);
 
             else if (user.Email != model.CurrentEmail)
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (user.Id != model.Id)
+            else if (user.Id != model.UserId)
                 return BadRequest(Strings.MsgUserInvalid);
 
             else if (!user.HumanBeing)
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            else if (user.Id != model.Id)
+            else if (user.Id != model.UserId)
                 return BadRequest(Strings.MsgUserInvalid);
 
             else if (!user.HumanBeing)

@@ -199,7 +199,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetUserV1([FromRoute] string userValue)
         {
             Guid userID;
-            AppUser user = null;
+            TUsers user = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -282,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppUser, bool>> preds;
+            Expression<Func<TUsers, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.UserRepo.CountAsync(preds);
                 var result = await UoW.UserRepo.GetAsync(preds,
-                    x => x.Include(r => r.AppUserRole),
+                    x => x.Include(r => r.TUserRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
@@ -403,7 +403,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (user.Immutable)
                 return BadRequest(Strings.MsgUserImmutable);
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<AppUser>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<TUsers>(model));
 
             await UoW.CommitAsync();
 

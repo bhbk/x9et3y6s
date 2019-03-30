@@ -12,9 +12,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 {
     public class GenerateTestData
     {
-        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly IIdentityContext<DatabaseContext> _uow;
 
-        public GenerateTestData(IIdentityContext<AppDbContext> uow)
+        public GenerateTestData(IIdentityContext<DatabaseContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -27,13 +27,13 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             if (_uow.Situation != ExecutionType.UnitTest)
                 throw new InvalidOperationException();
 
-            AppIssuer issuer1, issuer2;
-            AppClient client1, client2;
-            AppClientUri uri1, uri2;
-            AppRole role1, role2;
-            AppLogin login1, login2;
-            AppUser user1, user2;
-            AppClaim claim1, claim2;
+            TIssuers issuer1, issuer2;
+            TClients client1, client2;
+            TClientUrls uri1, uri2;
+            TRoles role1, role2;
+            TLogins login1, login2;
+            TUsers user1, user2;
+            TClaims claim1, claim2;
 
             //create test issuers
             issuer1 = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
@@ -212,13 +212,13 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             for (int i = 0; i < sets; i++)
             {
-                AppIssuer issuer;
-                AppClient client;
-                AppClientUri uri;
-                AppRole role;
-                AppLogin login;
-                AppUser user;
-                AppClaim claim;
+                TIssuers issuer;
+                TClients client;
+                TClientUrls uri;
+                TRoles role;
+                TLogins login;
+                TUsers user;
+                TClaims claim;
 
                 //create random issuer
                 issuer = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
@@ -364,10 +364,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 || x.Name.Contains(Strings.ApiUnitTestClient2));
 
             foreach (var client in clients)
-            {
-                await _uow.ClientRepo.RemoveRefreshTokensAsync(client);
                 await _uow.ClientRepo.DeleteAsync(client.Id);
-            }
 
             await _uow.CommitAsync();
 

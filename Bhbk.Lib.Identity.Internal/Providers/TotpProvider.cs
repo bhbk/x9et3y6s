@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _expire = expire;
         }
 
-        public Task<string> GenerateAsync(string purpose, AppUser user)
+        public Task<string> GenerateAsync(string purpose, TUsers user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);
@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(code.ComputeTotp());
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, AppUser user)
+        public Task<bool> ValidateAsync(string purpose, string token, TUsers user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);

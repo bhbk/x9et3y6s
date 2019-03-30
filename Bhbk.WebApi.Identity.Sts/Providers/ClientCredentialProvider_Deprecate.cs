@@ -77,13 +77,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                TIssuers issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))

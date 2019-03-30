@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Internal.Validators
 
     public sealed class UserValidator
     {
-        public Task<IdentityResult> ValidateAsync(AppUser user)
+        public Task<IdentityResult> ValidateAsync(TUsers user)
         {
             var errors = new List<IdentityError>();
             var describer = new IdentityErrorDescriber();

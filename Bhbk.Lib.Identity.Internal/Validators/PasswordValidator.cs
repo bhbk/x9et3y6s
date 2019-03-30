@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Internal.Validators
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
 
-        public Task<IdentityResult> ValidateAsync(AppUser user, string password)
+        public Task<IdentityResult> ValidateAsync(TUsers user, string password)
         {
             List<IdentityError> errors = new List<IdentityError>();
 

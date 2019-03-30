@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     public class JwtBuilder
     {
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1Legacy(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
+            CreateAccessTokenV1Legacy(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client, TUsers user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client, AppUser user)
+            CreateAccessTokenV1(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client, TUsers user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -97,7 +97,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client)
+            CreateAccessTokenV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -137,7 +137,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            CreateAccessTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, List<AppClient> clients, AppUser user)
+            CreateAccessTokenV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -185,7 +185,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppClient client)
+            CreateRefreshTokenV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -221,7 +221,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                     ));
 
             var refresh = await uow.ClientRepo.CreateRefreshAsync(
-                new ClientRefreshCreate()
+                new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -237,7 +237,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV1(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
+            CreateRefreshTokenV1(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TUsers user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -272,8 +272,8 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                     ));
 
-            var refresh = await uow.UserRepo.CreateRefreshAsync(
-                new UserRefreshCreate()
+            var refresh = await uow.RefreshRepo.CreateAsync(
+                new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -289,7 +289,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            CreateRefreshTokenV2(IIdentityContext<AppDbContext> uow, AppIssuer issuer, AppUser user)
+            CreateRefreshTokenV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TUsers user)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -324,8 +324,8 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            var refresh = await uow.UserRepo.CreateRefreshAsync(
-                new UserRefreshCreate()
+            var refresh = await uow.RefreshRepo.CreateAsync(
+                new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,

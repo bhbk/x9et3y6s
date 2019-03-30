@@ -88,13 +88,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                AppIssuer issuer;
+                TIssuers issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 Guid userID;
-                AppUser user;
+                TUsers user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 }
 
                 var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
-                var clients = new List<AppClient>();
+                var clients = new List<TClients>();
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     foreach (string entry in clientValue.Split(","))
                     {
                         Guid clientID;
-                        AppClient client;
+                        TClients client;
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out clientID))

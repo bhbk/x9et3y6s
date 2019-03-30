@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Me
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<AppDbContext>()
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             var mapper = new MapperConfiguration(x =>
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
-            sc.AddScoped<IIdentityContext<AppDbContext>>(x =>
+            sc.AddScoped<IIdentityContext<DatabaseContext>>(x =>
             {
                 return new IdentityContext(options, ExecutionType.Live, conf, mapper);
             });
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+            var uow = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
             /*
              * only live context allowed to run...

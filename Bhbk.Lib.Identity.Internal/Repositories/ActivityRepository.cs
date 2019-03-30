@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ActivityRepository : IGenericRepository<ActivityCreate, AppActivity, Guid>
+    public class ActivityRepository : IGenericRepository<ActivityCreate, TActivities, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
-        private readonly AppDbContext _context;
+        private readonly DatabaseContext _context;
 
-        public ActivityRepository(AppDbContext context, ExecutionType situation, IMapper mapper)
+        public ActivityRepository(DatabaseContext context, ExecutionType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -29,9 +29,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _mapper = mapper;
         }
 
-        public async Task<int> CountAsync(Expression<Func<AppActivity, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<TActivities, bool>> predicates = null)
         {
-            var query = _context.AppActivity.AsQueryable();
+            var query = _context.TActivities.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -39,41 +39,42 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<AppActivity> CreateAsync(ActivityCreate model)
+        public async Task<TActivities> CreateAsync(ActivityCreate model)
         {
-            var entity = _mapper.Map<AppActivity>(model);
-            var result = _context.Add(entity).Entity;
+            var entity = _mapper.Map<TActivities>(model);
+            var create = _context.Add(entity).Entity;
 
-            return await Task.FromResult(_mapper.Map<AppActivity>(result));
+            return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.AppActivity.Where(x => x.Id == key).Single();
+            var entity = _context.TActivities.Where(x => x.Id == key).Single();
 
             try
             {
-                await Task.FromResult(_context.Remove(entity).Entity);
-                return true;
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
             }
             catch (Exception)
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppActivity.Any(x => x.Id == key));
+            return await Task.FromResult(_context.TActivities.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppActivity>> GetAsync(Expression<Func<AppActivity, bool>> predicates = null,
-            Func<IQueryable<AppActivity>, IIncludableQueryable<AppActivity, object>> includes = null,
-            Func<IQueryable<AppActivity>, IOrderedQueryable<AppActivity>> orders = null,
+        public async Task<IEnumerable<TActivities>> GetAsync(Expression<Func<TActivities, bool>> predicates = null,
+            Func<IQueryable<TActivities>, IIncludableQueryable<TActivities, object>> includes = null,
+            Func<IQueryable<TActivities>, IOrderedQueryable<TActivities>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.AppActivity.AsQueryable();
+            var query = _context.TActivities.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -91,7 +92,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public Task<AppActivity> UpdateAsync(AppActivity entity)
+        public Task<TActivities> UpdateAsync(TActivities entity)
         {
             throw new NotImplementedException();
         }

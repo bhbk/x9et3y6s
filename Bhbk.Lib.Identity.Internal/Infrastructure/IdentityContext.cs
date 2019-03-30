@@ -12,34 +12,35 @@ using System.Threading.Tasks;
 namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
-    public class IdentityContext : IIdentityContext<AppDbContext>
+    public class IdentityContext : IIdentityContext<DatabaseContext>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
-        private readonly AppDbContext _context;
+        private readonly DatabaseContext _context;
         private readonly ActivityRepository _activityRepo;
         private readonly ClaimRepository _claimRepo;
         private readonly ClientRepository _clientRepo;
         private readonly ConfigRepository _configRepo;
         private readonly IssuerRepository _issuerRepo;
         private readonly LoginRepository _loginRepo;
+        private readonly RefreshRepository _refreshRepo;
         private readonly RoleRepository _roleRepo;
         private readonly UserRepository _userRepo;
         private UserQuotes _userQuote;
 
-        public IdentityContext(DbContextOptions<AppDbContext> options, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new AppDbContext(options), situation, conf, mapper)
+        public IdentityContext(DbContextOptions<DatabaseContext> options, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
+            : this(new DatabaseContext(options), situation, conf, mapper)
         {
 
         }
 
-        public IdentityContext(DbContextOptionsBuilder<AppDbContext> optionsBuilder, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new AppDbContext(optionsBuilder.Options), situation, conf, mapper)
+        public IdentityContext(DbContextOptionsBuilder<DatabaseContext> optionsBuilder, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
+            : this(new DatabaseContext(optionsBuilder.Options), situation, conf, mapper)
         {
 
         }
 
-        private IdentityContext(AppDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
+        private IdentityContext(DatabaseContext context, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
         {
             _disposed = false;
 
@@ -57,10 +58,11 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             _issuerRepo = new IssuerRepository(_context, _situation, mapper, conf["IdentityTenants:Salt"]);
             _loginRepo = new LoginRepository(_context, _situation, mapper);
             _roleRepo = new RoleRepository(_context, _situation, mapper);
+            _refreshRepo = new RefreshRepository(_context, _situation, mapper);
             _userRepo = new UserRepository(_context, _situation, conf, mapper);
         }
 
-        public AppDbContext Context
+        public DatabaseContext Context
         {
             get
             {
@@ -129,6 +131,14 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             get
             {
                 return _loginRepo;
+            }
+        }
+
+        public RefreshRepository RefreshRepo
+        {
+            get
+            {
+                return _refreshRepo;
             }
         }
 

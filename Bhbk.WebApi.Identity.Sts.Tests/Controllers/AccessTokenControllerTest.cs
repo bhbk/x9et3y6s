@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user, string.Empty);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -210,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -233,7 +233,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user, string.Empty);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -258,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), password);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user.Id.ToString(), password);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -295,7 +295,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsCompatibilityModeIssuer = true;
 
-            result = await _endpoints.AccessToken_GenerateV1_CompatibilityModeIssuer(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            result = await _endpoints.AccessToken_GenerateV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

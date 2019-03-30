@@ -73,7 +73,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
     public class UserAddPassword
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         public string NewPassword { get; set; }
@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
     public class UserAddPhoneNumber
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         [DataType(DataType.PhoneNumber)]
@@ -99,7 +99,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
     public class UserChangePassword
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         public string CurrentPassword { get; set; }
@@ -114,7 +114,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
     public class UserChangePhone
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         [DataType(DataType.PhoneNumber)]
@@ -132,7 +132,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
     public class UserChangeEmail
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]

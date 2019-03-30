@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetLoginV1([FromRoute] string loginValue)
         {
             Guid loginID;
-            AppLogin login = null;
+            TLogins login = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppLogin, bool>> preds;
+            Expression<Func<TLogins, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.LoginRepo.CountAsync(preds);
                 var result = await UoW.LoginRepo.GetAsync(preds,
-                    x => x.Include(l => l.AppUserLogin),
+                    x => x.Include(l => l.TUserLogins),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (login == null)
                 return NotFound(Strings.MsgLoginNotExist);
 
-            var result = await UoW.LoginRepo.UpdateAsync(UoW.Transform.Map<AppLogin>(model));
+            var result = await UoW.LoginRepo.UpdateAsync(UoW.Transform.Map<TLogins>(model));
 
             await UoW.CommitAsync();
 

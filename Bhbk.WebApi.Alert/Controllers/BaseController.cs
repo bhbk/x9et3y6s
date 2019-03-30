@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Alert.Controllers
     public class BaseController : Controller
     {
         protected IConfigurationRoot Conf { get => (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>(); }
-        protected IIdentityContext<AppDbContext> UoW { get => (IIdentityContext<AppDbContext>)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityContext<AppDbContext>>(); }
+        protected IIdentityContext<DatabaseContext> UoW { get => (IIdentityContext<DatabaseContext>)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
         protected IJwtContext Jwt { get => (IJwtContext)ControllerContext.HttpContext.RequestServices.GetService<IJwtContext>(); }
 

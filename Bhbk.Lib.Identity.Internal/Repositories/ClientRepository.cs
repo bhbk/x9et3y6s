@@ -17,14 +17,14 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ClientRepository : IGenericRepository<ClientCreate, AppClient, Guid>
+    public class ClientRepository : IGenericRepository<ClientCreate, TClients, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _transform;
-        private readonly AppDbContext _context;
+        private readonly DatabaseContext _context;
 
-        public ClientRepository(AppDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
+        public ClientRepository(DatabaseContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -35,9 +35,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<int> CountAsync(Expression<Func<AppClient, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<TClients, bool>> predicates = null)
         {
-            var query = _context.AppClient.AsQueryable();
+            var query = _context.TClients.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -45,25 +45,25 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<AppClient> CreateAsync(ClientCreate model)
+        public async Task<TClients> CreateAsync(ClientCreate model)
         {
-            var entity = _transform.Map<AppClient>(model);
+            var entity = _transform.Map<TClients>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
         }
 
-        public async Task<AppClientRefresh> CreateRefreshAsync(ClientRefreshCreate model)
+        public async Task<TRefreshes> CreateRefreshAsync(RefreshCreate model)
         {
-            var entity = _transform.Map<AppClientRefresh>(model);
+            var entity = _transform.Map<TRefreshes>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
         }
 
-        public async Task<AppClientUri> CreateUriAsync(ClientUriCreate model)
+        public async Task<TClientUrls> CreateUriAsync(ClientUriCreate model)
         {
-            var entity = _transform.Map<AppClientUri>(model);
+            var entity = _transform.Map<TClientUrls>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -71,29 +71,32 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.AppClient.Where(x => x.Id == key).Single();
+            var entity = _context.TClients.Where(x => x.Id == key).Single();
 
-            var roles = _context.AppRole.Where(x => x.ClientId == key);
+            var roles = _context.TRoles.Where(x => x.ClientId == key);
+            var refreshes = _context.TRefreshes.Where(x => x.ClientId == key);
 
             try
             {
                 _context.RemoveRange(roles);
+                _context.RemoveRange(refreshes);
 
-                await Task.FromResult(_context.Remove(entity).Entity);
-                return true;
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
             }
             catch (Exception)
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppClient.Any(x => x.Id == key));
+            return await Task.FromResult(_context.TClients.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(AppClient client)
+        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(TClients client)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -120,7 +123,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(AppClient client)
+        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(TClients client)
         {
             var claims = new List<Claim>();
 
@@ -142,13 +145,13 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<IEnumerable<AppClient>> GetAsync(Expression<Func<AppClient, bool>> predicates = null,
-            Func<IQueryable<AppClient>, IIncludableQueryable<AppClient, object>> includes = null,
-            Func<IQueryable<AppClient>, IOrderedQueryable<AppClient>> orders = null,
+        public async Task<IEnumerable<TClients>> GetAsync(Expression<Func<TClients, bool>> predicates = null,
+            Func<IQueryable<TClients>, IIncludableQueryable<TClients, object>> includes = null,
+            Func<IQueryable<TClients>, IOrderedQueryable<TClients>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.AppClient.AsQueryable();
+            var query = _context.TClients.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -156,7 +159,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             if (includes != null)
                 query = includes(query);
 
-            //query = query.Include(x => x.AppRole);
+            //query = query.Include(x => x.Roles);
 
             if (orders != null)
             {
@@ -168,47 +171,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<AppRole>> GetRoleListAsync(Guid key)
+        public async Task<IEnumerable<TRoles>> GetRoleListAsync(Guid key)
         {
-            var result = _context.AppRole.Where(x => x.ClientId == key).ToList();
+            var result = _context.TRoles.Where(x => x.ClientId == key).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<AppClientUri>> GetUriListAsync(Guid key)
+        public async Task<IEnumerable<TClientUrls>> GetUriListAsync(Guid key)
         {
-            var result = _context.AppClientUri.Where(x => x.ClientId == key).ToList();
+            var result = _context.TClientUrls.Where(x => x.ClientId == key).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<bool> RemoveRefreshTokenAsync(Guid key)
+        public async Task<TClients> UpdateAsync(TClients model)
         {
-            var token = _context.AppClientRefresh.Where(x => x.Id == key);
-
-            if (token == null)
-                throw new ArgumentNullException();
-
-            _context.AppClientRefresh.RemoveRange(token);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> RemoveRefreshTokensAsync(AppClient client)
-        {
-            var tokens = _context.AppClientRefresh.Where(x => x.ClientId == client.Id);
-
-            if (tokens == null)
-                throw new ArgumentNullException();
-
-            _context.AppClientRefresh.RemoveRange(tokens);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<AppClient> UpdateAsync(AppClient model)
-        {
-            var entity = _context.AppClient.Where(x => x.Id == model.Id).Single();
+            var entity = _context.TClients.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
@@ -224,7 +203,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_transform.Map<AppClient>(_context.Update(entity).Entity));
+            return await Task.FromResult(_context.Update(entity).Entity);
         }
     }
 }

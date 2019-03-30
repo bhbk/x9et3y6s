@@ -735,7 +735,7 @@ namespace Bhbk.Cli.Identity.Cmds
             var result = _admin.User_SetPasswordV1(_jwt.AccessToken.RawData, userID,
                 new UserAddPassword()
                 {
-                    Id = userID,
+                    UserId = userID,
                     NewPassword = password,
                     NewPasswordConfirm = password,
                 }).Result;

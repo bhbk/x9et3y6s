@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ClaimRepository : IGenericRepository<ClaimCreate, AppClaim, Guid>
+    public class ClaimRepository : IGenericRepository<ClaimCreate, TClaims, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly AppDbContext _context;
+        private readonly DatabaseContext _context;
 
-        public ClaimRepository(AppDbContext context, ExecutionType situation, IMapper transform)
+        public ClaimRepository(DatabaseContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -30,9 +30,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<int> CountAsync(Expression<Func<AppClaim, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<TClaims, bool>> predicates = null)
         {
-            var query = _context.AppClaim.AsQueryable();
+            var query = _context.TClaims.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -40,9 +40,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<AppClaim> CreateAsync(ClaimCreate model)
+        public async Task<TClaims> CreateAsync(ClaimCreate model)
         {
-            var entity = _transform.Map<AppClaim>(model);
+            var entity = _transform.Map<TClaims>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -50,31 +50,32 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.AppClaim.Where(x => x.Id == key).Single();
+            var entity = _context.TClaims.Where(x => x.Id == key).Single();
 
             try
             {
-                await Task.FromResult(_context.Remove(entity).Entity);
-                return true;
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
             }
             catch (Exception)
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppClaim.Any(x => x.Id == key));
+            return await Task.FromResult(_context.TClaims.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppClaim>> GetAsync(Expression<Func<AppClaim, bool>> predicates = null, 
-            Func<IQueryable<AppClaim>, IIncludableQueryable<AppClaim, object>> includes = null, 
-            Func<IQueryable<AppClaim>, IOrderedQueryable<AppClaim>> orders = null, 
+        public async Task<IEnumerable<TClaims>> GetAsync(Expression<Func<TClaims, bool>> predicates = null, 
+            Func<IQueryable<TClaims>, IIncludableQueryable<TClaims, object>> includes = null, 
+            Func<IQueryable<TClaims>, IOrderedQueryable<TClaims>> orders = null, 
             int? skip = null, 
             int? take = null)
         {
-            var query = _context.AppClaim.AsQueryable();
+            var query = _context.TClaims.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -92,9 +93,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<AppClaim> UpdateAsync(AppClaim model)
+        public async Task<TClaims> UpdateAsync(TClaims model)
         {
-            var entity = _context.AppClaim.Where(x => x.Id == model.Id).Single();
+            var entity = _context.TClaims.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
@@ -109,7 +110,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_transform.Map<AppClaim>(_context.Update(entity).Entity));
+            return await Task.FromResult(_context.Update(entity).Entity);
         }
     }
 }

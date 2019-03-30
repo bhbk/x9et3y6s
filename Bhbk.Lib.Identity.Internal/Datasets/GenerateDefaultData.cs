@@ -13,9 +13,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 {
     public class GenerateDefaultData
     {
-        private readonly IIdentityContext<AppDbContext> _uow;
+        private readonly IIdentityContext<DatabaseContext> _uow;
 
-        public GenerateDefaultData(IIdentityContext<AppDbContext> uow)
+        public GenerateDefaultData(IIdentityContext<DatabaseContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();

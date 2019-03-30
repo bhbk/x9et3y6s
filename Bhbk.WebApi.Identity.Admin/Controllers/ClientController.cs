@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClientV1([FromRoute] string clientValue)
         {
             Guid clientID;
-            AppClient client = null;
+            TClients client = null;
 
             if (Guid.TryParse(clientValue, out clientID))
                 client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<AppClient, bool>> preds;
+            Expression<Func<TClients, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -116,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.ClientRepo.CountAsync(preds);
                 var result = await UoW.ClientRepo.GetAsync(preds,
-                    x => x.Include(r => r.AppRole),
+                    x => x.Include(r => r.TRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
@@ -161,7 +161,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (client.Immutable)
                 return BadRequest(Strings.MsgClientImmutable);
 
-            var result = await UoW.ClientRepo.UpdateAsync(UoW.Transform.Map<AppClient>(model));
+            var result = await UoW.ClientRepo.UpdateAsync(UoW.Transform.Map<TClients>(model));
 
             await UoW.CommitAsync();
 

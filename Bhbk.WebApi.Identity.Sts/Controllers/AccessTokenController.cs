@@ -34,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/access"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GenerateAccessTokenV1([FromForm] AccessTokenV1 submit)
+        public async Task<IActionResult> GetAccessTokenV1([FromForm] AccessTokenV1 submit)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound();
 
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             if (UoW.ConfigRepo.DefaultsCompatibilityModeIssuer
                 && string.IsNullOrEmpty(submit.issuer_id))
@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            AppClient client;
+            TClients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgClientInvalid);
 
             Guid userID;
-            AppUser user;
+            TUsers user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.username, out userID))
@@ -205,7 +205,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/access"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GenerateAccessTokenV2([FromForm] AccessTokenV2 submit)
+        public async Task<IActionResult> GetAccessTokenV2([FromForm] AccessTokenV2 submit)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgSysParamsInvalid);
 
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))
@@ -229,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid userID;
-            AppUser user;
+            TUsers user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.user, out userID))
@@ -251,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserInvalid);
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<AppClient>();
+            var clients = new List<TClients>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
@@ -262,7 +262,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in submit.client.Split(","))
                 {
                     Guid clientID;
-                    AppClient client;
+                    TClients client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))

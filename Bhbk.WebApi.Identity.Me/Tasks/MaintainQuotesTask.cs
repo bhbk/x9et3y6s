@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+            var uow = (IIdentityContext<DatabaseContext>)_sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
             if (uow.Situation == ExecutionType.UnitTest)
                 QuoteOfDay = JsonConvert.DeserializeObject<UserQuotes>

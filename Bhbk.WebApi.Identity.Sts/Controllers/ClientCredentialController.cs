@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/client"), HttpPost]
         [AllowAnonymous]
-        public IActionResult GenerateClientCredentialV1([FromForm] ClientCredentialV1 submit)
+        public IActionResult UseClientCredentialV1([FromForm] ClientCredentialV1 submit)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/client"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GenerateClientCredentialV2([FromForm] ClientCredentialV2 submit)
+        public async Task<IActionResult> UseClientCredentialV2([FromForm] ClientCredentialV2 submit)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgSysParamsInvalid);
 
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            AppClient client;
+            TClients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client, out clientID))

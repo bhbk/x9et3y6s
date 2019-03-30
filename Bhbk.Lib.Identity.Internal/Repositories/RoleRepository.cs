@@ -21,22 +21,22 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : IGenericRepository<RoleCreate, AppRole, Guid>
+    public class RoleRepository : IGenericRepository<RoleCreate, TRoles, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly AppDbContext _context;
+        private readonly DatabaseContext _context;
 
-        public RoleRepository(AppDbContext context, ExecutionType situation, IMapper transform)
+        public RoleRepository(DatabaseContext context, ExecutionType situation, IMapper transform)
         {
             _context = context;
             _situation = situation;
             _transform = transform;
         }
 
-        public async Task<int> CountAsync(Expression<Func<AppRole, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<TRoles, bool>> predicates = null)
         {
-            var query = _context.AppRole.AsQueryable();
+            var query = _context.TRoles.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -44,9 +44,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<AppRole> CreateAsync(RoleCreate model)
+        public async Task<TRoles> CreateAsync(RoleCreate model)
         {
-            var entity = _transform.Map<AppRole>(model);
+            var entity = _transform.Map<TRoles>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -54,31 +54,32 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.AppRole.Where(x => x.Id == key).Single();
+            var entity = _context.TRoles.Where(x => x.Id == key).Single();
 
             try
             {
-                await Task.FromResult(_context.Remove(entity).Entity);
-                return true;
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
             }
             catch (Exception)
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.AppRole.Any(x => x.Id == key));
+            return await Task.FromResult(_context.TRoles.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<AppRole>> GetAsync(Expression<Func<AppRole, bool>> predicates = null,
-            Func<IQueryable<AppRole>, IIncludableQueryable<AppRole, object>> includes = null,
-            Func<IQueryable<AppRole>, IOrderedQueryable<AppRole>> orders = null,
+        public async Task<IEnumerable<TRoles>> GetAsync(Expression<Func<TRoles, bool>> predicates = null,
+            Func<IQueryable<TRoles>, IIncludableQueryable<TRoles, object>> includes = null,
+            Func<IQueryable<TRoles>, IOrderedQueryable<TRoles>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.AppRole.AsQueryable();
+            var query = _context.TRoles.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -86,7 +87,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             if (includes != null)
                 query = includes(query);
 
-            //query = query.Include(x => x.AppUserRole);
+            //query = query.Include(x => x.UserRoles);
 
             if (orders != null)
             {
@@ -98,23 +99,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IList<AppUser>> GetUsersListAsync(Guid key)
+        public async Task<IList<TUsers>> GetUsersListAsync(Guid key)
         {
-            var result = new List<AppUser>();
-            var list = _context.AppUserRole.Where(x => x.RoleId == key).AsQueryable();
+            var result = new List<TUsers>();
+            var entities = _context.TUserRoles.Where(x => x.RoleId == key).AsQueryable();
 
-            if (list == null)
+            if (entities == null)
                 throw new InvalidOperationException();
 
-            foreach (AppUserRole entry in list)
-                result.Add(_context.AppUser.Where(x => x.Id == entry.UserId).Single());
+            foreach (var entry in entities)
+                result.Add(_context.TUsers.Where(x => x.Id == entry.UserId).Single());
 
             return await Task.FromResult(result);
         }
 
-        public async Task<AppRole> UpdateAsync(AppRole model)
+        public async Task<TRoles> UpdateAsync(TRoles model)
         {
-            var entity = _context.AppRole.Where(x => x.Id == model.Id).Single();
+            var entity = _context.TRoles.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
@@ -128,7 +129,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_transform.Map<AppRole>(_context.Update(entity).Entity));
+            return await Task.FromResult(_context.Update(entity).Entity);
         }
     }
 }

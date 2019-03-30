@@ -12,17 +12,17 @@ namespace Bhbk.Lib.Identity.Providers
 {
     public class AlertClient : AlertEndpoints
     {
-        public AlertClient(IConfigurationRoot conf, ExecutionType situation, HttpClient http)
-            : base(conf, situation, http) { }
+        public AlertClient(IConfigurationRoot conf, ExecutionType situation, HttpClient client)
+            : base(conf, situation, client) { }
     }
 
     public class AlertEndpoints
     {
         protected readonly IConfigurationRoot _conf;
         protected readonly ExecutionType _situation;
-        protected readonly HttpClient _http;
+        protected readonly HttpClient _client;
 
-        public AlertEndpoints(IConfigurationRoot conf, ExecutionType situation, HttpClient http)
+        public AlertEndpoints(IConfigurationRoot conf, ExecutionType situation, HttpClient client)
         {
             if (conf == null)
                 throw new ArgumentNullException();
@@ -37,11 +37,11 @@ namespace Bhbk.Lib.Identity.Providers
                 //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
                 connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
 
-                _http = new HttpClient(connect);
+                _client = new HttpClient(connect);
             }
 
             if (situation == ExecutionType.UnitTest)
-                _http = http;
+                _client = client;
         }
 
         public async Task<HttpResponseMessage> Enqueue_ExceptionV1(string jwt, ExceptionCreate model)
@@ -51,16 +51,16 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/exception/v1";
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ExecutionType.Live)
-                return await _http.PostAsync(
+                return await _client.PostAsync(
                     string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
             if (_situation == ExecutionType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
+                return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -72,16 +72,16 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/email/v1";
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ExecutionType.Live)
-                return await _http.PostAsync(
+                return await _client.PostAsync(
                     string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
             if (_situation == ExecutionType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
+                return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -93,16 +93,16 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/text/v1";
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _http.DefaultRequestHeaders.Accept.Clear();
-            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (_situation == ExecutionType.Live)
-                return await _http.PostAsync(
+                return await _client.PostAsync(
                     string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
             if (_situation == ExecutionType.UnitTest)
-                return await _http.PostAsync(endpoint, content);
+                return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }

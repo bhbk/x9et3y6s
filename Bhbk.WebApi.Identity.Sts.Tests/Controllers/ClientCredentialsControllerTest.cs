@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentials_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            var result = await _endpoints.ClientCredentials_UseV1(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -52,11 +52,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), client.ClientKey);
+            var result = await _endpoints.ClientCredentials_UseV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateBase64String(16));
+            result = await _endpoints.ClientCredentials_UseV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateBase64String(16));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            result = await _endpoints.ClientCredentials_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentials_GenerateV2(Guid.NewGuid().ToString(), client.Id.ToString(), client.ClientKey);
+            var result = await _endpoints.ClientCredentials_UseV2(Guid.NewGuid().ToString(), client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            result = await _endpoints.ClientCredentials_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var result = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            var result = await _endpoints.ClientCredentials_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

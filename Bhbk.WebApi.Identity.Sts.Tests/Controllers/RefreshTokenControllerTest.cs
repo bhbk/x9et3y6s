@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             await _factory.UoW.ClientRepo.UpdateAsync(client);
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.DeleteAsync(client.Id);
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -103,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), string.Empty, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), string.Empty, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -180,7 +180,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV1(string.Empty, client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(string.Empty, client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -208,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -236,7 +236,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -261,7 +261,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
             var pos = random.Next(((string)ok["refresh_token"]).Length - 8);
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), ((string)ok["refresh_token"]).Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), ((string)ok["refresh_token"]).Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -276,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -304,7 +304,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -331,11 +331,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
             var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(AppUser));
+            update.Should().BeAssignableTo(typeof(TUsers));
 
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -362,8 +362,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var check = JArray.Parse(await result.Content.ReadAsStringAsync()).ToObject<IEnumerable<UserRefreshModel>>();
-            check.Should().BeAssignableTo<IEnumerable<UserRefreshModel>>();
+            var check = JArray.Parse(await result.Content.ReadAsStringAsync()).ToObject<IEnumerable<RefreshModel>>();
+            check.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
         }
 
         [Fact]
@@ -433,7 +433,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var check = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -505,7 +505,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var check = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -528,7 +528,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -566,7 +566,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             clients = new List<string> { client.Id.ToString() };
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -592,7 +592,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             clients = new List<string> { RandomValues.CreateBase64String(8) };
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -616,7 +616,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(RandomValues.CreateBase64String(8), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(RandomValues.CreateBase64String(8), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -640,7 +640,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(string.Empty, clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(string.Empty, clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -669,7 +669,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -698,7 +698,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -724,7 +724,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
             var pos = random.Next(((string)ok["refresh_token"]).Length - 8);
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, ((string)ok["refresh_token"]).Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, ((string)ok["refresh_token"]).Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -748,7 +748,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, string.Empty);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, string.Empty);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -776,11 +776,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
             var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(AppUser));
+            update.Should().BeAssignableTo(typeof(TUsers));
 
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -809,7 +809,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             await _factory.UoW.CommitAsync();
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -837,8 +837,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var check = JArray.Parse(await result.Content.ReadAsStringAsync()).ToObject<IEnumerable<UserRefreshModel>>();
-            check.Should().BeAssignableTo<IEnumerable<UserRefreshModel>>();
+            var check = JArray.Parse(await result.Content.ReadAsStringAsync()).ToObject<IEnumerable<RefreshModel>>();
+            check.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
         }
 
         [Fact]
@@ -911,7 +911,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var check = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -981,14 +981,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             access.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var refresh = (await _factory.UoW.UserRepo.GetRefreshAsync(x => x.UserId == user.Id 
+            var refresh = (await _factory.UoW.RefreshRepo.GetAsync(x => x.UserId == user.Id 
                 && x.ProtectedTicket == (string)ok["refresh_token"])).Single();
 
             var result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], user.Id.ToString(), refresh.Id.ToString());
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var check = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             check.Should().BeAssignableTo(typeof(HttpResponseMessage));
             check.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -1011,7 +1011,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -1050,7 +1050,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -1081,7 +1081,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
+            var result = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 

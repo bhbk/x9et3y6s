@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<AppClient> { client }, user);
+            var access = await JwtBuilder.CreateAccessTokenV2(_factory.UoW, issuer, new List<TClients> { client }, user);
 
             var create = new EmailCreate()
             {

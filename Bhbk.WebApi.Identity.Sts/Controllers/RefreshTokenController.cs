@@ -35,13 +35,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GenerateRefreshTokenV1([FromForm] RefreshTokenV1 submit)
+        public async Task<IActionResult> UseRefreshTokenV1([FromForm] RefreshTokenV1 submit)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer_id, out issuerID))
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgIssuerInvalid);
 
             Guid clientID;
-            AppClient client;
+            TClients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!client.Enabled)
                 return BadRequest(Strings.MsgClientInvalid);
 
-            var refreshToken = (await UoW.UserRepo.GetRefreshAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
+            var refreshToken = (await UoW.RefreshRepo.GetAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
 
             if (refreshToken == null
                 || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -120,13 +120,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/refresh"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GenerateRefreshTokenV2([FromForm] RefreshTokenV2 submit)
+        public async Task<IActionResult> UseRefreshTokenV2([FromForm] RefreshTokenV2 submit)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            AppIssuer issuer;
+            TIssuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!issuer.Enabled)
                 return BadRequest(Strings.MsgIssuerInvalid);
 
-            var refreshToken = (await UoW.UserRepo.GetRefreshAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
+            var refreshToken = (await UoW.RefreshRepo.GetAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
 
             if (refreshToken == null
                 || refreshToken.IssuedUtc >= DateTime.UtcNow
@@ -163,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(Strings.MsgUserInvalid);
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<AppClient>();
+            var clients = new List<TClients>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(submit.client))
@@ -174,7 +174,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in submit.client.Split(","))
                 {
                     Guid clientID;
-                    AppClient client;
+                    TClients client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -230,9 +230,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            var list = await UoW.UserRepo.GetRefreshAsync(x => x.UserId == userID);
+            var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
 
-            var result = list.Select(x => UoW.Transform.Map<UserRefreshModel>(x));
+            var result = tokens.Select(x => UoW.Transform.Map<RefreshModel>(x));
 
             return Ok(result);
         }
@@ -243,13 +243,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
-            var token = (await UoW.UserRepo.GetRefreshAsync(x => x.UserId == userID 
+            var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID 
                 && x.Id == refreshID)).SingleOrDefault();
 
             if (token == null)
                 return NotFound(Strings.MsgUserTokenInvalid);
 
-            if (!await UoW.UserRepo.RemoveRefreshTokenAsync(token.Id))
+            if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -268,8 +268,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null)
                 return NotFound(Strings.MsgUserNotExist);
 
-            if (!await UoW.UserRepo.RemoveRefreshTokensAsync(user))
-                return StatusCode(StatusCodes.Status500InternalServerError);
+            foreach (var token in await UoW.RefreshRepo.GetAsync(x => x.UserId == userID))
+            {
+                if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+            }
 
             await UoW.CommitAsync();
 

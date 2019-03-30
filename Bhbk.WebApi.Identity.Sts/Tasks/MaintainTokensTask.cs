@@ -46,17 +46,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             {
                 try
                 {
-                    var uow = (IIdentityContext<AppDbContext>)_sp.GetRequiredService<IIdentityContext<AppDbContext>>();
+                    var uow = (IIdentityContext<DatabaseContext>)_sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = (await uow.UserRepo.GetRefreshAsync(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow)).ToList();
+                    var invalid = (await uow.RefreshRepo.GetAsync(x => x.IssuedUtc > DateTime.UtcNow || x.ExpiresUtc < DateTime.UtcNow)).ToList();
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())
                     {
                         foreach (var entry in invalid.ToList())
-                            await uow.UserRepo.RemoveRefreshTokenAsync(entry.Id);
+                            await uow.RefreshRepo.DeleteAsync(entry.Id);
 
                         await uow.CommitAsync();
 
