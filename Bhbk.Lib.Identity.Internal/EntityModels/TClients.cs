@@ -7,7 +7,9 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
     {
         public TClients()
         {
+            TActivities = new HashSet<TActivities>();
             TClientUrls = new HashSet<TClientUrls>();
+            TCodes = new HashSet<TCodes>();
             TRefreshes = new HashSet<TRefreshes>();
             TRoles = new HashSet<TRoles>();
         }
@@ -25,7 +27,9 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public bool Immutable { get; set; }
 
         public virtual TIssuers Issuer { get; set; }
+        public virtual ICollection<TActivities> TActivities { get; set; }
         public virtual ICollection<TClientUrls> TClientUrls { get; set; }
+        public virtual ICollection<TCodes> TCodes { get; set; }
         public virtual ICollection<TRefreshes> TRefreshes { get; set; }
         public virtual ICollection<TRoles> TRoles { get; set; }
     }

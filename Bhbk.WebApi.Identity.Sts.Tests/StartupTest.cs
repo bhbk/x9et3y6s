@@ -28,7 +28,7 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Sts.Tests
 {
-    [CollectionDefinition("StsTestCollection")]
+    [CollectionDefinition("StsTests")]
     public class StartupTestCollection : ICollectionFixture<StartupTest> { }
 
     public class StartupTest : WebApplicationFactory<Startup>
@@ -80,9 +80,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 UoW = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
                 TestData = new GenerateTestData(UoW);
-                TestData.CreateAsync().Wait();
-
                 DefaultData = new GenerateDefaultData(UoW);
+
+                /*
+                 * must add defaults...
+                 */
+
                 DefaultData.CreateAsync().Wait();
 
                 /*
@@ -105,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (UoW.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                if (UoW.ConfigRepo.DefaultsLegacyModeIssuer)
                     issuers = (UoW.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 
@@ -174,8 +177,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 app.UseMvc();
 
                 //app.UseMiddleware<AccessTokenProvider_Deprecate>();
-                //app.UseMiddleware<AuthorizationCodeProvider_Deprecate>();
-                //app.UseMiddleware<ClientCredentialProvider_Deprecate>();
                 //app.UseMiddleware<RefreshTokenProvider_Deprecate>();
 
                 app.UseSwagger(SwaggerOptions.ConfigureSwagger);

@@ -1,33 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class ClientUriBase
+    public abstract class Roles
     {
+        public Guid ActorId { get; set; }
+
         [Required]
         public Guid ClientId { get; set; }
 
         [Required]
-        public Guid ActorId { get; set; }
+        public string Name { get; set; }
+
+        public string Description { get; set; }
 
         [Required]
-        public string AbsoluteUri { get; set; }
-
         [DefaultValue(true)]
         public bool Enabled { get; set; }
 
+        [Required]
         [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
-    public class ClientUriCreate : ClientUriBase
+    public class RoleCreate : Roles
     {
 
     }
 
-    public class ClientUriModel : ClientUriBase
+    public class RoleModel : Roles
     {
         [Required]
         public Guid Id { get; set; }
@@ -35,5 +39,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         public DateTime Created { get; set; }
 
         public Nullable<DateTime> LastUpdated { get; set; }
+
+        public ICollection<string> Users { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,20 +29,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = await UoW.ClientRepo.GetAsync(x => x.Name == model.Name);
-
-            if (check.Any())
+            if ((await UoW.ClientRepo.GetAsync(x => x.IssuerId == model.IssuerId
+                && x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.ClientAlreadyExists.ToString(), Strings.MsgClientAlreadyExists);
+                ModelState.AddModelError(MsgType.ClientAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
                 return BadRequest(ModelState);
             }
 
             ClientType clientType;
 
             if (!Enum.TryParse<ClientType>(model.ClientType, out clientType))
-                return BadRequest(Strings.MsgClientInvalid);
+            {
+                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
+                return BadRequest(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.ClientRepo.CreateAsync(model);
 
@@ -60,12 +61,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"clientID: { clientID }");
+                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{clientID}");
                 return NotFound(ModelState);
             }
-
             else if (client.Immutable)
-                return BadRequest(Strings.MsgClientImmutable);
+            {
+                ModelState.AddModelError(MsgType.ClientImmutable.ToString(), $"Client:{clientID}");
+                return BadRequest(ModelState);
+            }
 
             client.ActorId = GetUserGUID();
 
@@ -89,7 +92,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientValue)).SingleOrDefault();
 
             if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
+            {
+                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{clientValue}");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<ClientModel>(client));
         }
@@ -125,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -137,7 +143,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
             if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
+            {
+                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{clientID}");
+                return NotFound(ModelState);
+            }
 
             var roles = await UoW.ClientRepo.GetRoleListAsync(clientID);
 
@@ -151,15 +160,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
             var client = (await UoW.ClientRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
-
+            {
+                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{model.Id}");
+                return NotFound(ModelState);
+            }
             else if (client.Immutable)
-                return BadRequest(Strings.MsgClientImmutable);
+            {
+                ModelState.AddModelError(MsgType.ClientImmutable.ToString(), $"Client:{client.Id}");
+                return BadRequest(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.ClientRepo.UpdateAsync(UoW.Transform.Map<TClients>(model));
 

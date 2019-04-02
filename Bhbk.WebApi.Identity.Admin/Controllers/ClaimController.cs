@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -29,16 +28,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = await UoW.ClaimRepo.GetAsync(x => x.IssuerId == model.IssuerId
-                && x.Type == model.Type);
-
-            if (check.Any())
+            if ((await UoW.ClaimRepo.GetAsync(x => x.IssuerId == model.IssuerId
+                && x.Type == model.Type)).Any())
             {
-                ModelState.AddModelError(MsgType.ClaimAlreadyExists.ToString(), Strings.MsgClaimAlreadyExists);
+                ModelState.AddModelError(MsgType.ClaimAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Claim:{model.Type}");
                 return BadRequest(ModelState);
             }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.ClaimRepo.CreateAsync(model);
 
@@ -55,12 +52,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (claim == null)
             {
-                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"claimID: { claimID }");
+                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"Claim:{claimID}");
                 return NotFound(ModelState);
             }
 
-            else if (claim.Immutable)
-                return BadRequest(Strings.MsgClaimImmutable);
+            if (claim.Immutable)
+            {
+                ModelState.AddModelError(MsgType.ClaimImmutable.ToString(), $"Claim:{claimID}");
+                return BadRequest(ModelState);
+            }
 
             claim.ActorId = GetUserGUID();
 
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -135,15 +135,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
             var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (claim == null)
-                return NotFound(Strings.MsgClaimNotExist);
-
+            {
+                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"Claim:{model.Id}");
+                return NotFound(ModelState);
+            }
             else if (claim.Immutable)
-                return BadRequest(Strings.MsgClaimImmutable);
+            {
+                ModelState.AddModelError(MsgType.ClaimImmutable.ToString(), $"Claim:{model.Id}");
+                return BadRequest(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.ClaimRepo.UpdateAsync(UoW.Transform.Map<TClaims>(model));
 

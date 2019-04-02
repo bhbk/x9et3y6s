@@ -4,7 +4,6 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
 {
     public enum MsgType
     {
-        PagerException,
         ClaimAlreadyExists,
         ClaimImmutable,
         ClaimInvalid,
@@ -13,6 +12,8 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         ClientImmutable,
         ClientInvalid,
         ClientNotFound,
+        EmailDequeueError,
+        EmailEnueueError,
         IssuerAlreadyExists,
         IssuerImmutable,
         IssuerInvalid,
@@ -21,14 +22,21 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         LoginImmutable,
         LoginInvalid,
         LoginNotFound,
+        ParametersInvalid,
+        ParseError,
         RoleAlreadyExists,
         RoleImmutable,
         RoleInvalid,
         RoleNotFound,
+        TextDequeueError,
+        TextEnqueueError,
+        UriInvalid,
+        UriNotFound,
         UserAlreadyExists,
         UserImmutable,
         UserInvalid,
         UserNotFound,
+        TokenInvalid,
     }
 
     //https://tools.ietf.org/html/rfc6749#section-2.1
@@ -37,6 +45,19 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         user_agent,
         native,
         server,
+    }
+
+    public enum CodeType
+    {
+        Client,
+        User,
+    }
+
+    public enum RefreshType
+    {
+        Client,
+        Device,
+        User,
     }
 
     public enum LoginType

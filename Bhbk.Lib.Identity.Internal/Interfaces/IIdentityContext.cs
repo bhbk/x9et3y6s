@@ -13,6 +13,7 @@ namespace Bhbk.Lib.Identity.Internal.Interfaces
         ActivityRepository ActivityRepo { get; }
         ClaimRepository ClaimRepo { get; }
         ClientRepository ClientRepo { get; }
+        CodeRepository CodeRepo { get; }
         ConfigRepository ConfigRepo { get; }
         IssuerRepository IssuerRepo { get; }
         LoginRepository LoginRepo { get; }

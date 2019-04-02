@@ -44,7 +44,7 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     && _refresh.ValidFrom < DateTime.UtcNow
                     && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
-                    var result = _sts.RefreshToken_UseV2(_conf["IdentityLogin:IssuerName"],
+                    var result = _sts.RefreshToken_GenerateV2(_conf["IdentityLogin:IssuerName"],
                         new List<string> { _conf["IdentityLogin:ClientName"] }, _refresh.RawData).Result;
 
                     if (result.IsSuccessStatusCode)

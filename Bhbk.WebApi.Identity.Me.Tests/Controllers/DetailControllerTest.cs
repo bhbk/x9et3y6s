@@ -1,17 +1,20 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Me;
+using Bhbk.Lib.Identity.Internal.Datasets;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
-    [Collection("MeTestCollection")]
+    [Collection("MeTests")]
     public class DetailControllerTest
     {
         private readonly StartupTest _factory;
@@ -26,6 +29,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new DetailController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -46,6 +52,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new DetailController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -68,6 +77,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new DetailController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -96,6 +108,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new DetailController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -124,6 +139,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new DetailController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -146,6 +164,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new DetailController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();

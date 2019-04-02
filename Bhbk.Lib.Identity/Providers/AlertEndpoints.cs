@@ -44,27 +44,6 @@ namespace Bhbk.Lib.Identity.Providers
                 _client = client;
         }
 
-        public async Task<HttpResponseMessage> Enqueue_ExceptionV1(string jwt, ExceptionCreate model)
-        {
-            var content = new StringContent(
-                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-
-            var endpoint = "/exception/v1";
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _client.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
         public async Task<HttpResponseMessage> Enqueue_EmailV1(string jwt, EmailCreate model)
         {
             var content = new StringContent(

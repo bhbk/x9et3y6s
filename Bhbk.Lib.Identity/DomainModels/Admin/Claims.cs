@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class ClaimBase
+    public abstract class Claims
     {
         public Guid ActorId { get; set; }
 
+        [Required]
         public Guid IssuerId { get; set; }
 
         public string Subject { get; set; }
@@ -20,22 +21,24 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public string ValueType { get; set; }
 
+        [Required]
         [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
-    public class ClaimCreate : ClaimBase
+    public class ClaimCreate : Claims
     {
 
     }
 
-    public class ClaimModel : ClaimBase
+    public class ClaimModel : Claims
     {
         [Required]
         public Guid Id { get; set; }
 
+        [Required]
         public DateTime Created { get; set; }
 
-        public Nullable<DateTime> LastUpdated { get; set; }
+        public DateTime? LastUpdated { get; set; }
     }
 }

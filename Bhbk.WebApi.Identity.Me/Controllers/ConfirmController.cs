@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives;
+﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +25,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(email, token, user))
-                return BadRequest(Strings.MsgUserTokenInvalid);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+            else if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(email, token, user))
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{token}");
+                return BadRequest(ModelState);
+            }
 
             await UoW.UserRepo.SetConfirmedEmailAsync(user.Id, true);
 
@@ -47,10 +52,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(password, token, user))
-                return BadRequest(Strings.MsgUserTokenInvalid);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+            else if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(password, token, user))
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{token}");
+                return BadRequest(ModelState);
+            }
 
             await UoW.UserRepo.SetConfirmedPasswordAsync(user.Id, true);
 
@@ -69,10 +79,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
-                return BadRequest(Strings.MsgUserTokenInvalid);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+            else if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{token}");
+                return BadRequest(ModelState);
+            }
 
             await UoW.UserRepo.SetConfirmedPhoneNumberAsync(user.Id, true);
 

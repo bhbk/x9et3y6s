@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
@@ -104,14 +104,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
-
-                if (!issuer.Enabled)
+                else if (!issuer.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
 
                 Guid userID;
@@ -127,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{userValue}" }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -141,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
@@ -168,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                         }
 
                         if (!client.Enabled
@@ -176,7 +175,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                         }
 
                         clients.Add(client);
@@ -191,13 +190,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgLoginNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Login for user:{user.Id}" }, _serializer));
                 }
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                    || (uow.Situation == ExecutionType.UnitTest && logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1)).Any()))
+                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1) || x.Name.StartsWith(Strings.ApiUnitTestLogin2)).Any()
+                        && uow.Situation == ExecutionType.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -207,21 +207,21 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                     }
                 }
                 else
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgLoginInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtBuilder.CreateAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtBuilder.CreateRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.UserAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.UserRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -236,7 +236,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //add activity entry for login...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    ActorId = user.Id,
+                    UserId = user.Id,
                     ActivityType = LoginType.GenerateAccessTokenV2.ToString(),
                     Immutable = false
                 }).Wait();
@@ -282,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
@@ -303,14 +303,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
-
-                if (!issuer.Enabled)
+                else if (!issuer.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
 
                 Guid clientID;
@@ -326,14 +325,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                 }
 
                 if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                 }
 
                 Guid userID;
@@ -349,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{userValue}" }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -363,7 +362,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
@@ -374,13 +373,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgLoginNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Login for user:{user.Id}" }, _serializer));
                 }
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ExecutionType.UnitTest))
+                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1) || x.Name.StartsWith(Strings.ApiUnitTestLogin2)).Any()
+                        && uow.Situation == ExecutionType.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -390,21 +390,21 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                     }
                 }
                 else
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgLoginInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtBuilder.CreateAccessTokenV1(uow, issuer, client, user).Result;
-                var refresh = JwtBuilder.CreateRefreshTokenV1(uow, issuer, user).Result;
+                var access = JwtBuilder.UserAccessTokenV1(uow, issuer, client, user).Result;
+                var refresh = JwtBuilder.UserRefreshTokenV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -419,7 +419,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //add activity entry for login...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    ActorId = user.Id,
+                    UserId = user.Id,
                     ActivityType = LoginType.GenerateAccessTokenV1.ToString(),
                     Immutable = false
                 }).Wait();
@@ -464,7 +464,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
@@ -473,7 +473,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     throw new ArgumentNullException();
 
                 //check if issuer compatibility mode enabled.
-                if (!uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                if (!uow.ConfigRepo.DefaultsLegacyModeIssuer)
                     return _next(context);
 
                 /*
@@ -499,15 +499,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuer.Id}" }, _serializer));
                 }
-
-                if (!issuer.Enabled
+                else if (!issuer.Enabled
                     || !client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuer.Id}" }, _serializer));
                 }
 
                 Guid userID;
@@ -523,7 +522,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{userValue}" }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -537,7 +536,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
@@ -548,13 +547,14 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgLoginNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Login for user:{user.Id}" }, _serializer));
                 }
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1)).Any() && uow.Situation == ExecutionType.UnitTest))
+                    || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1) || x.Name.StartsWith(Strings.ApiUnitTestLogin2)).Any()
+                        && uow.Situation == ExecutionType.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -564,20 +564,20 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                     }
                 }
                 else
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgLoginInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtBuilder.CreateAccessTokenV1Legacy(uow, issuer, client, user).Result;
+                var access = JwtBuilder.UserAccessTokenV1Legacy(uow, issuer, client, user).Result;
 
                 var result = new
                 {
@@ -589,7 +589,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //add activity entry for login...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    ActorId = user.Id,
+                    UserId = user.Id,
                     ActivityType = LoginType.GenerateAccessTokenV1Legacy.ToString(),
                     Immutable = false
                 }).Wait();

@@ -9,6 +9,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         {
             TClaims = new HashSet<TClaims>();
             TClients = new HashSet<TClients>();
+            TCodes = new HashSet<TCodes>();
             TRefreshes = new HashSet<TRefreshes>();
         }
 
@@ -24,6 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
 
         public virtual ICollection<TClaims> TClaims { get; set; }
         public virtual ICollection<TClients> TClients { get; set; }
+        public virtual ICollection<TCodes> TCodes { get; set; }
         public virtual ICollection<TRefreshes> TRefreshes { get; set; }
     }
 }

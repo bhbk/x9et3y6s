@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            if (uow.ConfigRepo.DefaultsCompatibilityModeIssuer)
+            if (uow.ConfigRepo.DefaultsLegacyModeIssuer)
                 issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name).Concat(issuers);
 

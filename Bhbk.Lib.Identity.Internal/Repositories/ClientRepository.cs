@@ -53,15 +53,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<TRefreshes> CreateRefreshAsync(RefreshCreate model)
-        {
-            var entity = _transform.Map<TRefreshes>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
-        }
-
-        public async Task<TClientUrls> CreateUriAsync(ClientUriCreate model)
+        public async Task<TClientUrls> CreateUriAsync(ClientUrlsCreate model)
         {
             var entity = _transform.Map<TClientUrls>(model);
             var create = _context.Add(entity).Entity;
@@ -73,11 +65,13 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.TClients.Where(x => x.Id == key).Single();
 
+            var activity = _context.TActivities.Where(x => x.ClientId == key);
             var roles = _context.TRoles.Where(x => x.ClientId == key);
             var refreshes = _context.TRefreshes.Where(x => x.ClientId == key);
 
             try
             {
+                _context.RemoveRange(activity);
                 _context.RemoveRange(roles);
                 _context.RemoveRange(refreshes);
 
@@ -115,7 +109,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ExpireClientToken"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -137,7 +131,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ExpireClientRefresh"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);

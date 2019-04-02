@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class UserBase
+    public abstract class Users
     {
         public Guid ActorId { get; set; }
 
@@ -27,18 +27,20 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         public bool LockoutEnabled { get; set; }
 
         [Required]
+        [DefaultValue(false)]
         public bool HumanBeing { get; set; }
 
+        [Required]
         [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
-    public class UserCreate : UserBase
+    public class UserCreate : Users
     {
         public Guid IssuerId { get; set; }
     }
 
-    public class UserModel : UserBase
+    public class UserModel : Users
     {
         [Required]
         public Guid Id { get; set; }
@@ -145,43 +147,5 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         [Required]
         [DataType(DataType.EmailAddress)]
         public string NewEmailConfirm { get; set; }
-    }
-
-    public class UserQuotes
-    {
-        public Success success { get; set; }
-
-        public Contents contents { get; set; }
-
-        public class Contents
-        {
-            public List<Quote> quotes { get; set; }
-        }
-
-        public class Quote
-        {
-            public string quote { get; set; }
-
-            public string length { get; set; }
-
-            public string author { get; set; }
-
-            public List<string> tags { get; set; }
-
-            public string category { get; set; }
-
-            public string date { get; set; }
-
-            public string title { get; set; }
-
-            public string background { get; set; }
-
-            public string id { get; set; }
-        }
-
-        public class Success
-        {
-            public int total { get; set; }
-        }
     }
 }

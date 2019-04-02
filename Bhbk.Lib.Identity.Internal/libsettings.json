@@ -8,12 +8,18 @@
     }
   },
   "IdentityDefaults": {
-    "AccessTokenExpire": "600",
-    "AuthorizationCodeExpire": "600",
-    "BrowserCookieExpire": "600",
-    "RefreshTokenExpire": "86400",
-    "CompatibilityModeClaims": "true",
-    "CompatibilityModeIssuer": "true"
+    "ExpireAuthCodeRefresh": "86400",
+    "ExpireAuthCodeToken": "600",
+    "ExpireAuthCodeTOTP": "600",
+    "ExpireDeviceCodeRefresh": "86400",
+    "ExpireDeviceCodeToken": "600",
+    "ExpireDeviceCodeTOTP": "600",
+    "ExpireClientToken": "600",
+    "ExpireClientRefresh": "86400",
+    "ExpirePasswordToken": "600",
+    "ExpirePasswordRefresh": "86400",
+    "LegacyModeClaims": "true",
+    "LegacyModeIssuer": "true"
   },
   "IdentityTenants": {
     "AllowedIssuers": [

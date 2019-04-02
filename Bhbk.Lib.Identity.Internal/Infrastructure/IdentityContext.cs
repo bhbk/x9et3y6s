@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.DomainModels.Me;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Repositories;
@@ -20,6 +20,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         private readonly ActivityRepository _activityRepo;
         private readonly ClaimRepository _claimRepo;
         private readonly ClientRepository _clientRepo;
+        private readonly CodeRepository _codeRepo;
         private readonly ConfigRepository _configRepo;
         private readonly IssuerRepository _issuerRepo;
         private readonly LoginRepository _loginRepo;
@@ -54,20 +55,13 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             _activityRepo = new ActivityRepository(_context, _situation, _mapper);
             _claimRepo = new ClaimRepository(_context, _situation, _mapper);
             _clientRepo = new ClientRepository(_context, _situation, conf, _mapper);
+            _codeRepo = new CodeRepository(_context, _situation, _mapper);
             _configRepo = new ConfigRepository(conf, _situation);
             _issuerRepo = new IssuerRepository(_context, _situation, mapper, conf["IdentityTenants:Salt"]);
             _loginRepo = new LoginRepository(_context, _situation, mapper);
             _roleRepo = new RoleRepository(_context, _situation, mapper);
             _refreshRepo = new RefreshRepository(_context, _situation, mapper);
             _userRepo = new UserRepository(_context, _situation, conf, mapper);
-        }
-
-        public DatabaseContext Context
-        {
-            get
-            {
-                return _context;
-            }
         }
 
         public ExecutionType Situation
@@ -107,6 +101,14 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             get
             {
                 return _clientRepo;
+            }
+        }
+
+        public CodeRepository CodeRepo
+        {
+            get
+            {
+                return _codeRepo;
             }
         }
 

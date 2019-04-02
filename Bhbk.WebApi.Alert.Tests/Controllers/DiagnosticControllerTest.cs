@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Bhbk.WebApi.Alert.Tests.Controllers
 {
-    [Collection("AlertTestCollection")]
+    [Collection("AlertTests")]
     public class DiagnosticControllerTest
     {
         private readonly StartupTest _factory;

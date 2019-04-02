@@ -24,8 +24,4 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.15" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DomainModels\Me\" />
-  </ItemGroup>
-
 </Project>

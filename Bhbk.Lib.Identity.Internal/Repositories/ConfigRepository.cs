@@ -7,86 +7,135 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class ConfigRepository
     {
         private readonly ExecutionType _situation;
-        private UInt32 _defaultsAccessTokenExpire;
-        private UInt32 _defaultsAuthorizationCodeExpire;
-        private UInt32 _defaultsBrowserCookieExpire;
-        private UInt32 _defaultsRefreshTokenExpire;
-        private bool _defaultsCompatibilityModeClaims;
-        private bool _defaultsCompatibilityModeIssuer;
-        private bool _unitTestsAccessToken;
+        private UInt32 _defaultsExpireAuthCodeRefresh;
+        private UInt32 _defaultsExpireAuthCodeToken;
+        private UInt32 _defaultsExpireAuthCodeTOTP;
+        private UInt32 _defaultsExpireClientRefresh;
+        private UInt32 _defaultsExpireClientToken;
+        private UInt32 _defaultsExpireDeviceCodeRefresh;
+        private UInt32 _defaultsExpireDeviceCodeToken;
+        private UInt32 _defaultsExpireDeviceCodeTOTP;
+        private UInt32 _defaultsExpirePasswordRefresh;
+        private UInt32 _defaultsExpirePasswordToken;
+        private bool _defaultsLegacyModeClaims;
+        private bool _defaultsLegacyModeIssuer;
+        private bool _unitTestsPasswordToken;
         private bool _unitTestsRefreshToken;
-        private DateTime _unitTestsAccessTokenFakeUtcNow;
+        private DateTime _unitTestsPasswordTokenFakeUtcNow;
         private DateTime _unitTestsRefreshTokenFakeUtcNow;
 
         public ConfigRepository(IConfigurationRoot conf, ExecutionType situation)
         {
             _situation = situation;
-            _defaultsAccessTokenExpire = UInt32.Parse(conf["IdentityDefaults:AccessTokenExpire"]);
-            _defaultsAuthorizationCodeExpire = UInt32.Parse(conf["IdentityDefaults:AuthorizationCodeExpire"]);
-            _defaultsBrowserCookieExpire = UInt32.Parse(conf["IdentityDefaults:BrowserCookieExpire"]);
-            _defaultsRefreshTokenExpire = UInt32.Parse(conf["IdentityDefaults:RefreshTokenExpire"]);
-            _defaultsCompatibilityModeClaims = bool.Parse(conf["IdentityDefaults:CompatibilityModeClaims"]);
-            _defaultsCompatibilityModeIssuer = bool.Parse(conf["IdentityDefaults:CompatibilityModeIssuer"]);
-            _unitTestsAccessToken = false;
-            _unitTestsAccessTokenFakeUtcNow = DateTime.UtcNow;
+
+            _defaultsExpireAuthCodeRefresh = UInt32.Parse(conf["IdentityDefaults:ExpireAuthCodeRefresh"]);
+            _defaultsExpireAuthCodeToken = UInt32.Parse(conf["IdentityDefaults:ExpireAuthCodeToken"]);
+            _defaultsExpireAuthCodeTOTP = UInt32.Parse(conf["IdentityDefaults:ExpireAuthCodeTOTP"]);
+
+            _defaultsExpireClientRefresh = UInt32.Parse(conf["IdentityDefaults:ExpireClientRefresh"]);
+            _defaultsExpireClientToken = UInt32.Parse(conf["IdentityDefaults:ExpireClientToken"]);
+
+            _defaultsExpireDeviceCodeRefresh = UInt32.Parse(conf["IdentityDefaults:ExpireDeviceCodeRefresh"]);
+            _defaultsExpireDeviceCodeToken = UInt32.Parse(conf["IdentityDefaults:ExpireDeviceCodeToken"]);
+            _defaultsExpireDeviceCodeTOTP = UInt32.Parse(conf["IdentityDefaults:ExpireDeviceCodeTOTP"]);
+
+            _defaultsExpirePasswordRefresh = UInt32.Parse(conf["IdentityDefaults:ExpirePasswordRefresh"]);
+            _defaultsExpirePasswordToken = UInt32.Parse(conf["IdentityDefaults:ExpirePasswordToken"]);
+
+            _defaultsLegacyModeClaims = bool.Parse(conf["IdentityDefaults:LegacyModeClaims"]);
+            _defaultsLegacyModeIssuer = bool.Parse(conf["IdentityDefaults:LegacyModeIssuer"]);
+
+            _unitTestsPasswordToken = false;
+            _unitTestsPasswordTokenFakeUtcNow = DateTime.UtcNow;
+
             _unitTestsRefreshToken = false;
             _unitTestsRefreshTokenFakeUtcNow = DateTime.UtcNow;
         }
 
-        public UInt32 DefaultsAccessTokenExpire
+        public UInt32 DefaultsExpireAuthCodeRefresh
         {
-            get { return _defaultsAccessTokenExpire; }
+            get { return _defaultsExpireAuthCodeRefresh; }
         }
 
-        public UInt32 DefaultsAuthorizationCodeExpire
+        public UInt32 DefaultsExpireAuthCodeToken
         {
-            get { return _defaultsAuthorizationCodeExpire; }
+            get { return _defaultsExpireAuthCodeToken; }
         }
 
-        public UInt32 DefaultsBrowserCookieExpire
+        public UInt32 DefaultsExpireAuthCodeTOTP
         {
-            get { return _defaultsBrowserCookieExpire; }
+            get { return _defaultsExpireAuthCodeTOTP; }
         }
 
-        public UInt32 DefaultsRefreshTokenExpire
+        public UInt32 DefaultsExpireClientRefresh
         {
-            get { return _defaultsRefreshTokenExpire; }
+            get { return _defaultsExpireClientRefresh; }
         }
 
-        public bool DefaultsCompatibilityModeClaims
+        public UInt32 DefaultsExpireClientToken
         {
-            get { return _defaultsCompatibilityModeClaims; }
-            set { _defaultsCompatibilityModeClaims = value; }
+            get { return _defaultsExpireClientToken; }
         }
 
-        public bool DefaultsCompatibilityModeIssuer
+        public UInt32 DefaultsExpireDeviceCodeRefresh
         {
-            get { return _defaultsCompatibilityModeIssuer; }
-            set { _defaultsCompatibilityModeIssuer = value; }
+            get { return _defaultsExpireDeviceCodeRefresh; }
         }
 
-        public bool UnitTestsAccessToken
+        public UInt32 DefaultsExpireDeviceCodeToken
         {
-            get { return _unitTestsAccessToken; }
-            set { throw new NotImplementedException(); }
+            get { return _defaultsExpireDeviceCodeToken; }
         }
 
-        public bool UnitTestsRefreshToken
+        public UInt32 DefaultsExpireDeviceCodeTOTP
+        {
+            get { return _defaultsExpireDeviceCodeTOTP; }
+        }
+
+        public UInt32 DefaultsExpirePasswordRefresh
+        {
+            get { return _defaultsExpirePasswordRefresh; }
+        }
+
+        public UInt32 DefaultsExpirePasswordToken
+        {
+            get { return _defaultsExpirePasswordToken; }
+        }
+
+        public bool DefaultsLegacyModeClaims
+        {
+            get { return _defaultsLegacyModeClaims; }
+            set { _defaultsLegacyModeClaims = value; }
+        }
+
+        public bool DefaultsLegacyModeIssuer
+        {
+            get { return _defaultsLegacyModeIssuer; }
+            set { _defaultsLegacyModeIssuer = value; }
+        }
+
+        public bool UnitTestsPasswordRefresh
         {
             get { return _unitTestsRefreshToken; }
             set { _unitTestsRefreshToken = value; }
         }
 
-        public DateTime UnitTestsAccessTokenFakeUtcNow
+        public bool UnitTestsPasswordToken
         {
-            get { return _unitTestsAccessTokenFakeUtcNow; }
-            set { _unitTestsAccessTokenFakeUtcNow = value; }
+            get { return _unitTestsPasswordToken; }
+            set { _unitTestsPasswordToken = value; }
         }
 
-        public DateTime UnitTestsRefreshTokenFakeUtcNow
+        public DateTime UnitTestsPasswordRefreshFakeUtcNow
         {
             get { return _unitTestsRefreshTokenFakeUtcNow; }
             set { _unitTestsRefreshTokenFakeUtcNow = value; }
+        }
+
+        public DateTime UnitTestsPasswordTokenFakeUtcNow
+        {
+            get { return _unitTestsPasswordTokenFakeUtcNow; }
+            set { _unitTestsPasswordTokenFakeUtcNow = value; }
         }
     }
 }

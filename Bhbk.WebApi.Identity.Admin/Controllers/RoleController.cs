@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,12 +32,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
 
             if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
+            {
+                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
 
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             if (!await UoW.UserRepo.AddToRoleAsync(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -55,15 +60,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = (await UoW.RoleRepo.GetAsync(x => x.Name == model.Name));
-
-            if (check.Any())
+            if ((await UoW.RoleRepo.GetAsync(x => x.ClientId == model.ClientId
+                && x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.RoleAlreadyExists.ToString(), Strings.MsgRoleAlreadyExists);
+                ModelState.AddModelError(MsgType.RoleAlreadyExists.ToString(), $"Client:{model.ClientId} Role:{model.Name}");
                 return BadRequest(ModelState);
             }
+
+            model.ActorId = GetUserGUID();
 
             var create = await UoW.RoleRepo.CreateAsync(model);
 
@@ -88,9 +92,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"roleID: { roleID }");
                 return NotFound(ModelState);
             }
-
             else if (role.Immutable)
-                return BadRequest(Strings.MsgRoleImmutable);
+            {
+                ModelState.AddModelError(MsgType.RoleImmutable.ToString(), $"Role:{role.Id}");
+                return BadRequest(ModelState);
+            }
 
             role.ActorId = GetUserGUID();
 
@@ -114,7 +120,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 role = (await UoW.RoleRepo.GetAsync(x => x.Name == roleValue)).SingleOrDefault();
 
             if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
+            {
+                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleValue}");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<RoleModel>(role));
         }
@@ -150,7 +159,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -162,7 +171,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
 
             if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
+            {
+                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
 
             var users = await UoW.RoleRepo.GetUsersListAsync(role.Id);
 
@@ -179,12 +191,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
 
             if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
+            {
+                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
 
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             if (!await UoW.UserRepo.RemoveFromRoleAsync(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -201,15 +219,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
             var role = (await UoW.RoleRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (role == null)
-                return NotFound(Strings.MsgRoleNotExist);
-
+            {
+                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{model.Id}");
+                return NotFound(ModelState);
+            }
             else if (role.Immutable)
-                return BadRequest(Strings.MsgRoleImmutable);
+            {
+                ModelState.AddModelError(MsgType.RoleImmutable.ToString(), $"Role:{role.Id}");
+                return BadRequest(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.RoleRepo.UpdateAsync(UoW.Transform.Map<TRoles>(model));
 

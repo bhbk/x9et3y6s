@@ -130,7 +130,7 @@ namespace Bhbk.Lib.Identity.Providers
                 + "&client_id=" + client
                 + "&username=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&response_type=" + "code"
+                + "&grant_type=authorization_code"
                 + "&scope=" + scope);
 
             var endpoint = "/oauth2/v1/authorization-code";
@@ -154,7 +154,7 @@ namespace Bhbk.Lib.Identity.Providers
                 + "&client=" + client
                 + "&user=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&response_type=" + "code"
+                + "&grant_type=authorization_code"
                 + "&scope=" + scope);
 
             var endpoint = "/oauth2/v2/authorization-code";
@@ -172,14 +172,15 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCode_UseV1(string issuer, string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> AuthorizationCode_GenerateV1(string issuer, string client, string user, string redirectUri, string code, string state)
         {
             var content = HttpUtility.UrlPathEncode("?issuer_id=" + issuer
                 + "&client_id=" + client
                 + "&username=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&grant_type=code"
-                + "&code=" + code);
+                + "&grant_type=authorization_code"
+                + "&authorization_code=" + code
+                + "&state=" + state);
 
             var endpoint = "/oauth2/v1/authorization";
 
@@ -196,14 +197,15 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCode_UseV2(string issuer, string client, string user, string redirectUri, string code)
+        public async Task<HttpResponseMessage> AuthorizationCode_GenerateV2(string issuer, string client, string user, string redirectUri, string code, string state)
         {
             var content = HttpUtility.UrlPathEncode("?issuer=" + issuer
                 + "&client=" + client
                 + "&user=" + user
                 + "&redirect_uri=" + redirectUri
-                + "&grant_type=code"
-                + "&code=" + code);
+                + "&grant_type=authorization_code"
+                + "&authorization_code=" + code
+                + "&state=" + state);
 
             var endpoint = "/oauth2/v2/authorization";
 
@@ -221,7 +223,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
-        public async Task<HttpResponseMessage> ClientCredentials_UseV1(string issuer, string client, string secret)
+        public async Task<HttpResponseMessage> ClientCredentials_GenerateV1(string issuer, string client, string secret)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -246,7 +248,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCredentials_UseV2(string issuer, string client, string secret)
+        public async Task<HttpResponseMessage> ClientCredentials_GenerateV2(string issuer, string client, string secret)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -316,7 +318,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_UseV1(string issuer, string client, string user, string code)
+        public async Task<HttpResponseMessage> DeviceCode_GenerateV1(string issuer, string client, string user, string code)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -342,12 +344,13 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_UseV2(string issuer, string client, string code)
+        public async Task<HttpResponseMessage> DeviceCode_GenerateV2(string issuer, string client, string user, string code)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("issuer", issuer),
                     new KeyValuePair<string, string>("client", client),
+                    new KeyValuePair<string, string>("user", user),
                     new KeyValuePair<string, string>("device_code", code),
                     new KeyValuePair<string, string>("grant_type", "device_code")
                 });
@@ -476,7 +479,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshToken_UseV1(string issuer, string client, string refresh)
+        public async Task<HttpResponseMessage> RefreshToken_GenerateV1(string issuer, string client, string refresh)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -501,7 +504,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshToken_UseV2(string issuer, List<string> clients, string refresh)
+        public async Task<HttpResponseMessage> RefreshToken_GenerateV2(string issuer, List<string> clients, string refresh)
         {
             var content = new FormUrlEncodedContent(new[]
                 {

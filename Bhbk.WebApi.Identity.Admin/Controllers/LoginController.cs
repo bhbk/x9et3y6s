@@ -30,15 +30,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = await UoW.LoginRepo.GetAsync(x => x.Name == model.Name);
-
-            if (check.Any())
+            if ((await UoW.LoginRepo.GetAsync(x => x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.LoginAlreadyExists.ToString(), Strings.MsgLoginAlreadyExists);
+                ModelState.AddModelError(MsgType.LoginAlreadyExists.ToString(), $"Login:{model.Name}");
                 return BadRequest(ModelState);
             }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.LoginRepo.CreateAsync(model);
 
@@ -55,12 +53,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"loginID: { loginID }");
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login: { loginID }");
                 return NotFound(ModelState);
             }
-
             else if (login.Immutable)
-                return BadRequest(Strings.MsgLoginImmutable);
+            {
+                ModelState.AddModelError(MsgType.LoginImmutable.ToString(), $"Login:{login.Id}");
+                return BadRequest(ModelState);
+            }
 
             login.ActorId = GetUserGUID();
 
@@ -85,7 +85,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 login = (await UoW.LoginRepo.GetAsync(x => x.Name == loginValue)).SingleOrDefault();
 
             if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
+            {
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginValue}");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<LoginModel>(login));
         }
@@ -120,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
             }
         }
@@ -131,7 +134,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
             if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
+            {
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginID}");
+                return NotFound(ModelState);
+            }
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
@@ -147,12 +153,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
             var login = (await UoW.LoginRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
+            {
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{model.Id}");
+                return NotFound(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.LoginRepo.UpdateAsync(UoW.Transform.Map<TLogins>(model));
 

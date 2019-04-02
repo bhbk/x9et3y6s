@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Net;
 using System.Threading.Tasks;
 
 /*
@@ -50,10 +50,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == submit.issuer_id)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
-
-            if (!issuer.Enabled)
-                return BadRequest(Strings.MsgIssuerInvalid);
+            {
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{submit.issuer_id}");
+                return NotFound(ModelState);
+            }
+            else if (!issuer.Enabled)
+            {
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{submit.issuer_id}");
+                return BadRequest(ModelState);
+            }
 
             Guid clientID;
             TClients client;
@@ -65,57 +70,86 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 client = (await UoW.ClientRepo.GetAsync(x => x.Name == submit.client_id)).SingleOrDefault();
 
             if (client == null)
-                return NotFound(Strings.MsgClientNotExist);
-
-            if (!client.Enabled)
-                return BadRequest(Strings.MsgClientInvalid);
-
-            var refreshToken = (await UoW.RefreshRepo.GetAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
-
-            if (refreshToken == null
-                || refreshToken.IssuedUtc >= DateTime.UtcNow
-                || refreshToken.ExpiresUtc <= DateTime.UtcNow)
-                return BadRequest(Strings.MsgUserTokenInvalid);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == refreshToken.UserId)).SingleOrDefault();
-
-            //check that user exists...
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
-            //check that user is not locked...
-            if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
-                || !user.EmailConfirmed
-                || !user.PasswordConfirmed)
-                return BadRequest(Strings.MsgUserInvalid);
-
-            var access = await JwtBuilder.CreateAccessTokenV1(UoW, issuer, client, user);
-            var refresh = await JwtBuilder.CreateRefreshTokenV1(UoW, issuer, user);
-
-            var result = new JwtV1()
             {
-                token_type = "bearer",
-                access_token = access.token,
-                refresh_token = refresh,
-                user_id = user.Id.ToString(),
-                client_id = client.Id.ToString(),
-                issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-            };
-
-            //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
+                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{submit.client_id}");
+                return NotFound(ModelState);
+            }
+            else if (!client.Enabled)
             {
-                ActorId = user.Id,
-                ActivityType = LoginType.GenerateRefreshTokenV1.ToString(),
-                Immutable = false
-            });
+                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                return BadRequest(ModelState);
+            }
 
-            await UoW.CommitAsync();
+            var refreshToken = (await UoW.RefreshRepo.GetAsync(x => x.RefreshValue == submit.refresh_token)).SingleOrDefault();
+            RefreshType refreshType;
 
-            return Ok(result);
+            if (refreshToken == null)
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                return NotFound(ModelState);
+            }
+            else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), out refreshType)
+                || (refreshToken.ValidFromUtc >= DateTime.UtcNow || refreshToken.ValidToUtc <= DateTime.UtcNow))
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                return BadRequest(ModelState);
+            }
+
+            switch (refreshType)
+            {
+                case RefreshType.User:
+                    {
+                        var user = (await UoW.UserRepo.GetAsync(x => x.Id == refreshToken.UserId)).SingleOrDefault();
+
+                        //check that user exists...
+                        if (user == null)
+                        {
+                            ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{refreshToken.UserId}");
+                            return NotFound(ModelState);
+                        }
+                        //check that user is not locked...
+                        else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+                            || !user.EmailConfirmed
+                            || !user.PasswordConfirmed)
+                        {
+                            ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                            return BadRequest(ModelState);
+                        }
+
+                        //no context for auth exists yet... so set actor id same as user id...
+                        user.ActorId = user.Id;
+
+                        var access = await JwtBuilder.UserAccessTokenV1(UoW, issuer, client, user);
+                        var refresh = await JwtBuilder.UserRefreshTokenV1(UoW, issuer, user);
+
+                        var result = new UserJwtV1()
+                        {
+                            token_type = "bearer",
+                            access_token = access.token,
+                            refresh_token = refresh,
+                            user_id = user.Id.ToString(),
+                            client_id = client.Id.ToString(),
+                            issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                            expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                        };
+
+                        //add activity entry for login...
+                        await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
+                        {
+                            UserId = user.Id,
+                            ActivityType = LoginType.GenerateRefreshTokenV1.ToString(),
+                            Immutable = false
+                        });
+
+                        await UoW.CommitAsync();
+
+                        return Ok(result);
+                    }
+                default:
+                    {
+                        return StatusCode((int)HttpStatusCode.NotImplemented);
+                    }
+            }
         }
 
         [Route("v2/refresh"), HttpPost]
@@ -135,88 +169,172 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == submit.issuer)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
-
-            if (!issuer.Enabled)
-                return BadRequest(Strings.MsgIssuerInvalid);
-
-            var refreshToken = (await UoW.RefreshRepo.GetAsync(x => x.ProtectedTicket == submit.refresh_token)).SingleOrDefault();
-
-            if (refreshToken == null
-                || refreshToken.IssuedUtc >= DateTime.UtcNow
-                || refreshToken.ExpiresUtc <= DateTime.UtcNow)
-                return BadRequest(Strings.MsgUserTokenInvalid);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == refreshToken.UserId)).SingleOrDefault();
-
-            //check that user exists...
-            if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
-            //check that user is not locked...
-            if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
-                || !user.EmailConfirmed
-                || !user.PasswordConfirmed)
-                return BadRequest(Strings.MsgUserInvalid);
-
-            var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<TClients>();
-
-            //check if client is single, multiple or undefined...
-            if (string.IsNullOrEmpty(submit.client))
-                clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x)
-                    && x.Enabled == true)).ToList();
-            else
             {
-                foreach (string entry in submit.client.Split(","))
-                {
-                    Guid clientID;
-                    TClients client;
-
-                    //check if identifier is guid. resolve to guid if not.
-                    if (Guid.TryParse(entry.Trim(), out clientID))
-                        client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
-                    else
-                        client = (await UoW.ClientRepo.GetAsync(x => x.Name == entry.Trim())).SingleOrDefault();
-
-                    if (client == null)
-                        return NotFound(Strings.MsgClientNotExist);
-
-                    if (!client.Enabled
-                        || !clientList.Contains(client))
-                        return BadRequest(Strings.MsgClientInvalid);
-
-                    clients.Add(client);
-                }
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{submit.issuer}");
+                return NotFound(ModelState);
+            }
+            else if (!issuer.Enabled)
+            {
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{submit.issuer}");
+                return BadRequest(ModelState);
             }
 
-            var access = await JwtBuilder.CreateAccessTokenV2(UoW, issuer, clients, user);
-            var refresh = await JwtBuilder.CreateRefreshTokenV2(UoW, issuer, user);
+            var refreshToken = (await UoW.RefreshRepo.GetAsync(x => x.RefreshValue == submit.refresh_token)).SingleOrDefault();
+            RefreshType refreshType;
 
-            var result = new JwtV2()
+            if (refreshToken == null)
             {
-                token_type = "bearer",
-                access_token = access.token,
-                refresh_token = refresh,
-                user = user.Id.ToString(),
-                client = clients.Select(x => x.Id.ToString()).ToList(),
-                issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-            };
-
-            //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                return NotFound(ModelState);
+            }
+            else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), out refreshType)
+                || (refreshToken.ValidFromUtc >= DateTime.UtcNow || refreshToken.ValidToUtc <= DateTime.UtcNow))
             {
-                ActorId = user.Id,
-                ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
-                Immutable = false
-            });
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                return BadRequest(ModelState);
+            }
 
-            await UoW.CommitAsync();
+            switch (refreshType)
+            {
+                case RefreshType.Client:
+                    {
+                        Guid clientID;
+                        TClients client;
 
-            return Ok(result);
+                        //check if identifier is guid. resolve to guid if not.
+                        if (Guid.TryParse(submit.client, out clientID))
+                            client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                        else
+                            client = (await UoW.ClientRepo.GetAsync(x => x.Name == submit.client)).SingleOrDefault();
+
+                        if (client == null)
+                        {
+                            ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{submit.client}");
+                            return NotFound(ModelState);
+                        }
+                        else if (!client.Enabled)
+                        {
+                            ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                            return BadRequest(ModelState);
+                        }
+
+                        //no context for auth exists yet... so set actor id same as client id...
+                        client.ActorId = client.Id;
+
+                        var access = await JwtBuilder.ClientAccessTokenV2(UoW, issuer, client);
+                        var refresh = await JwtBuilder.ClientRefreshTokenV2(UoW, issuer, client);
+
+                        var result = new ClientJwtV2()
+                        {
+                            token_type = "bearer",
+                            access_token = access.token,
+                            refresh_token = refresh,
+                            client = client.Id.ToString(),
+                            issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                            expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                        };
+
+                        //add activity entry for login...
+                        await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
+                        {
+                            ClientId = client.Id,
+                            ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
+                            Immutable = false
+                        });
+
+                        await UoW.CommitAsync();
+
+                        return Ok(result);
+                    }
+                case RefreshType.User:
+                    {
+                        var user = (await UoW.UserRepo.GetAsync(x => x.Id == refreshToken.UserId)).SingleOrDefault();
+
+                        //check that user exists...
+                        if (user == null)
+                        {
+                            ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{refreshToken.UserId}");
+                            return NotFound(ModelState);
+                        }
+                        //check that user is not locked...
+                        else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+                            || !user.EmailConfirmed
+                            || !user.PasswordConfirmed)
+                        {
+                            ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                            return BadRequest(ModelState);
+                        }
+
+                        //no context for auth exists yet... so set actor id same as user id...
+                        user.ActorId = user.Id;
+
+                        var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
+                        var clients = new List<TClients>();
+
+                        //check if client is single, multiple or undefined...
+                        if (string.IsNullOrEmpty(submit.client))
+                            clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x)
+                                && x.Enabled == true)).ToList();
+                        else
+                        {
+                            foreach (string entry in submit.client.Split(","))
+                            {
+                                Guid clientID;
+                                TClients client;
+
+                                //check if identifier is guid. resolve to guid if not.
+                                if (Guid.TryParse(entry.Trim(), out clientID))
+                                    client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                                else
+                                    client = (await UoW.ClientRepo.GetAsync(x => x.Name == entry.Trim())).SingleOrDefault();
+
+                                if (client == null)
+                                {
+                                    ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{entry}");
+                                    return NotFound(ModelState);
+                                }
+                                else if (!client.Enabled
+                                    || !clientList.Contains(client))
+                                {
+                                    ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                                    return BadRequest(ModelState);
+                                }
+
+                                clients.Add(client);
+                            }
+                        }
+
+                        var access = await JwtBuilder.UserAccessTokenV2(UoW, issuer, clients, user);
+                        var refresh = await JwtBuilder.UserRefreshTokenV2(UoW, issuer, user);
+
+                        var result = new UserJwtV2()
+                        {
+                            token_type = "bearer",
+                            access_token = access.token,
+                            refresh_token = refresh,
+                            user = user.Id.ToString(),
+                            client = clients.Select(x => x.Id.ToString()).ToList(),
+                            issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                            expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                        };
+
+                        //add activity entry for login...
+                        await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
+                        {
+                            UserId = user.Id,
+                            ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
+                            Immutable = false
+                        });
+
+                        await UoW.CommitAsync();
+
+                        return Ok(result);
+                    }
+                default:
+                    {
+                        return StatusCode((int)HttpStatusCode.NotImplemented);
+                    }
+            }
         }
 
         [Route("v1/refresh/{userID}"), HttpGet]
@@ -228,7 +346,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
 
@@ -243,11 +364,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
-            var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID 
+            var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID
                 && x.Id == refreshID)).SingleOrDefault();
 
             if (token == null)
-                return NotFound(Strings.MsgUserTokenInvalid);
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{userID}");
+                return NotFound(ModelState);
+            }
 
             if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -266,7 +390,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             foreach (var token in await UoW.RefreshRepo.GetAsync(x => x.UserId == userID))
             {

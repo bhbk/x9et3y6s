@@ -69,10 +69,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.TClaims.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<TClaims>> GetAsync(Expression<Func<TClaims, bool>> predicates = null, 
-            Func<IQueryable<TClaims>, IIncludableQueryable<TClaims, object>> includes = null, 
-            Func<IQueryable<TClaims>, IOrderedQueryable<TClaims>> orders = null, 
-            int? skip = null, 
+        public async Task<IEnumerable<TClaims>> GetAsync(Expression<Func<TClaims, bool>> predicates = null,
+            Func<IQueryable<TClaims>, IIncludableQueryable<TClaims, object>> includes = null,
+            Func<IQueryable<TClaims>, IOrderedQueryable<TClaims>> orders = null,
+            int? skip = null,
             int? take = null)
         {
             var query = _context.TClaims.AsQueryable();

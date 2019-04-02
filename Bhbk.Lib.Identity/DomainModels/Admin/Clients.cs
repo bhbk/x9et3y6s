@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class RoleBase
+    public abstract class Clients
     {
         public Guid ActorId { get; set; }
 
         [Required]
-        public Guid ClientId { get; set; }
+        public Guid IssuerId { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -18,26 +18,35 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         public string Description { get; set; }
 
         [Required]
+        public string ClientKey { get; set; }
+
+        [Required]
+        public string ClientType { get; set; }
+
+        [Required]
+        [DefaultValue(true)]
         public bool Enabled { get; set; }
 
+        [Required]
         [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
-    public class RoleCreate : RoleBase
+    public class ClientCreate : Clients
     {
 
     }
 
-    public class RoleModel : RoleBase
+    public class ClientModel : Clients
     {
         [Required]
         public Guid Id { get; set; }
 
+        [Required]
         public DateTime Created { get; set; }
 
-        public Nullable<DateTime> LastUpdated { get; set; }
+        public DateTime? LastUpdated { get; set; }
 
-        public ICollection<string> Users { get; set; }
+        public ICollection<string> Roles { get; set; }
     }
 }

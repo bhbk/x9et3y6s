@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Alert.Providers
             msg.SetSpamCheck(false);
             msg.SetClickTracking(false, false);
             msg.SetFooterSetting(false);
-            
+
             return await client.SendEmailAsync(msg);
         }
     }

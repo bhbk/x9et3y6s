@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Internal.Datasets;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.WebApi.Identity.Me.Controllers;
@@ -7,12 +8,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
-    [Collection("MeTestCollection")]
+    [Collection("MeTests")]
     public class ConfirmControllerTest
     {
         private readonly StartupTest _factory;
@@ -27,6 +29,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -38,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
+                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmEmailV1(user.Id, newEmail,
@@ -52,6 +57,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -63,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
+                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
@@ -76,6 +84,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -87,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
+                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
@@ -101,6 +112,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -112,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:AuthorizationCodeExpire"])), user);
+                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
@@ -125,6 +139,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
@@ -149,6 +166,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
         {
             using (var owin = _factory.CreateClient())
             {
+                await new GenerateTestData(_factory.UoW).DestroyAsync();
+                await new GenerateTestData(_factory.UoW).CreateAsync();
+
                 var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();

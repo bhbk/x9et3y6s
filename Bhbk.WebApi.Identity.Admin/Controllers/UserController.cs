@@ -39,12 +39,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             user.ActorId = GetUserGUID();
+
+            if (model.NewPassword != model.NewPasswordConfirm)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             if (!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -61,12 +67,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
             if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
+            {
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginID}");
+                return NotFound(ModelState);
+            }
 
             if (!await UoW.UserRepo.AddToLoginAsync(user, login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -83,20 +95,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = (await UoW.UserRepo.GetAsync(x => x.Email == model.Email));
-
-            if (check.Any())
+            if ((await UoW.UserRepo.GetAsync(x => x.Email == model.Email)).Any())
             {
-                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), Strings.MsgUserAlreadyExists);
+                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), $"User:{model.Email}");
                 return BadRequest(ModelState);
             }
+
+            model.ActorId = GetUserGUID();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == model.IssuerId)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
+            {
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{model.IssuerId}");
+                return NotFound(ModelState);
+            }
 
             //ignore how bit may be set in model...
             model.HumanBeing = true;
@@ -116,9 +129,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthorizationCodeExpire), result));
+                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), result));
 
-                var url = UrlBuilder.ConfirmEmail(Conf, result, code);
+                var url = UrlBuilder.GenerateConfirmEmail(Conf, result, code);
 
                 var email = await alert.Enqueue_EmailV1(Jwt.AccessToken.ToString(),
                     new EmailCreate()
@@ -129,12 +142,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         ToId = result.Id,
                         ToEmail = result.Email,
                         ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
-                        Subject = string.Format("{0} {1}", issuer.Name, Strings.ApiMsgConfirmNewUserSubject),
-                        HtmlContent = Strings.ApiTemplateConfirmNewUser(issuer, result, url)
+                        Subject = string.Format("{0} {1}", issuer.Name, Strings.MsgConfirmNewUserSubject),
+                        HtmlContent = Strings.TemplateConfirmNewUser(issuer, result, url)
                     });
 
                 if (!email.IsSuccessStatusCode)
-                    return BadRequest(Strings.MsgSysQueueEmailError);
+                    return BadRequest(await email.Content.ReadAsStringAsync());
             }
 
             return Ok(UoW.Transform.Map<UserModel>(result));
@@ -147,15 +160,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = (await UoW.UserRepo.GetAsync(x => x.Email == model.Email));
-
-            if (check.Any())
+            if ((await UoW.UserRepo.GetAsync(x => x.Email == model.Email)).Any())
             {
-                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), Strings.MsgUserAlreadyExists);
+                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), $"User:{model.Email}");
                 return BadRequest(ModelState);
             }
+
+            model.ActorId = GetUserGUID();
 
             //ignore how bit may be set in model...
             model.HumanBeing = false;
@@ -178,12 +189,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"userID: { userID }");
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
-            else if (user.Immutable)
-                return BadRequest(Strings.MsgUserImmutable);
+            if (user.Immutable)
+            {
+                ModelState.AddModelError(MsgType.UserImmutable.ToString(), $"User:{userID}");
+                return BadRequest(ModelState);
+            }
 
             user.ActorId = GetUserGUID();
 
@@ -208,7 +222,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 user = (await UoW.UserRepo.GetAsync(x => x.Email == userValue)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userValue}");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<UserModel>(user));
         }
@@ -219,7 +236,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserInvalid);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             return Ok(await UoW.UserRepo.GetClaimsAsync(user.Id));
         }
@@ -230,7 +250,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             var clients = await UoW.UserRepo.GetClientsAsync(user.Id);
 
@@ -246,7 +269,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             var logins = await UoW.UserRepo.GetLoginsAsync(user.Id);
 
@@ -262,7 +288,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             var roles = await UoW.UserRepo.GetRolesAsync(user.Id);
 
@@ -305,7 +334,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -318,14 +347,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
             if (login == null)
-                return NotFound(Strings.MsgLoginNotExist);
-
-            if (!await UoW.UserRepo.RemoveFromLoginAsync(user, login))
+            {
+                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginID}");
+                return NotFound(ModelState);
+            }
+            else if (!await UoW.UserRepo.RemoveFromLoginAsync(user, login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -343,12 +377,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            else if (!await UoW.UserRepo.IsPasswordSetAsync(user.Id))
-                return BadRequest(Strings.MsgUserInvalidPassword);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             user.ActorId = GetUserGUID();
+
+            if (!await UoW.UserRepo.IsPasswordSetAsync(user.Id))
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             if (!await UoW.UserRepo.RemovePasswordAsync(user.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -368,12 +408,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
 
             user.ActorId = GetUserGUID();
+
+            if (model.NewPassword != model.NewPasswordConfirm)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             if (!await UoW.UserRepo.RemovePasswordAsync(user.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -393,15 +439,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{model.Id}");
+                return NotFound(ModelState);
+            }
 
-            else if (user.Immutable)
-                return BadRequest(Strings.MsgUserImmutable);
+            if (user.Immutable)
+            {
+                ModelState.AddModelError(MsgType.UserImmutable.ToString(), $"User:{model.Id}");
+                return BadRequest(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<TUsers>(model));
 

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class LoginBase
+    public abstract class Issuers
     {
         public Guid ActorId { get; set; }
 
@@ -14,23 +14,24 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public string Description { get; set; }
 
-        public string LoginKey { get; set; }
+        [Required]
+        public string IssuerKey { get; set; }
 
         [Required]
+        [DefaultValue(true)]
         public bool Enabled { get; set; }
 
+        [Required]
         [DefaultValue(false)]
         public bool Immutable { get; set; }
-
-        public ICollection<string> Users { get; set; }
     }
 
-    public class LoginCreate : LoginBase
+    public class IssuerCreate : Issuers
     {
 
     }
 
-    public class LoginModel : LoginBase
+    public class IssuerModel : Issuers
     {
         [Required]
         public Guid Id { get; set; }
@@ -38,6 +39,8 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         [Required]
         public DateTime Created { get; set; }
 
-        public Nullable<DateTime> LastUpdated { get; set; }
+        public DateTime? LastUpdated { get; set; }
+
+        public ICollection<string> Clients { get; set; }
     }
 }

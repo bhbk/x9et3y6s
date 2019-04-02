@@ -6,6 +6,7 @@ using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Providers;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -537,7 +538,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == client)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(Strings.MsgClientInvalid);
+                Console.WriteLine($"{MsgType.ClientInvalid.ToString()} Client:{client}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -562,7 +563,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == issuer)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(Strings.MsgIssuerInvalid);
+                Console.WriteLine($"{MsgType.IssuerInvalid.ToString()} Issuer:{issuer}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -587,7 +588,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == login)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(Strings.MsgLoginInvalid);
+                Console.WriteLine($"{MsgType.LoginInvalid.ToString()} Login:{login}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -613,7 +614,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["name"].Value<string>() == role)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(Strings.MsgRoleInvalid);
+                Console.WriteLine($"{MsgType.RoleInvalid.ToString()} Role:{role}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -643,7 +644,7 @@ namespace Bhbk.Cli.Identity.Cmds
                 if (content["email"].Value<string>() == user)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine(Strings.MsgUserInvalid);
+                Console.WriteLine($"{MsgType.UserInvalid.ToString()} User:{user}");
             }
 
             Console.WriteLine(result.RequestMessage

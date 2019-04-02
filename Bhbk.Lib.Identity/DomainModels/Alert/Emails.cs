@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Alert
 {
-    public abstract class EmailBase
+    public abstract class Emails
     {
-        public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
 
         [Required]
         public Guid FromId { get; set; }
@@ -17,7 +17,6 @@ namespace Bhbk.Lib.Identity.DomainModels.Alert
 
         public string FromDisplay { get; set; }
 
-        [Required]
         public Guid ToId { get; set; }
 
         [Required]
@@ -39,8 +38,8 @@ namespace Bhbk.Lib.Identity.DomainModels.Alert
         public DateTime SendAt { get; set; }
     }
 
-    public class EmailCreate : EmailBase
+    public class EmailCreate : Emails
     {
-        public Guid ActorId { get; set; }
+        public Guid Id { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<UserModel>(user));
         }
@@ -44,16 +47,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword))
-                return BadRequest(Strings.MsgUserInvalidCurrentPassword);
-
-            else if (model.NewPassword != model.NewPasswordConfirm)
-                return BadRequest(Strings.MsgUserInvalidPasswordConfirm);
-
-            if (!user.HumanBeing)
-                return BadRequest(Strings.MsgUserInvalid);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                return NotFound(ModelState);
+            }
+            else if (!user.HumanBeing)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+            else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword)
+                || model.NewPassword != model.NewPasswordConfirm)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             user.ActorId = GetUserGUID();
 
@@ -77,13 +85,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
-
-            else if (!user.HumanBeing)
-                return BadRequest(Strings.MsgUserInvalid);
-
-            if (user.TwoFactorEnabled == status)
-                return BadRequest(Strings.MsgUserInvalidTwoFactor);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                return NotFound(ModelState);
+            }
+            else if (!user.HumanBeing
+                || user.TwoFactorEnabled == status)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             if (!await UoW.UserRepo.SetTwoFactorEnabledAsync(user.Id, status))
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -102,13 +113,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
-                return NotFound(Strings.MsgUserNotExist);
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                return NotFound(ModelState);
+            }
 
-            if (user.Id != model.Id)
-                return BadRequest(Strings.MsgUserInvalid);
-
-            else if (!user.HumanBeing)
-                return BadRequest(Strings.MsgUserInvalid);
+            if (user.Id != model.Id
+                || !user.HumanBeing)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
 
             var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<TUsers>(model));
 

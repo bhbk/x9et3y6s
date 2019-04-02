@@ -8,7 +8,8 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }
         public Guid? ActorId { get; set; }
-        public string AbsoluteUri { get; set; }
+        public string UrlHost { get; set; }
+        public string UrlPath { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public DateTime? LastUpdated { get; set; }

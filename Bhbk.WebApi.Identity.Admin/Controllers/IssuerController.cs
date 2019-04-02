@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,15 +29,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
-            var check = await UoW.IssuerRepo.GetAsync(x => x.Name == model.Name);
-
-            if (check.Any())
+            if ((await UoW.IssuerRepo.GetAsync(x => x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.IssuerAlreadyExists.ToString(), Strings.MsgIssuerAlreadyExists);
+                ModelState.AddModelError(MsgType.IssuerAlreadyExists.ToString(), $"Issuer:{model.Name}");
                 return BadRequest(ModelState);
             }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.IssuerRepo.CreateAsync(model);
 
@@ -53,12 +50,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"issuerID: { issuerID }");
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
                 return NotFound(ModelState);
             }
-
             else if (issuer.Immutable)
-                return BadRequest(Strings.MsgIssuerImmutable);
+            {
+                ModelState.AddModelError(MsgType.IssuerImmutable.ToString(), $"Issuer:{issuerID}");
+                return BadRequest(ModelState);
+            }
 
             issuer.ActorId = GetUserGUID();
 
@@ -82,7 +81,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
+            {
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{issuerValue}");
+                return NotFound(ModelState);
+            }
 
             return Ok(UoW.Transform.Map<IssuerModel>(issuer));
         }
@@ -118,8 +120,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.PagerException.ToString(), ex.ToString());
-
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
             }
         }
@@ -130,7 +131,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
+            {
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
+                return NotFound(ModelState);
+            }
 
             var clients = await UoW.IssuerRepo.GetClientsAsync(issuerID);
 
@@ -144,15 +148,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = GetUserGUID();
-
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (issuer == null)
-                return NotFound(Strings.MsgIssuerNotExist);
-
+            {
+                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{model.Id}");
+                return NotFound(ModelState);
+            }
             else if (issuer.Immutable)
-                return BadRequest(Strings.MsgIssuerImmutable);
+            {
+                ModelState.AddModelError(MsgType.IssuerImmutable.ToString(), $"Issuer:{issuer.Id}");
+                return BadRequest(ModelState);
+            }
+
+            model.ActorId = GetUserGUID();
 
             var result = await UoW.IssuerRepo.UpdateAsync(UoW.Transform.Map<TIssuers>(model));
 

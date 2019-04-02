@@ -9,10 +9,10 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         {
             TActivities = new HashSet<TActivities>();
             TClaims = new HashSet<TClaims>();
+            TCodes = new HashSet<TCodes>();
             TLogins = new HashSet<TLogins>();
             TRefreshes = new HashSet<TRefreshes>();
             TUserClaims = new HashSet<TUserClaims>();
-            TUserCodes = new HashSet<TUserCodes>();
             TUserLogins = new HashSet<TUserLogins>();
             TUserRoles = new HashSet<TUserRoles>();
         }
@@ -43,10 +43,10 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
 
         public virtual ICollection<TActivities> TActivities { get; set; }
         public virtual ICollection<TClaims> TClaims { get; set; }
+        public virtual ICollection<TCodes> TCodes { get; set; }
         public virtual ICollection<TLogins> TLogins { get; set; }
         public virtual ICollection<TRefreshes> TRefreshes { get; set; }
         public virtual ICollection<TUserClaims> TUserClaims { get; set; }
-        public virtual ICollection<TUserCodes> TUserCodes { get; set; }
         public virtual ICollection<TUserLogins> TUserLogins { get; set; }
         public virtual ICollection<TUserRoles> TUserRoles { get; set; }
     }

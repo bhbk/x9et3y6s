@@ -7,8 +7,8 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
     {
         #region Attribute Constants
 
-        public const string AttrAuthorizeCodeIDV1 = "code";
-        public const string AttrAuthorizeCodeIDV2 = "code";
+        public const string AttrAuthorizeCodeIDV1 = "authorization_code";
+        public const string AttrAuthorizeCodeIDV2 = "authorization_code";
         public const string AttrIssuerIDV1 = "issuer_id";
         public const string AttrIssuerIDV2 = "issuer";
         public const string AttrClientIDV1 = "client_id";
@@ -34,7 +34,6 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         public const string ApiDefaultClientUi = "Bhbk.WebUi.Identity";
         public const string ApiDefaultClientApi = "Bhbk.WebApi.Identity";
-        public const string ApiDefaultFormatDate = "yyyy/M/dd h:mm:s tt";
         public const string ApiDefaultIssuer = "Bhbk";
         public const string ApiDefaultPhone = "+00000000000";
         public const string ApiDefaultLogin = "local";
@@ -69,76 +68,30 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string ApiUnitTestLogin2Key = "LoginUnitTests2Key";
         public const string ApiUnitTestRole1 = "RoleUnitTests1";
         public const string ApiUnitTestRole2 = "RoleUnitTests2";
+        public const string ApiUnitTestTextBody = "TextUnitTestsContent";
         public const string ApiUnitTestUser1 = "unittestuser1@local";
-        public const string ApiUnitTestUser1Phone = "+00000000000";
+        public const string ApiUnitTestUser1Phone = "+11111111111";
         public const string ApiUnitTestUser2 = "unittestuser2@local";
-        public const string ApiUnitTestUser2Phone = "+00000000000";
+        public const string ApiUnitTestUser2Phone = "+22222222222";
         public const string ApiUnitTestUserPassCurrent = "te$tpa$$word01!";
         public const string ApiUnitTestUserPassNew = "te$tpa$$word01!new";
         public const string ApiUnitTestUri1 = "UrlUnitTests1";
-        public const string ApiUnitTestUri1Link = "https://app.test.net/1/redirect";
+        public const string ApiUnitTestUri1Link = "https://app.test.net/1/callback";
         public const string ApiUnitTestUri2 = "UrlUnitTests2";
-        public const string ApiUnitTestUri2Link = "https://app.test.net/2/redirect";
+        public const string ApiUnitTestUri2Link = "https://app.test.net/2/callback";
 
         #endregion
 
         #region Messages
 
-        public const string MsgActivityNotExist = "Activity does not exist";
-        public const string MsgClaimAlreadyExists = "Claim already exists";
-        public const string MsgClaimImmutable = "Claim is immutable";
-        public const string MsgClaimInvalid = "Claim is invalid or disabled";
-        public const string MsgClaimNotExist = "Claim does not exist";
-        public const string MsgClientAlreadyExists = "Client already exists";
-        public const string MsgClientImmutable = "Client is immutable";
-        public const string MsgClientInvalid = "Client is invalid or disabled";
-        public const string MsgClientNotExist = "Client does not exist";
-        public const string MsgIssuerAlreadyExists = "Issuer already exists";
-        public const string MsgIssuerImmutable = "Issuer is immutable";
-        public const string MsgIssuerInvalid = "Issuer is invalid or disabled";
-        public const string MsgIssuerNotExist = "Issuer does not exist";
-        public const string MsgLoginAlreadyExists = "Login already exists";
-        public const string MsgLoginImmutable = "Login is immutable";
-        public const string MsgLoginInvalid = "Login invalid or disabled";
-        public const string MsgLoginNotExist = "Login does not exist";
-        public const string MsgRoleAlreadyExists = "Role already exists";
-        public const string MsgRoleImmutable = "Role is immutable";
-        public const string MsgRoleInvalid = "Role invalid or disabled";
-        public const string MsgRoleNotExist = "Role does not exist";
-        public const string MsgSysNotImplemented = "Feature not implemented yet";
-        public const string MsgSysParamsInvalid = "One or more parameters invalid";
-        public const string MsgSysQueueEmailError = "Fail to queue email message for delivery";
-        public const string MsgSysQueueSmsError = "Fail to queue SMS message for delivery";
-        public const string MsgUriAlreadyExists = "Uri already exists";
-        public const string MsgUriImmutable = "Uri is immutable";
-        public const string MsgUriInvalid = "Uri is invalid or disabled.";
-        public const string MsgUriNotExist = "Uri does not exist";
-        public const string MsgUserAlreadyExists = "User already exists";
-        public const string MsgUserImmutable = "User is immutable";
-        public const string MsgUserInvalid = "User is invalid, locked or disabled.";
-        public const string MsgUserInvalidCurrentEmail = "User current email incorrect";
-        public const string MsgUserInvalidCurrentPassword = "User current password incorrect";
-        public const string MsgUserInvalidCurrentPhone = "User current phone incorrect";
-        public const string MsgUserInvalidEmailConfirm = "User new email does not match confirm email";
-        public const string MsgUserInvalidPassword = "User password invalid";
-        public const string MsgUserInvalidPasswordConfirm = "User new password does not match confirm password";
-        public const string MsgUserInvalidPhoneConfirm = "User new phone does not match confirm phone";
-        public const string MsgUserTokenInvalid = "User token is invalid";
-        public const string MsgUserInvalidTwoFactor = "User two factor is invalid";
-        public const string MsgUserNotExist = "User does not exist";
-
-        #endregion
-
-        #region Messages (Templates)
-
-        public const string ApiMsgConfirmEmailSubject = "Confirm Email Address";
-        public const string ApiMsgConfirmPasswordSubject = "Confirm Password";
-        public const string ApiMsgConfirmPhoneSubject = "Confirm Phone Number";
-        public const string ApiMsgConfirmNewUserSubject = "Confirm New User";
+        public const string MsgConfirmEmailSubject = "Confirm Email Address";
+        public const string MsgConfirmPasswordSubject = "Confirm Password";
+        public const string MsgConfirmPhoneSubject = "Confirm Phone Number";
+        public const string MsgConfirmNewUserSubject = "Confirm New User";
 
         //https://htmlformatter.com/, https://www.freeformatter.com/java-dotnet-escape.html
 
-        public static string ApiTemplateConfirmEmail(TUsers user, Uri link)
+        public static string TemplateConfirmEmail(TUsers user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -188,7 +141,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             "</html>";
         }
 
-        public static string ApiTemplateConfirmPassword(TUsers user, Uri link)
+        public static string TemplateConfirmPassword(TUsers user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -238,7 +191,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             "</html>";
         }
 
-        public static string ApiTemplateConfirmNewUser(TIssuers issuer, TUsers user, Uri link)
+        public static string TemplateConfirmNewUser(TIssuers issuer, TUsers user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...

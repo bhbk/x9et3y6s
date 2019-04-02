@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             TIssuers issuer1, issuer2;
             TClients client1, client2;
-            TClientUrls uri1, uri2;
+            TClientUrls clientUri1, clientUri2;
             TRoles role1, role2;
             TLogins login1, login2;
             TUsers user1, user2;
@@ -78,17 +78,22 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             await _uow.CommitAsync();
 
             //assign test client uris
-            uri1 = await _uow.ClientRepo.CreateUriAsync(new ClientUriCreate()
+            var uri1 = new Uri(Strings.ApiUnitTestUri1Link);
+            var uri2 = new Uri(Strings.ApiUnitTestUri2Link);
+
+            clientUri1 = await _uow.ClientRepo.CreateUriAsync(new ClientUrlsCreate()
             {
                 ClientId = client1.Id,
-                AbsoluteUri = Strings.ApiUnitTestUri1Link,
+                UrlHost = uri1.Scheme + "://" + uri1.Host,
+                UrlPath = uri1.AbsolutePath,
                 Enabled = true,
             });
 
-            uri2 = await _uow.ClientRepo.CreateUriAsync(new ClientUriCreate()
+            clientUri2 = await _uow.ClientRepo.CreateUriAsync(new ClientUrlsCreate()
             {
                 ClientId = client2.Id,
-                AbsoluteUri = Strings.ApiUnitTestUri2Link,
+                UrlHost = uri2.Scheme + "://" + uri2.Host,
+                UrlPath = uri2.AbsolutePath,
                 Enabled = true,
             });
 
@@ -151,7 +156,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             user1 = await _uow.UserRepo.CreateAsync(new UserCreate()
             {
                 Email = Strings.ApiUnitTestUser1,
-                PhoneNumber = Strings.ApiDefaultPhone,
+                PhoneNumber = Strings.ApiUnitTestUser1Phone,
                 FirstName = "First " + RandomValues.CreateBase64String(4),
                 LastName = "Last " + RandomValues.CreateBase64String(4),
                 LockoutEnabled = false,
@@ -168,7 +173,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             user2 = await _uow.UserRepo.CreateAsync(new UserCreate()
             {
                 Email = Strings.ApiUnitTestUser2,
-                PhoneNumber = Strings.ApiDefaultPhone,
+                PhoneNumber = Strings.ApiUnitTestUser2Phone,
                 FirstName = "First " + RandomValues.CreateBase64String(4),
                 LastName = "Last " + RandomValues.CreateBase64String(4),
                 LockoutEnabled = false,
@@ -245,10 +250,13 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 await _uow.CommitAsync();
 
                 //assign random uri to random client
-                uri = await _uow.ClientRepo.CreateUriAsync(new ClientUriCreate()
+                var clientUri1 = new Uri(Strings.ApiUnitTestUri1Link);
+
+                uri = await _uow.ClientRepo.CreateUriAsync(new ClientUrlsCreate()
                 {
                     ClientId = client.Id,
-                    AbsoluteUri = Strings.ApiUnitTestUri1Link,
+                    UrlHost = clientUri1.Scheme + "://" + clientUri1.Host,
+                    UrlPath = clientUri1.AbsolutePath,
                     Enabled = true,
                 });
 
@@ -291,7 +299,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 user = await _uow.UserRepo.CreateAsync(new UserCreate()
                 {
                     Email = RandomValues.CreateAlphaNumericString(4) + "-" + Strings.ApiUnitTestUser1,
-                    PhoneNumber = Strings.ApiDefaultPhone,
+                    PhoneNumber = Strings.ApiUnitTestUser1Phone + RandomValues.CreateNumberAsString(1),
                     FirstName = "First-" + RandomValues.CreateBase64String(4),
                     LastName = "Last-" + RandomValues.CreateBase64String(4),
                     LockoutEnabled = false,

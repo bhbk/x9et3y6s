@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Alert
 {
-    public abstract class TextBase
+    public abstract class Texts
     {
-        public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
 
         [Required]
         public Guid FromId { get; set; }
@@ -14,7 +14,6 @@ namespace Bhbk.Lib.Identity.DomainModels.Alert
         [DataType(DataType.PhoneNumber)]
         public string FromPhoneNumber { get; set; }
 
-        [Required]
         public Guid ToId { get; set; }
 
         [Required]
@@ -27,8 +26,8 @@ namespace Bhbk.Lib.Identity.DomainModels.Alert
         public DateTime Created { get; set; }
     }
 
-    public class TextCreate : TextBase
+    public class TextCreate : Texts
     {
-        public Guid ActorId { get; set; }
+        public Guid Id { get; set; }
     }
 }

@@ -3,7 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
 {
-    public class AuthorizationCodeV1
+    public abstract class DeviceCodeRequests
+    {
+        [Required]
+        [RegularExpression("device_code")]
+        public string grant_type { get; set; }
+    }
+
+    public class DeviceCodeRequestV1 : DeviceCodeRequests
     {
         [Required]
         public string issuer_id { get; set; }
@@ -13,16 +20,9 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
 
         [Required]
         public string username { get; set; }
-
-        [Required]
-        public string redirect_uri { get; set; }
-
-        [Required]
-        [RegularExpression("code")]
-        public string grant_type { get; set; }
     }
 
-    public class AuthorizationCodeV2
+    public class DeviceCodeRequestV2 : DeviceCodeRequests
     {
         [Required]
         public string issuer { get; set; }
@@ -31,13 +31,6 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string client { get; set; }
 
         [Required]
-        public string username { get; set; }
-
-        [Required]
-        public string redirect_uri { get; set; }
-
-        [Required]
-        [RegularExpression("code")]
-        public string grant_type { get; set; }
+        public string user { get; set; }
     }
 }

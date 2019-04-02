@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
@@ -100,25 +100,24 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
-
-                if (!issuer.Enabled)
+                else if (!issuer.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
 
-                var refreshToken = (uow.RefreshRepo.GetAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
+                var refreshToken = (uow.RefreshRepo.GetAsync(x => x.RefreshValue == refreshTokenValue).Result).SingleOrDefault();
 
                 if (refreshToken == null
-                    || refreshToken.IssuedUtc >= DateTime.UtcNow
-                    || refreshToken.ExpiresUtc <= DateTime.UtcNow)
+                    || refreshToken.ValidFromUtc >= DateTime.UtcNow
+                    || refreshToken.ValidToUtc <= DateTime.UtcNow)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserTokenInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Token:{refreshTokenValue}" }, _serializer));
                 }
 
                 var user = (uow.UserRepo.GetAsync(x => x.Id == refreshToken.UserId).Result).SingleOrDefault();
@@ -128,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{refreshToken.UserId}" }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -141,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
                 var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
@@ -168,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                         }
 
                         if (!client.Enabled
@@ -176,15 +175,15 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                             context.Response.ContentType = "application/json";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                         }
 
                         clients.Add(client);
                     }
                 }
 
-                var access = JwtBuilder.CreateAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtBuilder.CreateRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.UserAccessTokenV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.UserRefreshTokenV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -199,7 +198,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //add activity entry for login...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    ActorId = user.Id,
+                    UserId = user.Id,
                     ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
                     Immutable = false
                 }).Wait();
@@ -242,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgSysParamsInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
@@ -263,14 +262,13 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
-
-                if (!issuer.Enabled)
+                else if (!issuer.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgIssuerInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Issuer:{issuerValue}" }, _serializer));
                 }
 
                 Guid clientID;
@@ -286,25 +284,25 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                 }
 
                 if (!client.Enabled)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgClientInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Client:{clientValue}" }, _serializer));
                 }
 
-                var refreshToken = (uow.RefreshRepo.GetAsync(x => x.ProtectedTicket == refreshTokenValue).Result).SingleOrDefault();
+                var refreshToken = (uow.RefreshRepo.GetAsync(x => x.RefreshValue == refreshTokenValue).Result).SingleOrDefault();
 
                 if (refreshToken == null
-                    || refreshToken.IssuedUtc >= DateTime.UtcNow
-                    || refreshToken.ExpiresUtc <= DateTime.UtcNow)
+                    || refreshToken.ValidFromUtc >= DateTime.UtcNow
+                    || refreshToken.ValidToUtc <= DateTime.UtcNow)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserTokenInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"Token:{refreshTokenValue}" }, _serializer));
                 }
 
                 var user = (uow.UserRepo.GetAsync(x => x.Id == refreshToken.UserId).Result).SingleOrDefault();
@@ -314,7 +312,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserNotExist }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{refreshToken.UserId}" }, _serializer));
                 }
 
                 //no context for auth exists yet... so set actor id same as user id...
@@ -327,11 +325,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = Strings.MsgUserInvalid }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var access = JwtBuilder.CreateAccessTokenV1(uow, issuer, client, user).Result;
-                var refresh = JwtBuilder.CreateRefreshTokenV1(uow, issuer, user).Result;
+                var access = JwtBuilder.UserAccessTokenV1(uow, issuer, client, user).Result;
+                var refresh = JwtBuilder.UserRefreshTokenV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -346,7 +344,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //add activity entry for login...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
-                    ActorId = user.Id,
+                    UserId = user.Id,
                     ActivityType = LoginType.GenerateRefreshTokenV1.ToString(),
                     Immutable = false
                 }).Wait();

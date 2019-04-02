@@ -27,7 +27,7 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Admin.Tests
 {
-    [CollectionDefinition("AdminTestCollection")]
+    [CollectionDefinition("AdminTests")]
     public class StartupTestCollection : ICollectionFixture<StartupTest> { }
 
     public class StartupTest : WebApplicationFactory<Startup>
@@ -78,10 +78,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                 Conf = sp.GetRequiredService<IConfigurationRoot>();
                 UoW = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
-                TestData = new GenerateTestData(UoW);
-                TestData.CreateAsync().Wait();
-
                 DefaultData = new GenerateDefaultData(UoW);
+                TestData = new GenerateTestData(UoW);
+
+                /*
+                 * must add to initialize properly...
+                 */
+
                 DefaultData.CreateAsync().Wait();
 
                 /*
@@ -104,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (UoW.ConfigRepo.DefaultsCompatibilityModeIssuer)
+                if (UoW.ConfigRepo.DefaultsLegacyModeIssuer)
                     issuers = (UoW.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 

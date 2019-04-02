@@ -1,16 +1,11 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Alert;
-using Bhbk.Lib.Identity.Internal.Primitives;
-using Bhbk.Lib.Identity.Providers;
+﻿using Bhbk.Lib.Identity.DomainModels.Alert;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Alert.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Alert.Controllers
@@ -21,30 +16,26 @@ namespace Bhbk.WebApi.Alert.Controllers
         public EmailController() { }
 
         [Route("v1"), HttpPost]
+        [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> SendEmailV1([FromBody] EmailCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Situation == ExecutionType.Live)
+            if (!(await UoW.UserRepo.GetAsync(x => x.Id == model.FromId
+                && x.Email == model.FromEmail)).Any())
             {
-                var admin = new AdminClient(Conf, ExecutionType.Live, new HttpClient());
-
-                if (admin == null)
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-
-                var user = await admin.User_GetV1(Jwt.AccessToken.ToString(), model.ToId.ToString());
-
-                if (!user.IsSuccessStatusCode)
-                    return BadRequest(Strings.MsgUserInvalid);
-
-                var recipient = JsonConvert.DeserializeObject<UserModel>(await user.Content.ReadAsStringAsync());
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
+                return NotFound(ModelState);
             }
 
             var queue = ((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask)));
 
             if (!queue.TryEnqueueEmail(model))
-                return BadRequest(Strings.MsgSysQueueEmailError);
+            {
+                ModelState.AddModelError(MsgType.EmailEnueueError.ToString(), $"MessageID:{model.Id} SenderEmail:{model.FromEmail}");
+                return BadRequest(ModelState);
+            }
 
             return NoContent();
         }

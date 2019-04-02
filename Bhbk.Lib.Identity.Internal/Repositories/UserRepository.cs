@@ -196,7 +196,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.TUsers.Where(x => x.Id == key).Single();
 
-            var activity = _context.TActivities.Where(x => x.ActorId == key);
+            var activity = _context.TActivities.Where(x => x.UserId == key);
             var claims = _context.TClaims.Where(x => x.ActorId == key);
             var logins = _context.TLogins.Where(x => x.ActorId == key);
             var refreshes = _context.TRefreshes.Where(x => x.UserId == key);
@@ -238,7 +238,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
             //check if claims compatibility enabled. means pack claim(s) with old name too.
-            if (bool.Parse(_conf["IdentityDefaults:CompatibilityModeClaims"]))
+            if (bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]))
                 foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
                     claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
 
@@ -259,7 +259,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:AccessTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ExpirePasswordToken"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -281,7 +281,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:RefreshTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ExpirePasswordRefresh"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -314,24 +314,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             return await Task.FromResult(query);
         }
-
-        //public async Task<IEnumerable<Refreshes>> GetRefreshAsync(Expression<Func<Refreshes, bool>> predicates = null,
-        //    Func<IQueryable<Refreshes>, IIncludableQueryable<Refreshes, object>> includes = null,
-        //    Func<IQueryable<Refreshes>, IOrderedQueryable<Refreshes>> orderBy = null)
-        //{
-        //    var query = _context.Refreshes.AsQueryable();
-
-        //    if (predicates != null)
-        //        query = query.Where(predicates);
-
-        //    if (includes != null)
-        //        query = includes(query);
-
-        //    if (orderBy != null)
-        //        return await Task.FromResult(orderBy(query));
-
-        //    return await Task.FromResult(query);
-        //}
 
         public async Task<IEnumerable<TClaims>> GetClaimsAsync(Guid key)
         {

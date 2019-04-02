@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 {
-    [Collection("MeTestCollection")]
+    [Collection("MeTests")]
     public class DiagnosticControllerTest
     {
         private readonly StartupTest _factory;

@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Providers;
 using FluentAssertions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -12,7 +13,7 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
-    [Collection("StsTestCollection")]
+    [Collection("StsTests")]
     public class DeviceCodeControllerTest
     {
         private readonly StartupTest _factory;
@@ -36,9 +37,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var result = await _endpoints.DeviceCode_AskV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+            var dc = await _endpoints.DeviceCode_AskV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
+            dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            dc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [Fact]
@@ -51,21 +52,43 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var result = await _endpoints.DeviceCode_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(32));
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+            var dc = await _endpoints.DeviceCode_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(32));
+            dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            dc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail()
         {
-            throw new NotImplementedException();
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var dc = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
+            dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            dc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await dc.Content.ReadAsStringAsync());
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public async Task Sts_OAuth2_DeviceCodeV2_Ask_Success()
         {
-            throw new NotImplementedException();
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+
+            var dc = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
+            dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            dc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await dc.Content.ReadAsStringAsync());
         }
 
         [Fact(Skip = "NotImplemented")]
