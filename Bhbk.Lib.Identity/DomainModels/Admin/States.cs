@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class Codes
+    public abstract class States
     {
         [Required]
         public Guid IssuerId { get; set; }
@@ -12,14 +14,14 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public Guid? UserId { get; set; }
 
-        [Required]
-        public string CodeValue { get; set; }
+        public string NonceValue { get; set; }
 
         [Required]
-        public string CodeType { get; set; }
+        public string NonceType { get; set; }
 
         [Required]
-        public string State { get; set; }
+        [DefaultValue(false)]
+        public bool NonceConsumed { get; set; }
 
         [Required]
         public DateTime ValidFromUtc { get; set; }
@@ -28,12 +30,12 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         public DateTime ValidToUtc { get; set; }
     }
 
-    public class CodeCreate : Codes
+    public class StateCreate : States
     {
 
     }
 
-    public class CodeModel : Codes
+    public class StateModel : States
     {
         [Required]
         public Guid Id { get; set; }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Sts.Tasks
 {
-    public class MaintainTokensTask : BackgroundService
+    public class MaintainStatesTask : BackgroundService
     {
         private readonly IServiceProvider _sp;
         private readonly JsonSerializerSettings _serializer;
@@ -20,13 +20,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
         public string Status { get; private set; }
 
 
-        public MaintainTokensTask(IServiceCollection sc, IConfigurationRoot conf)
+        public MaintainStatesTask(IServiceCollection sc, IConfigurationRoot conf)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-            _delay = int.Parse(conf["Tasks:MaintainTokens:PollingDelay"]);
+            _delay = int.Parse(conf["Tasks:MaintainStates:PollingDelay"]);
 
             _serializer = new JsonSerializerSettings
             {
@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             Status = JsonConvert.SerializeObject(
                 new
                 {
-                    status = typeof(MaintainTokensTask).Name + " not run yet."
+                    status = typeof(MaintainStatesTask).Name + " not run yet."
                 }, _serializer);
         }
 
@@ -50,18 +50,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
-                    var invalid = (await uow.RefreshRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow)).ToList();
+                    var invalid = (await uow.StateRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow)).ToList();
                     var invalidCount = invalid.Count();
 
                     if (invalid.Any())
                     {
                         foreach (var entry in invalid.ToList())
-                            await uow.RefreshRepo.DeleteAsync(entry.Id);
+                            await uow.StateRepo.DeleteAsync(entry.Id);
 
                         await uow.CommitAsync();
 
-                        var msg = typeof(MaintainTokensTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
-                                + invalidCount.ToString() + " invalid refresh tokens.";
+                        var msg = typeof(MaintainStatesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                                + invalidCount.ToString() + " invalid states.";
 
                         Status = JsonConvert.SerializeObject(
                             new

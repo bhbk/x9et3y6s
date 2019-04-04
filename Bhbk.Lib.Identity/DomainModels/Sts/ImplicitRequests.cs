@@ -3,18 +3,25 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
 {
-    public abstract class AccessTokens
+    public abstract class ImplicitRequests
     {
         [Required]
-        public string password { get; set; }
+        public string redirect_uri { get; set; }
 
         [Required]
-        [RegularExpression("password")]
-        public string grant_type { get; set; }
+        [RegularExpression("token")]
+        public string response_type { get; set; }
+
+        [Required]
+        public string scope { get; set; }
+
+        [Required]
+        public string state { get; set; }
     }
 
-    public class AccessTokenV1 : AccessTokens
+    public class ImplicitRequestV1 : ImplicitRequests
     {
+        [Required]
         public string issuer_id { get; set; }
 
         [Required]
@@ -24,11 +31,12 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string username { get; set; }
     }
 
-    public class AccessTokenV2 : AccessTokens
+    public class ImplicitRequestV2 : ImplicitRequests
     {
         [Required]
         public string issuer { get; set; }
 
+        [Required]
         public string client { get; set; }
 
         [Required]

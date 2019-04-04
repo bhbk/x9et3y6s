@@ -11,15 +11,15 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public virtual DbSet<LKCodeTypes> LKCodeTypes { get; set; }
         public virtual DbSet<TActivities> TActivities { get; set; }
         public virtual DbSet<TClaims> TClaims { get; set; }
-        public virtual DbSet<TClientUrls> TClientUrls { get; set; }
         public virtual DbSet<TClients> TClients { get; set; }
-        public virtual DbSet<TCodes> TCodes { get; set; }
         public virtual DbSet<TExceptions> TExceptions { get; set; }
         public virtual DbSet<TIssuers> TIssuers { get; set; }
         public virtual DbSet<TLogins> TLogins { get; set; }
         public virtual DbSet<TRefreshes> TRefreshes { get; set; }
         public virtual DbSet<TRoleClaims> TRoleClaims { get; set; }
         public virtual DbSet<TRoles> TRoles { get; set; }
+        public virtual DbSet<TStates> TStates { get; set; }
+        public virtual DbSet<TUrls> TUrls { get; set; }
         public virtual DbSet<TUserClaims> TUserClaims { get; set; }
         public virtual DbSet<TUserLogins> TUserLogins { get; set; }
         public virtual DbSet<TUserRoles> TUserRoles { get; set; }
@@ -119,20 +119,6 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
                     .HasConstraintName("FK_TClaims_IssuerID");
             });
 
-            modelBuilder.Entity<TClientUrls>(entity =>
-            {
-                entity.HasIndex(e => e.Id)
-                    .HasName("IX_TClientUrls")
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.Client)
-                    .WithMany(p => p.TClientUrls)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_TClientUrls_ClientID");
-            });
-
             modelBuilder.Entity<TClients>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -154,38 +140,6 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
                     .HasForeignKey(d => d.IssuerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_TClients_IssuerID");
-            });
-
-            modelBuilder.Entity<TCodes>(entity =>
-            {
-                entity.HasIndex(e => e.Id)
-                    .HasName("IX_UserTokens")
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.CodeType)
-                    .IsRequired()
-                    .HasMaxLength(64);
-
-                entity.Property(e => e.CodeValue).IsRequired();
-
-                entity.HasOne(d => d.Client)
-                    .WithMany(p => p.TCodes)
-                    .HasForeignKey(d => d.ClientId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_TCodes_TClients");
-
-                entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.TCodes)
-                    .HasForeignKey(d => d.IssuerId)
-                    .HasConstraintName("FK_TCodes_TIssuers");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.TCodes)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_TCodes_UserID");
             });
 
             modelBuilder.Entity<TExceptions>(entity =>
@@ -311,6 +265,50 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
                     .HasForeignKey(d => d.ClientId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_TRoles_ClientID");
+            });
+
+            modelBuilder.Entity<TStates>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_UserTokens")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.NonceType)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.TStates)
+                    .HasForeignKey(d => d.ClientId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_TCodes_TClients");
+
+                entity.HasOne(d => d.Issuer)
+                    .WithMany(p => p.TStates)
+                    .HasForeignKey(d => d.IssuerId)
+                    .HasConstraintName("FK_TCodes_TIssuers");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.TStates)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_TCodes_UserID");
+            });
+
+            modelBuilder.Entity<TUrls>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_TUrls")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.TUrls)
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK_TUrls_ClientID");
             });
 
             modelBuilder.Entity<TUserClaims>(entity =>

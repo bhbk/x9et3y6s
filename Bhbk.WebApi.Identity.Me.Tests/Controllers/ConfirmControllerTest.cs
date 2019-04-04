@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
+                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmEmailV1(user.Id, newEmail,
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
+                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
+                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
                 controller.SetUser(user.Id);
 
                 var token = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(UInt32.Parse(_factory.Conf["IdentityDefaults:ExpireAuthCodeTOTP"])), user);
+                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
                 token.Should().NotBeNullOrEmpty();
 
                 var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;

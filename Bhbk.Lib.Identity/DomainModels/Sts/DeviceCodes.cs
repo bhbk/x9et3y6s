@@ -9,6 +9,9 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string device_code { get; set; }
 
         [Required]
+        public string user_code { get; set; }
+
+        [Required]
         [RegularExpression("device_code")]
         public string grant_type { get; set; }
     }
@@ -20,9 +23,6 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
 
         [Required]
         public string client_id { get; set; }
-
-        [Required]
-        public string username { get; set; }
     }
 
     public class DeviceCodeV2 : DeviceCodes
@@ -32,8 +32,5 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
 
         [Required]
         public string client { get; set; }
-
-        [Required]
-        public string user { get; set; }
     }
 }

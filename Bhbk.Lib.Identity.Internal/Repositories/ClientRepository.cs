@@ -53,9 +53,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<TClientUrls> CreateUriAsync(ClientUrlsCreate model)
+        public async Task<TUrls> CreateUriAsync(UrlCreate model)
         {
-            var entity = _transform.Map<TClientUrls>(model);
+            var entity = _transform.Map<TUrls>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -172,9 +172,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<TClientUrls>> GetUriListAsync(Guid key)
+        public async Task<IEnumerable<TUrls>> GetUriListAsync(Guid key)
         {
-            var result = _context.TClientUrls.Where(x => x.ClientId == key).ToList();
+            var result = _context.TUrls.Where(x => x.ClientId == key).ToList();
 
             return await Task.FromResult(result);
         }

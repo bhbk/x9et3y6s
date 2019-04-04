@@ -7,8 +7,10 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
     {
         #region Attribute Constants
 
-        public const string AttrAuthorizeCodeIDV1 = "authorization_code";
-        public const string AttrAuthorizeCodeIDV2 = "authorization_code";
+        public const string AttrAuthCodeResponseIDV1 = "code";
+        public const string AttrAuthCodeResponseIDV2 = "code";
+        public const string AttrAuthCodeIDV1 = "authorization_code";
+        public const string AttrAuthCodeIDV2 = "authorization_code";
         public const string AttrIssuerIDV1 = "issuer_id";
         public const string AttrIssuerIDV2 = "issuer";
         public const string AttrClientIDV1 = "client_id";
@@ -23,10 +25,10 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string AttrRedirectUriIDV2 = "redirect_uri";
         public const string AttrRefreshTokenIDV1 = "refresh_token";
         public const string AttrRefreshTokenIDV2 = "refresh_token";
+        public const string AttrResourceOwnerIDV1 = "password";
+        public const string AttrResourceOwnerIDV2 = "password";
         public const string AttrUserIDV1 = "username";
         public const string AttrUserIDV2 = "user";
-        public const string AttrUserPasswordIDV1 = "password";
-        public const string AttrUserPasswordIDV2 = "password";
 
         #endregion
 

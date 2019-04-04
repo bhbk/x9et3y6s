@@ -157,37 +157,35 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        internal async Task<TUsers> CreateAsync(TUsers user)
+        internal async Task<TUsers> CreateAsync(TUsers entity)
         {
-            var check = await userValidator.ValidateAsync(user);
-
-            if (!check.Succeeded)
+            if (!(await userValidator.ValidateAsync(entity)).Succeeded)
                 throw new InvalidOperationException();
 
-            if (!user.HumanBeing)
-                user.EmailConfirmed = true;
+            if (!entity.HumanBeing)
+                entity.EmailConfirmed = true;
 
-            return await Task.FromResult(_context.Add(user).Entity);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
-        public async Task<TUsers> CreateAsync(UserCreate model)
+        public async Task<TUsers> CreateAsync(UserCreate entity)
         {
-            var entity = _transform.Map<TUsers>(model);
-            var create = await CreateAsync(entity);
+            var model = _transform.Map<TUsers>(entity);
+            var create = await CreateAsync(model);
 
             _context.SaveChanges();
 
             return await Task.FromResult(create);
         }
 
-        public async Task<TUsers> CreateAsync(UserCreate model, string password)
+        public async Task<TUsers> CreateAsync(UserCreate entity, string password)
         {
-            var entity = _transform.Map<TUsers>(model);
-            var create = await CreateAsync(entity);
+            var model = _transform.Map<TUsers>(entity);
+            var create = await CreateAsync(model);
 
             _context.SaveChanges();
 
-            await UpdatePassword(entity, password);
+            await UpdatePassword(model, password);
 
             return await Task.FromResult(create);
         }
@@ -525,30 +523,27 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<TUsers> UpdateAsync(TUsers model)
+        public async Task<TUsers> UpdateAsync(TUsers entity)
         {
-            var user = _transform.Map<TUsers>(model);
-            var check = await userValidator.ValidateAsync(user);
-
-            if (!check.Succeeded)
+            if (!(await userValidator.ValidateAsync(entity)).Succeeded)
                 throw new InvalidOperationException();
 
-            var entity = _context.TUsers.Where(x => x.Id == user.Id).Single();
+            var model = _context.TUsers.Where(x => x.Id == entity.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            entity.FirstName = user.FirstName;
-            entity.LastName = user.LastName;
-            entity.LockoutEnabled = user.LockoutEnabled;
-            entity.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
-            entity.LastUpdated = DateTime.Now;
-            entity.Immutable = user.Immutable;
+            model.FirstName = entity.FirstName;
+            model.LastName = entity.LastName;
+            model.LockoutEnabled = entity.LockoutEnabled;
+            model.LockoutEnd = entity.LockoutEnd.HasValue ? entity.LockoutEnd.Value.ToUniversalTime() : entity.LockoutEnd;
+            model.LastUpdated = DateTime.Now;
+            model.Immutable = entity.Immutable;
 
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(model).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return await Task.FromResult(_context.Update(model).Entity);
         }
 
         internal async Task<bool> UpdatePassword(TUsers user, string password)

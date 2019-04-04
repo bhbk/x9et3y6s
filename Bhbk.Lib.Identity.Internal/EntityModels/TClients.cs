@@ -8,10 +8,10 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
         public TClients()
         {
             TActivities = new HashSet<TActivities>();
-            TClientUrls = new HashSet<TClientUrls>();
-            TCodes = new HashSet<TCodes>();
             TRefreshes = new HashSet<TRefreshes>();
             TRoles = new HashSet<TRoles>();
+            TStates = new HashSet<TStates>();
+            TUrls = new HashSet<TUrls>();
         }
 
         public Guid Id { get; set; }
@@ -28,9 +28,9 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
 
         public virtual TIssuers Issuer { get; set; }
         public virtual ICollection<TActivities> TActivities { get; set; }
-        public virtual ICollection<TClientUrls> TClientUrls { get; set; }
-        public virtual ICollection<TCodes> TCodes { get; set; }
         public virtual ICollection<TRefreshes> TRefreshes { get; set; }
         public virtual ICollection<TRoles> TRoles { get; set; }
+        public virtual ICollection<TStates> TStates { get; set; }
+        public virtual ICollection<TUrls> TUrls { get; set; }
     }
 }

@@ -40,10 +40,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<TClaims> CreateAsync(ClaimCreate model)
+        public async Task<TClaims> CreateAsync(ClaimCreate entity)
         {
-            var entity = _transform.Map<TClaims>(model);
-            var create = _context.Add(entity).Entity;
+            var model = _transform.Map<TClaims>(entity);
+            var create = _context.Add(model).Entity;
 
             return await Task.FromResult(create);
         }
@@ -93,24 +93,24 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<TClaims> UpdateAsync(TClaims model)
+        public async Task<TClaims> UpdateAsync(TClaims entity)
         {
-            var entity = _context.TClaims.Where(x => x.Id == model.Id).Single();
+            var model = _context.TClaims.Where(x => x.Id == entity.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            entity.Subject = model.Subject;
-            entity.Type = model.Type;
-            entity.Value = model.Value;
-            entity.ValueType = model.ValueType;
-            entity.LastUpdated = DateTime.Now;
-            entity.Immutable = model.Immutable;
+            model.Subject = entity.Subject;
+            model.Type = entity.Type;
+            model.Value = entity.Value;
+            model.ValueType = entity.ValueType;
+            model.LastUpdated = DateTime.Now;
+            model.Immutable = entity.Immutable;
 
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(model).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return await Task.FromResult(_context.Update(model).Entity);
         }
     }
 }

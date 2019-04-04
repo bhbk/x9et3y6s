@@ -58,9 +58,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var result = controller.GetStatusV1(TaskType.MaintainTokens.ToString()) as OkObjectResult;
+                var result = controller.GetStatusV1(TaskType.MaintainRefreshes.ToString()) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+
+                result = controller.GetStatusV1(TaskType.MaintainStates.ToString()) as OkObjectResult;
+                ok = result.Should().BeOfType<OkObjectResult>().Subject;
             }
         }
 

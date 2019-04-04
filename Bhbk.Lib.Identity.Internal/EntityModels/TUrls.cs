@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
-    public partial class TClientUrls
+    public partial class TUrls
     {
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }

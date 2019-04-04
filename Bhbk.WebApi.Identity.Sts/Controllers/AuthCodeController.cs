@@ -6,7 +6,6 @@ using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -16,8 +15,6 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
-using System;
-using System.ComponentModel.DataAnnotations;
 
 /*
  * https://oauth.net/2/grant-types/authorization-code/
@@ -34,30 +31,50 @@ using System.ComponentModel.DataAnnotations;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    public class AuthorizationCodeController : BaseController
+    public class AuthCodeController : BaseController
     {
-        public AuthorizationCodeController() { }
+        public AuthCodeController() { }
 
-        [Route("v1/authorization-code"), HttpGet]
+        [Route("v1/authorization-ask"), HttpGet]
         [AllowAnonymous]
-        public IActionResult GetAuthCodeV1([FromQuery] AuthorizationCodeRequestV1 input)
+        public IActionResult AskAuthCodeV1([FromQuery] AuthCodeRequestV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            //clean out cruft from encoding...
+            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
+            input.client_id = HttpUtility.UrlDecode(input.client_id);
+            input.username = HttpUtility.UrlDecode(input.username);
+            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
+            input.scope = HttpUtility.UrlDecode(input.scope);
+
+            if (!input.response_type.Equals(Strings.AttrAuthCodeResponseIDV1))
+            {
+                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
+                return BadRequest(ModelState);
+            }
 
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v2/authorization-code"), HttpGet]
+        [Route("v2/authorization-ask"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAuthCodeV2([FromQuery] AuthorizationCodeRequestV2 input)
+        public async Task<IActionResult> AskAuthCodeV2([FromQuery] AuthCodeRequestV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrAuthorizeCodeIDV2))
+            //clean out cruft from encoding...
+            input.issuer = HttpUtility.UrlDecode(input.issuer);
+            input.client = HttpUtility.UrlDecode(input.client);
+            input.user = HttpUtility.UrlDecode(input.user);
+            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
+            input.scope = HttpUtility.UrlDecode(input.scope);
+
+            if (!input.response_type.Equals(Strings.AttrAuthCodeResponseIDV2))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
                 return BadRequest(ModelState);
             }
 
@@ -105,48 +122,58 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.user}");
                 return NotFound(ModelState);
             }
+            //check that user is confirmed...
+            //check that user is not locked...
+            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+                || !user.EmailConfirmed
+                || !user.PasswordConfirmed)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+
+            //no context for auth exists yet... so set actor id same as user id...
+            user.ActorId = user.Id;
 
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorization"));
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (client.TClientUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (client.TUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorization-callback"));
             }
-            else if (client.TClientUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (client.TUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
             else
             {
-                ModelState.AddModelError(MsgType.UriNotFound.ToString(), $"Uri:{input.redirect_uri}");
-                return NotFound(ModelState);
+                ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
+                return BadRequest(ModelState);
             }
 
-            var create = await UoW.CodeRepo.CreateAsync(
-                new CodeCreate()
+            var create = await UoW.StateRepo.CreateAsync(
+                new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    CodeType = CodeType.User.ToString(),
-                    CodeValue = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                        .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user)),
-                    State = RandomValues.CreateBase64String(32),
+                    NonceValue = RandomValues.CreateBase64String(32),
+                    NonceType = StateType.User.ToString(),
+                    NonceConsumed = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP),
                 });
 
             await UoW.CommitAsync();
 
-            var result = new Uri(authorize.AbsoluteUri + "?issuer=" + create.IssuerId.ToString()
-                + "&client=" + create.ClientId.ToString()
-                + "&user=" + create.UserId.ToString()
+            var result = new Uri(authorize.AbsoluteUri + "?issuer=" + HttpUtility.UrlEncode(create.IssuerId.ToString())
+                + "&client=" + HttpUtility.UrlEncode(create.ClientId.ToString())
+                + "&user=" + HttpUtility.UrlEncode(create.UserId.ToString())
                 + "&response_type=authorization_code"
-                + "&redirect_uri=" + redirect.AbsoluteUri
-                + "&authorization_code=" + create.CodeValue
-                + "&state=" + create.State);
+                + "&redirect_uri=" + HttpUtility.UrlEncode(redirect.AbsoluteUri)
+                + "&nonce=" + HttpUtility.UrlEncode(create.NonceValue));
 
             ///*
             // * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies
@@ -167,22 +194,44 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/authorization"), HttpGet]
         [AllowAnonymous]
-        public IActionResult UseAuthCodeV1(AuthorizationCodeV1 input)
+        public IActionResult UseAuthCodeV1([FromQuery] AuthCodeV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            //clean out cruft from encoding...
+            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
+            input.client_id = HttpUtility.UrlDecode(input.client_id);
+            input.username = HttpUtility.UrlDecode(input.username);
+            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
+            input.code = HttpUtility.UrlDecode(input.code);
+            input.nonce = HttpUtility.UrlDecode(input.nonce);
+
+            if (!input.grant_type.Equals(Strings.AttrAuthCodeIDV1))
+            {
+                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                return BadRequest(ModelState);
+            }
 
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
         [Route("v2/authorization"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> UseAuthCodeV2([FromQuery] AuthorizationCodeV2 input)
+        public async Task<IActionResult> UseAuthCodeV2([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrAuthorizeCodeIDV2))
+            //clean out cruft from encoding...
+            input.issuer = HttpUtility.UrlDecode(input.issuer);
+            input.client = HttpUtility.UrlDecode(input.client);
+            input.user = HttpUtility.UrlDecode(input.user);
+            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
+            input.code = HttpUtility.UrlDecode(input.code);
+            input.nonce = HttpUtility.UrlDecode(input.nonce);
+
+            if (!input.grant_type.Equals(Strings.AttrAuthCodeIDV2))
             {
                 ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -240,13 +289,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            //check that payload can be decrypted and validated...
-            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(user.SecurityStamp, input.authorization_code, user))
-            {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{input.authorization_code}");
-                return BadRequest(ModelState);
-            }
-
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
             var clients = new List<TClients>();
 
@@ -288,16 +330,35 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             foreach (var entry in clients)
             {
-                if (!entry.TClientUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath)
-                    && !entry.TClientUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+                if (!entry.TUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath)
+                    && !entry.TUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
                 {
-                    ModelState.AddModelError(MsgType.UriNotFound.ToString(), $"Uri:{input.redirect_uri}");
-                    return NotFound(ModelState);
+                    ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
+                    return BadRequest(ModelState);
                 }
             }
 
-            var access = await JwtBuilder.UserAccessTokenV2(UoW, issuer, clients, user);
-            var refresh = await JwtBuilder.UserRefreshTokenV2(UoW, issuer, user);
+            //check if state is valid...
+            var state = (await UoW.StateRepo.GetAsync(x => x.NonceValue == input.nonce
+                && x.ValidFromUtc < DateTime.UtcNow
+                && x.ValidToUtc > DateTime.UtcNow
+                && x.NonceType == StateType.User.ToString())).SingleOrDefault();
+
+            if (state == null)
+            {
+                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"State:{input.nonce}");
+                return BadRequest(ModelState);
+            }
+
+            //check that payload can be decrypted and validated...
+            if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(user.SecurityStamp, input.code, user))
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{input.code}");
+                return BadRequest(ModelState);
+            }
+
+            var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {
@@ -309,16 +370,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
-
-            //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-            {
-                UserId = user.Id,
-                ActivityType = LoginType.GenerateAuthorizationCodeV2.ToString(),
-                Immutable = false
-            });
-
-            await UoW.CommitAsync();
 
             return Ok(result);
         }

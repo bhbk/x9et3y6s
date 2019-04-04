@@ -71,7 +71,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                  */
 
                 sc.AddSingleton<IIdentityContext<DatabaseContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
-                sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
+                sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
+                sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
                 sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
 
                 var sp = sc.BuildServiceProvider();
@@ -176,8 +177,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 app.UseStaticFiles();
                 app.UseMvc();
 
-                //app.UseMiddleware<AccessTokenProvider_Deprecate>();
-                //app.UseMiddleware<RefreshTokenProvider_Deprecate>();
+                //app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();
+                //app.UseMiddleware<ResourceOwnerMiddleware_Deprecate>();
 
                 app.UseSwagger(SwaggerOptions.ConfigureSwagger);
                 app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);

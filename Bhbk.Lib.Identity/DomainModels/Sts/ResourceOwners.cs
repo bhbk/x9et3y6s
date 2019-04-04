@@ -3,25 +3,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
 {
-    public abstract class AuthorizationCodes
+    public abstract class ResourceOwners
     {
         [Required]
-        public string redirect_uri { get; set; }
+        public string password { get; set; }
 
         [Required]
-        [RegularExpression("authorization_code")]
+        [RegularExpression("password")]
         public string grant_type { get; set; }
-
-        [Required]
-        public string authorization_code { get; set; }
-
-        [Required]
-        public string state { get; set; }
     }
 
-    public class AuthorizationCodeV1 : AuthorizationCodes
+    public class ResourceOwnerV1 : ResourceOwners
     {
-        [Required]
         public string issuer_id { get; set; }
 
         [Required]
@@ -31,12 +24,11 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string username { get; set; }
     }
 
-    public class AuthorizationCodeV2 : AuthorizationCodes
+    public class ResourceOwnerV2 : ResourceOwners
     {
         [Required]
         public string issuer { get; set; }
 
-        [Required]
         public string client { get; set; }
 
         [Required]

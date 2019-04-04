@@ -20,14 +20,14 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         private readonly ActivityRepository _activityRepo;
         private readonly ClaimRepository _claimRepo;
         private readonly ClientRepository _clientRepo;
-        private readonly CodeRepository _codeRepo;
         private readonly ConfigRepository _configRepo;
         private readonly IssuerRepository _issuerRepo;
         private readonly LoginRepository _loginRepo;
         private readonly RefreshRepository _refreshRepo;
         private readonly RoleRepository _roleRepo;
+        private readonly StateRepository _stateRepo;
         private readonly UserRepository _userRepo;
-        private UserQuotes _userQuote;
+        private Quotes _userQuote;
 
         public IdentityContext(DbContextOptions<DatabaseContext> options, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
             : this(new DatabaseContext(options), situation, conf, mapper)
@@ -55,12 +55,12 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             _activityRepo = new ActivityRepository(_context, _situation, _mapper);
             _claimRepo = new ClaimRepository(_context, _situation, _mapper);
             _clientRepo = new ClientRepository(_context, _situation, conf, _mapper);
-            _codeRepo = new CodeRepository(_context, _situation, _mapper);
             _configRepo = new ConfigRepository(conf, _situation);
             _issuerRepo = new IssuerRepository(_context, _situation, mapper, conf["IdentityTenants:Salt"]);
             _loginRepo = new LoginRepository(_context, _situation, mapper);
             _roleRepo = new RoleRepository(_context, _situation, mapper);
             _refreshRepo = new RefreshRepository(_context, _situation, mapper);
+            _stateRepo = new StateRepository(_context, _situation, _mapper);
             _userRepo = new UserRepository(_context, _situation, conf, mapper);
         }
 
@@ -104,14 +104,6 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             }
         }
 
-        public CodeRepository CodeRepo
-        {
-            get
-            {
-                return _codeRepo;
-            }
-        }
-
         public ConfigRepository ConfigRepo
         {
             get
@@ -152,6 +144,14 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             }
         }
 
+        public StateRepository StateRepo
+        {
+            get
+            {
+                return _stateRepo;
+            }
+        }
+
         public UserRepository UserRepo
         {
             get
@@ -160,7 +160,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             }
         }
 
-        public UserQuotes UserQuote
+        public Quotes UserQuote
         {
             get
             {

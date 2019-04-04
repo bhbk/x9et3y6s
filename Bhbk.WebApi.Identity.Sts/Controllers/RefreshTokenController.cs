@@ -33,6 +33,75 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public RefreshTokenController() { }
 
+        [Route("v1/refresh/{userID}"), HttpGet]
+        [Route("v2/refresh/{userID}"), HttpGet]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
+
+            var result = tokens.Select(x => UoW.Transform.Map<RefreshModel>(x));
+
+            return Ok(result);
+        }
+
+        [Route("v1/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
+        [Route("v2/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
+        {
+            var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID
+                && x.Id == refreshID)).SingleOrDefault();
+
+            if (token == null)
+            {
+                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{userID}");
+                return NotFound(ModelState);
+            }
+
+            if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
+        [Route("v1/refresh/{userID}/revoke"), HttpDelete]
+        [Route("v2/refresh/{userID}/revoke"), HttpDelete]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "AdministratorPolicy")]
+        public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            foreach (var token in await UoW.RefreshRepo.GetAsync(x => x.UserId == userID))
+            {
+                if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
         [Route("v1/refresh"), HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> UseRefreshTokenV1([FromForm] RefreshTokenV1 submit)
@@ -119,8 +188,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         //no context for auth exists yet... so set actor id same as user id...
                         user.ActorId = user.Id;
 
-                        var access = await JwtBuilder.UserAccessTokenV1(UoW, issuer, client, user);
-                        var refresh = await JwtBuilder.UserRefreshTokenV1(UoW, issuer, user);
+                        var access = await JwtBuilder.UserResourceOwnerV1(UoW, issuer, client, user);
+                        var refresh = await JwtBuilder.UserRefreshV1(UoW, issuer, user);
 
                         var result = new UserJwtV1()
                         {
@@ -132,16 +201,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                             expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                         };
-
-                        //add activity entry for login...
-                        await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-                        {
-                            UserId = user.Id,
-                            ActivityType = LoginType.GenerateRefreshTokenV1.ToString(),
-                            Immutable = false
-                        });
-
-                        await UoW.CommitAsync();
 
                         return Ok(result);
                     }
@@ -221,8 +280,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         //no context for auth exists yet... so set actor id same as client id...
                         client.ActorId = client.Id;
 
-                        var access = await JwtBuilder.ClientAccessTokenV2(UoW, issuer, client);
-                        var refresh = await JwtBuilder.ClientRefreshTokenV2(UoW, issuer, client);
+                        var access = await JwtBuilder.ClientResourceOwnerV2(UoW, issuer, client);
+                        var refresh = await JwtBuilder.ClientRefreshV2(UoW, issuer, client);
 
                         var result = new ClientJwtV2()
                         {
@@ -233,16 +292,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                             expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                         };
-
-                        //add activity entry for login...
-                        await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-                        {
-                            ClientId = client.Id,
-                            ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
-                            Immutable = false
-                        });
-
-                        await UoW.CommitAsync();
 
                         return Ok(result);
                     }
@@ -304,8 +353,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             }
                         }
 
-                        var access = await JwtBuilder.UserAccessTokenV2(UoW, issuer, clients, user);
-                        var refresh = await JwtBuilder.UserRefreshTokenV2(UoW, issuer, user);
+                        var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
+                        var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
 
                         var result = new UserJwtV2()
                         {
@@ -318,16 +367,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                         };
 
-                        //add activity entry for login...
-                        await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-                        {
-                            UserId = user.Id,
-                            ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
-                            Immutable = false
-                        });
-
-                        await UoW.CommitAsync();
-
                         return Ok(result);
                     }
                 default:
@@ -335,75 +374,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         return StatusCode((int)HttpStatusCode.NotImplemented);
                     }
             }
-        }
-
-        [Route("v1/refresh/{userID}"), HttpGet]
-        [Route("v2/refresh/{userID}"), HttpGet]
-        //[Authorize(Policy = "UserPolicy")]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
-        {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-            {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
-                return NotFound(ModelState);
-            }
-
-            var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
-
-            var result = tokens.Select(x => UoW.Transform.Map<RefreshModel>(x));
-
-            return Ok(result);
-        }
-
-        [Route("v1/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
-        [Route("v2/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
-        //[Authorize(Policy = "UserPolicy")]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
-        {
-            var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID
-                && x.Id == refreshID)).SingleOrDefault();
-
-            if (token == null)
-            {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{userID}");
-                return NotFound(ModelState);
-            }
-
-            if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
-        [Route("v1/refresh/{userID}/revoke"), HttpDelete]
-        [Route("v2/refresh/{userID}/revoke"), HttpDelete]
-        //[Authorize(Policy = "UserPolicy")]
-        [Authorize(Policy = "AdministratorPolicy")]
-        public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
-        {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-            {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
-                return NotFound(ModelState);
-            }
-
-            foreach (var token in await UoW.RefreshRepo.GetAsync(x => x.UserId == userID))
-            {
-                if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-            await UoW.CommitAsync();
-
-            return NoContent();
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.DomainModels.Me
 {
-    public class UserQuotes
+    public class Quotes
     {
         public Success success { get; set; }
 

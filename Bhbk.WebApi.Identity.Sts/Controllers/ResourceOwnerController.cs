@@ -28,13 +28,13 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    public class AccessTokenController : BaseController
+    public class ResourceOwnerController : BaseController
     {
-        public AccessTokenController() { }
+        public ResourceOwnerController() { }
 
         [Route("v1/access"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAccessTokenV1([FromForm] AccessTokenV1 input)
+        public async Task<IActionResult> UseResourceOwnerV1([FromForm] ResourceOwnerV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -42,7 +42,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if issuer compatibility mode enabled.
             if (!UoW.ConfigRepo.DefaultsLegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
-                return NotFound();
+            {
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:None");
+                return BadRequest(ModelState);
+            }
 
             Guid issuerID;
             TIssuers issuer;
@@ -54,8 +57,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 if (UoW.Situation == ExecutionType.Live)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First())).SingleOrDefault();
-                else
+
+                else if (UoW.Situation == ExecutionType.UnitTest)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).SingleOrDefault();
+
+                else
+                {
+                    ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{input.issuer_id}");
+                    return BadRequest(ModelState);
+                }
             }
             else
             {
@@ -176,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (UoW.ConfigRepo.DefaultsLegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
-                var access = await JwtBuilder.UserAccessTokenV1Legacy(UoW, issuer, client, user);
+                var access = await JwtBuilder.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
 
                 var result = new UserJwtV1Legacy()
                 {
@@ -185,22 +195,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
-                //add activity entry for login...
-                await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.GenerateAccessTokenV1Legacy.ToString(),
-                    Immutable = false
-                });
-
-                await UoW.CommitAsync();
-
                 return Ok(result);
             }
             else
             {
-                var access = await JwtBuilder.UserAccessTokenV1(UoW, issuer, client, user);
-                var refresh = await JwtBuilder.UserRefreshTokenV1(UoW, issuer, user);
+                var access = await JwtBuilder.UserResourceOwnerV1(UoW, issuer, client, user);
+                var refresh = await JwtBuilder.UserRefreshV1(UoW, issuer, user);
 
                 var result = new UserJwtV1()
                 {
@@ -213,28 +213,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
-                //add activity entry for login...
-                await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.GenerateAccessTokenV1.ToString(),
-                    Immutable = false
-                });
-
-                await UoW.CommitAsync();
-
                 return Ok(result);
             }
         }
 
         [Route("v2/access"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAccessTokenV2([FromForm] AccessTokenV2 input)
+        public async Task<IActionResult> UseResourceOwnerV2([FromForm] ResourceOwnerV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrUserPasswordIDV2))
+            if (!input.grant_type.Equals(Strings.AttrResourceOwnerIDV2))
             {
                 ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -372,8 +362,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
 
-            var access = await JwtBuilder.UserAccessTokenV2(UoW, issuer, clients, user);
-            var refresh = await JwtBuilder.UserRefreshTokenV2(UoW, issuer, user);
+            var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {
@@ -385,16 +375,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
-
-            //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-            {
-                UserId = user.Id,
-                ActivityType = LoginType.GenerateAccessTokenV2.ToString(),
-                Immutable = false
-            });
-
-            await UoW.CommitAsync();
 
             return Ok(result);
         }

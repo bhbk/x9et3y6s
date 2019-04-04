@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Admin
 {
-    public abstract class ClientUris
+    public abstract class Urls
     {
         public Guid ActorId { get; set; }
 
@@ -26,12 +26,12 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
         public bool Immutable { get; set; }
     }
 
-    public class ClientUrlsCreate : ClientUris
+    public class UrlCreate : Urls
     {
 
     }
 
-    public class ClientUrlsModel : ClientUris
+    public class UrlModel : Urls
     {
         [Required]
         public Guid Id { get; set; }

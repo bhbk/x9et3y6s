@@ -3,20 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
 {
-    public abstract class AuthorizationCodeRequests
+    public abstract class AuthCodeRequests
     {
         [Required]
         public string redirect_uri { get; set; }
 
         [Required]
-        [RegularExpression("authorization_code")]
-        public string grant_type { get; set; }
+        [RegularExpression("code")]
+        public string response_type { get; set; }
 
         [Required]
         public string scope { get; set; }
     }
 
-    public class AuthorizationCodeRequestV1 : AuthorizationCodeRequests
+    public class AuthCodeRequestV1 : AuthCodeRequests
     {
         [Required]
         public string issuer_id { get; set; }
@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string username { get; set; }
     }
 
-    public class AuthorizationCodeRequestV2 : AuthorizationCodeRequests
+    public class AuthCodeRequestV2 : AuthCodeRequests
     {
         [Required]
         public string issuer { get; set; }

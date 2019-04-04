@@ -15,6 +15,10 @@ using System.Net;
 using System.Threading.Tasks;
 
 /*
+ * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
+ */
+
+/*
  * https://oauth.net/2/grant-types/refresh-token/
  */
 
@@ -25,22 +29,22 @@ using System.Threading.Tasks;
  * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
  */
 
-namespace Bhbk.WebApi.Identity.Sts.Providers
+namespace Bhbk.WebApi.Identity.Sts.Middleware
 {
     public static class RefreshTokenExtension
     {
         public static IApplicationBuilder UseRefreshTokenProvider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<RefreshTokenProvider_Deprecate>();
+            return app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();
         }
     }
 
-    public class RefreshTokenProvider_Deprecate
+    public class RefreshTokenMiddleware_Deprecate
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public RefreshTokenProvider_Deprecate(RequestDelegate next)
+        public RefreshTokenMiddleware_Deprecate(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -182,8 +186,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     }
                 }
 
-                var access = JwtBuilder.UserAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtBuilder.UserRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.UserResourceOwnerV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.UserRefreshV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -195,11 +199,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     issuer = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
-                //add activity entry for login...
+                //add activity entry...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.GenerateRefreshTokenV2.ToString(),
+                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
                     Immutable = false
                 }).Wait();
 
@@ -328,8 +332,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var access = JwtBuilder.UserAccessTokenV1(uow, issuer, client, user).Result;
-                var refresh = JwtBuilder.UserRefreshTokenV1(uow, issuer, user).Result;
+                var access = JwtBuilder.UserResourceOwnerV1(uow, issuer, client, user).Result;
+                var refresh = JwtBuilder.UserRefreshV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -341,11 +345,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     issuer_id = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
-                //add activity entry for login...
+                //add activity entry...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.GenerateRefreshTokenV1.ToString(),
+                    ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
                     Immutable = false
                 }).Wait();
 

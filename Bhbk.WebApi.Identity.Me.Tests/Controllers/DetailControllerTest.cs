@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.Controllers
 
                 var result = controller.GetQuoteOfTheDayV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<UserQuotes>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<Quotes>().Subject;
             }
         }
 

@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             TIssuers issuer1, issuer2;
             TClients client1, client2;
-            TClientUrls clientUri1, clientUri2;
+            TUrls clientUri1, clientUri2;
             TRoles role1, role2;
             TLogins login1, login2;
             TUsers user1, user2;
@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             var uri1 = new Uri(Strings.ApiUnitTestUri1Link);
             var uri2 = new Uri(Strings.ApiUnitTestUri2Link);
 
-            clientUri1 = await _uow.ClientRepo.CreateUriAsync(new ClientUrlsCreate()
+            clientUri1 = await _uow.ClientRepo.CreateUriAsync(new UrlCreate()
             {
                 ClientId = client1.Id,
                 UrlHost = uri1.Scheme + "://" + uri1.Host,
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 Enabled = true,
             });
 
-            clientUri2 = await _uow.ClientRepo.CreateUriAsync(new ClientUrlsCreate()
+            clientUri2 = await _uow.ClientRepo.CreateUriAsync(new UrlCreate()
             {
                 ClientId = client2.Id,
                 UrlHost = uri2.Scheme + "://" + uri2.Host,
@@ -219,7 +219,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             {
                 TIssuers issuer;
                 TClients client;
-                TClientUrls uri;
+                TUrls uri;
                 TRoles role;
                 TLogins login;
                 TUsers user;
@@ -252,7 +252,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
                 //assign random uri to random client
                 var clientUri1 = new Uri(Strings.ApiUnitTestUri1Link);
 
-                uri = await _uow.ClientRepo.CreateUriAsync(new ClientUrlsCreate()
+                uri = await _uow.ClientRepo.CreateUriAsync(new UrlCreate()
                 {
                     ClientId = client.Id,
                     UrlHost = clientUri1.Scheme + "://" + clientUri1.Host,

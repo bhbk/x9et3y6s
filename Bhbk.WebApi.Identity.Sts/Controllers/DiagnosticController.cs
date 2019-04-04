@@ -16,8 +16,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
-            if (name.ToLower() == TaskType.MaintainTokens.ToString().ToLower())
-                return Ok(((MaintainTokensTask)Tasks.Single(x => x.GetType() == typeof(MaintainTokensTask))).Status);
+            if (name.ToLower() == TaskType.MaintainRefreshes.ToString().ToLower())
+                return Ok(((MaintainRefreshesTask)Tasks.Single(x => x.GetType() == typeof(MaintainRefreshesTask))).Status);
+
+            else if (name.ToLower() == TaskType.MaintainStates.ToString().ToLower())
+                return Ok(((MaintainStatesTask)Tasks.Single(x => x.GetType() == typeof(MaintainStatesTask))).Status);
 
             return BadRequest();
         }

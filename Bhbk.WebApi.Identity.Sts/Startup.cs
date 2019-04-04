@@ -57,7 +57,8 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 return new IdentityContext(options, ExecutionType.Live, conf, mapper);
             });
-            sc.AddSingleton<IHostedService>(new MaintainTokensTask(sc, conf));
+            sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
+            sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
             sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
 
@@ -181,8 +182,8 @@ namespace Bhbk.WebApi.Identity.Sts
             app.UseSession();
             app.UseStaticFiles();
 
-            //app.UseMiddleware<AccessTokenProvider_Deprecate>();
-            //app.UseMiddleware<RefreshTokenProvider_Deprecate>();
+            //app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();
+            //app.UseMiddleware<ResourceOwnerMiddleware_Deprecate>();
 
             app.UseMvc();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);

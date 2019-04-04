@@ -52,41 +52,44 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.TActivities, src => src.Ignore())
-                .ForMember(dest => dest.TClientUrls, src => src.Ignore())
-                .ForMember(dest => dest.TCodes, src => src.Ignore())
                 .ForMember(dest => dest.TRefreshes, src => src.Ignore())
-                .ForMember(dest => dest.TRoles, src => src.Ignore());
+                .ForMember(dest => dest.TRoles, src => src.Ignore())
+                .ForMember(dest => dest.TStates, src => src.Ignore())
+                .ForMember(dest => dest.TUrls, src => src.Ignore());
 
             CreateMap<ClientModel, TClients>()
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.TActivities, src => src.Ignore())
-                .ForMember(dest => dest.TClientUrls, src => src.Ignore())
-                .ForMember(dest => dest.TCodes, src => src.Ignore())
                 .ForMember(dest => dest.TRefreshes, src => src.Ignore())
-                .ForMember(dest => dest.TRoles, src => src.Ignore());
+                .ForMember(dest => dest.TRoles, src => src.Ignore())
+                .ForMember(dest => dest.TStates, src => src.Ignore())
+                .ForMember(dest => dest.TUrls, src => src.Ignore());
 
             CreateMap<TClients, ClientModel>()
                 .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.TRoles
                     .ToDictionary(x => x.Id, x => x.Name)));
 
-            //client uri models
-            CreateMap<ClientUrlsCreate, TClientUrls>()
+            //url models
+            CreateMap<UrlCreate, TUrls>()
                     .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                     .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                     .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                     .ForMember(dest => dest.Client, src => src.Ignore());
 
-            CreateMap<TClientUrls, ClientUrlsModel>();
+            CreateMap<TUrls, UrlModel>();
 
-            //code models
-            CreateMap<CodeCreate, TCodes>()
+            //state models
+            CreateMap<StateCreate, TStates>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+                .ForMember(dest => dest.NonceValue, src => src.MapFrom(val => val.NonceValue))
+                .ForMember(dest => dest.NonceType, src => src.MapFrom(val => val.NonceType))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+                .ForMember(dest => dest.LastPolling, src => src.Ignore())
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<TCodes, CodeModel>();
+            CreateMap<TStates, StateModel>();
 
             //issuer models
             CreateMap<IssuerCreate, TIssuers>()
@@ -96,8 +99,8 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.TClaims, src => src.Ignore())
                 .ForMember(dest => dest.TClients, src => src.Ignore())
-                .ForMember(dest => dest.TCodes, src => src.Ignore())
-                .ForMember(dest => dest.TRefreshes, src => src.Ignore());
+                .ForMember(dest => dest.TRefreshes, src => src.Ignore())
+                .ForMember(dest => dest.TStates, src => src.Ignore());
 
             CreateMap<TIssuers, IssuerModel>()
                 .ForMember(dest => dest.Clients, src => src.MapFrom(val => val.TClients
@@ -106,8 +109,8 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             CreateMap<IssuerModel, TIssuers>()
                 .ForMember(dest => dest.TClaims, src => src.Ignore())
                 .ForMember(dest => dest.TClients, src => src.Ignore())
-                .ForMember(dest => dest.TCodes, src => src.Ignore())
-                .ForMember(dest => dest.TRefreshes, src => src.Ignore());
+                .ForMember(dest => dest.TRefreshes, src => src.Ignore())
+                .ForMember(dest => dest.TStates, src => src.Ignore());
 
             //login models
             CreateMap<LoginCreate, TLogins>()
@@ -177,9 +180,9 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.TwoFactorEnabled, src => src.MapFrom(val => false))
                 .ForMember(dest => dest.TActivities, src => src.Ignore())
                 .ForMember(dest => dest.TClaims, src => src.Ignore())
-                .ForMember(dest => dest.TCodes, src => src.Ignore())
                 .ForMember(dest => dest.TLogins, src => src.Ignore())
                 .ForMember(dest => dest.TRefreshes, src => src.Ignore())
+                .ForMember(dest => dest.TStates, src => src.Ignore())
                 .ForMember(dest => dest.TUserClaims, src => src.Ignore())
                 .ForMember(dest => dest.TUserLogins, src => src.Ignore())
                 .ForMember(dest => dest.TUserRoles, src => src.Ignore());
@@ -195,9 +198,9 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
                 .ForMember(dest => dest.TActivities, src => src.Ignore())
                 .ForMember(dest => dest.TClaims, src => src.Ignore())
-                .ForMember(dest => dest.TCodes, src => src.Ignore())
                 .ForMember(dest => dest.TLogins, src => src.Ignore())
                 .ForMember(dest => dest.TRefreshes, src => src.Ignore())
+                .ForMember(dest => dest.TStates, src => src.Ignore())
                 .ForMember(dest => dest.TUserClaims, src => src.Ignore())
                 .ForMember(dest => dest.TUserLogins, src => src.Ignore())
                 .ForMember(dest => dest.TUserRoles, src => src.Ignore());

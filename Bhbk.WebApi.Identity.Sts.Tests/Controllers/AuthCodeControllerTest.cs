@@ -19,13 +19,13 @@ using Xunit;
 namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 {
     [Collection("StsTests")]
-    public class AuthorizationCodeControllerTest
+    public class AuthCodeControllerTest
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
         private readonly StsClient _endpoints;
 
-        public AuthorizationCodeControllerTest(StartupTest factory)
+        public AuthCodeControllerTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
@@ -35,37 +35,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
-
-            var ask = await _endpoints.AuthorizationCode_AskV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "any");
+            var ask = await _endpoints.AuthorizationCode_AskV1(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 
+                RandomValues.CreateBase64String(8), "any");
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AuthCodeV1_Generate_NotImplemented()
+        public async Task Sts_OAuth2_AuthCodeV1_Use_NotImplemented()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            var url = new Uri(Strings.ApiUnitTestUri2Link);
-
-            var access = await _endpoints.AuthorizationCode_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                url.AbsoluteUri, RandomValues.CreateBase64String(8), RandomValues.CreateBase64String(8));
-
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+            var ac = await _endpoints.AuthorizationCode_UseV1(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(),
+                RandomValues.CreateBase64String(8), RandomValues.CreateBase64String(8), RandomValues.CreateBase64String(8));
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [Fact]
@@ -88,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             ask = await _endpoints.AuthorizationCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "any");
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
@@ -143,9 +125,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ok = new Uri(JsonConvert.DeserializeObject<string>(await ask.Content.ReadAsStringAsync()));
 
-            HttpUtility.ParseQueryString(ok.Query).Get("authorization_code").Should().NotBeNullOrEmpty();
             HttpUtility.ParseQueryString(ok.Query).Get("redirect_uri").Should().NotBeNullOrEmpty();
-            HttpUtility.ParseQueryString(ok.Query).Get("state").Should().NotBeNullOrEmpty();
+            HttpUtility.ParseQueryString(ok.Query).Get("nonce").Should().NotBeNullOrEmpty();
 
             ////not done yet...
             //var pairs = ask.Headers.GetValues("Set-Cookie");
@@ -166,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AuthCodeV2_Generate_Fail_Issuer()
+        public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_Issuer()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -182,22 +163,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ask_ok = new Uri(JsonConvert.DeserializeObject<string>(await ask.Content.ReadAsStringAsync()));
-            var ask_code = HttpUtility.ParseQueryString(ask_ok.Query).Get("authorization_code");
             var ask_redirect = HttpUtility.ParseQueryString(ask_ok.Query).Get("redirect_uri");
-            var ask_state = HttpUtility.ParseQueryString(ask_ok.Query).Get("state");
+            var ask_secret = await new ProtectProvider(_factory.UoW.Situation.ToString())
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
+            var ask_nonce = HttpUtility.ParseQueryString(ask_ok.Query).Get("nonce");
 
             await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
             await _factory.UoW.CommitAsync();
 
-            var access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                ask_redirect, ask_code, ask_state);
+            var ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                ask_redirect, ask_secret, ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AuthCodeV2_Generate_Fail_Client()
+        public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_Client()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -208,41 +190,42 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var url = new Uri(Strings.ApiUnitTestUri2Link);
 
-            var ask = await _endpoints.AuthorizationCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
+            var ask = await _endpoints.AuthorizationCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
                 url.AbsoluteUri, "any");
 
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ask_ok = new Uri(JsonConvert.DeserializeObject<string>(await ask.Content.ReadAsStringAsync()));
-            var ask_code = HttpUtility.ParseQueryString(ask_ok.Query).Get("authorization_code");
             var ask_redirect = HttpUtility.ParseQueryString(ask_ok.Query).Get("redirect_uri");
-            var ask_state = HttpUtility.ParseQueryString(ask_ok.Query).Get("state");
+            var ask_secret = await new ProtectProvider(_factory.UoW.Situation.ToString())
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
+            var ask_nonce = HttpUtility.ParseQueryString(ask_ok.Query).Get("nonce");
 
-            var access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                url.AbsoluteUri, RandomValues.CreateBase64String(64), ask_state);
+            var ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, RandomValues.CreateBase64String(64), ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                RandomValues.CreateBase64String(64), ask_code, ask_state);
+            ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                RandomValues.CreateBase64String(64), ask_secret, ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
             await _factory.UoW.ClientRepo.DeleteAsync(client.Id);
             await _factory.UoW.CommitAsync();
 
-            access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                url.AbsoluteUri, ask_code, ask_state);
+            ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, ask_secret, ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AuthCodeV2_Generate_Fail_User()
+        public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_User()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -258,28 +241,72 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ask_ok = new Uri(JsonConvert.DeserializeObject<string>(await ask.Content.ReadAsStringAsync()));
-            var ask_code = HttpUtility.ParseQueryString(ask_ok.Query).Get("authorization_code");
             var ask_redirect = HttpUtility.ParseQueryString(ask_ok.Query).Get("redirect_uri");
-            var ask_state = HttpUtility.ParseQueryString(ask_ok.Query).Get("state");
+            var ask_secret = await new ProtectProvider(_factory.UoW.Situation.ToString())
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
+            var ask_nonce = HttpUtility.ParseQueryString(ask_ok.Query).Get("nonce");
 
-            var access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), Guid.NewGuid().ToString(), 
-                url.AbsoluteUri, ask_code, ask_state);
+            var ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), Guid.NewGuid().ToString(),
+                url.AbsoluteUri, ask_secret, ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
             await _factory.UoW.UserRepo.DeleteAsync(user.Id);
             await _factory.UoW.CommitAsync();
 
-            access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                url.AbsoluteUri, ask_code, ask_state);
+            ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, ask_secret, ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_AuthCodeV2_Generate_Success()
+        public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_Validate()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var url = new Uri(Strings.ApiUnitTestUri2Link);
+
+            var ask = await _endpoints.AuthorizationCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), url.AbsoluteUri, "any");
+            ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ask.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ask_ok = new Uri(JsonConvert.DeserializeObject<string>(await ask.Content.ReadAsStringAsync()));
+            var ask_redirect = HttpUtility.ParseQueryString(ask_ok.Query).Get("redirect_uri");
+            var ask_secret = await new ProtectProvider(_factory.UoW.Situation.ToString())
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
+            var ask_nonce = HttpUtility.ParseQueryString(ask_ok.Query).Get("nonce");
+
+            var ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, ask_secret, RandomValues.CreateBase64String(32));
+
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, RandomValues.CreateBase64String(32), ask_nonce);
+
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            url = new Uri("https://app.test.net/a/invalid");
+
+            ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, ask_secret, ask_nonce);
+
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_AuthCodeV2_Use_Success()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -298,26 +325,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ask_ok = new Uri(JsonConvert.DeserializeObject<string>(await ask.Content.ReadAsStringAsync()));
-            var ask_code = HttpUtility.ParseQueryString(ask_ok.Query).Get("authorization_code");
             var ask_redirect = HttpUtility.ParseQueryString(ask_ok.Query).Get("redirect_uri");
-            var ask_state = HttpUtility.ParseQueryString(ask_ok.Query).Get("state");
+            var ask_secret = await new ProtectProvider(_factory.UoW.Situation.ToString())
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user);
+            var ask_nonce = HttpUtility.ParseQueryString(ask_ok.Query).Get("nonce");
 
-            var access = await _endpoints.AuthorizationCode_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), 
-                url.AbsoluteUri, ask_code, ask_state);
+            var ac = await _endpoints.AuthorizationCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(),
+                url.AbsoluteUri, ask_secret, ask_nonce);
 
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            ac.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var access_check = access_ok.ToObject<UserJwtV2>();
-            access_check.Should().BeAssignableTo<UserJwtV2>();
+            var ac_ok = JObject.Parse(await ac.Content.ReadAsStringAsync());
+            var ac_check = ac_ok.ToObject<UserJwtV2>();
+            ac_check.Should().BeAssignableTo<UserJwtV2>();
 
-            JwtBuilder.CanReadToken(access_check.access_token).Should().BeTrue();
+            JwtBuilder.CanReadToken(ac_check.access_token).Should().BeTrue();
 
-            var access_claims = JwtBuilder.ReadJwtToken(access_check.access_token).Claims
+            var ac_claims = JwtBuilder.ReadJwtToken(ac_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            access_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer2);
-            access_claims.Value.Split(':')[1].Should().Be(salt);
+            ac_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer2);
+            ac_claims.Value.Split(':')[1].Should().Be(salt);
         }
     }
 }

@@ -44,10 +44,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<TIssuers> CreateAsync(IssuerCreate model)
+        public async Task<TIssuers> CreateAsync(IssuerCreate entity)
         {
-            var entity = _transform.Map<TIssuers>(model);
-            var create = _context.Add(entity).Entity;
+            var model = _transform.Map<TIssuers>(entity);
+            var create = _context.Add(model).Entity;
 
             return await Task.FromResult(create);
         }
@@ -116,24 +116,24 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(result);
         }
 
-        public async Task<TIssuers> UpdateAsync(TIssuers model)
+        public async Task<TIssuers> UpdateAsync(TIssuers entity)
         {
-            var entity = _context.TIssuers.Where(x => x.Id == model.Id).Single();
+            var model = _context.TIssuers.Where(x => x.Id == entity.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            entity.Name = model.Name;
-            entity.Description = model.Description;
-            entity.IssuerKey = model.IssuerKey;
-            entity.LastUpdated = DateTime.Now;
-            entity.Enabled = model.Enabled;
-            entity.Immutable = model.Immutable;
+            model.Name = entity.Name;
+            model.Description = entity.Description;
+            model.IssuerKey = entity.IssuerKey;
+            model.LastUpdated = DateTime.Now;
+            model.Enabled = entity.Enabled;
+            model.Immutable = entity.Immutable;
 
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(model).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return await Task.FromResult(_context.Update(model).Entity);
         }
     }
 }

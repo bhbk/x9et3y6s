@@ -34,315 +34,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_ClientDisabled()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            client.Enabled = false;
-
-            await _factory.UoW.ClientRepo.UpdateAsync(client);
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_ClientNotFound()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            await _factory.UoW.ClientRepo.DeleteAsync(client.Id);
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_ClientUndefined()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), string.Empty, (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_IssuerDisabled()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            issuer.Enabled = false;
-
-            await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_IssuerNotFound()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_IssuerUndefined()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_GenerateV1(string.Empty, client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_DateExpired()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_DateIssued()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_TokenNotValid()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var random = new Random();
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var pos = random.Next(((string)ok["refresh_token"]).Length - 8);
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), ((string)ok["refresh_token"]).Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_TokenUndefined()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_UserNotFound()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var delete = await _factory.UoW.UserRepo.DeleteAsync(user.Id);
-            delete.Should().BeTrue();
-
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Fail_UserLocked()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            user.LockoutEnabled = true;
-            user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
-
-            var update = await _factory.UoW.UserRepo.UpdateAsync(user);
-            update.Should().BeAssignableTo(typeof(TUsers));
-
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
         public async Task Sts_OAuth2_RefreshV1_GetList_Success()
         {
             await _factory.TestData.DestroyAsync();
@@ -352,24 +43,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_GetListV1((string)ok["access_token"], user.Id.ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var result = await _endpoints.RefreshToken_GetListV1((string)ok["access_token"], user.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var check = JArray.Parse(await result.Content.ReadAsStringAsync()).ToObject<IEnumerable<RefreshModel>>();
+            var check = JArray.Parse(await rt.Content.ReadAsStringAsync()).ToObject<IEnumerable<RefreshModel>>();
             check.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV1_RevokeAll_Fail()
+        public async Task Sts_OAuth2_RefreshV1_Revoke_Fail()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -382,17 +71,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            var rt = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             /*
              * check model and/or action...
@@ -402,19 +89,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            result = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            rt = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], Guid.NewGuid().ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            rt = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], user.Id.ToString(), Guid.NewGuid().ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV1_RevokeAll_Success()
+        public async Task Sts_OAuth2_RefreshV1_Revoke_Success()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -423,100 +114,206 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            /*
+             */
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], user.Id.ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var result = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], user.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            /*
+             */
+            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var check = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            check.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            check.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+
+            rt = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], user.Id.ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV1_RevokeOne_Fail()
+        public async Task Sts_OAuth2_RefreshV1_Use_FailClient()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
-
-            /*
-             * check security...
-             */
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), Guid.NewGuid().ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            var result = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), string.Empty, (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            client.Enabled = false;
+
+            await _factory.UoW.ClientRepo.UpdateAsync(client);
+            await _factory.UoW.CommitAsync();
+
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_Use_FailIssuer()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+
+            var rt = await _endpoints.RefreshToken_UseV1(Guid.NewGuid().ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            rt = await _endpoints.RefreshToken_UseV1(string.Empty, client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            issuer.Enabled = false;
+
+            await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
+            await _factory.UoW.CommitAsync();
+
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_Use_FailUser()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
             /*
-             * check model and/or action...
              */
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            await _factory.UoW.UserRepo.UpdateAsync(user);
+            await _factory.UoW.CommitAsync();
 
-            access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            /*
+             */
+            await _factory.UoW.UserRepo.DeleteAsync(user.Id);
+            await _factory.UoW.CommitAsync();
 
-            result = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], user.Id.ToString(), Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV1_RevokeOne_Success()
+        public async Task Sts_OAuth2_RefreshV1_Use_FailToken()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var random = new Random();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            /*
+             */
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
+
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+
+            var rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            /*
+             */
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+
+            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
+
+            ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            /*
+             */
+            var pos = random.Next(((string)ok["refresh_token"]).Length - 8);
+
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), ((string)ok["refresh_token"]).Remove(pos, 8).Insert(pos, RandomValues.CreateBase64String(8)));
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            /*
+             */
+            rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV1_Use_Success_ClientSingle()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Email, Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_DeleteV1((string)ok["access_token"], user.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-            var check = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            check.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            check.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV1_Success()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
@@ -525,19 +322,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_UseV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var result = await _endpoints.RefreshToken_GenerateV1(issuer.Id.ToString(), client.Id.ToString(), (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            ok = JObject.Parse(await rt.Content.ReadAsStringAsync());
 
             var check = ok.ToObject<UserJwtV1>();
             check.Should().BeAssignableTo<UserJwtV1>();
@@ -551,396 +346,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_ClientDisabled()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            client.Enabled = false;
-
-            await _factory.UoW.ClientRepo.UpdateAsync(client);
-            await _factory.UoW.CommitAsync();
-
-            clients = new List<string> { client.Id.ToString() };
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_ClientNotFound()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            await _factory.UoW.ClientRepo.DeleteAsync(client.Id);
-            await _factory.UoW.CommitAsync();
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_IssuerDisabled()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            issuer.Enabled = false;
-
-            await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
-            await _factory.UoW.CommitAsync();
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_IssuerNotFound()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
-            await _factory.UoW.CommitAsync();
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_IssuerUndefined()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(string.Empty, clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(string.Empty, clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_DateExpired()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_DateIssued()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
-            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_TokenNotValid()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var random = new Random();
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-            var access_pos = random.Next(((string)access_ok["refresh_token"]).Length - 8);
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, ((string)access_ok["refresh_token"]).Remove(access_pos, 8).Insert(access_pos, RandomValues.CreateBase64String(8)));
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-            var cc_pos = random.Next(((string)cc_ok["refresh_token"]).Length - 8);
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, ((string)cc_ok["refresh_token"]).Remove(access_pos, 8).Insert(access_pos, RandomValues.CreateBase64String(8)));
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_TokenUndefined()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, string.Empty);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
-            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
-
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, string.Empty);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_UserDisabled()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            user.LockoutEnabled = true;
-            user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
-
-            await _factory.UoW.UserRepo.UpdateAsync(user);
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Fail_UserNotFound()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var delete = await _factory.UoW.UserRepo.DeleteAsync(user.Id);
-            delete.Should().BeTrue();
-
-            await _factory.UoW.CommitAsync();
-
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
         public async Task Sts_OAuth2_RefreshV2_GetList_Success()
         {
             await _factory.TestData.DestroyAsync();
@@ -948,27 +353,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_GetListV2((string)ok["access_token"], user.Id.ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var result = await _endpoints.RefreshToken_GetListV2((string)ok["access_token"], user.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var check = JArray.Parse(await result.Content.ReadAsStringAsync()).ToObject<IEnumerable<RefreshModel>>();
+            var check = JArray.Parse(await rt.Content.ReadAsStringAsync()).ToObject<IEnumerable<RefreshModel>>();
             check.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV2_RevokeAll_Fail()
+        public async Task Sts_OAuth2_RefreshV2_Revoke_Fail()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -979,20 +382,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            var rt = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], Guid.NewGuid().ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             /*
              * check model and/or action...
@@ -1000,151 +401,333 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            clients = new List<string> { client.Id.ToString() };
             user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            rt = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], Guid.NewGuid().ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            rt = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], user.Id.ToString(), Guid.NewGuid().ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV2_RevokeAll_Success()
+        public async Task Sts_OAuth2_RefreshV2_Revoke_Success()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], user.Id.ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], user.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiDefaultUserPassword);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var check = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
-            check.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            check.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_RevokeOne_Fail()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            /*
-             * check security...
-             */
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            var result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-
-            /*
-             * check model and/or action...
-             */
-
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            clients = new List<string> { client.Id.ToString() };
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-
-            access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            ok = JObject.Parse(await access.Content.ReadAsStringAsync());
-
-            result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_RefreshV2_RevokeOne_Success()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var clients = new List<string> { client.Id.ToString() };
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
-
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiDefaultUserPassword);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
             var refresh = (await _factory.UoW.RefreshRepo.GetAsync(x => x.UserId == user.Id
                 && x.RefreshValue == (string)ok["refresh_token"])).Single();
 
-            var result = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], user.Id.ToString(), refresh.Id.ToString());
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-            var check = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
-            check.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            check.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            rt = await _endpoints.RefreshToken_DeleteV2((string)ok["access_token"], user.Id.ToString(), refresh.Id.ToString());
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Success_ClientEmpty()
+        public async Task Sts_OAuth2_RefreshV2_Use_FailClient()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var clients = new List<string> { string.Empty };
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
+
+            var rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { Guid.NewGuid().ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            var cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { Guid.NewGuid().ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            client.Enabled = false;
+
+            await _factory.UoW.ClientRepo.UpdateAsync(client);
+            await _factory.UoW.CommitAsync();
+
+            rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_Use_FailIssuer()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
+
+            var rop_rt = await _endpoints.RefreshToken_UseV2(Guid.NewGuid().ToString(), new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            var cc_rt = await _endpoints.RefreshToken_UseV2(Guid.NewGuid().ToString(), new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            rop_rt = await _endpoints.RefreshToken_UseV2(string.Empty, new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            cc_rt = await _endpoints.RefreshToken_UseV2(string.Empty, new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            issuer.Enabled = false;
+
+            await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
+            await _factory.UoW.CommitAsync();
+
+            rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_Use_FailToken()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var random = new Random();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            /*
+             */
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
+
+            var rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+            var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
+
+            var rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            var cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            /*
+             */
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = true;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+
+            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(), 
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefresh = false;
+            _factory.UoW.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow = DateTime.UtcNow;
+
+            rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+            cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
+
+            rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            /*
+             */
+            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+            var rop_pos = random.Next(((string)rop_ok["refresh_token"]).Length - 8);
+
+            cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
+            var cc_pos = random.Next(((string)cc_ok["refresh_token"]).Length - 8);
+
+            rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, ((string)rop_ok["refresh_token"]).Remove(rop_pos, 8).Insert(rop_pos, RandomValues.CreateBase64String(8)));
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, ((string)cc_ok["refresh_token"]).Remove(rop_pos, 8).Insert(rop_pos, RandomValues.CreateBase64String(8)));
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            /*
+             */
+            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+            cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
+
+            rop_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, string.Empty);
+            rop_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, string.Empty);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_Use_FailUser()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
+
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
+
+            await _factory.UoW.UserRepo.UpdateAsync(user);
+            await _factory.UoW.CommitAsync();
+
+            var rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            await _factory.UoW.UserRepo.DeleteAsync(user.Id);
+            await _factory.UoW.CommitAsync();
+
+            rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_RefreshV2_Use_Success_ClientEmpty()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
+
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { string.Empty }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { string.Empty }, (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            ok = JObject.Parse(await rt.Content.ReadAsStringAsync());
 
             var check = ok.ToObject<UserJwtV2>();
             check.Should().BeAssignableTo<UserJwtV2>();
@@ -1158,7 +741,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Success_ClientMultiple()
+        public async Task Sts_OAuth2_RefreshV2_Use_Success_ClientMultiple()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
@@ -1166,7 +749,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var client2 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client1.Id.ToString(), client2.Name };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
@@ -1179,19 +761,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
             await _factory.UoW.CommitAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client1.Id.ToString(), client2.Name }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client1.Id.ToString(), client2.Name }, (string)ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)ok["refresh_token"]);
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+            ok = JObject.Parse(await rt.Content.ReadAsStringAsync());
 
             var check = ok.ToObject<UserJwtV2>();
             check.Should().BeAssignableTo<UserJwtV2>();
@@ -1205,54 +786,56 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         }
 
         [Fact]
-        public async Task Sts_OAuth2_RefreshV2_Success_ClientSingle()
+        public async Task Sts_OAuth2_RefreshV2_Use_Success_ClientSingle()
         {
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var clients = new List<string> { client.Id.ToString() };
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            /*
+             */
+            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
+                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access = await _endpoints.AccessToken_GenerateV2(issuer.Id.ToString(), clients, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
-            access.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access.StatusCode.Should().Be(HttpStatusCode.OK);
+            var rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
-            var access_ok = JObject.Parse(await access.Content.ReadAsStringAsync());
+            var rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)rop_ok["refresh_token"]);
+            rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var access_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)access_ok["refresh_token"]);
-            access_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            access_result.StatusCode.Should().Be(HttpStatusCode.OK);
+            var rt_ok = JObject.Parse(await rt.Content.ReadAsStringAsync());
 
-            access_ok = JObject.Parse(await access_result.Content.ReadAsStringAsync());
+            var rt_check = rt_ok.ToObject<UserJwtV2>();
+            rt_check.Should().BeAssignableTo<UserJwtV2>();
 
-            var access_check = access_ok.ToObject<UserJwtV2>();
-            access_check.Should().BeAssignableTo<UserJwtV2>();
+            JwtBuilder.CanReadToken(rt_check.access_token).Should().BeTrue();
 
-            JwtBuilder.CanReadToken(access_check.access_token).Should().BeTrue();
-
-            var access_claims = JwtBuilder.ReadJwtToken(access_check.access_token).Claims
+            var rt_claims = JwtBuilder.ReadJwtToken(rt_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            access_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer2);
-            access_claims.Value.Split(':')[1].Should().Be(salt);
+            rt_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer2);
+            rt_claims.Value.Split(':')[1].Should().Be(salt);
 
-            var cc = await _endpoints.ClientCredentials_GenerateV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            /*
+             */
+            var cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
 
-            var cc_result = await _endpoints.RefreshToken_GenerateV2(issuer.Id.ToString(), clients, (string)cc_ok["refresh_token"]);
-            cc_result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            cc_result.StatusCode.Should().Be(HttpStatusCode.OK);
+            var cc_rt = await _endpoints.RefreshToken_UseV2(issuer.Id.ToString(), new List<string> { client.Id.ToString() }, (string)cc_ok["refresh_token"]);
+            cc_rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            cc_rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            cc_ok = JObject.Parse(await cc_result.Content.ReadAsStringAsync());
+            cc_ok = JObject.Parse(await cc_rt.Content.ReadAsStringAsync());
 
             var cc_check = cc_ok.ToObject<ClientJwtV2>();
             cc_check.Should().BeAssignableTo<ClientJwtV2>();

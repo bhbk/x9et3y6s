@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Sts;
+﻿using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -104,8 +103,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var access = await JwtBuilder.ClientAccessTokenV2(UoW, issuer, client);
-            var refresh = await JwtBuilder.ClientRefreshTokenV2(UoW, issuer, client);
+            var access = await JwtBuilder.ClientResourceOwnerV2(UoW, issuer, client);
+            var refresh = await JwtBuilder.ClientRefreshV2(UoW, issuer, client);
 
             var result = new ClientJwtV2()
             {
@@ -116,16 +115,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
-
-            //add activity entry for login...
-            await UoW.ActivityRepo.CreateAsync(new ActivityCreate()
-            {
-                ClientId = client.Id,
-                ActivityType = LoginType.GenerateAccessTokenV2.ToString(),
-                Immutable = false
-            });
-
-            await UoW.CommitAsync();
 
             return Ok(result);
         }

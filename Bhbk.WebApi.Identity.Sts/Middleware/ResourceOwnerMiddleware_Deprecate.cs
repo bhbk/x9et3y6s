@@ -16,6 +16,10 @@ using System.Net;
 using System.Threading.Tasks;
 
 /*
+ * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
+ */
+
+/*
  * https://oauth.net/2/grant-types/password/
  */
 
@@ -26,22 +30,22 @@ using System.Threading.Tasks;
  * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
  */
 
-namespace Bhbk.WebApi.Identity.Sts.Providers
+namespace Bhbk.WebApi.Identity.Sts.Middleware
 {
-    public static class AccessTokenExtension
+    public static class ResourceOwnerExtension
     {
-        public static IApplicationBuilder UseAccessTokenProvider(this IApplicationBuilder app)
+        public static IApplicationBuilder UseResourceOwnerMiddleware(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<AccessTokenProvider_Deprecate>();
+            return app.UseMiddleware<ResourceOwnerMiddleware_Deprecate>();
         }
     }
 
-    public class AccessTokenProvider_Deprecate
+    public class ResourceOwnerMiddleware_Deprecate
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public AccessTokenProvider_Deprecate(RequestDelegate next)
+        public ResourceOwnerMiddleware_Deprecate(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -62,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Form.ContainsKey(Strings.AttrClientIDV2)
                     && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV2)
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV2)
-                    && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV2)))
+                    && context.Request.Form.ContainsKey(Strings.AttrResourceOwnerIDV2)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
@@ -73,11 +77,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV2).Value;
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV2).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserIDV2).Value;
-                string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserPasswordIDV2).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrResourceOwnerIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
-                    || !grantTypeValue.Equals(Strings.AttrUserPasswordIDV2)
+                    || !grantTypeValue.Equals(Strings.AttrResourceOwnerIDV2)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -220,8 +224,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtBuilder.UserAccessTokenV2(uow, issuer, clients, user).Result;
-                var refresh = JwtBuilder.UserRefreshTokenV2(uow, issuer, user).Result;
+                var access = JwtBuilder.UserResourceOwnerV2(uow, issuer, clients, user).Result;
+                var refresh = JwtBuilder.UserRefreshV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -233,11 +237,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     issuer = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
-                //add activity entry for login...
+                //add activity entry...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.GenerateAccessTokenV2.ToString(),
+                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                     Immutable = false
                 }).Wait();
 
@@ -260,7 +264,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV1)
-                    && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV1)))
+                    && context.Request.Form.ContainsKey(Strings.AttrResourceOwnerIDV1)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
@@ -271,12 +275,12 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV1).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserIDV1).Value;
-                string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserPasswordIDV1).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrResourceOwnerIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
                     || string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Strings.AttrUserPasswordIDV1)
+                    || !grantTypeValue.Equals(Strings.AttrResourceOwnerIDV1)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -403,8 +407,8 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtBuilder.UserAccessTokenV1(uow, issuer, client, user).Result;
-                var refresh = JwtBuilder.UserRefreshTokenV1(uow, issuer, user).Result;
+                var access = JwtBuilder.UserResourceOwnerV1(uow, issuer, client, user).Result;
+                var refresh = JwtBuilder.UserRefreshV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -416,11 +420,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     issuer_id = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
-                //add activity entry for login...
+                //add activity entry...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.GenerateAccessTokenV1.ToString(),
+                    ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
                     Immutable = false
                 }).Wait();
 
@@ -444,7 +448,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     && context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV1)
                     && context.Request.Form.ContainsKey(Strings.AttrUserIDV1)
-                    && context.Request.Form.ContainsKey(Strings.AttrUserPasswordIDV1)))
+                    && context.Request.Form.ContainsKey(Strings.AttrResourceOwnerIDV1)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
@@ -454,11 +458,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV1).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserIDV1).Value;
-                string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrUserPasswordIDV1).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrResourceOwnerIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Strings.AttrUserPasswordIDV1)
+                    || !grantTypeValue.Equals(Strings.AttrResourceOwnerIDV1)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -577,7 +581,7 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtBuilder.UserAccessTokenV1Legacy(uow, issuer, client, user).Result;
+                var access = JwtBuilder.UserResourceOwnerV1_Legacy(uow, issuer, client, user).Result;
 
                 var result = new
                 {
@@ -586,11 +590,11 @@ namespace Bhbk.WebApi.Identity.Sts.Providers
                     expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
-                //add activity entry for login...
+                //add activity entry...
                 uow.ActivityRepo.CreateAsync(new ActivityCreate()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.GenerateAccessTokenV1Legacy.ToString(),
+                    ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
                     Immutable = false
                 }).Wait();
 

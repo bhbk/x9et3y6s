@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         private readonly HttpClient _client = new HttpClient();
         private readonly string _url = string.Empty, _output = string.Empty;
         private readonly int _delay;
-        public UserQuotes QuoteOfDay { get; private set; }
+        public Quotes QuoteOfDay { get; private set; }
         public string Status { get; private set; }
 
         public MaintainQuotesTask(IServiceCollection sc, IConfigurationRoot conf)
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                     status = typeof(MaintainQuotesTask).Name + " not run yet."
                 }, _serializer);
 
-            QuoteOfDay = JsonConvert.DeserializeObject<UserQuotes>
+            QuoteOfDay = JsonConvert.DeserializeObject<Quotes>
                 (File.ReadAllText(_output));
         }
 
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             var uow = (IIdentityContext<DatabaseContext>)_sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
 
             if (uow.Situation == ExecutionType.UnitTest)
-                QuoteOfDay = JsonConvert.DeserializeObject<UserQuotes>
+                QuoteOfDay = JsonConvert.DeserializeObject<Quotes>
                     (File.ReadAllText(_output));
             else
                 DoWork(cancellationToken);
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             try
             {
                 var response = _client.GetAsync(_url, cancellationToken).Result;
-                var quotes = JsonConvert.DeserializeObject<UserQuotes>(response.Content.ReadAsStringAsync().Result);
+                var quotes = JsonConvert.DeserializeObject<Quotes>(response.Content.ReadAsStringAsync().Result);
 
                 if (response.IsSuccessStatusCode)
                 {
