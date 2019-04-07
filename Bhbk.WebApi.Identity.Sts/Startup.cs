@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,13 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+
+/*
+ * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+ * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ */
 
 namespace Bhbk.WebApi.Identity.Sts
 {
@@ -43,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
+            var options = new DbContextOptionsBuilder<_DbContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             var mapper = new MapperConfiguration(x =>
@@ -53,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
-            sc.AddScoped<IIdentityContext<DatabaseContext>>(x =>
+            sc.AddScoped<IIdentityContext<_DbContext>>(x =>
             {
                 return new IdentityContext(options, ExecutionType.Live, conf, mapper);
             });
@@ -63,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
 
             var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+            var uow = sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
             /*
              * only live context allowed to run...
@@ -144,9 +152,8 @@ namespace Bhbk.WebApi.Identity.Sts
                 }));
             sc.AddAuthorization(auth =>
                 auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new AuthorizeUsersRequirement())));
-            sc.AddSession();
             sc.AddMvc();
-            sc.AddMvc().AddControllersAsServices();
+            sc.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             sc.AddMvc().AddJsonOptions(json =>
             {
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -179,7 +186,6 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AllowAnyHeader()
                 .AllowAnyMethod());
             app.UseAuthentication();
-            app.UseSession();
             app.UseStaticFiles();
 
             //app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();

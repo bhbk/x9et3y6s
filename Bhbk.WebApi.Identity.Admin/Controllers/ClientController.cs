@@ -100,6 +100,39 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<ClientModel>(client));
         }
 
+        [Route("v1/pages"), HttpGet]
+        public async Task<IActionResult> GetClientsPageV1([FromQuery] SimplePager model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            Expression<Func<TClients, bool>> preds;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                preds = x => true;
+            else
+                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
+                || x.Description.ToLower().Contains(model.Filter.ToLower());
+
+            try
+            {
+                var total = await UoW.ClientRepo.CountAsync(preds);
+                var result = await UoW.ClientRepo.GetAsync(preds,
+                    x => x.Include(r => r.TRoles),
+                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
+                    model.Skip,
+                    model.Take);
+
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClientModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
+        }
+
         [Route("v1/pages"), HttpPost]
         public async Task<IActionResult> GetClientsPageV1([FromBody] CascadePager model)
         {

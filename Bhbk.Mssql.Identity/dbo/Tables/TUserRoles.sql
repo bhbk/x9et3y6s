@@ -3,11 +3,13 @@
     [RoleId]    UNIQUEIDENTIFIER NOT NULL,
     [ActorId]   UNIQUEIDENTIFIER NULL,
     [Created]   DATETIME2 (7)    NOT NULL,
-    [Immutable] BIT              NOT NULL,
+    [Immutable] BIT              CONSTRAINT [DF_TUserRoles_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_TUserRoles] PRIMARY KEY CLUSTERED ([UserId] ASC, [RoleId] ASC),
     CONSTRAINT [FK_TUserRoles_RoleID] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[TRoles] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_TUserRoles_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[TUsers] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 GO

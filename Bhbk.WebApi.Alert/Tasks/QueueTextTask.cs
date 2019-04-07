@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                 if (!_enabled || _queue.IsEmpty)
                     continue;
 
-                var uow = (IIdentityContext<DatabaseContext>)_sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+                var uow = (IIdentityContext<_DbContext>)_sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
                 foreach (var entry in _queue)
                 {

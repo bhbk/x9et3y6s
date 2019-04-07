@@ -34,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
     public class StartupTest : WebApplicationFactory<Startup>
     {
         public IConfigurationRoot Conf;
-        public IIdentityContext<DatabaseContext> UoW;
+        public IIdentityContext<_DbContext> UoW;
         public GenerateDefaultData DefaultData;
         public GenerateTestData TestData;
 
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
 
             builder.ConfigureServices((sc) =>
             {
-                var options = new DbContextOptionsBuilder<DatabaseContext>()
+                var options = new DbContextOptionsBuilder<_DbContext>()
                     .EnableSensitiveDataLogging();
 
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityContext<DatabaseContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
+                sc.AddSingleton<IIdentityContext<_DbContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
                 sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
                 sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
                 sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 var sp = sc.BuildServiceProvider();
 
                 Conf = sp.GetRequiredService<IConfigurationRoot>();
-                UoW = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+                UoW = sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
                 TestData = new GenerateTestData(UoW);
                 DefaultData = new GenerateDefaultData(UoW);

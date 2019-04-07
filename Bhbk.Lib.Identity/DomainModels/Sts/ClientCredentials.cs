@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
@@ -6,6 +7,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
     public abstract class ClientCredentials
     {
         [Required]
+        [DefaultValue("client_secret")]
         [RegularExpression("client_secret")]
         public string grant_type { get; set; }
     }

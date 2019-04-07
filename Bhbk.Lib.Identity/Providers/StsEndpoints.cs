@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.DomainModels.Sts;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -46,16 +47,16 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
-        public async Task<HttpResponseMessage> AuthorizationCode_AskV1(string issuer, string client, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> AuthCode_AskV1(AuthCodeRequestV1 model)
         {
-            string content = "?issuer_id=" + HttpUtility.UrlEncode(issuer)
-                + "&client_id=" + HttpUtility.UrlEncode(client)
-                + "&username=" + HttpUtility.UrlEncode(user)
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirectUri)
+            string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
+                + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
+                + "&username=" + HttpUtility.UrlEncode(model.username)
+                + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
                 + "&response_type=code"
-                + "&scope=" + HttpUtility.UrlEncode(scope);
+                + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
-            var endpoint = "/oauth2/v1/authorization-ask";
+            var endpoint = "/oauth2/v1/authorize-ask";
 
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -70,41 +71,16 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCode_AskV2(string issuer, string client, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> AuthCode_AskV2(AuthCodeRequestV2 model)
         {
-            string content = "?issuer=" + HttpUtility.UrlEncode(issuer)
-                + "&client=" + HttpUtility.UrlEncode(client)
-                + "&user=" + HttpUtility.UrlEncode(user)
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirectUri)
+            string content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
+                + "&client=" + HttpUtility.UrlEncode(model.client)
+                + "&user=" + HttpUtility.UrlEncode(model.user)
+                + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
                 + "&response_type=code"
-                + "&scope=" + HttpUtility.UrlEncode(scope);
+                + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
-            var endpoint = "/oauth2/v2/authorization-ask";
-
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _client.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> AuthorizationCode_UseV1(string issuer, string client, string user, string redirectUri, string code, string nonce)
-        {
-            var content = Uri.EscapeUriString("?issuer_id=" + HttpUtility.UrlEncode(issuer)
-                + "&client_id=" + HttpUtility.UrlEncode(client)
-                + "&username=" + HttpUtility.UrlEncode(user)
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirectUri)
-                + "&grant_type=authorization_code"
-                + "&code=" + HttpUtility.UrlEncode(code)
-                + "&nonce=" + HttpUtility.UrlEncode(nonce));
-
-            var endpoint = "/oauth2/v1/authorization";
+            var endpoint = "/oauth2/v2/authorize-ask";
 
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -119,17 +95,42 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthorizationCode_UseV2(string issuer, string client, string user, string redirectUri, string code, string nonce)
+        public async Task<HttpResponseMessage> AuthCode_UseV1(AuthCodeV1 model)
         {
-            var content = "?issuer=" + HttpUtility.UrlEncode(issuer)
-                + "&client=" + HttpUtility.UrlEncode(client)
-                + "&user=" + HttpUtility.UrlEncode(user)
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirectUri)
+            var content = Uri.EscapeUriString("?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
+                + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
+                + "&username=" + HttpUtility.UrlEncode(model.username)
+                + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
                 + "&grant_type=authorization_code"
-                + "&code=" + HttpUtility.UrlEncode(code)
-                + "&nonce=" + HttpUtility.UrlEncode(nonce);
+                + "&code=" + HttpUtility.UrlEncode(model.code)
+                + "&state=" + HttpUtility.UrlEncode(model.state));
 
-            var endpoint = "/oauth2/v2/authorization";
+            var endpoint = "/oauth2/v1/authorize";
+
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _client.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _client.GetAsync(endpoint + content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> AuthCode_UseV2(AuthCodeV2 model)
+        {
+            var content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
+                + "&client=" + HttpUtility.UrlEncode(model.client)
+                + "&user=" + HttpUtility.UrlEncode(model.user)
+                + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
+                + "&grant_type=authorization_code"
+                + "&code=" + HttpUtility.UrlEncode(model.code)
+                + "&state=" + HttpUtility.UrlEncode(model.state);
+
+            var endpoint = "/oauth2/v2/authorize";
 
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -145,13 +146,13 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/client-credentials/
-        public async Task<HttpResponseMessage> ClientCredential_UseV1(string issuer, string client, string secret)
+        public async Task<HttpResponseMessage> ClientCredential_UseV1(ClientCredentialV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer_id", issuer),
-                    new KeyValuePair<string, string>("client_id", client),
-                    new KeyValuePair<string, string>("client_secret", secret),
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("client_secret", model.client_secret),
                     new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
 
@@ -170,13 +171,13 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCredential_UseV2(string issuer, string client, string secret)
+        public async Task<HttpResponseMessage> ClientCredential_UseV2(ClientCredentialV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer", issuer),
-                    new KeyValuePair<string, string>("client", client),
-                    new KeyValuePair<string, string>("client_secret", secret),
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("client_secret", model.client_secret),
                     new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
 
@@ -196,13 +197,13 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/device-code/
-        public async Task<HttpResponseMessage> DeviceCode_AskV1(string issuer, string client, string user)
+        public async Task<HttpResponseMessage> DeviceCode_AskV1(DeviceCodeRequestV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer_id", issuer),
-                    new KeyValuePair<string, string>("client_id", client),
-                    new KeyValuePair<string, string>("username", user),
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("username", model.username),
                     new KeyValuePair<string, string>("grant_type", "device_code")
                 });
 
@@ -221,13 +222,13 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_AskV2(string issuer, string client, string user)
+        public async Task<HttpResponseMessage> DeviceCode_AskV2(DeviceCodeRequestV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer", issuer),
-                    new KeyValuePair<string, string>("client", client),
-                    new KeyValuePair<string, string>("user", user),
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("user", model.user),
                     new KeyValuePair<string, string>("grant_type", "device_code")
                 });
 
@@ -246,14 +247,14 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_UseV1(string issuer, string client, string user_code, string device_code)
+        public async Task<HttpResponseMessage> DeviceCode_UseV1(DeviceCodeV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer_id", issuer),
-                    new KeyValuePair<string, string>("client_id", client),
-                    new KeyValuePair<string, string>("user_code", user_code),
-                    new KeyValuePair<string, string>("device_code", device_code),
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("user_code", model.user_code),
+                    new KeyValuePair<string, string>("device_code", model.device_code),
                     new KeyValuePair<string, string>("grant_type", "device_code"),
                 });
 
@@ -272,14 +273,14 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_UseV2(string issuer, string client, string user_code, string device_code)
+        public async Task<HttpResponseMessage> DeviceCode_UseV2(DeviceCodeV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer", issuer),
-                    new KeyValuePair<string, string>("client", client),
-                    new KeyValuePair<string, string>("user_code", user_code),
-                    new KeyValuePair<string, string>("device_code", device_code),
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("user_code", model.user_code),
+                    new KeyValuePair<string, string>("device_code", model.device_code),
                     new KeyValuePair<string, string>("grant_type", "device_code"),
                 });
 
@@ -299,61 +300,15 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/implicit/
-        public async Task<HttpResponseMessage> Implicit_AskV1(string issuer, string client, string user, string redirectUri, string scope)
+        public async Task<HttpResponseMessage> Implicit_UseV1(ImplicitV1 model)
         {
-            string content = "?issuer_id=" + HttpUtility.UrlEncode(issuer)
-                + "&client_id=" + HttpUtility.UrlEncode(client)
-                + "&username=" + HttpUtility.UrlEncode(user)
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirectUri)
+            string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
+                + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
+                + "&username=" + HttpUtility.UrlEncode(model.username)
+                + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
                 + "&response_type=token"
-                + "&scope=" + HttpUtility.UrlEncode(scope);
-
-            var endpoint = "/oauth2/v1/implicit-ask";
-
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _client.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> Implicit_AskV2(string issuer, string client, string user, string redirectUri, string scope)
-        {
-            string content = "?issuer=" + HttpUtility.UrlEncode(issuer)
-                + "&client=" + HttpUtility.UrlEncode(client)
-                + "&user=" + HttpUtility.UrlEncode(user)
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirectUri)
-                + "&response_type=token"
-                + "&scope=" + HttpUtility.UrlEncode(scope);
-
-            var endpoint = "/oauth2/v2/implicit-ask";
-
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (_situation == ExecutionType.Live)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_situation == ExecutionType.UnitTest)
-                return await _client.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> Implicit_UseV1(string access_token, string expires_in, string state)
-        {
-            var content = "#access_token=" + HttpUtility.UrlEncode(access_token)
-                + "&expires_in=" + HttpUtility.UrlEncode(expires_in)
-                + "&grant_type=implicit"
-                + "&token_type=bearer"
-                + "&state=" + HttpUtility.UrlEncode(state);
+                + "&scope=" + HttpUtility.UrlEncode(model.scope)
+                + "&state=" + HttpUtility.UrlEncode(model.state);
 
             var endpoint = "/oauth2/v1/implicit";
 
@@ -370,13 +325,15 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Implicit_UseV2(string access_token, string expires_in, string state)
+        public async Task<HttpResponseMessage> Implicit_UseV2(ImplicitV2 model)
         {
-            var content = "#access_token=" + HttpUtility.UrlEncode(access_token)
-                + "&expires_in=" + HttpUtility.UrlEncode(expires_in)
-                + "&grant_type=implicit"
-                + "&token_type=bearer"
-                + "&state=" + HttpUtility.UrlEncode(state);
+            string content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
+                + "&client=" + HttpUtility.UrlEncode(model.client)
+                + "&user=" + HttpUtility.UrlEncode(model.user)
+                + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
+                + "&response_type=token"
+                + "&scope=" + HttpUtility.UrlEncode(model.scope)
+                + "&state=" + HttpUtility.UrlEncode(model.state);
 
             var endpoint = "/oauth2/v2/implicit";
 
@@ -502,14 +459,14 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshToken_UseV1(string issuer, string client, string refresh)
+        public async Task<HttpResponseMessage> RefreshToken_UseV1(RefreshTokenV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer_id", issuer),
-                    new KeyValuePair<string, string>("client_id", client),
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
                     new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                    new KeyValuePair<string, string>("refresh_token", refresh),
+                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
             var endpoint = "/oauth2/v1/refresh";
@@ -527,14 +484,14 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> RefreshToken_UseV2(string issuer, List<string> clients, string refresh)
+        public async Task<HttpResponseMessage> RefreshToken_UseV2(RefreshTokenV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer", issuer),
-                    new KeyValuePair<string, string>("client", string.Join(",", clients.Select(x => x))),
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
                     new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                    new KeyValuePair<string, string>("refresh_token", refresh),
+                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
             var endpoint = "/oauth2/v2/refresh";
@@ -553,15 +510,14 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/password/
-        public async Task<HttpResponseMessage> ResourceOwnerPassword_UseV1(string issuer, string client, string user, string password)
+        public async Task<HttpResponseMessage> ResourceOwner_UseV1Legacy(ResourceOwnerV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer_id", issuer),
-                    new KeyValuePair<string, string>("client_id", client),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
                     new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("username", user),
-                    new KeyValuePair<string, string>("password", password),
+                    new KeyValuePair<string, string>("username", model.username),
+                    new KeyValuePair<string, string>("password", model.password),
                 });
 
             var endpoint = "/oauth2/v1/access";
@@ -579,14 +535,15 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ResourceOwnerPassword_UseV1Legacy(string client, string user, string password)
+        public async Task<HttpResponseMessage> ResourceOwner_UseV1(ResourceOwnerV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("client_id", client),
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
                     new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("username", user),
-                    new KeyValuePair<string, string>("password", password),
+                    new KeyValuePair<string, string>("username", model.username),
+                    new KeyValuePair<string, string>("password", model.password),
                 });
 
             var endpoint = "/oauth2/v1/access";
@@ -604,15 +561,15 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ResourceOwnerPassword_UseV2(string issuer, List<string> clients, string user, string password)
+        public async Task<HttpResponseMessage> ResourceOwner_UseV2(ResourceOwnerV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("issuer", issuer),
-                    new KeyValuePair<string, string>("client", string.Join(",", clients.Select(x => x))),
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
                     new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("user", user),
-                    new KeyValuePair<string, string>("password", password),
+                    new KeyValuePair<string, string>("user", model.user),
+                    new KeyValuePair<string, string>("password", model.password),
                 });
 
             var endpoint = "/oauth2/v2/access";

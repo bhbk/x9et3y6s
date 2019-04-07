@@ -10,15 +10,15 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8?view=aspnetcore-2.0
      */
 
-    public partial class DatabaseContext
+    public partial class _DbContext
     {
-        public DatabaseContext(DbContextOptions<DatabaseContext> options)
+        public _DbContext(DbContextOptions<_DbContext> options)
             : base(options)
         {
 
         }
 
-        public DatabaseContext(DbContextOptionsBuilder<DatabaseContext> optionsBuilder)
+        public _DbContext(DbContextOptionsBuilder<_DbContext> optionsBuilder)
             : base(optionsBuilder.Options)
         {
 

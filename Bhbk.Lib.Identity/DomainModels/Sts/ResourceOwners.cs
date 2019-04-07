@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
@@ -9,6 +10,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string password { get; set; }
 
         [Required]
+        [DefaultValue("password")]
         [RegularExpression("password")]
         public string grant_type { get; set; }
     }

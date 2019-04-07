@@ -33,7 +33,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV1_Ask_NotImplemented()
         {
-            var ask = await _endpoints.DeviceCode_AskV1(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            var ask = await _endpoints.DeviceCode_AskV1(
+                new DeviceCodeRequestV1()
+                {
+                    issuer_id = Guid.NewGuid().ToString(),
+                    client_id = Guid.NewGuid().ToString(),
+                    username = Guid.NewGuid().ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -41,9 +48,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV1_Use_NotImplemented()
         {
-            var ask = await _endpoints.DeviceCode_UseV1(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), RandomValues.CreateBase64String(32));
-            ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            ask.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+            var dc = await _endpoints.DeviceCode_UseV1(
+                new DeviceCodeV1()
+                {
+                    issuer_id = Guid.NewGuid().ToString(),
+                    client_id = Guid.NewGuid().ToString(),
+                    user_code = RandomValues.CreateBase64String(32),
+                    device_code = RandomValues.CreateBase64String(32),
+                    grant_type = "device_code",
+                });
+            dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            dc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
 
         [Fact]
@@ -56,27 +71,69 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var ask = await _endpoints.DeviceCode_AskV2(Guid.NewGuid().ToString(), client.Id.ToString(), user.Id.ToString());
+            var ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = Guid.NewGuid().ToString(),
+                    client = client.Id.ToString(),
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            ask = await _endpoints.DeviceCode_AskV2(string.Empty, client.Id.ToString(), user.Id.ToString());
+            ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = string.Empty,
+                    client = client.Id.ToString(),
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), user.Id.ToString());
+            ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = Guid.NewGuid().ToString(),
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), string.Empty, user.Id.ToString());
+            ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Empty,
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), Guid.NewGuid().ToString());
+            ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user = Guid.NewGuid().ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), string.Empty);
+            ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user = string.Empty,
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -94,7 +151,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
+            var ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -114,33 +178,88 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
+            var ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var ok = JObject.Parse(await ask.Content.ReadAsStringAsync());
 
-            var dc = await _endpoints.DeviceCode_UseV2(Guid.NewGuid().ToString(), client.Id.ToString(), (string)ok["user_code"], (string)ok["device_code"]);
+            var dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = Guid.NewGuid().ToString(),
+                    client = client.Id.ToString(),
+                    user_code = (string)ok["user_code"],
+                    device_code = (string)ok["device_code"],
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            dc = await _endpoints.DeviceCode_UseV2(string.Empty, client.Id.ToString(), (string)ok["user_code"], (string)ok["device_code"]);
+            dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = string.Empty,
+                    client = client.Id.ToString(),
+                    user_code = (string)ok["user_code"],
+                    device_code = (string)ok["device_code"],
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            dc = await _endpoints.DeviceCode_UseV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), (string)ok["user_code"], (string)ok["device_code"]);
+            dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = Guid.NewGuid().ToString(),
+                    user_code = (string)ok["user_code"],
+                    device_code = (string)ok["device_code"],
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            dc = await _endpoints.DeviceCode_UseV2(issuer.Id.ToString(), string.Empty, (string)ok["user_code"], (string)ok["device_code"]);
+            dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Empty,
+                    user_code = (string)ok["user_code"],
+                    device_code = (string)ok["device_code"],
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            dc = await _endpoints.DeviceCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateAlphaNumericString(32), (string)ok["device_code"]);
+            dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user_code = RandomValues.CreateAlphaNumericString(32),
+                    device_code = (string)ok["device_code"],
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            dc = await _endpoints.DeviceCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), (string)ok["user_code"], RandomValues.CreateAlphaNumericString(32));
+            dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user_code = (string)ok["user_code"],
+                    device_code = RandomValues.CreateAlphaNumericString(32),
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -158,13 +277,28 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var ask = await _endpoints.DeviceCode_AskV2(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString());
+            var ask = await _endpoints.DeviceCode_AskV2(
+                new DeviceCodeRequestV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user = user.Id.ToString(),
+                    grant_type = "device_code",
+                });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var rop_ok = JObject.Parse(await ask.Content.ReadAsStringAsync());
 
-            var dc = await _endpoints.DeviceCode_UseV2(issuer.Id.ToString(), client.Id.ToString(), (string)rop_ok["user_code"], (string)rop_ok["device_code"]);
+            var dc = await _endpoints.DeviceCode_UseV2(
+                new DeviceCodeV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    user_code = (string)rop_ok["user_code"],
+                    device_code = (string)rop_ok["device_code"],
+                    grant_type = "device_code",
+                });
             dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             dc.StatusCode.Should().Be(HttpStatusCode.OK);
 

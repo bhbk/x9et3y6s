@@ -22,9 +22,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _transform;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
 
-        public ClientRepository(DatabaseContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
+        public ClientRepository(_DbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
@@ -6,14 +7,15 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
     public abstract class Implicits
     {
         [Required]
-        public string access_token { get; set; }
+        public string redirect_uri { get; set; }
 
         [Required]
-        public string expires_in { get; set; }
+        [DefaultValue("token")]
+        [RegularExpression("token")]
+        public string response_type { get; set; }
 
         [Required]
-        [RegularExpression("implicit")]
-        public string grant_type { get; set; }
+        public string scope { get; set; }
 
         [Required]
         public string state { get; set; }
@@ -21,11 +23,25 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
 
     public class ImplicitV1 : Implicits
     {
+        [Required]
+        public string issuer_id { get; set; }
 
+        [Required]
+        public string client_id { get; set; }
+
+        [Required]
+        public string username { get; set; }
     }
 
     public class ImplicitV2 : Implicits
     {
+        [Required]
+        public string issuer { get; set; }
 
+        [Required]
+        public string client { get; set; }
+
+        [Required]
+        public string user { get; set; }
     }
 }

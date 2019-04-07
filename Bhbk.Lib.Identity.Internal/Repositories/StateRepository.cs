@@ -3,18 +3,6 @@ using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.Internal.EntityModels;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -30,9 +18,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
 
-        public StateRepository(DatabaseContext context, ExecutionType situation, IMapper transform)
+        public StateRepository(_DbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();

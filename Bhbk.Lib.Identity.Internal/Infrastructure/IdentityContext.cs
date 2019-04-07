@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
-    public class IdentityContext : IIdentityContext<DatabaseContext>
+    public class IdentityContext : IIdentityContext<_DbContext>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
         private readonly ActivityRepository _activityRepo;
         private readonly ClaimRepository _claimRepo;
         private readonly ClientRepository _clientRepo;
@@ -29,19 +29,19 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         private readonly UserRepository _userRepo;
         private Quotes _userQuote;
 
-        public IdentityContext(DbContextOptions<DatabaseContext> options, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new DatabaseContext(options), situation, conf, mapper)
+        public IdentityContext(DbContextOptions<_DbContext> options, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
+            : this(new _DbContext(options), situation, conf, mapper)
         {
 
         }
 
-        public IdentityContext(DbContextOptionsBuilder<DatabaseContext> optionsBuilder, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new DatabaseContext(optionsBuilder.Options), situation, conf, mapper)
+        public IdentityContext(DbContextOptionsBuilder<_DbContext> optionsBuilder, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
+            : this(new _DbContext(optionsBuilder.Options), situation, conf, mapper)
         {
 
         }
 
-        private IdentityContext(DatabaseContext context, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
+        private IdentityContext(_DbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper mapper)
         {
             _disposed = false;
 

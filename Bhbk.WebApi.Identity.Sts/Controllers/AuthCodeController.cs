@@ -17,15 +17,11 @@ using System.Threading.Tasks;
 using System.Web;
 
 /*
- * https://oauth.net/2/grant-types/authorization-code/
- * https://www.oauth.com/playground/authorization-code.html
+ * https://tools.ietf.org/html/rfc6749#section-4.1
  */
 
 /*
- * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
- * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://oauth.net/2/grant-types/authorization-code/
  */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -35,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public AuthCodeController() { }
 
-        [Route("v1/authorization-ask"), HttpGet]
+        [Route("v1/authorize-ask"), HttpGet]
         [AllowAnonymous]
         public IActionResult AskAuthCodeV1([FromQuery] AuthCodeRequestV1 input)
         {
@@ -58,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v2/authorization-ask"), HttpGet]
+        [Route("v2/authorize-ask"), HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> AskAuthCodeV2([FromQuery] AuthCodeRequestV2 input)
         {
@@ -135,13 +131,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorization"));
+            var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
             if (client.TUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
-                redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorization-callback"));
+                redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize-callback"));
             }
             else if (client.TUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
@@ -171,28 +167,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new Uri(authorize.AbsoluteUri + "?issuer=" + HttpUtility.UrlEncode(create.IssuerId.ToString())
                 + "&client=" + HttpUtility.UrlEncode(create.ClientId.ToString())
                 + "&user=" + HttpUtility.UrlEncode(create.UserId.ToString())
-                + "&response_type=authorization_code"
+                + "&response_type=code"
                 + "&redirect_uri=" + HttpUtility.UrlEncode(redirect.AbsoluteUri)
-                + "&nonce=" + HttpUtility.UrlEncode(create.NonceValue));
+                + "&state=" + HttpUtility.UrlEncode(create.NonceValue));
 
-            ///*
-            // * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.1#cookies
-            // */
-
-            //var cookie = new CookieOptions
-            //{
-            //    Expires = DateTime.Now.AddSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP),
-            //    IsEssential = true,
-            //};
-
-            //Response.Cookies.Append("BhbkAuthCodeScope", scope);
-            //Response.Cookies.Append("BhbkAuthCodeState", state);
-            //Response.Cookies.Append("BhbkAuthCodeUrl", result.AbsoluteUri);
-
-            return Ok(result.AbsoluteUri);
+            return RedirectPermanent(result.AbsoluteUri);
         }
 
-        [Route("v1/authorization"), HttpGet]
+        [Route("v1/authorize"), HttpGet]
         [AllowAnonymous]
         public IActionResult UseAuthCodeV1([FromQuery] AuthCodeV1 input)
         {
@@ -205,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.username = HttpUtility.UrlDecode(input.username);
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.code = HttpUtility.UrlDecode(input.code);
-            input.nonce = HttpUtility.UrlDecode(input.nonce);
+            input.state = HttpUtility.UrlDecode(input.state);
 
             if (!input.grant_type.Equals(Strings.AttrAuthCodeIDV1))
             {
@@ -216,7 +198,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v2/authorization"), HttpGet]
+        [Route("v2/authorize"), HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> UseAuthCodeV2([FromQuery] AuthCodeV2 input)
         {
@@ -229,7 +211,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.user = HttpUtility.UrlDecode(input.user);
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.code = HttpUtility.UrlDecode(input.code);
-            input.nonce = HttpUtility.UrlDecode(input.nonce);
+            input.state = HttpUtility.UrlDecode(input.state);
 
             if (!input.grant_type.Equals(Strings.AttrAuthCodeIDV2))
             {
@@ -339,14 +321,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if state is valid...
-            var state = (await UoW.StateRepo.GetAsync(x => x.NonceValue == input.nonce
+            var state = (await UoW.StateRepo.GetAsync(x => x.NonceValue == input.state
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow
                 && x.NonceType == StateType.User.ToString())).SingleOrDefault();
 
             if (state == null)
             {
-                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"State:{input.nonce}");
+                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"State:{input.state}");
                 return BadRequest(ModelState);
             }
 
@@ -357,18 +339,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = access.token,
-                refresh_token = refresh,
+                access_token = rop.token,
+                refresh_token = rt,
                 user = user.Id.ToString(),
                 client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             return Ok(result);

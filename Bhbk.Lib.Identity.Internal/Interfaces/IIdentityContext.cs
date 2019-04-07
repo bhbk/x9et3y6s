@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Internal.Interfaces
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public interface IIdentityContext<TContext> : IGenericUnitOfWork
-        where TContext : DatabaseContext
+        where TContext : _DbContext
     {
         IMapper Transform { get; }
         ActivityRepository ActivityRepo { get; }

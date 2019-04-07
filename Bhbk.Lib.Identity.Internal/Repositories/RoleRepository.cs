@@ -25,9 +25,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
 
-        public RoleRepository(DatabaseContext context, ExecutionType situation, IMapper transform)
+        public RoleRepository(_DbContext context, ExecutionType situation, IMapper transform)
         {
             _context = context;
             _situation = situation;

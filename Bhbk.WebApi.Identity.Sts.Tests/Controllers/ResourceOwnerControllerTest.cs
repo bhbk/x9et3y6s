@@ -43,11 +43,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), Guid.NewGuid().ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = Guid.NewGuid().ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), string.Empty, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = string.Empty,
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -56,7 +72,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -73,11 +97,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(Guid.NewGuid().ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = Guid.NewGuid().ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(string.Empty, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = string.Empty,
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -86,7 +124,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -103,11 +148,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV1(Guid.NewGuid().ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = Guid.NewGuid().ToString(),
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(string.Empty, client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = string.Empty,
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -116,7 +177,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = user.Email,
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -133,15 +202,39 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), Guid.NewGuid().ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = Guid.NewGuid().ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), string.Empty, Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = string.Empty,
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(8));
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = RandomValues.CreateBase64String(8),
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -150,7 +243,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             await _factory.UoW.UserRepo.UpdateAsync(user);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -167,15 +268,36 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(client.Id.ToString(), Guid.NewGuid().ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = client.Id.ToString(),
+                    username = Guid.NewGuid().ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(client.Id.ToString(), string.Empty, Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = client.Id.ToString(),
+                    username = string.Empty,
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(client.Id.ToString(), user.Id.ToString(), RandomValues.CreateBase64String(8));
+            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = RandomValues.CreateBase64String(8),
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -184,7 +306,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             await _factory.UoW.UserRepo.UpdateAsync(user);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -206,7 +335,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
              */
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV1(issuer.Id.ToString(), client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV1(
+                new ResourceOwnerV1()
+                {
+                    issuer_id = issuer.Id.ToString(),
+                    client_id = client.Id.ToString(),
+                    username = user.Email,
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -225,7 +362,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
              */
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = true;
 
-            var legacy = await _endpoints.ResourceOwnerPassword_UseV1Legacy(client.Id.ToString(), user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var legacy = await _endpoints.ResourceOwner_UseV1Legacy(
+                new ResourceOwnerV1()
+                {
+                    client_id = client.Id.ToString(),
+                    username = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             legacy.Should().BeAssignableTo(typeof(HttpResponseMessage));
             legacy.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -256,8 +400,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             if (client1.Id == client2.Id)
                 return;
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client1.Id.ToString(), RandomValues.CreateBase64String(8) }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client1.Id.ToString(), RandomValues.CreateBase64String(8) }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
@@ -266,8 +417,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.UpdateAsync(client1);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client1.Id.ToString(), client2.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client1.Id.ToString(), client2.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -284,13 +442,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV2(Guid.NewGuid().ToString(),
-                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = Guid.NewGuid().ToString(),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV2(string.Empty,
-                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = string.Empty,
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -299,8 +471,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -317,18 +496,39 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client.Id.ToString() }, Guid.NewGuid().ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = Guid.NewGuid().ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client.Id.ToString() }, string.Empty, Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = string.Empty,
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client.Id.ToString() }, user.Id.ToString(), RandomValues.CreateBase64String(8));
+            rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = RandomValues.CreateBase64String(8),
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -337,8 +537,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             await _factory.UoW.UserRepo.UpdateAsync(user);
 
-            rop = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            rop = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -369,8 +576,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             /*
              */
-            var empty = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { string.Empty }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var empty = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { string.Empty }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             empty.Should().BeAssignableTo(typeof(HttpResponseMessage));
             empty.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -387,8 +601,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             /*
              */
-            var single = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client1.Name }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var single = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client1.Name }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             single.Should().BeAssignableTo(typeof(HttpResponseMessage));
             single.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -405,8 +626,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             /*
              */
-            var multiple = await _endpoints.ResourceOwnerPassword_UseV2(issuer.Id.ToString(),
-                new List<string> { client1.Id.ToString(), client2.Id.ToString() }, user.Id.ToString(), Strings.ApiUnitTestUserPassCurrent);
+            var multiple = await _endpoints.ResourceOwner_UseV2(
+                new ResourceOwnerV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = string.Join(",", new List<string> { client1.Id.ToString(), client2.Id.ToString() }),
+                    user = user.Id.ToString(),
+                    grant_type = "password",
+                    password = Strings.ApiUnitTestUserPassCurrent,
+                });
             multiple.Should().BeAssignableTo(typeof(HttpResponseMessage));
             multiple.StatusCode.Should().Be(HttpStatusCode.OK);
 

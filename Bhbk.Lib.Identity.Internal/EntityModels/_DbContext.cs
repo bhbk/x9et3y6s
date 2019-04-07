@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Bhbk.Lib.Identity.Internal.EntityModels
 {
-    public partial class DatabaseContext : DbContext
+    public partial class _DbContext : DbContext
     {
         public virtual DbSet<LKActivityTypes> LKActivityTypes { get; set; }
         public virtual DbSet<LKClaimTypes> LKClaimTypes { get; set; }
@@ -270,7 +270,7 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
             modelBuilder.Entity<TStates>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_UserTokens")
+                    .HasName("IX_States")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -283,18 +283,18 @@ namespace Bhbk.Lib.Identity.Internal.EntityModels
                     .WithMany(p => p.TStates)
                     .HasForeignKey(d => d.ClientId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_TCodes_TClients");
+                    .HasConstraintName("FK_TStates_TClients");
 
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.TStates)
                     .HasForeignKey(d => d.IssuerId)
-                    .HasConstraintName("FK_TCodes_TIssuers");
+                    .HasConstraintName("FK_TStates_TIssuers");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.TStates)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_TCodes_UserID");
+                    .HasConstraintName("FK_TStates_UserID");
             });
 
             modelBuilder.Entity<TUrls>(entity =>

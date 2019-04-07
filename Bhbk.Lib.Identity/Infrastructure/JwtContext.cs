@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
@@ -44,8 +45,14 @@ namespace Bhbk.Lib.Identity.Infrastructure
                     && _refresh.ValidFrom < DateTime.UtcNow
                     && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
                 {
-                    var result = _sts.RefreshToken_UseV2(_conf["IdentityLogin:IssuerName"],
-                        new List<string> { _conf["IdentityLogin:ClientName"] }, _refresh.RawData).Result;
+                    var result = _sts.RefreshToken_UseV2(
+                        new RefreshTokenV2()
+                        {
+                            issuer = _conf["IdentityLogin:IssuerName"],
+                            client = string.Join(",", new List<string> { _conf["IdentityLogin:ClientName"] }),
+                            grant_type = "refresh_token",
+                            refresh_token = _refresh.RawData,
+                        }).Result;
 
                     if (result.IsSuccessStatusCode)
                     {
@@ -70,8 +77,15 @@ namespace Bhbk.Lib.Identity.Infrastructure
 
                 else
                 {
-                    var result = _sts.ResourceOwnerPassword_UseV2(_conf["IdentityLogin:IssuerName"],
-                        new List<string> { _conf["IdentityLogin:ClientName"] }, _conf["IdentityLogin:UserName"], _conf["IdentityLogin:UserPass"]).Result;
+                    var result = _sts.ResourceOwner_UseV2(
+                        new ResourceOwnerV2()
+                        {
+                            issuer = _conf["IdentityLogin:IssuerName"],
+                            client = string.Join(",", new List<string> { _conf["IdentityLogin:ClientName"] }),
+                            user = _conf["IdentityLogin:UserName"],
+                            grant_type = "password",
+                            password = _conf["IdentityLogin:UserPass"],
+                        }).Result;
 
                     if (result.IsSuccessStatusCode)
                     {

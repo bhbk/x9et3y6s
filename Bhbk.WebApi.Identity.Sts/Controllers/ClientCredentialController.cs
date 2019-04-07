@@ -13,14 +13,11 @@ using System.Net;
 using System.Threading.Tasks;
 
 /*
- * https://oauth.net/2/grant-types/client-credentials/
+ * https://tools.ietf.org/html/rfc6749#section-4.4
  */
 
 /*
- * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
- * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://oauth.net/2/grant-types/client-credentials/
  */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers

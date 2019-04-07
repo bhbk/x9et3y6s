@@ -32,12 +32,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _transform;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
         private readonly PasswordValidator _passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(DatabaseContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
+        public UserRepository(_DbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
         {
             _context = context;
             _situation = situation;

@@ -42,10 +42,12 @@ deploy:
   - dotnet publish Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2
   - dotnet publish Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2
   - dotnet publish Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2
+  - dotnet publish Bhbk.WebUi.Identity\Bhbk.WebUi.Identity.csproj --output bin\Release\netcoreapp2.2\publish --configuration Release --framework netcoreapp2.2
   - dotnet octo pack --id=Bhbk.Cli.Identity --version=%VERSION% --basePath=Bhbk.Cli.Identity\bin\Release\netcoreapp2.2\publish --outFolder=.
   - dotnet octo pack --id=Bhbk.WebApi.Alert --version=%VERSION% --basePath=Bhbk.WebApi.Alert\bin\Release\netcoreapp2.2\publish --outFolder=.
   - dotnet octo pack --id=Bhbk.WebApi.Identity.Admin --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Admin\bin\Release\netcoreapp2.2\publish --outFolder=.
   - dotnet octo pack --id=Bhbk.WebApi.Identity.Me --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Me\bin\Release\netcoreapp2.2\publish --outFolder=.
   - dotnet octo pack --id=Bhbk.WebApi.Identity.Sts --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Sts\bin\Release\netcoreapp2.2\publish --outFolder=.
+  - dotnet octo pack --id=Bhbk.WebUi.Identity --version=%VERSION% --basePath=Bhbk.WebUi.Identity\bin\Release\netcoreapp2.2\publish --outFolder=.
   - dotnet nuget push *.nupkg --api-key %NUGET_FEED_KEY% --source %NUGET_FEED_URL%
   - set VERSION=

@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         private readonly HttpClient _client = new HttpClient();
         private readonly string _url = string.Empty, _output = string.Empty;
         private readonly int _delay;
-        public Quotes QuoteOfDay { get; private set; }
+        public Quotes Qotd { get; private set; }
         public string Status { get; private set; }
 
         public MaintainQuotesTask(IServiceCollection sc, IConfigurationRoot conf)
@@ -48,16 +48,16 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                     status = typeof(MaintainQuotesTask).Name + " not run yet."
                 }, _serializer);
 
-            QuoteOfDay = JsonConvert.DeserializeObject<Quotes>
+            Qotd = JsonConvert.DeserializeObject<Quotes>
                 (File.ReadAllText(_output));
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var uow = (IIdentityContext<DatabaseContext>)_sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+            var uow = (IIdentityContext<_DbContext>)_sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
             if (uow.Situation == ExecutionType.UnitTest)
-                QuoteOfDay = JsonConvert.DeserializeObject<Quotes>
+                Qotd = JsonConvert.DeserializeObject<Quotes>
                     (File.ReadAllText(_output));
             else
                 DoWork(cancellationToken);
@@ -79,12 +79,12 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                 if (response.IsSuccessStatusCode)
                 {
-                    if (QuoteOfDay == null
-                        || QuoteOfDay.contents.quotes[0].id != quotes.contents.quotes[0].id)
+                    if (Qotd == null
+                        || Qotd.contents.quotes[0].id != quotes.contents.quotes[0].id)
                     {
-                        QuoteOfDay = quotes;
+                        Qotd = quotes;
 
-                        File.WriteAllText(_output, JsonConvert.SerializeObject(QuoteOfDay));
+                        File.WriteAllText(_output, JsonConvert.SerializeObject(Qotd));
 
                         var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
 

@@ -4,12 +4,14 @@
     [Name]        NVARCHAR (MAX)   NOT NULL,
     [Description] NVARCHAR (MAX)   NULL,
     [IssuerKey]   NVARCHAR (MAX)   NOT NULL,
-    [Enabled]     BIT              NOT NULL,
+    [Enabled]     BIT              CONSTRAINT [DF_TIssuers_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [LastUpdated] DATETIME2 (7)    NULL,
-    [Immutable]   BIT              NOT NULL,
+    [Immutable]   BIT              CONSTRAINT [DF_TIssuers_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_TIssuers] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 GO

@@ -8,11 +8,13 @@
     [ValueType]   NVARCHAR (64)    NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [LastUpdated] DATETIME2 (7)    NULL,
-    [Immutable]   BIT              NOT NULL,
+    [Immutable]   BIT              CONSTRAINT [DF_TClaims_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_TClaims] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_TClaims_ActorID] FOREIGN KEY ([ActorId]) REFERENCES [dbo].[TUsers] ([Id]),
     CONSTRAINT [FK_TClaims_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[TIssuers] ([Id])
 );
+
+
 
 
 GO

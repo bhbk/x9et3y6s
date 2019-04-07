@@ -18,9 +18,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
 
-        public ClaimRepository(DatabaseContext context, ExecutionType situation, IMapper transform)
+        public ClaimRepository(_DbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();

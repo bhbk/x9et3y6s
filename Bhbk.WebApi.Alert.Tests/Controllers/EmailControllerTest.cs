@@ -40,13 +40,13 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
             var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
-            var response = await _endpoints.Enqueue_EmailV1(access.token, new EmailCreate());
+            var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
+            var result = await _endpoints.Enqueue_EmailV1(rop.token, new EmailCreate());
 
-            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            response = await _endpoints.Enqueue_EmailV1(access.token,
+            result = await _endpoints.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
                     FromId = Guid.NewGuid(),
@@ -57,10 +57,10 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
                     HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                 });
 
-            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            response = await _endpoints.Enqueue_EmailV1(access.token,
+            result = await _endpoints.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -71,8 +71,8 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
                     HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                 });
 
-            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
@@ -86,9 +86,9 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
             var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
 
-            var access = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
+            var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
 
-            var response = await _endpoints.Enqueue_EmailV1(access.token,
+            var result = await _endpoints.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
                     FromId = user.Id,
@@ -99,8 +99,8 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
                     HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                 });
 
-            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         {
             var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
 
-            return Ok(task.QuoteOfDay);
+            return Ok(task.Qotd);
         }
 
         [Route("v1/set-password"), HttpPut]

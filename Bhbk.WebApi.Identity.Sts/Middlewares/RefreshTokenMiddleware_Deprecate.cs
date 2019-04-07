@@ -29,7 +29,7 @@ using System.Threading.Tasks;
  * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
  */
 
-namespace Bhbk.WebApi.Identity.Sts.Middleware
+namespace Bhbk.WebApi.Identity.Sts.Middlewares
 {
     public static class RefreshTokenExtension
     {
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middleware
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<_DbContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -186,14 +186,14 @@ namespace Bhbk.WebApi.Identity.Sts.Middleware
                     }
                 }
 
-                var access = JwtBuilder.UserResourceOwnerV2(uow, issuer, clients, user).Result;
-                var refresh = JwtBuilder.UserRefreshV2(uow, issuer, user).Result;
+                var rop = JwtBuilder.UserResourceOwnerV2(uow, issuer, clients, user).Result;
+                var rt = JwtBuilder.UserRefreshV2(uow, issuer, user).Result;
 
                 var result = new
                 {
                     token_type = "bearer",
-                    access_token = access.token,
-                    refresh_token = refresh,
+                    access_token = rop.token,
+                    refresh_token = rt,
                     user = user.Id.ToString(),
                     client = clients.Select(x => x.Id.ToString()),
                     issuer = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
@@ -248,7 +248,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middleware
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<DatabaseContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityContext<_DbContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();

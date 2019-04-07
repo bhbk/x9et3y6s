@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
+            var options = new DbContextOptionsBuilder<_DbContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             var mapper = new MapperConfiguration(x =>
@@ -52,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
-            sc.AddScoped<IIdentityContext<DatabaseContext>>(x =>
+            sc.AddScoped<IIdentityContext<_DbContext>>(x =>
             {
                 return new IdentityContext(options, ExecutionType.Live, conf, mapper);
             });
@@ -61,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+            var uow = sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
             /*
              * only live context allowed to run...
@@ -135,9 +136,8 @@ namespace Bhbk.WebApi.Identity.Admin
                 {
                     policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
                 }));
-            sc.AddSession();
             sc.AddMvc();
-            sc.AddMvc().AddControllersAsServices();
+            sc.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             sc.AddMvc().AddJsonOptions(json =>
             {
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -170,7 +170,6 @@ namespace Bhbk.WebApi.Identity.Admin
                 .AllowAnyHeader()
                 .AllowAnyMethod());
             app.UseAuthentication();
-            app.UseSession();
             app.UseStaticFiles();
             app.UseMvc();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);

@@ -36,7 +36,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                var builder = new DbContextOptionsBuilder<DatabaseContext>()
+                var builder = new DbContextOptionsBuilder<_DbContext>()
                     .UseSqlServer(conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 

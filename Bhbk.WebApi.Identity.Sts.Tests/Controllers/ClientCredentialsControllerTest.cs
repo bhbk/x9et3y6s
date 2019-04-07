@@ -33,7 +33,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV1_NotImplemented()
         {
-            var cc = await _endpoints.ClientCredential_UseV1(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), RandomValues.CreateAlphaNumericString(8));
+            var cc = await _endpoints.ClientCredential_UseV1(
+                new ClientCredentialV1()
+                {
+                    issuer_id = Guid.NewGuid().ToString(),
+                    client_id = Guid.NewGuid().ToString(),
+                    client_secret = RandomValues.CreateAlphaNumericString(8),
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -47,11 +53,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), Guid.NewGuid().ToString(), client.ClientKey);
+            var cc = await _endpoints.ClientCredential_UseV2(
+                new ClientCredentialV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = Guid.NewGuid().ToString(),
+                    client_secret = client.ClientKey,
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), RandomValues.CreateBase64String(16));
+            cc = await _endpoints.ClientCredential_UseV2(
+                new ClientCredentialV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    client_secret = RandomValues.CreateBase64String(16),
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -60,7 +78,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc = await _endpoints.ClientCredential_UseV2(
+                new ClientCredentialV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    client_secret = client.ClientKey,
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -74,7 +98,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
 
-            var cc = await _endpoints.ClientCredential_UseV2(Guid.NewGuid().ToString(), client.Id.ToString(), client.ClientKey);
+            var cc = await _endpoints.ClientCredential_UseV2(
+                new ClientCredentialV2()
+                {
+                    issuer = Guid.NewGuid().ToString(),
+                    client = client.Id.ToString(),
+                    client_secret = client.ClientKey,
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
@@ -83,7 +113,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            cc = await _endpoints.ClientCredential_UseV2(
+                new ClientCredentialV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    client_secret = client.ClientKey,
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -100,7 +136,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var cc = await _endpoints.ClientCredential_UseV2(issuer.Id.ToString(), client.Id.ToString(), client.ClientKey);
+            var cc = await _endpoints.ClientCredential_UseV2(
+                new ClientCredentialV2()
+                {
+                    issuer = issuer.Id.ToString(),
+                    client = client.Id.ToString(),
+                    client_secret = client.ClientKey,
+                });
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.OK);
 

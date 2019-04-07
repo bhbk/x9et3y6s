@@ -20,8 +20,42 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public ActivityController() { }
 
+        [Route("v1/pages"), HttpGet]
+        public async Task<IActionResult> GetActivityPageV1([FromQuery] SimplePager model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            Expression<Func<TActivities, bool>> preds;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                preds = x => true;
+            else
+                preds = x => x.ActivityType.ToLower().Contains(model.Filter.ToLower())
+                || x.TableName.ToLower().Contains(model.Filter.ToLower())
+                || x.OriginalValues.ToLower().Contains(model.Filter.ToLower())
+                || x.CurrentValues.ToLower().Contains(model.Filter.ToLower());
+
+            try
+            {
+                var total = await UoW.ActivityRepo.CountAsync(preds);
+                var result = await UoW.ActivityRepo.GetAsync(preds,
+                    null,
+                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
+                    model.Skip,
+                    model.Take);
+
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
+        }
+
         [Route("v1/pages"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> GetActivityPageV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
@@ -50,9 +84,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                //Func<IQueryable<Activities>, IOrderedQueryable<Activities>> ords = x => GenerateOrders(model.Orders);
-                //var result = await UoW.ActivityRepo.GetAsync(preds, null, ords, model.Skip, model.Take);
-
                 return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
             }
             catch (ParseException ex)
@@ -62,74 +93,5 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
         }
-
-        public IOrderedQueryable<TActivities> GenerateOrders(List<Tuple<string, string>> sortExpressions)
-        {
-            if ((sortExpressions == null) || (sortExpressions.Count <= 0))
-                return null;
-
-            IEnumerable<TActivities> query = Enumerable.Empty<TActivities>();
-            IOrderedEnumerable<TActivities> orderedQuery = Enumerable.Empty<TActivities>().OrderBy(x => x);
-
-            for (int i = 1; i < sortExpressions.Count; i++)
-            {
-                Func<TActivities, object> expression = x => x.GetType()
-                    .GetProperty(sortExpressions[i].Item1)
-                    .GetValue(x);
-
-                if (sortExpressions[i].Item2 == "asc")
-                {
-                    if (i == 1)
-                        orderedQuery.OrderBy(expression);
-                    else
-                        orderedQuery.ThenBy(expression);
-                }
-                else
-                {
-                    if (i == 1)
-                        orderedQuery.OrderByDescending(expression);
-                    else
-                        orderedQuery.ThenByDescending(expression);
-                }
-            }
-
-            return orderedQuery.AsQueryable().OrderBy(x => x);
-        }
-
-        //public IEnumerable<T> GenerateOrders<T>(List<Tuple<string, string>> sortExpressions)
-        //{
-        //    // No sorting needed  
-        //    if ((sortExpressions == null) || (sortExpressions.Count <= 0))
-        //        return null;
-
-        //    // Let us sort it  
-        //    IEnumerable<T> query = null;
-        //    IOrderedEnumerable<T> orderedQuery = null;
-
-        //    for (int i = 0; i < sortExpressions.Count; i++)
-        //    {
-        //        // We need to keep the loop index, not sure why it is altered by the Linq.  
-        //        var index = i;
-
-        //        Func<T, object> expression = item => item.GetType()
-        //         .GetProperty(sortExpressions[index].Item1)
-        //         .GetValue(item, null);
-
-        //        if (sortExpressions[index].Item2 == "asc")
-        //        {
-        //            orderedQuery = (index == 0) ? query.OrderBy(expression) :
-        //                orderedQuery.ThenBy(expression);
-        //        }
-        //        else
-        //        {
-        //            orderedQuery = (index == 0) ? query.OrderByDescending(expression) :
-        //                orderedQuery.ThenByDescending(expression);
-        //        }
-        //    }
-
-        //    query = orderedQuery;
-
-        //    return query;
-        //}
     }
 }

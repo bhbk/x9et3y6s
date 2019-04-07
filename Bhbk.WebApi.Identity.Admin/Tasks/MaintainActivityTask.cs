@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 try
                 {
-                    var uow = (IIdentityContext<DatabaseContext>)_sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+                    var uow = (IIdentityContext<_DbContext>)_sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 

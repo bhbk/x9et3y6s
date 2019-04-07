@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.DomainModels.Sts
@@ -9,6 +10,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string redirect_uri { get; set; }
 
         [Required]
+        [DefaultValue("authorization_code")]
         [RegularExpression("authorization_code")]
         public string grant_type { get; set; }
 
@@ -16,7 +18,7 @@ namespace Bhbk.Lib.Identity.DomainModels.Sts
         public string code { get; set; }
 
         [Required]
-        public string nonce { get; set; }
+        public string state { get; set; }
     }
 
     public class AuthCodeV1 : AuthCodes

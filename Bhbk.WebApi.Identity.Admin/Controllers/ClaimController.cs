@@ -90,6 +90,44 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<ClaimModel>(claim));
         }
 
+        [Route("v1/pages"), HttpGet]
+        public async Task<IActionResult> GetClientsPageV1([FromQuery] SimplePager model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            /*
+             * tidbits below need enhancment, just tinkering...
+             */
+
+            Expression<Func<TClaims, bool>> preds;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                preds = x => true;
+            else
+                preds = x => x.Type.ToLower().Contains(model.Filter.ToLower())
+                || x.Value.ToLower().Contains(model.Filter.ToLower())
+                || x.ValueType.ToLower().Contains(model.Filter.ToLower());
+
+            try
+            {
+                var total = await UoW.ClaimRepo.CountAsync(preds);
+                var result = await UoW.ClaimRepo.GetAsync(preds,
+                    null,
+                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
+                    model.Skip,
+                    model.Take);
+
+                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClaimModel>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+
+                return BadRequest(ModelState);
+            }
+        }
+
         [Route("v1/pages"), HttpPost]
         public async Task<IActionResult> GetClientsPageV1([FromBody] CascadePager model)
         {

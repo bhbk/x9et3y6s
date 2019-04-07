@@ -18,12 +18,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
         private readonly string _salt;
 
         public string Salt { get => _salt; }
 
-        public IssuerRepository(DatabaseContext context, ExecutionType situation, IMapper transform, string salt)
+        public IssuerRepository(_DbContext context, ExecutionType situation, IMapper transform, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();

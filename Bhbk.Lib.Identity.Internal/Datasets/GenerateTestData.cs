@@ -12,9 +12,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 {
     public class GenerateTestData
     {
-        private readonly IIdentityContext<DatabaseContext> _uow;
+        private readonly IIdentityContext<_DbContext> _uow;
 
-        public GenerateTestData(IIdentityContext<DatabaseContext> uow)
+        public GenerateTestData(IIdentityContext<_DbContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();

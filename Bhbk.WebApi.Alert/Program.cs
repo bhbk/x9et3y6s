@@ -11,8 +11,9 @@ namespace Bhbk.WebApi.Alert
     public class Program
     {
         private static IConfigurationRoot _conf;
+        private static FileInfo _api;
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHost CreateWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(_conf)
                 .UseStartup<Startup>()
@@ -22,12 +23,16 @@ namespace Bhbk.WebApi.Alert
                 })
                 .UseApplicationInsights()
                 .CaptureStartupErrors(true)
-                .PreferHostingUrls(false)
+                .PreferHostingUrls(true)
                 .Build();
 
         public static void Main(string[] args)
         {
-            var api = SearchRoots.ByAssemblyContext("appsettings.json");
+            _api = SearchRoots.ByAssemblyContext("appsettings.json");
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(_api.DirectoryName)
+                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
+                .Build();
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
@@ -35,12 +40,7 @@ namespace Bhbk.WebApi.Alert
                 .WriteTo.RollingFile(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(api.DirectoryName)
-                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
-                .Build();
-
-            BuildWebHost(args).Run();
+            CreateWebHost(args).Run();
         }
     }
 }

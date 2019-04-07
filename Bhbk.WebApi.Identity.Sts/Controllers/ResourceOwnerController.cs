@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
 using Bhbk.Lib.Identity.DomainModels.Sts;
 using Bhbk.Lib.Identity.Internal.EntityModels;
 using Bhbk.Lib.Identity.Internal.Primitives;
@@ -15,14 +14,11 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 /*
- * https://oauth.net/2/grant-types/password/
+ * https://tools.ietf.org/html/rfc6749#section-4.3
  */
 
 /*
- * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
- * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://oauth.net/2/grant-types/password/
  */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -362,18 +358,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
 
-            var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = access.token,
-                refresh_token = refresh,
+                access_token = rop.token,
+                refresh_token = rt,
                 user = user.Id.ToString(),
                 client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             return Ok(result);

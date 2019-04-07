@@ -17,9 +17,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
-        private readonly DatabaseContext _context;
+        private readonly _DbContext _context;
 
-        public ActivityRepository(DatabaseContext context, ExecutionType situation, IMapper mapper)
+        public ActivityRepository(_DbContext context, ExecutionType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();

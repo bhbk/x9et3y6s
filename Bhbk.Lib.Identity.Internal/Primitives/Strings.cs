@@ -11,6 +11,8 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string AttrAuthCodeResponseIDV2 = "code";
         public const string AttrAuthCodeIDV1 = "authorization_code";
         public const string AttrAuthCodeIDV2 = "authorization_code";
+        public const string AttrImplicitResponseIDV1 = "token";
+        public const string AttrImplicitResponseIDV2 = "token";
         public const string AttrIssuerIDV1 = "issuer_id";
         public const string AttrIssuerIDV2 = "issuer";
         public const string AttrClientIDV1 = "client_id";

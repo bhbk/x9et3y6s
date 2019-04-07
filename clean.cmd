@@ -58,4 +58,8 @@ cd ..\Bhbk.WebApi.Identity.Sts.Tests
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 
+cd ..\Bhbk.WebUi.Identity
+powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
+powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
+
 cd..

@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Alert.Tests
     public class StartupTest : WebApplicationFactory<Startup>
     {
         public IConfigurationRoot Conf;
-        public IIdentityContext<DatabaseContext> UoW;
+        public IIdentityContext<_DbContext> UoW;
         public GenerateDefaultData DefaultData;
         public GenerateTestData TestData;
 
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Alert.Tests
 
             builder.ConfigureServices((sc) =>
             {
-                var options = new DbContextOptionsBuilder<DatabaseContext>()
+                var options = new DbContextOptionsBuilder<_DbContext>()
                     .EnableSensitiveDataLogging();
 
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
@@ -69,14 +69,14 @@ namespace Bhbk.WebApi.Alert.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityContext<DatabaseContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
+                sc.AddSingleton<IIdentityContext<_DbContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
                 sc.AddSingleton<IHostedService>(new QueueEmailTask(sc, conf));
                 sc.AddSingleton<IHostedService>(new QueueTextTask(sc, conf));
 
                 var sp = sc.BuildServiceProvider();
 
                 Conf = sp.GetRequiredService<IConfigurationRoot>();
-                UoW = sp.GetRequiredService<IIdentityContext<DatabaseContext>>();
+                UoW = sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
                 DefaultData = new GenerateDefaultData(UoW);
                 TestData = new GenerateTestData(UoW);

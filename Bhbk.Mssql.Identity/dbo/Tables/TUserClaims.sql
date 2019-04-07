@@ -3,11 +3,13 @@
     [ClaimId]   UNIQUEIDENTIFIER NOT NULL,
     [ActorId]   UNIQUEIDENTIFIER NULL,
     [Created]   DATETIME2 (7)    NOT NULL,
-    [Immutable] BIT              NOT NULL,
+    [Immutable] BIT              CONSTRAINT [DF_TUserClaims_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_TUserClaims] PRIMARY KEY CLUSTERED ([UserId] ASC, [ClaimId] ASC),
     CONSTRAINT [FK_TUserClaims_ClaimID] FOREIGN KEY ([ClaimId]) REFERENCES [dbo].[TClaims] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_TUserClaims_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[TUsers] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 GO

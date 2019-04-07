@@ -16,15 +16,11 @@ using System.Net;
 using System.Threading.Tasks;
 
 /*
- * https://oauth.net/2/grant-types/device-code/
- * https://www.oauth.com/playground/device-code.html
+ * https://tools.ietf.org/html/draft-ietf-oauth-device-flow-15
  */
 
 /*
- * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
- * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://oauth.net/2/grant-types/device-code/
  */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -108,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorization"));
+            var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = RandomValues.CreateBase64String(32);
 
             var create = await UoW.StateRepo.CreateAsync(

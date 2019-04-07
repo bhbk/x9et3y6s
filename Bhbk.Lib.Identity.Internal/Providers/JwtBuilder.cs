@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     public class JwtBuilder
     {
         public static async Task<string>
-            ClientRefreshV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client)
+            ClientRefreshV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client)
         {
             var principal = await uow.ClientRepo.GenerateRefreshTokenAsync(client);
 
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            ClientResourceOwnerV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client)
+            ClientResourceOwnerV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client)
         {
             var principal = await uow.ClientRepo.GenerateAccessTokenAsync(client);
 
@@ -121,7 +121,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            DeviceRefreshV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TUsers user)
+            DeviceRefreshV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -178,7 +178,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            DeviceResourceOwnerV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
+            DeviceResourceOwnerV2(IIdentityContext<_DbContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -233,7 +233,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            UserRefreshV1(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TUsers user)
+            UserRefreshV1(IIdentityContext<_DbContext> uow, TIssuers issuer, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -290,7 +290,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            UserRefreshV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TUsers user)
+            UserRefreshV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -347,7 +347,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1_Legacy(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client, TUsers user)
+            UserResourceOwnerV1_Legacy(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -395,7 +395,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1(IIdentityContext<DatabaseContext> uow, TIssuers issuer, TClients client, TUsers user)
+            UserResourceOwnerV1(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -442,7 +442,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV2(IIdentityContext<DatabaseContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
+            UserResourceOwnerV2(IIdentityContext<_DbContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
