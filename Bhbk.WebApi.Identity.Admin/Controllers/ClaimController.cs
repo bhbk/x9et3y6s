@@ -90,8 +90,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<ClaimModel>(claim));
         }
 
-        [Route("v1/pages"), HttpGet]
-        public async Task<IActionResult> GetClientsPageV1([FromQuery] SimplePager model)
+        [Route("v1/page"), HttpGet]
+        public async Task<IActionResult> GetClaimsV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -128,8 +128,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetClientsPageV1([FromBody] CascadePager model)
+        [Route("v1/page"), HttpPost]
+        public async Task<IActionResult> GetClaimsV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -180,9 +180,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"Claim:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (claim.Immutable)
+            else if (claim.Immutable
+                && claim.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.ClaimImmutable.ToString(), $"Claim:{model.Id}");
+                ModelState.AddModelError(MsgType.ClaimImmutable.ToString(), $"Claim:{claim.Id}");
                 return BadRequest(ModelState);
             }
 

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using Xunit;
 
@@ -73,18 +75,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 sc.AddSingleton<IIdentityContext<_DbContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
                 sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
                 sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
-                sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
 
                 var sp = sc.BuildServiceProvider();
 
                 Conf = sp.GetRequiredService<IConfigurationRoot>();
                 UoW = sp.GetRequiredService<IIdentityContext<_DbContext>>();
 
-                TestData = new GenerateTestData(UoW);
                 DefaultData = new GenerateDefaultData(UoW);
+                TestData = new GenerateTestData(UoW);
 
                 /*
-                 * must add defaults...
+                 * must add seed data for good bearer setup...
                  */
 
                 DefaultData.CreateAsync().Wait();
@@ -140,24 +141,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                         ClockSkew = TimeSpan.Zero,
                     };
                 });
-                sc.AddAuthorization(auth =>
-                    auth.AddPolicy("AdministratorPolicy", policy =>
-                    {
-                        policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
-                    }));
-                sc.AddAuthorization(auth =>
-                    auth.AddPolicy("SystemPolicy", policy =>
-                    {
-                        policy.RequireRole("Bhbk.WebApi.Identity(System)");
-                    }));
-                sc.AddAuthorization(auth =>
-                    auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new AuthorizeUsersRequirement())));
-                sc.AddMvc();
-                sc.AddMvc().AddControllersAsServices();
+                sc.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
                 sc.AddMvc().AddJsonOptions(json =>
                 {
                     json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                });
+                sc.AddAuthorization(auth =>
+                {
+                    auth.AddPolicy("AdministratorPolicy", policy =>
+                    {
+                        policy.RequireClaim(ClaimTypes.Role, "(Built-In) Administrators");
+                    });
+                    auth.AddPolicy("UserPolicy", policy =>
+                    {
+                        policy.RequireClaim(ClaimTypes.Role, "(Built-In) Users");
+                    });
                 });
                 sc.Configure<ForwardedHeadersOptions>(headers =>
                 {
@@ -173,8 +172,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                     .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod());
-                app.UseAuthentication();
                 app.UseStaticFiles();
+                app.UseAuthentication();
                 app.UseMvc();
 
                 //app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();

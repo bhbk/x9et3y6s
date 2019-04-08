@@ -67,9 +67,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var ask = await _endpoints.DeviceCode_AskV2(
                 new DeviceCodeRequestV2()
@@ -144,9 +144,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
@@ -174,9 +174,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var ask = await _endpoints.DeviceCode_AskV2(
                 new DeviceCodeRequestV2()
@@ -270,9 +270,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
@@ -311,7 +311,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var dc_claims = JwtBuilder.ReadJwtToken(dc_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            dc_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            dc_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             dc_claims.Value.Split(':')[1].Should().Be(salt);
         }
     }

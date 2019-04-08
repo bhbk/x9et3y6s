@@ -96,6 +96,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+                .ForMember(dest => dest.IssuerKey, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.TClaims, src => src.Ignore())
                 .ForMember(dest => dest.TClients, src => src.Ignore())

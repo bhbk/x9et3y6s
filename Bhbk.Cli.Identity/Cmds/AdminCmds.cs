@@ -18,7 +18,6 @@ namespace Bhbk.Cli.Identity.Cmds
 {
     public class AdminCmds : ConsoleCommand
     {
-        private static IConfigurationRoot _conf;
         private static IJwtContext _jwt;
         private static CmdType _cmdType;
         private static AdminClient _admin = null;
@@ -53,17 +52,14 @@ namespace Bhbk.Cli.Identity.Cmds
             {
                 var lib = SearchRoots.ByAssemblyContext("libsettings.json");
 
-                _conf = new ConfigurationBuilder()
+                var conf = new ConfigurationBuilder()
                     .SetBasePath(lib.DirectoryName)
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _admin = new AdminClient(_conf, ExecutionType.Live, new HttpClient());
-                _sts = new StsClient(_conf, ExecutionType.Live, new HttpClient());
-                _jwt = new JwtContext(_conf, ExecutionType.Live, new HttpClient());
-
-                for (int i = 0; i < 20; i++)
-                    System.Console.WriteLine(RandomValues.CreateBase64String(32));
+                _admin = new AdminClient(conf, ExecutionType.Live, new HttpClient());
+                _sts = new StsClient(conf, ExecutionType.Live, new HttpClient());
+                _jwt = new JwtContext(conf, ExecutionType.Live, new HttpClient());
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
@@ -629,9 +625,9 @@ namespace Bhbk.Cli.Identity.Cmds
                 new UserCreate()
                 {
                     Email = user,
-                    FirstName = Strings.ApiDefaultFirstName,
-                    LastName = Strings.ApiDefaultLastName,
-                    PhoneNumber = Strings.ApiDefaultPhone,
+                    FirstName = Strings.ApiDefaultAdminUserFirstName,
+                    LastName = Strings.ApiDefaultAdminUserLastName,
+                    PhoneNumber = Strings.ApiDefaultAdminUserPhone,
                     LockoutEnabled = false,
                     HumanBeing = false,
                     Immutable = false,

@@ -16,7 +16,6 @@ namespace Bhbk.WebApi.Alert.Controllers
         public EmailController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
         public async Task<IActionResult> SendEmailV1([FromBody] EmailCreate model)
         {
             if (!ModelState.IsValid)

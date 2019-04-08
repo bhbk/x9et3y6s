@@ -100,8 +100,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<ClientModel>(client));
         }
 
-        [Route("v1/pages"), HttpGet]
-        public async Task<IActionResult> GetClientsPageV1([FromQuery] SimplePager model)
+        [Route("v1/page"), HttpGet]
+        public async Task<IActionResult> GetClientsV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -133,8 +133,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetClientsPageV1([FromBody] CascadePager model)
+        [Route("v1/page"), HttpPost]
+        public async Task<IActionResult> GetClientsV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -200,7 +200,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (client.Immutable)
+            else if (client.Immutable
+                && client.Immutable != model.Immutable)
             {
                 ModelState.AddModelError(MsgType.ClientImmutable.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);

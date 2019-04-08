@@ -14,7 +14,6 @@ namespace Bhbk.Lib.Identity.DomainModels.Admin
 
         public string Description { get; set; }
 
-        [Required]
         public string IssuerKey { get; set; }
 
         [Required]

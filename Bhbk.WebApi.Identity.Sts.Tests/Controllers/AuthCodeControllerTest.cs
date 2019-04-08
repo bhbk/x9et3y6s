@@ -74,11 +74,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await _endpoints.AuthCode_AskV2(
                 new AuthCodeRequestV2()
                 {
@@ -112,11 +112,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await _endpoints.AuthCode_AskV2(
                 new AuthCodeRequestV2()
                 {
@@ -137,11 +137,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = Guid.NewGuid();
 
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await _endpoints.AuthCode_AskV2(
                 new AuthCodeRequestV2()
                 {
@@ -162,16 +162,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var controller = new AuthCodeController();
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await controller.AskAuthCodeV2(
                 new AuthCodeRequestV2()
                 {
@@ -188,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ask_url = new Uri(ask.Url);
 
-            HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Strings.ApiUnitTestUri1Link);
+            HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Strings.ApiUnitTestUriLink);
             HttpUtility.ParseQueryString(ask_url.Query).Get("state").Should().NotBeNullOrEmpty();
         }
 
@@ -198,16 +198,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var controller = new AuthCodeController();
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var url = new Uri(Strings.ApiUnitTestUri2Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await controller.AskAuthCodeV2(
                 new AuthCodeRequestV2()
                 {
@@ -280,9 +280,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var controller = new AuthCodeController();
             controller.ControllerContext = new ControllerContext();
@@ -295,7 +295,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
                     issuer = issuer.Id.ToString(),
                     client = client.Id.ToString(),
                     user = user.Id.ToString(),
-                    redirect_uri = Strings.ApiUnitTestUri2Link,
+                    redirect_uri = Strings.ApiUnitTestUriLink,
                     response_type = "code",
                     scope = "any",
                 }) as RedirectResult;
@@ -333,16 +333,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var controller = new AuthCodeController();
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var url = new Uri(Strings.ApiUnitTestUri2Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await controller.AskAuthCodeV2(
                 new AuthCodeRequestV2()
                 {
@@ -401,16 +401,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var controller = new AuthCodeController();
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var url = new Uri(Strings.ApiUnitTestUri2Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await controller.AskAuthCodeV2(
                 new AuthCodeRequestV2()
                 {
@@ -480,9 +480,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
@@ -492,7 +492,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var url = new Uri(Strings.ApiUnitTestUri2Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var ask = await controller.AskAuthCodeV2(
                 new AuthCodeRequestV2()
                 {
@@ -535,7 +535,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var ac_claims = JwtBuilder.ReadJwtToken(ac_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            ac_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer2);
+            ac_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             ac_claims.Value.Split(':')[1].Should().Be(salt);
         }
     }

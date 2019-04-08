@@ -128,8 +128,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<RoleModel>(role));
         }
 
-        [Route("v1/pages"), HttpGet]
-        public async Task<IActionResult> GetRolesPageV1([FromQuery] SimplePager model)
+        [Route("v1/page"), HttpGet]
+        public async Task<IActionResult> GetRolesV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -161,8 +161,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetRolesPageV1([FromBody] CascadePager model)
+        [Route("v1/page"), HttpPost]
+        public async Task<IActionResult> GetRolesV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -259,7 +259,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (role.Immutable)
+            else if (role.Immutable
+                && role.Immutable != model.Immutable)
             {
                 ModelState.AddModelError(MsgType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);

@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         .Select(i => i.Value).First())).SingleOrDefault();
 
                 else if (UoW.Situation == ExecutionType.UnitTest)
-                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).SingleOrDefault();
+                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).SingleOrDefault();
 
                 else
                 {
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1) || x.Name.StartsWith(Strings.ApiUnitTestLogin2)).Any()
+                || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
                     && UoW.Situation == ExecutionType.UnitTest))
             {
                 //check that password is valid...
@@ -336,7 +336,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin1) || x.Name.StartsWith(Strings.ApiUnitTestLogin2)).Any()
+                || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
                     && UoW.Situation == ExecutionType.UnitTest))
             {
                 //check that password is valid...

@@ -41,12 +41,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
              * check security...
              */
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
             var result = await _endpoints.Issuer_CreateV1(rop.token, new IssuerCreate());
+
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+
+            rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
+            result = await _endpoints.Issuer_CreateV1(rop.token, new IssuerCreate());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -57,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
             rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
             result = await _endpoints.Issuer_CreateV1(rop.token, new IssuerCreate());
@@ -74,13 +84,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
 
             var create = new IssuerCreate()
             {
-                Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestIssuer1,
+                Name = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestIssuer,
                 IssuerKey = RandomValues.CreateBase64String(32),
                 Enabled = true,
             };
@@ -104,12 +114,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
              * check security...
              */
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
             var result = await _endpoints.Issuer_DeleteV1(rop.token, Guid.NewGuid());
+
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+
+            rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
+            result = await _endpoints.Issuer_DeleteV1(rop.token, Guid.NewGuid());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -120,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
             rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
             result = await _endpoints.Issuer_DeleteV1(rop.token, Guid.NewGuid());
@@ -148,17 +168,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            var issuer2 = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
+            var testIssuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
-            var result = await _endpoints.Issuer_DeleteV1(rop.token, issuer2.Id);
+            var result = await _endpoints.Issuer_DeleteV1(rop.token, testIssuer.Id);
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Id == issuer2.Id)).Any();
+            var check = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Id == testIssuer.Id)).Any();
             check.Should().BeFalse();
         }
 
@@ -168,14 +188,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
 
-            var issuer1 = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
+            var testIssuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
-            var result = await _endpoints.Issuer_GetV1(rop.token, issuer1.Id.ToString());
+            var result = await _endpoints.Issuer_GetV1(rop.token, testIssuer.Id.ToString());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -183,7 +203,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
             var check = ok.ToObject<IssuerModel>();
 
-            result = await _endpoints.Issuer_GetV1(rop.token, issuer1.Name);
+            result = await _endpoints.Issuer_GetV1(rop.token, testIssuer.Name);
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -199,9 +219,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             await _factory.TestData.CreateAsync();
             await _factory.TestData.CreateRandomAsync(3);
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
 
@@ -209,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("name", "asc"));
 
-            var result = await _endpoints.Issuer_GetV1(rop.token,
+            var result = await _endpoints.Issuer_GetPageV1(rop.token,
                 new CascadePager()
                 {
                     Filter = string.Empty,
@@ -240,12 +260,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
              * check security...
              */
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser2)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
             var result = await _endpoints.Issuer_UpdateV1(rop.token, new IssuerModel());
+
+            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+
+            rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
+            result = await _endpoints.Issuer_UpdateV1(rop.token, new IssuerModel());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -256,7 +286,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
             rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
             result = await _endpoints.Issuer_UpdateV1(rop.token, new IssuerModel());
@@ -273,14 +303,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
 
-            var issuer2 = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer2)).Single();
-            issuer2.Name += "(Updated)";
+            var testIssuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            testIssuer.Name += "(Updated)";
 
-            var response = await _endpoints.Issuer_UpdateV1(rop.token, _factory.UoW.Transform.Map<IssuerModel>(issuer2));
+            var response = await _endpoints.Issuer_UpdateV1(rop.token, _factory.UoW.Transform.Map<IssuerModel>(testIssuer));
 
             response.Should().BeAssignableTo(typeof(HttpResponseMessage));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -288,7 +318,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.Controllers
             var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
             var check = ok.ToObject<IssuerModel>();
 
-            check.Name.Should().Be(issuer2.Name);
+            check.Name.Should().Be(testIssuer.Name);
         }
     }
 }

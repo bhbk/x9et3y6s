@@ -12,7 +12,8 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
-    [Authorize]
+    //[Authorize(Policy = "UserPolicy")]
+    [Authorize(Roles = "(Built-In) Administrators, (Built-In) Users")]
     public class BaseController : Controller
     {
         protected IConfigurationRoot Conf { get => (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>(); }

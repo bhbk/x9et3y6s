@@ -39,6 +39,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var result = await UoW.IssuerRepo.CreateAsync(model);
 
+            await UoW.CommitAsync();
+
             return Ok(UoW.Transform.Map<IssuerModel>(result));
         }
 
@@ -89,8 +91,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<IssuerModel>(issuer));
         }
 
-        [Route("v1/pages"), HttpGet]
-        public async Task<IActionResult> GetIssuersPageV1([FromQuery] SimplePager model)
+        [Route("v1/page"), HttpGet]
+        public async Task<IActionResult> GetIssuersV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -121,8 +123,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetIssuersPageV1([FromBody] CascadePager model)
+        [Route("v1/page"), HttpPost]
+        public async Task<IActionResult> GetIssuersV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -187,7 +189,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (issuer.Immutable)
+            else if (issuer.Immutable
+                && issuer.Immutable != model.Immutable)
             {
                 ModelState.AddModelError(MsgType.IssuerImmutable.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);

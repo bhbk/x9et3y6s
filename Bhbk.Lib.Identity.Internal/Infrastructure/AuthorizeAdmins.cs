@@ -9,8 +9,8 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AuthorizeAdminsRequirement requirement)
         {
-            if (context.User.Claims.Where(x => x.Type == ClaimTypes.Role
-                 && x.Value == "Bhbk.WebApi.Identity(Admins)").Any())
+            if (context.User.HasClaim(x => x.Type == ClaimTypes.Role
+                 && x.Value == "(Built-In) Administrators"))
                 context.Succeed(requirement);
 
             return Task.CompletedTask;
@@ -19,6 +19,6 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
 
     public class AuthorizeAdminsRequirement : IAuthorizationRequirement
     {
-
+        public AuthorizeAdminsRequirement() { }
     }
 }

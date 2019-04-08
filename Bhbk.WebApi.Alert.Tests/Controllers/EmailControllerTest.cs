@@ -37,10 +37,10 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var admin = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
+            var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, admin);
             var result = await _endpoints.Enqueue_EmailV1(rop.token, new EmailCreate());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -50,9 +50,9 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
                 new EmailCreate()
                 {
                     FromId = Guid.NewGuid(),
-                    FromEmail = user.Email,
-                    ToId = user1.Id,
-                    ToEmail = user1.Email,
+                    FromEmail = admin.Email,
+                    ToId = user.Id,
+                    ToEmail = user.Email,
                     Subject = Strings.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
                     HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                 });
@@ -63,10 +63,10 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
             result = await _endpoints.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
-                    FromId = user.Id,
-                    FromEmail = user1.Email,
-                    ToId = user1.Id,
-                    ToEmail = user1.Email,
+                    FromId = admin.Id,
+                    FromEmail = user.Email,
+                    ToId = user.Id,
+                    ToEmail = user.Email,
                     Subject = Strings.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
                     HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                 });
@@ -83,8 +83,8 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultUserAdmin)).Single();
-            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<TClients> { client }, user);
 

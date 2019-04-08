@@ -57,11 +57,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var state = RandomValues.CreateBase64String(8);
             var imp = await _endpoints.Implicit_UseV2(
                 new ImplicitV2()
@@ -140,9 +140,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var url = new Uri(Strings.ApiUnitTestUri1Link);
+            var url = new Uri(Strings.ApiUnitTestUriLink);
             var state = RandomValues.CreateBase64String(8);
             var imp = await controller.AskImplicitV2(
                 new ImplicitV2()
@@ -190,7 +190,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var imp_claims = JwtBuilder.ReadJwtToken(imp_rop).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            imp_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            imp_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             imp_claims.Value.Split(':')[1].Should().Be(salt);
         }
     }

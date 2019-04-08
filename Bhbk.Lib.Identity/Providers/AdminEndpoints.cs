@@ -46,12 +46,12 @@ namespace Bhbk.Lib.Identity.Providers
                 _client = client;
         }
 
-        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Activity_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/activity/v1/pages";
+            var endpoint = "/activity/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();
@@ -123,12 +123,12 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Claim_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/claim/v1/pages";
+            var endpoint = "/claim/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();
@@ -221,12 +221,12 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Client_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Client_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/client/v1/pages";
+            var endpoint = "/client/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();
@@ -338,12 +338,12 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Issuer_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/issuer/v1/pages";
+            var endpoint = "/issuer/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();
@@ -437,12 +437,12 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Login_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Login_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/login/v1/pages";
+            var endpoint = "/login/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();
@@ -554,12 +554,12 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Role_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/role/v1/pages";
+            var endpoint = "/role/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();
@@ -767,12 +767,12 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> User_GetPageV1(string jwt, CascadePager model)
         {
             var content = new StringContent(
                JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
-            var endpoint = "/user/v1/pages";
+            var endpoint = "/user/v1/page";
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
             _client.DefaultRequestHeaders.Accept.Clear();

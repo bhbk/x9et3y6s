@@ -8,9 +8,11 @@ using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +23,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using Xunit;
 
@@ -82,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tests
                 TestData = new GenerateTestData(UoW);
 
                 /*
-                 * must add to initialize properly...
+                 * must add seed data for good bearer setup...
                  */
 
                 DefaultData.CreateAsync().Wait();
@@ -138,17 +141,22 @@ namespace Bhbk.WebApi.Alert.Tests
                         ClockSkew = TimeSpan.Zero,
                     };
                 });
-                sc.AddAuthorization(auth =>
-                    auth.AddPolicy("AdministratorPolicy", policy =>
-                    {
-                        policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
-                    }));
-                sc.AddMvc();
-                sc.AddMvc().AddControllersAsServices();
+                sc.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
                 sc.AddMvc().AddJsonOptions(json =>
                 {
                     json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                });
+                sc.AddAuthorization(auth =>
+                {
+                    auth.AddPolicy("AdministratorPolicy", policy =>
+                    {
+                        policy.RequireClaim(ClaimTypes.Role, "(Built-In) Administrators");
+                    });
+                    auth.AddPolicy("UserPolicy", policy =>
+                    {
+                        policy.RequireClaim(ClaimTypes.Role, "(Built-In) Users");
+                    });
                 });
                 sc.Configure<ForwardedHeadersOptions>(headers =>
                 {

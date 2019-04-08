@@ -39,50 +39,44 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string ApiDefaultClientUi = "Bhbk.WebUi.Identity";
         public const string ApiDefaultClientApi = "Bhbk.WebApi.Identity";
         public const string ApiDefaultIssuer = "Bhbk";
-        public const string ApiDefaultPhone = "+00000000000";
         public const string ApiDefaultLogin = "local";
         public const string ApiDefaultLoginKey = "local";
         public const string ApiDefaultLoginName = "local";
-        public const string ApiDefaultRoleForAdmin = "Bhbk.WebApi.Identity(Admins)";
-        public const string ApiDefaultRoleForUser = "Bhbk.WebApi.Identity(Users)";
-        public const string ApiDefaultUserAdmin = "root@local";
-        public const string ApiDefaultUserPassword = "pa$$word01!";
-        public const string ApiDefaultFirstName = "System";
-        public const string ApiDefaultLastName = "Administrator";
+        public const string ApiDefaultRoleForAdmin = "(Built-In) Administrators";
+        public const string ApiDefaultRoleForSystem = "(Built-In) Systems";
+        public const string ApiDefaultRoleForUser = "(Built-In) Users";
+        public const string ApiDefaultAdminUser = "admin@local";
+        public const string ApiDefaultAdminUserPassword = "pa$$word01!";
+        public const string ApiDefaultAdminUserFirstName = "Administrator";
+        public const string ApiDefaultAdminUserLastName = "User";
+        public const string ApiDefaultAdminUserPhone = "+00000000000";
+        public const string ApiDefaultNormalUser = "user@local";
+        public const string ApiDefaultNormalUserPassword = "pa$$word02!";
+        public const string ApiDefaultNormalUserFirstName = "Normal";
+        public const string ApiDefaultNormalUserLastName = "User";
+        public const string ApiDefaultNormalUserPhone = "+00000000000";
 
         #endregion
 
         #region Configuration Constants (Unit Tests)
 
-        public const string ApiUnitTestClient1 = "ClientUnitTests1";
-        public const string ApiUnitTestClient1Key = "ClientUnitTests1Key";
-        public const string ApiUnitTestClient2 = "ClientUnitTests2";
-        public const string ApiUnitTestClient2Key = "ClientUnitTests2Key";
-        public const string ApiUnitTestClaim1 = "ClaimUnitTests1";
-        public const string ApiUnitTestClaim2 = "ClaimUnitTests2";
+        public const string ApiUnitTestClient = "ClientUnitTests";
+        public const string ApiUnitTestClientKey = "ClientUnitTestsKey";
+        public const string ApiUnitTestClaim = "ClaimUnitTests";
         public const string ApiUnitTestEmailContent = "EmailUnitTestsContent";
         public const string ApiUnitTestEmailSubject = "EmailUnitTestsSubject";
-        public const string ApiUnitTestIssuer1 = "IssuerUnitTests1";
-        public const string ApiUnitTestIssuer1Key = "IssuerUnitTests1Key";
-        public const string ApiUnitTestIssuer2 = "IssuerUnitTests2";
-        public const string ApiUnitTestIssuer2Key = "IssuerUnitTests2Key";
-        public const string ApiUnitTestLogin1 = "LoginUnitTests1";
-        public const string ApiUnitTestLogin1Key = "LoginUnitTests1Key";
-        public const string ApiUnitTestLogin2 = "LoginUnitTests2";
-        public const string ApiUnitTestLogin2Key = "LoginUnitTests2Key";
-        public const string ApiUnitTestRole1 = "RoleUnitTests1";
-        public const string ApiUnitTestRole2 = "RoleUnitTests2";
+        public const string ApiUnitTestIssuer = "IssuerUnitTests";
+        public const string ApiUnitTestIssuerKey = "IssuerUnitTestsKey";
+        public const string ApiUnitTestLogin = "LoginUnitTests";
+        public const string ApiUnitTestLoginKey = "LoginUnitTestsKey";
+        public const string ApiUnitTestRole = "RoleUnitTests";
         public const string ApiUnitTestTextBody = "TextUnitTestsContent";
-        public const string ApiUnitTestUser1 = "unittestuser1@local";
-        public const string ApiUnitTestUser1Phone = "+11111111111";
-        public const string ApiUnitTestUser2 = "unittestuser2@local";
-        public const string ApiUnitTestUser2Phone = "+22222222222";
+        public const string ApiUnitTestUser = "unittestuser1@local";
+        public const string ApiUnitTestUserPhone = "+11111111111";
         public const string ApiUnitTestUserPassCurrent = "te$tpa$$word01!";
         public const string ApiUnitTestUserPassNew = "te$tpa$$word01!new";
-        public const string ApiUnitTestUri1 = "UrlUnitTests1";
-        public const string ApiUnitTestUri1Link = "https://app.test.net/1/callback";
-        public const string ApiUnitTestUri2 = "UrlUnitTests2";
-        public const string ApiUnitTestUri2Link = "https://app.test.net/2/callback";
+        public const string ApiUnitTestUri = "UrlUnitTests";
+        public const string ApiUnitTestUriLink = "https://app.test.net/1/callback";
 
         #endregion
 

@@ -43,29 +43,27 @@
   "IdentityAdminUrls": {
     "BaseApiUrl": "https://localhost:44359",
     "BaseApiPath": "/api/identity/admin",
-    "BaseUiUrl": "http://localhost:4200",
+    "BaseUiUrl": "http://localhost:4300",
     "BaseUiPath": "/ui/identity/admin"
   },
   "IdentityMeUrls": {
     "BaseApiUrl": "https://localhost:44348",
     "BaseApiPath": "/api/identity/me",
-    "BaseUiUrl": "http://localhost:4200",
+    "BaseUiUrl": "http://localhost:4300",
     "BaseUiPath": "/ui/identity/me"
   },
   "IdentityStsUrls": {
     "BaseApiUrl": "https://localhost:44375",
-    "BaseApiPath": "/api/identity/sts",
-    "BaseUiUrl": "http://localhost:4200",
-    "BaseUiPath": "/ui/identity/sts"
+    "BaseApiPath": "/api/identity/sts"
   },
   "AlertUrls": {
     "BaseApiUrl": "https://localhost:44374",
     "BaseApiPath": "/api/alert"
   }
   //"IdentityAdminUrls": {
-  //  "BaseApiUrl": "https://yolo.ochap.net",
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
   //  "BaseApiPath": "/api/identity/admin",
-  //  "BaseUiUrl": "https://yolo.ochap.net",
+  //  "BaseUiUrl": "https://yolo.test.ochap.net",
   //  "BaseUiPath": "/ui/identity/admin"
   //},
   //"IdentityMeUrls": {
@@ -75,11 +73,11 @@
   //  "BaseUiPath": "/ui/identity/me"
   //},
   //"IdentityStsUrls": {
-  //  "BaseApiUrl": "https://yolo.ochap.net",
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
   //  "BaseApiPath": "/api/identity/sts"
   //},
   //"AlertUrls": {
-  //  "BaseApiUrl": "https://yolo.ochap.net",
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
   //  "BaseApiPath": "/api/alert"
   //}
 }

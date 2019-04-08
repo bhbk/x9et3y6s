@@ -301,8 +301,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/pages"), HttpGet]
-        public async Task<IActionResult> GetUsersPageV1([FromQuery] SimplePager model)
+        [Route("v1/page"), HttpGet]
+        public async Task<IActionResult> GetUsersV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -336,8 +336,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetUsersPageV1([FromBody] CascadePager model)
+        [Route("v1/page"), HttpPost]
+        public async Task<IActionResult> GetUsersV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -481,10 +481,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{model.Id}");
                 return NotFound(ModelState);
             }
-
-            if (user.Immutable)
+            else if (user.Immutable
+                && user.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.UserImmutable.ToString(), $"User:{model.Id}");
+                ModelState.AddModelError(MsgType.UserImmutable.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 

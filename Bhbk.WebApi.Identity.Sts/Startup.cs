@@ -26,6 +26,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text;
 
 /*
@@ -68,7 +69,6 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
-            sc.AddTransient<IAuthorizationRequirement, AuthorizeUsersRequirement>();
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityContext<_DbContext>>();
@@ -140,24 +140,22 @@ namespace Bhbk.WebApi.Identity.Sts
                     ClockSkew = TimeSpan.Zero,
                 };
             });
-            sc.AddAuthorization(auth =>
-                auth.AddPolicy("AdministratorPolicy", policy =>
-                {
-                    policy.RequireRole("Bhbk.WebApi.Identity(Admins)");
-                }));
-            sc.AddAuthorization(auth =>
-                auth.AddPolicy("SystemPolicy", policy =>
-                {
-                    policy.RequireRole("Bhbk.WebApi.Identity(System)");
-                }));
-            sc.AddAuthorization(auth =>
-                auth.AddPolicy("UserPolicy", policy => policy.Requirements.Add(new AuthorizeUsersRequirement())));
-            sc.AddMvc();
             sc.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             sc.AddMvc().AddJsonOptions(json =>
             {
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
+            sc.AddAuthorization(auth =>
+            {
+                auth.AddPolicy("AdministratorPolicy", policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, "(Built-In) Administrators");
+                });
+                auth.AddPolicy("UserPolicy", policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, "(Built-In) Users");
+                });
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>
             {
@@ -185,13 +183,13 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
-            app.UseAuthentication();
             app.UseStaticFiles();
+            app.UseAuthentication();
+            app.UseMvc();
 
             //app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();
             //app.UseMiddleware<ResourceOwnerMiddleware_Deprecate>();
 
-            app.UseMvc();
             app.UseSwagger(SwaggerOptions.ConfigureSwagger);
             app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
         }

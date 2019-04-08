@@ -93,8 +93,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Transform.Map<LoginModel>(login));
         }
 
-        [Route("v1/pages"), HttpGet]
-        public async Task<IActionResult> GetLoginsPageV1([FromQuery] SimplePager model)
+        [Route("v1/page"), HttpGet]
+        public async Task<IActionResult> GetLoginsV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -125,8 +125,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         }
 
-        [Route("v1/pages"), HttpPost]
-        public async Task<IActionResult> GetLoginsPageV1([FromBody] CascadePager model)
+        [Route("v1/page"), HttpPost]
+        public async Task<IActionResult> GetLoginsV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -191,6 +191,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{model.Id}");
                 return NotFound(ModelState);
+            }
+            else if (login.Immutable
+                && login.Immutable != model.Immutable)
+            {
+                ModelState.AddModelError(MsgType.LoginImmutable.ToString(), $"Client:{login.Id}");
+                return BadRequest(ModelState);
             }
 
             model.ActorId = GetUserGUID();

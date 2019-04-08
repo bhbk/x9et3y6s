@@ -39,9 +39,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
@@ -93,9 +93,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = true;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
@@ -144,9 +144,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
@@ -198,9 +198,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
@@ -264,9 +264,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = true;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
@@ -324,9 +324,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
@@ -355,7 +355,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var rop_claims = JwtBuilder.ReadJwtToken(rop_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            rop_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            rop_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             rop_claims.Value.Split(':')[1].Should().Be(salt);
 
             /*
@@ -381,7 +381,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var legacy_claims = JwtBuilder.ReadJwtToken(legacy_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            legacy_claims.Value.Should().Be(Strings.ApiUnitTestIssuer1);
+            legacy_claims.Value.Should().Be(Strings.ApiUnitTestIssuer);
         }
 
         [Fact]
@@ -392,19 +392,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var client2 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
-
-            if (client1.Id == client2.Id)
-                return;
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
-                    client = string.Join(",", new List<string> { client1.Id.ToString(), RandomValues.CreateBase64String(8) }),
+                    client = string.Join(",", new List<string> { client.Id.ToString(), RandomValues.CreateBase64String(8) }),
                     user = user.Id.ToString(),
                     grant_type = "password",
                     password = Strings.ApiUnitTestUserPassCurrent,
@@ -412,16 +408,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            client1.Enabled = false;
+            client.Enabled = false;
 
-            await _factory.UoW.ClientRepo.UpdateAsync(client1);
+            await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
             rop = await _endpoints.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
-                    client = string.Join(",", new List<string> { client1.Id.ToString(), client2.Id.ToString() }),
+                    client = string.Join(",", new List<string> { client.Id.ToString() }),
                     user = user.Id.ToString(),
                     grant_type = "password",
                     password = Strings.ApiUnitTestUserPassCurrent,
@@ -438,9 +434,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
@@ -492,9 +488,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await _endpoints.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
@@ -558,10 +554,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer1)).Single();
-            var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient1)).Single();
-            var client2 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient2)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser1)).Single();
+            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var client2 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
@@ -569,7 +565,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
             if (client1.Id == client2.Id)
                 return;
 
-            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole2)).Single();
+            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiDefaultRoleForUser)).Single();
 
             await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
             await _factory.UoW.CommitAsync();
@@ -596,7 +592,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var empty_claims = JwtBuilder.ReadJwtToken(empty_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            empty_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            empty_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             empty_claims.Value.Split(':')[1].Should().Be(salt);
 
             /*
@@ -621,7 +617,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var single_claims = JwtBuilder.ReadJwtToken(single_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            single_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            single_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             single_claims.Value.Split(':')[1].Should().Be(salt);
 
             /*
@@ -646,7 +642,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.Controllers
 
             var multiple_claims = JwtBuilder.ReadJwtToken(multiple_check.access_token).Claims
                 .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            multiple_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer1);
+            multiple_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
             multiple_claims.Value.Split(':')[1].Should().Be(salt);
         }
     }
