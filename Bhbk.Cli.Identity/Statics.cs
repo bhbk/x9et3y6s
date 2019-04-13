@@ -24,7 +24,7 @@ namespace Bhbk.Cli.Identity
 
     internal class Statics
     {
-        internal static IdentityContext UoW;
+        internal static IdentityUnitOfWork UoW;
         internal static GenerateDefaultData DefaultData;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.AspNetCore.Identity;
 using OtpNet;
 using System.Text;
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _expire = expire;
         }
 
-        public Task<string> GenerateAsync(string purpose, TUsers user)
+        public Task<string> GenerateAsync(string purpose, tbl_Users user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);
@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(code.ComputeTotp());
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, TUsers user)
+        public Task<bool> ValidateAsync(string purpose, string token, tbl_Users user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     }
     public static class IdentityBuilderExtensions
     {
-        public static IdentityBuilder AddMyTotpProvider(this IdentityBuilder builder)
+        public static IdentityBuilder AddIdentityTotpProvider(this IdentityBuilder builder)
         {
             var userType = builder.UserType;
             var providerType = typeof(TotpProvider).MakeGenericType(userType);

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Alert;
+﻿using Bhbk.Lib.Identity.Models.Alert;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;

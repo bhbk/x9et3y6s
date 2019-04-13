@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ActivityRepository : IGenericRepository<ActivityCreate, TActivities, Guid>
+    public class ActivityRepository : IGenericRepository<ActivityCreate, tbl_Activities, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _mapper;
-        private readonly _DbContext _context;
+        private readonly IdentityDbContext _context;
 
-        public ActivityRepository(_DbContext context, ExecutionType situation, IMapper mapper)
+        public ActivityRepository(IdentityDbContext context, ExecutionType situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -29,9 +29,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _mapper = mapper;
         }
 
-        public async Task<int> CountAsync(Expression<Func<TActivities, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<tbl_Activities, bool>> predicates = null)
         {
-            var query = _context.TActivities.AsQueryable();
+            var query = _context.tbl_Activities.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -39,9 +39,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<TActivities> CreateAsync(ActivityCreate model)
+        public async Task<tbl_Activities> CreateAsync(ActivityCreate model)
         {
-            var entity = _mapper.Map<TActivities>(model);
+            var entity = _mapper.Map<tbl_Activities>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.TActivities.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_Activities.Where(x => x.Id == key).Single();
 
             try
             {
@@ -65,16 +65,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.TActivities.Any(x => x.Id == key));
+            return await Task.FromResult(_context.tbl_Activities.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<TActivities>> GetAsync(Expression<Func<TActivities, bool>> predicates = null,
-            Func<IQueryable<TActivities>, IIncludableQueryable<TActivities, object>> includes = null,
-            Func<IQueryable<TActivities>, IOrderedQueryable<TActivities>> orders = null,
+        public async Task<IEnumerable<tbl_Activities>> GetAsync(Expression<Func<tbl_Activities, bool>> predicates = null,
+            Func<IQueryable<tbl_Activities>, IIncludableQueryable<tbl_Activities, object>> includes = null,
+            Func<IQueryable<tbl_Activities>, IOrderedQueryable<tbl_Activities>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.TActivities.AsQueryable();
+            var query = _context.tbl_Activities.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -92,7 +92,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public Task<TActivities> UpdateAsync(TActivities entity)
+        public Task<tbl_Activities> UpdateAsync(tbl_Activities entity)
         {
             throw new NotImplementedException();
         }

@@ -130,75 +130,75 @@
     </Build>
     <Build Include="dbo\Stored Procedures\uspSys_DbRefresh_Pre.sql" />
     <Build Include="dbo\Stored Procedures\uspSys_DbRefresh_Post.sql" />
-    <Build Include="dbo\Tables\TUsers.sql">
+    <Build Include="dbo\Tables\tbl_Users.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TUserRoles.sql">
+    <Build Include="dbo\Tables\tbl_UserRoles.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TUserLogins.sql">
+    <Build Include="dbo\Tables\tbl_UserLogins.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TUserClaims.sql">
+    <Build Include="dbo\Tables\tbl_UserClaims.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TRoles.sql">
+    <Build Include="dbo\Tables\tbl_Urls.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TRoleClaims.sql">
+    <Build Include="dbo\Tables\tbl_StateTypes.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TRefreshes.sql">
+    <Build Include="dbo\Tables\tbl_States.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TLogins.sql">
+    <Build Include="dbo\Tables\tbl_Roles.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TIssuers.sql">
+    <Build Include="dbo\Tables\tbl_RoleClaims.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TExceptions.sql">
+    <Build Include="dbo\Tables\tbl_Refreshes.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TClients.sql">
+    <Build Include="dbo\Tables\tbl_Logins.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TClaims.sql">
+    <Build Include="dbo\Tables\tbl_Issuers.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TActivities.sql">
+    <Build Include="dbo\Tables\tbl_Exceptions.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\LKCodeTypes.sql">
+    <Build Include="dbo\Tables\tbl_Clients.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\LKClaimTypes.sql">
+    <Build Include="dbo\Tables\tbl_ClaimTypes.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\LKActivityTypes.sql">
+    <Build Include="dbo\Tables\tbl_Claims.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TUrls.sql">
+    <Build Include="dbo\Tables\tbl_ActivityTypes.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\TStates.sql">
+    <Build Include="dbo\Tables\tbl_Activities.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>

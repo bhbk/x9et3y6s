@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<IssuerModel>(result));
+            return Ok(UoW.Reshape.Map<IssuerModel>(result));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetIssuerV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
-            TIssuers issuer = null;
+            tbl_Issuers issuer = null;
 
             if (Guid.TryParse(issuerValue, out issuerID))
                 issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Transform.Map<IssuerModel>(issuer));
+            return Ok(UoW.Reshape.Map<IssuerModel>(issuer));
         }
 
         [Route("v1/page"), HttpGet]
@@ -97,24 +97,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<TIssuers, bool>> preds;
+            Expression<Func<tbl_Issuers, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.IssuerRepo.CountAsync(preds);
                 var result = await UoW.IssuerRepo.GetAsync(preds,
-                    x => x.Include(c => c.TClients),
+                    x => x.Include(c => c.tbl_Clients),
                     x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<IssuerModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -133,24 +133,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TIssuers, bool>> preds;
+            Expression<Func<tbl_Issuers, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.IssuerRepo.CountAsync(preds);
                 var result = await UoW.IssuerRepo.GetAsync(preds,
-                    x => x.Include(c => c.TClients),
+                    x => x.Include(c => c.tbl_Clients),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<IssuerModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -198,11 +198,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Transform.Map<TIssuers>(model));
+            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Reshape.Map<tbl_Issuers>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<IssuerModel>(result));
+            return Ok(UoW.Reshape.Map<IssuerModel>(result));
         }
     }
 }

@@ -30,6 +30,7 @@ powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Forc
 cd ..\Bhbk.Mssql.Identity
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
+powershell -command "& { Remove-Item *.dbmdl }"
 
 cd ..\Bhbk.WebApi.Identity.Admin
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"

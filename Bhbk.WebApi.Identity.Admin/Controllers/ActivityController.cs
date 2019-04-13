@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,15 +26,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<TActivities, bool>> preds;
+            Expression<Func<tbl_Activities, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.ActivityType.ToLower().Contains(model.Filter.ToLower())
-                || x.TableName.ToLower().Contains(model.Filter.ToLower())
-                || x.OriginalValues.ToLower().Contains(model.Filter.ToLower())
-                || x.CurrentValues.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.ActivityType.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.TableName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.OriginalValues.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.CurrentValues.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ActivityModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -65,15 +65,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TActivities, bool>> preds;
+            Expression<Func<tbl_Activities, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.ActivityType.ToLower().Contains(model.Filter.ToLower())
-                || x.TableName.ToLower().Contains(model.Filter.ToLower())
-                || x.OriginalValues.ToLower().Contains(model.Filter.ToLower())
-                || x.CurrentValues.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.ActivityType.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.TableName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.OriginalValues.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.CurrentValues.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ActivityModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ActivityModel>>(result) });
             }
             catch (ParseException ex)
             {

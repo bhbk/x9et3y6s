@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class StateRepository : IGenericRepository<StateCreate, TStates, Guid>
+    public class StateRepository : IGenericRepository<StateCreate, tbl_States, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly _DbContext _context;
+        private readonly IdentityDbContext _context;
 
-        public StateRepository(_DbContext context, ExecutionType situation, IMapper transform)
+        public StateRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -30,17 +30,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<TStates> CreateAsync(StateCreate entity)
+        public async Task<tbl_States> CreateAsync(StateCreate model)
         {
-            var model = _transform.Map<TStates>(entity);
-            var create = _context.Add(model).Entity;
+            var entity = _transform.Map<tbl_States>(model);
+            var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.TRefreshes.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_Refreshes.Where(x => x.Id == key).Single();
 
             try
             {
@@ -56,16 +56,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.TStates.Any(x => x.Id == key));
+            return await Task.FromResult(_context.tbl_States.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<TStates>> GetAsync(Expression<Func<TStates, bool>> predicates = null, 
-            Func<IQueryable<TStates>, IIncludableQueryable<TStates, object>> includes = null, 
-            Func<IQueryable<TStates>, IOrderedQueryable<TStates>> orders = null, 
+        public async Task<IEnumerable<tbl_States>> GetAsync(Expression<Func<tbl_States, bool>> predicates = null, 
+            Func<IQueryable<tbl_States>, IIncludableQueryable<tbl_States, object>> includes = null, 
+            Func<IQueryable<tbl_States>, IOrderedQueryable<tbl_States>> orders = null, 
             int? skip = null, 
             int? take = null)
         {
-            var query = _context.TStates.AsQueryable();
+            var query = _context.tbl_States.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -83,8 +83,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<TStates> UpdateAsync(TStates entity)
+        public async Task<tbl_States> UpdateAsync(tbl_States model)
         {
+            var entity = _context.tbl_States.Where(x => x.Id == model.Id).Single();
+
+            /*
+             * only persist certain fields.
+             */
+
+            entity.LastPolling = model.LastPolling;
+            entity.StateConsume = model.StateConsume;
+
             _context.Entry(entity).State = EntityState.Modified;
 
             return await Task.FromResult(_context.Update(entity).Entity);

@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
 
-            var result = tokens.Select(x => UoW.Transform.Map<RefreshModel>(x));
+            var result = tokens.Select(x => UoW.Reshape.Map<RefreshModel>(x));
 
             return Ok(result);
         }
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer_id, out issuerID))
@@ -122,12 +122,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{submit.issuer_id}");
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
             Guid clientID;
-            TClients client;
+            tbl_Clients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.client_id, out clientID))
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
                 return NotFound(ModelState);
             }
-            else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), out refreshType)
+            else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), true, out refreshType)
                 || (refreshToken.ValidFromUtc >= DateTime.UtcNow || refreshToken.ValidToUtc <= DateTime.UtcNow))
             {
                 ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(submit.issuer, out issuerID))
@@ -231,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{submit.issuer}");
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -243,7 +243,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
                 return NotFound(ModelState);
             }
-            else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), out refreshType)
+            else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), true, out refreshType)
                 || (refreshToken.ValidFromUtc >= DateTime.UtcNow || refreshToken.ValidToUtc <= DateTime.UtcNow))
             {
                 ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
@@ -255,7 +255,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case RefreshType.Client:
                     {
                         Guid clientID;
-                        TClients client;
+                        tbl_Clients client;
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(submit.client, out clientID))
@@ -315,7 +315,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         user.ActorId = user.Id;
 
                         var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-                        var clients = new List<TClients>();
+                        var clients = new List<tbl_Clients>();
 
                         //check if client is single, multiple or undefined...
                         if (string.IsNullOrEmpty(submit.client))
@@ -326,7 +326,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             foreach (string entry in submit.client.Split(","))
                             {
                                 Guid clientID;
-                                TClients client;
+                                tbl_Clients client;
 
                                 //check if identifier is guid. resolve to guid if not.
                                 if (Guid.TryParse(entry.Trim(), out clientID))

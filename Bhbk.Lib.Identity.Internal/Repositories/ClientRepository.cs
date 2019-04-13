@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
@@ -17,14 +17,14 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ClientRepository : IGenericRepository<ClientCreate, TClients, Guid>
+    public class ClientRepository : IGenericRepository<ClientCreate, tbl_Clients, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _transform;
-        private readonly _DbContext _context;
+        private readonly IdentityDbContext _context;
 
-        public ClientRepository(_DbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
+        public ClientRepository(IdentityDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -35,9 +35,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<int> CountAsync(Expression<Func<TClients, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<tbl_Clients, bool>> predicates = null)
         {
-            var query = _context.TClients.AsQueryable();
+            var query = _context.tbl_Clients.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -45,17 +45,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<TClients> CreateAsync(ClientCreate model)
+        public async Task<tbl_Clients> CreateAsync(ClientCreate model)
         {
-            var entity = _transform.Map<TClients>(model);
+            var entity = _transform.Map<tbl_Clients>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
         }
 
-        public async Task<TUrls> CreateUriAsync(UrlCreate model)
+        public async Task<tbl_Urls> CreateUriAsync(UrlCreate model)
         {
-            var entity = _transform.Map<TUrls>(model);
+            var entity = _transform.Map<tbl_Urls>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -63,17 +63,19 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.TClients.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_Clients.Where(x => x.Id == key).Single();
 
-            var activity = _context.TActivities.Where(x => x.ClientId == key);
-            var roles = _context.TRoles.Where(x => x.ClientId == key);
-            var refreshes = _context.TRefreshes.Where(x => x.ClientId == key);
+            var activity = _context.tbl_Activities.Where(x => x.ClientId == key);
+            var roles = _context.tbl_Roles.Where(x => x.ClientId == key);
+            var refreshes = _context.tbl_Refreshes.Where(x => x.ClientId == key);
+            var states = _context.tbl_States.Where(x => x.ClientId == key);
 
             try
             {
                 _context.RemoveRange(activity);
                 _context.RemoveRange(roles);
                 _context.RemoveRange(refreshes);
+                _context.RemoveRange(states);
 
                 _context.Remove(entity);
 
@@ -87,10 +89,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.TClients.Any(x => x.Id == key));
+            return await Task.FromResult(_context.tbl_Clients.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(TClients client)
+        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Clients client)
         {
             /*
              * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -109,7 +111,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ExpireClientToken"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ClientCredTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -117,7 +119,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(TClients client)
+        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Clients client)
         {
             var claims = new List<Claim>();
 
@@ -131,7 +133,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ExpireClientRefresh"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ClientCredRefreshExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -139,13 +141,13 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<IEnumerable<TClients>> GetAsync(Expression<Func<TClients, bool>> predicates = null,
-            Func<IQueryable<TClients>, IIncludableQueryable<TClients, object>> includes = null,
-            Func<IQueryable<TClients>, IOrderedQueryable<TClients>> orders = null,
+        public async Task<IEnumerable<tbl_Clients>> GetAsync(Expression<Func<tbl_Clients, bool>> predicates = null,
+            Func<IQueryable<tbl_Clients>, IIncludableQueryable<tbl_Clients, object>> includes = null,
+            Func<IQueryable<tbl_Clients>, IOrderedQueryable<tbl_Clients>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.TClients.AsQueryable();
+            var query = _context.tbl_Clients.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -165,23 +167,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<TRoles>> GetRoleListAsync(Guid key)
+        public async Task<IEnumerable<tbl_Roles>> GetRoleListAsync(Guid key)
         {
-            var result = _context.TRoles.Where(x => x.ClientId == key).ToList();
+            var result = _context.tbl_Roles.Where(x => x.ClientId == key).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<TUrls>> GetUriListAsync(Guid key)
+        public async Task<IEnumerable<tbl_Urls>> GetUriListAsync(Guid key)
         {
-            var result = _context.TUrls.Where(x => x.ClientId == key).ToList();
+            var result = _context.tbl_Urls.Where(x => x.ClientId == key).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<TClients> UpdateAsync(TClients model)
+        public async Task<tbl_Clients> UpdateAsync(tbl_Clients model)
         {
-            var entity = _context.TClients.Where(x => x.Id == model.Id).Single();
+            var entity = _context.tbl_Clients.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.

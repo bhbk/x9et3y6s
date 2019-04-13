@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using System;
 
 namespace Bhbk.Lib.Identity.Internal.Primitives
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         //https://htmlformatter.com/, https://www.freeformatter.com/java-dotnet-escape.html
 
-        public static string TemplateConfirmEmail(TUsers user, Uri link)
+        public static string TemplateConfirmEmail(tbl_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -139,7 +139,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             "</html>";
         }
 
-        public static string TemplateConfirmPassword(TUsers user, Uri link)
+        public static string TemplateConfirmPassword(tbl_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -189,7 +189,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
             "</html>";
         }
 
-        public static string TemplateConfirmNewUser(TIssuers issuer, TUsers user, Uri link)
+        public static string TemplateConfirmNewUser(tbl_Issuers issuer, tbl_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...

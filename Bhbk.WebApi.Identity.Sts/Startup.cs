@@ -4,7 +4,7 @@ using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.WebApi.Identity.Sts.Tasks;
@@ -52,26 +52,26 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<_DbContext>()
+            var options = new DbContextOptionsBuilder<IdentityDbContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             var mapper = new MapperConfiguration(x =>
             {
-                x.AddProfile<IdentityMappings>();
+                x.AddProfile<IdentityMapper>();
             }).CreateMapper();
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
-            sc.AddScoped<IIdentityContext<_DbContext>>(x =>
+            sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
             {
-                return new IdentityContext(options, ExecutionType.Live, conf, mapper);
+                return new IdentityUnitOfWork(options, ExecutionType.Live, conf, mapper);
             });
             sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityContext<_DbContext>>();
+            var uow = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
             /*
              * only live context allowed to run...

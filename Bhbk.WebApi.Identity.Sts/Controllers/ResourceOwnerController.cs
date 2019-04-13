@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             if (UoW.ConfigRepo.DefaultsLegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
@@ -79,12 +79,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{input.issuer_id}");
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
             Guid clientID;
-            TClients client;
+            tbl_Clients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client_id, out clientID))
@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            TUsers user;
+            tbl_Users user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.username, out userID))
@@ -227,7 +227,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -242,12 +242,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
             Guid userID;
-            TUsers user;
+            tbl_Users user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -274,7 +274,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<TClients>();
+            var clients = new List<tbl_Clients>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
@@ -285,7 +285,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in input.client.Split(","))
                 {
                     Guid clientID;
-                    TClients client;
+                    tbl_Clients client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))

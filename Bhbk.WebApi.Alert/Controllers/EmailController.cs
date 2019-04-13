@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Alert;
+﻿using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authorization;

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
-        public async Task<HttpResponseMessage> AuthCode_AskV1(AuthCodeRequestV1 model)
+        public async Task<HttpResponseMessage> AuthCode_AskV1(AuthCodeAskV1 model)
         {
             string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
                 + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthCode_AskV2(AuthCodeRequestV2 model)
+        public async Task<HttpResponseMessage> AuthCode_AskV2(AuthCodeAskV2 model)
         {
             string content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
                 + "&client=" + HttpUtility.UrlEncode(model.client)
@@ -197,7 +197,7 @@ namespace Bhbk.Lib.Identity.Providers
         }
 
         //https://oauth.net/2/grant-types/device-code/
-        public async Task<HttpResponseMessage> DeviceCode_AskV1(DeviceCodeRequestV1 model)
+        public async Task<HttpResponseMessage> DeviceCode_AskV1(DeviceCodeAskV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Providers
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_AskV2(DeviceCodeRequestV2 model)
+        public async Task<HttpResponseMessage> DeviceCode_AskV2(DeviceCodeAskV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -243,6 +243,42 @@ namespace Bhbk.Lib.Identity.Providers
 
             if (_situation == ExecutionType.UnitTest)
                 return await _client.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> DeviceCode_DecideV1(string jwt, string code, string action)
+        {
+            var endpoint = "/oauth2/v1/device/" + code + "/" + action;
+
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _client.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _client.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> DeviceCode_DecideV2(string jwt, string code, string action)
+        {
+            var endpoint = "/oauth2/v2/device/" + code + "/" + action;
+
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (_situation == ExecutionType.Live)
+                return await _client.GetAsync(
+                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_situation == ExecutionType.UnitTest)
+                return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }

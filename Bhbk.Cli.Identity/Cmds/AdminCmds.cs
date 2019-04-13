@@ -2,7 +2,7 @@
 using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;

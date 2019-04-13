@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.state = HttpUtility.UrlDecode(input.state);
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid clientID;
-            TClients client;
+            tbl_Clients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            TUsers user;
+            tbl_Users user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -121,11 +121,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (client.TUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (client.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/implicit-callback"));
             }
-            else if (client.TUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (client.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
@@ -135,7 +135,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, new List<TClients> { client }, user);
+            //no refresh token as part of this flow...
+            var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
 
             var result = new Uri(redirect.AbsoluteUri + "#access_token=" + HttpUtility.UrlEncode(rop.token)
                 + "&expires_in=" + HttpUtility.UrlEncode(((int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds).ToString())

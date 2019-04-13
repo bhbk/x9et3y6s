@@ -2,6 +2,7 @@
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
@@ -16,10 +17,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
-            if (name.ToLower() == TaskType.MaintainActivity.ToString().ToLower())
+            if (string.Equals(name, TaskType.MaintainActivity.ToString(), StringComparison.OrdinalIgnoreCase))
                 return Ok(((MaintainActivityTask)Tasks.Single(x => x.GetType() == typeof(MaintainActivityTask))).Status);
 
-            if (name.ToLower() == TaskType.MaintainUsers.ToString().ToLower())
+            if (string.Equals(name, TaskType.MaintainUsers.ToString(), StringComparison.OrdinalIgnoreCase))
                 return Ok(((MaintainUsersTask)Tasks.Single(x => x.GetType() == typeof(MaintainUsersTask))).Status);
 
             return BadRequest();

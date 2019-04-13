@@ -1,0 +1,41 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace Bhbk.Lib.Identity.Models.Admin
+{
+    public abstract class Refreshes
+    {
+        [Required]
+        public Guid IssuerId { get; set; }
+
+        public Guid? ClientId { get; set; }
+
+        public Guid? UserId { get; set; }
+
+        [Required]
+        public string RefreshValue { get; set; }
+
+        [Required]
+        public string RefreshType { get; set; }
+
+        [Required]
+        public DateTime ValidFromUtc { get; set; }
+
+        [Required]
+        public DateTime ValidToUtc { get; set; }
+    }
+
+    public class RefreshCreate : Refreshes
+    {
+
+    }
+
+    public class RefreshModel : Refreshes
+    {
+        [Required]
+        public Guid Id { get; set; }
+
+        [Required]
+        public DateTime Created { get; set; }
+    }
+}

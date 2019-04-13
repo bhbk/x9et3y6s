@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
 {
     public class UrlBuilder
     {
-        public static Uri GenerateConfirmEmail(IConfigurationRoot conf, TUsers user, string code)
+        public static Uri GenerateConfirmEmail(IConfigurationRoot conf, tbl_Users user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");
 
@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 + "&code=" + code);
         }
 
-        public static Uri GenerateConfirmPassword(IConfigurationRoot conf, TUsers user, string code)
+        public static Uri GenerateConfirmPassword(IConfigurationRoot conf, tbl_Users user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-password");
 
@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
                 + "&code=" + code);
         }
 
-        public static Uri GenerateConfirmPhone(IConfigurationRoot conf, TUsers user, string code)
+        public static Uri GenerateConfirmPhone(IConfigurationRoot conf, tbl_Users user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-phone");
 

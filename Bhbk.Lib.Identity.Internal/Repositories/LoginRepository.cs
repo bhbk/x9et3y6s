@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class LoginRepository : IGenericRepository<LoginCreate, TLogins, Guid>
+    public class LoginRepository : IGenericRepository<LoginCreate, tbl_Logins, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly _DbContext _context;
+        private readonly IdentityDbContext _context;
 
-        public LoginRepository(_DbContext context, ExecutionType situation, IMapper transform)
+        public LoginRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -30,9 +30,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<int> CountAsync(Expression<Func<TLogins, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<tbl_Logins, bool>> predicates = null)
         {
-            var query = _context.TLogins.AsQueryable();
+            var query = _context.tbl_Logins.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -40,17 +40,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<TLogins> CreateAsync(LoginCreate entity)
+        public async Task<tbl_Logins> CreateAsync(LoginCreate model)
         {
-            var model = _transform.Map<TLogins>(entity);
-            var create = _context.Add(model).Entity;
+            var entit = _transform.Map<tbl_Logins>(model);
+            var create = _context.Add(entit).Entity;
 
             return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.TLogins.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_Logins.Where(x => x.Id == key).Single();
 
             try
             {
@@ -66,16 +66,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.TLogins.Any(x => x.Id == key));
+            return await Task.FromResult(_context.tbl_Logins.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<TLogins>> GetAsync(Expression<Func<TLogins, bool>> predicates = null,
-            Func<IQueryable<TLogins>, IIncludableQueryable<TLogins, object>> includes = null,
-            Func<IQueryable<TLogins>, IOrderedQueryable<TLogins>> orders = null,
+        public async Task<IEnumerable<tbl_Logins>> GetAsync(Expression<Func<tbl_Logins, bool>> predicates = null,
+            Func<IQueryable<tbl_Logins>, IIncludableQueryable<tbl_Logins, object>> includes = null,
+            Func<IQueryable<tbl_Logins>, IOrderedQueryable<tbl_Logins>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.TLogins.AsQueryable();
+            var query = _context.tbl_Logins.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -95,39 +95,39 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IQueryable<TUsers>> GetUsersAsync(Guid key)
+        public async Task<IQueryable<tbl_Users>> GetUsersAsync(Guid key)
         {
-            var result = (IList<string>)_context.TLogins
-                .Join(_context.TUserLogins, x => x.Id, y => y.LoginId, (login1, user1) => new {
+            var result = (IList<string>)_context.tbl_Logins
+                .Join(_context.tbl_UserLogins, x => x.Id, y => y.LoginId, (login1, user1) => new {
                     LoginId = login1.Id,
                     UserId = user1.UserId
                 })
                 .Where(x => x.LoginId == key)
-                .Select(x => x.UserId.ToString().ToLower())
+                .Select(x => x.UserId.ToString())
                 .Distinct()
                 .ToList();
 
-            return await Task.FromResult(_context.TUsers.Where(x => result.Contains(x.Id.ToString())));
+            return await Task.FromResult(_context.tbl_Users.Where(x => result.Contains(x.Id.ToString())));
         }
 
-        public async Task<TLogins> UpdateAsync(TLogins entity)
+        public async Task<tbl_Logins> UpdateAsync(tbl_Logins model)
         {
-            var model = _context.TLogins.Where(x => x.Id == entity.Id).Single();
+            var entity = _context.tbl_Logins.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            model.Name = entity.Name;
-            model.Description = entity.Description;
-            model.LoginKey = entity.LoginKey;
-            model.LastUpdated = DateTime.Now;
-            model.Enabled = entity.Enabled;
-            model.Immutable = entity.Immutable;
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.LoginKey = model.LoginKey;
+            entity.LastUpdated = DateTime.Now;
+            entity.Enabled = model.Enabled;
+            entity.Immutable = model.Immutable;
 
-            _context.Entry(model).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(model).Entity);
+            return await Task.FromResult(_context.Update(entity).Entity);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/device-ask"), HttpPost]
         [AllowAnonymous]
-        public IActionResult AskDeviceCodeV1([FromForm] DeviceCodeRequestV1 input)
+        public IActionResult AskDeviceCodeV1([FromForm] DeviceCodeAskV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/device-ask"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> AskDeviceCodeV2([FromForm] DeviceCodeRequestV2 input)
+        public async Task<IActionResult> AskDeviceCodeV2([FromForm] DeviceCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid clientID;
-            TClients client;
+            tbl_Clients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            TUsers user;
+            tbl_Users user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -107,33 +107,95 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = RandomValues.CreateBase64String(32);
 
-            var create = await UoW.StateRepo.CreateAsync(
+            var state = await UoW.StateRepo.CreateAsync(
                 new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    NonceValue = nonce,
-                    NonceType = StateType.Device.ToString(),
-                    NonceConsumed = false,
+                    StateValue = nonce,
+                    StateType = StateType.Device.ToString(),
+                    StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DefaultsExpireDeviceCodeTOTP),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.UnitTestsDeviceCodeTokenExpire),
                 });
 
             await UoW.CommitAsync();
 
             //create domain model for this result type...
-            var result = new
+            var result = new DeviceCodeV2()
             {
                 issuer = issuer.Id.ToString(),
                 client = client.Id.ToString(),
                 verification_url = authorize.AbsoluteUri,
                 user_code = await new TotpProvider(8, 10).GenerateAsync(user.SecurityStamp, user),
                 device_code = nonce,
-                interval = 10,
+                interval = UoW.ConfigRepo.DefaultsDeviceCodePollMax,
             };
 
             return Ok(result);
+        }
+
+        [Route("v1/device/{userCode}/{userAction}"), HttpGet]
+        public IActionResult DecideDeviceCodeV1([FromRoute] string userCode, string userAction)
+        {
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
+        [Route("v2/device/{userCode}/{userAction}"), HttpGet]
+        public async Task<IActionResult> DecideDeviceCodeV2([FromRoute] string userCode, string userAction)
+        {
+            ActionType actionType;
+
+            if (!Enum.TryParse<ActionType>(userAction, true, out actionType))
+            {
+                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"User action:{userAction}");
+                return BadRequest(ModelState);
+            }
+
+            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == userCode)).SingleOrDefault();
+
+            if (state == null)
+            {
+                ModelState.AddModelError(MsgType.StateNotFound.ToString(), $"User code:{userCode}");
+                return NotFound(ModelState);
+            }
+            else if (state.StateDecision.HasValue
+                && state.StateDecision.Value == false)
+            {
+                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"User code:{userCode}");
+                return BadRequest(ModelState);
+            }
+
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+
+            if (user == null
+                || user.Id != state.UserId)
+            {
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{state.UserId}");
+                return NotFound(ModelState);
+            }
+            //check that user is confirmed...
+            //check that user is not locked...
+            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+                || !user.EmailConfirmed
+                || !user.PasswordConfirmed)
+            {
+                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+
+            if (string.Equals(userAction, ActionType.Allow.ToString(), StringComparison.OrdinalIgnoreCase))
+                state.StateDecision = true;
+            else if (string.Equals(userAction, ActionType.Deny.ToString(), StringComparison.OrdinalIgnoreCase))
+                state.StateDecision = false;
+            else
+                throw new NotImplementedException();
+
+            await UoW.StateRepo.UpdateAsync(state);
+            await UoW.CommitAsync();
+
+            return NoContent();
         }
 
         [Route("v1/device"), HttpPost]
@@ -166,7 +228,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -181,12 +243,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
             Guid clientID;
-            TClients client;
+            tbl_Clients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
@@ -205,27 +267,41 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            /*
-             * TODO: finish implementation...
-             * https://www.oauth.com/oauth2-servers/device-flow/token-request/
-             */
-
             //check if state is valid...
-            var state = (await UoW.StateRepo.GetAsync(x => x.NonceValue == input.device_code
-                && x.NonceType == StateType.Device.ToString()
-                && x.NonceConsumed == false
+            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == input.device_code
+                && x.StateType == StateType.Device.ToString()
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow)).SingleOrDefault();
 
-            if (state == null)
+            if (state == null
+                || state.StateConsume == true)
             {
-                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"State:{input.device_code}");
+                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
             }
             //check if device is polling too frequently...
-            else if(state.LastPolling < DateTime.UtcNow.AddSeconds(-10))
+            else if (UoW.ConfigRepo.DefaultsDeviceCodePollMax <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
             {
-                ModelState.AddModelError(MsgType.StateSlowDown.ToString(), $"State:SlowDown");
+                state.LastPolling = DateTime.UtcNow;
+                state.StateConsume = false;
+
+                await UoW.StateRepo.UpdateAsync(state);
+                await UoW.CommitAsync();
+
+                ModelState.AddModelError(MsgType.StateSlowDown.ToString(), $"Device code:{input.device_code}");
+                return BadRequest(ModelState);
+            }
+
+            //check if device has been approved/denied...
+            if (!state.StateDecision.HasValue)
+            {
+                ModelState.AddModelError(MsgType.StatePending.ToString(), $"Device code:{input.device_code}");
+                return BadRequest(ModelState);
+            }
+            else if (state.StateDecision.HasValue
+                && !state.StateDecision.Value)
+            {
+                ModelState.AddModelError(MsgType.StateDenied.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
             }
 
@@ -233,7 +309,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{state.UserId}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -254,19 +330,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{input.user_code}");
                 return BadRequest(ModelState);
             }
-            else
-            {
-                state.NonceConsumed = true;
 
-                await UoW.StateRepo.UpdateAsync(state);
-                await UoW.CommitAsync();
-            }
+            state.LastPolling = DateTime.UtcNow;
+            state.StateConsume = true;
 
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
+            await UoW.StateRepo.UpdateAsync(state);
+            await UoW.CommitAsync();
 
-            var access = await JwtBuilder.DeviceResourceOwnerV2(UoW, issuer, new List<TClients> { client }, user);
-            var refresh = await JwtBuilder.DeviceRefreshV2(UoW, issuer, user);
+            var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
+            var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

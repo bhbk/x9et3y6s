@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ClaimRepository : IGenericRepository<ClaimCreate, TClaims, Guid>
+    public class ClaimRepository : IGenericRepository<ClaimCreate, tbl_Claims, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly _DbContext _context;
+        private readonly IdentityDbContext _context;
 
-        public ClaimRepository(_DbContext context, ExecutionType situation, IMapper transform)
+        public ClaimRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -30,9 +30,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<int> CountAsync(Expression<Func<TClaims, bool>> predicates = null)
+        public async Task<int> CountAsync(Expression<Func<tbl_Claims, bool>> predicates = null)
         {
-            var query = _context.TClaims.AsQueryable();
+            var query = _context.tbl_Claims.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -40,17 +40,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<TClaims> CreateAsync(ClaimCreate entity)
+        public async Task<tbl_Claims> CreateAsync(ClaimCreate model)
         {
-            var model = _transform.Map<TClaims>(entity);
-            var create = _context.Add(model).Entity;
+            var entity = _transform.Map<tbl_Claims>(model);
+            var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.TClaims.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_Claims.Where(x => x.Id == key).Single();
 
             try
             {
@@ -66,16 +66,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.TClaims.Any(x => x.Id == key));
+            return await Task.FromResult(_context.tbl_Claims.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<TClaims>> GetAsync(Expression<Func<TClaims, bool>> predicates = null,
-            Func<IQueryable<TClaims>, IIncludableQueryable<TClaims, object>> includes = null,
-            Func<IQueryable<TClaims>, IOrderedQueryable<TClaims>> orders = null,
+        public async Task<IEnumerable<tbl_Claims>> GetAsync(Expression<Func<tbl_Claims, bool>> predicates = null,
+            Func<IQueryable<tbl_Claims>, IIncludableQueryable<tbl_Claims, object>> includes = null,
+            Func<IQueryable<tbl_Claims>, IOrderedQueryable<tbl_Claims>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.TClaims.AsQueryable();
+            var query = _context.tbl_Claims.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -93,24 +93,24 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<TClaims> UpdateAsync(TClaims entity)
+        public async Task<tbl_Claims> UpdateAsync(tbl_Claims model)
         {
-            var model = _context.TClaims.Where(x => x.Id == entity.Id).Single();
+            var entity = _context.tbl_Claims.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            model.Subject = entity.Subject;
-            model.Type = entity.Type;
-            model.Value = entity.Value;
-            model.ValueType = entity.ValueType;
-            model.LastUpdated = DateTime.Now;
-            model.Immutable = entity.Immutable;
+            entity.Subject = model.Subject;
+            entity.Type = model.Type;
+            entity.Value = model.Value;
+            entity.ValueType = model.ValueType;
+            entity.LastUpdated = DateTime.Now;
+            entity.Immutable = model.Immutable;
 
-            _context.Entry(model).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(model).Entity);
+            return await Task.FromResult(_context.Update(entity).Entity);
         }
     }
 }

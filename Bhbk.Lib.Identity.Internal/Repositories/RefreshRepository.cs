@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class RefreshRepository : IGenericRepository<RefreshCreate, TRefreshes, Guid>
+    public class RefreshRepository : IGenericRepository<RefreshCreate, tbl_Refreshes, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _transform;
-        private readonly _DbContext _context;
+        private readonly IdentityDbContext _context;
 
-        public RefreshRepository(_DbContext context, ExecutionType situation, IMapper transform)
+        public RefreshRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -28,9 +28,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _transform = transform;
         }
 
-        public async Task<TRefreshes> CreateAsync(RefreshCreate model)
+        public async Task<tbl_Refreshes> CreateAsync(RefreshCreate model)
         {
-            var entity = _transform.Map<TRefreshes>(model);
+            var entity = _transform.Map<tbl_Refreshes>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.TRefreshes.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_Refreshes.Where(x => x.Id == key).Single();
 
             try
             {
@@ -54,16 +54,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> ExistsAsync(Guid key)
         {
-            return await Task.FromResult(_context.TRefreshes.Any(x => x.Id == key));
+            return await Task.FromResult(_context.tbl_Refreshes.Any(x => x.Id == key));
         }
 
-        public async Task<IEnumerable<TRefreshes>> GetAsync(Expression<Func<TRefreshes, bool>> predicates = null,
-            Func<IQueryable<TRefreshes>, IIncludableQueryable<TRefreshes, object>> includes = null,
-            Func<IQueryable<TRefreshes>, IOrderedQueryable<TRefreshes>> orders = null,
+        public async Task<IEnumerable<tbl_Refreshes>> GetAsync(Expression<Func<tbl_Refreshes, bool>> predicates = null,
+            Func<IQueryable<tbl_Refreshes>, IIncludableQueryable<tbl_Refreshes, object>> includes = null,
+            Func<IQueryable<tbl_Refreshes>, IOrderedQueryable<tbl_Refreshes>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.TRefreshes.AsQueryable();
+            var query = _context.tbl_Refreshes.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public Task<TRefreshes> UpdateAsync(TRefreshes entity)
+        public Task<tbl_Refreshes> UpdateAsync(tbl_Refreshes model)
         {
             throw new NotImplementedException();
         }

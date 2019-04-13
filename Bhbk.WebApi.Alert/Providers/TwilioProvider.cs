@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Alert;
+﻿using Bhbk.Lib.Identity.Models.Alert;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;

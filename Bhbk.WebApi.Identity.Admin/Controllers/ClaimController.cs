@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<ClaimModel>(result));
+            return Ok(UoW.Reshape.Map<ClaimModel>(result));
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetClaimV1([FromRoute] string claimValue)
         {
             Guid claimID;
-            TClaims claim = null;
+            tbl_Claims claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
                 claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Transform.Map<ClaimModel>(claim));
+            return Ok(UoW.Reshape.Map<ClaimModel>(claim));
         }
 
         [Route("v1/page"), HttpGet]
@@ -100,14 +100,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TClaims, bool>> preds;
+            Expression<Func<tbl_Claims, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Type.ToLower().Contains(model.Filter.ToLower())
-                || x.Value.ToLower().Contains(model.Filter.ToLower())
-                || x.ValueType.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Type.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Value.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.ValueType.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ClaimModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -138,14 +138,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TClaims, bool>> preds;
+            Expression<Func<tbl_Claims, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Type.ToLower().Contains(model.Filter.ToLower())
-                || x.Value.ToLower().Contains(model.Filter.ToLower())
-                || x.ValueType.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Type.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Value.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.ValueType.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ClaimModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -189,11 +189,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Transform.Map<TClaims>(model));
+            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Reshape.Map<tbl_Claims>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<ClaimModel>(result));
+            return Ok(UoW.Reshape.Map<ClaimModel>(result));
         }
     }
 }

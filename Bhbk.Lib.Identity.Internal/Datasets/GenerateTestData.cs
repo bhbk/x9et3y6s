@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -12,9 +12,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 {
     public class GenerateTestData
     {
-        private readonly IIdentityContext<_DbContext> _uow;
+        private readonly IIdentityUnitOfWork<IdentityDbContext> _uow;
 
-        public GenerateTestData(IIdentityContext<_DbContext> uow)
+        public GenerateTestData(IIdentityUnitOfWork<IdentityDbContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();
@@ -27,13 +27,13 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
             if (_uow.Situation != ExecutionType.UnitTest)
                 throw new InvalidOperationException();
 
-            TIssuers issuer;
-            TClients client;
-            TUrls clientUri;
-            TRoles role;
-            TLogins login;
-            TUsers user;
-            TClaims claim;
+            tbl_Issuers issuer;
+            tbl_Clients client;
+            tbl_Urls clientUri;
+            tbl_Roles role;
+            tbl_Logins login;
+            tbl_Users user;
+            tbl_Claims claim;
 
             //create test issuers
             issuer = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
@@ -140,13 +140,13 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
             for (int i = 0; i < sets; i++)
             {
-                TIssuers issuer;
-                TClients client;
-                TUrls uri;
-                TRoles role;
-                TLogins login;
-                TUsers user;
-                TClaims claim;
+                tbl_Issuers issuer;
+                tbl_Clients client;
+                tbl_Urls uri;
+                tbl_Roles role;
+                tbl_Logins login;
+                tbl_Users user;
+                tbl_Claims claim;
 
                 //create random issuer
                 issuer = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()

@@ -2,7 +2,7 @@
 using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using ManyConsole;
 using Microsoft.AspNetCore.Identity;
@@ -34,16 +34,16 @@ namespace Bhbk.Cli.Identity.Cmds
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                var builder = new DbContextOptionsBuilder<_DbContext>()
+                var builder = new DbContextOptionsBuilder<IdentityDbContext>()
                     .UseSqlServer(conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMappings>();
+                    x.AddProfile<IdentityMapper>();
                 }).CreateMapper();
 
-                Statics.UoW = new IdentityContext(builder, ExecutionType.Live, conf, mapper);
+                Statics.UoW = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
 
                 if (Generate)
                 {

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -90,13 +90,13 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<_DbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                TIssuers issuer;
+                tbl_Issuers issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 Guid userID;
-                TUsers user;
+                tbl_Users user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
-                var clients = new List<TClients>();
+                var clients = new List<tbl_Clients>();
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
@@ -159,7 +159,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     foreach (string entry in clientValue.Split(","))
                     {
                         Guid clientID;
-                        TClients client;
+                        tbl_Clients client;
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out clientID))
@@ -289,13 +289,13 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<_DbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
 
                 Guid issuerID;
-                TIssuers issuer;
+                tbl_Issuers issuer;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
@@ -317,7 +317,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 Guid clientID;
-                TClients client;
+                tbl_Clients client;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
@@ -340,7 +340,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 Guid userID;
-                TUsers user;
+                tbl_Users user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
@@ -471,7 +471,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityContext<_DbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -490,7 +490,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 var issuer = uow.IssuerRepo.GetAsync().Result.First();
 
                 Guid clientID;
-                TClients client;
+                tbl_Clients client;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
@@ -514,7 +514,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 Guid userID;
-                TUsers user;
+                tbl_Users user;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))

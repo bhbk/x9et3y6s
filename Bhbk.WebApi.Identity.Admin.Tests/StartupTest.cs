@@ -3,7 +3,7 @@ using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Datasets;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.WebApi.Identity.Admin.Tasks;
@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
     public class StartupTest : WebApplicationFactory<Startup>
     {
         public IConfigurationRoot Conf;
-        public IIdentityContext<_DbContext> UoW;
+        public IIdentityUnitOfWork<IdentityDbContext> UoW;
         public GenerateDefaultData DefaultData;
         public GenerateTestData TestData;
 
@@ -52,16 +52,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
-            builder.ConfigureServices((sc) =>
+            builder.ConfigureServices((Action<IServiceCollection>)((sc) =>
             {
-                var options = new DbContextOptionsBuilder<_DbContext>()
+                var options = new DbContextOptionsBuilder<IdentityDbContext>()
                     .EnableSensitiveDataLogging();
 
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMappings>();
+                    x.AddProfile<IdentityMapper>();
                 }).CreateMapper();
 
                 sc.AddSingleton(mapper);
@@ -72,14 +72,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityContext<_DbContext>>(new IdentityContext(options, ExecutionType.UnitTest, conf, mapper));
-                sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
-                sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
+                sc.AddSingleton((IIdentityUnitOfWork<IdentityDbContext>)new IdentityUnitOfWork(options, ExecutionType.UnitTest, conf, mapper));
+                sc.AddSingleton((IHostedService)new MaintainActivityTask(sc, conf));
+                sc.AddSingleton((IHostedService)new MaintainUsersTask(sc, conf));
 
                 var sp = sc.BuildServiceProvider();
 
                 Conf = sp.GetRequiredService<IConfigurationRoot>();
-                UoW = sp.GetRequiredService<IIdentityContext<_DbContext>>();
+                UoW = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
                 DefaultData = new GenerateDefaultData(UoW);
                 TestData = new GenerateTestData(UoW);
@@ -158,12 +158,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                         policy.RequireClaim(ClaimTypes.Role, "(Built-In) Users");
                     });
                 });
-                sc.Configure<ForwardedHeadersOptions>(headers =>
+                sc.Configure((ForwardedHeadersOptions headers) =>
                 {
                     headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 });
                 sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
-            });
+            }));
 
             builder.Configure(app =>
             {

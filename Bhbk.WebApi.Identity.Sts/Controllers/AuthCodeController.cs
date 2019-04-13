@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Sts;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/authorize-ask"), HttpGet]
         [AllowAnonymous]
-        public IActionResult AskAuthCodeV1([FromQuery] AuthCodeRequestV1 input)
+        public IActionResult AskAuthCodeV1([FromQuery] AuthCodeAskV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/authorize-ask"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> AskAuthCodeV2([FromQuery] AuthCodeRequestV2 input)
+        public async Task<IActionResult> AskAuthCodeV2([FromQuery] AuthCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid clientID;
-            TClients client;
+            tbl_Clients client;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
@@ -105,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            TUsers user;
+            tbl_Users user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -135,11 +135,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (client.TUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (client.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize-callback"));
             }
-            else if (client.TUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (client.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
@@ -155,11 +155,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    NonceValue = RandomValues.CreateBase64String(32),
-                    NonceType = StateType.User.ToString(),
-                    NonceConsumed = false,
+                    StateValue = RandomValues.CreateBase64String(32),
+                    StateType = StateType.User.ToString(),
+                    StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire),
                 });
 
             await UoW.CommitAsync();
@@ -169,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 + "&user=" + HttpUtility.UrlEncode(create.UserId.ToString())
                 + "&response_type=code"
                 + "&redirect_uri=" + HttpUtility.UrlEncode(redirect.AbsoluteUri)
-                + "&state=" + HttpUtility.UrlEncode(create.NonceValue));
+                + "&state=" + HttpUtility.UrlEncode(create.StateValue));
 
             return RedirectPermanent(result.AbsoluteUri);
         }
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            TIssuers issuer;
+            tbl_Issuers issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -240,12 +240,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
             Guid userID;
-            TUsers user;
+            tbl_Users user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -272,7 +272,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
-            var clients = new List<TClients>();
+            var clients = new List<tbl_Clients>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
@@ -283,7 +283,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in input.client.Split(","))
                 {
                     Guid clientID;
-                    TClients client;
+                    tbl_Clients client;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
@@ -312,8 +312,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             foreach (var entry in clients)
             {
-                if (!entry.TUrls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath)
-                    && !entry.TUrls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+                if (!entry.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath)
+                    && !entry.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
                 {
                     ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                     return BadRequest(ModelState);
@@ -321,10 +321,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if state is valid...
-            var state = (await UoW.StateRepo.GetAsync(x => x.NonceValue == input.state
+            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == input.state
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow
-                && x.NonceType == StateType.User.ToString())).SingleOrDefault();
+                && x.StateType == StateType.User.ToString())).SingleOrDefault();
 
             if (state == null)
             {

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Internal.Validators
 
     public sealed class UserValidator
     {
-        public Task<IdentityResult> ValidateAsync(TUsers user)
+        public Task<IdentityResult> ValidateAsync(tbl_Users user)
         {
             var errors = new List<IdentityError>();
             var describer = new IdentityErrorDescriber();

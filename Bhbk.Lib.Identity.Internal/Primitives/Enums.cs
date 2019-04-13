@@ -2,6 +2,33 @@
 
 namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
 {
+    public enum ActionType
+    {
+        Allow,
+        Deny
+    }
+
+    //https://tools.ietf.org/html/rfc6749#section-2.1
+    public enum ClientType
+    {
+        user_agent,
+        native,
+        server,
+    }
+
+    public enum LoginType
+    {
+        CreateUserAccessTokenV1Legacy,
+        CreateUserAccessTokenV1,
+        CreateUserAccessTokenV2,
+        CreateUserRefreshTokenV1,
+        CreateUserRefreshTokenV2,
+        CreateClientAccessTokenV1,
+        CreateClientAccessTokenV2,
+        CreateClientRefreshTokenV1,
+        CreateClientRefreshTokenV2,
+    }
+
     public enum MsgType
     {
         ClaimAlreadyExists,
@@ -28,8 +55,10 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         RoleImmutable,
         RoleInvalid,
         RoleNotFound,
-        StateAuthPending,
+        StateDenied,
         StateInvalid,
+        StateNotFound,
+        StatePending,
         StateSlowDown,
         TextDequeueError,
         TextEnqueueError,
@@ -39,14 +68,6 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         UserImmutable,
         UserInvalid,
         UserNotFound,
-    }
-
-    //https://tools.ietf.org/html/rfc6749#section-2.1
-    public enum ClientType
-    {
-        user_agent,
-        native,
-        server,
     }
 
     public enum RefreshType
@@ -61,27 +82,6 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         Client,
         Device,
         User,
-    }
-
-    public enum LoginType
-    {
-        AskAuthorizationCodeV1,
-        AskAuthorizationCodeV2,
-        AskDeviceCodeV1,
-        AskDeviceCodeV2,
-        CreateUserAccessTokenV1Legacy,
-        CreateUserAccessTokenV1,
-        CreateUserAccessTokenV2,
-        CreateUserRefreshTokenV1,
-        CreateUserRefreshTokenV2,
-        CreateClientAccessTokenV1,
-        CreateClientAccessTokenV2,
-        CreateClientRefreshTokenV1,
-        CreateClientRefreshTokenV2,
-        CreateDeviceAccessTokenV1,
-        CreateDeviceAccessTokenV2,
-        CreateDeviceRefreshTokenV1,
-        CreateDeviceRefreshTokenV2,
     }
 
     public enum TaskType

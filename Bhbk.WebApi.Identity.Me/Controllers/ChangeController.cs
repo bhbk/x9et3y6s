@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Alert;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user));
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user));
 
             if (UoW.Situation == ExecutionType.UnitTest)
                 return Ok(token);
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), user));
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user));
 
             if (UoW.Situation == ExecutionType.UnitTest)
                 return Ok(token);

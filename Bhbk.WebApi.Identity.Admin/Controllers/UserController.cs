@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.DomainModels.Alert;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Alert;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsExpireAuthCodeTOTP), result));
+                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), result));
 
                 var url = UrlBuilder.GenerateConfirmEmail(Conf, result, code);
 
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return BadRequest(await email.Content.ReadAsStringAsync());
             }
 
-            return Ok(UoW.Transform.Map<UserModel>(result));
+            return Ok(UoW.Reshape.Map<UserModel>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<UserModel>(result));
+            return Ok(UoW.Reshape.Map<UserModel>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -213,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetUserV1([FromRoute] string userValue)
         {
             Guid userID;
-            TUsers user = null;
+            tbl_Users user = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
@@ -227,7 +227,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Transform.Map<UserModel>(user));
+            return Ok(UoW.Reshape.Map<UserModel>(user));
         }
 
         [Route("v1/{userID:guid}/claims"), HttpGet]
@@ -258,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var clients = await UoW.UserRepo.GetClientsAsync(user.Id);
 
             var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x)))
-                .Select(x => UoW.Transform.Map<ClientModel>(x));
+                .Select(x => UoW.Reshape.Map<ClientModel>(x));
 
             return Ok(result);
         }
@@ -277,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.UserRepo.GetLoginsAsync(user.Id);
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x)))
-                .Select(x => UoW.Transform.Map<LoginModel>(x));
+                .Select(x => UoW.Reshape.Map<LoginModel>(x));
 
             return Ok(result);
         }
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await UoW.UserRepo.GetRolesAsync(user.Id);
 
             var result = (await UoW.RoleRepo.GetAsync(x => roles.Contains(x)))
-                .Select(x => UoW.Transform.Map<RoleModel>(x));
+                .Select(x => UoW.Reshape.Map<RoleModel>(x));
 
             return Ok(result);
         }
@@ -307,26 +307,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<TUsers, bool>> preds;
+            Expression<Func<tbl_Users, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Email.ToLower().Contains(model.Filter.ToLower())
-                || x.PhoneNumber.ToLower().Contains(model.Filter.ToLower())
-                || x.FirstName.ToLower().Contains(model.Filter.ToLower())
-                || x.LastName.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Email.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.PhoneNumber.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.FirstName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.LastName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.UserRepo.CountAsync(preds);
                 var result = await UoW.UserRepo.GetAsync(preds,
-                    x => x.Include(r => r.TUserRoles),
+                    x => x.Include(r => r.tbl_UserRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<UserModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -346,26 +346,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TUsers, bool>> preds;
+            Expression<Func<tbl_Users, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Email.ToLower().Contains(model.Filter.ToLower())
-                || x.PhoneNumber.ToLower().Contains(model.Filter.ToLower())
-                || x.FirstName.ToLower().Contains(model.Filter.ToLower())
-                || x.LastName.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Email.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.PhoneNumber.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.FirstName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.LastName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.UserRepo.CountAsync(preds);
                 var result = await UoW.UserRepo.GetAsync(preds,
-                    x => x.Include(r => r.TUserRoles),
+                    x => x.Include(r => r.tbl_UserRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<UserModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -490,11 +490,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<TUsers>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Reshape.Map<tbl_Users>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<UserModel>(result));
+            return Ok(UoW.Reshape.Map<UserModel>(result));
         }
     }
 }

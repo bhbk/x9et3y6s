@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -13,9 +13,9 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 {
     public class GenerateDefaultData
     {
-        private readonly IIdentityContext<_DbContext> _uow;
+        private readonly IIdentityUnitOfWork<IdentityDbContext> _uow;
 
-        public GenerateDefaultData(IIdentityContext<_DbContext> uow)
+        public GenerateDefaultData(IIdentityUnitOfWork<IdentityDbContext> uow)
         {
             if (uow == null)
                 throw new ArgumentNullException();

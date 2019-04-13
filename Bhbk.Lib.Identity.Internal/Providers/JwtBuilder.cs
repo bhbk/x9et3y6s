@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
     public class JwtBuilder
     {
         public static async Task<string>
-            ClientRefreshV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client)
+            ClientRefreshV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateRefreshTokenAsync(client);
 
@@ -28,15 +28,15 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordRefresh)
+                && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpireClientRefresh);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredRefreshExpire);
             }
             else
             {
                 validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpireClientRefresh);
+                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredRefreshExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            ClientResourceOwnerV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client)
+            ClientResourceOwnerV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateAccessTokenAsync(client);
 
@@ -83,7 +83,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpireClientToken);
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredTokenExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
@@ -91,10 +91,10 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              */
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordToken)
+                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpireClientToken);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredTokenExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -121,7 +121,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            DeviceRefreshV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TUsers user)
+            UserRefreshV1(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -132,127 +132,15 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordRefresh)
+                && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordRefresh);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
             }
             else
             {
                 validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordRefresh);
-            }
-
-            var result = new JwtSecurityTokenHandler().WriteToken(
-                new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
-                    audience: null,
-                    claims: principal.Claims,
-                    notBefore: validFromUtc,
-                    expires: validToUtc,
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-                    ));
-
-            await uow.RefreshRepo.CreateAsync(
-                new RefreshCreate()
-                {
-                    IssuerId = issuer.Id,
-                    UserId = user.Id,
-                    RefreshType = RefreshType.Device.ToString(),
-                    RefreshValue = result,
-                    ValidFromUtc = validFromUtc,
-                    ValidToUtc = validToUtc
-                });
-
-            await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateDeviceRefreshTokenV2.ToString(),
-                    Immutable = false
-                });
-
-            await uow.CommitAsync();
-
-            return result;
-        }
-
-        public static async Task<(string token, DateTime begin, DateTime end)>
-            DeviceResourceOwnerV2(IIdentityContext<_DbContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
-        {
-            var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
-
-            var symmetricKeyAsBase64 = issuer.IssuerKey;
-            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
-            var signingKey = new SymmetricSecurityKey(keyBytes);
-
-            var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordToken);
-
-            /*
-             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
-             * because this is gross. prefer removal of test check below and muck with clock in test context. 
-             */
-
-            if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordToken)
-            {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordToken);
-            }
-
-            string clientList = string.Empty;
-
-            if (clients.Count == 0)
-                throw new InvalidOperationException();
-
-            else
-                clientList = string.Join(", ", clients.Select(x => x.Name.ToString()).OrderBy(x => x));
-
-            var result = new JwtSecurityTokenHandler().WriteToken(
-                new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
-                    audience: clientList,
-                    claims: principal.Claims,
-                    notBefore: validFromUtc,
-                    expires: validToUtc,
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-                    ));
-
-            await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateDeviceAccessTokenV2.ToString(),
-                    Immutable = false
-                });
-
-            await uow.CommitAsync();
-
-            return (result, validFromUtc, validToUtc);
-        }
-
-        public static async Task<string>
-            UserRefreshV1(IIdentityContext<_DbContext> uow, TIssuers issuer, TUsers user)
-        {
-            var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
-
-            DateTime validFromUtc, validToUtc;
-
-            var symmetricKeyAsBase64 = issuer.IssuerKey;
-            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
-            var signingKey = new SymmetricSecurityKey(keyBytes);
-
-            if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordRefresh)
-            {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordRefresh);
-            }
-            else
-            {
-                validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordRefresh);
+                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -290,7 +178,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<string>
-            UserRefreshV2(IIdentityContext<_DbContext> uow, TIssuers issuer, TUsers user)
+            UserRefreshV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -301,15 +189,15 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordRefresh)
+                && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordRefresh);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
             }
             else
             {
                 validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordRefresh);
+                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -347,7 +235,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1_Legacy(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client, TUsers user)
+            UserResourceOwnerV1_Legacy(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -364,10 +252,10 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              */
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordToken)
+                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow.AddSeconds(86400);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(86400);
             }
 
             //do not use issuer salt for compatibility here...
@@ -395,7 +283,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1(IIdentityContext<_DbContext> uow, TIssuers issuer, TClients client, TUsers user)
+            UserResourceOwnerV1(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -404,7 +292,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordToken);
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
@@ -412,10 +300,10 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              */
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordToken)
+                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordToken);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -442,7 +330,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV2(IIdentityContext<_DbContext> uow, TIssuers issuer, List<TClients> clients, TUsers user)
+            UserResourceOwnerV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -451,7 +339,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordToken);
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
@@ -459,10 +347,10 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              */
 
             if (uow.Situation == ExecutionType.UnitTest
-                && uow.ConfigRepo.UnitTestsPasswordToken)
+                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsPasswordTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsExpirePasswordToken);
+                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
             }
 
             string clientList = string.Empty;

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Sts;
+using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.AspNetCore.DataProtection;
 using System;
 using System.Security.Cryptography;
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             _provider = DataProtectionProvider.Create(appName);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, TIssuers issuer)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, tbl_Issuers issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<string> GenerateAsync(string purpose, TimeSpan expire, TUsers user)
+        public Task<string> GenerateAsync(string purpose, TimeSpan expire, tbl_Users user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<string>(ciphertext);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, TIssuers issuer)
+        public Task<bool> ValidateAsync(string purpose, string token, tbl_Issuers issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             return Task.FromResult<bool>(false);
         }
 
-        public Task<bool> ValidateAsync(string purpose, string token, TUsers user)
+        public Task<bool> ValidateAsync(string purpose, string token, tbl_Users user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);

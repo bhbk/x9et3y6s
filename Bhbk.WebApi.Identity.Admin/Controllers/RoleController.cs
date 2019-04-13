@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(UoW.Transform.Map<RoleModel>(result));
+            return Ok(UoW.Reshape.Map<RoleModel>(result));
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetRoleV1([FromRoute] string roleValue)
         {
             Guid roleID;
-            TRoles role = null;
+            tbl_Roles role = null;
 
             if (Guid.TryParse(roleValue, out roleID))
                 role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Transform.Map<RoleModel>(role));
+            return Ok(UoW.Reshape.Map<RoleModel>(role));
         }
 
         [Route("v1/page"), HttpGet]
@@ -134,24 +134,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<TRoles, bool>> preds;
+            Expression<Func<tbl_Roles, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.RoleRepo.CountAsync(preds);
                 var result = await UoW.RoleRepo.GetAsync(preds,
-                    x => x.Include(r => r.TUserRoles),
+                    x => x.Include(r => r.tbl_UserRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<RoleModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<RoleModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -171,24 +171,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TRoles, bool>> preds;
+            Expression<Func<tbl_Roles, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower())
-                || x.Description.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.RoleRepo.CountAsync(preds);
                 var result = await UoW.RoleRepo.GetAsync(preds,
-                    x => x.Include(r => r.TUserRoles),
+                    x => x.Include(r => r.tbl_UserRoles),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<RoleModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<RoleModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -211,7 +211,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.RoleRepo.GetUsersListAsync(role.Id);
 
-            return Ok(UoW.Transform.Map<IEnumerable<UserModel>>(users));
+            return Ok(UoW.Reshape.Map<IEnumerable<UserModel>>(users));
         }
 
         [Route("v1/{roleID:guid}/remove/{userID:guid}"), HttpGet]
@@ -268,11 +268,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.RoleRepo.UpdateAsync(UoW.Transform.Map<TRoles>(model));
+            var result = await UoW.RoleRepo.UpdateAsync(UoW.Reshape.Map<tbl_Roles>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<RoleModel>(result));
+            return Ok(UoW.Reshape.Map<RoleModel>(result));
         }
     }
 }

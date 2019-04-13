@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<LoginModel>(result));
+            return Ok(UoW.Reshape.Map<LoginModel>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public async Task<IActionResult> GetLoginV1([FromRoute] string loginValue)
         {
             Guid loginID;
-            TLogins login = null;
+            tbl_Logins login = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Transform.Map<LoginModel>(login));
+            return Ok(UoW.Reshape.Map<LoginModel>(login));
         }
 
         [Route("v1/page"), HttpGet]
@@ -99,23 +99,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            Expression<Func<TLogins, bool>> preds;
+            Expression<Func<tbl_Logins, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.LoginRepo.CountAsync(preds);
                 var result = await UoW.LoginRepo.GetAsync(preds,
-                    x => x.Include(l => l.TUserLogins),
+                    x => x.Include(l => l.tbl_UserLogins),
                     x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<LoginModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<LoginModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -135,23 +135,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<TLogins, bool>> preds;
+            Expression<Func<tbl_Logins, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
             else
-                preds = x => x.Name.ToLower().Contains(model.Filter.ToLower());
+                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.LoginRepo.CountAsync(preds);
                 var result = await UoW.LoginRepo.GetAsync(preds,
-                    x => x.Include(l => l.TUserLogins),
+                    x => x.Include(l => l.tbl_UserLogins),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Transform.Map<IEnumerable<LoginModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<LoginModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -173,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => UoW.Transform.Map<UserModel>(x));
+            var result = users.Select(x => UoW.Reshape.Map<UserModel>(x));
 
             return Ok(result);
         }
@@ -201,11 +201,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.LoginRepo.UpdateAsync(UoW.Transform.Map<TLogins>(model));
+            var result = await UoW.LoginRepo.UpdateAsync(UoW.Reshape.Map<tbl_Logins>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<LoginModel>(result));
+            return Ok(UoW.Reshape.Map<LoginModel>(result));
         }
     }
 }

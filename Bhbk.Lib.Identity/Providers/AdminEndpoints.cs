@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.DomainModels;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.DomainModels.Admin;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;

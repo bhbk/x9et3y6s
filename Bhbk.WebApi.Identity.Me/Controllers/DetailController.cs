@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.DomainModels.Admin;
-using Bhbk.Lib.Identity.Internal.EntityModels;
+﻿using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Transform.Map<UserModel>(user));
+            return Ok(UoW.Reshape.Map<UserModel>(user));
         }
 
         [Route("v1/quotes"), HttpGet]
@@ -125,14 +125,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Transform.Map<TUsers>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Reshape.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Transform.Map<UserModel>(result));
+            return Ok(UoW.Reshape.Map<UserModel>(result));
         }
     }
 }
