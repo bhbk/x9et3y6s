@@ -17,17 +17,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class ClaimRepository : IGenericRepository<ClaimCreate, tbl_Claims, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _transform;
+        private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public ClaimRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
+        public ClaimRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
-            _transform = transform;
+            _shape = shape;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Claims, bool>> predicates = null)
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Claims> CreateAsync(ClaimCreate model)
         {
-            var entity = _transform.Map<tbl_Claims>(model);
+            var entity = _shape.Map<tbl_Claims>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);

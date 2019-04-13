@@ -52,16 +52,16 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             _situation = situation;
             _shape = shape;
 
-            _activityRepo = new ActivityRepository(_context, _situation, _shape);
-            _claimRepo = new ClaimRepository(_context, _situation, _shape);
-            _clientRepo = new ClientRepository(_context, _situation, conf, _shape);
-            _configRepo = new ConfigRepository(conf, _situation);
-            _issuerRepo = new IssuerRepository(_context, _situation, shape, conf["IdentityTenants:Salt"]);
-            _loginRepo = new LoginRepository(_context, _situation, shape);
-            _roleRepo = new RoleRepository(_context, _situation, shape);
-            _refreshRepo = new RefreshRepository(_context, _situation, shape);
-            _stateRepo = new StateRepository(_context, _situation, _shape);
-            _userRepo = new UserRepository(_context, _situation, conf, shape);
+            _activityRepo = new ActivityRepository(context, situation, shape);
+            _claimRepo = new ClaimRepository(context, situation, shape);
+            _clientRepo = new ClientRepository(context, situation, conf, shape);
+            _configRepo = new ConfigRepository(conf, situation);
+            _issuerRepo = new IssuerRepository(context, situation, shape, conf["IdentityTenants:Salt"]);
+            _loginRepo = new LoginRepository(context, situation, shape);
+            _roleRepo = new RoleRepository(context, situation, shape);
+            _refreshRepo = new RefreshRepository(context, situation, shape);
+            _stateRepo = new StateRepository(context, situation, shape);
+            _userRepo = new UserRepository(context, situation, conf, shape);
         }
 
         public ExecutionType Situation
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             }
         }
 
-        public IMapper Reshape
+        public IMapper Shape
         {
             get
             {

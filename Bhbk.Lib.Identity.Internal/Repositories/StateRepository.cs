@@ -17,22 +17,22 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class StateRepository : IGenericRepository<StateCreate, tbl_States, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _transform;
+        private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public StateRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
+        public StateRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
-            _transform = transform;
+            _shape = shape;
         }
 
         public async Task<tbl_States> CreateAsync(StateCreate model)
         {
-            var entity = _transform.Map<tbl_States>(model);
+            var entity = _shape.Map<tbl_States>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);

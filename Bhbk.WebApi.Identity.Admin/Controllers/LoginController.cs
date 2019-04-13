@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Reshape.Map<LoginModel>(result));
+            return Ok(UoW.Shape.Map<LoginModel>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Reshape.Map<LoginModel>(login));
+            return Ok(UoW.Shape.Map<LoginModel>(login));
         }
 
         [Route("v1/page"), HttpGet]
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<LoginModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<LoginModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -151,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<LoginModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<LoginModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -173,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => UoW.Reshape.Map<UserModel>(x));
+            var result = users.Select(x => UoW.Shape.Map<UserModel>(x));
 
             return Ok(result);
         }
@@ -201,11 +201,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.LoginRepo.UpdateAsync(UoW.Reshape.Map<tbl_Logins>(model));
+            var result = await UoW.LoginRepo.UpdateAsync(UoW.Shape.Map<tbl_Logins>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Reshape.Map<LoginModel>(result));
+            return Ok(UoW.Shape.Map<LoginModel>(result));
         }
     }
 }

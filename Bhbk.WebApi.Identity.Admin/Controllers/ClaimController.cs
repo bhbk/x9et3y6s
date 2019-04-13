@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Reshape.Map<ClaimModel>(result));
+            return Ok(UoW.Shape.Map<ClaimModel>(result));
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Reshape.Map<ClaimModel>(claim));
+            return Ok(UoW.Shape.Map<ClaimModel>(claim));
         }
 
         [Route("v1/page"), HttpGet]
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<ClaimModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<ClaimModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -189,11 +189,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Reshape.Map<tbl_Claims>(model));
+            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Shape.Map<tbl_Claims>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Reshape.Map<ClaimModel>(result));
+            return Ok(UoW.Shape.Map<ClaimModel>(result));
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
 
-            var result = tokens.Select(x => UoW.Reshape.Map<RefreshModel>(x));
+            var result = tokens.Select(x => UoW.Shape.Map<RefreshModel>(x));
 
             return Ok(result);
         }

@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManyConsole" Version="1.0.0.4" />
+    <PackageReference Include="ManyConsole" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.4" />

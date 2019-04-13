@@ -24,14 +24,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class RoleRepository : IGenericRepository<RoleCreate, tbl_Roles, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _transform;
+        private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public RoleRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
+        public RoleRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
         {
             _context = context;
             _situation = situation;
-            _transform = transform;
+            _shape = shape;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Roles, bool>> predicates = null)
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Roles> CreateAsync(RoleCreate model)
         {
-            var entity = _transform.Map<tbl_Roles>(model);
+            var entity = _shape.Map<tbl_Roles>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);

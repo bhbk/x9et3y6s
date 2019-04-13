@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Internal.Interfaces
     public interface IIdentityUnitOfWork<TContext> : IGenericUnitOfWork
         where TContext : IdentityDbContext
     {
-        IMapper Reshape { get; }
+        IMapper Shape { get; }
         ActivityRepository ActivityRepo { get; }
         ClaimRepository ClaimRepo { get; }
         ClientRepository ClientRepo { get; }

@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 
-namespace Bhbk.Cli.Identity.Cmds
+namespace Bhbk.Cli.Identity.Commands
 {
-    public class HashCmds : ConsoleCommand
+    public class HashCommands : ConsoleCommand
     {
         private static bool Generate = false;
 
-        public HashCmds()
+        public HashCommands()
         {
             IsCommand("hash", "Do things with hashes...");
 
@@ -43,15 +43,15 @@ namespace Bhbk.Cli.Identity.Cmds
                     x.AddProfile<IdentityMapper>();
                 }).CreateMapper();
 
-                Statics.UoW = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
+                var uow = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
 
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = ConsoleHelper.GetHiddenInput();
-                    var hashvalue = Statics.UoW.UserRepo.passwordHasher.HashPassword(null, cleartext);
+                    var hashvalue = uow.UserRepo.passwordHasher.HashPassword(null, cleartext);
 
-                    if (Statics.UoW.UserRepo.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (uow.UserRepo.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

@@ -17,20 +17,20 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class IssuerRepository : IGenericRepository<IssuerCreate, tbl_Issuers, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _transform;
+        private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
         private readonly string _salt;
 
         public string Salt { get => _salt; }
 
-        public IssuerRepository(IdentityDbContext context, ExecutionType situation, IMapper transform, string salt)
+        public IssuerRepository(IdentityDbContext context, ExecutionType situation, IMapper shape, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
-            _transform = transform;
+            _shape = shape;
             _salt = salt;
         }
 
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Issuers> CreateAsync(IssuerCreate model)
         {
-            var entity = _transform.Map<tbl_Issuers>(model);
+            var entity = _shape.Map<tbl_Issuers>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);

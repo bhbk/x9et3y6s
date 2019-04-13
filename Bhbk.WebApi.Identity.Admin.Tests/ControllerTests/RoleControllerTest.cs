@@ -350,7 +350,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var result = await _endpoints.Role_UpdateV1(rop.token, _factory.UoW.Reshape.Map<RoleModel>(testRole));
+            var result = await _endpoints.Role_UpdateV1(rop.token, _factory.UoW.Shape.Map<RoleModel>(testRole));
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ActivityModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<ActivityModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Reshape.Map<IEnumerable<ActivityModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<ActivityModel>>(result) });
             }
             catch (ParseException ex)
             {

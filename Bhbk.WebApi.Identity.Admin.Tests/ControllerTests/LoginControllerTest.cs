@@ -311,7 +311,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
             var testLogin = (await _factory.UoW.LoginRepo.GetAsync(x => x.Name == Strings.ApiUnitTestLogin)).Single();
             testLogin.Name += "(Updated)";
 
-            var result = await _endpoints.Login_UpdateV1(rop.token, _factory.UoW.Reshape.Map<LoginModel>(testLogin));
+            var result = await _endpoints.Login_UpdateV1(rop.token, _factory.UoW.Shape.Map<LoginModel>(testLogin));
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);

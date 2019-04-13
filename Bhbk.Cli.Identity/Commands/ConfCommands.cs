@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 
-namespace Bhbk.Cli.Identity.Cmds
+namespace Bhbk.Cli.Identity.Commands
 {
-    public class ConfCmds : ConsoleCommand
+    public class ConfCommands : ConsoleCommand
     {
         private static bool ReadConfig = false;
 
-        public ConfCmds()
+        public ConfCommands()
         {
             IsCommand("conf", "Do things with conf...");
 
@@ -42,7 +42,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     x.AddProfile<IdentityMapper>();
                 }).CreateMapper();
 
-                Statics.UoW = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
+                var uow = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
 
                 if (ReadConfig)
                 {
@@ -50,7 +50,7 @@ namespace Bhbk.Cli.Identity.Cmds
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(Statics.UoW.ConfigRepo.ToString());
+                    Console.Write(uow.ConfigRepo.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

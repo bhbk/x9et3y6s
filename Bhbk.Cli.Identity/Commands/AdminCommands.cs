@@ -1,12 +1,12 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Cli.Identity.Primitives;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Providers;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -14,18 +14,18 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 
-namespace Bhbk.Cli.Identity.Cmds
+namespace Bhbk.Cli.Identity.Commands
 {
-    public class AdminCmds : ConsoleCommand
+    public class AdminCommands : ConsoleCommand
     {
         private static IJwtContext _jwt;
-        private static CmdType _cmdType;
+        private static CommandTypes _cmdType;
         private static AdminClient _admin = null;
         private static StsClient _sts = null;
-        private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CmdType)));
+        private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CommandTypes)));
         private static bool _create = false, _destroy = false;
 
-        public AdminCmds()
+        public AdminCommands()
         {
             IsCommand("admin", "Do things with identity entities...");
 
@@ -33,7 +33,7 @@ namespace Bhbk.Cli.Identity.Cmds
             {
                 _create = true;
 
-                if (!Enum.TryParse<CmdType>(arg, out _cmdType))
+                if (!Enum.TryParse<CommandTypes>(arg, out _cmdType))
                     throw new ConsoleHelpAsException("Invalid entity type. Possible are " + _cmdTypeList);
             });
 
@@ -41,7 +41,7 @@ namespace Bhbk.Cli.Identity.Cmds
             {
                 _destroy = true;
 
-                if (!Enum.TryParse<CmdType>(arg, out _cmdType))
+                if (!Enum.TryParse<CommandTypes>(arg, out _cmdType))
                     throw new ConsoleHelpAsException("Invalid entity type. Possible are " + _cmdTypeList);
             });
         }
@@ -66,11 +66,11 @@ namespace Bhbk.Cli.Identity.Cmds
 
                 switch (_cmdType)
                 {
-                    case CmdType.issuer:
+                    case CommandTypes.issuer:
 
                         if (_create)
                         {
-                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerName = PromptForInput(CommandTypes.issuer);
                             var issuerID = Guid.Empty;
 
                             if (CheckIssuer(issuerName, ref issuerID))
@@ -89,7 +89,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerName = PromptForInput(CommandTypes.issuer);
                             var issuerID = Guid.Empty;
 
                             if (!CheckIssuer(issuerName, ref issuerID))
@@ -107,17 +107,17 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.client:
+                    case CommandTypes.client:
 
                         if (_create)
                         {
-                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerName = PromptForInput(CommandTypes.issuer);
                             var issuerID = Guid.Empty;
 
                             if (!CheckIssuer(issuerName, ref issuerID))
                                 throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
 
-                            var clientName = PromptForInput(CmdType.client);
+                            var clientName = PromptForInput(CommandTypes.client);
                             var clientID = Guid.Empty;
 
                             if (CheckClient(clientName, ref clientID))
@@ -136,13 +136,13 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var issuerName = PromptForInput(CmdType.issuer);
+                            var issuerName = PromptForInput(CommandTypes.issuer);
                             var issuerID = Guid.Empty;
 
                             if (!CheckIssuer(issuerName, ref issuerID))
                                 throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
 
-                            var clientName = PromptForInput(CmdType.client);
+                            var clientName = PromptForInput(CommandTypes.client);
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
@@ -160,11 +160,11 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.login:
+                    case CommandTypes.login:
 
                         if (_create)
                         {
-                            var loginName = PromptForInput(CmdType.login);
+                            var loginName = PromptForInput(CommandTypes.login);
                             var loginID = Guid.Empty;
 
                             if (CheckLogin(loginName, ref loginID))
@@ -183,7 +183,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var loginName = PromptForInput(CmdType.login);
+                            var loginName = PromptForInput(CommandTypes.login);
                             var loginID = Guid.Empty;
 
                             if (!CheckLogin(loginName, ref loginID))
@@ -201,17 +201,17 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.role:
+                    case CommandTypes.role:
 
                         if (_create)
                         {
-                            var clientName = PromptForInput(CmdType.client);
+                            var clientName = PromptForInput(CommandTypes.client);
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
                                 throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
-                            var roleName = PromptForInput(CmdType.role);
+                            var roleName = PromptForInput(CommandTypes.role);
                             var roleID = Guid.Empty;
 
                             if (CheckRole(roleName, ref roleID))
@@ -230,13 +230,13 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var clientName = PromptForInput(CmdType.client);
+                            var clientName = PromptForInput(CommandTypes.client);
                             var clientID = Guid.Empty;
 
                             if (!CheckClient(clientName, ref clientID))
                                 throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
-                            var roleName = PromptForInput(CmdType.role);
+                            var roleName = PromptForInput(CommandTypes.role);
                             var roleID = Guid.Empty;
 
                             if (!CheckRole(roleName, ref roleID))
@@ -254,11 +254,11 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.rolemap:
+                    case CommandTypes.rolemap:
 
                         if (_create)
                         {
-                            var userName = PromptForInput(CmdType.user);
+                            var userName = PromptForInput(CommandTypes.user);
                             var userID = Guid.Empty;
 
                             if (CheckUser(userName, ref userID))
@@ -267,7 +267,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             else
                                 throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
-                            var roleName = PromptForInput(CmdType.role);
+                            var roleName = PromptForInput(CommandTypes.role);
                             var roleID = Guid.Empty;
 
                             if (CheckRole(roleName, ref roleID))
@@ -283,7 +283,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var userName = PromptForInput(CmdType.user);
+                            var userName = PromptForInput(CommandTypes.user);
                             var userID = Guid.Empty;
 
                             if (CheckUser(userName, ref userID))
@@ -292,7 +292,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             else
                                 throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
-                            var roleName = PromptForInput(CmdType.role);
+                            var roleName = PromptForInput(CommandTypes.role);
                             var roleID = Guid.Empty;
 
                             if (CheckRole(roleName, ref roleID))
@@ -309,11 +309,11 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.user:
+                    case CommandTypes.user:
 
                         if (_create)
                         {
-                            var userName = PromptForInput(CmdType.user);
+                            var userName = PromptForInput(CommandTypes.user);
                             var userID = Guid.Empty;
 
                             if (CheckUser(userName, ref userID))
@@ -346,7 +346,7 @@ namespace Bhbk.Cli.Identity.Cmds
                         }
                         else if (_destroy)
                         {
-                            var userName = PromptForInput(CmdType.user);
+                            var userName = PromptForInput(CommandTypes.user);
                             var userID = Guid.Empty;
 
                             if (!CheckUser(userName, ref userID))
@@ -364,11 +364,11 @@ namespace Bhbk.Cli.Identity.Cmds
 
                         break;
 
-                    case CmdType.userpass:
+                    case CommandTypes.userpass:
 
                         if (_create)
                         {
-                            var userName = PromptForInput(CmdType.user);
+                            var userName = PromptForInput(CommandTypes.user);
                             var userID = Guid.Empty;
 
                             if (CheckUser(userName, ref userID))
@@ -377,7 +377,7 @@ namespace Bhbk.Cli.Identity.Cmds
                             else
                                 throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
-                            var password = PromptForInput(CmdType.userpass);
+                            var password = PromptForInput(CommandTypes.userpass);
 
                             if (SetPassword(userID, password))
                                 Console.WriteLine(Environment.NewLine + "SUCCESS set password for user \"" + userName + "\"");
@@ -746,27 +746,27 @@ namespace Bhbk.Cli.Identity.Cmds
             return false;
         }
 
-        private string PromptForInput(CmdType cmd)
+        private string PromptForInput(CommandTypes cmd)
         {
             switch (cmd)
             {
-                case CmdType.issuer:
+                case CommandTypes.issuer:
                     Console.Write(Environment.NewLine + "ENTER issuer name : ");
                     break;
 
-                case CmdType.client:
+                case CommandTypes.client:
                     Console.Write(Environment.NewLine + "ENTER client name : ");
                     break;
 
-                case CmdType.role:
+                case CommandTypes.role:
                     Console.Write(Environment.NewLine + "ENTER role name : ");
                     break;
 
-                case CmdType.user:
+                case CommandTypes.user:
                     Console.Write(Environment.NewLine + "ENTER user name : ");
                     break;
 
-                case CmdType.userpass:
+                case CommandTypes.userpass:
                     Console.Write(Environment.NewLine + "ENTER password : ");
                     return ConsoleHelper.GetHiddenInput();
             }

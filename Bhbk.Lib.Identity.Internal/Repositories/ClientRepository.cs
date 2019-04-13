@@ -21,10 +21,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;
-        private readonly IMapper _transform;
+        private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public ClientRepository(IdentityDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper transform)
+        public ClientRepository(IdentityDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _context = context;
             _situation = situation;
             _conf = conf;
-            _transform = transform;
+            _shape = shape;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Clients, bool>> predicates = null)
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Clients> CreateAsync(ClientCreate model)
         {
-            var entity = _transform.Map<tbl_Clients>(model);
+            var entity = _shape.Map<tbl_Clients>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Urls> CreateUriAsync(UrlCreate model)
         {
-            var entity = _transform.Map<tbl_Urls>(model);
+            var entity = _shape.Map<tbl_Urls>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);

@@ -17,17 +17,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class LoginRepository : IGenericRepository<LoginCreate, tbl_Logins, Guid>
     {
         private readonly ExecutionType _situation;
-        private readonly IMapper _transform;
+        private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public LoginRepository(IdentityDbContext context, ExecutionType situation, IMapper transform)
+        public LoginRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
             _situation = situation;
-            _transform = transform;
+            _shape = shape;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Logins, bool>> predicates = null)
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Logins> CreateAsync(LoginCreate model)
         {
-            var entit = _transform.Map<tbl_Logins>(model);
+            var entit = _shape.Map<tbl_Logins>(model);
             var create = _context.Add(entit).Entity;
 
             return await Task.FromResult(create);

@@ -708,7 +708,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
             var testUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
             testUser.FirstName += "(Updated)";
 
-            var result = await _endpoints.User_UpdateV1(rop.token, _factory.UoW.Reshape.Map<UserModel>(testUser));
+            var result = await _endpoints.User_UpdateV1(rop.token, _factory.UoW.Shape.Map<UserModel>(testUser));
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);
