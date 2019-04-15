@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Me;
@@ -13,6 +12,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using BaseLib = Bhbk.Lib.Core.UnitOfWork;
 
 namespace Bhbk.WebApi.Identity.Me.Tasks
 {
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         {
             var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
-            if (uow.Situation == ExecutionType.Test)
+            if (uow.Situation == BaseLib.ExecutionContext.Testing)
                 Qotd = JsonConvert.DeserializeObject<Quotes>
                     (File.ReadAllText(_output));
             else

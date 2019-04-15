@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/implicit"), HttpGet]
         [AllowAnonymous]
-        public IActionResult AskImplicitV1([FromQuery] ImplicitV1 input)
+        public IActionResult UseImplicitV1([FromQuery] ImplicitV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v2/implicit"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> AskImplicitV2([FromQuery] ImplicitV2 input)
+        public async Task<IActionResult> UseImplicitV2([FromQuery] ImplicitV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -118,6 +118,20 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
+            //check if state is valid...
+            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == input.state
+                && x.StateType == StateType.User.ToString()
+                && x.ValidFromUtc < DateTime.UtcNow
+                && x.ValidToUtc > DateTime.UtcNow)).SingleOrDefault();
+
+            if (state == null
+                || state.StateConsume == true
+                || state.UserId != user.Id)
+            {
+                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"User state:{input.state}");
+                return BadRequest(ModelState);
+            }
+
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
@@ -143,6 +157,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 + "&grant_type=implicit"
                 + "&token_type=bearer"
                 + "&state=" + HttpUtility.UrlEncode(input.state));
+
+            //no reuse of state after this...
+            state.StateConsume = true;
+
+            //adjust counter(s) for login success...
+            await UoW.UserRepo.AccessSuccessAsync(user.Id);
+            await UoW.StateRepo.UpdateAsync(state);
+            await UoW.CommitAsync();
 
             return RedirectPermanent(result.AbsoluteUri);
         }

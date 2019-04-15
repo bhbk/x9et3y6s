@@ -46,7 +46,7 @@ namespace Bhbk.Cli.Identity.Commands
                     x.AddProfile<AutoMapperProfile>();
                 }).CreateMapper();
 
-                var uow = new IdentityUnitOfWork(builder, ExecutionType.Normal, conf, mapper);
+                var uow = new IdentityUnitOfWork(builder, ExecutionContext.DeployedOrLocal, conf, mapper);
                 var data = new GenerateDefaultData(uow);
 
                 if (CreateDefault)

@@ -27,16 +27,21 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
+            /*
+             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
+             * because this is gross. prefer removal of test check below and muck with clock in test context. 
+             */
+
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerRefreshFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredRefreshExpire);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ClientCredRefreshExpire);
             }
             else
             {
                 validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredRefreshExpire);
+                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ClientCredRefreshExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -83,18 +88,18 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredTokenExpire);
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ClientCredTokenExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsClientCredTokenExpire);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ClientCredTokenExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -131,16 +136,21 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
+            /*
+             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
+             * because this is gross. prefer removal of test check below and muck with clock in test context. 
+             */
+
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerRefreshFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
             }
             else
             {
                 validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
+                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -188,16 +198,21 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
+            /*
+             * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
+             * because this is gross. prefer removal of test check below and muck with clock in test context. 
+             */
+
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerRefreshFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
             }
             else
             {
                 validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerRefreshExpire);
+                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -251,11 +266,11 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(86400);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(86400);
             }
 
             //do not use issuer salt for compatibility here...
@@ -292,18 +307,18 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -339,18 +354,18 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
             var validFromUtc = DateTime.UtcNow;
-            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.Test
-                && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
+            if (uow.Situation == ExecutionContext.Testing
+                && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
-                validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.DefaultsResourceOwnerTokenExpire);
+                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
             }
 
             string clientList = string.Empty;

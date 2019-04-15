@@ -1,6 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Providers;
 using Bhbk.WebApi.Identity.Sts.Controllers;
@@ -153,8 +155,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var state = RandomValues.CreateBase64String(8);
-            var imp = await controller.AskImplicitV2(
+
+            var state = await _factory.UoW.StateRepo.CreateAsync(
+                new StateCreate()
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    UserId = user.Id,
+                    StateValue = RandomValues.CreateBase64String(32),
+                    StateType = StateType.User.ToString(),
+                    StateConsume = false,
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.ImplicitTokenExpire),
+                });
+
+            await _factory.UoW.CommitAsync();
+
+            var imp = await controller.UseImplicitV2(
                 new ImplicitV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -163,9 +180,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     redirect_uri = url.AbsoluteUri,
                     response_type = "token",
                     scope = "any",
-                    state = state,
+                    state = state.StateValue,
                 }) as RedirectResult;
-            imp.Should().NotBeNull();
             imp.Should().BeAssignableTo(typeof(RedirectResult));
             imp.Permanent.Should().BeTrue();
 
@@ -180,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
              */
             var imp_frag = "?" + imp_url.Fragment.Substring(1, imp_url.Fragment.Length - 1);
 
-            HttpUtility.ParseQueryString(imp_frag).Get("state").Should().BeEquivalentTo(state);
+            HttpUtility.ParseQueryString(imp_frag).Get("state").Should().BeEquivalentTo(state.StateValue);
             HttpUtility.ParseQueryString(imp_frag).Get("grant_type").Should().BeEquivalentTo("implicit");
             HttpUtility.ParseQueryString(imp_frag).Get("token_type").Should().BeEquivalentTo("bearer");
 

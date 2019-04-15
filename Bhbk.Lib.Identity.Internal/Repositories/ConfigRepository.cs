@@ -6,158 +6,162 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ConfigRepository
     {
-        private readonly ExecutionType _situation;
-        private UInt32 _defaultsAuthCodeRefreshExpire;
-        private UInt32 _defaultsAuthCodeTokenExpire;
-        private UInt32 _defaultsAuthCodeTotpExpire;
-        private UInt32 _defaultsClientCredRefreshExpire;
-        private UInt32 _defaultsClientCredTokenExpire;
-        private UInt32 _defaultsDeviceCodePollMax;
-        private UInt32 _defaultsDeviceCodeRefreshExpire;
-        private UInt32 _defaultsDeviceCodeTokenExpire;
-        private UInt32 _defaultsDeviceCodeTotpExpire;
-        private bool _defaultsLegacyModeClaims;
-        private bool _defaultsLegacyModeIssuer;
-        private UInt32 _defaultsResourceOwnerRefreshExpire;
-        private UInt32 _defaultsResourceOwnerTokenExpire;
-        private UInt32 _unitTestsDeviceCodePollMax;
-        private UInt32 _unitTestsDeviceCodeTokenExpire;
-        private bool _unitTestsResourceOwnerTokenFake;
-        private bool _unitTestsResourceOwnerRefreshFake;
-        private DateTime _unitTestsResourceOwnerTokenFakeUtcNow;
-        private DateTime _unitTestsResourceOwnerRefreshFakeUtcNow;
+        private readonly ExecutionContext _situation;
+        private readonly IConfigurationRoot _conf;
+        private bool _legacyModeClaims;
+        private bool _legacyModeIssuer;
+        private bool _resourceOwnerRefreshFake;
+        private bool _resourceOwnerTokenFake;
+        private DateTime _resourceOwnerRefreshFakeUtcNow;
+        private DateTime _resourceOwnerTokenFakeUtcNow;
 
-        public ConfigRepository(IConfigurationRoot conf, ExecutionType situation)
+        public ConfigRepository(IConfigurationRoot conf, ExecutionContext situation)
         {
+            _conf = conf;
             _situation = situation;
 
-            _defaultsAuthCodeRefreshExpire = UInt32.Parse(conf["IdentityDefaults:AuthCodeRefreshExpire"]);
-            _defaultsAuthCodeTokenExpire = UInt32.Parse(conf["IdentityDefaults:AuthCodeTokenExpire"]);
-            _defaultsAuthCodeTotpExpire = UInt32.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"]);
-
-            _defaultsClientCredRefreshExpire = UInt32.Parse(conf["IdentityDefaults:ClientCredRefreshExpire"]);
-            _defaultsClientCredTokenExpire = UInt32.Parse(conf["IdentityDefaults:ClientCredTokenExpire"]);
-
-            _defaultsDeviceCodePollMax = UInt32.Parse(conf["IdentityDefaults:DeviceCodePollMax"]);
-            _defaultsDeviceCodeRefreshExpire = UInt32.Parse(conf["IdentityDefaults:DeviceCodeRefreshExpire"]);
-            _defaultsDeviceCodeTokenExpire = UInt32.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"]);
-            _defaultsDeviceCodeTotpExpire = UInt32.Parse(conf["IdentityDefaults:DeviceCodeTotpExpire"]);
-
-            _defaultsResourceOwnerRefreshExpire = UInt32.Parse(conf["IdentityDefaults:ResourceOwnerRefreshExpire"]);
-            _defaultsResourceOwnerTokenExpire = UInt32.Parse(conf["IdentityDefaults:ResourceOwnerTokenExpire"]);
-
-            _defaultsLegacyModeClaims = bool.Parse(conf["IdentityDefaults:LegacyModeClaims"]);
-            _defaultsLegacyModeIssuer = bool.Parse(conf["IdentityDefaults:LegacyModeIssuer"]);
-
-            _unitTestsDeviceCodePollMax = 60;
-            _unitTestsDeviceCodeTokenExpire = 60;
-
-            _unitTestsResourceOwnerTokenFake = false;
-            _unitTestsResourceOwnerTokenFakeUtcNow = DateTime.UtcNow;
-
-            _unitTestsResourceOwnerRefreshFake = false;
-            _unitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+            _legacyModeClaims = bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]);
+            _legacyModeIssuer = bool.Parse(_conf["IdentityDefaults:LegacyModeIssuer"]);
+            _resourceOwnerTokenFake = false;
+            _resourceOwnerTokenFakeUtcNow = DateTime.UtcNow;
+            _resourceOwnerRefreshFake = false;
+            _resourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
         }
 
-        public UInt32 DefaultsAuthCodeRefreshExpire
+        public uint AuthCodeRefreshExpire => uint.Parse(_conf["IdentityDefaults:AuthCodeRefreshExpire"]);
+
+        public uint AuthCodeTokenExpire => uint.Parse(_conf["IdentityDefaults:AuthCodeTokenExpire"]);
+
+        public uint AuthCodeTotpExpire => uint.Parse(_conf["IdentityDefaults:AuthCodeTotpExpire"]);
+
+        public uint ClientCredRefreshExpire => uint.Parse(_conf["IdentityDefaults:ClientCredRefreshExpire"]);
+
+        public uint ClientCredTokenExpire => uint.Parse(_conf["IdentityDefaults:ClientCredTokenExpire"]);
+
+        public uint DeviceCodePollMax
         {
-            get { return _defaultsAuthCodeRefreshExpire; }
+            get
+            {
+                if (_situation == ExecutionContext.DeployedOrLocal)
+                    return uint.Parse(_conf["IdentityDefaults:DeviceCodePollMax"]); ;
+
+                if (_situation == ExecutionContext.Testing)
+                    return 60;
+
+                throw new NotSupportedException();
+            }
         }
 
-        public UInt32 DefaultsAuthCodeTokenExpire
+        public uint DeviceCodeRefreshExpire => uint.Parse(_conf["IdentityDefaults:DeviceCodeRefreshExpire"]);
+
+        public uint DeviceCodeTokenExpire
         {
-            get { return _defaultsAuthCodeTokenExpire; }
+            get
+            {
+                if (_situation == ExecutionContext.DeployedOrLocal)
+                    return uint.Parse(_conf["IdentityDefaults:DeviceCodeTokenExpire"]); ;
+
+                if (_situation == ExecutionContext.Testing)
+                    return 60;
+
+                throw new NotSupportedException();
+            }
         }
 
-        public UInt32 DefaultsAuthCodeTotpExpire
+        public uint DeviceCodeTotpExpire => uint.Parse(_conf["IdentityDefaults:DeviceCodeTotpExpire"]);
+
+        public uint ImplicitTokenExpire
         {
-            get { return _defaultsAuthCodeTotpExpire; }
+            get
+            {
+                if (_situation == ExecutionContext.DeployedOrLocal)
+                    return uint.Parse(_conf["IdentityDefaults:ImplicitTokenExpire"]);
+
+                else if (_situation == ExecutionContext.Testing)
+                    return 60;
+
+                throw new NotSupportedException();
+            }
         }
 
-        public UInt32 DefaultsClientCredRefreshExpire
+        public bool LegacyModeClaims
         {
-            get { return _defaultsClientCredRefreshExpire; }
+            get { return _legacyModeClaims; }
+            set { _legacyModeClaims = value; }
         }
 
-        public UInt32 DefaultsClientCredTokenExpire
+        public bool LegacyModeIssuer
         {
-            get { return _defaultsClientCredTokenExpire; }
+            get { return _legacyModeIssuer; }
+            set { _legacyModeIssuer = value; }
         }
 
-        public UInt32 DefaultsDeviceCodePollMax
+        public uint ResourceOwnerRefreshExpire => uint.Parse(_conf["IdentityDefaults:ResourceOwnerRefreshExpire"]);
+
+        public uint ResourceOwnerTokenExpire => uint.Parse(_conf["IdentityDefaults:ResourceOwnerTokenExpire"]);
+
+        public bool ResourceOwnerRefreshFake
         {
-            get { return _defaultsDeviceCodePollMax; }
+            get
+            {
+                if (_situation == ExecutionContext.Testing)
+                    return _resourceOwnerRefreshFake;
+
+                throw new NotSupportedException();
+            }
+            set
+            {
+                if (_situation == ExecutionContext.Testing)
+                    _resourceOwnerRefreshFake = value;
+            }
         }
 
-        public UInt32 DefaultsDeviceCodeRefreshExpire
+        public bool ResourceOwnerTokenFake
         {
-            get { return _defaultsDeviceCodeRefreshExpire; }
+            get
+            {
+                if (_situation == ExecutionContext.Testing)
+                    return _resourceOwnerTokenFake;
+
+                throw new NotSupportedException();
+            }
+            set
+            {
+                if (_situation == ExecutionContext.Testing)
+                    _resourceOwnerTokenFake = value;
+            }
         }
 
-        public UInt32 DefaultsDeviceCodeTokenExpire
+        public DateTime ResourceOwnerRefreshFakeUtcNow
         {
-            get { return _defaultsDeviceCodeTokenExpire; }
+            get
+            {
+                if (_situation == ExecutionContext.Testing)
+                    return _resourceOwnerRefreshFakeUtcNow;
+
+                throw new NotSupportedException();
+            }
+            set
+            {
+                if (_situation == ExecutionContext.Testing)
+                    _resourceOwnerRefreshFakeUtcNow = value;
+            }
         }
 
-        public UInt32 DefaultsDeviceCodeTotpExpire
+        public DateTime ResourceOwnerTokenFakeUtcNow
         {
-            get { return _defaultsDeviceCodeTotpExpire; }
-        }
+            get
+            {
+                if (_situation == ExecutionContext.Testing)
+                    return _resourceOwnerTokenFakeUtcNow;
 
-        public bool DefaultsLegacyModeClaims
-        {
-            get { return _defaultsLegacyModeClaims; }
-            set { _defaultsLegacyModeClaims = value; }
-        }
-
-        public bool DefaultsLegacyModeIssuer
-        {
-            get { return _defaultsLegacyModeIssuer; }
-            set { _defaultsLegacyModeIssuer = value; }
-        }
-
-        public UInt32 DefaultsResourceOwnerRefreshExpire
-        {
-            get { return _defaultsResourceOwnerRefreshExpire; }
-        }
-
-        public UInt32 DefaultsResourceOwnerTokenExpire
-        {
-            get { return _defaultsResourceOwnerTokenExpire; }
-        }
-
-        public bool UnitTestsResourceOwnerRefreshFake
-        {
-            get { return _unitTestsResourceOwnerRefreshFake; }
-            set { _unitTestsResourceOwnerRefreshFake = value; }
-        }
-
-        public bool UnitTestsResourceOwnerTokenFake
-        {
-            get { return _unitTestsResourceOwnerTokenFake; }
-            set { _unitTestsResourceOwnerTokenFake = value; }
-        }
-
-        public UInt32 UnitTestsDeviceCodePollMax
-        {
-            get { return _unitTestsDeviceCodePollMax; }
-        }
-
-        public UInt32 UnitTestsDeviceCodeTokenExpire
-        {
-            get { return _unitTestsDeviceCodeTokenExpire; }
-        }
-
-        public DateTime UnitTestsResourceOwnerRefreshFakeUtcNow
-        {
-            get { return _unitTestsResourceOwnerRefreshFakeUtcNow; }
-            set { _unitTestsResourceOwnerRefreshFakeUtcNow = value; }
-        }
-
-        public DateTime UnitTestsResourceOwnerTokenFakeUtcNow
-        {
-            get { return _unitTestsResourceOwnerTokenFakeUtcNow; }
-            set { _unitTestsResourceOwnerTokenFakeUtcNow = value; }
+                throw new NotSupportedException();
+            }
+            set
+            {
+                if (_situation == ExecutionContext.Testing)
+                    _resourceOwnerTokenFakeUtcNow = value;
+            }
         }
     }
 }

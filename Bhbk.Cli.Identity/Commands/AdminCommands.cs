@@ -55,9 +55,9 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _admin = new AdminClient(conf, ExecutionType.Normal, new HttpClient());
-                _sts = new StsClient(conf, ExecutionType.Normal, new HttpClient());
-                _jwt = new JwtContext(conf, ExecutionType.Normal, new HttpClient());
+                _admin = new AdminClient(conf, ExecutionContext.DeployedOrLocal, new HttpClient());
+                _sts = new StsClient(conf, ExecutionContext.DeployedOrLocal, new HttpClient());
+                _jwt = new JwtContext(conf, ExecutionContext.DeployedOrLocal, new HttpClient());
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");

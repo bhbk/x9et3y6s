@@ -107,6 +107,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = RandomValues.CreateBase64String(32);
 
+            //create domain model for this result type...
+            var result = new DeviceCodeV2()
+            {
+                issuer = issuer.Id.ToString(),
+                client = client.Id.ToString(),
+                verification_url = authorize.AbsoluteUri,
+                user_code = await new TotpProvider(8, 10).GenerateAsync(user.SecurityStamp, user),
+                device_code = nonce,
+                interval = UoW.ConfigRepo.DeviceCodePollMax,
+            };
+
             var state = await UoW.StateRepo.CreateAsync(
                 new StateCreate()
                 {
@@ -117,21 +128,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     StateType = StateType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.UnitTestsDeviceCodeTokenExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DeviceCodeTokenExpire),
                 });
 
             await UoW.CommitAsync();
-
-            //create domain model for this result type...
-            var result = new DeviceCodeV2()
-            {
-                issuer = issuer.Id.ToString(),
-                client = client.Id.ToString(),
-                verification_url = authorize.AbsoluteUri,
-                user_code = await new TotpProvider(8, 10).GenerateAsync(user.SecurityStamp, user),
-                device_code = nonce,
-                interval = UoW.ConfigRepo.DefaultsDeviceCodePollMax,
-            };
 
             return Ok(result);
         }
@@ -280,7 +280,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
             //check if device is polling too frequently...
-            else if (UoW.ConfigRepo.DefaultsDeviceCodePollMax <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
+            else if (UoW.ConfigRepo.DeviceCodePollMax <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
             {
                 state.LastPolling = DateTime.UtcNow;
                 state.StateConsume = false;
@@ -331,13 +331,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
+            //no reuse of state after this...
             state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
-
-            //adjust counter(s) for login success...
-            await UoW.UserRepo.AccessSuccessAsync(user.Id);
-            await UoW.StateRepo.UpdateAsync(state);
-            await UoW.CommitAsync();
 
             var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
             var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
@@ -349,6 +345,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = refresh,
                 expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
+
+            //adjust counter(s) for login success...
+            await UoW.UserRepo.AccessSuccessAsync(user.Id);
+            await UoW.StateRepo.UpdateAsync(state);
+            await UoW.CommitAsync();
 
             return Ok(result);
         }

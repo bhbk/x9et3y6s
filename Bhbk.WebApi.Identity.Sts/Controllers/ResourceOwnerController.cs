@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             //check if issuer compatibility mode enabled.
-            if (!UoW.ConfigRepo.DefaultsLegacyModeIssuer
+            if (!UoW.ConfigRepo.LegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:None");
@@ -46,15 +46,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             Guid issuerID;
             tbl_Issuers issuer;
 
-            if (UoW.ConfigRepo.DefaultsLegacyModeIssuer
+            if (UoW.ConfigRepo.LegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 //really gross but needed for backward compatibility. can be lame if more than one issuer.
-                if (UoW.Situation == ExecutionType.Normal)
+                if (UoW.Situation == ExecutionContext.DeployedOrLocal)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First())).SingleOrDefault();
 
-                else if (UoW.Situation == ExecutionType.Test)
+                else if (UoW.Situation == ExecutionContext.Testing)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).SingleOrDefault();
 
                 else
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if login provider is local...
-            else if ((UoW.Situation == ExecutionType.Normal)
+            else if ((UoW.Situation == ExecutionContext.DeployedOrLocal)
                 && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
@@ -158,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                 || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                    && UoW.Situation == ExecutionType.Test))
+                    && UoW.Situation == ExecutionContext.Testing))
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -179,7 +179,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
 
-            if (UoW.ConfigRepo.DefaultsLegacyModeIssuer
+            if (UoW.ConfigRepo.LegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 var access = await JwtBuilder.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
@@ -320,7 +320,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if login provider is local...
-            else if ((UoW.Situation == ExecutionType.Normal)
+            else if ((UoW.Situation == ExecutionContext.DeployedOrLocal)
                 && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
@@ -337,7 +337,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                 || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                    && UoW.Situation == ExecutionType.Test))
+                    && UoW.Situation == ExecutionContext.Testing))
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))

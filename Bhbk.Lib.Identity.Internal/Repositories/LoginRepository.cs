@@ -16,11 +16,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class LoginRepository : IGenericRepositoryAsync<LoginCreate, tbl_Logins, Guid>
     {
-        private readonly ExecutionType _situation;
+        private readonly ExecutionContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public LoginRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
+        public LoginRepository(IdentityDbContext context, ExecutionContext situation, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();

@@ -16,14 +16,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class IssuerRepository : IGenericRepositoryAsync<IssuerCreate, tbl_Issuers, Guid>
     {
-        private readonly ExecutionType _situation;
+        private readonly ExecutionContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
         private readonly string _salt;
 
         public string Salt { get => _salt; }
 
-        public IssuerRepository(IdentityDbContext context, ExecutionType situation, IMapper shape, string salt)
+        public IssuerRepository(IdentityDbContext context, ExecutionContext situation, IMapper shape, string salt)
         {
             if (context == null)
                 throw new NullReferenceException();

@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IssuerController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateIssuerV1([FromBody] IssuerCreate model)
         {
             if (!ModelState.IsValid)
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteIssuerV1([FromRoute] Guid issuerID)
         {
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> UpdateIssuerV1([FromBody] IssuerModel model)
         {
             if (!ModelState.IsValid)

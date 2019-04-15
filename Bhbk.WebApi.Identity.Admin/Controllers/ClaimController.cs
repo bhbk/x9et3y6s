@@ -22,7 +22,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ClaimController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateClaimV1([FromBody] ClaimCreate model)
         {
             if (!ModelState.IsValid)
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteClaimV1([FromRoute] Guid claimID)
         {
             var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> UpdateClaimV1([FromBody] ClaimModel model)
         {
             if (!ModelState.IsValid)

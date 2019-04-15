@@ -5,6 +5,7 @@ using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Validators;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -29,7 +30,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class UserRepository : IGenericRepositoryAsync<UserCreate, tbl_Users, Guid>
     {
-        private readonly ExecutionType _situation;
+        private readonly ExecutionContext _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
@@ -37,7 +38,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(IdentityDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper shape)
+        public UserRepository(IdentityDbContext context, ExecutionContext situation, IConfigurationRoot conf, IMapper shape)
         {
             _context = context;
             _situation = situation;
@@ -221,31 +222,22 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Users user)
         {
-            /*
-             * moving away from microsoft constructs for identity implementation because of un-needed additional 
-             * layers of complexity, and limitations, for the simple operations needing to be performed.
-             * 
-             * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1
-             */
-
             var claims = new List<Claim>();
 
+            //user identity vs. a service identity
+            claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
+
             foreach (var role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x.Name))
+            {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
-            //check if claims compatibility enabled. means pack claim(s) with old name too.
-            if (bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]))
-                foreach (var role in claims.Where(x => x.Type == ClaimTypes.Role).ToList().OrderBy(x => x.Type))
-                    claims.Add(new Claim("role", role.Value, ClaimTypes.Role));
+                //check compatibility is enabled. pack claim(s) with old name and new name.
+                if (bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]))
+                    claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
+            }
 
-            foreach (tbl_Claims claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
+            foreach (var claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
-
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
-            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
-            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
-            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -313,7 +305,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<IEnumerable<tbl_Claims>> GetClaimsAsync(Guid key)
         {
+            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
             var result = _context.tbl_Claims.Where(x => x.tbl_UserClaims.Any(y => y.UserId == key)).ToList();
+
+            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.NameIdentifier, Value = entity.Id.ToString() });
+            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.Email, Value = entity.Email });
+            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.MobilePhone, Value = entity.PhoneNumber });
+            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.GivenName, Value = entity.FirstName });
+            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.Surname, Value = entity.LastName });
 
             return await Task.FromResult(result);
         }

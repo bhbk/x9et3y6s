@@ -23,11 +23,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class RoleRepository : IGenericRepositoryAsync<RoleCreate, tbl_Roles, Guid>
     {
-        private readonly ExecutionType _situation;
+        private readonly ExecutionContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public RoleRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
+        public RoleRepository(IdentityDbContext context, ExecutionContext situation, IMapper shape)
         {
             _context = context;
             _situation = situation;

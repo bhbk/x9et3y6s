@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -91,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = true;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -262,7 +262,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = true;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -333,7 +333,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var rop = await _endpoints.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
@@ -360,7 +360,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = true;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
 
             var legacy = await _endpoints.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
@@ -390,7 +390,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -432,7 +432,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -486,7 +486,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -552,7 +552,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();

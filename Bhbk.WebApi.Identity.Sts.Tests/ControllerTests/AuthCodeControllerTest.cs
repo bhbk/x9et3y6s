@@ -103,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var ask_url = new Uri(ask.Url);
             var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
             var ask_code = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
             var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
             var ac = await _endpoints.AuthCode_UseV2(
@@ -184,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var ask_url = new Uri(ask.Url);
             var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
             var ask_code = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
             var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
             await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
@@ -238,7 +238,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var ask_url = new Uri(ask.Url);
             var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
             var ask_code = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
             var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
             var ac = await _endpoints.AuthCode_UseV2(
@@ -306,7 +306,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var ask_url = new Uri(ask.Url);
             var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
             var ask_code = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
             var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
             var ac = await _endpoints.AuthCode_UseV2(
@@ -388,7 +388,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var ask_url = new Uri(ask.Url);
             var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
             var ask_code = await new ProtectProvider(_factory.UoW.Situation.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
             var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
             var ac = await _endpoints.AuthCode_UseV2(

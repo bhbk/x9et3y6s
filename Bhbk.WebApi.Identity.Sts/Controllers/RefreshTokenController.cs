@@ -32,8 +32,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}"), HttpGet]
         [Route("v2/refresh/{userID}"), HttpGet]
-        //[Authorize(Policy = "UserPolicy")]
-        [Authorize(Policy = "AdministratorPolicy")]
+        //[Authorize(Policy = "UsersPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> GetRefreshTokensV1([FromRoute] Guid userID)
         {
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
@@ -53,8 +53,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
         [Route("v2/refresh/{userID}/revoke/{refreshID}"), HttpDelete]
-        //[Authorize(Policy = "UserPolicy")]
-        [Authorize(Policy = "AdministratorPolicy")]
+        //[Authorize(Policy = "UsersPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> RevokeRefreshTokenV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
             var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID
@@ -76,8 +76,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
         [Route("v1/refresh/{userID}/revoke"), HttpDelete]
         [Route("v2/refresh/{userID}/revoke"), HttpDelete]
-        //[Authorize(Policy = "UserPolicy")]
-        [Authorize(Policy = "AdministratorPolicy")]
+        //[Authorize(Policy = "UsersPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> RevokeRefreshTokensV1([FromRoute] Guid userID)
         {
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();

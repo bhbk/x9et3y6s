@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ClientController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateClientV1([FromBody] ClientCreate model)
         {
             if (!ModelState.IsValid)
@@ -54,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{clientID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteClientV1([FromRoute] Guid clientID)
         {
             var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
@@ -181,13 +182,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = await UoW.ClientRepo.GetRoleListAsync(clientID);
+            var roles = await UoW.ClientRepo.GetRolesAsync(clientID);
 
             return Ok(roles);
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> UpdateClientV1([FromBody] ClientModel model)
         {
             if (!ModelState.IsValid)

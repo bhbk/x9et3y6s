@@ -377,8 +377,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = true;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
             var rop = await _endpoints.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
@@ -392,8 +392,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = false;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
             var ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
@@ -410,8 +410,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = true;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
             rop = await _endpoints.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
@@ -425,8 +425,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = false;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
             ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
 
@@ -476,7 +476,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
@@ -872,8 +872,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = true;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
             var rop = await _endpoints.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
@@ -897,8 +897,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = false;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
             var rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
             var cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
@@ -927,8 +927,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = true;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
             rop = await _endpoints.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
@@ -952,8 +952,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFake = false;
-            _factory.UoW.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
+            _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
             rop_ok = JObject.Parse(await rop.Content.ReadAsStringAsync());
             cc_ok = JObject.Parse(await cc.Content.ReadAsStringAsync());
@@ -1088,7 +1088,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.TestData.DestroyAsync();
             await _factory.TestData.CreateAsync();
 
-            _factory.UoW.ConfigRepo.DefaultsLegacyModeIssuer = false;
+            _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();

@@ -16,7 +16,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         public TextController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> SendTextV1([FromBody] TextCreate model)
         {
             if (!ModelState.IsValid)
@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return NotFound(ModelState);
             }
 
-            var queue = ((QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask)));
+            var queue = (QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask));
 
             if (!queue.TryEnqueueText(model))
             {

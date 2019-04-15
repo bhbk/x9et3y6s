@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public UserController() { }
 
         [Route("v1/{userID:guid}/add-password"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> AddPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateUserV1([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            if (UoW.Situation == ExecutionType.Normal)
+            if (UoW.Situation == ExecutionContext.DeployedOrLocal)
             {
                 var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
 
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
                 var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), result));
+                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), result));
 
                 var url = UrlBuilder.GenerateConfirmEmail(Conf, result, code);
 
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/no-confirm"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateUserV1NoConfirm([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
@@ -182,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteUserV1([FromRoute] Guid userID)
         {
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
@@ -376,7 +376,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> RemoveLoginFromUserV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
@@ -403,7 +403,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpGet]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> RemovePasswordV1([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
@@ -434,7 +434,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
@@ -468,7 +468,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> UpdateUserV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)

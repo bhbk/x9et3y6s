@@ -9,6 +9,7 @@
     "DeviceCodeRefreshExpire": "86400",
     "DeviceCodeTokenExpire": "600",
     "DeviceCodeTotpExpire": "600",
+    "ImplicitTokenExpire": "600",
     "ResourceOwnerTokenExpire": "600",
     "ResourceOwnerRefreshExpire": "86400",
     "LegacyModeClaims": "true",

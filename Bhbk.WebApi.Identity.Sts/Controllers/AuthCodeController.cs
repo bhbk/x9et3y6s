@@ -159,7 +159,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.AuthCodeTotpExpire),
                 });
 
             await UoW.CommitAsync();

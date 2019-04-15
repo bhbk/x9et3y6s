@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public RoleController() { }
 
         [Route("v1/{roleID:guid}/add/{userID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> AddRoleToUserV1([FromRoute] Guid roleID, [FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateRoleV1([FromBody] RoleCreate model)
         {
             if (!ModelState.IsValid)
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteRoleV1([FromRoute] Guid roleID)
         {
             var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
@@ -215,7 +215,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID:guid}/remove/{userID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> RemoveRoleFromUserV1([FromRoute] Guid roleID, [FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
@@ -246,7 +246,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> UpdateRoleV1([FromBody] RoleModel model)
         {
             if (!ModelState.IsValid)

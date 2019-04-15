@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     StateType = StateType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.UnitTestsDeviceCodeTokenExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.DeviceCodeTokenExpire),
                 });
 
             await _factory.UoW.CommitAsync();
@@ -273,7 +273,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     StateType = StateType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.UnitTestsDeviceCodeTokenExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.DeviceCodeTokenExpire),
                 });
 
             await _factory.UoW.CommitAsync();
@@ -323,7 +323,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     StateType = StateType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.UnitTestsDeviceCodeTokenExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.DeviceCodeTokenExpire),
                 });
 
             await _factory.UoW.CommitAsync();
@@ -426,7 +426,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     StateType = StateType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.UnitTestsDeviceCodeTokenExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.DeviceCodeTokenExpire),
                 });
 
             await _factory.UoW.CommitAsync();

@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return NotFound(ModelState);
             }
 
-            var queue = ((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask)));
+            var queue = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
 
             if (!queue.TryEnqueueEmail(model))
             {

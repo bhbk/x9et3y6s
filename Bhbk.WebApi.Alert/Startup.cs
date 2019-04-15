@@ -8,6 +8,7 @@ using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -24,7 +25,6 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Text;
 
 namespace Bhbk.WebApi.Alert
@@ -53,13 +53,16 @@ namespace Bhbk.WebApi.Alert
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionContext.DeployedOrLocal, new HttpClient()));
             sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
             {
-                return new IdentityUnitOfWork(options, ExecutionType.Normal, conf, mapper);
+                return new IdentityUnitOfWork(options, ExecutionContext.DeployedOrLocal, conf, mapper);
             });
             sc.AddSingleton<IHostedService>(new QueueEmailTask(sc, conf));
             sc.AddSingleton<IHostedService>(new QueueTextTask(sc, conf));
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Normal, new HttpClient()));
+            sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
+            sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();
+            sc.AddSingleton<IAuthorizationHandler, AuthorizeUsers>();
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
@@ -68,7 +71,7 @@ namespace Bhbk.WebApi.Alert
              * only live context allowed to run...
              */
 
-            if (uow.Situation != ExecutionType.Normal)
+            if (uow.Situation != ExecutionContext.DeployedOrLocal)
                 throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
@@ -90,7 +93,7 @@ namespace Bhbk.WebApi.Alert
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            if (uow.ConfigRepo.DefaultsLegacyModeIssuer)
+            if (uow.ConfigRepo.LegacyModeIssuer)
                 issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name).Concat(issuers);
 
@@ -142,13 +145,17 @@ namespace Bhbk.WebApi.Alert
             });
             sc.AddAuthorization(auth => 
             {
-                auth.AddPolicy("AdministratorPolicy", policy =>
+                auth.AddPolicy("AdministratorsPolicy", admins =>
                 {
-                    policy.RequireClaim(ClaimTypes.Role, "(Built-In) Administrators");
+                    admins.Requirements.Add(new AuthorizeAdminsRequirement());
                 });
-                auth.AddPolicy("UserPolicy", policy =>
+                auth.AddPolicy("ServicesPolicy", services =>
                 {
-                    policy.RequireClaim(ClaimTypes.Role, "(Built-In) Users");
+                    services.Requirements.Add(new AuthorizeServicesRequirement());
+                });
+                auth.AddPolicy("UsersPolicy", users =>
+                {
+                    users.Requirements.Add(new AuthorizeUsersRequirement());
                 });
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>

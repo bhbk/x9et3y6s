@@ -8,6 +8,7 @@ using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -22,7 +23,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Text;
 using Xunit;
 
@@ -71,9 +71,12 @@ namespace Bhbk.WebApi.Alert.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton((IIdentityUnitOfWork<IdentityDbContext>)new IdentityUnitOfWork(options, ExecutionType.Test, conf, mapper));
-                sc.AddSingleton((IHostedService)new QueueEmailTask(sc, conf));
-                sc.AddSingleton((IHostedService)new QueueTextTask(sc, conf));
+                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, ExecutionContext.Testing, conf, mapper));
+                sc.AddSingleton<IHostedService>(new QueueEmailTask(sc, conf));
+                sc.AddSingleton<IHostedService>(new QueueTextTask(sc, conf));
+                sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
+                sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();
+                sc.AddSingleton<IAuthorizationHandler, AuthorizeUsers>();
 
                 var sp = sc.BuildServiceProvider();
 
@@ -93,7 +96,7 @@ namespace Bhbk.WebApi.Alert.Tests
                  * only test context allowed to run...
                  */
 
-                if (UoW.Situation != ExecutionType.Test)
+                if (UoW.Situation != ExecutionContext.Testing)
                     throw new NotSupportedException();
 
                 var issuers = (UoW.IssuerRepo.GetAsync().Result)
@@ -109,7 +112,7 @@ namespace Bhbk.WebApi.Alert.Tests
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (UoW.ConfigRepo.DefaultsLegacyModeIssuer)
+                if (UoW.ConfigRepo.LegacyModeIssuer)
                     issuers = (UoW.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 
@@ -148,13 +151,17 @@ namespace Bhbk.WebApi.Alert.Tests
                 });
                 sc.AddAuthorization(auth =>
                 {
-                    auth.AddPolicy("AdministratorPolicy", policy =>
+                    auth.AddPolicy("AdministratorsPolicy", admins =>
                     {
-                        policy.RequireClaim(ClaimTypes.Role, "(Built-In) Administrators");
+                        admins.Requirements.Add(new AuthorizeAdminsRequirement());
                     });
-                    auth.AddPolicy("UserPolicy", policy =>
+                    auth.AddPolicy("ServicesPolicy", services =>
                     {
-                        policy.RequireClaim(ClaimTypes.Role, "(Built-In) Users");
+                        services.Requirements.Add(new AuthorizeServicesRequirement());
+                    });
+                    auth.AddPolicy("UsersPolicy", users =>
+                    {
+                        users.Requirements.Add(new AuthorizeUsersRequirement());
                     });
                 });
                 sc.Configure((ForwardedHeadersOptions headers) =>

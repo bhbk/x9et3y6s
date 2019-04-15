@@ -14,11 +14,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class RefreshRepository : IGenericRepositoryAsync<RefreshCreate, tbl_Refreshes, Guid>
     {
-        private readonly ExecutionType _situation;
+        private readonly ExecutionContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public RefreshRepository(IdentityDbContext context, ExecutionType situation, IMapper shape)
+        public RefreshRepository(IdentityDbContext context, ExecutionContext situation, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();

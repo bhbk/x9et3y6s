@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public LoginController() { }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateLoginV1([FromBody] LoginCreate model)
         {
             if (!ModelState.IsValid)
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
         {
             var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorPolicy")]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> UpdateLoginV1([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)

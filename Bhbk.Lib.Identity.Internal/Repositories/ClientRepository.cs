@@ -3,6 +3,7 @@ using Bhbk.Lib.Core.Repositories;
 using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
@@ -19,12 +20,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ClientRepository : IGenericRepositoryAsync<ClientCreate, tbl_Clients, Guid>
     {
-        private readonly ExecutionType _situation;
+        private readonly ExecutionContext _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public ClientRepository(IdentityDbContext context, ExecutionType situation, IConfigurationRoot conf, IMapper shape)
+        public ClientRepository(IdentityDbContext context, ExecutionContext situation, IConfigurationRoot conf, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();
@@ -94,14 +95,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Clients client)
         {
-            /*
-             * moving away from microsoft constructs for identity implementation because of un-needed additional 
-             * layers of complexity, and limitations, for the simple operations needing to be performed.
-             * 
-             * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserclaimsprincipalfactory-1
-             */
-
             var claims = new List<Claim>();
+
+            //service identity vs. a user identity
+            claims.Add(new Claim(ClaimTypes.System, ClientType.server.ToString()));
+
+            foreach (var role in (await GetRolesAsync(client.Id)).ToList().OrderBy(x => x.Name))
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+
+            foreach (var claim in (await GetClaimsAsync(client.Id)).ToList().OrderBy(x => x.Type))
+                claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -167,14 +170,24 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<tbl_Roles>> GetRoleListAsync(Guid key)
+        public async Task<IEnumerable<tbl_Claims>> GetClaimsAsync(Guid key)
+        {
+            var entity = _context.tbl_Clients.Where(x => x.Id == key).Single();
+            var result = new List<tbl_Claims>() { };
+
+            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.NameIdentifier, Value = entity.Id.ToString() });
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<tbl_Roles>> GetRolesAsync(Guid key)
         {
             var result = _context.tbl_Roles.Where(x => x.ClientId == key).ToList();
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<tbl_Urls>> GetUriListAsync(Guid key)
+        public async Task<IEnumerable<tbl_Urls>> GetUrisAsync(Guid key)
         {
             var result = _context.tbl_Urls.Where(x => x.ClientId == key).ToList();
 

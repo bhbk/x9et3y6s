@@ -44,9 +44,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user));
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
 
-            if (UoW.Situation == ExecutionType.Test)
+            if (UoW.Situation == ExecutionContext.Testing)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmEmail(Conf, user, token);
@@ -102,9 +102,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user));
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
 
-            if (UoW.Situation == ExecutionType.Test)
+            if (UoW.Situation == ExecutionContext.Testing)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
@@ -161,7 +161,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
-            if (UoW.Situation == ExecutionType.Test)
+            if (UoW.Situation == ExecutionContext.Testing)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
