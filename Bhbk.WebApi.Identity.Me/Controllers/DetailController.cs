@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -48,18 +48,18 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
                 return NotFound(ModelState);
             }
             else if (!user.HumanBeing)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
             else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -86,13 +86,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
                 return NotFound(ModelState);
             }
             else if (!user.HumanBeing
                 || user.TwoFactorEnabled == status)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -114,14 +114,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
                 return NotFound(ModelState);
             }
 
             if (user.Id != model.Id
                 || !user.HumanBeing)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 

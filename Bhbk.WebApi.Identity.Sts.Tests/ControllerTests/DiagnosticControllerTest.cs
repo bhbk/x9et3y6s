@@ -4,10 +4,7 @@ using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
@@ -20,17 +17,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public DiagnosticControllerTest(StartupTest factory)
         {
             _factory = factory;
-        }
-
-        [Fact]
-        public async Task Sts_DiagV1_CheckSwagger_Success()
-        {
-            using (var client = _factory.CreateClient())
-            {
-                var result = await client.GetAsync($"help/index.html");
-                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                result.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
         }
 
         [Fact]

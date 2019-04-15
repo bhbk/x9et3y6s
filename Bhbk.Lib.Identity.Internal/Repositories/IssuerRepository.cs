@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Core.Repositories;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class IssuerRepository : IGenericRepository<IssuerCreate, tbl_Issuers, Guid>
+    public class IssuerRepository : IGenericRepositoryAsync<IssuerCreate, tbl_Issuers, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _shape;

@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/refresh", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v2/refresh", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
@@ -78,12 +78,12 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
-                    || !grantTypeValue.Equals(Strings.AttrRefreshTokenIDV2)
+                    || !grantTypeValue.Equals(Strings.AttrRefreshTokenIDV2, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
@@ -219,7 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v1 end-point
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/refresh", StringComparison.Ordinal)
+            if (context.Request.Path.Equals("/oauth2/v1/refresh", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
@@ -240,12 +240,12 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
                     || string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Strings.AttrRefreshTokenIDV1)
+                    || !grantTypeValue.Equals(Strings.AttrRefreshTokenIDV1, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MsgType.ParametersInvalid.ToString() }, _serializer));
+                    return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
                 var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();

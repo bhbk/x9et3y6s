@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

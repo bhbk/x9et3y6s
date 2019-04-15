@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
 
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
                 return NotFound(ModelState);
             }
 
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.user}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{input.user}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
+                ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                 return BadRequest(ModelState);
             }
 

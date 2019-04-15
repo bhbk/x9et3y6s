@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.UnitOfWork;
 using Microsoft.Extensions.Configuration;
 using System;
 

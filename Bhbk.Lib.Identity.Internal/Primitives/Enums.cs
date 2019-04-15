@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives.Enums
         CreateClientRefreshTokenV2,
     }
 
-    public enum MsgType
+    public enum MessageType
     {
         ClaimAlreadyExists,
         ClaimImmutable,

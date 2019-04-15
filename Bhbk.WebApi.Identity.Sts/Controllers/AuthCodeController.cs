@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -45,9 +45,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.scope = HttpUtility.UrlDecode(input.scope);
 
-            if (!input.response_type.Equals(Strings.AttrAuthCodeResponseIDV1))
+            if (!string.Equals(input.response_type, Strings.AttrAuthCodeResponseIDV1, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
                 return BadRequest(ModelState);
             }
 
@@ -68,9 +68,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.scope = HttpUtility.UrlDecode(input.scope);
 
-            if (!input.response_type.Equals(Strings.AttrAuthCodeResponseIDV2))
+            if (!string.Equals(input.response_type, Strings.AttrAuthCodeResponseIDV2, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
                 return BadRequest(ModelState);
             }
 
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
 
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
                 return NotFound(ModelState);
             }
 
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.user}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{input.user}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
+                ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                 return BadRequest(ModelState);
             }
 
@@ -188,10 +188,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.code = HttpUtility.UrlDecode(input.code);
             input.state = HttpUtility.UrlDecode(input.state);
-
-            if (!input.grant_type.Equals(Strings.AttrAuthCodeIDV1))
+            
+            if (!string.Equals(input.grant_type, Strings.AttrAuthCodeIDV1, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -213,14 +213,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.code = HttpUtility.UrlDecode(input.code);
             input.state = HttpUtility.UrlDecode(input.state);
 
-            if (!input.grant_type.Equals(Strings.AttrAuthCodeIDV2))
+            if (!string.Equals(input.grant_type, Strings.AttrAuthCodeIDV2, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
             else if (!Uri.IsWellFormedUriString(input.redirect_uri, UriKind.Absolute))
             {
-                ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
+                ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                 return BadRequest(ModelState);
             }
 
@@ -235,12 +235,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -255,7 +255,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.user}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{input.user}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -264,7 +264,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -293,13 +293,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                     if (client == null)
                     {
-                        ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client}");
+                        ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
                         return NotFound(ModelState);
                     }
                     else if (!client.Enabled
                         || !clientList.Contains(client))
                     {
-                        ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                        ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                         return BadRequest(ModelState);
                     }
 
@@ -315,7 +315,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 if (!entry.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath)
                     && !entry.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
                 {
-                    ModelState.AddModelError(MsgType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
+                    ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                     return BadRequest(ModelState);
                 }
             }
@@ -328,14 +328,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (state == null)
             {
-                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"State:{input.state}");
+                ModelState.AddModelError(MessageType.StateNotFound.ToString(), $"User code:{input.state}");
                 return BadRequest(ModelState);
             }
 
             //check that payload can be decrypted and validated...
             if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(user.SecurityStamp, input.code, user))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{input.code}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.code}");
                 return BadRequest(ModelState);
             }
 

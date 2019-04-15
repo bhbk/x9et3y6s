@@ -1,9 +1,7 @@
-﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Cli.Identity.Primitives;
+﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -57,9 +55,9 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _admin = new AdminClient(conf, ExecutionType.Live, new HttpClient());
-                _sts = new StsClient(conf, ExecutionType.Live, new HttpClient());
-                _jwt = new JwtContext(conf, ExecutionType.Live, new HttpClient());
+                _admin = new AdminClient(conf, ExecutionType.Normal, new HttpClient());
+                _sts = new StsClient(conf, ExecutionType.Normal, new HttpClient());
+                _jwt = new JwtContext(conf, ExecutionType.Normal, new HttpClient());
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
@@ -392,11 +390,11 @@ namespace Bhbk.Cli.Identity.Commands
                         break;
                 }
 
-                return MessageHelper.FondFarewell();
+                return StandardOutput.FondFarewell();
             }
             catch (Exception ex)
             {
-                return MessageHelper.AngryFarewell(ex);
+                return StandardOutput.AngryFarewell(ex);
             }
         }
 
@@ -534,7 +532,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (content["name"].Value<string>() == client)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine($"{MsgType.ClientInvalid.ToString()} Client:{client}");
+                Console.WriteLine($"{MessageType.ClientInvalid.ToString()} Client:{client}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -559,7 +557,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (content["name"].Value<string>() == issuer)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine($"{MsgType.IssuerInvalid.ToString()} Issuer:{issuer}");
+                Console.WriteLine($"{MessageType.IssuerInvalid.ToString()} Issuer:{issuer}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -584,7 +582,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (content["name"].Value<string>() == login)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine($"{MsgType.LoginInvalid.ToString()} Login:{login}");
+                Console.WriteLine($"{MessageType.LoginInvalid.ToString()} Login:{login}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -610,7 +608,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (content["name"].Value<string>() == role)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine($"{MsgType.RoleInvalid.ToString()} Role:{role}");
+                Console.WriteLine($"{MessageType.RoleInvalid.ToString()} Role:{role}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -640,7 +638,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (content["email"].Value<string>() == user)
                     return Guid.Parse(content["id"].Value<string>());
 
-                Console.WriteLine($"{MsgType.UserInvalid.ToString()} User:{user}");
+                Console.WriteLine($"{MessageType.UserInvalid.ToString()} User:{user}");
             }
 
             Console.WriteLine(result.RequestMessage
@@ -768,10 +766,10 @@ namespace Bhbk.Cli.Identity.Commands
 
                 case CommandTypes.userpass:
                     Console.Write(Environment.NewLine + "ENTER password : ");
-                    return ConsoleHelper.GetHiddenInput();
+                    return StandardInput.GetHiddenInput();
             }
 
-            return ConsoleHelper.GetInput();
+            return StandardInput.GetInput();
         }
     }
 }

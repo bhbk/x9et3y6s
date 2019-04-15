@@ -12,8 +12,8 @@
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>Bhbk.Dal.Identity.Mssql</RootNamespace>
-    <AssemblyName>Bhbk.Dal.Identity.Mssql</AssemblyName>
+    <RootNamespace>Bhbk.Mssql.Identity</RootNamespace>
+    <AssemblyName>Bhbk.Mssql.Identity</AssemblyName>
     <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -123,13 +123,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Stored Procedures\uspSys_ExDelete.sql" />
-    <Build Include="dbo\Stored Procedures\uspSys_ExCreate.sql">
-      <AnsiNulls>Off</AnsiNulls>
-      <QuotedIdentifier>Off</QuotedIdentifier>
-    </Build>
-    <Build Include="dbo\Stored Procedures\uspSys_DbRefresh_Pre.sql" />
-    <Build Include="dbo\Stored Procedures\uspSys_DbRefresh_Post.sql" />
     <Build Include="dbo\Tables\tbl_Users.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
@@ -202,6 +195,10 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
+    <Build Include="dbo\Stored Procedures\usp_ErrorDelete.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ErrorCreate.sql" />
+    <Build Include="dbo\Stored Procedures\usp_DbRefresh_Pre.sql" />
+    <Build Include="dbo\Stored Procedures\usp_DbRefresh_Post.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac">

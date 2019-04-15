@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Models.Admin;
 using System;
 using System.Threading.Tasks;
 
@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
         public async Task CreateAsync()
         {
-            if (_uow.Situation != ExecutionType.UnitTest)
+            if (_uow.Situation != ExecutionType.Test)
                 throw new InvalidOperationException();
 
             tbl_Issuers issuer;
@@ -135,7 +135,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
         public async Task CreateRandomAsync(uint sets)
         {
-            if (_uow.Situation != ExecutionType.UnitTest)
+            if (_uow.Situation != ExecutionType.Test)
                 throw new InvalidOperationException();
 
             for (int i = 0; i < sets; i++)
@@ -251,7 +251,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
         public async Task DestroyAsync()
         {
-            if (_uow.Situation != ExecutionType.UnitTest)
+            if (_uow.Situation != ExecutionType.Test)
                 throw new InvalidOperationException();
 
             //delete test users

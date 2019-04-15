@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using Bhbk.Cli.Identity.Helpers;
+using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using ManyConsole;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using Bhbk.Lib.Core.UnitOfWork;
 
 namespace Bhbk.Cli.Identity.Commands
 {
@@ -39,10 +40,10 @@ namespace Bhbk.Cli.Identity.Commands
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMapper>();
+                    x.AddProfile<AutoMapperProfile>();
                 }).CreateMapper();
 
-                var uow = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
+                var uow = new IdentityUnitOfWork(builder, ExecutionType.Normal, conf, mapper);
 
                 if (ReadConfig)
                 {
@@ -56,11 +57,11 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine();
                 }
 
-                return MessageHelper.FondFarewell();
+                return StandardOutput.FondFarewell();
             }
             catch (Exception ex)
             {
-                return MessageHelper.AngryFarewell(ex);
+                return StandardOutput.AngryFarewell(ex);
             }
         }
     }

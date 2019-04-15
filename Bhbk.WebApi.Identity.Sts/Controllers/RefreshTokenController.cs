@@ -1,8 +1,8 @@
-﻿using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (token == null)
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{userID}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -117,12 +117,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{submit.issuer_id}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{submit.issuer_id}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -137,12 +137,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{submit.client_id}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{submit.client_id}");
                 return NotFound(ModelState);
             }
             else if (!client.Enabled)
             {
-                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -151,13 +151,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (refreshToken == null)
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
                 return NotFound(ModelState);
             }
             else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), true, out refreshType)
                 || (refreshToken.ValidFromUtc >= DateTime.UtcNow || refreshToken.ValidToUtc <= DateTime.UtcNow))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
                 return BadRequest(ModelState);
             }
 
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         //check that user exists...
                         if (user == null)
                         {
-                            ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{refreshToken.UserId}");
+                            ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{refreshToken.UserId}");
                             return NotFound(ModelState);
                         }
                         //check that user is not locked...
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || !user.EmailConfirmed
                             || !user.PasswordConfirmed)
                         {
-                            ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                            ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                             return BadRequest(ModelState);
                         }
 
@@ -226,12 +226,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{submit.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{submit.issuer}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -240,13 +240,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (refreshToken == null)
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
                 return NotFound(ModelState);
             }
             else if (!Enum.TryParse<RefreshType>(refreshToken.RefreshType.ToString(), true, out refreshType)
                 || (refreshToken.ValidFromUtc >= DateTime.UtcNow || refreshToken.ValidToUtc <= DateTime.UtcNow))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{submit.refresh_token}");
                 return BadRequest(ModelState);
             }
 
@@ -265,12 +265,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                         if (client == null)
                         {
-                            ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{submit.client}");
+                            ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{submit.client}");
                             return NotFound(ModelState);
                         }
                         else if (!client.Enabled)
                         {
-                            ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                            ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                             return BadRequest(ModelState);
                         }
 
@@ -299,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         //check that user exists...
                         if (user == null)
                         {
-                            ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{refreshToken.UserId}");
+                            ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{refreshToken.UserId}");
                             return NotFound(ModelState);
                         }
                         //check that user is not locked...
@@ -307,7 +307,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || !user.EmailConfirmed
                             || !user.PasswordConfirmed)
                         {
-                            ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                            ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                             return BadRequest(ModelState);
                         }
 
@@ -336,13 +336,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                                 if (client == null)
                                 {
-                                    ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{entry}");
+                                    ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{entry}");
                                     return NotFound(ModelState);
                                 }
                                 else if (!client.Enabled
                                     || !clientList.Contains(client))
                                 {
-                                    ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                                    ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                                     return BadRequest(ModelState);
                                 }
 

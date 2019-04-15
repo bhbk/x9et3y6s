@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if ((await UoW.ClientRepo.GetAsync(x => x.IssuerId == model.IssuerId
                 && x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.ClientAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
+                ModelState.AddModelError(MessageType.ClientAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
                 return BadRequest(ModelState);
             }
 
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (!Enum.TryParse<ClientType>(model.ClientType, true, out clientType))
             {
-                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
                 return BadRequest(ModelState);
             }
 
@@ -61,12 +61,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{clientID}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientID}");
                 return NotFound(ModelState);
             }
             else if (client.Immutable)
             {
-                ModelState.AddModelError(MsgType.ClientImmutable.ToString(), $"Client:{clientID}");
+                ModelState.AddModelError(MessageType.ClientImmutable.ToString(), $"Client:{clientID}");
                 return BadRequest(ModelState);
             }
 
@@ -93,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{clientValue}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientValue}");
                 return NotFound(ModelState);
             }
 
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -164,7 +164,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{clientID}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientID}");
                 return NotFound(ModelState);
             }
 
@@ -197,13 +197,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{model.Id}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{model.Id}");
                 return NotFound(ModelState);
             }
             else if (client.Immutable
                 && client.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.ClientImmutable.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.ClientImmutable.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
             }
 

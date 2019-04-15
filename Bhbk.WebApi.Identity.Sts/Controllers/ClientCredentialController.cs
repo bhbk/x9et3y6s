@@ -1,8 +1,8 @@
-﻿using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -34,9 +34,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrClientSecretIDV1))
+            if (!string.Equals(input.grant_type, Strings.AttrClientSecretIDV1, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -50,9 +50,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrClientSecretIDV2))
+            if (!string.Equals(input.grant_type, Strings.AttrClientSecretIDV2, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -67,12 +67,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -87,13 +87,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
                 return NotFound(ModelState);
             }
             else if (!client.Enabled
                 || input.client_secret != client.ClientKey)
             {
-                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
             }
 

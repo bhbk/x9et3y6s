@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -37,9 +37,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrDeviceCodeIDV1))
+            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -53,9 +53,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrDeviceCodeIDV2))
+            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV2, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
 
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
                 return NotFound(ModelState);
             }
 
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.user}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{input.user}");
                 return NotFound(ModelState);
             }
 
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (!Enum.TryParse<ActionType>(userAction, true, out actionType))
             {
-                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"User action:{userAction}");
+                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"User action:{userAction}");
                 return BadRequest(ModelState);
             }
 
@@ -157,13 +157,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (state == null)
             {
-                ModelState.AddModelError(MsgType.StateNotFound.ToString(), $"User code:{userCode}");
+                ModelState.AddModelError(MessageType.StateNotFound.ToString(), $"User code:{userCode}");
                 return NotFound(ModelState);
             }
             else if (state.StateDecision.HasValue
                 && state.StateDecision.Value == false)
             {
-                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"User code:{userCode}");
+                ModelState.AddModelError(MessageType.StateDenied.ToString(), $"User code:{userCode}");
                 return BadRequest(ModelState);
             }
 
@@ -172,7 +172,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (user == null
                 || user.Id != state.UserId)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{state.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{state.UserId}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -181,7 +181,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -205,9 +205,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrDeviceCodeIDV1))
+            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -221,9 +221,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!input.grant_type.Equals(Strings.AttrDeviceCodeIDV2))
+            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV2, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -238,12 +238,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -258,12 +258,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
                 return NotFound(ModelState);
             }
             else if (!client.Enabled)
             {
-                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -276,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (state == null
                 || state.StateConsume == true)
             {
-                ModelState.AddModelError(MsgType.StateInvalid.ToString(), $"Device code:{input.device_code}");
+                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
             }
             //check if device is polling too frequently...
@@ -288,20 +288,20 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 await UoW.StateRepo.UpdateAsync(state);
                 await UoW.CommitAsync();
 
-                ModelState.AddModelError(MsgType.StateSlowDown.ToString(), $"Device code:{input.device_code}");
+                ModelState.AddModelError(MessageType.StateSlowDown.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
             }
 
             //check if device has been approved/denied...
             if (!state.StateDecision.HasValue)
             {
-                ModelState.AddModelError(MsgType.StatePending.ToString(), $"Device code:{input.device_code}");
+                ModelState.AddModelError(MessageType.StatePending.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
             }
             else if (state.StateDecision.HasValue
                 && !state.StateDecision.Value)
             {
-                ModelState.AddModelError(MsgType.StateDenied.ToString(), $"Device code:{input.device_code}");
+                ModelState.AddModelError(MessageType.StateDenied.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
             }
 
@@ -309,7 +309,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{state.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{state.UserId}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -318,7 +318,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -327,7 +327,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (!await new TotpProvider(8, 10).ValidateAsync(user.SecurityStamp, input.user_code, user))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{input.user_code}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.user_code}");
                 return BadRequest(ModelState);
             }
 

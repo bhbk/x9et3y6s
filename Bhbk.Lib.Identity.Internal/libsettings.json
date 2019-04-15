@@ -1,12 +1,4 @@
 ﻿{
-  "Logging": {
-    "IncludeScopes": false,
-    "LogLevel": {
-      "Default": "Information",
-      "System": "Information",
-      "Microsoft": "Information"
-    }
-  },
   "IdentityDefaults": {
     "AuthCodeRefreshExpire": "86400",
     "AuthCodeTokenExpire": "600",

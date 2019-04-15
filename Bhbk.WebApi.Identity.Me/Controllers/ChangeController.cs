@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Models.Alert;
+﻿using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,21 +32,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{model.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.UserId}");
                 return NotFound(ModelState);
             }
             else if (user.Id != model.UserId
                 || user.Email != model.CurrentEmail
                 || model.NewEmail != model.NewEmailConfirm)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
                 .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user));
 
-            if (UoW.Situation == ExecutionType.UnitTest)
+            if (UoW.Situation == ExecutionType.Test)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmEmail(Conf, user, token);
@@ -85,26 +85,26 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{model.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.UserId}");
                 return NotFound(ModelState);
             }
             else if (!user.HumanBeing
                 || user.Id != model.UserId)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
             else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
                 .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.DefaultsAuthCodeTotpExpire), user));
 
-            if (UoW.Situation == ExecutionType.UnitTest)
+            if (UoW.Situation == ExecutionType.Test)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
@@ -143,25 +143,25 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{model.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.UserId}");
                 return NotFound(ModelState);
             }
             else if (user.Id != model.UserId
                 || !user.HumanBeing)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
             else if (user.PhoneNumber != model.CurrentPhoneNumber
                 || model.NewPhoneNumber != model.NewPhoneNumberConfirm)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad phone for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad phone for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
-            if (UoW.Situation == ExecutionType.UnitTest)
+            if (UoW.Situation == ExecutionType.Test)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);

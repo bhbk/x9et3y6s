@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Alert;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Providers
             _situation = situation;
             _conf = conf;
 
-            if (situation == ExecutionType.Live)
+            if (situation == ExecutionType.Normal)
             {
                 var connect = new HttpClientHandler();
 
@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Providers
                 _client = new HttpClient(connect);
             }
 
-            if (situation == ExecutionType.UnitTest)
+            if (situation == ExecutionType.Test)
                 _client = client;
         }
 
@@ -55,11 +55,11 @@ namespace Bhbk.Lib.Identity.Providers
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ExecutionType.Live)
+            if (_situation == ExecutionType.Normal)
                 return await _client.PostAsync(
                     string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
-            if (_situation == ExecutionType.UnitTest)
+            if (_situation == ExecutionType.Test)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -76,11 +76,11 @@ namespace Bhbk.Lib.Identity.Providers
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == ExecutionType.Live)
+            if (_situation == ExecutionType.Normal)
                 return await _client.PostAsync(
                     string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
-            if (_situation == ExecutionType.UnitTest)
+            if (_situation == ExecutionType.Test)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();

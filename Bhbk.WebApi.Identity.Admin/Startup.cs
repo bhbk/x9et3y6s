@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Infrastructure;
-using Bhbk.Lib.Identity.Interfaces;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -26,7 +24,6 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Text;
 
 namespace Bhbk.WebApi.Identity.Admin
@@ -50,18 +47,18 @@ namespace Bhbk.WebApi.Identity.Admin
 
             var mapper = new MapperConfiguration(x =>
             {
-                x.AddProfile<IdentityMapper>();
+                x.AddProfile<AutoMapperProfile>();
             }).CreateMapper();
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
             sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
             {
-                return new IdentityUnitOfWork(options, ExecutionType.Live, conf, mapper);
+                return new IdentityUnitOfWork(options, ExecutionType.Normal, conf, mapper);
             });
             sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Live, new HttpClient()));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionType.Normal, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
@@ -70,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin
              * only live context allowed to run...
              */
 
-            if (uow.Situation != ExecutionType.Live)
+            if (uow.Situation != ExecutionType.Normal)
                 throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
@@ -105,7 +102,10 @@ namespace Bhbk.WebApi.Identity.Admin
                 .Select(x => x.Value));
 #endif
 
-            sc.AddLogging(log => log.AddSerilog());
+            sc.AddLogging(log =>
+            {
+                log.AddSerilog();
+            });
             sc.AddCors();
             sc.AddAuthentication(auth =>
             {

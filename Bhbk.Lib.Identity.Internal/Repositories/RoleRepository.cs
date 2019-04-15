@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Core.Repositories;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : IGenericRepository<RoleCreate, tbl_Roles, Guid>
+    public class RoleRepository : IGenericRepositoryAsync<RoleCreate, tbl_Roles, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IMapper _shape;

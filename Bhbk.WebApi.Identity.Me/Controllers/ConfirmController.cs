@@ -26,12 +26,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
             else if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(email, token, user))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
@@ -53,12 +53,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
             else if (!await new ProtectProvider(UoW.Situation.ToString()).ValidateAsync(password, token, user))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
@@ -80,12 +80,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
             else if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
             {
-                ModelState.AddModelError(MsgType.TokenInvalid.ToString(), $"Token:{token}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 

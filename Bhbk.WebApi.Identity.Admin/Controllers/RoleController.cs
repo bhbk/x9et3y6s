@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (role == null)
             {
-                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleID}");
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
                 return NotFound(ModelState);
             }
 
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if ((await UoW.RoleRepo.GetAsync(x => x.ClientId == model.ClientId
                 && x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.RoleAlreadyExists.ToString(), $"Client:{model.ClientId} Role:{model.Name}");
+                ModelState.AddModelError(MessageType.RoleAlreadyExists.ToString(), $"Client:{model.ClientId} Role:{model.Name}");
                 return BadRequest(ModelState);
             }
 
@@ -89,12 +89,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (role == null)
             {
-                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"roleID: { roleID }");
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"roleID: { roleID }");
                 return NotFound(ModelState);
             }
             else if (role.Immutable)
             {
-                ModelState.AddModelError(MsgType.RoleImmutable.ToString(), $"Role:{role.Id}");
+                ModelState.AddModelError(MessageType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (role == null)
             {
-                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleValue}");
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleValue}");
                 return NotFound(ModelState);
             }
 
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -192,7 +192,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -205,7 +205,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (role == null)
             {
-                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleID}");
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
                 return NotFound(ModelState);
             }
 
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (role == null)
             {
-                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{roleID}");
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
                 return NotFound(ModelState);
             }
 
@@ -233,7 +233,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -256,13 +256,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (role == null)
             {
-                ModelState.AddModelError(MsgType.RoleNotFound.ToString(), $"Role:{model.Id}");
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{model.Id}");
                 return NotFound(ModelState);
             }
             else if (role.Immutable
                 && role.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.RoleImmutable.ToString(), $"Role:{role.Id}");
+                ModelState.AddModelError(MessageType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);
             }
 

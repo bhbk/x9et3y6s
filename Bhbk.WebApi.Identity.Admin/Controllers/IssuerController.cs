@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if ((await UoW.IssuerRepo.GetAsync(x => x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.IssuerAlreadyExists.ToString(), $"Issuer:{model.Name}");
+                ModelState.AddModelError(MessageType.IssuerAlreadyExists.ToString(), $"Issuer:{model.Name}");
                 return BadRequest(ModelState);
             }
 
@@ -52,12 +52,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
                 return NotFound(ModelState);
             }
             else if (issuer.Immutable)
             {
-                ModelState.AddModelError(MsgType.IssuerImmutable.ToString(), $"Issuer:{issuerID}");
+                ModelState.AddModelError(MessageType.IssuerImmutable.ToString(), $"Issuer:{issuerID}");
                 return BadRequest(ModelState);
             }
 
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{issuerValue}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{issuerValue}");
                 return NotFound(ModelState);
             }
 
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
             }
         }
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
             }
         }
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
                 return NotFound(ModelState);
             }
 
@@ -186,13 +186,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{model.Id}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{model.Id}");
                 return NotFound(ModelState);
             }
             else if (issuer.Immutable
                 && issuer.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.IssuerImmutable.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerImmutable.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 

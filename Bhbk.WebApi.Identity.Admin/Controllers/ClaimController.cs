@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if ((await UoW.ClaimRepo.GetAsync(x => x.IssuerId == model.IssuerId
                 && x.Type == model.Type)).Any())
             {
-                ModelState.AddModelError(MsgType.ClaimAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Claim:{model.Type}");
+                ModelState.AddModelError(MessageType.ClaimAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Claim:{model.Type}");
                 return BadRequest(ModelState);
             }
 
@@ -52,13 +52,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (claim == null)
             {
-                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"Claim:{claimID}");
+                ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{claimID}");
                 return NotFound(ModelState);
             }
 
             if (claim.Immutable)
             {
-                ModelState.AddModelError(MsgType.ClaimImmutable.ToString(), $"Claim:{claimID}");
+                ModelState.AddModelError(MessageType.ClaimImmutable.ToString(), $"Claim:{claimID}");
                 return BadRequest(ModelState);
             }
 
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (claim == null)
             {
-                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"claimID: { claimValue }");
+                ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"claimID: { claimValue }");
                 return NotFound(ModelState);
             }
 
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -177,13 +177,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (claim == null)
             {
-                ModelState.AddModelError(MsgType.ClaimNotFound.ToString(), $"Claim:{model.Id}");
+                ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{model.Id}");
                 return NotFound(ModelState);
             }
             else if (claim.Immutable
                 && claim.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.ClaimImmutable.ToString(), $"Claim:{claim.Id}");
+                ModelState.AddModelError(MessageType.ClaimImmutable.ToString(), $"Claim:{claim.Id}");
                 return BadRequest(ModelState);
             }
 

@@ -10,15 +10,12 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchUrl": "api/identity/me",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "ancmHostingModel": "OutOfProcess"
+      }
     },
     "Bhbk.WebApi.Identity.Me": {
       "commandName": "Project",
-      "launchUrl": "api/identity/me",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

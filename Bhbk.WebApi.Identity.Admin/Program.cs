@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Options;
+﻿using Bhbk.Lib.Core.Options;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,30 +9,25 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Program
     {
-        private static IConfigurationRoot _conf;
-        private static FileInfo _api;
-
         public static IWebHost CreateWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseConfiguration(_conf)
-                .UseStartup<Startup>()
+                .CaptureStartupErrors(true)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(Directory.GetCurrentDirectory());
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    config.AddEnvironmentVariables();
+                })
+                .UseIISIntegration()
                 .UseKestrel(options =>
                 {
                     options.ConfigureEndpoints();
                 })
-                .UseApplicationInsights()
-                .CaptureStartupErrors(true)
-                .PreferHostingUrls(true)
+                .UseStartup<Startup>()
                 .Build();
 
         public static void Main(string[] args)
         {
-            _api = SearchRoots.ByAssemblyContext("appsettings.json");
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(_api.DirectoryName)
-                .AddJsonFile(_api.Name, optional: false, reloadOnChange: true)
-                .Build();
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()

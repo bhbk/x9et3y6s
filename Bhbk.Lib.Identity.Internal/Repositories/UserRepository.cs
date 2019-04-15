@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Core.Repositories;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Validators;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : IGenericRepository<UserCreate, tbl_Users, Guid>
+    public class UserRepository : IGenericRepositoryAsync<UserCreate, tbl_Users, Guid>
     {
         private readonly ExecutionType _situation;
         private readonly IConfigurationRoot _conf;

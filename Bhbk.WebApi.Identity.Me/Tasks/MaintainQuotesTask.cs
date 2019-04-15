@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         {
             var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
-            if (uow.Situation == ExecutionType.UnitTest)
+            if (uow.Situation == ExecutionType.Test)
                 Qotd = JsonConvert.DeserializeObject<Quotes>
                     (File.ReadAllText(_output));
             else

@@ -1,11 +1,11 @@
-﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Models.Alert;
+﻿using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (model.NewPassword != model.NewPasswordConfirm)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginID}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
                 return NotFound(ModelState);
             }
 
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if ((await UoW.UserRepo.GetAsync(x => x.Email == model.Email)).Any())
             {
-                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), $"User:{model.Email}");
+                ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.Email}");
                 return BadRequest(ModelState);
             }
 
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{model.IssuerId}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{model.IssuerId}");
                 return NotFound(ModelState);
             }
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            if (UoW.Situation == ExecutionType.Live)
+            if (UoW.Situation == ExecutionType.Normal)
             {
                 var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
 
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if ((await UoW.UserRepo.GetAsync(x => x.Email == model.Email)).Any())
             {
-                ModelState.AddModelError(MsgType.UserAlreadyExists.ToString(), $"User:{model.Email}");
+                ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.Email}");
                 return BadRequest(ModelState);
             }
 
@@ -189,13 +189,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
             if (user.Immutable)
             {
-                ModelState.AddModelError(MsgType.UserImmutable.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserImmutable.ToString(), $"User:{userID}");
                 return BadRequest(ModelState);
             }
 
@@ -223,7 +223,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userValue}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userValue}");
                 return NotFound(ModelState);
             }
 
@@ -237,7 +237,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -251,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -270,7 +270,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -289,7 +289,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -330,7 +330,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -369,7 +369,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
                 return BadRequest(ModelState);
             }
@@ -383,7 +383,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -391,7 +391,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginID}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
                 return NotFound(ModelState);
             }
             else if (!await UoW.UserRepo.RemoveFromLoginAsync(user, login))
@@ -413,7 +413,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -421,7 +421,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (!await UoW.UserRepo.IsPasswordSetAsync(user.Id))
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -444,7 +444,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{userID}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
@@ -452,7 +452,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (model.NewPassword != model.NewPasswordConfirm)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -478,13 +478,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{model.Id}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.Id}");
                 return NotFound(ModelState);
             }
             else if (user.Immutable
                 && user.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.UserImmutable.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserImmutable.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 

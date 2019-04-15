@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.Interfaces;
+﻿using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

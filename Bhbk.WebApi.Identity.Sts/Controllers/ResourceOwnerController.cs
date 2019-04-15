@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Sts;
+﻿using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!UoW.ConfigRepo.DefaultsLegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:None");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:None");
                 return BadRequest(ModelState);
             }
 
@@ -50,16 +50,16 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 //really gross but needed for backward compatibility. can be lame if more than one issuer.
-                if (UoW.Situation == ExecutionType.Live)
+                if (UoW.Situation == ExecutionType.Normal)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First())).SingleOrDefault();
 
-                else if (UoW.Situation == ExecutionType.UnitTest)
+                else if (UoW.Situation == ExecutionType.Test)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).SingleOrDefault();
 
                 else
                 {
-                    ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{input.issuer_id}");
+                    ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{input.issuer_id}");
                     return BadRequest(ModelState);
                 }
             }
@@ -74,12 +74,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer_id}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer_id}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -94,12 +94,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (client == null)
             {
-                ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{input.client_id}");
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client_id}");
                 return NotFound(ModelState);
             }
             else if (!client.Enabled)
             {
-                ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.username}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{input.username}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -136,12 +136,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check that login provider exists...
             if (loginList == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
                 return NotFound(ModelState);
             }
 
             //check if login provider is local...
-            else if ((UoW.Situation == ExecutionType.Live)
+            else if ((UoW.Situation == ExecutionType.Normal)
                 && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     //adjust counter(s) for login failure...
                     await UoW.UserRepo.AccessFailedAsync(user.Id);
 
-                    ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                     return BadRequest(ModelState);
                 }
             }
@@ -158,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                 || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                    && UoW.Situation == ExecutionType.UnitTest))
+                    && UoW.Situation == ExecutionType.Test))
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -166,13 +166,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     //adjust counter(s) for login failure...
                     await UoW.UserRepo.AccessFailedAsync(user.Id);
 
-                    ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                     return BadRequest(ModelState);
                 }
             }
             else
             {
-                ModelState.AddModelError(MsgType.LoginInvalid.ToString(), $"Login for user:{user.Id}");
+                ModelState.AddModelError(MessageType.LoginInvalid.ToString(), $"Login for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -219,10 +219,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (!input.grant_type.Equals(Strings.AttrResourceOwnerIDV2))
+            
+            if (!string.Equals(input.grant_type, Strings.AttrResourceOwnerIDV2, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError(MsgType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
             }
 
@@ -237,12 +237,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (issuer == null)
             {
-                ModelState.AddModelError(MsgType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
             else if (!issuer.Enabled)
             {
-                ModelState.AddModelError(MsgType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -257,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"User:{input.user}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{input.user}");
                 return NotFound(ModelState);
             }
             //check that user is confirmed...
@@ -266,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
-                ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -295,13 +295,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                     if (client == null)
                     {
-                        ModelState.AddModelError(MsgType.ClientNotFound.ToString(), $"Client:{entry}");
+                        ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{entry}");
                         return NotFound(ModelState);
                     }
                     else if (!client.Enabled
                         || !clientList.Contains(client))
                     {
-                        ModelState.AddModelError(MsgType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                        ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                         return BadRequest(ModelState);
                     }
 
@@ -315,12 +315,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check that login provider exists...
             if (loginList == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
                 return NotFound(ModelState);
             }
 
             //check if login provider is local...
-            else if ((UoW.Situation == ExecutionType.Live)
+            else if ((UoW.Situation == ExecutionType.Normal)
                 && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
@@ -329,7 +329,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     //adjust counter(s) for login failure...
                     await UoW.UserRepo.AccessFailedAsync(user.Id);
 
-                    ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                     return BadRequest(ModelState);
                 }
             }
@@ -337,7 +337,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                 || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                    && UoW.Situation == ExecutionType.UnitTest))
+                    && UoW.Situation == ExecutionType.Test))
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -345,13 +345,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     //adjust counter(s) for login failure...
                     await UoW.UserRepo.AccessFailedAsync(user.Id);
 
-                    ModelState.AddModelError(MsgType.UserInvalid.ToString(), $"User:{user.Id}");
+                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                     return BadRequest(ModelState);
                 }
             }
             else
             {
-                ModelState.AddModelError(MsgType.LoginInvalid.ToString(), $"Login for user:{user.Id}");
+                ModelState.AddModelError(MessageType.LoginInvalid.ToString(), $"Login for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 

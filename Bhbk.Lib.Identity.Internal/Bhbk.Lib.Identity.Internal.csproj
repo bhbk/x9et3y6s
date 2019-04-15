@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.1.0" />
-    <PackageReference Include="Bhbk.Lib.Core" Version="2019.4.5.732" />
+    <PackageReference Include="Bhbk.Lib.Core" Version="2019.4.7.2230" />
     <PackageReference Include="CryptoHelper" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="2.2.0" />

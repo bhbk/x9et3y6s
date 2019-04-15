@@ -1,7 +1,6 @@
-﻿using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Linq;
@@ -24,7 +23,7 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!(await UoW.UserRepo.GetAsync(x => x.Id == model.FromId
                 && x.Email == model.FromEmail)).Any())
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
                 return NotFound(ModelState);
             }
 
@@ -32,7 +31,7 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             if (!queue.TryEnqueueEmail(model))
             {
-                ModelState.AddModelError(MsgType.EmailEnueueError.ToString(), $"MessageID:{model.Id} SenderEmail:{model.FromEmail}");
+                ModelState.AddModelError(MessageType.EmailEnueueError.ToString(), $"MessageID:{model.Id} SenderEmail:{model.FromEmail}");
                 return BadRequest(ModelState);
             }
 

@@ -1,8 +1,8 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
@@ -90,7 +90,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
@@ -131,7 +131,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
@@ -188,7 +188,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerRefreshFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerRefreshFakeUtcNow;
@@ -251,7 +251,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
@@ -299,7 +299,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;
@@ -346,7 +346,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Situation == ExecutionType.UnitTest
+            if (uow.Situation == ExecutionType.Test
                 && uow.ConfigRepo.UnitTestsResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.UnitTestsResourceOwnerTokenFakeUtcNow;

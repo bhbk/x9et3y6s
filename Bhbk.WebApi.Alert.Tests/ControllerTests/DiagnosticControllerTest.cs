@@ -4,13 +4,10 @@ using Bhbk.WebApi.Alert.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace Bhbk.WebApi.Alert.Tests.Controllers
+namespace Bhbk.WebApi.Alert.Tests.ControllerTests
 {
     [Collection("AlertTests")]
     public class DiagnosticControllerTest
@@ -54,17 +51,6 @@ namespace Bhbk.WebApi.Alert.Tests.Controllers
                 result = controller.GetStatusV1(TaskType.QueueTexts.ToString()) as OkObjectResult;
                 ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 data = ok.Value.Should().BeAssignableTo<string>().Subject;
-            }
-        }
-
-        [Fact]
-        public async Task Admin_DiagV1_CheckSwagger_Success()
-        {
-            using (var client = _factory.CreateClient())
-            {
-                var result = await client.GetAsync($"help/index.html");
-                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                result.StatusCode.Should().Be(HttpStatusCode.OK);
             }
         }
 

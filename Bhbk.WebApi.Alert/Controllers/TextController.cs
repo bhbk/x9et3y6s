@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!(await UoW.UserRepo.GetAsync(x => x.Id == model.FromId
                 && x.PhoneNumber == model.FromPhoneNumber)).Any())
             {
-                ModelState.AddModelError(MsgType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderPhone:{model.FromPhoneNumber}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderPhone:{model.FromPhoneNumber}");
                 return NotFound(ModelState);
             }
 
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             if (!queue.TryEnqueueText(model))
             {
-                ModelState.AddModelError(MsgType.TextEnqueueError.ToString(), $"MessageID:{model.Id} SenderPhone:{model.FromPhoneNumber}");
+                ModelState.AddModelError(MessageType.TextEnqueueError.ToString(), $"MessageID:{model.Id} SenderPhone:{model.FromPhoneNumber}");
                 return BadRequest(ModelState);
             }
 

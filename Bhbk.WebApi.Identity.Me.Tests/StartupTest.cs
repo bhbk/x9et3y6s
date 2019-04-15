@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Datasets;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -53,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
-            builder.ConfigureServices((Action<IServiceCollection>)((sc) =>
+            builder.ConfigureServices((sc) =>
             {
                 var options = new DbContextOptionsBuilder<IdentityDbContext>()
                     .EnableSensitiveDataLogging();
@@ -62,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMapper>();
+                    x.AddProfile<AutoMapperProfile>();
                 }).CreateMapper();
 
                 sc.AddSingleton(mapper);
@@ -73,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton((IIdentityUnitOfWork<IdentityDbContext>)new IdentityUnitOfWork(options, ExecutionType.UnitTest, conf, mapper));
+                sc.AddSingleton((IIdentityUnitOfWork<IdentityDbContext>)new IdentityUnitOfWork(options, ExecutionType.Test, conf, mapper));
                 sc.AddSingleton((IHostedService)new MaintainQuotesTask(sc, conf));
 
                 var sp = sc.BuildServiceProvider();
@@ -94,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * only test context allowed to run...
                  */
 
-                if (UoW.Situation != ExecutionType.UnitTest)
+                if (UoW.Situation != ExecutionType.Test)
                     throw new NotSupportedException();
 
                 var issuers = (UoW.IssuerRepo.GetAsync().Result)
@@ -163,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                     headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 });
                 sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
-            }));
+            });
 
             builder.Configure(app =>
             {

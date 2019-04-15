@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Models.Alert;
+﻿using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Interfaces;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Providers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             continue;
                         }
 
-                        if (uow.Situation == ExecutionType.Live)
+                        if (uow.Situation == ExecutionType.Normal)
                         {
                             await _provider.TryTextHandoff(_providerSid, _providerToken, model);
 

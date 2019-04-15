@@ -1,8 +1,7 @@
-﻿using Bhbk.Lib.Core.DomainModels;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if ((await UoW.LoginRepo.GetAsync(x => x.Name == model.Name)).Any())
             {
-                ModelState.AddModelError(MsgType.LoginAlreadyExists.ToString(), $"Login:{model.Name}");
+                ModelState.AddModelError(MessageType.LoginAlreadyExists.ToString(), $"Login:{model.Name}");
                 return BadRequest(ModelState);
             }
 
@@ -53,12 +52,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login: { loginID }");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login: { loginID }");
                 return NotFound(ModelState);
             }
             else if (login.Immutable)
             {
-                ModelState.AddModelError(MsgType.LoginImmutable.ToString(), $"Login:{login.Id}");
+                ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Login:{login.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -86,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginValue}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginValue}");
                 return NotFound(ModelState);
             }
 
@@ -119,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
             }
 
@@ -155,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
             catch (ParseException ex)
             {
-                ModelState.AddModelError(MsgType.ParseError.ToString(), ex.ToString());
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
             }
         }
@@ -167,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{loginID}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
                 return NotFound(ModelState);
             }
 
@@ -189,13 +188,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (login == null)
             {
-                ModelState.AddModelError(MsgType.LoginNotFound.ToString(), $"Login:{model.Id}");
+                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{model.Id}");
                 return NotFound(ModelState);
             }
             else if (login.Immutable
                 && login.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MsgType.LoginImmutable.ToString(), $"Client:{login.Id}");
+                ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Client:{login.Id}");
                 return BadRequest(ModelState);
             }
 

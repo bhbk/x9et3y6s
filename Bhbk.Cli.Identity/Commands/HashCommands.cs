@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using Bhbk.Cli.Identity.Helpers;
+using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using ManyConsole;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -40,15 +41,15 @@ namespace Bhbk.Cli.Identity.Commands
 
                 var mapper = new MapperConfiguration(x =>
                 {
-                    x.AddProfile<IdentityMapper>();
+                    x.AddProfile<AutoMapperProfile>();
                 }).CreateMapper();
 
-                var uow = new IdentityUnitOfWork(builder, ExecutionType.Live, conf, mapper);
+                var uow = new IdentityUnitOfWork(builder, ExecutionType.Normal, conf, mapper);
 
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
-                    var cleartext = ConsoleHelper.GetHiddenInput();
+                    var cleartext = StandardInput.GetHiddenInput();
                     var hashvalue = uow.UserRepo.passwordHasher.HashPassword(null, cleartext);
 
                     if (uow.UserRepo.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
@@ -60,11 +61,11 @@ namespace Bhbk.Cli.Identity.Commands
                     }
                 }
 
-                return MessageHelper.FondFarewell();
+                return StandardOutput.FondFarewell();
             }
             catch (Exception ex)
             {
-                return MessageHelper.AngryFarewell(ex);
+                return StandardOutput.AngryFarewell(ex);
             }
         }
     }
