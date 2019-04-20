@@ -30,20 +30,20 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class UserRepository : IGenericRepositoryAsync<UserCreate, tbl_Users, Guid>
     {
-        private readonly InstanceContext _situation;
+        private readonly InstanceContext _instance;
         private readonly IConfigurationRoot _conf;
-        private readonly IMapper _shape;
+        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
         private readonly PasswordValidator _passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(IdentityDbContext context, InstanceContext situation, IConfigurationRoot conf, IMapper shape)
+        public UserRepository(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf, IMapper mapper)
         {
             _context = context;
-            _situation = situation;
+            _instance = instance;
             _conf = conf;
-            _shape = shape;
+            _mapper = mapper;
             _passwordValidator = new PasswordValidator();
 
             passwordHasher = new PasswordHasher();
@@ -171,7 +171,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Users> CreateAsync(UserCreate model)
         {
-            var entity = _shape.Map<tbl_Users>(model);
+            var entity = _mapper.Map<tbl_Users>(model);
             var create = await CreateAsync(entity);
 
             _context.SaveChanges();
@@ -181,7 +181,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Users> CreateAsync(UserCreate model, string password)
         {
-            var entity = _shape.Map<tbl_Users>(model);
+            var entity = _mapper.Map<tbl_Users>(model);
             var create = await CreateAsync(entity);
 
             _context.SaveChanges();
@@ -377,7 +377,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                     entity.LockoutEnabled = false;
                     entity.LockoutEnd = null;
 
-                    await UpdateAsync(_shape.Map<tbl_Users>(entity));
+                    await UpdateAsync(_mapper.Map<tbl_Users>(entity));
 
                     return false;
                 }
@@ -387,7 +387,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             else
             {
                 entity.LockoutEnd = null;
-                await UpdateAsync(_shape.Map<tbl_Users>(entity));
+                await UpdateAsync(_mapper.Map<tbl_Users>(entity));
 
                 return false;
             }

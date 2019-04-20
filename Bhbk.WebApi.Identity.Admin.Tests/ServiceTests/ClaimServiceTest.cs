@@ -321,7 +321,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             var testClaim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
             testClaim.Value += "(Updated)";
 
-            var result = await _endpoints.Claim_UpdateV1(rop.token, _factory.UoW.Shape.Map<ClaimModel>(testClaim));
+            var result = await _endpoints.Claim_UpdateV1(rop.token, _factory.UoW.Mapper.Map<ClaimModel>(testClaim));
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);

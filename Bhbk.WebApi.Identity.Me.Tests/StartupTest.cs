@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.FileSystem;
+﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Datasets;
@@ -59,12 +58,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-                var mapper = new MapperConfiguration(x =>
-                {
-                    x.AddProfile<AutoMapperProfile>();
-                }).CreateMapper();
-
-                sc.AddSingleton(mapper);
                 sc.AddSingleton(conf);
 
                 /*
@@ -72,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.Testing, conf, mapper));
+                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.Testing, conf));
                 sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
                 sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
                 sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();

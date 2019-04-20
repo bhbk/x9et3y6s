@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Shape.Map<UserModel>(user));
+            return Ok(UoW.Mapper.Map<UserModel>(user));
         }
 
         [Route("v1/quotes"), HttpGet]
@@ -125,14 +125,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Shape.Map<tbl_Users>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Shape.Map<UserModel>(result));
+            return Ok(UoW.Mapper.Map<UserModel>(result));
         }
     }
 }

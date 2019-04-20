@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
     public interface IIdentityUnitOfWork<TContext> : IGenericUnitOfWorkAsync
         where TContext : IdentityDbContext
     {
-        IMapper Shape { get; }
+        IMapper Mapper { get; }
         ActivityRepository ActivityRepo { get; }
         ClaimRepository ClaimRepo { get; }
         ClientRepository ClientRepo { get; }

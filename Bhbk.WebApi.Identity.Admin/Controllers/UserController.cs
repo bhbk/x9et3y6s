@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     return BadRequest(await email.Content.ReadAsStringAsync());
             }
 
-            return Ok(UoW.Shape.Map<UserModel>(result));
+            return Ok(UoW.Mapper.Map<UserModel>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Shape.Map<UserModel>(result));
+            return Ok(UoW.Mapper.Map<UserModel>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -227,7 +227,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Shape.Map<UserModel>(user));
+            return Ok(UoW.Mapper.Map<UserModel>(user));
         }
 
         [Route("v1/{userID:guid}/claims"), HttpGet]
@@ -258,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var clients = await UoW.UserRepo.GetClientsAsync(user.Id);
 
             var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x)))
-                .Select(x => UoW.Shape.Map<ClientModel>(x));
+                .Select(x => UoW.Mapper.Map<ClientModel>(x));
 
             return Ok(result);
         }
@@ -277,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.UserRepo.GetLoginsAsync(user.Id);
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x)))
-                .Select(x => UoW.Shape.Map<LoginModel>(x));
+                .Select(x => UoW.Mapper.Map<LoginModel>(x));
 
             return Ok(result);
         }
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await UoW.UserRepo.GetRolesAsync(user.Id);
 
             var result = (await UoW.RoleRepo.GetAsync(x => roles.Contains(x)))
-                .Select(x => UoW.Shape.Map<RoleModel>(x));
+                .Select(x => UoW.Mapper.Map<RoleModel>(x));
 
             return Ok(result);
         }
@@ -326,7 +326,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<UserModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -365,7 +365,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<UserModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -490,11 +490,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Shape.Map<tbl_Users>(model));
+            var result = await UoW.UserRepo.UpdateAsync(UoW.Mapper.Map<tbl_Users>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Shape.Map<UserModel>(result));
+            return Ok(UoW.Mapper.Map<UserModel>(result));
         }
     }
 }

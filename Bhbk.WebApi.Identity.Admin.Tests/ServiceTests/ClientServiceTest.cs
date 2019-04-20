@@ -312,7 +312,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             client1.Name += "(Updated)";
 
-            var result = await _endpoints.Client_UpdateV1(rop.token, _factory.UoW.Shape.Map<ClientModel>(client1));
+            var result = await _endpoints.Client_UpdateV1(rop.token, _factory.UoW.Mapper.Map<ClientModel>(client1));
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.OK);

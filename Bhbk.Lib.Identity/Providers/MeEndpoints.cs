@@ -9,25 +9,25 @@ namespace Bhbk.Lib.Identity.Providers
 {
     public class MeClient : AdminEndpoints
     {
-        public MeClient(IConfigurationRoot conf, InstanceContext situation, HttpClient client)
-            : base(conf, situation, client) { }
+        public MeClient(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+            : base(conf, instance, client) { }
     }
 
     public class MeEndpoints
     {
         protected readonly IConfigurationRoot _conf;
-        protected readonly InstanceContext _situation;
+        protected readonly InstanceContext _instance;
         protected readonly HttpClient _client;
 
-        public MeEndpoints(IConfigurationRoot conf, InstanceContext situation, HttpClient client)
+        public MeEndpoints(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
         {
             if (conf == null)
                 throw new ArgumentNullException();
 
-            _situation = situation;
+            _instance = instance;
             _conf = conf;
 
-            if (situation == InstanceContext.DeployedOrLocal)
+            if (instance == InstanceContext.DeployedOrLocal)
             {
                 var connect = new HttpClientHandler();
 
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Providers
                 _client = new HttpClient(connect);
             }
 
-            if (situation == InstanceContext.Testing)
+            if (instance == InstanceContext.Testing)
                 _client = client;
         }
 
@@ -49,11 +49,11 @@ namespace Bhbk.Lib.Identity.Providers
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_situation == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(
                     string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_situation == InstanceContext.Testing)
+            if (_instance == InstanceContext.Testing)
                 return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();

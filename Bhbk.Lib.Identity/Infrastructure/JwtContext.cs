@@ -14,18 +14,18 @@ namespace Bhbk.Lib.Identity.Infrastructure
     public class JwtContext : IJwtContext
     {
         private readonly IConfigurationRoot _conf;
-        private readonly InstanceContext _situation;
+        private readonly InstanceContext _instance;
         private readonly StsClient _sts;
         private static JwtSecurityToken _access, _refresh;
 
-        public JwtContext(IConfigurationRoot conf, InstanceContext situation, HttpClient http)
+        public JwtContext(IConfigurationRoot conf, InstanceContext instance, HttpClient http)
         {
             if (conf == null)
                 throw new ArgumentNullException();
 
             _conf = conf;
-            _situation = situation;
-            _sts = new StsClient(conf, situation, http);
+            _instance = instance;
+            _sts = new StsClient(conf, instance, http);
         }
 
         public JwtSecurityToken AccessToken

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Repositories;
 using Bhbk.Lib.Identity.Models.Me;
@@ -12,8 +13,8 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
 {
     public class IdentityUnitOfWork : IIdentityUnitOfWork<IdentityDbContext>
     {
-        private readonly InstanceContext _situation;
-        private readonly IMapper _shape;
+        private readonly InstanceContext _instance;
+        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
         private readonly ActivityRepository _activityRepo;
         private readonly ClaimRepository _claimRepo;
@@ -27,19 +28,19 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
         private readonly UserRepository _userRepo;
         private Quotes _userQuote;
 
-        public IdentityUnitOfWork(DbContextOptions<IdentityDbContext> options, InstanceContext situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new IdentityDbContext(options), situation, conf, mapper)
+        public IdentityUnitOfWork(DbContextOptions<IdentityDbContext> options, InstanceContext instance, IConfigurationRoot conf)
+            : this(new IdentityDbContext(options), instance, conf)
         {
 
         }
 
-        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, InstanceContext situation, IConfigurationRoot conf, IMapper mapper)
-            : this(new IdentityDbContext(optionsBuilder.Options), situation, conf, mapper)
+        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, InstanceContext instance, IConfigurationRoot conf)
+            : this(new IdentityDbContext(optionsBuilder.Options), instance, conf)
         {
 
         }
 
-        private IdentityUnitOfWork(IdentityDbContext context, InstanceContext situation, IConfigurationRoot conf, IMapper shape)
+        private IdentityUnitOfWork(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf)
         {
             _disposed = false;
 
@@ -47,34 +48,37 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
                 throw new ArgumentNullException();
 
             _context = context;
-            _situation = situation;
-            _shape = shape;
+            _instance = instance;
+            _mapper = new MapperConfiguration(x =>
+            {
+                x.AddProfile<AutoMapperProfile>();
+            }).CreateMapper();
 
-            _activityRepo = new ActivityRepository(context, situation, shape);
-            _claimRepo = new ClaimRepository(context, situation, shape);
-            _clientRepo = new ClientRepository(context, situation, conf, shape);
-            _configRepo = new ConfigRepository(conf, situation);
-            _issuerRepo = new IssuerRepository(context, situation, shape, conf["IdentityTenants:Salt"]);
-            _loginRepo = new LoginRepository(context, situation, shape);
-            _roleRepo = new RoleRepository(context, situation, shape);
-            _refreshRepo = new RefreshRepository(context, situation, shape);
-            _stateRepo = new StateRepository(context, situation, shape);
-            _userRepo = new UserRepository(context, situation, conf, shape);
+            _activityRepo = new ActivityRepository(context, instance, _mapper);
+            _claimRepo = new ClaimRepository(context, instance, _mapper);
+            _clientRepo = new ClientRepository(context, instance, conf, _mapper);
+            _configRepo = new ConfigRepository(conf, instance);
+            _issuerRepo = new IssuerRepository(context, instance, _mapper, conf["IdentityTenants:Salt"]);
+            _loginRepo = new LoginRepository(context, instance, _mapper);
+            _roleRepo = new RoleRepository(context, instance, _mapper);
+            _refreshRepo = new RefreshRepository(context, instance, _mapper);
+            _stateRepo = new StateRepository(context, instance, _mapper);
+            _userRepo = new UserRepository(context, instance, conf, _mapper);
         }
 
         public InstanceContext Instance
         {
             get
             {
-                return _situation;
+                return _instance;
             }
         }
 
-        public IMapper Shape
+        public IMapper Mapper
         {
             get
             {
-                return _shape;
+                return _mapper;
             }
         }
 

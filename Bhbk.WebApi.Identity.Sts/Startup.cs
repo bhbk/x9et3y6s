@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.FileSystem;
+﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
@@ -53,17 +52,11 @@ namespace Bhbk.WebApi.Identity.Sts
             var options = new DbContextOptionsBuilder<IdentityDbContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
-            var mapper = new MapperConfiguration(x =>
-            {
-                x.AddProfile<AutoMapperProfile>();
-            }).CreateMapper();
-
-            sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
             sc.AddSingleton<IJwtContext>(new JwtContext(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
             sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
             {
-                return new IdentityUnitOfWork(options, InstanceContext.DeployedOrLocal, conf, mapper);
+                return new IdentityUnitOfWork(options, InstanceContext.DeployedOrLocal, conf);
             });
             sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));

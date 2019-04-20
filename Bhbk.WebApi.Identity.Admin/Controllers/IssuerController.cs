@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Shape.Map<IssuerModel>(result));
+            return Ok(UoW.Mapper.Map<IssuerModel>(result));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Shape.Map<IssuerModel>(issuer));
+            return Ok(UoW.Mapper.Map<IssuerModel>(issuer));
         }
 
         [Route("v1/page"), HttpGet]
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<IssuerModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -150,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Shape.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<IssuerModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -198,11 +198,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Shape.Map<tbl_Issuers>(model));
+            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Mapper.Map<tbl_Issuers>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Shape.Map<IssuerModel>(result));
+            return Ok(UoW.Mapper.Map<IssuerModel>(result));
         }
     }
 }

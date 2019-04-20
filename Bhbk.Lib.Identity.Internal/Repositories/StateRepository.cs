@@ -16,23 +16,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class StateRepository : IGenericRepositoryAsync<StateCreate, tbl_States, Guid>
     {
-        private readonly InstanceContext _situation;
-        private readonly IMapper _shape;
+        private readonly InstanceContext _instance;
+        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public StateRepository(IdentityDbContext context, InstanceContext situation, IMapper shape)
+        public StateRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
-            _situation = situation;
-            _shape = shape;
+            _instance = instance;
+            _mapper = mapper;
         }
 
         public async Task<tbl_States> CreateAsync(StateCreate model)
         {
-            var entity = _shape.Map<tbl_States>(model);
+            var entity = _mapper.Map<tbl_States>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);

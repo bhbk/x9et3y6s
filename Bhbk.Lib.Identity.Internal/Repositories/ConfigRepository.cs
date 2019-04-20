@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ConfigRepository
     {
-        private readonly InstanceContext _situation;
+        private readonly InstanceContext _instance;
         private readonly IConfigurationRoot _conf;
         private bool _legacyModeClaims;
         private bool _legacyModeIssuer;
@@ -15,10 +15,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private DateTime _resourceOwnerRefreshFakeUtcNow;
         private DateTime _resourceOwnerTokenFakeUtcNow;
 
-        public ConfigRepository(IConfigurationRoot conf, InstanceContext situation)
+        public ConfigRepository(IConfigurationRoot conf, InstanceContext instance)
         {
             _conf = conf;
-            _situation = situation;
+            _instance = instance;
 
             _legacyModeClaims = bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]);
             _legacyModeIssuer = bool.Parse(_conf["IdentityDefaults:LegacyModeIssuer"]);
@@ -42,10 +42,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.DeployedOrLocal)
+                if (_instance == InstanceContext.DeployedOrLocal)
                     return uint.Parse(_conf["IdentityDefaults:DeviceCodePollMax"]); ;
 
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     return 60;
 
                 throw new NotSupportedException();
@@ -58,10 +58,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.DeployedOrLocal)
+                if (_instance == InstanceContext.DeployedOrLocal)
                     return uint.Parse(_conf["IdentityDefaults:DeviceCodeTokenExpire"]); ;
 
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     return 60;
 
                 throw new NotSupportedException();
@@ -74,10 +74,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.DeployedOrLocal)
+                if (_instance == InstanceContext.DeployedOrLocal)
                     return uint.Parse(_conf["IdentityDefaults:ImplicitTokenExpire"]);
 
-                else if (_situation == InstanceContext.Testing)
+                else if (_instance == InstanceContext.Testing)
                     return 60;
 
                 throw new NotSupportedException();
@@ -104,14 +104,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     return _resourceOwnerRefreshFake;
 
                 throw new NotSupportedException();
             }
             set
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     _resourceOwnerRefreshFake = value;
             }
         }
@@ -120,14 +120,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     return _resourceOwnerTokenFake;
 
                 throw new NotSupportedException();
             }
             set
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     _resourceOwnerTokenFake = value;
             }
         }
@@ -136,14 +136,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     return _resourceOwnerRefreshFakeUtcNow;
 
                 throw new NotSupportedException();
             }
             set
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     _resourceOwnerRefreshFakeUtcNow = value;
             }
         }
@@ -152,14 +152,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             get
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     return _resourceOwnerTokenFakeUtcNow;
 
                 throw new NotSupportedException();
             }
             set
             {
-                if (_situation == InstanceContext.Testing)
+                if (_instance == InstanceContext.Testing)
                     _resourceOwnerTokenFakeUtcNow = value;
             }
         }

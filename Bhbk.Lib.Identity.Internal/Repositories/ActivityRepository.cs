@@ -15,17 +15,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ActivityRepository : IGenericRepositoryAsync<ActivityCreate, tbl_Activities, Guid>
     {
-        private readonly InstanceContext _situation;
+        private readonly InstanceContext _instance;
         private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public ActivityRepository(IdentityDbContext context, InstanceContext situation, IMapper mapper)
+        public ActivityRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
-            _situation = situation;
+            _instance = instance;
             _mapper = mapper;
         }
 

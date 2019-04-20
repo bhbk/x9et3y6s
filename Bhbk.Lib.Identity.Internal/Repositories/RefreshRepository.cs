@@ -14,23 +14,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class RefreshRepository : IGenericRepositoryAsync<RefreshCreate, tbl_Refreshes, Guid>
     {
-        private readonly InstanceContext _situation;
-        private readonly IMapper _shape;
+        private readonly InstanceContext _instance;
+        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public RefreshRepository(IdentityDbContext context, InstanceContext situation, IMapper shape)
+        public RefreshRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();
 
             _context = context;
-            _situation = situation;
-            _shape = shape;
+            _instance = instance;
+            _mapper = mapper;
         }
 
         public async Task<tbl_Refreshes> CreateAsync(RefreshCreate model)
         {
-            var entity = _shape.Map<tbl_Refreshes>(model);
+            var entity = _mapper.Map<tbl_Refreshes>(model);
             var create = _context.Add(entity).Entity;
 
             return await Task.FromResult(create);
