@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Core.Repositories;
-using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +15,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ActivityRepository : IGenericRepositoryAsync<ActivityCreate, tbl_Activities, Guid>
     {
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public ActivityRepository(IdentityDbContext context, ExecutionContext situation, IMapper mapper)
+        public ActivityRepository(IdentityDbContext context, InstanceContext situation, IMapper mapper)
         {
             if (context == null)
                 throw new NullReferenceException();

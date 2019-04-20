@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -55,9 +55,9 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _admin = new AdminClient(conf, ExecutionContext.DeployedOrLocal, new HttpClient());
-                _sts = new StsClient(conf, ExecutionContext.DeployedOrLocal, new HttpClient());
-                _jwt = new JwtContext(conf, ExecutionContext.DeployedOrLocal, new HttpClient());
+                _admin = new AdminClient(conf, InstanceContext.DeployedOrLocal, new HttpClient());
+                _sts = new StsClient(conf, InstanceContext.DeployedOrLocal, new HttpClient());
+                _jwt = new JwtContext(conf, InstanceContext.DeployedOrLocal, new HttpClient());
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");

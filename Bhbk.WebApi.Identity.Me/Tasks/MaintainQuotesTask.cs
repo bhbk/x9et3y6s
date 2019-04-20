@@ -12,7 +12,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 
 namespace Bhbk.WebApi.Identity.Me.Tasks
 {
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         {
             var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
-            if (uow.Situation == BaseLib.ExecutionContext.Testing)
+            if (uow.Instance == InstanceContext.Testing)
                 Qotd = JsonConvert.DeserializeObject<Quotes>
                     (File.ReadAllText(_output));
             else

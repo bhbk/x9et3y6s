@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Providers;
@@ -13,7 +14,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Core.UnitOfWork;
 
 namespace Bhbk.WebApi.Alert.Tasks
 {
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             continue;
                         }
 
-                        if (uow.Situation == BaseLib.ExecutionContext.DeployedOrLocal)
+                        if (uow.Instance == InstanceContext.DeployedOrLocal)
                         {
                             var result = await _provider.TryEmailHandoff(_providerApiKey, model);
 

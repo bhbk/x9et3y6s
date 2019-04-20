@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BaseLib = Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 
 namespace Bhbk.WebApi.Alert.Tasks
 {
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             continue;
                         }
 
-                        if (uow.Situation == BaseLib.ExecutionContext.DeployedOrLocal)
+                        if (uow.Instance == InstanceContext.DeployedOrLocal)
                         {
                             await _provider.TryTextHandoff(_providerSid, _providerToken, model);
 

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
@@ -44,7 +44,7 @@ namespace Bhbk.Cli.Identity.Commands
                     x.AddProfile<AutoMapperProfile>();
                 }).CreateMapper();
 
-                var uow = new IdentityUnitOfWork(builder, ExecutionContext.DeployedOrLocal, conf, mapper);
+                var uow = new IdentityUnitOfWork(builder, InstanceContext.DeployedOrLocal, conf, mapper);
 
                 if (Generate)
                 {

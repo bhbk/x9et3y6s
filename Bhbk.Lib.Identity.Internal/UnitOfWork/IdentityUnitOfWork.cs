@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Repositories;
 using Bhbk.Lib.Identity.Models.Me;
@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
 {
     public class IdentityUnitOfWork : IIdentityUnitOfWork<IdentityDbContext>
     {
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
         private readonly ActivityRepository _activityRepo;
@@ -27,19 +27,19 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
         private readonly UserRepository _userRepo;
         private Quotes _userQuote;
 
-        public IdentityUnitOfWork(DbContextOptions<IdentityDbContext> options, ExecutionContext situation, IConfigurationRoot conf, IMapper mapper)
+        public IdentityUnitOfWork(DbContextOptions<IdentityDbContext> options, InstanceContext situation, IConfigurationRoot conf, IMapper mapper)
             : this(new IdentityDbContext(options), situation, conf, mapper)
         {
 
         }
 
-        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, ExecutionContext situation, IConfigurationRoot conf, IMapper mapper)
+        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, InstanceContext situation, IConfigurationRoot conf, IMapper mapper)
             : this(new IdentityDbContext(optionsBuilder.Options), situation, conf, mapper)
         {
 
         }
 
-        private IdentityUnitOfWork(IdentityDbContext context, ExecutionContext situation, IConfigurationRoot conf, IMapper shape)
+        private IdentityUnitOfWork(IdentityDbContext context, InstanceContext situation, IConfigurationRoot conf, IMapper shape)
         {
             _disposed = false;
 
@@ -62,7 +62,7 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
             _userRepo = new UserRepository(context, situation, conf, shape);
         }
 
-        public ExecutionContext Situation
+        public InstanceContext Instance
         {
             get
             {

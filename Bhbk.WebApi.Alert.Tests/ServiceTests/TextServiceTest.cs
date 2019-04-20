@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new AlertClient(_factory.Conf, _factory.UoW.Situation, _client);
+            _endpoints = new AlertClient(_factory.Conf, _factory.UoW.Instance, _client);
         }
 
         [Fact]

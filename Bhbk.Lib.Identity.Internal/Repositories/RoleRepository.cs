@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Core.Repositories;
-using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +23,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class RoleRepository : IGenericRepositoryAsync<RoleCreate, tbl_Roles, Guid>
     {
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public RoleRepository(IdentityDbContext context, ExecutionContext situation, IMapper shape)
+        public RoleRepository(IdentityDbContext context, InstanceContext situation, IMapper shape)
         {
             _context = context;
             _situation = situation;

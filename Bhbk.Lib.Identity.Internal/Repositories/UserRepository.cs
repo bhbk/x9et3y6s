@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Core.Repositories;
-using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Validators;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class UserRepository : IGenericRepositoryAsync<UserCreate, tbl_Users, Guid>
     {
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(IdentityDbContext context, ExecutionContext situation, IConfigurationRoot conf, IMapper shape)
+        public UserRepository(IdentityDbContext context, InstanceContext situation, IConfigurationRoot conf, IMapper shape)
         {
             _context = context;
             _situation = situation;

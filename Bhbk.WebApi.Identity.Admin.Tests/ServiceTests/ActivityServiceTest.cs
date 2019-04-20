@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new AdminClient(_factory.Conf, _factory.UoW.Situation, _client);
+            _endpoints = new AdminClient(_factory.Conf, _factory.UoW.Instance, _client);
         }
 
         [Fact]

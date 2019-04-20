@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
@@ -60,10 +60,10 @@ namespace Bhbk.WebApi.Identity.Sts
 
             sc.AddSingleton(mapper);
             sc.AddSingleton(conf);
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, ExecutionContext.DeployedOrLocal, new HttpClient()));
+            sc.AddSingleton<IJwtContext>(new JwtContext(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
             sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
             {
-                return new IdentityUnitOfWork(options, ExecutionContext.DeployedOrLocal, conf, mapper);
+                return new IdentityUnitOfWork(options, InstanceContext.DeployedOrLocal, conf, mapper);
             });
             sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts
              * only live context allowed to run...
              */
 
-            if (uow.Situation != ExecutionContext.DeployedOrLocal)
+            if (uow.Instance != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()

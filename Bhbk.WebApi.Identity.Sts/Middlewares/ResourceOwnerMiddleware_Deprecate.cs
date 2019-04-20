@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.UnitOfWork;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -201,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                     || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                        && uow.Situation == ExecutionContext.Testing))
+                        && uow.Instance == InstanceContext.Testing))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -384,7 +384,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                     || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                        && uow.Situation == ExecutionContext.Testing))
+                        && uow.Instance == InstanceContext.Testing))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -558,7 +558,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                     || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                        && uow.Situation == ExecutionContext.Testing))
+                        && uow.Instance == InstanceContext.Testing))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Core.Repositories;
-using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore.Query;
@@ -14,11 +14,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class RefreshRepository : IGenericRepositoryAsync<RefreshCreate, tbl_Refreshes, Guid>
     {
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public RefreshRepository(IdentityDbContext context, ExecutionContext situation, IMapper shape)
+        public RefreshRepository(IdentityDbContext context, InstanceContext situation, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.UnitOfWork;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Providers;
 using Microsoft.Extensions.Configuration;
@@ -14,11 +14,11 @@ namespace Bhbk.Lib.Identity.Infrastructure
     public class JwtContext : IJwtContext
     {
         private readonly IConfigurationRoot _conf;
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly StsClient _sts;
         private static JwtSecurityToken _access, _refresh;
 
-        public JwtContext(IConfigurationRoot conf, ExecutionContext situation, HttpClient http)
+        public JwtContext(IConfigurationRoot conf, InstanceContext situation, HttpClient http)
         {
             if (conf == null)
                 throw new ArgumentNullException();

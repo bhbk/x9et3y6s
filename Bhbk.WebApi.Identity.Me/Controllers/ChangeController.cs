@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.UnitOfWork;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
@@ -43,15 +43,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Instance.ToString())
                 .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
 
-            if (UoW.Situation == ExecutionContext.Testing)
+            if (UoW.Instance == InstanceContext.Testing)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmEmail(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
+            var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -101,15 +101,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Instance.ToString())
                 .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
 
-            if (UoW.Situation == ExecutionContext.Testing)
+            if (UoW.Instance == InstanceContext.Testing)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
+            var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -161,12 +161,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
-            if (UoW.Situation == ExecutionContext.Testing)
+            if (UoW.Instance == InstanceContext.Testing)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
+            var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
 
             if (alert == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

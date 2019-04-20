@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
@@ -121,14 +121,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            if (UoW.Situation == ExecutionContext.DeployedOrLocal)
+            if (UoW.Instance == InstanceContext.DeployedOrLocal)
             {
-                var alert = new AlertClient(Conf, UoW.Situation, new HttpClient());
+                var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
 
                 if (alert == null)
                     return StatusCode(StatusCodes.Status500InternalServerError);
 
-                var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Situation.ToString())
+                var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Instance.ToString())
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), result));
 
                 var url = UrlBuilder.GenerateConfirmEmail(Conf, result, code);

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Datasets;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, ExecutionContext.Testing, conf, mapper));
+                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.Testing, conf, mapper));
                 sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
                 sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
                 sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();
@@ -96,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * only test context allowed to run...
                  */
 
-                if (UoW.Situation != ExecutionContext.Testing)
+                if (UoW.Instance != InstanceContext.Testing)
                     throw new NotSupportedException();
 
                 var issuers = (UoW.IssuerRepo.GetAsync().Result)

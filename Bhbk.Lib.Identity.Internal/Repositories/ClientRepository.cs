@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Core.Repositories;
-using Bhbk.Lib.Core.UnitOfWork;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -20,12 +20,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ClientRepository : IGenericRepositoryAsync<ClientCreate, tbl_Clients, Guid>
     {
-        private readonly ExecutionContext _situation;
+        private readonly InstanceContext _situation;
         private readonly IConfigurationRoot _conf;
         private readonly IMapper _shape;
         private readonly IdentityDbContext _context;
 
-        public ClientRepository(IdentityDbContext context, ExecutionContext situation, IConfigurationRoot conf, IMapper shape)
+        public ClientRepository(IdentityDbContext context, InstanceContext situation, IConfigurationRoot conf, IMapper shape)
         {
             if (context == null)
                 throw new NullReferenceException();
