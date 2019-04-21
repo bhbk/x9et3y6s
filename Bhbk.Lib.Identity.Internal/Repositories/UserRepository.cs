@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Core.Repositories;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Validators;
 using Bhbk.Lib.Identity.Models.Admin;

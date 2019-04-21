@@ -6,7 +6,7 @@ using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -121,33 +121,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             await UoW.CommitAsync();
 
-            if (UoW.Instance == InstanceContext.DeployedOrLocal)
+            if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
             {
-                var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
-
-                if (alert == null)
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-
-                var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Instance.ToString())
+                var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.InstanceType.ToString())
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), result));
 
                 var url = UrlBuilder.GenerateConfirmEmail(Conf, result, code);
 
-                var email = await alert.Enqueue_EmailV1(Jwt.AccessToken.ToString(),
-                    new EmailCreate()
-                    {
-                        FromId = result.Id,
-                        FromEmail = result.Email,
-                        FromDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
-                        ToId = result.Id,
-                        ToEmail = result.Email,
-                        ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
-                        Subject = string.Format("{0} {1}", issuer.Name, Strings.MsgConfirmNewUserSubject),
-                        HtmlContent = Strings.TemplateConfirmNewUser(issuer, result, url)
-                    });
-
-                if (!email.IsSuccessStatusCode)
-                    return BadRequest(await email.Content.ReadAsStringAsync());
+                Alerts.EmailEnqueueV1(new EmailCreate()
+                {
+                    FromId = result.Id,
+                    FromEmail = result.Email,
+                    FromDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
+                    ToId = result.Id,
+                    ToEmail = result.Email,
+                    ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
+                    Subject = string.Format("{0} {1}", issuer.Name, Strings.MsgConfirmNewUserSubject),
+                    HtmlContent = Strings.TemplateConfirmNewUser(issuer, result, url)
+                });
             }
 
             return Ok(UoW.Mapper.Map<UserModel>(result));

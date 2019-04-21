@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             continue;
                         }
 
-                        if (uow.Instance == InstanceContext.DeployedOrLocal)
+                        if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
                             await _provider.TryTextHandoff(_providerSid, _providerToken, model);
 

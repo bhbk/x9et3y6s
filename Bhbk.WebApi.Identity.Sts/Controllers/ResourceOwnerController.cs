@@ -50,11 +50,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 //really gross but needed for backward compatibility. can be lame if more than one issuer.
-                if (UoW.Instance == InstanceContext.DeployedOrLocal)
+                if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First())).SingleOrDefault();
 
-                else if (UoW.Instance == InstanceContext.Testing)
+                else if (UoW.InstanceType == InstanceContext.UnitTest)
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).SingleOrDefault();
 
                 else
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if login provider is local...
-            else if ((UoW.Instance == InstanceContext.DeployedOrLocal)
+            else if ((UoW.InstanceType == InstanceContext.DeployedOrLocal)
                 && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
@@ -158,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                 || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                    && UoW.Instance == InstanceContext.Testing))
+                    && UoW.InstanceType == InstanceContext.UnitTest))
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -320,7 +320,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if login provider is local...
-            else if ((UoW.Instance == InstanceContext.DeployedOrLocal)
+            else if ((UoW.InstanceType == InstanceContext.DeployedOrLocal)
                 && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
@@ -337,7 +337,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if login provider is transient for unit/integration test...
             else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                 || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                    && UoW.Instance == InstanceContext.Testing))
+                    && UoW.InstanceType == InstanceContext.UnitTest))
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))

@@ -201,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                     || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                        && uow.Instance == InstanceContext.Testing))
+                        && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -384,7 +384,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                     || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                        && uow.Instance == InstanceContext.Testing))
+                        && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
@@ -558,7 +558,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //check if login provider is transient for unit/integration test...
                 else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
                     || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
-                        && uow.Instance == InstanceContext.Testing))
+                        && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
                     if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)

@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.Testing, conf));
+                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf));
                 sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
                 sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
                 sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * only test context allowed to run...
                  */
 
-                if (UoW.Instance != InstanceContext.Testing)
+                if (UoW.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
 
                 var issuers = (UoW.IssuerRepo.GetAsync().Result)

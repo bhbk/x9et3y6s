@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             continue;
                         }
 
-                        if (uow.Instance == InstanceContext.DeployedOrLocal)
+                        if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
                             var result = await _provider.TryEmailHandoff(_providerApiKey, model);
 

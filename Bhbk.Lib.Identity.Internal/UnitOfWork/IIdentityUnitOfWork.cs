@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.UnitOfWork;
+using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Repositories;
 

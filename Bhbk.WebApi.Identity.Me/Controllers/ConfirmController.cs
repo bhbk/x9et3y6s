@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new ProtectProvider(UoW.Instance.ToString()).ValidateAsync(email, token, user))
+            else if (!await new ProtectProvider(UoW.InstanceType.ToString()).ValidateAsync(email, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new ProtectProvider(UoW.Instance.ToString()).ValidateAsync(password, token, user))
+            else if (!await new ProtectProvider(UoW.InstanceType.ToString()).ValidateAsync(password, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);

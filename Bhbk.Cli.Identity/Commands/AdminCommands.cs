@@ -1,11 +1,11 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Infrastructure;
+using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Repositories;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -16,10 +16,9 @@ namespace Bhbk.Cli.Identity.Commands
 {
     public class AdminCommands : ConsoleCommand
     {
-        private static IJwtContext _jwt;
+        private static IJwtHelper _jwt;
         private static CommandTypes _cmdType;
-        private static AdminClient _admin = null;
-        private static StsClient _sts = null;
+        private static AdminRepository _admin = null;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CommandTypes)));
         private static bool _create = false, _destroy = false;
 
@@ -55,9 +54,8 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
                     .Build();
 
-                _admin = new AdminClient(conf, InstanceContext.DeployedOrLocal, new HttpClient());
-                _sts = new StsClient(conf, InstanceContext.DeployedOrLocal, new HttpClient());
-                _jwt = new JwtContext(conf, InstanceContext.DeployedOrLocal, new HttpClient());
+                _admin = new AdminRepository(conf, InstanceContext.DeployedOrLocal, new HttpClient());
+                _jwt = new JwtHelper(conf, InstanceContext.DeployedOrLocal, new HttpClient());
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
@@ -400,7 +398,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool AddUserToLogin(Guid userID, Guid loginID)
         {
-            var result = _admin.User_AddToLoginV1(_jwt.AccessToken.RawData, userID, loginID).Result;
+            var result = _admin.User_AddToLoginV1(_jwt.ResourceOwnerV2.RawData, userID, loginID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -413,7 +411,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool AddUserToRole(Guid roleID, Guid userID)
         {
-            var result = _admin.Role_AddToUserV1(_jwt.AccessToken.RawData, roleID, userID).Result;
+            var result = _admin.Role_AddToUserV1(_jwt.ResourceOwnerV2.RawData, roleID, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -426,7 +424,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool CheckClient(string client, ref Guid clientID)
         {
-            var result = _admin.Client_GetV1(_jwt.AccessToken.RawData, client).Result;
+            var result = _admin.Client_GetV1(_jwt.ResourceOwnerV2.RawData, client).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -444,7 +442,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool CheckIssuer(string issuer, ref Guid issuerID)
         {
-            var result = _admin.Issuer_GetV1(_jwt.AccessToken.RawData, issuer).Result;
+            var result = _admin.Issuer_GetV1(_jwt.ResourceOwnerV2.RawData, issuer).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -462,7 +460,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool CheckLogin(string login, ref Guid loginID)
         {
-            var result = _admin.Login_GetV1(_jwt.AccessToken.RawData, login).Result;
+            var result = _admin.Login_GetV1(_jwt.ResourceOwnerV2.RawData, login).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -480,7 +478,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool CheckRole(string role, ref Guid roleID)
         {
-            var result = _admin.Role_GetV1(_jwt.AccessToken.RawData, role).Result;
+            var result = _admin.Role_GetV1(_jwt.ResourceOwnerV2.RawData, role).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -498,7 +496,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool CheckUser(string user, ref Guid userID)
         {
-            var result = _admin.User_GetV1(_jwt.AccessToken.RawData, user).Result;
+            var result = _admin.User_GetV1(_jwt.ResourceOwnerV2.RawData, user).Result;
 
             if (result.IsSuccessStatusCode)
             {
@@ -516,7 +514,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private Guid CreateClient(Guid issuerID, string client)
         {
-            var result = _admin.Client_CreateV1(_jwt.AccessToken.RawData,
+            var result = _admin.Client_CreateV1(_jwt.ResourceOwnerV2.RawData,
                 new ClientCreate()
                 {
                     IssuerId = issuerID,
@@ -543,7 +541,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private Guid CreateIssuer(string issuer)
         {
-            var result = _admin.Issuer_CreateV1(_jwt.AccessToken.RawData,
+            var result = _admin.Issuer_CreateV1(_jwt.ResourceOwnerV2.RawData,
                 new IssuerCreate()
                 {
                     Name = issuer,
@@ -568,7 +566,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private Guid CreateLogin(string login)
         {
-            var result = _admin.Login_CreateV1(_jwt.AccessToken.RawData,
+            var result = _admin.Login_CreateV1(_jwt.ResourceOwnerV2.RawData,
                 new LoginCreate()
                 {
                     Name = login,
@@ -593,7 +591,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private Guid CreateRole(Guid clientID, string role)
         {
-            var result = _admin.Role_CreateV1(_jwt.AccessToken.RawData,
+            var result = _admin.Role_CreateV1(_jwt.ResourceOwnerV2.RawData,
                 new RoleCreate()
                 {
                     ClientId = clientID,
@@ -619,7 +617,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private Guid CreateUser(string user)
         {
-            var result = _admin.User_CreateV1NoConfirm(_jwt.AccessToken.RawData,
+            var result = _admin.User_CreateV1NoConfirm(_jwt.ResourceOwnerV2.RawData,
                 new UserCreate()
                 {
                     Email = user,
@@ -649,7 +647,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool DeleteClient(Guid clientID)
         {
-            var result = _admin.Client_DeleteV1(_jwt.AccessToken.RawData, clientID).Result;
+            var result = _admin.Client_DeleteV1(_jwt.ResourceOwnerV2.RawData, clientID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -662,7 +660,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool DeleteIssuer(Guid issuerID)
         {
-            var result = _admin.Issuer_DeleteV1(_jwt.AccessToken.RawData, issuerID).Result;
+            var result = _admin.Issuer_DeleteV1(_jwt.ResourceOwnerV2.RawData, issuerID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -675,7 +673,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool DeleteLogin(Guid loginID)
         {
-            var result = _admin.Login_DeleteV1(_jwt.AccessToken.RawData, loginID).Result;
+            var result = _admin.Login_DeleteV1(_jwt.ResourceOwnerV2.RawData, loginID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -688,7 +686,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool DeleteRole(Guid roleID)
         {
-            var result = _admin.Role_DeleteV1(_jwt.AccessToken.RawData, roleID).Result;
+            var result = _admin.Role_DeleteV1(_jwt.ResourceOwnerV2.RawData, roleID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -701,7 +699,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool DeleteUser(Guid userID)
         {
-            var result = _admin.User_DeleteV1(_jwt.AccessToken.RawData, userID).Result;
+            var result = _admin.User_DeleteV1(_jwt.ResourceOwnerV2.RawData, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -714,7 +712,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool RemoveRoleFromUser(Guid roleID, Guid userID)
         {
-            var result = _admin.Role_RemoveFromUserV1(_jwt.AccessToken.RawData, roleID, userID).Result;
+            var result = _admin.Role_RemoveFromUserV1(_jwt.ResourceOwnerV2.RawData, roleID, userID).Result;
 
             if (result.IsSuccessStatusCode)
                 return true;
@@ -727,7 +725,7 @@ namespace Bhbk.Cli.Identity.Commands
 
         private bool SetPassword(Guid userID, string password)
         {
-            var result = _admin.User_SetPasswordV1(_jwt.AccessToken.RawData, userID,
+            var result = _admin.User_SetPasswordV1(_jwt.ResourceOwnerV2.RawData, userID,
                 new UserAddPassword()
                 {
                     UserId = userID,

@@ -8,28 +8,19 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Bhbk.Lib.Identity.Providers
+namespace Bhbk.Lib.Identity.Repositories
 {
-    public class StsClient : StsEndpoints
-    {
-        public StsClient(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
-            : base(conf, instance, client) { }
-    }
-
     //https://oauth.com/playground/
-    public class StsEndpoints
+    public class StsRepository
     {
-        protected readonly IConfigurationRoot _conf;
-        protected readonly InstanceContext _instance;
-        protected readonly HttpClient _client;
+        private readonly IConfigurationRoot _conf;
+        private readonly InstanceContext _instance;
+        private readonly HttpClient _client;
 
-        public StsEndpoints(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+        public StsRepository(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
         {
-            if (conf == null)
-                throw new ArgumentNullException();
-
+            _conf = conf ?? throw new ArgumentNullException();
             _instance = instance;
-            _conf = conf;
 
             if (instance == InstanceContext.DeployedOrLocal)
             {
@@ -41,8 +32,11 @@ namespace Bhbk.Lib.Identity.Providers
                 _client = new HttpClient(connect);
             }
 
-            if (instance == InstanceContext.Testing)
+            if (instance == InstanceContext.UnitTest)
                 _client = client;
+
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         //https://oauth.net/2/grant-types/authorization-code/
@@ -57,14 +51,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/authorize-ask";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint + content);
 
             throw new NotSupportedException();
@@ -81,14 +71,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/authorize-ask";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint + content);
 
             throw new NotSupportedException();
@@ -106,14 +92,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/authorize";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint + content);
 
             throw new NotSupportedException();
@@ -131,14 +113,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/authorize";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint + content);
 
             throw new NotSupportedException();
@@ -157,14 +135,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/client";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -182,14 +156,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/client";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -208,14 +178,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/device-ask";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -233,14 +199,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/device-ask";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -248,17 +210,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> DeviceCode_DecideV1(string jwt, string code, string action)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v1/device/" + code + "/" + action;
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -266,17 +225,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> DeviceCode_DecideV2(string jwt, string code, string action)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v2/device/" + code + "/" + action;
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -295,14 +251,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/device";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -321,14 +273,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/device";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -347,14 +295,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/implicit";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint + content);
 
             throw new NotSupportedException();
@@ -372,14 +316,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/implicit";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint + content);
 
             throw new NotSupportedException();
@@ -388,17 +328,14 @@ namespace Bhbk.Lib.Identity.Providers
         //https://oauth.net/2/grant-types/refresh-token/
         public async Task<HttpResponseMessage> RefreshToken_DeleteV1(string jwt, string user)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v1/refresh/" + user + "/revoke";
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -406,17 +343,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> RefreshToken_DeleteV1(string jwt, string user, string token)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v1/refresh/" + user + "/revoke/" + token;
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -424,17 +358,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> RefreshToken_DeleteV2(string jwt, string user)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -442,17 +373,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> RefreshToken_DeleteV2(string jwt, string user, string token)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v2/refresh/" + user + "/revoke/" + token;
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -460,17 +388,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> RefreshToken_GetListV1(string jwt, string user)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v1/refresh/" + user;
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -478,17 +403,14 @@ namespace Bhbk.Lib.Identity.Providers
 
         public async Task<HttpResponseMessage> RefreshToken_GetListV2(string jwt, string user)
         {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/oauth2/v2/refresh/" + user;
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -506,14 +428,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/refresh";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -531,14 +449,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/refresh";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -557,14 +471,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/access";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -583,14 +493,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v1/access";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -609,14 +515,10 @@ namespace Bhbk.Lib.Identity.Providers
 
             var endpoint = "/oauth2/v2/access";
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(
-                    string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.Testing)
+            if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();

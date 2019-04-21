@@ -30,4 +30,9 @@ namespace Bhbk.Lib.Identity.Models.Alert
     {
         public Guid Id { get; set; }
     }
+
+    public class TextModel : Texts
+    {
+
+    }
 }

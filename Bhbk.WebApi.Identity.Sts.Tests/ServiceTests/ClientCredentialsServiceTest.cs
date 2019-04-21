@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,19 +21,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
-        private readonly StsClient _endpoints;
+        private readonly IStsService _service;
 
         public ClientCredentialsServiceTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new StsClient(_factory.Conf, _factory.UoW.Instance, _client);
+            _service = new StsService(_factory.Conf, _factory.UoW.InstanceType, _client);
         }
 
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV1_NotImplemented()
         {
-            var cc = await _endpoints.ClientCredential_UseV1(
+            var cc = await _service.Repo.ClientCredential_UseV1(
                 new ClientCredentialV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
 
-            var cc = await _endpoints.ClientCredential_UseV2(
+            var cc = await _service.Repo.ClientCredential_UseV2(
                 new ClientCredentialV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
             cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            cc = await _endpoints.ClientCredential_UseV2(
+            cc = await _service.Repo.ClientCredential_UseV2(
                 new ClientCredentialV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            cc = await _endpoints.ClientCredential_UseV2(
+            cc = await _service.Repo.ClientCredential_UseV2(
                 new ClientCredentialV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
 
-            var cc = await _endpoints.ClientCredential_UseV2(
+            var cc = await _service.Repo.ClientCredential_UseV2(
                 new ClientCredentialV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            cc = await _endpoints.ClientCredential_UseV2(
+            cc = await _service.Repo.ClientCredential_UseV2(
                 new ClientCredentialV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var salt = _factory.Conf["IdentityTenants:Salt"];
             salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
 
-            var cc = await _endpoints.ClientCredential_UseV2(
+            var cc = await _service.Repo.ClientCredential_UseV2(
                 new ClientCredentialV2()
                 {
                     issuer = issuer.Id.ToString(),

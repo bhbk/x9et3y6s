@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -19,13 +19,13 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
-        private readonly AlertClient _endpoints;
+        private readonly IAlertService _service;
 
         public TextServiceTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new AlertClient(_factory.Conf, _factory.UoW.Instance, _client);
+            _service = new AlertService(_factory.Conf, _factory.UoW.InstanceType, _client);
         }
 
         [Fact]
@@ -40,12 +40,12 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _endpoints.Enqueue_TextV1(rop.token, new TextCreate());
+            var result = await _service.Repo.Enqueue_TextV1(rop.token, new TextCreate());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            result = await _endpoints.Enqueue_TextV1(rop.token,
+            result = await _service.Repo.Enqueue_TextV1(rop.token,
                 new TextCreate()
                 {
                     FromId = Guid.NewGuid(),
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            result = await _endpoints.Enqueue_TextV1(rop.token,
+            result = await _service.Repo.Enqueue_TextV1(rop.token,
                 new TextCreate()
                 {
                     FromId = user.Id,
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var result = await _endpoints.Enqueue_TextV1(rop.token,
+            var result = await _service.Repo.Enqueue_TextV1(rop.token,
                 new TextCreate()
                 {
                     FromId = user.Id,

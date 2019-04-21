@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
         public async Task CreateAsync()
         {
-            if (_uow.Instance != InstanceContext.Testing)
+            if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
 
             tbl_Issuers issuer;
@@ -135,7 +135,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
         public async Task CreateRandomAsync(uint sets)
         {
-            if (_uow.Instance != InstanceContext.Testing)
+            if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
 
             for (int i = 0; i < sets; i++)
@@ -251,7 +251,7 @@ namespace Bhbk.Lib.Identity.Internal.Datasets
 
         public async Task DestroyAsync()
         {
-            if (_uow.Instance != InstanceContext.Testing)
+            if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
 
             //delete test users

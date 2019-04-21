@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -53,7 +53,6 @@ namespace Bhbk.WebApi.Identity.Sts
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             sc.AddSingleton(conf);
-            sc.AddSingleton<IJwtContext>(new JwtContext(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
             sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
             {
                 return new IdentityUnitOfWork(options, InstanceContext.DeployedOrLocal, conf);
@@ -63,6 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
             sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();
             sc.AddSingleton<IAuthorizationHandler, AuthorizeUsers>();
+            sc.AddSingleton<IAlertService>(new AlertService(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts
              * only live context allowed to run...
              */
 
-            if (uow.Instance != InstanceContext.DeployedOrLocal)
+            if (uow.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()

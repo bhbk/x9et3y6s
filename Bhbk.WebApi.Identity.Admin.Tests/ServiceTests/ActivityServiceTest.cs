@@ -4,11 +4,11 @@ using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -23,13 +23,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
-        private readonly AdminClient _endpoints;
+        private readonly IAdminService _service;
 
         public ActivityServiceTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new AdminClient(_factory.Conf, _factory.UoW.Instance, _client);
+            _service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, _client);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("created", "desc"));
 
-            var result = await _endpoints.Activity_GetPageV1(rop.token,
+            var result = await _service.Repo.Activity_GetV1(rop.token,
                 new CascadePager()
                 {
                     Filter = string.Empty,
@@ -74,6 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
             var rop = await JwtBuilder.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+            _service.Jwt = new JwtSecurityToken(rop.token);
 
             var take = 3;
             var orders = new List<Tuple<string, string>>();
@@ -89,26 +90,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             await _factory.UoW.CommitAsync();
 
-            var response = await _endpoints.Activity_GetPageV1(rop.token,
-                new CascadePager()
-                {
-                    Filter = string.Empty,
-                    Orders = orders,
-                    Skip = 1,
-                    Take = take,
-                });
+            var result = _service.ActivityGetV1(new CascadePager()
+            {
+                Filter = string.Empty,
+                Orders = orders,
+                Skip = 1,
+                Take = take,
+            });
 
-            response.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ActivityModel>>();
-            var count = (int)ok["count"];
-
-            list.Should().BeAssignableTo<IEnumerable<ActivityModel>>();
-            list.Count().Should().Be(take);
-
-            count.Should().Be(await _factory.UoW.ActivityRepo.CountAsync());
+            result.Item1.Should().Be(await _factory.UoW.ActivityRepo.CountAsync());
+            result.Item2.Should().BeAssignableTo<IEnumerable<ActivityModel>>();
+            result.Item2.Count().Should().Be(take);
         }
     }
 }

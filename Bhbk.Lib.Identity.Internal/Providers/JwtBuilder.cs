@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerRefreshFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
@@ -95,7 +95,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
@@ -141,7 +141,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerRefreshFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
@@ -203,7 +203,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerRefreshFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
@@ -266,7 +266,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
@@ -314,7 +314,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
@@ -361,7 +361,7 @@ namespace Bhbk.Lib.Identity.Internal.Providers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.Instance == InstanceContext.Testing
+            if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
                 validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;

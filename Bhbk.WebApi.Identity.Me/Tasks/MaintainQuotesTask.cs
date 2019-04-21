@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         {
             var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
-            if (uow.Instance == InstanceContext.Testing)
+            if (uow.InstanceType == InstanceContext.UnitTest)
                 Qotd = JsonConvert.DeserializeObject<Quotes>
                     (File.ReadAllText(_output));
             else

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using System;
 using System.Linq;
@@ -18,19 +18,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
-        private readonly StsClient _endpoints;
+        private readonly IStsService _service;
 
         public AuthCodeServiceTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new StsClient(_factory.Conf, _factory.UoW.Instance, _client);
+            _service = new StsService(_factory.Conf, _factory.UoW.InstanceType, _client);
         }
 
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
         {
-            var ask = await _endpoints.AuthCode_AskV1(
+            var ask = await _service.Repo.AuthCode_AskV1(
                 new AuthCodeAskV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Use_NotImplemented()
         {
-            var ac = await _endpoints.AuthCode_UseV1(
+            var ac = await _service.Repo.AuthCode_UseV1(
                 new AuthCodeV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await _endpoints.AuthCode_AskV2(
+            var ask = await _service.Repo.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            ask = await _endpoints.AuthCode_AskV2(
+            ask = await _service.Repo.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await _endpoints.AuthCode_AskV2(
+            var ask = await _service.Repo.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var user = Guid.NewGuid();
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await _endpoints.AuthCode_AskV2(
+            var ask = await _service.Repo.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -147,6 +147,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Fact(Skip = "NotImplemented")]
+        public async Task Sts_OAuth2_AuthCodeV2_Ask_Success()
+        {
+            await _factory.TestData.DestroyAsync();
+            await _factory.TestData.CreateAsync();
         }
     }
 }

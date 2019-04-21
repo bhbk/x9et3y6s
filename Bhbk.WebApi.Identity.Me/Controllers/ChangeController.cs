@@ -4,7 +4,7 @@ using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -43,34 +43,25 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Instance.ToString())
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.InstanceType.ToString())
                 .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
 
-            if (UoW.Instance == InstanceContext.Testing)
+            if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmEmail(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
-
-            if (alert == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            var email = await alert.Enqueue_EmailV1(Jwt.AccessToken.ToString(),
-                new EmailCreate()
-                {
-                    FromId = user.Id,
-                    FromEmail = user.Email,
-                    FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    ToId = user.Id,
-                    ToEmail = user.Email,
-                    ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0}", Strings.MsgConfirmEmailSubject),
-                    HtmlContent = Strings.TemplateConfirmEmail(user, url)
-                });
-
-            if (!email.IsSuccessStatusCode)
-                return BadRequest(email.Content.ReadAsStringAsync());
+            Alerts.EmailEnqueueV1(new EmailCreate()
+            {
+                FromId = user.Id,
+                FromEmail = user.Email,
+                FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                ToId = user.Id,
+                ToEmail = user.Email,
+                ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                Subject = string.Format("{0}", Strings.MsgConfirmEmailSubject),
+                HtmlContent = Strings.TemplateConfirmEmail(user, url)
+            });
 
             return NoContent();
         }
@@ -101,34 +92,25 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.Instance.ToString())
+            string token = HttpUtility.UrlEncode(await new ProtectProvider(UoW.InstanceType.ToString())
                 .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
 
-            if (UoW.Instance == InstanceContext.Testing)
+            if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
-
-            if (alert == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            var email = await alert.Enqueue_EmailV1(Jwt.AccessToken.ToString(),
-                new EmailCreate()
-                {
-                    FromId = user.Id,
-                    FromEmail = user.Email,
-                    FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    ToId = user.Id,
-                    ToEmail = user.Email,
-                    ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                    Subject = string.Format("{0}", Strings.MsgConfirmPasswordSubject),
-                    HtmlContent = Strings.TemplateConfirmPassword(user, url)
-                });
-
-            if (!email.IsSuccessStatusCode)
-                return BadRequest(await email.Content.ReadAsStringAsync());
+            Alerts.EmailEnqueueV1(new EmailCreate()
+            {
+                FromId = user.Id,
+                FromEmail = user.Email,
+                FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                ToId = user.Id,
+                ToEmail = user.Email,
+                ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                Subject = string.Format("{0}", Strings.MsgConfirmPasswordSubject),
+                HtmlContent = Strings.TemplateConfirmPassword(user, url)
+            });
 
             return NoContent();
         }
@@ -161,28 +143,19 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(await new TotpProvider(8, 10).GenerateAsync(model.NewPhoneNumber, user));
 
-            if (UoW.Instance == InstanceContext.Testing)
+            if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
             var url = UrlBuilder.GenerateConfirmPassword(Conf, user, token);
 
-            var alert = new AlertClient(Conf, UoW.Instance, new HttpClient());
-
-            if (alert == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            var text = await alert.Enqueue_TextV1(Jwt.AccessToken.ToString(),
-                new TextCreate()
-                {
-                    FromId = user.Id,
-                    FromPhoneNumber = model.NewPhoneNumber,
-                    ToId = user.Id,
-                    ToPhoneNumber = model.NewPhoneNumber,
-                    Body = token
-                });
-
-            if (!text.IsSuccessStatusCode)
-                return BadRequest(await text.Content.ReadAsStringAsync());
+            Alerts.TextEnqueueV1(new TextCreate()
+            {
+                FromId = user.Id,
+                FromPhoneNumber = model.NewPhoneNumber,
+                ToId = user.Id,
+                ToPhoneNumber = model.NewPhoneNumber,
+                Body = token
+            });
 
             return NoContent();
         }

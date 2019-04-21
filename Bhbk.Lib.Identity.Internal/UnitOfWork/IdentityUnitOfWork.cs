@@ -44,10 +44,7 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
         {
             _disposed = false;
 
-            if (context == null)
-                throw new ArgumentNullException();
-
-            _context = context;
+            _context = context ?? throw new ArgumentNullException();
             _instance = instance;
             _mapper = new MapperConfiguration(x =>
             {
@@ -66,7 +63,7 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
             _userRepo = new UserRepository(context, instance, conf, _mapper);
         }
 
-        public InstanceContext Instance
+        public InstanceContext InstanceType
         {
             get
             {

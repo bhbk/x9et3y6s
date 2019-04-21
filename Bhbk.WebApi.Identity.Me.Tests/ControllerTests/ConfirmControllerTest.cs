@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(user.Id);
 
-                var token = await new ProtectProvider(_factory.UoW.Instance.ToString())
+                var token = await new ProtectProvider(_factory.UoW.InstanceType.ToString())
                     .GenerateAsync(newEmail, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
                 token.Should().NotBeNullOrEmpty();
 
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(user.Id);
 
-                var token = await new ProtectProvider(_factory.UoW.Instance.ToString())
+                var token = await new ProtectProvider(_factory.UoW.InstanceType.ToString())
                     .GenerateAsync(newEmail, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
                 token.Should().NotBeNullOrEmpty();
 
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(user.Id);
 
-                var token = await new ProtectProvider(_factory.UoW.Instance.ToString())
+                var token = await new ProtectProvider(_factory.UoW.InstanceType.ToString())
                     .GenerateAsync(newPassword, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
                 token.Should().NotBeNullOrEmpty();
 
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(user.Id);
 
-                var token = await new ProtectProvider(_factory.UoW.Instance.ToString())
+                var token = await new ProtectProvider(_factory.UoW.InstanceType.ToString())
                     .GenerateAsync(newPassword, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
                 token.Should().NotBeNullOrEmpty();
 

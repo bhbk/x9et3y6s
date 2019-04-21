@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Providers;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Providers;
+using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
@@ -22,13 +22,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
     {
         private readonly StartupTest _factory;
         private readonly HttpClient _client;
-        private readonly StsClient _endpoints;
+        private readonly IStsService _service;
 
         public ResourceOwnerServiceTest(StartupTest factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            _endpoints = new StsClient(_factory.Conf, _factory.UoW.Instance, _client);
+            _service = new StsService(_factory.Conf, _factory.UoW.InstanceType, _client);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV1(
+            var rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            var rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = Guid.NewGuid().ToString(),
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = string.Empty,
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = client.Id.ToString(),
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV1(
+            var rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = string.Empty,
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -202,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV1(
+            var rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -226,7 +226,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -243,7 +243,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             await _factory.UoW.UserRepo.UpdateAsync(user);
 
-            rop = await _endpoints.ResourceOwner_UseV1(
+            rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            var rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = client.Id.ToString(),
@@ -279,7 +279,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = client.Id.ToString(),
@@ -290,7 +290,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = client.Id.ToString(),
@@ -306,7 +306,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             await _factory.UoW.UserRepo.UpdateAsync(user);
 
-            rop = await _endpoints.ResourceOwner_UseV1Legacy(
+            rop = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = client.Id.ToString(),
@@ -335,7 +335,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
              */
             _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
 
-            var rop = await _endpoints.ResourceOwner_UseV1(
+            var rop = await _service.Repo.ResourceOwner_UseV1(
                 new ResourceOwnerV1()
                 {
                     issuer_id = issuer.Id.ToString(),
@@ -362,7 +362,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
              */
             _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
 
-            var legacy = await _endpoints.ResourceOwner_UseV1Legacy(
+            var legacy = await _service.Repo.ResourceOwner_UseV1Legacy(
                 new ResourceOwnerV1()
                 {
                     client_id = client.Id.ToString(),
@@ -396,7 +396,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV2(
+            var rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -413,7 +413,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.ClientRepo.UpdateAsync(client);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwner_UseV2(
+            rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -438,7 +438,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV2(
+            var rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -450,7 +450,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV2(
+            rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = string.Empty,
@@ -467,7 +467,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
             await _factory.UoW.CommitAsync();
 
-            rop = await _endpoints.ResourceOwner_UseV2(
+            rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -492,7 +492,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await _endpoints.ResourceOwner_UseV2(
+            var rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -504,7 +504,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rop = await _endpoints.ResourceOwner_UseV2(
+            rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -516,7 +516,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            rop = await _endpoints.ResourceOwner_UseV2(
+            rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -533,7 +533,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             await _factory.UoW.UserRepo.UpdateAsync(user);
 
-            rop = await _endpoints.ResourceOwner_UseV2(
+            rop = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -572,7 +572,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            var empty = await _endpoints.ResourceOwner_UseV2(
+            var empty = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -597,7 +597,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            var single = await _endpoints.ResourceOwner_UseV2(
+            var single = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -622,7 +622,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             /*
              */
-            var multiple = await _endpoints.ResourceOwner_UseV2(
+            var multiple = await _service.Repo.ResourceOwner_UseV2(
                 new ResourceOwnerV2()
                 {
                     issuer = issuer.Id.ToString(),
