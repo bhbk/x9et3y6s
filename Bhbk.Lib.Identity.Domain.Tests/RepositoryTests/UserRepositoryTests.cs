@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -30,10 +30,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                 await UoW.UserRepo.CreateAsync(
                     Mapper.Map<tbl_Users>(new UserCreate()
                         {
-                            Email = RandomValues.CreateAlphaNumericString(4),
+                            Email = AlphaNumeric.CreateString(4),
                             PhoneNumber = Constants.ApiTestUserPhone,
-                            FirstName = "First-" + RandomValues.CreateBase64String(4),
-                            LastName = "Last-" + RandomValues.CreateBase64String(4),
+                            FirstName = "First-" + Base64.CreateString(4),
+                            LastName = "Last-" + Base64.CreateString(4),
                             LockoutEnabled = false,
                             HumanBeing = true,
                             Immutable = false,
@@ -52,8 +52,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                     {
                         Email = Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone,
-                        FirstName = "First-" + RandomValues.CreateBase64String(4),
-                        LastName = "Last-" + RandomValues.CreateBase64String(4),
+                        FirstName = "First-" + Base64.CreateString(4),
+                        LastName = "Last-" + Base64.CreateString(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
                         grant_type = "client_secret",
-                        client_secret = RandomValues.CreateAlphaNumericString(8),
+                        client_secret = AlphaNumeric.CreateString(8),
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
                         grant_type = "refresh_token",
-                        refresh_token = RandomValues.CreateAlphaNumericString(8),
+                        refresh_token = AlphaNumeric.CreateString(8),
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotImplemented);

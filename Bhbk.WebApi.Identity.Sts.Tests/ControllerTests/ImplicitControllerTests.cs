@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -61,10 +61,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     client_id = Guid.NewGuid().ToString(),
                     grant_type = "implicit",
                     username = Guid.NewGuid().ToString(),
-                    redirect_uri = RandomValues.CreateBase64String(8),
+                    redirect_uri = Base64.CreateString(8),
                     response_type = "token",
-                    scope = RandomValues.CreateBase64String(8),
-                    state = RandomValues.CreateBase64String(8),
+                    scope = Base64.CreateString(8),
+                    state = Base64.CreateString(8),
                 });
             imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
             imp.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var state = RandomValues.CreateBase64String(8);
+            var state = Base64.CreateString(8);
             var imp = await _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var state = RandomValues.CreateBase64String(8);
+            var state = Base64.CreateString(8);
             var imp = await _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var state = RandomValues.CreateBase64String(8);
+            var state = Base64.CreateString(8);
             var imp = _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
@@ -172,7 +172,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var state = RandomValues.CreateBase64String(8);
+            var state = Base64.CreateString(8);
             var imp = _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
@@ -215,7 +215,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,

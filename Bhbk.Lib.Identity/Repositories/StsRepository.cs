@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.Extensions.Configuration;
 using System;

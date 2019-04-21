@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -9,6 +8,7 @@ using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.Paging.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,8 +63,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
-                        Type = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestClaim,
-                        Value = RandomValues.CreateBase64String(8),
+                        Type = Base64.CreateString(4) + "-" + FakeConstants.ApiTestClaim,
+                        Value = Base64.CreateString(8),
                         Immutable = false,
                     }));
 
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testLogin = await uow.LoginRepo.CreateAsync(
                     _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
-                        Name = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestLogin,
+                        Name = Base64.CreateString(4) + "-" + FakeConstants.ApiTestLogin,
                         LoginKey = FakeConstants.ApiTestLoginKey,
                         Enabled = true,
                         Immutable = false,
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
-                        Name = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestLogin,
+                        Name = Base64.CreateString(4) + "-" + FakeConstants.ApiTestLogin,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.User_CreateV1(RandomValues.CreateBase64String(8), new UserCreate());
+                var result = await _service.Http.User_CreateV1(Base64.CreateString(8), new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -211,10 +211,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = _service.User_CreateV1NoConfirm(
                     new UserCreate()
                     {
-                        Email = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestUser,
-                        FirstName = "First-" + RandomValues.CreateBase64String(4),
-                        LastName = "Last-" + RandomValues.CreateBase64String(4),
-                        PhoneNumber = RandomValues.CreateNumberAsString(10),
+                        Email = Base64.CreateString(4) + "-" + FakeConstants.ApiTestUser,
+                        FirstName = "First-" + Base64.CreateString(4),
+                        LastName = "Last-" + Base64.CreateString(4),
+                        PhoneNumber = NumberAs.CreateString(10),
                         LockoutEnabled = false,
                         HumanBeing = true,
                     });
@@ -240,10 +240,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     new UserCreate()
                     {
                         IssuerId = issuer.Id,
-                        Email = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestUser,
-                        FirstName = "First-" + RandomValues.CreateBase64String(4),
-                        LastName = "Last-" + RandomValues.CreateBase64String(4),
-                        PhoneNumber = RandomValues.CreateNumberAsString(10),
+                        Email = Base64.CreateString(4) + "-" + FakeConstants.ApiTestUser,
+                        FirstName = "First-" + Base64.CreateString(4),
+                        LastName = "Last-" + Base64.CreateString(4),
+                        PhoneNumber = NumberAs.CreateString(10),
                         LockoutEnabled = false,
                         HumanBeing = false,
                     });
@@ -261,7 +261,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.User_DeleteV1(RandomValues.CreateBase64String(8), Guid.NewGuid());
+                var result = await _service.Http.User_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -693,7 +693,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.User_UpdateV1(RandomValues.CreateBase64String(8), new UserModel());
+                var result = await _service.Http.User_UpdateV1(Base64.CreateString(8), new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }

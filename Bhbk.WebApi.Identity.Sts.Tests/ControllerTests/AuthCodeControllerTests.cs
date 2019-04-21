@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     username = Guid.NewGuid().ToString(),
                     redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
                     response_type = "code",
-                    scope = RandomValues.CreateBase64String(8),
+                    scope = Base64.CreateString(8),
                 });
             ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ask.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -81,8 +81,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     grant_type = "authorization_code",
                     username = Guid.NewGuid().ToString(),
                     redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
-                    code = RandomValues.CreateBase64String(8),
-                    state = RandomValues.CreateBase64String(8),
+                    code = Base64.CreateString(8),
+                    state = Base64.CreateString(8),
                 });
             ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ac.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -255,7 +255,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
@@ -303,7 +303,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
@@ -351,7 +351,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
@@ -399,7 +399,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
@@ -447,7 +447,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
@@ -464,7 +464,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     grant_type = "authorization_code",
                     user = user.Id.ToString(),
                     redirect_uri = url.AbsoluteUri,
-                    code = RandomValues.CreateBase64String(32),
+                    code = Base64.CreateString(32),
                     state = model.StateValue,
                 });
             ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -495,7 +495,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
@@ -513,7 +513,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     user = user.Id.ToString(),
                     redirect_uri = url.AbsoluteUri,
                     code = code,
-                    state = RandomValues.CreateBase64String(32),
+                    state = Base64.CreateString(32),
                 });
             ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
             ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -545,7 +545,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -49,14 +49,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
-            var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiTestUser;
+            var newEmail = Base64.CreateString(4) + "-" + Constants.ApiTestUser;
 
             controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangeEmail()
             {
                 UserId = user.Id,
-                CurrentEmail = RandomValues.CreateBase64String(4),
+                CurrentEmail = Base64.CreateString(4),
                 NewEmail = newEmail,
                 NewEmailConfirm = newEmail
             };
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
-            var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiTestUser;
+            var newEmail = Base64.CreateString(4) + "-" + Constants.ApiTestUser;
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             var model = new UserChangePassword()
             {
                 UserId = user.Id,
-                CurrentPassword = RandomValues.CreateBase64String(16),
+                CurrentPassword = Base64.CreateString(16),
                 NewPassword = Constants.ApiTestUserPassNew,
                 NewPasswordConfirm = Constants.ApiTestUserPassNew
             };
@@ -173,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
-            var newPhone = RandomValues.CreateNumberAsString(10);
+            var newPhone = NumberAs.CreateString(10);
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -204,7 +204,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
-            var newPhone = RandomValues.CreateNumberAsString(10);
+            var newPhone = NumberAs.CreateString(10);
 
             controller.SetUser(issuer.Id, user.Id);
 

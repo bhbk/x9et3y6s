@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -76,8 +76,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
                         grant_type = "device_code",
-                        user_code = RandomValues.CreateBase64String(32),
-                        device_code = RandomValues.CreateBase64String(32),
+                        user_code = Base64.CreateString(32),
+                        device_code = Base64.CreateString(32),
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -208,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
@@ -254,7 +254,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
@@ -270,7 +270,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = client.Id.ToString(),
                         grant_type = "device_code",
                         user_code = secret,
-                        device_code = RandomValues.CreateAlphaNumericString(32),
+                        device_code = AlphaNumeric.CreateString(32),
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -300,7 +300,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
@@ -346,7 +346,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
@@ -361,7 +361,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
                         grant_type = "device_code",
-                        user_code = RandomValues.CreateAlphaNumericString(32),
+                        user_code = AlphaNumeric.CreateString(32),
                         device_code = state.StateValue,
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -392,7 +392,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,

@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Core.CommandLine;
-using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.CommandLine;
+using Bhbk.Lib.Common.FileSystem;
+using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using ManyConsole;
 using Microsoft.AspNetCore.Identity;
@@ -29,7 +29,6 @@ namespace Bhbk.Cli.Identity.Commands
                 var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
-                    .AddEnvironmentVariables()
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);

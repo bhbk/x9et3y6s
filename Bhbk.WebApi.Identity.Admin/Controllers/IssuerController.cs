@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Paging.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -109,18 +109,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<tbl_Issuers, bool>> preds;
+            Expression<Func<tbl_Issuers, bool>> predicates;
 
             if (string.IsNullOrEmpty(model.Filter))
-                preds = x => true;
+                predicates = x => true;
             else
-                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                predicates = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
                 || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
-                var total = await UoW.IssuerRepo.CountAsync(preds);
-                var result = await UoW.IssuerRepo.GetAsync(preds,
+                var total = await UoW.IssuerRepo.CountAsync(predicates);
+                var result = await UoW.IssuerRepo.GetAsync(predicates,
                     x => x.Include(c => c.tbl_Clients),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,

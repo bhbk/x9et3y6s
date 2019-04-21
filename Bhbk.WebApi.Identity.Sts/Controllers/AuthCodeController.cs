@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
                     UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
+                    StateValue = Base64.CreateString(32),
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,

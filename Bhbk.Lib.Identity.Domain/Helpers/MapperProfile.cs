@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.IssuerKey, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
+                .ForMember(dest => dest.IssuerKey, src => src.MapFrom(val => Base64.CreateString(32)))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
@@ -163,7 +163,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.quote, src => src.MapFrom(val => val.Quote))
                 .ForMember(dest => dest.category, src => src.MapFrom(val => val.Category))
                 .ForMember(dest => dest.date, src => src.MapFrom(val => val.Date))
-                .ForMember(dest => dest.tags, src => src.MapFrom(val => val.Tags.Split(',').ToList()))
+                .ForMember(dest => dest.tags, src => src.MapFrom(val => val.Tags.Split(',', StringSplitOptions.None).ToList()))
                 .ForMember(dest => dest.length, src => src.MapFrom(val => val.Length))
                 .ForMember(dest => dest.background, src => src.MapFrom(val => val.Background));
 
@@ -188,7 +188,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
+                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => Base64.CreateString(32)))
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
@@ -264,10 +264,10 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.LastLoginSuccess, src => src.Ignore())
                 .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => 0))
                 .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => 0))
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
+                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => Base64.CreateString(32)))
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
                 .ForMember(dest => dest.PasswordConfirmed, src => src.MapFrom(val => false))
-                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => RandomValues.CreateBase64String(32)))
+                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => Base64.CreateString(32)))
                 .ForMember(dest => dest.TwoFactorEnabled, src => src.MapFrom(val => false))
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())

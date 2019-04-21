@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.Core.CommandLine;
-using Bhbk.Lib.Core.FileSystem;
+﻿using Bhbk.Lib.Common.CommandLine;
+using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
@@ -60,7 +61,6 @@ namespace Bhbk.Cli.Identity.Commands
                 var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
-                    .AddEnvironmentVariables()
                     .Build();
 
                 _service = new AdminService(conf);

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                             ClientId = Guid.NewGuid(),
                             UserId = Guid.NewGuid(),
                             RefreshType = RefreshType.User.ToString(),
-                            RefreshValue = RandomValues.CreateBase64String(8),
+                            RefreshValue = Base64.CreateString(8),
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         ClientId = client.Id,
                         UserId = user.Id,
                         RefreshType = RefreshType.User.ToString(),
-                        RefreshValue = RandomValues.CreateBase64String(8),
+                        RefreshValue = Base64.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));

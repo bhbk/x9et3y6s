@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.FileSystem;
+using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
@@ -28,7 +28,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
                 .Build();
 
             var instance = new ContextService(InstanceContext.UnitTest);

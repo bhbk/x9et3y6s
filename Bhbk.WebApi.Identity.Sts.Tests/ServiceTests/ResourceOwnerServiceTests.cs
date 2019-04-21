@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         grant_type = "password",
                         username = user.Id.ToString(),
-                        password = RandomValues.CreateBase64String(8),
+                        password = Base64.CreateString(8),
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -811,7 +811,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         grant_type = "password",
                         user = user.Id.ToString(),
-                        password = RandomValues.CreateBase64String(8),
+                        password = Base64.CreateString(8),
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);

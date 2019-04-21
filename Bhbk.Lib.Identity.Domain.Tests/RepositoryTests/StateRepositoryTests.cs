@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                             IssuerId = Guid.NewGuid(),
                             ClientId = Guid.NewGuid(),
                             UserId = Guid.NewGuid(),
-                            StateValue = RandomValues.CreateBase64String(32),
+                            StateValue = Base64.CreateString(32),
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,

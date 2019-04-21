@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && x.ConfigKey == Constants.ApiSettingPollingMax)).Single();
 
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
-            var nonce = RandomValues.CreateBase64String(32);
+            var nonce = Base64.CreateString(32);
 
             //create domain model for this result type...
             var result = new DeviceCodeV2()

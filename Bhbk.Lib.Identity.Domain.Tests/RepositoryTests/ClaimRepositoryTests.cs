@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                     {
                         IssuerId = Guid.NewGuid(),
                         Type = Constants.ApiTestClaim,
-                        Value = RandomValues.CreateBase64String(8),
+                        Value = Base64.CreateString(8),
                         Immutable = false,
                     }));
             });
@@ -51,7 +51,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                 {
                     IssuerId = issuer.Id,
                     Type = Constants.ApiTestClaim,
-                    Value = RandomValues.CreateBase64String(8),
+                    Value = Base64.CreateString(8),
                     Immutable = false,
                 }));
             result.Should().BeAssignableTo<tbl_Claims>();

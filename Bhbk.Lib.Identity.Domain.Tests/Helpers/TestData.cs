@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -132,7 +132,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             IssuerId = foundIssuer.Id,
                             ClientId = foundClient.Id,
                             RefreshType = RefreshType.Client.ToString(),
-                            RefreshValue = RandomValues.CreateBase64String(8),
+                            RefreshValue = Base64.CreateString(8),
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
@@ -177,7 +177,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     {
                         IssuerId = foundIssuer.Id,
                         Type = FakeConstants.ApiTestClaim,
-                        Value = RandomValues.CreateBase64String(8),
+                        Value = Base64.CreateString(8),
                         Immutable = false,
                     }));
 
@@ -235,8 +235,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 {
                     Email = FakeConstants.ApiTestUser,
                     PhoneNumber = FakeConstants.ApiTestUserPhone,
-                    FirstName = "First-" + RandomValues.CreateBase64String(4),
-                    LastName = "Last-" + RandomValues.CreateBase64String(4),
+                    FirstName = "First-" + Base64.CreateString(4),
+                    LastName = "Last-" + Base64.CreateString(4),
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = false,
@@ -259,7 +259,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             IssuerId = foundIssuer.Id,
                             ClientId = foundClient.Id,
                             UserId = foundUser.Id,
-                            StateValue = RandomValues.CreateBase64String(32),
+                            StateValue = Base64.CreateString(32),
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
@@ -274,7 +274,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             ClientId = foundClient.Id,
                             UserId = foundUser.Id,
                             RefreshType = RefreshType.User.ToString(),
-                            RefreshValue = RandomValues.CreateBase64String(8),
+                            RefreshValue = Base64.CreateString(8),
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
@@ -307,7 +307,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             await _uow.UserRepo.CreateMOTDAsync(
                 new tbl_MotDType1()
                 {
-                    Id = RandomValues.CreateAlphaNumericString(8),
+                    Id = AlphaNumeric.CreateString(8),
                     Date = DateTime.Now,
                     Author = "Test Author",
                     Quote = "Test Quote",
@@ -343,7 +343,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 issuer = await _uow.IssuerRepo.CreateAsync(
                     _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
-                        Name = FakeConstants.ApiTestIssuer + "-" + RandomValues.CreateBase64String(4),
+                        Name = FakeConstants.ApiTestIssuer + "-" + Base64.CreateString(4),
                         IssuerKey = FakeConstants.ApiTestIssuerKey,
                         Enabled = true,
                         Immutable = false,
@@ -359,7 +359,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = issuer.Id,
-                        Name = FakeConstants.ApiTestClient + "-" + RandomValues.CreateBase64String(4),
+                        Name = FakeConstants.ApiTestClient + "-" + Base64.CreateString(4),
                         ClientKey = FakeConstants.ApiTestClientKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
@@ -382,7 +382,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             IssuerId = issuer.Id,
                             ClientId = client.Id,
                             RefreshType = RefreshType.Client.ToString(),
-                            RefreshValue = RandomValues.CreateBase64String(8),
+                            RefreshValue = Base64.CreateString(8),
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
@@ -414,8 +414,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
-                        Type = FakeConstants.ApiTestClaim + "-" + RandomValues.CreateBase64String(4),
-                        Value = RandomValues.CreateBase64String(8),
+                        Type = FakeConstants.ApiTestClaim + "-" + Base64.CreateString(4),
+                        Value = Base64.CreateString(8),
                         Immutable = false,
                     }));
 
@@ -428,7 +428,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 login = await _uow.LoginRepo.CreateAsync(
                     _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
-                        Name = FakeConstants.ApiTestLogin + "-" + RandomValues.CreateBase64String(4),
+                        Name = FakeConstants.ApiTestLogin + "-" + Base64.CreateString(4),
                         LoginKey = FakeConstants.ApiTestLoginKey,
                         Enabled = true,
                         Immutable = false,
@@ -444,7 +444,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
-                        Name = FakeConstants.ApiTestRole + "-" + RandomValues.CreateBase64String(4),
+                        Name = FakeConstants.ApiTestRole + "-" + Base64.CreateString(4),
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -458,10 +458,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 user = await _uow.UserRepo.CreateAsync(
                     _mapper.Map<tbl_Users>(new UserCreate()
                     {
-                        Email = RandomValues.CreateAlphaNumericString(4) + "-" + FakeConstants.ApiTestUser,
-                        PhoneNumber = FakeConstants.ApiTestUserPhone + RandomValues.CreateNumberAsString(1),
-                        FirstName = "First-" + RandomValues.CreateBase64String(4),
-                        LastName = "Last-" + RandomValues.CreateBase64String(4),
+                        Email = AlphaNumeric.CreateString(4) + "-" + FakeConstants.ApiTestUser,
+                        PhoneNumber = FakeConstants.ApiTestUserPhone + NumberAs.CreateString(1),
+                        FirstName = "First-" + Base64.CreateString(4),
+                        LastName = "Last-" + Base64.CreateString(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
@@ -484,7 +484,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             IssuerId = issuer.Id,
                             ClientId = client.Id,
                             UserId = user.Id,
-                            StateValue = RandomValues.CreateBase64String(32),
+                            StateValue = Base64.CreateString(32),
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
@@ -499,7 +499,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             ClientId = client.Id,
                             UserId = user.Id,
                             RefreshType = RefreshType.User.ToString(),
-                            RefreshValue = RandomValues.CreateBase64String(8),
+                            RefreshValue = Base64.CreateString(8),
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
@@ -531,7 +531,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.UserRepo.CreateMOTDAsync(
                     new tbl_MotDType1()
                     {
-                        Id = RandomValues.CreateAlphaNumericString(8),
+                        Id = AlphaNumeric.CreateString(8),
                         Date = DateTime.Now,
                         Author = "Test Author",
                         Quote = "Test Quote",

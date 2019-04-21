@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Core.Extensions;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Extensions;
+using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;

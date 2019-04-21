@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.Core.Options;
+﻿using Bhbk.Lib.Hosting.Options;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.IO;
 
@@ -9,21 +10,20 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Program
     {
-        public static IWebHost CreateWebHost(string[] args) =>
+        public static IWebHostBuilder CreateHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .CaptureStartupErrors(true)
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                    config.AddEnvironmentVariables();
-                })
-                .UseKestrel(options =>
-                {
-                    options.ConfigureEndpoints();
-                })
-                .UseStartup<Startup>()
-                .Build();
+            .CaptureStartupErrors(true)
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            })
+            //.UseIIS()
+            .UseKestrel(options =>
+            {
+                options.ConfigureEndpoints();
+            })
+            .UseStartup<Startup>();
 
         public static void Main(string[] args)
         {
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 .WriteTo.RollingFile(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
-            CreateWebHost(args).Run();
+            CreateHostBuilder(args).Build().Run();
         }
     }
 }

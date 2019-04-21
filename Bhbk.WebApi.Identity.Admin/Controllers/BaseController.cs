@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

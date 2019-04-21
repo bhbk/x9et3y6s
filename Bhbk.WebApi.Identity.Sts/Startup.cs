@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Options;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Hosting.Options;
+using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
@@ -35,7 +35,6 @@ namespace Bhbk.WebApi.Identity.Sts
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
@@ -102,27 +101,27 @@ namespace Bhbk.WebApi.Identity.Sts
             issuerKeys = issuerKeys.Concat(conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
                 .Select(x => x.Value));
 #endif
-            sc.AddLogging(log =>
+            sc.AddLogging(opt =>
             {
-                log.AddSerilog();
+                opt.AddSerilog();
             });
             sc.AddCors();
-            sc.AddAuthentication(auth =>
+            sc.AddAuthentication(opt =>
             {
-                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(bearer =>
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(jwt =>
             {
 #if RELEASE
-                bearer.IncludeErrorDetails = false;
+                jwt.IncludeErrorDetails = false;
 #elif !RELEASE
-                bearer.IncludeErrorDetails = true;
+                jwt.IncludeErrorDetails = true;
 #endif
-                bearer.TokenValidationParameters = new TokenValidationParameters
+                jwt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
@@ -137,41 +136,42 @@ namespace Bhbk.WebApi.Identity.Sts
                     ClockSkew = TimeSpan.Zero,
                 };
             });
-            sc.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            sc.AddMvc().AddJsonOptions(json =>
+            sc.AddMvc(opt =>
+            {
+                opt.EnableEndpointRouting = false;
+            }).AddNewtonsoftJson(json =>
             {
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            });
-            sc.AddAuthorization(auth =>
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+            sc.AddAuthorization(opt =>
             {
-                auth.AddPolicy("AdministratorsPolicy", admins =>
+                opt.AddPolicy("AdministratorsPolicy", admins =>
                 {
                     admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                 });
-                auth.AddPolicy("ServicesPolicy", services =>
+                opt.AddPolicy("ServicesPolicy", services =>
                 {
                     services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
-                auth.AddPolicy("UsersPolicy", users =>
+                opt.AddPolicy("UsersPolicy", users =>
                 {
                     users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
             });
-            sc.Configure<ForwardedHeadersOptions>(headers =>
+            sc.Configure<ForwardedHeadersOptions>(opt =>
             {
-                headers.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                opt.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-            sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
+            //sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
         }
 
-        public virtual void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, ILoggerFactory log)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory log)
         {
             //order below is important...
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -179,19 +179,19 @@ namespace Bhbk.WebApi.Identity.Sts
             }
 
             app.UseForwardedHeaders();
-            app.UseCors(policy => policy
+            app.UseStaticFiles();
+            app.UseCors(opt => opt
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
-            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc();
 
             //app.UseMiddleware<ResourceOwner_Deprecate>();
             //app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
 
-            app.UseSwagger(SwaggerOptions.ConfigureSwagger);
-            app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
+            //app.UseSwagger(SwaggerOptions.ConfigureSwagger);
+            //app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
@@ -10,6 +9,7 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.Paging.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -443,20 +443,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<tbl_Users, bool>> preds;
+            Expression<Func<tbl_Users, bool>> predicates;
 
             if (string.IsNullOrEmpty(model.Filter))
-                preds = x => true;
+                predicates = x => true;
             else
-                preds = x => x.Email.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                predicates = x => x.Email.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
                 || x.PhoneNumber.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
                 || x.FirstName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
                 || x.LastName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
 
             try
             {
-                var total = await UoW.UserRepo.CountAsync(preds);
-                var result = await UoW.UserRepo.GetAsync(preds,
+                var total = await UoW.UserRepo.CountAsync(predicates);
+                var result = await UoW.UserRepo.GetAsync(predicates,
                     x => x.Include(r => r.tbl_UserRoles).ThenInclude(r => r.Role),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,

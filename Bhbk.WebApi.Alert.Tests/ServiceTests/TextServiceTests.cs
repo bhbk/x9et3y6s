@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Enqueue_TextV1(RandomValues.CreateBase64String(8), new TextCreate());
+                var result = await _service.Http.Enqueue_TextV1(Base64.CreateString(8), new TextCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }

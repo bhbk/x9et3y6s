@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Interfaces;
+﻿using Bhbk.Lib.DataAccess.UnitOfWork;
 using Bhbk.Lib.Identity.Data.Repositories;
 
 namespace Bhbk.Lib.Identity.Data.Services

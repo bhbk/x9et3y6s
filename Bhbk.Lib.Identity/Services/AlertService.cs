@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Repositories;

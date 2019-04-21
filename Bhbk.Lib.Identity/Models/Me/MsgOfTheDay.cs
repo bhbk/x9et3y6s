@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Models.Me
 {
-    public abstract class MotD
+    public abstract class MsgOfTheDay
     {
         public string id { get; set; }
 
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Models.Me
         }
     }
 
-    public class MotDType1Model : MotD
+    public class MotDType1Model : MsgOfTheDay
     {
         public string length { get; set; }
 

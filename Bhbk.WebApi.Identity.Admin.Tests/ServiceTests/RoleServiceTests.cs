@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.Paging.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Role_CreateV1(RandomValues.CreateBase64String(8), new RoleCreate());
+                var result = await _service.Http.Role_CreateV1(Base64.CreateString(8), new RoleCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     new RoleCreate()
                     {
                         ClientId = client.Id,
-                        Name = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestRole,
+                        Name = Base64.CreateString(4) + "-" + FakeConstants.ApiTestRole,
                         Enabled = true,
                         Immutable = false
                     });
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Role_DeleteV1(RandomValues.CreateBase64String(8), Guid.NewGuid());
+                var result = await _service.Http.Role_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -270,7 +270,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Role_UpdateV1(RandomValues.CreateBase64String(8), new RoleModel());
+                var result = await _service.Http.Role_UpdateV1(Base64.CreateString(8), new RoleModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }

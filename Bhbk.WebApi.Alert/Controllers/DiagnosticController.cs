@@ -12,6 +12,7 @@ using System.Reflection;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
+    [ApiController]
     [Route("diagnostic")]
     public class DiagnosticController : BaseController
     {

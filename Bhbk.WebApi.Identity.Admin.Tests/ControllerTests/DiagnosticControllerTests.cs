@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.WebApi.Identity.Admin.Controllers;
@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var result = controller.GetStatusV1(RandomValues.CreateAlphaNumericString(8)) as BadRequestResult;
+            var result = controller.GetStatusV1(AlphaNumeric.CreateString(8)) as BadRequestResult;
             var ok = result.Should().BeOfType<BadRequestResult>().Subject;
         }
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var dc = await _service.Http.Info_UpdateCodeV1(RandomValues.CreateBase64String(8), RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
+                var dc = await _service.Http.Info_UpdateCodeV1(Base64.CreateString(8), Base64.CreateString(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
+                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, Base64.CreateString(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, state.StateValue, RandomValues.CreateAlphaNumericString(8));
+                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, state.StateValue, AlphaNumeric.CreateString(8));
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                             IssuerId = issuer.Id,
                             ClientId = client.Id,
                             UserId = user.Id,
-                            StateValue = RandomValues.CreateBase64String(32),
+                            StateValue = Base64.CreateString(32),
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
@@ -171,7 +171,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
                         UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
+                        StateValue = Base64.CreateString(32),
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,

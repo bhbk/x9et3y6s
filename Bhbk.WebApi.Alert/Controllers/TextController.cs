@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
+    [ApiController]
     [Route("text")]
     public class TextController : BaseController
     {

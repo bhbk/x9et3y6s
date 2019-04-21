@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.Paging.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Claim_CreateV1(RandomValues.CreateBase64String(8), new ClaimCreate());
+                var result = await _service.Http.Claim_CreateV1(Base64.CreateString(8), new ClaimCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -104,8 +104,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
-                        Type = FakeConstants.ApiTestClaim + "-" + RandomValues.CreateBase64String(4),
-                        Value = RandomValues.CreateBase64String(8),
+                        Type = FakeConstants.ApiTestClaim + "-" + Base64.CreateString(4),
+                        Value = Base64.CreateString(8),
                     });
                 result.Should().BeAssignableTo<ClaimModel>();
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Claim_DeleteV1(RandomValues.CreateBase64String(8), Guid.NewGuid());
+                var result = await _service.Http.Claim_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -265,7 +265,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Claim_UpdateV1(RandomValues.CreateBase64String(8), new ClaimModel());
+                var result = await _service.Http.Claim_UpdateV1(Base64.CreateString(8), new ClaimModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }

@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataAccess.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, Base64.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -174,7 +174,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
 
             //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, Base64.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));

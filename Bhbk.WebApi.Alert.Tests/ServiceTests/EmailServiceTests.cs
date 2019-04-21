@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var result = await _service.Http.Enqueue_EmailV1(RandomValues.CreateBase64String(8), new EmailCreate());
+                var result = await _service.Http.Enqueue_EmailV1(Base64.CreateString(8), new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -88,8 +88,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = user.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = FakeConstants.ApiTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        Subject = FakeConstants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
+                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -115,8 +115,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = testUser.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = FakeConstants.ApiTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        Subject = FakeConstants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
+                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -146,8 +146,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = user.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = FakeConstants.ApiTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        Subject = FakeConstants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
+                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NoContent);

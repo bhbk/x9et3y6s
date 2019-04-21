@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataAccess.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Microsoft.EntityFrameworkCore.Query;
 using System;

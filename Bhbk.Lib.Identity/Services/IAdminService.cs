@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Paging.Models;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;

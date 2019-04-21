@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -152,8 +153,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             var model = new UserChangePassword()
             {
                 CurrentPassword = Constants.ApiTestUserPassCurrent,
-                NewPassword = RandomValues.CreateBase64String(16),
-                NewPasswordConfirm = RandomValues.CreateBase64String(16)
+                NewPassword = Base64.CreateString(16),
+                NewPasswordConfirm = Base64.CreateString(16)
             };
 
             controller.SetUser(issuer.Id, user.Id);

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-            var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
+            var newEmail = string.Format("{0}{1}", Base64.CreateString(4), user.Email);
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
-                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
+                Base64.CreateString(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-            var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
+            var newEmail = string.Format("{0}{1}", Base64.CreateString(4), user.Email);
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-            var newPassword = RandomValues.CreateBase64String(12);
+            var newPassword = Base64.CreateString(12);
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
-                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
+                Base64.CreateString(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-            var newPassword = RandomValues.CreateBase64String(12);
+            var newPassword = Base64.CreateString(12);
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -188,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-            var newPhoneNumber = RandomValues.CreateNumberAsString(10);
+            var newPhoneNumber = NumberAs.CreateString(10);
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber,
-                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
+                Base64.CreateString(token.Length)) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
@@ -218,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-            var newPhoneNumber = RandomValues.CreateNumberAsString(10);
+            var newPhoneNumber = NumberAs.CreateString(10);
 
             controller.SetUser(issuer.Id, user.Id);
 
