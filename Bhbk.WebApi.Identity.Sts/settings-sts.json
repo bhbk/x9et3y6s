@@ -1,0 +1,112 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "LogLevel": {
+      "Default": "Information",
+      "System": "Information",
+      "Microsoft": "Information"
+    }
+  },
+  "Databases": {
+    "IdentityEntities": "Data Source=bits.test.ochap.local; Initial Catalog=BhbkIdentity; User ID=Sql.BhbkIdentity; Password=Pa$$word01!"
+  },
+  "KestrelServer": {
+    "Endpoints": {
+      "Insecure": {
+        "Host": "localhost",
+        "Port": 55114,
+        "Scheme": "http",
+        "Enable": "true"
+      },
+      "Secure": {
+        "Host": "localhost",
+        "Port": 44375,
+        "Scheme": "https",
+        "Enable": "false"
+      }
+    }
+  },
+  "Tasks": {
+    "MaintainRefreshes": {
+      "PollingDelay": "60"
+    },
+    "MaintainStates": {
+      "PollingDelay": "60"
+    }
+  },
+  "IdentityDefaults": {
+    "AuthCodeRefreshExpire": "86400",
+    "AuthCodeTokenExpire": "600",
+    "AuthCodeTotpExpire": "600",
+    "ClientCredTokenExpire": "600",
+    "ClientCredRefreshExpire": "86400",
+    "DeviceCodePollMax": "10",
+    "DeviceCodeRefreshExpire": "86400",
+    "DeviceCodeTokenExpire": "600",
+    "DeviceCodeTotpExpire": "600",
+    "ImplicitTokenExpire": "600",
+    "ResourceOwnerTokenExpire": "600",
+    "ResourceOwnerRefreshExpire": "86400",
+    "LegacyModeClaims": "true",
+    "LegacyModeIssuer": "true"
+  },
+  "IdentityTenants": {
+    "AllowedIssuers": [
+      "Bhbk"
+    ],
+    "AllowedIssuerKeys": [
+      "abcdefghijklmnopqrstuvwxyz0123456789"
+    ],
+    "AllowedClients": [
+      "Bhbk.WebApi.Identity",
+      "Bhbk.WebUi.Identity"
+    ],
+    "Salt": "0123456789"
+  },
+  "IdentityLogin": {
+    "IssuerName": "Bhbk",
+    "ClientName": "",
+    "UserName": "identity@system.ochap.local",
+    "UserPass": "pa$$word01!"
+  },
+  "IdentityAdminUrls": {
+    "BaseApiUrl": "https://localhost:44359",
+    "BaseApiPath": "/api/identity/admin",
+    "BaseUiUrl": "http://localhost:4300",
+    "BaseUiPath": "/ui/identity/admin"
+  },
+  "IdentityMeUrls": {
+    "BaseApiUrl": "https://localhost:44348",
+    "BaseApiPath": "/api/identity/me",
+    "BaseUiUrl": "http://localhost:4300",
+    "BaseUiPath": "/ui/identity/me"
+  },
+  "IdentityStsUrls": {
+    "BaseApiUrl": "https://localhost:44375",
+    "BaseApiPath": "/api/identity/sts"
+  },
+  "AlertUrls": {
+    "BaseApiUrl": "https://localhost:44374",
+    "BaseApiPath": "/api/alert"
+  }
+  //"IdentityAdminUrls": {
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
+  //  "BaseApiPath": "/api/identity/admin",
+  //  "BaseUiUrl": "https://yolo.test.ochap.net",
+  //  "BaseUiPath": "/ui/identity/admin"
+  //},
+  //"IdentityMeUrls": {
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
+  //  "BaseApiPath": "/api/identity/me",
+  //  "BaseUiUrl": "https://yolo.test.ochap.net",
+  //  "BaseUiPath": "/ui/identity/me"
+  //},
+  //"IdentityStsUrls": {
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
+  //  "BaseApiPath": "/api/identity/sts"
+  //},
+  //"AlertUrls": {
+  //  "BaseApiUrl": "https://yolo.test.ochap.net",
+  //  "BaseApiPath": "/api/alert"
+  //}
+}

@@ -3,10 +3,9 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +17,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -123,12 +121,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
             {
-                var code = HttpUtility.UrlEncode(await new ProtectProvider(UoW.InstanceType.ToString())
+                var code = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), result));
 
-                var url = UrlBuilder.GenerateConfirmEmail(Conf, result, code);
+                var url = UrlHelper.GenerateConfirmEmail(Conf, result, code);
 
-                Alerts.EmailEnqueueV1(new EmailCreate()
+                Alerts.Email_EnqueueV1(new EmailCreate()
                 {
                     FromId = result.Id,
                     FromEmail = result.Email,
@@ -232,7 +230,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            return Ok(await UoW.UserRepo.GetClaimsAsync(user.Id));
+            var claims = await UoW.UserRepo.GetClaimsAsync(user.Id);
+
+            var result = (await UoW.ClaimRepo.GetAsync(x => claims.Contains(x)))
+                .Select(x => UoW.Mapper.Map<ClaimModel>(x));
+
+            return Ok(result);
         }
 
         [Route("v1/{userID:guid}/clients"), HttpGet]

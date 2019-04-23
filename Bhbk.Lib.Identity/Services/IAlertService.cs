@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Services
         JwtSecurityToken Jwt { get; set; }
         AlertRepository Repo { get; }
 
-        void EmailEnqueueV1(EmailCreate model);
-        void TextEnqueueV1(TextCreate model);
+        bool Email_EnqueueV1(EmailCreate model);
+        bool Text_EnqueueV1(TextCreate model);
     }
 }

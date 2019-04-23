@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public UserRepository(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf, IMapper mapper)
         {
-            _context = context;
+            _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _conf = conf;
             _mapper = mapper;
@@ -220,14 +220,21 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.tbl_Users.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Users user)
+        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Users model)
         {
             var claims = new List<Claim>();
+
+            //defaults...
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Email, model.Email));
+            claims.Add(new Claim(ClaimTypes.MobilePhone, model.PhoneNumber));
+            claims.Add(new Claim(ClaimTypes.GivenName, model.FirstName));
+            claims.Add(new Claim(ClaimTypes.Surname, model.LastName));
 
             //user identity vs. a service identity
             claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
 
-            foreach (var role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x.Name))
+            foreach (var role in (await GetRolesAsync(model.Id)).ToList().OrderBy(x => x.Name))
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
@@ -236,7 +243,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                     claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
             }
 
-            foreach (var claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
+            foreach (var claim in (await GetClaimsAsync(model.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //not before timestamp
@@ -255,11 +262,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Users user)
+        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Users model)
         {
             var claims = new List<Claim>();
 
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -305,14 +312,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<IEnumerable<tbl_Claims>> GetClaimsAsync(Guid key)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
             var result = _context.tbl_Claims.Where(x => x.tbl_UserClaims.Any(y => y.UserId == key)).ToList();
-
-            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.NameIdentifier, Value = entity.Id.ToString() });
-            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.Email, Value = entity.Email });
-            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.MobilePhone, Value = entity.PhoneNumber });
-            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.GivenName, Value = entity.FirstName });
-            result.Add(new tbl_Claims() { Id = Guid.NewGuid(), Type = ClaimTypes.Surname, Value = entity.LastName });
 
             return await Task.FromResult(result);
         }
@@ -575,12 +575,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return true;
         }
 
-        internal async Task<PasswordVerificationResult> VerifyPasswordAsync(tbl_Users user, string password)
+        internal async Task<PasswordVerificationResult> VerifyPasswordAsync(tbl_Users model, string password)
         {
             if (passwordHasher == null)
                 throw new NotSupportedException();
 
-            if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
+            if (passwordHasher.VerifyHashedPassword(model, model.PasswordHash, password) != PasswordVerificationResult.Failed)
                 return PasswordVerificationResult.Success;
 
             return await Task.FromResult(PasswordVerificationResult.Failed);

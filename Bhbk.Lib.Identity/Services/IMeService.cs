@@ -9,6 +9,6 @@ namespace Bhbk.Lib.Identity.Services
         JwtSecurityToken Jwt { get; set; }
         MeRepository Repo { get; }
 
-        UserModel DetailGetV1(string userValue);
+        UserModel Detail_GetV1();
     }
 }

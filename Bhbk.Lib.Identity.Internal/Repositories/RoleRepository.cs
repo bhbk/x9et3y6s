@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public RoleRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
         {
-            _context = context;
+            _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _mapper = mapper;
         }

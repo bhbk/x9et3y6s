@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile("settings-sts.json", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
                 .UseIISIntegration()

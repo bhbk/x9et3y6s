@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString(),
                 client = client.Id.ToString(),
                 verification_url = authorize.AbsoluteUri,
-                user_code = await new TotpProvider(8, 10).GenerateAsync(user.SecurityStamp, user),
+                user_code = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user),
                 device_code = nonce,
                 interval = UoW.ConfigRepo.DeviceCodePollMax,
             };
@@ -137,13 +137,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/device/{userCode}/{userAction}"), HttpGet]
-        public IActionResult DecideDeviceCodeV1([FromRoute] string userCode, string userAction)
+        public IActionResult DeviceCodeActionV1([FromRoute] string userCode, string userAction)
         {
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
         [Route("v2/device/{userCode}/{userAction}"), HttpGet]
-        public async Task<IActionResult> DecideDeviceCodeV2([FromRoute] string userCode, string userAction)
+        public async Task<IActionResult> DeviceCodeActionV2([FromRoute] string userCode, string userAction)
         {
             ActionType actionType;
 
@@ -325,7 +325,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            if (!await new TotpProvider(8, 10).ValidateAsync(user.SecurityStamp, input.user_code, user))
+            if (!await new TotpHelper(8, 10).ValidateAsync(user.SecurityStamp, input.user_code, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.user_code}");
                 return BadRequest(ModelState);
@@ -335,8 +335,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
 
-            var access = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
-            var refresh = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
+            var access = await JwtHelper.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
+            var refresh = await JwtHelper.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

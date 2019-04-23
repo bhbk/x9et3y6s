@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -185,8 +185,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         //no context for auth exists yet... so set actor id same as user id...
                         user.ActorId = user.Id;
 
-                        var access = await JwtBuilder.UserResourceOwnerV1(UoW, issuer, client, user);
-                        var refresh = await JwtBuilder.UserRefreshV1(UoW, issuer, user);
+                        var access = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
+                        var refresh = await JwtHelper.UserRefreshV1(UoW, issuer, user);
 
                         var result = new UserJwtV1()
                         {
@@ -277,8 +277,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         //no context for auth exists yet... so set actor id same as client id...
                         client.ActorId = client.Id;
 
-                        var access = await JwtBuilder.ClientResourceOwnerV2(UoW, issuer, client);
-                        var refresh = await JwtBuilder.ClientRefreshV2(UoW, issuer, client);
+                        var access = await JwtHelper.ClientResourceOwnerV2(UoW, issuer, client);
+                        var refresh = await JwtHelper.ClientRefreshV2(UoW, issuer, client);
 
                         var result = new ClientJwtV2()
                         {
@@ -350,8 +350,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             }
                         }
 
-                        var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
-                        var rt = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
+                        var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
+                        var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
 
                         var result = new UserJwtV2()
                         {

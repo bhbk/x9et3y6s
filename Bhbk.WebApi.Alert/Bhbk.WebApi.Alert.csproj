@@ -10,11 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="appsettings.json" />
+    <Content Remove="settings-alert.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="appsettings.json">
+    <None Include="settings-alert.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

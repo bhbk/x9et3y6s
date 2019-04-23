@@ -28,7 +28,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var lib = SearchRoots.ByAssemblyContext("libsettings.json");
+                var lib = SearchRoots.ByAssemblyContext("settings-cli.json");
 
                 var conf = new ConfigurationBuilder()
                     .SetBasePath(lib.DirectoryName)
@@ -40,7 +40,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .EnableSensitiveDataLogging();
 
                 var uow = new IdentityUnitOfWork(builder, InstanceContext.DeployedOrLocal, conf);
-                var data = new GenerateDefaultData(uow);
+                var data = new GenerateDefaults(uow);
 
                 if (CreateDefault)
                 {

@@ -17,6 +17,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
+            TaskType taskType;
+
+            if (!Enum.TryParse<TaskType>(name, true, out taskType))
+                return BadRequest();
+
             if (string.Equals(name, TaskType.MaintainActivity.ToString(), StringComparison.OrdinalIgnoreCase))
                 return Ok(((MaintainActivityTask)Tasks.Single(x => x.GetType() == typeof(MaintainActivityTask))).Status);
 

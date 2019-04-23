@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string ApiDefaultLogin = "local";
         public const string ApiDefaultLoginKey = "local";
         public const string ApiDefaultLoginName = "local";
-        public const string ApiDefaultRoleForAdmin = "(Built-In) Administrators";
+        public const string ApiDefaultRoleForAdmin = "(Built-In) Admins";
         public const string ApiDefaultRoleForSystem = "(Built-In) Services";
         public const string ApiDefaultRoleForUser = "(Built-In) Users";
         public const string ApiDefaultAdminUser = "admin@local";

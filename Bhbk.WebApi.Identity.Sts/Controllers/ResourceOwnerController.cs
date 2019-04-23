@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -182,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (UoW.ConfigRepo.LegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
-                var access = await JwtBuilder.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
+                var access = await JwtHelper.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
 
                 var result = new UserJwtV1Legacy()
                 {
@@ -195,8 +195,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                var access = await JwtBuilder.UserResourceOwnerV1(UoW, issuer, client, user);
-                var refresh = await JwtBuilder.UserRefreshV1(UoW, issuer, user);
+                var access = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
+                var refresh = await JwtHelper.UserRefreshV1(UoW, issuer, user);
 
                 var result = new UserJwtV1()
                 {
@@ -358,8 +358,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
 
-            var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

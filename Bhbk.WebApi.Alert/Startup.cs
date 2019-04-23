@@ -32,13 +32,11 @@ namespace Bhbk.WebApi.Alert
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var lib = SearchRoots.ByAssemblyContext("libsettings.json");
-            var api = SearchRoots.ByAssemblyContext("appsettings.json");
+            var file = SearchRoots.ByAssemblyContext("settings-alert.json");
 
             var conf = new ConfigurationBuilder()
-                .SetBasePath(lib.DirectoryName)
-                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
-                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(file.DirectoryName)
+                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -52,9 +50,9 @@ namespace Bhbk.WebApi.Alert
             });
             sc.AddSingleton<IHostedService>(new QueueEmailTask(sc, conf));
             sc.AddSingleton<IHostedService>(new QueueTextTask(sc, conf));
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeAdmins>();
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeServices>();
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeUsers>();
+            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityAdmins>();
+            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityServices>();
+            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityUsers>();
             sc.AddSingleton<IAlertService>(new AlertService(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
@@ -140,15 +138,15 @@ namespace Bhbk.WebApi.Alert
             {
                 auth.AddPolicy("AdministratorsPolicy", admins =>
                 {
-                    admins.Requirements.Add(new AuthorizeAdminsRequirement());
+                    admins.Requirements.Add(new AuthorizeAlertAdminsRequirement());
                 });
                 auth.AddPolicy("ServicesPolicy", services =>
                 {
-                    services.Requirements.Add(new AuthorizeServicesRequirement());
+                    services.Requirements.Add(new AuthorizeAlertServicesRequirement());
                 });
                 auth.AddPolicy("UsersPolicy", users =>
                 {
-                    users.Requirements.Add(new AuthorizeUsersRequirement());
+                    users.Requirements.Add(new AuthorizeAlertUsersRequirement());
                 });
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>

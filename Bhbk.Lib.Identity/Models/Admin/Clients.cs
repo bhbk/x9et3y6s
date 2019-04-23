@@ -12,7 +12,11 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid IssuerId { get; set; }
 
+        /*
+         * do not allow commas...
+         */
         [Required]
+        [RegularExpression(@"^[a-zA-Z0-9\._\-^%$#!~@?\[\]{}() \\/=+]+$")]
         public string Name { get; set; }
 
         public string Description { get; set; }

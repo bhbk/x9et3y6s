@@ -20,10 +20,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public RefreshRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
         {
-            if (context == null)
-                throw new NullReferenceException();
-
-            _context = context;
+            _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _mapper = mapper;
         }

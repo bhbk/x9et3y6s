@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
@@ -186,8 +186,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     }
                 }
 
-                var rop = JwtBuilder.UserResourceOwnerV2(uow, issuer, clients, user).Result;
-                var rt = JwtBuilder.UserRefreshV2(uow, issuer, user).Result;
+                var rop = JwtHelper.UserResourceOwnerV2(uow, issuer, clients, user).Result;
+                var rt = JwtHelper.UserRefreshV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -332,8 +332,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var access = JwtBuilder.UserResourceOwnerV1(uow, issuer, client, user).Result;
-                var refresh = JwtBuilder.UserRefreshV1(uow, issuer, user).Result;
+                var access = JwtHelper.UserResourceOwnerV1(uow, issuer, client, user).Result;
+                var refresh = JwtHelper.UserRefreshV1(uow, issuer, user).Result;
 
                 var result = new
                 {

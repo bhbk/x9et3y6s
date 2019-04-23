@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -100,8 +100,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var access = await JwtBuilder.ClientResourceOwnerV2(UoW, issuer, client);
-            var refresh = await JwtBuilder.ClientRefreshV2(UoW, issuer, client);
+            var access = await JwtHelper.ClientResourceOwnerV2(UoW, issuer, client);
+            var refresh = await JwtHelper.ClientRefreshV2(UoW, issuer, client);
 
             var result = new ClientJwtV2()
             {

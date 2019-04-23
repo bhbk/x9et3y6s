@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -333,14 +333,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check that payload can be decrypted and validated...
-            if (!await new ProtectProvider(UoW.InstanceType.ToString()).ValidateAsync(user.SecurityStamp, input.code, user))
+            if (!await new ProtectHelper(UoW.InstanceType.ToString()).ValidateAsync(user.SecurityStamp, input.code, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.code}");
                 return BadRequest(ModelState);
             }
 
-            var rop = await JwtBuilder.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtBuilder.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

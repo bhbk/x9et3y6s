@@ -25,10 +25,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public IssuerRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, string salt)
         {
-            if (context == null)
-                throw new NullReferenceException();
-
-            _context = context;
+            _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _mapper = mapper;
             _salt = salt;

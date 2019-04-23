@@ -87,11 +87,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, string claim)
+        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, string claimValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/claim/v1/" + claim;
+            var endpoint = "/claim/v1/" + claimValue;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -165,11 +165,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Client_GetV1(string jwt, string client)
+        public async Task<HttpResponseMessage> Client_GetV1(string jwt, string clientValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/client/v1/" + client;
+            var endpoint = "/client/v1/" + clientValue;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -243,11 +243,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Issuer_GetClientsV1(string jwt, string issuer)
+        public async Task<HttpResponseMessage> Issuer_GetClientsV1(string jwt, string issuerValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/issuer/v1/" + issuer + "/clients";
+            var endpoint = "/issuer/v1/" + issuerValue + "/clients";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -258,11 +258,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, string issuer)
+        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, string issuerValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/issuer/v1/" + issuer;
+            var endpoint = "/issuer/v1/" + issuerValue;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -336,11 +336,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Login_GetV1(string jwt, string login)
+        public async Task<HttpResponseMessage> Login_GetV1(string jwt, string loginValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/login/v1/" + login;
+            var endpoint = "/login/v1/" + loginValue;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -383,7 +383,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_AddToUserV1(string jwt, Guid roleID, Guid userID)
+        public async Task<HttpResponseMessage> Role_AddUserV1(string jwt, Guid roleID, Guid userID)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -429,11 +429,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_GetV1(string jwt, string role)
+        public async Task<HttpResponseMessage> Role_GetV1(string jwt, string roleValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/role/v1/" + role;
+            var endpoint = "/role/v1/" + roleValue;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -460,7 +460,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_RemoveFromUserV1(string jwt, Guid roleID, Guid userID)
+        public async Task<HttpResponseMessage> Role_RemoveUserV1(string jwt, Guid roleID, Guid userID)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -491,7 +491,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_AddToLoginV1(string jwt, Guid userID, Guid loginID)
+        public async Task<HttpResponseMessage> User_AddLoginV1(string jwt, Guid userID, Guid loginID)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -569,11 +569,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetClientsV1(string jwt, string user)
+        public async Task<HttpResponseMessage> User_GetClaimsV1(string jwt, string userValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/user/v1/" + user + "/clients";
+            var endpoint = "/user/v1/" + userValue + "/claims";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -584,11 +584,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetLoginsV1(string jwt, string user)
+        public async Task<HttpResponseMessage> User_GetClientsV1(string jwt, string userValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/user/v1/" + user + "/logins";
+            var endpoint = "/user/v1/" + userValue + "/clients";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -599,11 +599,26 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetV1(string jwt, string user)
+        public async Task<HttpResponseMessage> User_GetLoginsV1(string jwt, string userValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/user/v1/" + user;
+            var endpoint = "/user/v1/" + userValue + "/logins";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _client.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_GetV1(string jwt, string userValue)
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/user/v1/" + userValue;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -630,11 +645,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetRolesV1(string jwt, string user)
+        public async Task<HttpResponseMessage> User_GetRolesV1(string jwt, string userValue)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/user/v1/" + user + "/roles";
+            var endpoint = "/user/v1/" + userValue + "/roles";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -645,7 +660,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_RemoveFromLoginV1(string jwt, Guid userID, Guid loginID)
+        public async Task<HttpResponseMessage> User_RemoveLoginV1(string jwt, Guid userID, Guid loginID)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

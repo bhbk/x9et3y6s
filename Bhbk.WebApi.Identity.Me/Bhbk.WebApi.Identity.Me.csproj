@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Content Remove="appquotes.json" />
-    <Content Remove="appsettings.json" />
+    <Content Remove="settings-me.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,7 +71,7 @@
     <None Include="appquotes.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="appsettings.json">
+    <None Include="settings-me.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

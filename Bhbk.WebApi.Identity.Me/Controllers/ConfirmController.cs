@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Providers;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new ProtectProvider(UoW.InstanceType.ToString()).ValidateAsync(email, token, user))
+            else if (!await new ProtectHelper(UoW.InstanceType.ToString()).ValidateAsync(email, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new ProtectProvider(UoW.InstanceType.ToString()).ValidateAsync(password, token, user))
+            else if (!await new ProtectHelper(UoW.InstanceType.ToString()).ValidateAsync(password, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new TotpProvider(8, 10).ValidateAsync(phoneNumber, token, user))
+            else if (!await new TotpHelper(8, 10).ValidateAsync(phoneNumber, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);

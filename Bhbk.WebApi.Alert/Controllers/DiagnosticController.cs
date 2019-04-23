@@ -17,6 +17,11 @@ namespace Bhbk.WebApi.Alert.Controllers
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)
         {
+            TaskType taskType;
+
+            if (!Enum.TryParse<TaskType>(name, true, out taskType))
+                return BadRequest();
+
             if (string.Equals(name, TaskType.QueueEmails.ToString(), StringComparison.OrdinalIgnoreCase))
                 return Ok(((QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask))).Status);
 

@@ -11,40 +11,40 @@ namespace Bhbk.Lib.Identity.Services
         StsRepository Repo { get; }
 
         //authorization code flows
-        AuthCodeV1 AuthCodeGetV1(AuthCodeAskV1 model);
-        AuthCodeV2 AuthCodeGetV2(AuthCodeAskV2 model);
-        UserJwtV1 AuthCodeGetJwtV1(AuthCodeV1 model);
-        UserJwtV2 AuthCodeGetJwtV2(AuthCodeV2 model);
+        AuthCodeV1 AuthCode_AskV1(AuthCodeAskV1 model);
+        AuthCodeV2 AuthCode_AskV2(AuthCodeAskV2 model);
+        UserJwtV1 AuthCode_UseV1(AuthCodeV1 model);
+        UserJwtV2 AuthCode_UseV2(AuthCodeV2 model);
 
         //device code flows
-        void DeviceCodeDecisionV1(string code, string action);
-        void DeviceCodeDecisionV2(string code, string action);
-        DeviceCodeV1 DeviceCodeGetV1(DeviceCodeAskV1 model);
-        DeviceCodeV2 DeviceCodeGetV2(DeviceCodeAskV2 model);
-        UserJwtV1 DeviceCodeGetJwtV1(DeviceCodeV1 model);
-        UserJwtV2 DeviceCodeGetJwtV2(DeviceCodeV2 model);
+        bool DeviceCode_ActionV1(string code, string action);
+        bool DeviceCode_ActionV2(string code, string action);
+        DeviceCodeV1 DeviceCode_AskV1(DeviceCodeAskV1 model);
+        DeviceCodeV2 DeviceCode_AskV2(DeviceCodeAskV2 model);
+        UserJwtV1 DeviceCode_UseV1(DeviceCodeV1 model);
+        UserJwtV2 DeviceCode_UseV2(DeviceCodeV2 model);
 
         //client credential flows
-        UserJwtV1 ClientCredGetJwtV1(ClientCredentialV1 model);
-        UserJwtV2 ClientCredGetJwtV2(ClientCredentialV2 model);
+        UserJwtV1 ClientCredential_UseV1(ClientCredentialV1 model);
+        UserJwtV2 ClientCredential_UseV2(ClientCredentialV2 model);
 
         //implicit flows
-        UserJwtV1 ImplicitGetJwtV1(ImplicitV1 model);
-        UserJwtV2 ImplicitGetJwtV2(ImplicitV2 model);
+        UserJwtV1 Implicit_UseV1(ImplicitV1 model);
+        UserJwtV2 Implicit_UseV2(ImplicitV2 model);
 
         //refresh tokens
-        void RefreshTokenDeleteV1(string userValue, string token);
-        void RefreshTokenDeleteV2(string userValue, string token);
-        void RefreshTokensDeleteV1(string userValue);
-        void RefreshTokensDeleteV2(string userValue);
-        IEnumerable<RefreshTokenV1> RefreshTokensGetV1(string userValue);
-        IEnumerable<RefreshTokenV2> RefreshTokensGetV2(string userValue);
-        UserJwtV1 RefreshTokenGetJwtV1(RefreshTokenV1 model);
-        UserJwtV2 RefreshTokenGetJwtV2(RefreshTokenV2 model);
+        bool RefreshToken_DeleteV1(string userValue, string token);
+        bool RefreshToken_DeleteV2(string userValue, string token);
+        bool RefreshToken_DeleteAllV1(string userValue);
+        bool RefreshToken_DeleteAllV2(string userValue);
+        IEnumerable<RefreshTokenV1> RefreshToken_GetListV1(string userValue);
+        IEnumerable<RefreshTokenV2> RefreshToken_GetListV2(string userValue);
+        UserJwtV1 RefreshToken_UseV1(RefreshTokenV1 model);
+        UserJwtV2 RefreshToken_UseV2(RefreshTokenV2 model);
 
         //resource owner flows
-        UserJwtV1Legacy ResourceOwnerGetJwtV1Legacy(ResourceOwnerV1 model);
-        UserJwtV1 ResourceOwnerGetJwtV1(ResourceOwnerV1 model);
-        UserJwtV2 ResourceOwnerGetJwtV2(ResourceOwnerV2 model);
+        UserJwtV1Legacy ResourceOwner_UseV1Legacy(ResourceOwnerV1 model);
+        UserJwtV1 ResourceOwner_UseV1(ResourceOwnerV1 model);
+        UserJwtV2 ResourceOwner_UseV2(ResourceOwnerV2 model);
     }
 }

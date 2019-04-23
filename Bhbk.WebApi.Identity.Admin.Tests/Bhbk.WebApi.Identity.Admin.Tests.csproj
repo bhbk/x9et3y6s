@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Internal.Tests\Bhbk.Lib.Identity.Internal.Tests.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity.Internal\Bhbk.Lib.Identity.Internal.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
     <ProjectReference Include="..\Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj" />

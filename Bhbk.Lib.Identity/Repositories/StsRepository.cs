@@ -208,7 +208,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_DecideV1(string jwt, string code, string action)
+        public async Task<HttpResponseMessage> DeviceCode_ActionV1(string jwt, string code, string action)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -223,7 +223,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_DecideV2(string jwt, string code, string action)
+        public async Task<HttpResponseMessage> DeviceCode_ActionV2(string jwt, string code, string action)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -326,11 +326,26 @@ namespace Bhbk.Lib.Identity.Repositories
         }
 
         //https://oauth.net/2/grant-types/refresh-token/
-        public async Task<HttpResponseMessage> RefreshToken_DeleteV1(string jwt, string user)
+        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV1(string jwt, string user)
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
             var endpoint = "/oauth2/v1/refresh/" + user + "/revoke";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _client.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV2(string jwt, string user)
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -346,21 +361,6 @@ namespace Bhbk.Lib.Identity.Repositories
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
             var endpoint = "/oauth2/v1/refresh/" + user + "/revoke/" + token;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteV2(string jwt, string user)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));

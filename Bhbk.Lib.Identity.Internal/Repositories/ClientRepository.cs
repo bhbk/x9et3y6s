@@ -27,10 +27,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public ClientRepository(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf, IMapper mapper)
         {
-            if (context == null)
-                throw new NullReferenceException();
-
-            _context = context;
+            _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _conf = conf;
             _mapper = mapper;
@@ -93,17 +90,20 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.tbl_Clients.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Clients client)
+        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Clients model)
         {
             var claims = new List<Claim>();
+
+            //defaults...
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
 
             //service identity vs. a user identity
             claims.Add(new Claim(ClaimTypes.System, ClientType.server.ToString()));
 
-            foreach (var role in (await GetRolesAsync(client.Id)).ToList().OrderBy(x => x.Name))
+            foreach (var role in (await GetRolesAsync(model.Id)).ToList().OrderBy(x => x.Name))
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
-            foreach (var claim in (await GetClaimsAsync(client.Id)).ToList().OrderBy(x => x.Type))
+            foreach (var claim in (await GetClaimsAsync(model.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //not before timestamp
@@ -122,11 +122,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Clients client)
+        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Clients model)
         {
             var claims = new List<Claim>();
 
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));

@@ -26,7 +26,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var lib = SearchRoots.ByAssemblyContext("libsettings.json");
+                var lib = SearchRoots.ByAssemblyContext("settings-cli.json");
 
                 var conf = new ConfigurationBuilder()
                     .SetBasePath(lib.DirectoryName)
