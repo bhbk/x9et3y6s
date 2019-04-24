@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     password = Strings.ApiDefaultAdminUserPassword,
                 });
 
-            var rt = await _service.Raw.RefreshToken_GetListV1(rop.access_token, user.Id.ToString());
+            var rt = await _service.Repo.RefreshToken_GetListV1(rop.access_token, user.Id.ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -74,11 +74,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     password = Strings.ApiDefaultAdminUserPassword,
                 });
 
-            var rt = await _service.Raw.RefreshToken_DeleteAllV1(rop.access_token, Guid.NewGuid().ToString());
+            var rt = await _service.Repo.RefreshToken_DeleteAllV1(rop.access_token, Guid.NewGuid().ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
 
-            rt = await _service.Raw.RefreshToken_DeleteV1(rop.access_token, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            rt = await _service.Repo.RefreshToken_DeleteV1(rop.access_token, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
         }
@@ -103,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     password = Strings.ApiDefaultAdminUserPassword,
                 });
 
-            var rt = await _service.Raw.RefreshToken_GetListV2(rop.access_token, user.Id.ToString());
+            var rt = await _service.Repo.RefreshToken_GetListV2(rop.access_token, user.Id.ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     password = Strings.ApiUnitTestUserPassCurrent,
                 });
 
-            var rt = await _service.Raw.RefreshToken_DeleteAllV2(rop.access_token, Guid.NewGuid().ToString());
+            var rt = await _service.Repo.RefreshToken_DeleteAllV2(rop.access_token, Guid.NewGuid().ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -157,11 +157,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     password = Strings.ApiDefaultAdminUserPassword,
                 });
 
-            rt = await _service.Raw.RefreshToken_DeleteAllV2(rop.access_token, Guid.NewGuid().ToString());
+            rt = await _service.Repo.RefreshToken_DeleteAllV2(rop.access_token, Guid.NewGuid().ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            rt = await _service.Raw.RefreshToken_DeleteV2(rop.access_token, user.Id.ToString(), Guid.NewGuid().ToString());
+            rt = await _service.Repo.RefreshToken_DeleteV2(rop.access_token, user.Id.ToString(), Guid.NewGuid().ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
@@ -186,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     password = Strings.ApiDefaultAdminUserPassword,
                 });
 
-            var rt = await _service.Raw.RefreshToken_DeleteAllV2(rop.access_token, user.Id.ToString());
+            var rt = await _service.Repo.RefreshToken_DeleteAllV2(rop.access_token, user.Id.ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
@@ -203,7 +203,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             var refresh = (await _factory.UoW.RefreshRepo.GetAsync(x => x.UserId == user.Id
                 && x.RefreshValue == rop.refresh_token)).Single();
 
-            rt = await _service.Raw.RefreshToken_DeleteV2(rop.access_token, user.Id.ToString(), refresh.Id.ToString());
+            rt = await _service.Repo.RefreshToken_DeleteV2(rop.access_token, user.Id.ToString(), refresh.Id.ToString());
             rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
             rt.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }

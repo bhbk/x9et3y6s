@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Services
     public interface IStsService
     {
         JwtSecurityToken Jwt { get; set; }
-        StsRepository Raw { get; }
+        StsRepository Repo { get; }
 
         //authorization code flows
         AuthCodeV1 AuthCode_AskV1(AuthCodeAskV1 model);

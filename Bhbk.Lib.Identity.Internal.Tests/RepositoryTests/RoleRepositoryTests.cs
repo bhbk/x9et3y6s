@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
     {
         private StartupTests _factory;
 
-        public RoleRepositoryTests(StartupTests startup) => _factory = startup;
+        public RoleRepositoryTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public async Task Lib_RoleRepo_GetV1_Success()

@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Services
             set { _jwt.JwtV2 = value; }
         }
 
-        public AdminRepository Raw
+        public AdminRepository Repo
         {
             get { return _repo; }
         }

@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v1/rt";
+                    var endpoint = "/oauth2/v1/ropg-rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -153,7 +153,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v2/rt";
+                    var endpoint = "/oauth2/v2/ropg-rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;

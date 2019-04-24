@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ImplicitV1_Use_NotImplemented()
         {
-            var imp = await _service.Raw.Implicit_UseV1(
+            var imp = await _service.Repo.Implicit_UseV1(
                 new ImplicitV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
             var state = RandomValues.CreateBase64String(8);
-            var imp = await _service.Raw.Implicit_UseV2(
+            var imp = await _service.Repo.Implicit_UseV2(
                 new ImplicitV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
             imp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            imp = await _service.Raw.Implicit_UseV2(
+            imp = await _service.Repo.Implicit_UseV2(
                 new ImplicitV2()
                 {
                     issuer = string.Empty,
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
             imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            imp = await _service.Raw.Implicit_UseV2(
+            imp = await _service.Repo.Implicit_UseV2(
                 new ImplicitV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
             imp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            imp = await _service.Raw.Implicit_UseV2(
+            imp = await _service.Repo.Implicit_UseV2(
                 new ImplicitV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
             imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            imp = await _service.Raw.Implicit_UseV2(
+            imp = await _service.Repo.Implicit_UseV2(
                 new ImplicitV2()
                 {
                     issuer = issuer.Id.ToString(),
