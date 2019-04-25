@@ -19,16 +19,15 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private readonly InstanceContext _instance;
         private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
-        private readonly string _salt;
 
-        public string Salt { get => _salt; }
+        public string Salt { get; }
 
         public IssuerRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, string salt)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _mapper = mapper;
-            _salt = salt;
+            Salt = salt;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Issuers, bool>> predicates = null)

@@ -6,11 +6,11 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Internal.Infrastructure
+namespace Bhbk.Lib.Identity.Internal.Helpers
 {
-    public class AutoMapperProfile : Profile
+    public class MapperProfile : Profile
     {
-        public AutoMapperProfile()
+        public MapperProfile()
         {
             //activity models
             CreateMap<ActivityCreate, tbl_Activities>()

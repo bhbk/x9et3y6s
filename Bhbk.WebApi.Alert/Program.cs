@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Alert
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("settings-alert.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile("config-alert.json", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
                 .UseIISIntegration()

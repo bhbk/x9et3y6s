@@ -7,11 +7,11 @@ using System.Threading.Tasks;
  * https://andrewlock.net/custom-authorisation-policies-and-requirements-in-asp-net-core/
  */
 
-namespace Bhbk.Lib.Identity.Internal.Infrastructure
+namespace Bhbk.Lib.Identity.Internal.Authorize
 {
-    public class AuthorizeIdentityServices : AuthorizationHandler<AuthorizeIdentityServicesRequirement>
+    public class IdentityServicesAuthorize : AuthorizationHandler<IdentityServicesAuthorizeRequirement>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AuthorizeIdentityServicesRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IdentityServicesAuthorizeRequirement requirement)
         {
             if (context.User.HasClaim(x => x.Type == ClaimTypes.Role && x.Value == "(Built-In) Services")
                 && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == ClientType.server.ToString()))
@@ -21,8 +21,8 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         }
     }
 
-    public class AuthorizeIdentityServicesRequirement : IAuthorizationRequirement
+    public class IdentityServicesAuthorizeRequirement : IAuthorizationRequirement
     {
-        public AuthorizeIdentityServicesRequirement() { }
+        public IdentityServicesAuthorizeRequirement() { }
     }
 }

@@ -21,12 +21,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="settings-sts.json" />
+    <Content Remove="config-sts.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Middlewares\" />
     <Folder Include="Tasks\" />
   </ItemGroup>
 
@@ -68,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="settings-sts.json">
+    <None Include="config-sts.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

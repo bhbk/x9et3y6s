@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Services
     public interface IStsService
     {
         JwtSecurityToken Jwt { get; set; }
-        StsRepository Repo { get; }
+        StsRepository Raw { get; }
 
         //authorization code flows
         AuthCodeV1 AuthCode_AskV1(AuthCodeAskV1 model);
@@ -25,8 +25,10 @@ namespace Bhbk.Lib.Identity.Services
         UserJwtV2 DeviceCode_UseV2(DeviceCodeV2 model);
 
         //client credential flows
-        UserJwtV1 ClientCredential_UseV1(ClientCredentialV1 model);
-        UserJwtV2 ClientCredential_UseV2(ClientCredentialV2 model);
+        ClientJwtV1 ClientCredential_UseV1(ClientCredentialV1 model);
+        ClientJwtV2 ClientCredential_UseV2(ClientCredentialV2 model);
+        ClientJwtV1 ClientCredentialRefresh_UseV1(RefreshTokenV1 model);
+        ClientJwtV2 ClientCredentialRefresh_UseV2(RefreshTokenV2 model);
 
         //implicit flows
         UserJwtV1 Implicit_UseV1(ImplicitV1 model);
@@ -39,12 +41,12 @@ namespace Bhbk.Lib.Identity.Services
         bool RefreshToken_DeleteAllV2(string userValue);
         IEnumerable<RefreshTokenV1> RefreshToken_GetListV1(string userValue);
         IEnumerable<RefreshTokenV2> RefreshToken_GetListV2(string userValue);
-        UserJwtV1 RefreshToken_UseV1(RefreshTokenV1 model);
-        UserJwtV2 RefreshToken_UseV2(RefreshTokenV2 model);
 
         //resource owner flows
         UserJwtV1Legacy ResourceOwner_UseV1Legacy(ResourceOwnerV1 model);
         UserJwtV1 ResourceOwner_UseV1(ResourceOwnerV1 model);
         UserJwtV2 ResourceOwner_UseV2(ResourceOwnerV2 model);
+        UserJwtV1 ResourceOwnerRefresh_UseV1(RefreshTokenV1 model);
+        UserJwtV2 ResourceOwnerRefresh_UseV2(RefreshTokenV2 model);
     }
 }

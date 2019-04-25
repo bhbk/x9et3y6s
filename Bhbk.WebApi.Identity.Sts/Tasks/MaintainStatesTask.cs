@@ -19,7 +19,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
         private readonly int _delay;
         public string Status { get; private set; }
 
-
         public MaintainStatesTask(IServiceCollection sc, IConfigurationRoot conf)
         {
             if (sc == null)

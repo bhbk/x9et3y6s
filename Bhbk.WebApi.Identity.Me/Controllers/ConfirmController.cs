@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
+﻿using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;

@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("settings-admin.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile("config-admin.json", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
                 .UseIISIntegration()

@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Me
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("settings-me.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile("config-me.json", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
                 .UseIISIntegration()

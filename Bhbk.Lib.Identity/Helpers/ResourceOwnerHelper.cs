@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v1/refresh";
+                    var endpoint = "/oauth2/v1/rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("password", _conf["IdentityLogin:UserPass"]),
                         });
 
-                    var endpoint = "/oauth2/v1/access";
+                    var endpoint = "/oauth2/v1/ropg";
 
                     if (_instance == InstanceContext.DeployedOrLocal)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -153,7 +153,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v2/refresh";
+                    var endpoint = "/oauth2/v2/rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -190,7 +190,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("password", _conf["IdentityLogin:UserPass"]),
                         });
 
-                    var endpoint = "/oauth2/v2/access";
+                    var endpoint = "/oauth2/v2/ropg";
 
                     if (_instance == InstanceContext.DeployedOrLocal)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;

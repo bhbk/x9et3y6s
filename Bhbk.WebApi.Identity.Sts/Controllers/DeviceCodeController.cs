@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -30,9 +30,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     {
         public DeviceCodeController() { }
 
-        [Route("v1/device-ask"), HttpPost]
+        [Route("v1/dcg-ask"), HttpPost]
         [AllowAnonymous]
-        public IActionResult AskDeviceCodeV1([FromForm] DeviceCodeAskV1 input)
+        public IActionResult DeviceCodeV1_Ask([FromForm] DeviceCodeAskV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -46,9 +46,31 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v2/device-ask"), HttpPost]
+        [Route("v1/dcg/{userCode}/{userAction}"), HttpGet]
+        public IActionResult DeviceCodeV1_Action([FromRoute] string userCode, string userAction)
+        {
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
+        [Route("v1/dcg"), HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> AskDeviceCodeV2([FromForm] DeviceCodeAskV2 input)
+        public IActionResult DeviceCodeV1_Use([FromForm] DeviceCodeV1 input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                return BadRequest(ModelState);
+            }
+
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
+        [Route("v2/dcg-ask"), HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -136,14 +158,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return Ok(result);
         }
 
-        [Route("v1/device/{userCode}/{userAction}"), HttpGet]
-        public IActionResult DeviceCodeActionV1([FromRoute] string userCode, string userAction)
-        {
-            return StatusCode((int)HttpStatusCode.NotImplemented);
-        }
-
-        [Route("v2/device/{userCode}/{userAction}"), HttpGet]
-        public async Task<IActionResult> DeviceCodeActionV2([FromRoute] string userCode, string userAction)
+        [Route("v2/dcg/{userCode}/{userAction}"), HttpGet]
+        public async Task<IActionResult> DeviceCodeV2_Action([FromRoute] string userCode, string userAction)
         {
             ActionType actionType;
 
@@ -198,25 +214,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return NoContent();
         }
 
-        [Route("v1/device"), HttpPost]
+        [Route("v2/dcg"), HttpPost]
         [AllowAnonymous]
-        public IActionResult UseDeviceCodeV1([FromForm] DeviceCodeV1 input)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
-
-            return StatusCode((int)HttpStatusCode.NotImplemented);
-        }
-
-        [Route("v2/device"), HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> UseDeviceCodeV2([FromForm] DeviceCodeV2 input)
+        public async Task<IActionResult> DeviceCodeV2_Use([FromForm] DeviceCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -335,15 +335,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
 
-            var access = await JwtHelper.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
-            var refresh = await JwtHelper.UserRefreshV2(UoW, issuer, user);
+            var dc = await JwtHelper.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
+            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = access.token,
-                refresh_token = refresh,
-                expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                access_token = dc.token,
+                refresh_token = rt,
+                expires_in = (int)(new DateTimeOffset(dc.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             //adjust counter(s) for login success...

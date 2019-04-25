@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -27,13 +27,13 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
+    [AllowAnonymous]
     public class AuthCodeController : BaseController
     {
         public AuthCodeController() { }
 
-        [Route("v1/authorize-ask"), HttpGet]
-        [AllowAnonymous]
-        public IActionResult AskAuthCodeV1([FromQuery] AuthCodeAskV1 input)
+        [Route("v1/acg-ask"), HttpGet]
+        public IActionResult AuthCodeV1_Ask([FromQuery] AuthCodeAskV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -54,9 +54,31 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v2/authorize-ask"), HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> AskAuthCodeV2([FromQuery] AuthCodeAskV2 input)
+        [Route("v1/acg"), HttpGet]
+        public IActionResult AuthCodeV1_Use([FromQuery] AuthCodeV1 input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //clean out cruft from encoding...
+            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
+            input.client_id = HttpUtility.UrlDecode(input.client_id);
+            input.username = HttpUtility.UrlDecode(input.username);
+            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
+            input.code = HttpUtility.UrlDecode(input.code);
+            input.state = HttpUtility.UrlDecode(input.state);
+
+            if (!string.Equals(input.grant_type, Strings.AttrAuthCodeIDV1, StringComparison.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
+                return BadRequest(ModelState);
+            }
+
+            return StatusCode((int)HttpStatusCode.NotImplemented);
+        }
+
+        [Route("v2/acg-ask"), HttpGet]
+        public async Task<IActionResult> AuthCodeV2_Ask([FromQuery] AuthCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -174,33 +196,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return RedirectPermanent(result.AbsoluteUri);
         }
 
-        [Route("v1/authorize"), HttpGet]
-        [AllowAnonymous]
-        public IActionResult UseAuthCodeV1([FromQuery] AuthCodeV1 input)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            //clean out cruft from encoding...
-            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
-            input.client_id = HttpUtility.UrlDecode(input.client_id);
-            input.username = HttpUtility.UrlDecode(input.username);
-            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
-            input.code = HttpUtility.UrlDecode(input.code);
-            input.state = HttpUtility.UrlDecode(input.state);
-            
-            if (!string.Equals(input.grant_type, Strings.AttrAuthCodeIDV1, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
-
-            return StatusCode((int)HttpStatusCode.NotImplemented);
-        }
-
-        [Route("v2/authorize"), HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> UseAuthCodeV2([FromQuery] AuthCodeV2 input)
+        [Route("v2/acg"), HttpGet]
+        public async Task<IActionResult> AuthCodeV2_Use([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

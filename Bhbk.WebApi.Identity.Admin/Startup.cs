@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Services;
@@ -32,11 +32,13 @@ namespace Bhbk.WebApi.Identity.Admin
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var settings = SearchRoots.ByAssemblyContext("settings-admin.json");
+            var lib = SearchRoots.ByAssemblyContext("config-lib.json");
+            var api = SearchRoots.ByAssemblyContext("config-admin.json");
 
             var conf = new ConfigurationBuilder()
-                .SetBasePath(settings.DirectoryName)
-                .AddJsonFile(settings.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(lib.DirectoryName)
+                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -50,9 +52,9 @@ namespace Bhbk.WebApi.Identity.Admin
             });
             sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
             sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityAdmins>();
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityServices>();
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityUsers>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
             sc.AddSingleton<IAlertService>(new AlertService(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
@@ -138,15 +140,15 @@ namespace Bhbk.WebApi.Identity.Admin
             {
                 auth.AddPolicy("AdministratorsPolicy", admins =>
                 {
-                    admins.Requirements.Add(new AuthorizeIdentityAdminsRequirement());
+                    admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                 });
                 auth.AddPolicy("ServicesPolicy", services =>
                 {
-                    services.Requirements.Add(new AuthorizeIdentityServicesRequirement());
+                    services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
                 auth.AddPolicy("UsersPolicy", users =>
                 {
-                    users.Requirements.Add(new AuthorizeIdentityUsersRequirement());
+                    users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>

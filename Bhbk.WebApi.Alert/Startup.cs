@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Services;
@@ -32,11 +32,13 @@ namespace Bhbk.WebApi.Alert
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var file = SearchRoots.ByAssemblyContext("settings-alert.json");
+            var lib = SearchRoots.ByAssemblyContext("config-lib.json");
+            var api = SearchRoots.ByAssemblyContext("config-alert.json");
 
             var conf = new ConfigurationBuilder()
-                .SetBasePath(file.DirectoryName)
-                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(lib.DirectoryName)
+                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -50,9 +52,9 @@ namespace Bhbk.WebApi.Alert
             });
             sc.AddSingleton<IHostedService>(new QueueEmailTask(sc, conf));
             sc.AddSingleton<IHostedService>(new QueueTextTask(sc, conf));
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityAdmins>();
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityServices>();
-            sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityUsers>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
             sc.AddSingleton<IAlertService>(new AlertService(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
@@ -138,15 +140,15 @@ namespace Bhbk.WebApi.Alert
             {
                 auth.AddPolicy("AdministratorsPolicy", admins =>
                 {
-                    admins.Requirements.Add(new AuthorizeAlertAdminsRequirement());
+                    admins.Requirements.Add(new AlertAdminsAuthorizeRequirement());
                 });
                 auth.AddPolicy("ServicesPolicy", services =>
                 {
-                    services.Requirements.Add(new AuthorizeAlertServicesRequirement());
+                    services.Requirements.Add(new AlertServicesAuthorizeRequirement());
                 });
                 auth.AddPolicy("UsersPolicy", users =>
                 {
-                    users.Requirements.Add(new AuthorizeAlertUsersRequirement());
+                    users.Requirements.Add(new AlertUsersAuthorizeRequirement());
                 });
             });
             sc.Configure<ForwardedHeadersOptions>(headers =>

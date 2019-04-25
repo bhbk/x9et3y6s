@@ -7,11 +7,11 @@ using System.Threading.Tasks;
  * https://andrewlock.net/custom-authorisation-policies-and-requirements-in-asp-net-core/
  */
 
-namespace Bhbk.Lib.Identity.Internal.Infrastructure
+namespace Bhbk.Lib.Identity.Internal.Authorize
 {
-    public class AuthorizeAlertUsers : AuthorizationHandler<AuthorizeAlertUsersRequirement>
+    public class AlertUsersAuthorize : AuthorizationHandler<AlertUsersAuthorizeRequirement>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AuthorizeAlertUsersRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AlertUsersAuthorizeRequirement requirement)
         {
             if (context.User.HasClaim(x => x.Type == ClaimTypes.Role && (x.Value == "Bhbk.WebApi.Alert(Admins)"
                     || x.Value == "Bhbk.WebApi.Alert(Services)"
@@ -23,8 +23,8 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         }
     }
 
-    public class AuthorizeAlertUsersRequirement : IAuthorizationRequirement
+    public class AlertUsersAuthorizeRequirement : IAuthorizationRequirement
     {
-        public AuthorizeAlertUsersRequirement() { }
+        public AlertUsersAuthorizeRequirement() { }
     }
 }

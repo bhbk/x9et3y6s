@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
@@ -41,12 +41,12 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
             var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, admin);
-            var result = await _service.Repo.Enqueue_EmailV1(rop.token, new EmailCreate());
+            var result = await _service.Raw.Enqueue_EmailV1(rop.token, new EmailCreate());
 
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            result = await _service.Repo.Enqueue_EmailV1(rop.token,
+            result = await _service.Raw.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
                     FromId = Guid.NewGuid(),
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             result.Should().BeAssignableTo(typeof(HttpResponseMessage));
             result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            result = await _service.Repo.Enqueue_EmailV1(rop.token,
+            result = await _service.Raw.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
                     FromId = admin.Id,
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
             var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var result = await _service.Repo.Enqueue_EmailV1(rop.token,
+            var result = await _service.Raw.Enqueue_EmailV1(rop.token,
                 new EmailCreate()
                 {
                     FromId = user.Id,

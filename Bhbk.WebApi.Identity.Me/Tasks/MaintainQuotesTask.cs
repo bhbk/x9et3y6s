@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Me;
@@ -12,14 +13,13 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Bhbk.Lib.Core.Primitives.Enums;
 
 namespace Bhbk.WebApi.Identity.Me.Tasks
 {
     public class MaintainQuotesTask : BackgroundService
     {
         private readonly IServiceProvider _sp;
-        private readonly FileInfo _qod = SearchRoots.ByAssemblyContext("appquotes.json");
+        private readonly FileInfo _qod = SearchRoots.ByAssemblyContext("config-quotes.json");
         private readonly JsonSerializerSettings _serializer;
         private readonly HttpClient _client = new HttpClient();
         private readonly string _url = string.Empty, _output = string.Empty;

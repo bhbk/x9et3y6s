@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Models.Sts
         public string issuer_id { get; set; }
 
         [Required]
-        public string client_id { get; set; }
+        public string client_id { get; set; }   //should always be single value...
 
         [Required]
         public string client_secret { get; set; }
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Models.Sts
         public string issuer { get; set; }
 
         [Required]
-        public string client { get; set; }
+        public string client { get; set; }      //should always be single value...
 
         [Required]
         public string client_secret { get; set; }

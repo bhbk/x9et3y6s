@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Services
             set { _jwt.JwtV2 = value; }
         }
 
-        public AlertRepository Repo
+        public AlertRepository Raw
         {
             get { return _repo; }
         }

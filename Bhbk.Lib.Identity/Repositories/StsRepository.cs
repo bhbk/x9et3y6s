@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&response_type=code"
                 + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
-            var endpoint = "/oauth2/v1/authorize-ask";
+            var endpoint = "/oauth2/v1/acg-ask";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&response_type=code"
                 + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
-            var endpoint = "/oauth2/v2/authorize-ask";
+            var endpoint = "/oauth2/v2/acg-ask";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
@@ -90,7 +90,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&code=" + HttpUtility.UrlEncode(model.code)
                 + "&state=" + HttpUtility.UrlEncode(model.state));
 
-            var endpoint = "/oauth2/v1/authorize";
+            var endpoint = "/oauth2/v1/acg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&code=" + HttpUtility.UrlEncode(model.code)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
-            var endpoint = "/oauth2/v2/authorize";
+            var endpoint = "/oauth2/v2/acg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
@@ -133,7 +133,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
 
-            var endpoint = "/oauth2/v1/client";
+            var endpoint = "/oauth2/v1/ccg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -149,12 +149,54 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
-                    new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("client",  model.client),
                     new KeyValuePair<string, string>("client_secret", model.client_secret),
                     new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
 
-            var endpoint = "/oauth2/v2/client";
+            var endpoint = "/oauth2/v2/ccg";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _client.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> ClientCredentialRefresh_UseV1(RefreshTokenV1 model)
+        {
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
+                });
+
+            var endpoint = "/oauth2/v1/ccg-rt";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _client.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> ClientCredentialRefresh_UseV2(RefreshTokenV2 model)
+        {
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
+                });
+
+            var endpoint = "/oauth2/v2/ccg-rt";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -176,7 +218,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("grant_type", "device_code")
                 });
 
-            var endpoint = "/oauth2/v1/device-ask";
+            var endpoint = "/oauth2/v1/dcg-ask";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -197,7 +239,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("grant_type", "device_code")
                 });
 
-            var endpoint = "/oauth2/v2/device-ask";
+            var endpoint = "/oauth2/v2/dcg-ask";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -212,7 +254,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v1/device/" + code + "/" + action;
+            var endpoint = "/oauth2/v1/dcg/" + code + "/" + action;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -227,7 +269,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v2/device/" + code + "/" + action;
+            var endpoint = "/oauth2/v2/dcg/" + code + "/" + action;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -249,7 +291,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("grant_type", "device_code"),
                 });
 
-            var endpoint = "/oauth2/v1/device";
+            var endpoint = "/oauth2/v1/dcg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -271,7 +313,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("grant_type", "device_code"),
                 });
 
-            var endpoint = "/oauth2/v2/device";
+            var endpoint = "/oauth2/v2/dcg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -293,7 +335,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&scope=" + HttpUtility.UrlEncode(model.scope)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
-            var endpoint = "/oauth2/v1/implicit";
+            var endpoint = "/oauth2/v1/ig";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
@@ -314,7 +356,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&scope=" + HttpUtility.UrlEncode(model.scope)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
-            var endpoint = "/oauth2/v2/implicit";
+            var endpoint = "/oauth2/v2/ig";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
@@ -330,7 +372,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v1/refresh/" + user + "/revoke";
+            var endpoint = "/oauth2/v1/rt/" + user + "/revoke";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -345,7 +387,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke";
+            var endpoint = "/oauth2/v2/rt/" + user + "/revoke";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -360,7 +402,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v1/refresh/" + user + "/revoke/" + token;
+            var endpoint = "/oauth2/v1/rt/" + user + "/revoke/" + token;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -375,7 +417,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v2/refresh/" + user + "/revoke/" + token;
+            var endpoint = "/oauth2/v2/rt/" + user + "/revoke/" + token;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -390,7 +432,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v1/refresh/" + user;
+            var endpoint = "/oauth2/v1/rt/" + user;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
@@ -405,55 +447,13 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/oauth2/v2/refresh/" + user;
+            var endpoint = "/oauth2/v2/rt/" + user;
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
 
             if (_instance == InstanceContext.UnitTest)
                 return await _client.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_UseV1(RefreshTokenV1 model)
-        {
-            var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
-                    new KeyValuePair<string, string>("client_id", model.client_id),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
-                });
-
-            var endpoint = "/oauth2/v1/refresh";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_UseV2(RefreshTokenV2 model)
-        {
-            var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("issuer", model.issuer),
-                    new KeyValuePair<string, string>("client", model.client),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
-                });
-
-            var endpoint = "/oauth2/v2/refresh";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -469,7 +469,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
-            var endpoint = "/oauth2/v1/access";
+            var endpoint = "/oauth2/v1/ropg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -491,7 +491,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
-            var endpoint = "/oauth2/v1/access";
+            var endpoint = "/oauth2/v1/ropg";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
@@ -513,7 +513,49 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
-            var endpoint = "/oauth2/v2/access";
+            var endpoint = "/oauth2/v2/ropg";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _client.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> ResourceOwnerRefresh_UseV1(RefreshTokenV1 model)
+        {
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("issuer_id", model.issuer_id),
+                    new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
+                });
+
+            var endpoint = "/oauth2/v1/ropg-rt";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _client.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> ResourceOwnerRefresh_UseV2(RefreshTokenV2 model)
+        {
+            var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("issuer", model.issuer),
+                    new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("refresh_token", model.refresh_token),
+                });
+
+            var endpoint = "/oauth2/v2/ropg-rt";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);

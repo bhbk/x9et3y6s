@@ -1,17 +1,14 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 

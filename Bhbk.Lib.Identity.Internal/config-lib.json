@@ -7,33 +7,6 @@
       "Microsoft": "Information"
     }
   },
-  "Databases": {
-    "IdentityEntities": "Data Source=bits.test.ochap.local; Initial Catalog=BhbkIdentity; User ID=Sql.BhbkIdentity; Password=Pa$$word01!"
-  },
-  "KestrelServer": {
-    "Endpoints": {
-      "Insecure": {
-        "Host": "localhost",
-        "Port": 55114,
-        "Scheme": "http",
-        "Enable": "true"
-      },
-      "Secure": {
-        "Host": "localhost",
-        "Port": 44375,
-        "Scheme": "https",
-        "Enable": "false"
-      }
-    }
-  },
-  "Tasks": {
-    "MaintainRefreshes": {
-      "PollingDelay": "60"
-    },
-    "MaintainStates": {
-      "PollingDelay": "60"
-    }
-  },
   "IdentityDefaults": {
     "AuthCodeRefreshExpire": "86400",
     "AuthCodeTokenExpire": "600",
@@ -51,23 +24,7 @@
     "LegacyModeIssuer": "true"
   },
   "IdentityTenants": {
-    "AllowedIssuers": [
-      "Bhbk"
-    ],
-    "AllowedIssuerKeys": [
-      "abcdefghijklmnopqrstuvwxyz0123456789"
-    ],
-    "AllowedClients": [
-      "Bhbk.WebApi.Identity",
-      "Bhbk.WebUi.Identity"
-    ],
     "Salt": "0123456789"
-  },
-  "IdentityLogin": {
-    "IssuerName": "Bhbk",
-    "ClientName": "",
-    "UserName": "identity@system.ochap.local",
-    "UserPass": "pa$$word01!"
   },
   "IdentityAdminUrls": {
     "BaseApiUrl": "https://localhost:44359",

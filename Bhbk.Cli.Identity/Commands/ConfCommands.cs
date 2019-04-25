@@ -25,11 +25,14 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var lib = SearchRoots.ByAssemblyContext("settings-cli.json");
+                var lib = SearchRoots.ByAssemblyContext("config-lib.json");
+                var cli = SearchRoots.ByAssemblyContext("config-cli.json");
 
                 var conf = new ConfigurationBuilder()
                     .SetBasePath(lib.DirectoryName)
                     .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
+                    .AddJsonFile(cli.Name, optional: false, reloadOnChange: true)
+                    .AddEnvironmentVariables()
                     .Build();
 
                 var builder = new DbContextOptionsBuilder<IdentityDbContext>()

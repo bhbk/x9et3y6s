@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Services
             set { _jwt.JwtV2 = value; }
         }
 
-        public StsRepository Repo
+        public StsRepository Raw
         {
             get { return _repo; }
         }
@@ -61,18 +61,32 @@ namespace Bhbk.Lib.Identity.Services
             return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
         }
 
-        public UserJwtV1 ClientCredential_UseV1(ClientCredentialV1 model)
+        public ClientJwtV1 ClientCredential_UseV1(ClientCredentialV1 model)
         {
             var response = _repo.ClientCredential_UseV1(model).Result;
 
-            return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
+            return response.Content.ReadAsJsonAsync<ClientJwtV1>().Result;
         }
 
-        public UserJwtV2 ClientCredential_UseV2(ClientCredentialV2 model)
+        public ClientJwtV2 ClientCredential_UseV2(ClientCredentialV2 model)
         {
             var response = _repo.ClientCredential_UseV2(model).Result;
 
-            return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
+            return response.Content.ReadAsJsonAsync<ClientJwtV2>().Result;
+        }
+
+        public ClientJwtV1 ClientCredentialRefresh_UseV1(RefreshTokenV1 model)
+        {
+            var response = _repo.ClientCredentialRefresh_UseV1(model).Result;
+
+            return response.Content.ReadAsJsonAsync<ClientJwtV1>().Result;
+        }
+
+        public ClientJwtV2 ClientCredentialRefresh_UseV2(RefreshTokenV2 model)
+        {
+            var response = _repo.ClientCredentialRefresh_UseV2(model).Result;
+
+            return response.Content.ReadAsJsonAsync<ClientJwtV2>().Result;
         }
 
         public bool DeviceCode_ActionV1(string code, string action)
@@ -197,20 +211,6 @@ namespace Bhbk.Lib.Identity.Services
             return response.Content.ReadAsJsonAsync<IEnumerable<RefreshTokenV2>>().Result;
         }
 
-        public UserJwtV1 RefreshToken_UseV1(RefreshTokenV1 model)
-        {
-            var response = _repo.RefreshToken_UseV1(model).Result;
-
-            return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
-        }
-
-        public UserJwtV2 RefreshToken_UseV2(RefreshTokenV2 model)
-        {
-            var response = _repo.RefreshToken_UseV2(model).Result;
-
-            return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
-        }
-
         public UserJwtV1Legacy ResourceOwner_UseV1Legacy(ResourceOwnerV1 model)
         {
             var response = _repo.ResourceOwner_UseV1Legacy(model).Result;
@@ -228,6 +228,20 @@ namespace Bhbk.Lib.Identity.Services
         public UserJwtV2 ResourceOwner_UseV2(ResourceOwnerV2 model)
         {
             var response = _repo.ResourceOwner_UseV2(model).Result;
+
+            return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
+        }
+
+        public UserJwtV1 ResourceOwnerRefresh_UseV1(RefreshTokenV1 model)
+        {
+            var response = _repo.ResourceOwnerRefresh_UseV1(model).Result;
+
+            return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
+        }
+
+        public UserJwtV2 ResourceOwnerRefresh_UseV2(RefreshTokenV2 model)
+        {
+            var response = _repo.ResourceOwnerRefresh_UseV2(model).Result;
 
             return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
         }

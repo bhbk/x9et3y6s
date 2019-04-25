@@ -1,7 +1,7 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
@@ -31,20 +31,20 @@ using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Sts.Middlewares
 {
-    public static class RefreshTokenExtension
+    public static class ResourceOwnerRefreshExtension
     {
         public static IApplicationBuilder UseRefreshTokenProvider(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<RefreshTokenMiddleware_Deprecate>();
+            return app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
         }
     }
 
-    public class RefreshTokenMiddleware_Deprecate
+    public class ResourceOwnerRefresh_Deprecate
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public RefreshTokenMiddleware_Deprecate(RequestDelegate next)
+        public ResourceOwnerRefresh_Deprecate(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/refresh", StringComparison.OrdinalIgnoreCase)
+            if (context.Request.Path.Equals("/oauth2/v2/ropg-rt", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
@@ -219,7 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v1 end-point
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/refresh", StringComparison.OrdinalIgnoreCase)
+            if (context.Request.Path.Equals("/oauth2/v1/ropg-rt", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)

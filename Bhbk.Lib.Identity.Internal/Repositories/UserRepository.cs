@@ -31,21 +31,21 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class UserRepository : IGenericRepositoryAsync<UserCreate, tbl_Users, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IConfigurationRoot _conf;
         private readonly IMapper _mapper;
+        private readonly IConfigurationRoot _conf;
         private readonly IdentityDbContext _context;
-        private readonly PasswordValidator _passwordValidator;
+        public readonly PasswordValidator passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf, IMapper mapper)
+        public UserRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, IConfigurationRoot conf)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _conf = conf;
             _mapper = mapper;
-            _passwordValidator = new PasswordValidator();
+            _conf = conf;
 
+            passwordValidator = new PasswordValidator();
             passwordHasher = new PasswordHasher();
             userValidator = new UserValidator();
         }
@@ -246,6 +246,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             foreach (var claim in (await GetClaimsAsync(model.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
+            //nonce to enhance entropy
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
+
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
@@ -266,7 +269,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var claims = new List<Claim>();
 
+            //defaults...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
+
+            //nonce to enhance entropy
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -545,10 +552,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         internal async Task<bool> UpdatePassword(tbl_Users user, string password)
         {
-            if (_passwordValidator == null)
+            if (passwordValidator == null)
                 throw new NotSupportedException();
 
-            var result = await _passwordValidator.ValidateAsync(user, password);
+            var result = await passwordValidator.ValidateAsync(user, password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();

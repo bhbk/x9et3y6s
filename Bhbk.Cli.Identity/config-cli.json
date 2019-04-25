@@ -1,0 +1,16 @@
+{
+  "Logging": {
+    "IncludeScopes": false,
+    "LogLevel": {
+      "Default": "Information",
+      "System": "Information",
+      "Microsoft": "Information"
+    }
+  },
+  "IdentityLogin": {
+    "IssuerName": "Bhbk",
+    "ClientName": "",
+    "UserName": "identity@system.ochap.local",
+    "UserPass": "pa$$word01!"
+  }
+}

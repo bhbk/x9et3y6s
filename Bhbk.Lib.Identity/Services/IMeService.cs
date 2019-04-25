@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Services
     public interface IMeService
     {
         JwtSecurityToken Jwt { get; set; }
-        MeRepository Repo { get; }
+        MeRepository Raw { get; }
 
         UserModel Detail_GetV1();
     }

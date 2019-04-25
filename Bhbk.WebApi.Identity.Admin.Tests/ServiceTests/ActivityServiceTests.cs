@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             var orders = new List<Tuple<string, string>>();
             orders.Add(new Tuple<string, string>("created", "desc"));
 
-            var result = await _service.Repo.Activity_GetV1(rop.token,
+            var result = await _service.Raw.Activity_GetV1(rop.token,
                 new CascadePager()
                 {
                     Filter = string.Empty,

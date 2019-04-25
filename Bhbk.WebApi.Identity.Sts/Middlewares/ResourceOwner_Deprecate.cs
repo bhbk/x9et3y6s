@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
@@ -36,16 +36,16 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
     {
         public static IApplicationBuilder UseResourceOwnerMiddleware(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<ResourceOwnerMiddleware_Deprecate>();
+            return app.UseMiddleware<ResourceOwner_Deprecate>();
         }
     }
 
-    public class ResourceOwnerMiddleware_Deprecate
+    public class ResourceOwner_Deprecate
     {
         private readonly RequestDelegate _next;
         private readonly JsonSerializerSettings _serializer;
 
-        public ResourceOwnerMiddleware_Deprecate(RequestDelegate next)
+        public ResourceOwner_Deprecate(RequestDelegate next)
         {
             _next = next;
             _serializer = new JsonSerializerSettings
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v2/access", StringComparison.OrdinalIgnoreCase)
+            if (context.Request.Path.Equals("/oauth2/v2/ropg", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
@@ -257,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v1 end-point
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.OrdinalIgnoreCase)
+            if (context.Request.Path.Equals("/oauth2/v1/ropg", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
@@ -441,7 +441,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             #region v1 end-point (compatibility: issuer and client entities mixed. no issuer salt.)
 
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/access", StringComparison.OrdinalIgnoreCase)
+            if (context.Request.Path.Equals("/oauth2/v1/ropg", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (!context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)

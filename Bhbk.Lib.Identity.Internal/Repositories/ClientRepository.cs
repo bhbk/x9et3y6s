@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
@@ -21,16 +22,16 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class ClientRepository : IGenericRepositoryAsync<ClientCreate, tbl_Clients, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IConfigurationRoot _conf;
         private readonly IMapper _mapper;
+        private readonly IConfigurationRoot _conf;
         private readonly IdentityDbContext _context;
 
-        public ClientRepository(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf, IMapper mapper)
+        public ClientRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, IConfigurationRoot conf)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _conf = conf;
             _mapper = mapper;
+            _conf = conf;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Clients, bool>> predicates = null)
@@ -106,6 +107,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             foreach (var claim in (await GetClaimsAsync(model.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
+            //nonce to enhance entropy
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
+
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
@@ -126,7 +130,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var claims = new List<Claim>();
 
+            //defaults...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
+
+            //nonce to enhance entropy
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));

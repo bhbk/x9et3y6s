@@ -1,6 +1,6 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +24,13 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
+    [AllowAnonymous]
     public class ImplicitController : BaseController
     {
         public ImplicitController() { }
 
-        [Route("v1/implicit"), HttpGet]
-        [AllowAnonymous]
-        public IActionResult UseImplicitV1([FromQuery] ImplicitV1 input)
+        [Route("v1/ig"), HttpGet]
+        public IActionResult ImplicitV1_Use([FromQuery] ImplicitV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -46,9 +46,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v2/implicit"), HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> UseImplicitV2([FromQuery] ImplicitV2 input)
+        [Route("v2/ig"), HttpGet]
+        public async Task<IActionResult> ImplicitV2_Use([FromQuery] ImplicitV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

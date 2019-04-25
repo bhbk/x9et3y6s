@@ -15,10 +15,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         private DateTime _resourceOwnerRefreshFakeUtcNow;
         private DateTime _resourceOwnerTokenFakeUtcNow;
 
-        public ConfigRepository(IConfigurationRoot conf, InstanceContext instance)
+        public ConfigRepository(InstanceContext instance, IConfigurationRoot conf)
         {
-            _conf = conf;
             _instance = instance;
+            _conf = conf;
 
             _legacyModeClaims = bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]);
             _legacyModeIssuer = bool.Parse(_conf["IdentityDefaults:LegacyModeIssuer"]);

@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="settings-admin.json" />
+    <Content Remove="config-admin.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,7 +69,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="settings-admin.json">
+    <None Include="config-admin.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

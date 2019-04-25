@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await controller.AskAuthCodeV2(
+            var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await controller.AskAuthCodeV2(
+            var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var ask = await controller.AskAuthCodeV2(
+            var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -221,7 +221,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await controller.AskAuthCodeV2(
+            var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -289,7 +289,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await controller.AskAuthCodeV2(
+            var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -371,7 +371,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var url = new Uri(Strings.ApiUnitTestUriLink);
-            var ask = await controller.AskAuthCodeV2(
+            var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),

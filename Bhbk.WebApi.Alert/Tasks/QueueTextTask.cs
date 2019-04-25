@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Providers;
@@ -12,7 +13,6 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Bhbk.Lib.Core.Primitives.Enums;
 
 namespace Bhbk.WebApi.Alert.Tasks
 {

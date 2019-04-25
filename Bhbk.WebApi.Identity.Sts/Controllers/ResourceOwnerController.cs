@@ -1,12 +1,13 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,13 +25,110 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
+    [AllowAnonymous]
     public class ResourceOwnerController : BaseController
     {
         public ResourceOwnerController() { }
 
-        [Route("v1/access"), HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> UseResourceOwnerV1([FromForm] ResourceOwnerV1 input)
+        [Route("v1/ropg-rt"), HttpPost]
+        public async Task<IActionResult> ResourceOwnerV1_Refresh([FromForm] RefreshTokenV1 input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var refresh = (await UoW.RefreshRepo.GetAsync(x => x.RefreshValue == input.refresh_token)).SingleOrDefault();
+
+            if (refresh == null)
+            {
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
+                return NotFound(ModelState);
+            }
+            else if (!string.Equals(refresh.RefreshType, RefreshType.User.ToString(), StringComparison.OrdinalIgnoreCase)
+                || (refresh.ValidFromUtc >= DateTime.UtcNow || refresh.ValidToUtc <= DateTime.UtcNow))
+            {
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
+                return BadRequest(ModelState);
+            }
+
+            Guid issuerID;
+            tbl_Issuers issuer;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(input.issuer_id, out issuerID))
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+            else
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == input.issuer_id)).SingleOrDefault();
+
+            if (issuer == null)
+            {
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer_id}");
+                return NotFound(ModelState);
+            }
+            else if (!issuer.Enabled)
+            {
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                return BadRequest(ModelState);
+            }
+
+            Guid clientID;
+            tbl_Clients client;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(input.client_id, out clientID))
+                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            else
+                client = (await UoW.ClientRepo.GetAsync(x => x.Name == input.client_id)).SingleOrDefault();
+
+            if (client == null)
+            {
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client_id}");
+                return NotFound(ModelState);
+            }
+            else if (!client.Enabled)
+            {
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                return BadRequest(ModelState);
+            }
+
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == refresh.UserId)).SingleOrDefault();
+
+            //check that user exists...
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{refresh.UserId}");
+                return NotFound(ModelState);
+            }
+            //check that user is not locked...
+            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+                || !user.EmailConfirmed
+                || !user.PasswordConfirmed)
+            {
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+
+            //no context for auth exists yet... so set actor id same as user id...
+            user.ActorId = user.Id;
+
+            var rop = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
+            var rt = await JwtHelper.UserRefreshV1(UoW, issuer, user);
+
+            var result = new UserJwtV1()
+            {
+                token_type = "bearer",
+                access_token = rop.token,
+                refresh_token = rt,
+                user_id = user.Id.ToString(),
+                client_id = client.Id.ToString(),
+                issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+            };
+
+            return Ok(result);
+        }
+
+        [Route("v1/ropg"), HttpPost]
+        public async Task<IActionResult> ResourceOwnerV1_Use([FromForm] ResourceOwnerV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -195,27 +293,140 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                var access = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
-                var refresh = await JwtHelper.UserRefreshV1(UoW, issuer, user);
+                var rop = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
+                var rt = await JwtHelper.UserRefreshV1(UoW, issuer, user);
 
                 var result = new UserJwtV1()
                 {
                     token_type = "bearer",
-                    access_token = access.token,
-                    refresh_token = refresh,
+                    access_token = rop.token,
+                    refresh_token = rt,
                     user_id = user.Id.ToString(),
                     client_id = client.Id.ToString(),
                     issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                    expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                    expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
                 return Ok(result);
             }
         }
 
-        [Route("v2/access"), HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> UseResourceOwnerV2([FromForm] ResourceOwnerV2 input)
+        [Route("v2/ropg-rt"), HttpPost]
+        public async Task<IActionResult> ResourceOwnerV2_Refresh([FromForm] RefreshTokenV2 input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var refresh = (await UoW.RefreshRepo.GetAsync(x => x.RefreshValue == input.refresh_token)).SingleOrDefault();
+
+            if (refresh == null)
+            {
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
+                return NotFound(ModelState);
+            }
+            else if (!string.Equals(refresh.RefreshType, RefreshType.User.ToString(), StringComparison.OrdinalIgnoreCase)
+                || (refresh.ValidFromUtc >= DateTime.UtcNow || refresh.ValidToUtc <= DateTime.UtcNow))
+            {
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
+                return BadRequest(ModelState);
+            }
+
+            Guid issuerID;
+            tbl_Issuers issuer;
+
+            //check if identifier is guid. resolve to guid if not.
+            if (Guid.TryParse(input.issuer, out issuerID))
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+            else
+                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+
+            if (issuer == null)
+            {
+                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
+                return NotFound(ModelState);
+            }
+            else if (!issuer.Enabled)
+            {
+                ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
+                return BadRequest(ModelState);
+            }
+
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == refresh.UserId)).SingleOrDefault();
+
+            //check that user exists...
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{refresh.UserId}");
+                return NotFound(ModelState);
+            }
+            //check that user is not locked...
+            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+                || !user.EmailConfirmed
+                || !user.PasswordConfirmed)
+            {
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+
+            //no context for auth exists yet... so set actor id same as user id...
+            user.ActorId = user.Id;
+
+            var clientList = await UoW.UserRepo.GetClientsAsync(user.Id);
+            var clients = new List<tbl_Clients>();
+
+            //check if client is single, multiple or undefined...
+            if (string.IsNullOrEmpty(input.client))
+                clients = (await UoW.ClientRepo.GetAsync(x => clientList.Contains(x)
+                    && x.Enabled == true)).ToList();
+            else
+            {
+                foreach (string entry in input.client.Split(","))
+                {
+                    Guid clientID;
+                    tbl_Clients client;
+
+                    //check if identifier is guid. resolve to guid if not.
+                    if (Guid.TryParse(entry.Trim(), out clientID))
+                        client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                    else
+                        client = (await UoW.ClientRepo.GetAsync(x => x.Name == entry.Trim())).SingleOrDefault();
+
+                    if (client == null)
+                    {
+                        ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{entry}");
+                        return NotFound(ModelState);
+                    }
+                    else if (!client.Enabled
+                        || !clientList.Contains(client))
+                    {
+                        ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                        return BadRequest(ModelState);
+                    }
+
+                    clients.Add(client);
+                }
+            }
+
+            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
+
+
+            var result = new UserJwtV2()
+            {
+                token_type = "bearer",
+                access_token = rop.token,
+                refresh_token = rt,
+                user = user.Id.ToString(),
+                client = clients.Select(x => x.Id.ToString()).ToList(),
+                issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+            };
+
+            return Ok(result);
+        }
+
+        [Route("v2/ropg"), HttpPost]
+        public async Task<IActionResult> ResourceOwnerV2_Use([FromForm] ResourceOwnerV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

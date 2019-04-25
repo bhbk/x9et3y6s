@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Datasets;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Tests.Datasets;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
@@ -42,11 +42,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var settings = SearchRoots.ByAssemblyContext("settings-me.json");
+            var lib = SearchRoots.ByAssemblyContext("config-lib.json");
+            var api = SearchRoots.ByAssemblyContext("config-me.json");
 
             var conf = new ConfigurationBuilder()
-                .SetBasePath(settings.DirectoryName)
-                .AddJsonFile(settings.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(lib.DirectoryName)
+                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -66,9 +68,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
                 sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf));
                 sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc, conf));
-                sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityAdmins>();
-                sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityServices>();
-                sc.AddSingleton<IAuthorizationHandler, AuthorizeIdentityUsers>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
 
                 var sp = sc.BuildServiceProvider();
 
@@ -145,15 +147,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                 {
                     auth.AddPolicy("AdministratorsPolicy", admins =>
                     {
-                        admins.Requirements.Add(new AuthorizeIdentityAdminsRequirement());
+                        admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                     });
                     auth.AddPolicy("ServicesPolicy", services =>
                     {
-                        services.Requirements.Add(new AuthorizeIdentityServicesRequirement());
+                        services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });
                     auth.AddPolicy("UsersPolicy", users =>
                     {
-                        users.Requirements.Add(new AuthorizeIdentityUsersRequirement());
+                        users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                     });
                 });
                 sc.Configure((ForwardedHeadersOptions headers) =>

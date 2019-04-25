@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Repositories;
 using Bhbk.Lib.Identity.Models.Me;
@@ -13,21 +13,21 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
 {
     public class IdentityUnitOfWork : IIdentityUnitOfWork<IdentityDbContext>, IDisposable
     {
-        private readonly InstanceContext _instance;
-        private readonly LoggingLevel _logger;
-        private readonly IMapper _mapper;
-        private readonly IdentityDbContext _context;
-        private readonly ActivityRepository _activityRepo;
-        private readonly ClaimRepository _claimRepo;
-        private readonly ClientRepository _clientRepo;
-        private readonly ConfigRepository _configRepo;
-        private readonly IssuerRepository _issuerRepo;
-        private readonly LoginRepository _loginRepo;
-        private readonly RefreshRepository _refreshRepo;
-        private readonly RoleRepository _roleRepo;
-        private readonly StateRepository _stateRepo;
-        private readonly UserRepository _userRepo;
-        private Quotes _userQuote;
+        private readonly IdentityDbContext Context;
+        public InstanceContext InstanceType { get; private set; }
+        public LoggingLevel LoggingType { get; private set; }
+        public IMapper Mapper { get; private set; }
+        public ActivityRepository ActivityRepo { get; private set; }
+        public ClaimRepository ClaimRepo { get; private set; }
+        public ClientRepository ClientRepo { get; private set; }
+        public ConfigRepository ConfigRepo { get; private set; }
+        public IssuerRepository IssuerRepo { get; private set; }
+        public LoginRepository LoginRepo { get; private set; }
+        public RefreshRepository RefreshRepo { get; private set; }
+        public RoleRepository RoleRepo { get; private set; }
+        public StateRepository StateRepo { get; private set; }
+        public UserRepository UserRepo { get; private set; }
+        public Quotes UserQuote { get; set; }
 
         public IdentityUnitOfWork(DbContextOptions<IdentityDbContext> options, InstanceContext instance, IConfigurationRoot conf)
             : this(new IdentityDbContext(options), instance, conf)
@@ -43,105 +43,34 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
 
         private IdentityUnitOfWork(IdentityDbContext context, InstanceContext instance, IConfigurationRoot conf)
         {
-            _context = context ?? throw new ArgumentNullException();
-            _instance = instance;
-            _logger = (LoggingLevel)Enum.Parse(typeof(LoggingLevel), conf["Logging:LogLevel:Default"], true);
-            _mapper = new MapperConfiguration(x =>
+            Context = context ?? throw new ArgumentNullException();
+            InstanceType = instance;
+            LoggingType = (LoggingLevel)Enum.Parse(typeof(LoggingLevel), conf["Logging:LogLevel:Default"], true);
+            Mapper = new MapperConfiguration(x =>
             {
-                x.AddProfile<AutoMapperProfile>();
+                x.AddProfile<MapperProfile>();
             }).CreateMapper();
 
-            _activityRepo = new ActivityRepository(_context, _instance, _mapper);
-            _claimRepo = new ClaimRepository(_context, _instance, _mapper);
-            _clientRepo = new ClientRepository(_context, _instance, conf, _mapper);
-            _configRepo = new ConfigRepository(conf, _instance);
-            _issuerRepo = new IssuerRepository(_context, _instance, _mapper, conf["IdentityTenants:Salt"]);
-            _loginRepo = new LoginRepository(_context, _instance, _mapper);
-            _roleRepo = new RoleRepository(_context, _instance, _mapper);
-            _refreshRepo = new RefreshRepository(_context, _instance, _mapper);
-            _stateRepo = new StateRepository(_context, _instance, _mapper);
-            _userRepo = new UserRepository(_context, _instance, conf, _mapper);
-        }
-
-        public InstanceContext InstanceType
-        {
-            get { return _instance; }
-        }
-
-        public LoggingLevel LoggingType
-        {
-            get { return _logger; }
-        }
-
-        public IMapper Mapper
-        {
-            get { return _mapper; }
-        }
-
-        public ActivityRepository ActivityRepo
-        {
-            get { return _activityRepo; }
-        }
-
-        public ClaimRepository ClaimRepo
-        {
-            get { return _claimRepo; }
-        }
-
-        public ClientRepository ClientRepo
-        {
-            get { return _clientRepo; }
-        }
-
-        public ConfigRepository ConfigRepo
-        {
-            get { return _configRepo; }
-        }
-
-        public IssuerRepository IssuerRepo
-        {
-            get { return _issuerRepo; }
-        }
-
-        public LoginRepository LoginRepo
-        {
-            get { return _loginRepo; }
-        }
-
-        public RefreshRepository RefreshRepo
-        {
-            get { return _refreshRepo; }
-        }
-
-        public RoleRepository RoleRepo
-        {
-            get { return _roleRepo; }
-        }
-
-        public StateRepository StateRepo
-        {
-            get { return _stateRepo; }
-        }
-
-        public UserRepository UserRepo
-        {
-            get { return _userRepo; }
-        }
-
-        public Quotes UserQuote
-        {
-            get { return _userQuote; }
-            set {  _userQuote = value; }
+            ActivityRepo = new ActivityRepository(Context, InstanceType, Mapper);
+            ClaimRepo = new ClaimRepository(Context, InstanceType, Mapper);
+            ClientRepo = new ClientRepository(Context, InstanceType, Mapper, conf);
+            ConfigRepo = new ConfigRepository(InstanceType, conf);
+            IssuerRepo = new IssuerRepository(Context, InstanceType, Mapper, conf["IdentityTenants:Salt"]);
+            LoginRepo = new LoginRepository(Context, InstanceType, Mapper);
+            RoleRepo = new RoleRepository(Context, InstanceType, Mapper);
+            RefreshRepo = new RefreshRepository(Context, InstanceType, Mapper);
+            StateRepo = new StateRepository(Context, InstanceType, Mapper);
+            UserRepo = new UserRepository(Context, InstanceType, Mapper, conf);
         }
 
         public async Task CommitAsync()
         {
-            await _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
         }
 
         public void Dispose()
         {
-            _context.Dispose();
+            Context.Dispose();
         }
     }
 }
