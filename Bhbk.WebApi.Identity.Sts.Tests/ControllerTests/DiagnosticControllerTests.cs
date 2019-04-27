@@ -14,10 +14,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
     {
         private readonly StartupTests _factory;
 
-        public DiagnosticControllerTests(StartupTests factory)
-        {
-            _factory = factory;
-        }
+        public DiagnosticControllerTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public void Sts_DiagV1_GetStatus_Fail()

@@ -14,10 +14,12 @@ using System.Threading.Tasks;
 
 /*
  * https://tools.ietf.org/html/rfc6749#section-4.4
+ * https://tools.ietf.org/html/rfc6749#section-6
  */
 
 /*
  * https://oauth.net/2/grant-types/client-credentials/
+ * https://oauth.net/2/grant-types/refresh-token/
  */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -108,8 +110,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var cc = await JwtHelper.ClientResourceOwnerV2(UoW, issuer, client);
-            var rt = await JwtHelper.ClientRefreshV2(UoW, issuer, client);
+            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, issuer, client);
+            var rt = await JwtFactory.ClientRefreshV2(UoW, issuer, client);
 
             var result = new ClientJwtV2()
             {
@@ -187,8 +189,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var cc = await JwtHelper.ClientResourceOwnerV2(UoW, issuer, client);
-            var rt = await JwtHelper.ClientRefreshV2(UoW, issuer, client);
+            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, issuer, client);
+            var rt = await JwtFactory.ClientRefreshV2(UoW, issuer, client);
 
             var result = new ClientJwtV2()
             {

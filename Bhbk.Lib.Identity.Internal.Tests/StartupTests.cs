@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Datasets;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Tests.Datasets;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,8 +19,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests
     {
         public IConfigurationRoot Conf;
         public IIdentityUnitOfWork<IdentityDbContext> UoW;
-        public GenerateDefaults DefaultData;
-        public GenerateTests TestData;
+        public DefaultData DefaultData;
+        public TestData TestData;
 
         public StartupTests()
         {
@@ -38,8 +38,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
             UoW = new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf);
-            DefaultData = new GenerateDefaults(UoW);
-            TestData = new GenerateTests(UoW);
+            DefaultData = new DefaultData(UoW);
+            TestData = new TestData(UoW);
 
             /*
              * only test context allowed to run...

@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> DeleteAsync(Guid key)
         {
-            var entity = _context.tbl_Refreshes.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_States.Where(x => x.Id == key).Single();
 
             try
             {

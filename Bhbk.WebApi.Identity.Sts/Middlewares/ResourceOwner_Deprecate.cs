@@ -224,8 +224,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var rop = JwtHelper.UserResourceOwnerV2(uow, issuer, clients, user).Result;
-                var rt = JwtHelper.UserRefreshV2(uow, issuer, user).Result;
+                var rop = JwtFactory.UserResourceOwnerV2(uow, issuer, clients, user).Result;
+                var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -407,8 +407,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtHelper.UserResourceOwnerV1(uow, issuer, client, user).Result;
-                var refresh = JwtHelper.UserRefreshV1(uow, issuer, user).Result;
+                var access = JwtFactory.UserResourceOwnerV1(uow, issuer, client, user).Result;
+                var refresh = JwtFactory.UserRefreshV1(uow, issuer, user).Result;
 
                 var result = new
                 {
@@ -581,7 +581,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtHelper.UserResourceOwnerV1_Legacy(uow, issuer, client, user).Result;
+                var access = JwtFactory.UserResourceOwnerV1_Legacy(uow, issuer, client, user).Result;
 
                 var result = new
                 {

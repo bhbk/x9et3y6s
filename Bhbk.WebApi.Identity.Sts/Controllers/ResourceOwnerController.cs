@@ -16,10 +16,12 @@ using System.Threading.Tasks;
 
 /*
  * https://tools.ietf.org/html/rfc6749#section-4.3
+ * https://tools.ietf.org/html/rfc6749#section-6
  */
 
 /*
  * https://oauth.net/2/grant-types/password/
+ * https://oauth.net/2/grant-types/refresh-token/
  */
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -110,8 +112,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var rop = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
-            var rt = await JwtHelper.UserRefreshV1(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV1(UoW, issuer, client, user);
+            var rt = await JwtFactory.UserRefreshV1(UoW, issuer, user);
 
             var result = new UserJwtV1()
             {
@@ -280,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (UoW.ConfigRepo.LegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
-                var access = await JwtHelper.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
+                var access = await JwtFactory.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
 
                 var result = new UserJwtV1Legacy()
                 {
@@ -293,8 +295,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                var rop = await JwtHelper.UserResourceOwnerV1(UoW, issuer, client, user);
-                var rt = await JwtHelper.UserRefreshV1(UoW, issuer, user);
+                var rop = await JwtFactory.UserResourceOwnerV1(UoW, issuer, client, user);
+                var rt = await JwtFactory.UserRefreshV1(UoW, issuer, user);
 
                 var result = new UserJwtV1()
                 {
@@ -407,8 +409,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
 
 
             var result = new UserJwtV2()
@@ -569,8 +571,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
 
-            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

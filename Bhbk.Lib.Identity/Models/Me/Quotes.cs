@@ -3,7 +3,12 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Models.Me
 {
-    public class Quotes
+    public abstract class Quotes
+    {
+
+    }
+
+    public class QuotesModel : Quotes
     {
         public Success success { get; set; }
 

@@ -12,7 +12,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public Guid? UserId { get; set; }
 
-        [Required]
         public string RefreshValue { get; set; }
 
         [Required]

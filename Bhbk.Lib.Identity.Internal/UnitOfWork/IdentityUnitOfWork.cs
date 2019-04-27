@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
         public RoleRepository RoleRepo { get; private set; }
         public StateRepository StateRepo { get; private set; }
         public UserRepository UserRepo { get; private set; }
-        public Quotes UserQuote { get; set; }
+        public QuotesModel UserQuote { get; set; }
 
         public IdentityUnitOfWork(DbContextOptions<IdentityDbContext> options, InstanceContext instance, IConfigurationRoot conf)
             : this(new IdentityDbContext(options), instance, conf)

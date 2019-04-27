@@ -39,7 +39,9 @@ namespace Bhbk.Lib.Identity.Repositories
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        //https://oauth.net/2/grant-types/authorization-code/
+        /*
+         * https://oauth.net/2/grant-types/authorization-code/
+         */
         public async Task<HttpResponseMessage> AuthCode_AskV1(AuthCodeAskV1 model)
         {
             string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
@@ -122,7 +124,10 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        //https://oauth.net/2/grant-types/client-credentials/
+        /*
+         * https://oauth.net/2/grant-types/client-credentials/
+         * https://oauth.net/2/grant-types/refresh-token/
+         */
         public async Task<HttpResponseMessage> ClientCredential_UseV1(ClientCredentialV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
@@ -207,7 +212,9 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        //https://oauth.net/2/grant-types/device-code/
+        /*
+         * https://oauth.net/2/grant-types/device-code/
+         */
         public async Task<HttpResponseMessage> DeviceCode_AskV1(DeviceCodeAskV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
@@ -246,36 +253,6 @@ namespace Bhbk.Lib.Identity.Repositories
 
             if (_instance == InstanceContext.UnitTest)
                 return await _client.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> DeviceCode_ActionV1(string jwt, string code, string action)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v1/dcg/" + code + "/" + action;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> DeviceCode_ActionV2(string jwt, string code, string action)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v2/dcg/" + code + "/" + action;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -324,7 +301,9 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        //https://oauth.net/2/grant-types/implicit/
+        /* 
+         * https://oauth.net/2/grant-types/implicit/
+         */
         public async Task<HttpResponseMessage> Implicit_UseV1(ImplicitV1 model)
         {
             string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
@@ -367,98 +346,10 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        //https://oauth.net/2/grant-types/refresh-token/
-        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV1(string jwt, string user)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v1/rt/" + user + "/revoke";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteAllV2(string jwt, string user)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v2/rt/" + user + "/revoke";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteV1(string jwt, string user, string token)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v1/rt/" + user + "/revoke/" + token;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_DeleteV2(string jwt, string user, string token)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v2/rt/" + user + "/revoke/" + token;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_GetListV1(string jwt, string user)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v1/rt/" + user;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async Task<HttpResponseMessage> RefreshToken_GetListV2(string jwt, string user)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/oauth2/v2/rt/" + user;
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _client.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        //https://oauth.net/2/grant-types/password/
+        /*
+         * https://oauth.net/2/grant-types/password/
+         * https://oauth.net/2/grant-types/refresh-token/
+         */
         public async Task<HttpResponseMessage> ResourceOwner_UseV1Legacy(ResourceOwnerV1 model)
         {
             var content = new FormUrlEncodedContent(new[]

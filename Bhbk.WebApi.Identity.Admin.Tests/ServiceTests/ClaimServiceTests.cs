@@ -21,315 +21,321 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
     public class ClaimServiceTests
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _client;
-        private readonly IAdminService _service;
 
-        public ClaimServiceTests(StartupTests factory)
-        {
-            _factory = factory;
-            _client = _factory.CreateClient();
-            _service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, _client);
-        }
+        public ClaimServiceTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public async Task Admin_ClaimV1_Create_Fail()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
 
-            /*
-             * check security...
-             */
+                /*
+                 * check security...
+                 */
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _service.Repo.Claim_CreateV1(rop.token, new ClaimCreate());
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var result = await service.HttpClient.Claim_CreateV1(rop.token, new ClaimCreate());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
 
-            rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            result = await _service.Repo.Claim_CreateV1(rop.token, new ClaimCreate());
+                rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                result = await service.HttpClient.Claim_CreateV1(rop.token, new ClaimCreate());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
-            /*
-             * check model and/or action...
-             */
+                /*
+                 * check model and/or action...
+                 */
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            result = await _service.Repo.Claim_CreateV1(rop.token, new ClaimCreate());
+                rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                result = await service.HttpClient.Claim_CreateV1(rop.token, new ClaimCreate());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+                await _factory.TestData.DestroyAsync();
+            }
         }
 
         [Fact]
         public async Task Admin_ClaimV1_Create_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
-
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-
-            var create = new ClaimCreate()
+            using (var owin = _factory.CreateClient())
             {
-                IssuerId = issuer.Id,
-                Type = Strings.ApiUnitTestClaim,
-                Value = RandomValues.CreateBase64String(8),
-            };
+                await _factory.TestData.CreateAsync();
 
-            var result = await _service.Repo.Claim_CreateV1(rop.token, create);
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check = ok.ToObject<ClaimModel>();
+                var create = new ClaimCreate()
+                {
+                    IssuerId = issuer.Id,
+                    Type = Strings.ApiUnitTestClaim,
+                    Value = RandomValues.CreateBase64String(8),
+                };
+
+                var result = await service.HttpClient.Claim_CreateV1(rop.token, create);
+
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+                var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+                ok.ToObject<ClaimModel>().Should().BeAssignableTo<ClaimModel>();
+
+                await _factory.TestData.DestroyAsync();
+            }
         }
 
         [Fact]
         public async Task Admin_ClaimV1_Delete_Fail()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
 
-            /*
-             * check security...
-             */
+                /*
+                 * check security...
+                 */
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _service.Repo.Claim_DeleteV1(rop.token, Guid.NewGuid());
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var result = await service.HttpClient.Claim_DeleteV1(rop.token, Guid.NewGuid());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
 
-            rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            result = await _service.Repo.Claim_DeleteV1(rop.token, Guid.NewGuid());
+                rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                result = await service.HttpClient.Claim_DeleteV1(rop.token, Guid.NewGuid());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
-            /*
-             * check model and/or action...
-             */
+                /*
+                 * check model and/or action...
+                 */
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            result = await _service.Repo.Claim_DeleteV1(rop.token, Guid.NewGuid());
+                rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                result = await service.HttpClient.Claim_DeleteV1(rop.token, Guid.NewGuid());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            var model = (await _factory.UoW.ClaimRepo.GetAsync()).First();
-            model.Immutable = true;
+                var model = (await _factory.UoW.ClaimRepo.GetAsync()).First();
+                model.Immutable = true;
 
-            await _factory.UoW.ClaimRepo.UpdateAsync(model);
-            await _factory.UoW.CommitAsync();
+                await _factory.UoW.ClaimRepo.UpdateAsync(model);
+                await _factory.UoW.CommitAsync();
 
-            result = await _service.Repo.Claim_DeleteV1(rop.token, model.Id);
+                result = await service.HttpClient.Claim_DeleteV1(rop.token, model.Id);
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+                await _factory.TestData.DestroyAsync();
+            }
         }
 
         [Fact]
         public async Task Admin_ClaimV1_Delete_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            var testClaim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
+                var testClaim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _service.Repo.Claim_DeleteV1(rop.token, testClaim.Id);
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var result = await service.HttpClient.Claim_DeleteV1(rop.token, testClaim.Id);
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var check = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Id == testClaim.Id)).Any();
-            check.Should().BeFalse();
+                var check = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Id == testClaim.Id)).Any();
+                check.Should().BeFalse();
+
+                await _factory.TestData.DestroyAsync();
+            }
         }
 
         [Fact]
         public async Task Admin_ClaimV1_Get_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
+                await _factory.TestData.CreateRandomAsync(3);
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
 
-            var testClaim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _service.Repo.Claim_GetV1(rop.token, testClaim.Id.ToString());
+                var take = 3;
+                var orders = new List<Tuple<string, string>>();
+                orders.Add(new Tuple<string, string>("type", "asc"));
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+                for (int i = 0; i <= take; i++)
+                    await _factory.UoW.ClaimRepo.CreateAsync(new ClaimCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        Type = "ClaimTest-" + RandomValues.CreateBase64String(32),
+                        Value = RandomValues.CreateBase64String(8),
+                        Immutable = false,
+                    });
 
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check = ok.ToObject<ClaimModel>();
+                await _factory.UoW.CommitAsync();
 
-            result = await _service.Repo.Claim_GetV1(rop.token, testClaim.Id.ToString());
+                var result = await service.HttpClient.Claim_GetV1(rop.token,
+                    new CascadePager()
+                    {
+                        Filter = string.Empty,
+                        Orders = orders,
+                        Skip = 1,
+                        Take = take,
+                    });
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            check = ok.ToObject<ClaimModel>();
-        }
+                var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ClaimModel>>();
+                var count = (int)ok["count"];
 
-        [Fact]
-        public async Task Admin_ClaimV1_GetList_Success()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-            await _factory.TestData.CreateRandomAsync(3);
+                list.Should().BeAssignableTo<IEnumerable<ClaimModel>>();
+                list.Count().Should().Be(take);
+                count.Should().Be(await _factory.UoW.ClaimRepo.CountAsync());
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                result = await service.HttpClient.Claim_GetV1(rop.token, list.First().Id.ToString());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+                ok.ToObject<ClaimModel>().Should().BeAssignableTo<ClaimModel>();
 
-            var take = 3;
-            var orders = new List<Tuple<string, string>>();
-            orders.Add(new Tuple<string, string>("type", "asc"));
-
-            for (int i = 0; i <= take; i++)
-                await _factory.UoW.ClaimRepo.CreateAsync(new ClaimCreate()
-                {
-                    IssuerId = issuer.Id,
-                    Type = "ClaimTest-" + RandomValues.CreateBase64String(32),
-                    Value = RandomValues.CreateBase64String(8),
-                    Immutable = false,
-                });
-
-            await _factory.UoW.CommitAsync();
-
-            var result = await _service.Repo.Claim_GetV1(rop.token,
-                new CascadePager()
-                {
-                    Filter = string.Empty,
-                    Orders = orders,
-                    Skip = 1,
-                    Take = take,
-                });
-
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ClaimModel>>();
-            var count = (int)ok["count"];
-
-            list.Should().BeAssignableTo<IEnumerable<ClaimModel>>();
-            list.Count().Should().Be(take);
-            count.Should().Be(await _factory.UoW.ClaimRepo.CountAsync());
+                await _factory.TestData.DestroyAsync();
+            }
         }
 
         [Fact]
         public async Task Admin_ClaimV1_Update_Fail()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
 
-            /*
-             * check security...
-             */
+                /*
+                 * check security...
+                 */
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _service.Repo.Claim_UpdateV1(rop.token, new ClaimModel());
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var result = await service.HttpClient.Claim_UpdateV1(rop.token, new ClaimModel());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
 
-            rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            result = await _service.Repo.Claim_UpdateV1(rop.token, new ClaimModel());
+                rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                result = await service.HttpClient.Claim_UpdateV1(rop.token, new ClaimModel());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
-            /*
-             * check model and/or action...
-             */
+                /*
+                 * check model and/or action...
+                 */
 
-            issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            result = await _service.Repo.Claim_UpdateV1(rop.token, new ClaimModel());
+                rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                result = await service.HttpClient.Claim_UpdateV1(rop.token, new ClaimModel());
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+                await _factory.TestData.DestroyAsync();
+            }
+
         }
 
         [Fact]
         public async Task Admin_ClaimV1_Update_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                var service = new AdminService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var testClaim = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
-            testClaim.Value += "(Updated)";
+                var update = (await _factory.UoW.ClaimRepo.GetAsync(x => x.Immutable == false)).First();
+                update.Value += "(Updated)";
 
-            var result = await _service.Repo.Claim_UpdateV1(rop.token, _factory.UoW.Mapper.Map<ClaimModel>(testClaim));
+                var result = await service.HttpClient.Claim_UpdateV1(rop.token, _factory.UoW.Mapper.Map<ClaimModel>(update));
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
-            var check = ok.ToObject<ClaimModel>();
+                var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+                var check = ok.ToObject<ClaimModel>();
 
-            check.Value.Should().Be(testClaim.Value);
+                check.Value.Should().Be(update.Value);
+
+                await _factory.TestData.DestroyAsync();
+            }
         }
     }
 }

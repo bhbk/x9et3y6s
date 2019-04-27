@@ -336,8 +336,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

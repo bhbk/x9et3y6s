@@ -17,17 +17,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
     {
         private readonly StartupTests _factory;
 
-        public ChangeControllerTests(StartupTests factory)
-        {
-            _factory = factory;
-        }
+        public ChangeControllerTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public async Task Me_ChangeV1_Email_Fail()
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ChangeController();
@@ -50,6 +46,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ChangeEmailV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -58,7 +56,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ChangeController();
@@ -82,6 +79,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ChangeEmailV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -90,7 +89,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ChangeController();
@@ -112,6 +110,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -120,7 +120,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ChangeController();
@@ -143,6 +142,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ChangePasswordV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -151,7 +152,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ChangeController();
@@ -174,6 +174,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ChangePhoneV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -182,7 +184,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ChangeController();
@@ -206,6 +207,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ChangePhoneV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+
+                await _factory.TestData.DestroyAsync();
             }
         }
     }

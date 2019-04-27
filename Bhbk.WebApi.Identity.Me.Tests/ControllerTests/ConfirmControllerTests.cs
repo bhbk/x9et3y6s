@@ -18,17 +18,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
     {
         private readonly StartupTests _factory;
 
-        public ConfirmControllerTests(StartupTests factory)
-        {
-            _factory = factory;
-        }
+        public ConfirmControllerTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public async Task Me_ConfirmV1_Email_Fail()
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ConfirmController();
@@ -48,6 +44,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ConfirmEmailV1(user.Id, newEmail,
                     RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -56,7 +54,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ConfirmController();
@@ -75,6 +72,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -83,7 +82,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ConfirmController();
@@ -103,6 +101,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
                     RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -111,7 +111,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ConfirmController();
@@ -130,6 +129,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -138,7 +139,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ConfirmController();
@@ -157,6 +157,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber,
                     RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -165,7 +167,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.DestroyAsync();
                 await _factory.TestData.CreateAsync();
 
                 var controller = new ConfirmController();
@@ -183,6 +184,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber, token) as NoContentResult;
                 result.Should().BeAssignableTo(typeof(NoContentResult));
+
+                await _factory.TestData.DestroyAsync();
             }
         }
     }

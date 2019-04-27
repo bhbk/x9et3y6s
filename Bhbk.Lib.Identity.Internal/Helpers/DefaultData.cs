@@ -9,13 +9,13 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Datasets
+namespace Bhbk.Lib.Identity.Internal.Helpers
 {
-    public class GenerateDefaults
+    public class DefaultData
     {
         private readonly IIdentityUnitOfWork<IdentityDbContext> _uow;
 
-        public GenerateDefaults(IIdentityUnitOfWork<IdentityDbContext> uow)
+        public DefaultData(IIdentityUnitOfWork<IdentityDbContext> uow)
         {
             _uow = uow ?? throw new ArgumentNullException();
         }

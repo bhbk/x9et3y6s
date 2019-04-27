@@ -11,17 +11,14 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
     {
         private readonly StartupTests _factory;
 
-        public DiagnosticServiceTests(StartupTests factory)
-        {
-            _factory = factory;
-        }
+        public DiagnosticServiceTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public async Task Admin_DiagV1_CheckSwagger_Success()
         {
-            using (var client = _factory.CreateClient())
+            using (var owin = _factory.CreateClient())
             {
-                var result = await client.GetAsync($"help/index.html");
+                var result = await owin.GetAsync($"help/index.html");
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.OK);
             }

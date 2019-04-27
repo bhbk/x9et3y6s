@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Datasets;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using ManyConsole;
@@ -43,7 +43,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .EnableSensitiveDataLogging();
 
                 var uow = new IdentityUnitOfWork(builder, InstanceContext.DeployedOrLocal, conf);
-                var data = new GenerateDefaults(uow);
+                var data = new DefaultData(uow);
 
                 if (CreateDefault)
                 {

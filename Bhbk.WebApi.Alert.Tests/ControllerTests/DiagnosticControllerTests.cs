@@ -14,15 +14,12 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
     {
         private readonly StartupTests _factory;
 
-        public DiagnosticControllerTests(StartupTests factory)
-        {
-            _factory = factory;
-        }
+        public DiagnosticControllerTests(StartupTests factory) => _factory = factory;
 
         [Fact]
         public void Admin_DiagV1_GetStatus_Fail()
         {
-            using (var client = _factory.CreateClient())
+            using (var owin = _factory.CreateClient())
             {
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();
@@ -37,7 +34,7 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
         [Fact]
         public void Admin_DiagV1_GetStatus_Success()
         {
-            using (var client = _factory.CreateClient())
+            using (var owin = _factory.CreateClient())
             {
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();
@@ -57,7 +54,7 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
         [Fact]
         public void Admin_DiagV1_GetVersion_Success()
         {
-            using (var client = _factory.CreateClient())
+            using (var owin = _factory.CreateClient())
             {
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();

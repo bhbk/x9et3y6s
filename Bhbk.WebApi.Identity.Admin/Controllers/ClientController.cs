@@ -81,6 +81,50 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
+        [Route("v1/{clientID:guid}/refresh"), HttpDelete]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> DeleteClientRefreshesV1([FromRoute] Guid clientID)
+        {
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+
+            if (client == null)
+            {
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientID}");
+                return NotFound(ModelState);
+            }
+
+            foreach (var refreshes in await UoW.RefreshRepo.GetAsync(x => x.ClientId == clientID))
+            {
+                if (!await UoW.RefreshRepo.DeleteAsync(refreshes.Id))
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
+        [Route("v1/{clientID:guid}/refresh/{refreshID}"), HttpDelete]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> DeleteClientRefreshV1([FromRoute] Guid clientID, [FromRoute] Guid refreshID)
+        {
+            var refresh = (await UoW.RefreshRepo.GetAsync(x => x.ClientId == clientID
+                && x.Id == refreshID)).SingleOrDefault();
+
+            if (refresh == null)
+            {
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{clientID}");
+                return NotFound(ModelState);
+            }
+
+            if (!await UoW.RefreshRepo.DeleteAsync(refresh.Id))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
         [Route("v1/{clientValue}"), HttpGet]
         public async Task<IActionResult> GetClientV1([FromRoute] string clientValue)
         {
@@ -169,6 +213,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
                 return BadRequest(ModelState);
             }
+        }
+
+        [Route("v1/{clientID:guid}/refreshes"), HttpGet]
+        public async Task<IActionResult> GetClientRefreshesV1([FromRoute] Guid clientID)
+        {
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+
+            if (client == null)
+            {
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientID}");
+                return NotFound(ModelState);
+            }
+
+            var refreshes = await UoW.RefreshRepo.GetAsync(x => x.ClientId == clientID);
+
+            var result = refreshes.Select(x => UoW.Mapper.Map<RefreshModel>(x));
+
+            return Ok(result);
         }
 
         [Route("v1/{clientID:guid}/roles"), HttpGet]

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Helpers
 {
-    public class JwtHelper
+    public class JwtFactory
     {
         public static async Task<string>
             ClientRefreshV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client)

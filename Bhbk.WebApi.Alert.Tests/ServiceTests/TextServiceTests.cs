@@ -18,85 +18,88 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
     public class TextServiceTests
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _client;
-        private readonly IAlertService _service;
 
-        public TextServiceTests(StartupTests factory)
+        public TextServiceTests(StartupTests factory) => _factory = factory;
+
+        [Fact]
+        public async Task Alert_TextV1_Enqueue_Fail()
         {
-            _factory = factory;
-            _client = _factory.CreateClient();
-            _service = new AlertService(_factory.Conf, _factory.UoW.InstanceType, _client);
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
+
+                var service = new AlertService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var adminUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                var normalUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, adminUser);
+                var result = await service.HttpClient.Enqueue_TextV1(rop.token, new TextCreate());
+
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+                result = await service.HttpClient.Enqueue_TextV1(rop.token,
+                    new TextCreate()
+                    {
+                        FromId = Guid.NewGuid(),
+                        FromPhoneNumber = adminUser.PhoneNumber,
+                        ToId = normalUser.Id,
+                        ToPhoneNumber = normalUser.PhoneNumber,
+                        Body = Strings.ApiUnitTestTextBody,
+                    });
+
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+                result = await service.HttpClient.Enqueue_TextV1(rop.token,
+                    new TextCreate()
+                    {
+                        FromId = adminUser.Id,
+                        FromPhoneNumber = normalUser.PhoneNumber,
+                        ToId = normalUser.Id,
+                        ToPhoneNumber = normalUser.PhoneNumber,
+                        Body = Strings.ApiUnitTestTextBody,
+                    });
+
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+                await _factory.TestData.DestroyAsync();
+            }
         }
 
         [Fact]
-        public async Task Api_TextV1_Enqueue_Fail()
+        public async Task Alert_TextV1_Enqueue_Success()
         {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
+            using (var owin = _factory.CreateClient())
+            {
+                await _factory.TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
-            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var service = new AlertService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
+                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
+                var adminUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
+                var normalUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
 
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-            var result = await _service.Repo.Enqueue_TextV1(rop.token, new TextCreate());
+                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, adminUser);
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                var result = await service.HttpClient.Enqueue_TextV1(rop.token,
+                    new TextCreate()
+                    {
+                        FromId = adminUser.Id,
+                        FromPhoneNumber = adminUser.PhoneNumber,
+                        ToId = normalUser.Id,
+                        ToPhoneNumber = normalUser.PhoneNumber,
+                        Body = Strings.ApiUnitTestTextBody,
+                    });
 
-            result = await _service.Repo.Enqueue_TextV1(rop.token,
-                new TextCreate()
-                {
-                    FromId = Guid.NewGuid(),
-                    FromPhoneNumber = user.PhoneNumber,
-                    ToId = user1.Id,
-                    ToPhoneNumber = user1.PhoneNumber,
-                    Body = Strings.ApiUnitTestTextBody,
-                });
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-            result = await _service.Repo.Enqueue_TextV1(rop.token,
-                new TextCreate()
-                {
-                    FromId = user.Id,
-                    FromPhoneNumber = user1.PhoneNumber,
-                    ToId = user1.Id,
-                    ToPhoneNumber = user1.PhoneNumber,
-                    Body = Strings.ApiUnitTestTextBody,
-                });
-
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Api_TextV1_Enqueue_Success()
-        {
-            await _factory.TestData.DestroyAsync();
-            await _factory.TestData.CreateAsync();
-
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
-            var user1 = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
-            var rop = await JwtHelper.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
-
-            var result = await _service.Repo.Enqueue_TextV1(rop.token,
-                new TextCreate()
-                {
-                    FromId = user.Id,
-                    FromPhoneNumber = user.PhoneNumber,
-                    ToId = user1.Id,
-                    ToPhoneNumber = user1.PhoneNumber,
-                    Body = Strings.ApiUnitTestTextBody,
-                });
-
-            result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-            result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+                await _factory.TestData.DestroyAsync();
+            }
         }
     }
 }

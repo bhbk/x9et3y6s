@@ -2,9 +2,9 @@
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
-using Bhbk.Lib.Identity.Internal.Datasets;
+using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Tests.Datasets;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,8 +36,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
     {
         public IConfigurationRoot Conf;
         public IIdentityUnitOfWork<IdentityDbContext> UoW;
-        public GenerateDefaults DefaultData;
-        public GenerateTests TestData;
+        public DefaultData DefaultData;
+        public TestData TestData;
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -77,8 +77,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 Conf = sp.GetRequiredService<IConfigurationRoot>();
                 UoW = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
 
-                DefaultData = new GenerateDefaults(UoW);
-                TestData = new GenerateTests(UoW);
+                DefaultData = new DefaultData(UoW);
+                TestData = new TestData(UoW);
 
                 /*
                  * must add seed data for good bearer setup...

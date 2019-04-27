@@ -2,19 +2,20 @@
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.Tests.Datasets
+namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
 {
-    public class GenerateTests
+    public class TestData
     {
         private readonly IIdentityUnitOfWork<IdentityDbContext> _uow;
 
-        public GenerateTests(IIdentityUnitOfWork<IdentityDbContext> uow)
+        public TestData(IIdentityUnitOfWork<IdentityDbContext> uow)
         {
             _uow = uow ?? throw new ArgumentNullException();
         }
@@ -126,6 +127,45 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Datasets
 
             if (!await _uow.UserRepo.IsInClaimAsync(user.Id, claim.Id))
                 await _uow.UserRepo.AddToClaimAsync(user, claim);
+
+            await _uow.CommitAsync();
+
+            //create activity
+            await _uow.ActivityRepo.CreateAsync(
+                new ActivityCreate()
+                {
+                    ClientId = client.Id,
+                    UserId = user.Id,
+                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                    Immutable = false,
+                });
+
+            //create refreshes
+            await _uow.RefreshRepo.CreateAsync(
+                new RefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    UserId = user.Id,
+                    RefreshType = RefreshType.User.ToString(),
+                    RefreshValue = RandomValues.CreateBase64String(8),
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                });
+
+            //create states
+            await _uow.StateRepo.CreateAsync(
+                new StateCreate()
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    UserId = user.Id,
+                    StateValue = RandomValues.CreateBase64String(32),
+                    StateType = StateType.Device.ToString(),
+                    StateConsume = false,
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
+                });
 
             await _uow.CommitAsync();
         }
@@ -243,6 +283,45 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Datasets
                     await _uow.UserRepo.AddToClaimAsync(user, claim);
 
                 await _uow.CommitAsync();
+
+                //create activity
+                await _uow.ActivityRepo.CreateAsync(
+                    new ActivityCreate()
+                    {
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                        Immutable = false,
+                    });
+
+                //create refreshes
+                await _uow.RefreshRepo.CreateAsync(
+                    new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = RandomValues.CreateBase64String(8),
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                    });
+
+                //create states
+                await _uow.StateRepo.CreateAsync(
+                    new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
+                    });
+
+                await _uow.CommitAsync();
             }
         }
 
@@ -250,6 +329,30 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Datasets
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
+
+            //delete test activity
+            var actvities = await _uow.ActivityRepo.GetAsync();
+
+            foreach (var activity in actvities)
+                await _uow.ActivityRepo.DeleteAsync(activity.Id);
+
+            await _uow.CommitAsync();
+
+            //delete test refreshes
+            var refreshes = await _uow.RefreshRepo.GetAsync();
+
+            foreach (var refresh in refreshes)
+                await _uow.RefreshRepo.DeleteAsync(refresh.Id);
+
+            await _uow.CommitAsync();
+
+            //delete test states
+            var states = await _uow.StateRepo.GetAsync();
+
+            foreach (var state in states)
+                await _uow.StateRepo.DeleteAsync(state.Id);
+
+            await _uow.CommitAsync();
 
             //delete test users
             var users = await _uow.UserRepo.GetAsync(x => x.Email.Contains(Strings.ApiUnitTestUser));

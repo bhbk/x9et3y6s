@@ -26,12 +26,12 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
+    [AllowAnonymous]
     public class DeviceCodeController : BaseController
     {
         public DeviceCodeController() { }
 
         [Route("v1/dcg-ask"), HttpPost]
-        [AllowAnonymous]
         public IActionResult DeviceCodeV1_Ask([FromForm] DeviceCodeAskV1 input)
         {
             if (!ModelState.IsValid)
@@ -46,14 +46,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
-        [Route("v1/dcg/{userCode}/{userAction}"), HttpGet]
-        public IActionResult DeviceCodeV1_Action([FromRoute] string userCode, string userAction)
-        {
-            return StatusCode((int)HttpStatusCode.NotImplemented);
-        }
-
         [Route("v1/dcg"), HttpPost]
-        [AllowAnonymous]
         public IActionResult DeviceCodeV1_Use([FromForm] DeviceCodeV1 input)
         {
             if (!ModelState.IsValid)
@@ -69,7 +62,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg-ask"), HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
         {
             if (!ModelState.IsValid)
@@ -158,64 +150,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             return Ok(result);
         }
 
-        [Route("v2/dcg/{userCode}/{userAction}"), HttpGet]
-        public async Task<IActionResult> DeviceCodeV2_Action([FromRoute] string userCode, string userAction)
-        {
-            ActionType actionType;
-
-            if (!Enum.TryParse<ActionType>(userAction, true, out actionType))
-            {
-                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"User action:{userAction}");
-                return BadRequest(ModelState);
-            }
-
-            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == userCode)).SingleOrDefault();
-
-            if (state == null)
-            {
-                ModelState.AddModelError(MessageType.StateNotFound.ToString(), $"User code:{userCode}");
-                return NotFound(ModelState);
-            }
-            else if (state.StateDecision.HasValue
-                && state.StateDecision.Value == false)
-            {
-                ModelState.AddModelError(MessageType.StateDenied.ToString(), $"User code:{userCode}");
-                return BadRequest(ModelState);
-            }
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
-
-            if (user == null
-                || user.Id != state.UserId)
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{state.UserId}");
-                return NotFound(ModelState);
-            }
-            //check that user is confirmed...
-            //check that user is not locked...
-            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
-                || !user.EmailConfirmed
-                || !user.PasswordConfirmed)
-            {
-                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
-                return BadRequest(ModelState);
-            }
-
-            if (string.Equals(userAction, ActionType.Allow.ToString(), StringComparison.OrdinalIgnoreCase))
-                state.StateDecision = true;
-            else if (string.Equals(userAction, ActionType.Deny.ToString(), StringComparison.OrdinalIgnoreCase))
-                state.StateDecision = false;
-            else
-                throw new NotImplementedException();
-
-            await UoW.StateRepo.UpdateAsync(state);
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
         [Route("v2/dcg"), HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> DeviceCodeV2_Use([FromForm] DeviceCodeV2 input)
         {
             if (!ModelState.IsValid)
@@ -335,8 +270,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
 
-            var dc = await JwtHelper.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
-            var rt = await JwtHelper.UserRefreshV2(UoW, issuer, user);
+            var dc = await JwtFactory.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
 
             var result = new UserJwtV2()
             {

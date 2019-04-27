@@ -198,6 +198,50 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
+        [Route("v1/{userID:guid}/refresh"), HttpDelete]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> DeleteUserRefreshesV1([FromRoute] Guid userID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            foreach (var refreshes in await UoW.RefreshRepo.GetAsync(x => x.UserId == userID))
+            {
+                if (!await UoW.RefreshRepo.DeleteAsync(refreshes.Id))
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
+        [Route("v1/{userID:guid}/refresh/{refreshID}"), HttpDelete]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> DeleteUserRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
+        {
+            var refresh = (await UoW.RefreshRepo.GetAsync(x => x.UserId == userID
+                && x.Id == refreshID)).SingleOrDefault();
+
+            if (refresh == null)
+            {
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{userID}");
+                return NotFound(ModelState);
+            }
+
+            if (!await UoW.RefreshRepo.DeleteAsync(refresh.Id))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
         [Route("v1/{userValue}"), HttpGet]
         public async Task<IActionResult> GetUserV1([FromRoute] string userValue)
         {
@@ -272,6 +316,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x)))
                 .Select(x => UoW.Mapper.Map<LoginModel>(x));
+
+            return Ok(result);
+        }
+
+        [Route("v1/{userID:guid}/refreshes"), HttpGet]
+        public async Task<IActionResult> GetUserRefreshesV1([FromRoute] Guid userID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            var refreshes = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
+
+            var result = refreshes.Select(x => UoW.Mapper.Map<RefreshModel>(x));
 
             return Ok(result);
         }

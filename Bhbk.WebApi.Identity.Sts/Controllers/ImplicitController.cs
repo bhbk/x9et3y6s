@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //no refresh token as part of this flow...
-            var rop = await JwtHelper.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
 
             var result = new Uri(redirect.AbsoluteUri + "#access_token=" + HttpUtility.UrlEncode(rop.token)
                 + "&expires_in=" + HttpUtility.UrlEncode(((int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds).ToString())
