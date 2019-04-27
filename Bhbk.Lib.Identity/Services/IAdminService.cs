@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Services
     public interface IAdminService
     {
         JwtSecurityToken Jwt { get; set; }
-        AdminRepository HttpClient { get; }
+        AdminRepository Endpoints { get; }
 
         /*
          * activity

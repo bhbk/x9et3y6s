@@ -68,15 +68,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await service.HttpClient.Info_UpdateCodeV1(RandomValues.CreateBase64String(32), state.StateValue, ActionType.Allow.ToString());
+                var dc = await service.Endpoints.Info_UpdateCodeV1(RandomValues.CreateBase64String(32), state.StateValue, ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
+                dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, state.StateValue, RandomValues.CreateAlphaNumericString(8));
+                dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, state.StateValue, RandomValues.CreateAlphaNumericString(8));
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -118,11 +118,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Allow.ToString());
+                var dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-                dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Deny.ToString());
+                dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Deny.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NoContent);
 

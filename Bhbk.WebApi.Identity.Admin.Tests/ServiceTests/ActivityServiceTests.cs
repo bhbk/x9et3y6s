@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("created", "desc"));
 
-                var result = await sts.HttpClient.Activity_GetV1(rop.token,
+                var result = await sts.Endpoints.Activity_GetV1(rop.token,
                     new CascadePager()
                     {
                         Filter = string.Empty,
