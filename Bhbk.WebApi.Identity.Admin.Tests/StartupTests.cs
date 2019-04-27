@@ -4,7 +4,6 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -34,11 +33,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
 
     public class StartupTests : WebApplicationFactory<Startup>
     {
-        public IConfigurationRoot Conf;
-        public IIdentityUnitOfWork<IdentityDbContext> UoW;
-        public DefaultData DefaultData;
-        public TestData TestData;
-
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             var lib = SearchRoots.ByAssemblyContext("config-lib.json");
@@ -65,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork<IdentityDbContext>>(new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf));
+                sc.AddSingleton<IIdentityUnitOfWork>(new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf));
                 sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
                 sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
                 sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
@@ -73,41 +67,36 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
 
                 var sp = sc.BuildServiceProvider();
-
-                Conf = sp.GetRequiredService<IConfigurationRoot>();
-                UoW = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
-
-                DefaultData = new DefaultData(UoW);
-                TestData = new TestData(UoW);
+                var uow = sp.GetRequiredService<IIdentityUnitOfWork>();
 
                 /*
                  * must add seed data for good bearer setup...
                  */
 
-                DefaultData.CreateAsync().Wait();
+                new DefaultData(uow).CreateAsync().Wait();
 
                 /*
                  * only test context allowed to run...
                  */
 
-                if (UoW.InstanceType != InstanceContext.UnitTest)
+                if (uow.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
 
-                var issuers = (UoW.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name + ":" + UoW.IssuerRepo.Salt);
+                var issuers = (uow.IssuerRepo.GetAsync().Result)
+                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
 
-                var issuerKeys = (UoW.IssuerRepo.GetAsync().Result)
+                var issuerKeys = (uow.IssuerRepo.GetAsync().Result)
                     .Select(x => x.IssuerKey);
 
-                var clients = (UoW.ClientRepo.GetAsync().Result)
+                var clients = (uow.ClientRepo.GetAsync().Result)
                     .Select(x => x.Name);
 
                 /*
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (UoW.ConfigRepo.LegacyModeIssuer)
-                    issuers = (UoW.IssuerRepo.GetAsync().Result)
+                if (uow.ConfigRepo.LegacyModeIssuer)
+                    issuers = (uow.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 
                 sc.AddCors();

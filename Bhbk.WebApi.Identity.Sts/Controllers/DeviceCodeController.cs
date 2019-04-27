@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrDeviceCodeIDV1, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV2, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrDeviceCodeIDV2, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Strings.AttrDeviceCodeIDV2, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrDeviceCodeIDV2, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);

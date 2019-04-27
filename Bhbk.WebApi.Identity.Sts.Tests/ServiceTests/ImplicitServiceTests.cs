@@ -1,8 +1,12 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -25,9 +29,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var imp = await service.Endpoints.Implicit_UseV1(
+                var imp = await service.HttpClient.Implicit_UseV1(
                     new ImplicitV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -48,16 +54,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var url = new Uri(Strings.ApiUnitTestUriLink);
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var url = new Uri(Constants.ApiUnitTestUriLink);
                 var state = RandomValues.CreateBase64String(8);
-                var imp = await service.Endpoints.Implicit_UseV2(
+                var imp = await service.HttpClient.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -71,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                imp = await service.Endpoints.Implicit_UseV2(
+                imp = await service.HttpClient.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = string.Empty,
@@ -85,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                imp = await service.Endpoints.Implicit_UseV2(
+                imp = await service.HttpClient.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -99,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                imp = await service.Endpoints.Implicit_UseV2(
+                imp = await service.HttpClient.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -113,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                imp = await service.Endpoints.Implicit_UseV2(
+                imp = await service.HttpClient.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -126,8 +136,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
     }

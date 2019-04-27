@@ -311,9 +311,9 @@ namespace Bhbk.Cli.Identity.Commands
                                 user = _service.User_CreateV1(new UserCreate()
                                 {
                                     Email = userName,
-                                    FirstName = Strings.ApiDefaultAdminUserFirstName,
-                                    LastName = Strings.ApiDefaultAdminUserLastName,
-                                    PhoneNumber = Strings.ApiDefaultAdminUserPhone,
+                                    FirstName = Constants.ApiDefaultAdminUserFirstName,
+                                    LastName = Constants.ApiDefaultAdminUserLastName,
+                                    PhoneNumber = Constants.ApiDefaultAdminUserPhone,
                                     LockoutEnabled = false,
                                     HumanBeing = false,
                                     Immutable = false,
@@ -326,7 +326,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\"");
                             }
 
-                            loginName = Strings.ApiDefaultLogin;
+                            loginName = Constants.ApiDefaultLogin;
                             login = _service.Login_GetV1(loginName);
 
                             if (login != null)

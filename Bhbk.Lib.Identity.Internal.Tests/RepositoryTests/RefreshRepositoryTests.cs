@@ -15,23 +15,19 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [Collection("LibraryTests")]
-    public class RefreshRepositoryTests
+    public class RefreshRepositoryTests : BaseRepositoryTests
     {
-        private StartupTests _factory;
-
-        public RefreshRepositoryTests(StartupTests factory) => _factory = factory;
-
         [Fact(Skip = "NotImplemented")]
         public async Task Lib_RefreshRepo_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await _factory.UoW.RefreshRepo.CreateAsync(new RefreshCreate());
+                await UoW.RefreshRepo.CreateAsync(new RefreshCreate());
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await _factory.UoW.RefreshRepo.CreateAsync(
+                await UoW.RefreshRepo.CreateAsync(
                     new RefreshCreate()
                     {
                         IssuerId = Guid.NewGuid(),
@@ -48,13 +44,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RefreshRepo_CreateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            var result = await _factory.UoW.RefreshRepo.CreateAsync(
+            var result = await UoW.RefreshRepo.CreateAsync(
                 new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
@@ -67,7 +63,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 });
             result.Should().BeAssignableTo<tbl_Refreshes>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -75,32 +71,32 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.RefreshRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.RefreshRepo.DeleteAsync(Guid.NewGuid());
             });
         }
 
         [Fact]
         public async Task Lib_RefreshRepo_DeleteV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var refresh = (await _factory.UoW.RefreshRepo.GetAsync()).First();
+            var refresh = (await UoW.RefreshRepo.GetAsync()).First();
 
-            var result = await _factory.UoW.RefreshRepo.DeleteAsync(refresh.Id);
+            var result = await UoW.RefreshRepo.DeleteAsync(refresh.Id);
             result.Should().BeTrue();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
         public async Task Lib_RefreshRepo_GetV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.RefreshRepo.GetAsync();
+            var result = await UoW.RefreshRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Refreshes>>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -108,7 +104,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NotImplementedException>(async () =>
             {
-                await _factory.UoW.RefreshRepo.UpdateAsync(new tbl_Refreshes());
+                await UoW.RefreshRepo.UpdateAsync(new tbl_Refreshes());
             });
         }
     }

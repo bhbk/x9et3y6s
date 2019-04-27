@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
+﻿using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     public class BaseController : Controller
     {
         protected IConfigurationRoot Conf { get => (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>(); }
-        protected IIdentityUnitOfWork<IdentityDbContext> UoW { get => (IIdentityUnitOfWork<IdentityDbContext>)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>(); }
+        protected IIdentityUnitOfWork UoW { get => (IIdentityUnitOfWork)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
         protected IAlertService Alerts { get => (IAlertService)ControllerContext.HttpContext.RequestServices.GetService<IAlertService>(); }
 

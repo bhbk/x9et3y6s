@@ -1,9 +1,13 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,12 +32,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = service.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
@@ -42,10 +50,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Email,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -56,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -69,10 +77,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 client.Enabled = false;
 
-                await _factory.UoW.ClientRepo.UpdateAsync(client);
-                await _factory.UoW.CommitAsync();
+                await uow.ClientRepo.UpdateAsync(client);
+                await uow.CommitAsync();
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -82,8 +90,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -92,12 +98,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = service.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
@@ -106,10 +116,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Email,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -120,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = string.Empty,
@@ -133,10 +143,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 issuer.Enabled = false;
 
-                await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
-                await _factory.UoW.CommitAsync();
+                await uow.IssuerRepo.UpdateAsync(issuer);
+                await uow.CommitAsync();
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -146,8 +156,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -156,12 +164,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = service.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
@@ -170,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
                 /*
@@ -178,10 +190,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
-                await _factory.UoW.UserRepo.UpdateAsync(user);
-                await _factory.UoW.CommitAsync();
+                await uow.UserRepo.UpdateAsync(user);
+                await uow.CommitAsync();
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -194,10 +206,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 /*
                  */
-                await _factory.UoW.UserRepo.DeleteAsync(user.Id);
-                await _factory.UoW.CommitAsync();
+                await uow.UserRepo.DeleteAsync(user.Id);
+                await uow.CommitAsync();
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -207,8 +219,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -217,18 +227,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
                 var random = new Random();
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 /*
                  */
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
                 var rop = service.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
@@ -237,13 +251,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -256,8 +270,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 /*
                  */
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
                 rop = service.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
@@ -266,13 +280,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -287,7 +301,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                  */
                 var pos = random.Next((rop.refresh_token).Length - 8);
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -300,7 +314,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 /*
                  */
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV1(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -310,8 +324,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -320,57 +332,59 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV1(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = Guid.NewGuid().ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = string.Empty,
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
                 client.Enabled = false;
 
-                await _factory.UoW.ClientRepo.UpdateAsync(client);
-                await _factory.UoW.CommitAsync();
+                await uow.ClientRepo.UpdateAsync(client);
+                await uow.CommitAsync();
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -379,54 +393,56 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = true;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = Guid.NewGuid().ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = string.Empty,
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
                 client.Enabled = false;
 
-                await _factory.UoW.ClientRepo.UpdateAsync(client);
-                await _factory.UoW.CommitAsync();
+                await uow.ClientRepo.UpdateAsync(client);
+                await uow.CommitAsync();
 
-                rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -435,57 +451,59 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV1(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = string.Empty,
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
                 issuer.Enabled = false;
 
-                await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
-                await _factory.UoW.CommitAsync();
+                await uow.IssuerRepo.UpdateAsync(issuer);
+                await uow.CommitAsync();
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = client.Id.ToString(),
                         username = user.Email,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -494,40 +512,44 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV1(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = client.Id.ToString(),
                         username = Guid.NewGuid().ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = client.Id.ToString(),
                         username = string.Empty,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -542,21 +564,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
-                await _factory.UoW.UserRepo.UpdateAsync(user);
+                await uow.UserRepo.UpdateAsync(user);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1(
+                rop = await service.HttpClient.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -565,38 +585,42 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = true;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
                         username = Guid.NewGuid().ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
                         username = string.Empty,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
@@ -610,20 +634,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
-                await _factory.UoW.UserRepo.UpdateAsync(user);
+                await uow.UserRepo.UpdateAsync(user);
 
-                rop = await service.Endpoints.ResourceOwner_UseV1Legacy(
+                rop = await service.HttpClient.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -632,19 +654,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var salt = _factory.Conf["IdentityTenants:Salt"];
-                salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var salt = conf["IdentityTenants:Salt"];
+                salt.Should().Be(uow.IssuerRepo.Salt);
 
                 /*
                  */
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
                 var rop = service.ResourceOwner_UseV1(
                     new ResourceOwnerV1()
@@ -653,7 +679,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Email,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo<UserJwtV1>();
 
@@ -661,7 +687,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var rop_claims = JwtFactory.ReadJwtToken(rop.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                rop_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                rop_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 rop_claims.Value.Split(':')[1].Should().Be(salt);
 
                 var rt = service.ResourceOwnerRefresh_UseV1(
@@ -678,12 +704,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var rt_claims = JwtFactory.ReadJwtToken(rt.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                rt_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 rt_claims.Value.Split(':')[1].Should().Be(salt);
 
                 /*
                  */
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = true;
+                uow.ConfigRepo.LegacyModeIssuer = true;
 
                 var rop_legacy = service.ResourceOwner_UseV1Legacy(
                     new ResourceOwnerV1()
@@ -691,7 +717,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client_id = client.Id.ToString(),
                         username = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop_legacy.Should().BeAssignableTo<UserJwtV1Legacy>();
 
@@ -699,9 +725,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var rop_legacy_claims = JwtFactory.ReadJwtToken(rop_legacy.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                rop_legacy_claims.Value.Should().Be(Strings.ApiUnitTestIssuer);
-
-                await _factory.TestData.DestroyAsync();
+                rop_legacy_claims.Value.Should().Be(Constants.ApiUnitTestIssuer);
             }
         }
 
@@ -710,12 +734,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = service.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
@@ -724,10 +752,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -740,10 +768,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 client.Enabled = false;
 
-                await _factory.UoW.ClientRepo.UpdateAsync(client);
-                await _factory.UoW.CommitAsync();
+                await uow.ClientRepo.UpdateAsync(client);
+                await uow.CommitAsync();
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -753,8 +781,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -763,12 +789,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = service.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
@@ -777,10 +807,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -791,7 +821,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = string.Empty,
@@ -804,10 +834,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 issuer.Enabled = false;
 
-                await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
-                await _factory.UoW.CommitAsync();
+                await uow.IssuerRepo.UpdateAsync(issuer);
+                await uow.CommitAsync();
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -817,8 +847,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -827,18 +855,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
                 var random = new Random();
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 /*
                  */
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
 
                 var rop = service.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
@@ -847,13 +879,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -866,8 +898,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 /*
                  */
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = true;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
 
                 rop = service.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
@@ -876,13 +908,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFake = false;
-                _factory.UoW.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -902,12 +934,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
                 var rop_pos = random.Next((rop.refresh_token).Length - 8);
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -927,10 +959,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -940,8 +972,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -950,14 +980,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = service.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
@@ -966,16 +1000,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
 
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
-                await _factory.UoW.UserRepo.UpdateAsync(user);
-                await _factory.UoW.CommitAsync();
+                await uow.UserRepo.UpdateAsync(user);
+                await uow.CommitAsync();
 
-                var rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -986,10 +1020,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                await _factory.UoW.UserRepo.DeleteAsync(user.Id);
-                await _factory.UoW.CommitAsync();
+                await uow.UserRepo.DeleteAsync(user.Id);
+                await uow.CommitAsync();
 
-                rt = await service.Endpoints.ResourceOwnerRefresh_UseV2(
+                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -999,8 +1033,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -1009,45 +1041,47 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV2(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString(), RandomValues.CreateBase64String(8) }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
                 client.Enabled = false;
 
-                await _factory.UoW.ClientRepo.UpdateAsync(client);
-                await _factory.UoW.CommitAsync();
+                await uow.ClientRepo.UpdateAsync(client);
+                await uow.CommitAsync();
 
-                rop = await service.Endpoints.ResourceOwner_UseV2(
+                rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -1056,57 +1090,59 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV2(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV2(
+                rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = string.Empty,
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
                 issuer.Enabled = false;
 
-                await _factory.UoW.IssuerRepo.UpdateAsync(issuer);
-                await _factory.UoW.CommitAsync();
+                await uow.IssuerRepo.UpdateAsync(issuer);
+                await uow.CommitAsync();
 
-                rop = await service.Endpoints.ResourceOwner_UseV2(
+                rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -1115,40 +1151,44 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var rop = await service.Endpoints.ResourceOwner_UseV2(
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = Guid.NewGuid().ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rop = await service.Endpoints.ResourceOwner_UseV2(
+                rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = string.Empty,
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                rop = await service.Endpoints.ResourceOwner_UseV2(
+                rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1163,21 +1203,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
-                await _factory.UoW.UserRepo.UpdateAsync(user);
+                await uow.UserRepo.UpdateAsync(user);
 
-                rop = await service.Endpoints.ResourceOwner_UseV2(
+                rop = await service.HttpClient.ResourceOwner_UseV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Join(",", new List<string> { client.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -1186,26 +1224,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsService(conf, uow.InstanceType, owin);
 
-                _factory.UoW.ConfigRepo.LegacyModeIssuer = false;
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var service = new StsService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client1 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var client2 = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                uow.ConfigRepo.LegacyModeIssuer = false;
 
-                var salt = _factory.Conf["IdentityTenants:Salt"];
-                salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                if (client1.Id == client2.Id)
+                var defaultClient = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var defaultRole = (await uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).Single();
+
+                var salt = conf["IdentityTenants:Salt"];
+                salt.Should().Be(uow.IssuerRepo.Salt);
+
+                if (client.Id == defaultClient.Id)
                     return;
 
-                var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiDefaultRoleForUser)).Single();
-
-                await _factory.UoW.UserRepo.AddToRoleAsync(user, role);
-                await _factory.UoW.CommitAsync();
+                await uow.UserRepo.AddToRoleAsync(user, defaultRole);
+                await uow.CommitAsync();
 
                 /*
                  */
@@ -1216,7 +1258,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         client = string.Join(",", new List<string> { string.Empty }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 empty_rop.Should().BeAssignableTo<UserJwtV2>();
 
@@ -1224,7 +1266,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var empty_rop_claims = JwtFactory.ReadJwtToken(empty_rop.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                empty_rop_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                empty_rop_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 empty_rop_claims.Value.Split(':')[1].Should().Be(salt);
 
                 var empty_rt = service.ResourceOwnerRefresh_UseV2(
@@ -1241,7 +1283,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var empty_rt_claims = JwtFactory.ReadJwtToken(empty_rt.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                empty_rt_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                empty_rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 empty_rt_claims.Value.Split(':')[1].Should().Be(salt);
 
                 /*
@@ -1250,10 +1292,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client1.Name }),
+                        client = string.Join(",", new List<string> { client.Name }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 single_rop.Should().BeAssignableTo<UserJwtV2>();
 
@@ -1261,14 +1303,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var single_rop_claims = JwtFactory.ReadJwtToken(single_rop.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                single_rop_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                single_rop_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 single_rop_claims.Value.Split(':')[1].Should().Be(salt);
 
                 var single_rt = service.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client1.Name }),
+                        client = string.Join(",", new List<string> { client.Name }),
                         grant_type = "refresh_token",
                         refresh_token = single_rop.refresh_token,
                     });
@@ -1278,7 +1320,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var single_rt_claims = JwtFactory.ReadJwtToken(single_rt.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                single_rt_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                single_rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 single_rt_claims.Value.Split(':')[1].Should().Be(salt);
 
                 /*
@@ -1287,10 +1329,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client1.Id.ToString(), client2.Id.ToString() }),
+                        client = string.Join(",", new List<string> { client.Id.ToString(), defaultClient.Id.ToString() }),
                         user = user.Id.ToString(),
                         grant_type = "password",
-                        password = Strings.ApiUnitTestUserPassCurrent,
+                        password = Constants.ApiUnitTestUserPassCurrent,
                     });
                 multiple_rop.Should().BeAssignableTo<UserJwtV2>();
 
@@ -1298,14 +1340,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var multiple_rop_claims = JwtFactory.ReadJwtToken(multiple_rop.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                multiple_rop_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                multiple_rop_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 multiple_rop_claims.Value.Split(':')[1].Should().Be(salt);
 
                 var multiple_rt = service.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client1.Id.ToString(), client2.Id.ToString() }),
+                        client = string.Join(",", new List<string> { client.Id.ToString(), defaultClient.Id.ToString() }),
                         grant_type = "refresh_token",
                         refresh_token = multiple_rop.refresh_token,
                     });
@@ -1315,10 +1357,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var multiple_rt_claims = JwtFactory.ReadJwtToken(multiple_rt.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                multiple_rt_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                multiple_rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 multiple_rt_claims.Value.Split(':')[1].Should().Be(salt);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
     }

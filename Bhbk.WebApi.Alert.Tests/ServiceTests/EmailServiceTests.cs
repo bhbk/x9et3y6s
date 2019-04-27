@@ -2,12 +2,17 @@
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -27,49 +32,50 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new AlertService(conf, uow.InstanceType, owin);
 
-                var service = new AlertService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-                var adminUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
-                var normalUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, adminUser);
-                var result = await service.Endpoints.Enqueue_EmailV1(rop.token, new EmailCreate());
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
 
+                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+
+                var result = await service.HttpClient.Enqueue_EmailV1(rop.token, new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                result = await service.Endpoints.Enqueue_EmailV1(rop.token,
+                result = await service.HttpClient.Enqueue_EmailV1(rop.token,
                     new EmailCreate()
                     {
                         FromId = Guid.NewGuid(),
-                        FromEmail = adminUser.Email,
-                        ToId = normalUser.Id,
-                        ToEmail = normalUser.Email,
-                        Subject = Strings.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        FromEmail = user.Email,
+                        ToId = testUser.Id,
+                        ToEmail = testUser.Email,
+                        Subject = Constants.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
+                        HtmlContent = Constants.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                     });
-
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                result = await service.Endpoints.Enqueue_EmailV1(rop.token,
+                result = await service.HttpClient.Enqueue_EmailV1(rop.token,
                     new EmailCreate()
                     {
-                        FromId = adminUser.Id,
-                        FromEmail = normalUser.Email,
-                        ToId = normalUser.Id,
-                        ToEmail = normalUser.Email,
-                        Subject = Strings.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        FromId = user.Id,
+                        FromEmail = testUser.Email,
+                        ToId = testUser.Id,
+                        ToEmail = testUser.Email,
+                        Subject = Constants.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
+                        HtmlContent = Constants.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                     });
-
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -78,31 +84,33 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new AlertService(conf, uow.InstanceType, owin);
 
-                var service = new AlertService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-                var adminUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).Single();
-                var normalUser = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, adminUser);
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
 
-                var result = await service.Endpoints.Enqueue_EmailV1(rop.token,
+                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+
+                var result = await service.HttpClient.Enqueue_EmailV1(rop.token,
                     new EmailCreate()
                     {
-                        FromId = adminUser.Id,
-                        FromEmail = adminUser.Email,
-                        ToId = normalUser.Id,
-                        ToEmail = normalUser.Email,
-                        Subject = Strings.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = Strings.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        FromId = user.Id,
+                        FromEmail = user.Email,
+                        ToId = testUser.Id,
+                        ToEmail = testUser.Email,
+                        Subject = Constants.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
+                        HtmlContent = Constants.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                     });
-
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
     }

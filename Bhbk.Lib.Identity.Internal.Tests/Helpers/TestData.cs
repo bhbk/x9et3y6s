@@ -13,9 +13,9 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
 {
     public class TestData
     {
-        private readonly IIdentityUnitOfWork<IdentityDbContext> _uow;
+        private readonly IIdentityUnitOfWork _uow;
 
-        public TestData(IIdentityUnitOfWork<IdentityDbContext> uow)
+        public TestData(IIdentityUnitOfWork uow)
         {
             _uow = uow ?? throw new ArgumentNullException();
         }
@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             //create test issuers
             issuer = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
             {
-                Name = Strings.ApiUnitTestIssuer,
-                IssuerKey = Strings.ApiUnitTestIssuerKey,
+                Name = Constants.ApiUnitTestIssuer,
+                IssuerKey = Constants.ApiUnitTestIssuerKey,
                 Enabled = true,
                 Immutable = false,
             });
@@ -48,8 +48,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             client = await _uow.ClientRepo.CreateAsync(new ClientCreate()
             {
                 IssuerId = issuer.Id,
-                Name = Strings.ApiUnitTestClient,
-                ClientKey = Strings.ApiUnitTestClientKey,
+                Name = Constants.ApiUnitTestClient,
+                ClientKey = Constants.ApiUnitTestClientKey,
                 ClientType = ClientType.user_agent.ToString(),
                 Enabled = true,
                 Immutable = false,
@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //assign test client uris
-            var uri1 = new Uri(Strings.ApiUnitTestUriLink);
+            var uri1 = new Uri(Constants.ApiUnitTestUriLink);
 
             clientUri = await _uow.ClientRepo.CreateUriAsync(new UrlCreate()
             {
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             claim = await _uow.ClaimRepo.CreateAsync(new ClaimCreate()
             {
                 IssuerId = issuer.Id,
-                Type = Strings.ApiUnitTestClaim,
+                Type = Constants.ApiUnitTestClaim,
                 Value = RandomValues.CreateBase64String(8),
                 Immutable = false,
             });
@@ -84,7 +84,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             //create test logins
             login = await _uow.LoginRepo.CreateAsync(new LoginCreate()
             {
-                Name = Strings.ApiUnitTestLogin,
+                Name = Constants.ApiUnitTestLogin,
                 Immutable = false,
             });
 
@@ -94,7 +94,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             role = await _uow.RoleRepo.CreateAsync(new RoleCreate()
             {
                 ClientId = client.Id,
-                Name = Strings.ApiUnitTestRole,
+                Name = Constants.ApiUnitTestRole,
                 Enabled = true,
                 Immutable = false,
             });
@@ -104,14 +104,14 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             //create test user 1
             user = await _uow.UserRepo.CreateAsync(new UserCreate()
             {
-                Email = Strings.ApiUnitTestUser,
-                PhoneNumber = Strings.ApiUnitTestUserPhone,
+                Email = Constants.ApiUnitTestUser,
+                PhoneNumber = Constants.ApiUnitTestUserPhone,
                 FirstName = "First-" + RandomValues.CreateBase64String(4),
                 LastName = "Last-" + RandomValues.CreateBase64String(4),
                 LockoutEnabled = false,
                 HumanBeing = true,
                 Immutable = false,
-            }, Strings.ApiUnitTestUserPassCurrent);
+            }, Constants.ApiUnitTestUserPassCurrent);
 
             await _uow.UserRepo.SetConfirmedEmailAsync(user.Id, true);
             await _uow.UserRepo.SetConfirmedPasswordAsync(user.Id, true);
@@ -188,8 +188,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 //create random issuer
                 issuer = await _uow.IssuerRepo.CreateAsync(new IssuerCreate()
                 {
-                    Name = Strings.ApiUnitTestIssuer + "-" + RandomValues.CreateBase64String(4),
-                    IssuerKey = Strings.ApiUnitTestIssuerKey,
+                    Name = Constants.ApiUnitTestIssuer + "-" + RandomValues.CreateBase64String(4),
+                    IssuerKey = Constants.ApiUnitTestIssuerKey,
                     Enabled = true,
                     Immutable = false,
                 });
@@ -200,8 +200,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 client = await _uow.ClientRepo.CreateAsync(new ClientCreate()
                 {
                     IssuerId = issuer.Id,
-                    Name = Strings.ApiUnitTestClient + "-" + RandomValues.CreateBase64String(4),
-                    ClientKey = Strings.ApiUnitTestClientKey,
+                    Name = Constants.ApiUnitTestClient + "-" + RandomValues.CreateBase64String(4),
+                    ClientKey = Constants.ApiUnitTestClientKey,
                     ClientType = ClientType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = false,
@@ -210,7 +210,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 await _uow.CommitAsync();
 
                 //assign random uri to random client
-                var clientUri1 = new Uri(Strings.ApiUnitTestUriLink);
+                var clientUri1 = new Uri(Constants.ApiUnitTestUriLink);
 
                 uri = await _uow.ClientRepo.CreateUriAsync(new UrlCreate()
                 {
@@ -226,7 +226,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 claim = await _uow.ClaimRepo.CreateAsync(new ClaimCreate()
                 {
                     IssuerId = issuer.Id,
-                    Type = Strings.ApiUnitTestClaim + "-" + RandomValues.CreateBase64String(4),
+                    Type = Constants.ApiUnitTestClaim + "-" + RandomValues.CreateBase64String(4),
                     Value = RandomValues.CreateBase64String(8),
                     Immutable = false,
                 });
@@ -236,8 +236,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 //create random login
                 login = await _uow.LoginRepo.CreateAsync(new LoginCreate()
                 {
-                    Name = Strings.ApiUnitTestLogin + "-" + RandomValues.CreateBase64String(4),
-                    LoginKey = Strings.ApiUnitTestLoginKey,
+                    Name = Constants.ApiUnitTestLogin + "-" + RandomValues.CreateBase64String(4),
+                    LoginKey = Constants.ApiUnitTestLoginKey,
                     Enabled = true,
                     Immutable = false,
                 });
@@ -248,7 +248,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 role = await _uow.RoleRepo.CreateAsync(new RoleCreate()
                 {
                     ClientId = client.Id,
-                    Name = Strings.ApiUnitTestRole + "-" + RandomValues.CreateBase64String(4),
+                    Name = Constants.ApiUnitTestRole + "-" + RandomValues.CreateBase64String(4),
                     Enabled = true,
                     Immutable = false,
                 });
@@ -258,14 +258,14 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 //create random user
                 user = await _uow.UserRepo.CreateAsync(new UserCreate()
                 {
-                    Email = RandomValues.CreateAlphaNumericString(4) + "-" + Strings.ApiUnitTestUser,
-                    PhoneNumber = Strings.ApiUnitTestUserPhone + RandomValues.CreateNumberAsString(1),
+                    Email = RandomValues.CreateAlphaNumericString(4) + "-" + Constants.ApiUnitTestUser,
+                    PhoneNumber = Constants.ApiUnitTestUserPhone + RandomValues.CreateNumberAsString(1),
                     FirstName = "First-" + RandomValues.CreateBase64String(4),
                     LastName = "Last-" + RandomValues.CreateBase64String(4),
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = false,
-                }, Strings.ApiUnitTestUserPassCurrent);
+                }, Constants.ApiUnitTestUserPassCurrent);
 
                 //assign roles, claims & logins to random user
                 await _uow.UserRepo.SetConfirmedEmailAsync(user.Id, true);
@@ -355,7 +355,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //delete test users
-            var users = await _uow.UserRepo.GetAsync(x => x.Email.Contains(Strings.ApiUnitTestUser));
+            var users = await _uow.UserRepo.GetAsync(x => x.Email.Contains(Constants.ApiUnitTestUser));
 
             foreach (var user in users)
                 await _uow.UserRepo.DeleteAsync(user.Id);
@@ -363,7 +363,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //delete test claims
-            var claims = await _uow.ClaimRepo.GetAsync(x => x.Type.Contains(Strings.ApiUnitTestClaim));
+            var claims = await _uow.ClaimRepo.GetAsync(x => x.Type.Contains(Constants.ApiUnitTestClaim));
 
             foreach (var claim in claims)
                 await _uow.ClaimRepo.DeleteAsync(claim.Id);
@@ -371,7 +371,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //delete test roles
-            var roles = await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestRole));
+            var roles = await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestRole));
 
             foreach (var role in roles)
                 await _uow.RoleRepo.DeleteAsync(role.Id);
@@ -379,7 +379,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //delete test logins
-            var logins = await _uow.LoginRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestLogin));
+            var logins = await _uow.LoginRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestLogin));
 
             foreach (var login in logins)
                 await _uow.LoginRepo.DeleteAsync(login.Id);
@@ -387,7 +387,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //delete test clients
-            var clients = await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestClient));
+            var clients = await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestClient));
 
             foreach (var client in clients)
                 await _uow.ClientRepo.DeleteAsync(client.Id);
@@ -395,7 +395,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //delete test issuers
-            var issuers = await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Strings.ApiUnitTestIssuer));
+            var issuers = await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestIssuer));
 
             foreach (var issuer in issuers)
                 await _uow.IssuerRepo.DeleteAsync(issuer.Id);

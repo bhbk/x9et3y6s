@@ -56,8 +56,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ToId = user.Id,
                 ToEmail = user.Email,
                 ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                Subject = string.Format("{0}", Strings.MsgConfirmEmailSubject),
-                HtmlContent = Strings.TemplateConfirmEmail(user, url)
+                Subject = string.Format("{0}", Constants.MsgConfirmEmailSubject),
+                HtmlContent = Constants.TemplateConfirmEmail(user, url)
             });
 
             return NoContent();
@@ -105,8 +105,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ToId = user.Id,
                 ToEmail = user.Email,
                 ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                Subject = string.Format("{0}", Strings.MsgConfirmPasswordSubject),
-                HtmlContent = Strings.TemplateConfirmPassword(user, url)
+                Subject = string.Format("{0}", Constants.MsgConfirmPasswordSubject),
+                HtmlContent = Constants.TemplateConfirmPassword(user, url)
             });
 
             return NoContent();

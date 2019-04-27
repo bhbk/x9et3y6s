@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -13,9 +12,9 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
 {
     public class DefaultData
     {
-        private readonly IIdentityUnitOfWork<IdentityDbContext> _uow;
+        private readonly IIdentityUnitOfWork _uow;
 
-        public DefaultData(IIdentityUnitOfWork<IdentityDbContext> uow)
+        public DefaultData(IIdentityUnitOfWork uow)
         {
             _uow = uow ?? throw new ArgumentNullException();
         }
@@ -29,13 +28,13 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             UserCreate user;
 
             //create default issuers
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).SingleOrDefault();
+            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).SingleOrDefault();
 
             if (foundIssuer == null)
             {
                 issuer = new IssuerCreate()
                 {
-                    Name = Strings.ApiDefaultIssuer,
+                    Name = Constants.ApiDefaultIssuer,
                     IssuerKey = RandomValues.CreateBase64String(32),
                     Enabled = true,
                     Immutable = true,
@@ -47,14 +46,14 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //create default clients
-            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).SingleOrDefault();
+            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).SingleOrDefault();
 
             if (foundClientUi == null)
             {
                 client = new ClientCreate()
                 {
                     IssuerId = foundIssuer.Id,
-                    Name = Strings.ApiDefaultClientUi,
+                    Name = Constants.ApiDefaultClientUi,
                     ClientKey = RandomValues.CreateBase64String(32),
                     ClientType = ClientType.user_agent.ToString(),
                     Enabled = true,
@@ -66,14 +65,14 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientApi)).SingleOrDefault();
+            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientApi)).SingleOrDefault();
 
             if (foundClientApi == null)
             {
                 client = new ClientCreate()
                 {
                     IssuerId = foundIssuer.Id,
-                    Name = Strings.ApiDefaultClientApi,
+                    Name = Constants.ApiDefaultClientApi,
                     ClientKey = RandomValues.CreateBase64String(32),
                     ClientType = ClientType.server.ToString(),
                     Enabled = true,
@@ -86,14 +85,14 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //create default logins
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Strings.ApiDefaultLogin)).SingleOrDefault();
+            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Constants.ApiDefaultLogin)).SingleOrDefault();
 
             if (foundLogin == null)
             {
                 login = new LoginCreate()
                 {
-                    Name = Strings.ApiDefaultLogin,
-                    LoginKey = Strings.ApiUnitTestLoginKey,
+                    Name = Constants.ApiDefaultLogin,
+                    LoginKey = Constants.ApiUnitTestLoginKey,
                     Enabled = true,
                     Immutable = false,
                 };
@@ -104,14 +103,14 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //create default roles
-            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == Strings.ApiDefaultRoleForAdmin)).SingleOrDefault();
+            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForAdmin)).SingleOrDefault();
 
             if (foundRoleForAdmin == null)
             {
                 role = new RoleCreate()
                 {
                     ClientId = foundClientUi.Id,
-                    Name = Strings.ApiDefaultRoleForAdmin,
+                    Name = Constants.ApiDefaultRoleForAdmin,
                     Enabled = true,
                     Immutable = true,
                 };
@@ -122,14 +121,14 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == role.Name)).Single();
             }
 
-            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == Strings.ApiDefaultRoleForUser)).SingleOrDefault();
+            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).SingleOrDefault();
 
             if (foundRoleForUser == null)
             {
                 role = new RoleCreate()
                 {
                     ClientId = foundClientUi.Id,
-                    Name = Strings.ApiDefaultRoleForUser,
+                    Name = Constants.ApiDefaultRoleForUser,
                     Enabled = true,
                     Immutable = true,
                 };
@@ -141,22 +140,22 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //create default users
-            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser)).SingleOrDefault();
+            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).SingleOrDefault();
 
             if (foundAdminUser == null)
             {
                 user = new UserCreate()
                 {
-                    Email = Strings.ApiDefaultAdminUser,
-                    PhoneNumber = Strings.ApiDefaultAdminUserPhone,
-                    FirstName = Strings.ApiDefaultAdminUserFirstName,
-                    LastName = Strings.ApiDefaultAdminUserLastName,
+                    Email = Constants.ApiDefaultAdminUser,
+                    PhoneNumber = Constants.ApiDefaultAdminUserPhone,
+                    FirstName = Constants.ApiDefaultAdminUserFirstName,
+                    LastName = Constants.ApiDefaultAdminUserLastName,
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = true,
                 };
 
-                await _uow.UserRepo.CreateAsync(user, Strings.ApiDefaultAdminUserPassword);
+                await _uow.UserRepo.CreateAsync(user, Constants.ApiDefaultAdminUserPassword);
                 await _uow.CommitAsync();
 
                 foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == user.Email)).Single();
@@ -167,22 +166,22 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).SingleOrDefault();
+            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).SingleOrDefault();
 
             if (foundNormalUser == null)
             {
                 user = new UserCreate()
                 {
-                    Email = Strings.ApiDefaultNormalUser,
-                    PhoneNumber = Strings.ApiDefaultNormalUserPhone,
-                    FirstName = Strings.ApiDefaultNormalUserFirstName,
-                    LastName = Strings.ApiDefaultNormalUserLastName,
+                    Email = Constants.ApiDefaultNormalUser,
+                    PhoneNumber = Constants.ApiDefaultNormalUserPhone,
+                    FirstName = Constants.ApiDefaultNormalUserFirstName,
+                    LastName = Constants.ApiDefaultNormalUserLastName,
                     LockoutEnabled = false,
                     HumanBeing = true,
                     Immutable = true,
                 };
 
-                await _uow.UserRepo.CreateAsync(user, Strings.ApiDefaultNormalUserPassword);
+                await _uow.UserRepo.CreateAsync(user, Constants.ApiDefaultNormalUserPassword);
                 await _uow.CommitAsync();
 
                 foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == user.Email)).Single();
@@ -210,7 +209,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public async Task DestroyAsync()
         {
             //delete default users
-            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultAdminUser + "@local")).SingleOrDefault();
+            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser + "@local")).SingleOrDefault();
 
             if (foundAdminUser != null)
             {
@@ -218,7 +217,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser + "@local")).SingleOrDefault();
+            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser + "@local")).SingleOrDefault();
 
             if (foundNormalUser != null)
             {
@@ -227,7 +226,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //delete default roles
-            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == Strings.ApiDefaultRoleForAdmin)).SingleOrDefault();
+            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForAdmin)).SingleOrDefault();
 
             if (foundRoleForAdmin != null)
             {
@@ -235,7 +234,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == Strings.ApiDefaultRoleForUser)).SingleOrDefault();
+            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).SingleOrDefault();
 
             if (foundRoleForUser != null)
             {
@@ -244,7 +243,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //delete default logins
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Strings.ApiDefaultLogin)).SingleOrDefault();
+            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Constants.ApiDefaultLogin)).SingleOrDefault();
 
             if (foundLogin != null)
             {
@@ -253,7 +252,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //delete default clients
-            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).SingleOrDefault();
+            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).SingleOrDefault();
 
             if (foundClientUi != null)
             {
@@ -261,7 +260,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientApi)).SingleOrDefault();
+            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientApi)).SingleOrDefault();
 
             if (foundClientApi != null)
             {
@@ -270,7 +269,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
             }
 
             //delete default issuers
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).SingleOrDefault();
+            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).SingleOrDefault();
 
             if (foundIssuer != null)
             {

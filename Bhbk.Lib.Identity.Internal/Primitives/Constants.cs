@@ -3,7 +3,7 @@ using System;
 
 namespace Bhbk.Lib.Identity.Internal.Primitives
 {
-    public class Strings
+    public class Constants
     {
         #region Attribute Constants
 

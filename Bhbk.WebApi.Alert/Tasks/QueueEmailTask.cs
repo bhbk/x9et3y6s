@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Providers;
@@ -64,7 +63,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                 if (!_enabled || _queue.IsEmpty)
                     continue;
 
-                var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
+                var uow = (IIdentityUnitOfWork)_sp.GetRequiredService<IIdentityUnitOfWork>();
 
                 foreach (var entry in _queue)
                 {

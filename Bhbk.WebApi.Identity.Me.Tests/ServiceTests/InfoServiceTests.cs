@@ -3,10 +3,14 @@ using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,11 +30,16 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         public InfoServiceTests(StartupTests factory) => _factory = factory;
 
         [Fact]
-        public void Me_InfoV1_GetQOTD_Success()
+        public async Task Me_InfoV1_GetQOTD_Success()
         {
             using (var owin = _factory.CreateClient())
             {
-                var service = new MeService(_factory.Conf, _factory.UoW.InstanceType, owin);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new MeService(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
                 var result = service.Info_GetQOTDV1();
                 result.Should().BeAssignableTo<QuotesModel>();
@@ -42,16 +51,20 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new MeService(conf, uow.InstanceType, owin);
 
-                var service = new MeService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
 
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
 
-                var state = await _factory.UoW.StateRepo.CreateAsync(
+                var state = await uow.StateRepo.CreateAsync(
                     new StateCreate()
                     {
                         IssuerId = issuer.Id,
@@ -61,26 +74,24 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
                     });
 
-                await _factory.UoW.CommitAsync();
+                await uow.CommitAsync();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await service.Endpoints.Info_UpdateCodeV1(RandomValues.CreateBase64String(32), state.StateValue, ActionType.Allow.ToString());
+                var dc = await service.HttpClient.Info_UpdateCodeV1(RandomValues.CreateBase64String(32), state.StateValue, ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
+                dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, state.StateValue, RandomValues.CreateAlphaNumericString(8));
+                dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, state.StateValue, RandomValues.CreateAlphaNumericString(8));
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -89,19 +100,23 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new MeService(conf, uow.InstanceType, owin);
 
-                var service = new MeService(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiDefaultIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiDefaultClientUi)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiDefaultNormalUser)).Single();
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
 
-                var salt = _factory.Conf["IdentityTenants:Salt"];
-                salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
+
+                var salt = conf["IdentityTenants:Salt"];
+                salt.Should().Be(uow.IssuerRepo.Salt);
 
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
 
-                var state = await _factory.UoW.StateRepo.CreateAsync(
+                var state = await uow.StateRepo.CreateAsync(
                     new StateCreate()
                     {
                         IssuerId = issuer.Id,
@@ -111,22 +126,20 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(_factory.UoW.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
                     });
 
-                await _factory.UoW.CommitAsync();
+                await uow.CommitAsync();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(_factory.UoW, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Allow.ToString());
+                var dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-                dc = await service.Endpoints.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Deny.ToString());
+                dc = await service.HttpClient.Info_UpdateCodeV1(rop.token, state.StateValue, ActionType.Deny.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
     }

@@ -10,19 +10,19 @@ using System;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
-namespace Bhbk.Lib.Identity.Internal.Tests
+namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [CollectionDefinition("LibraryTests")]
-    public class StartupTestsCollection : ICollectionFixture<StartupTests> { }
+    public class StartupTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
 
-    public class StartupTests
+    public class BaseRepositoryTests
     {
-        public IConfigurationRoot Conf;
-        public IIdentityUnitOfWork<IdentityDbContext> UoW;
-        public DefaultData DefaultData;
-        public TestData TestData;
+        protected IConfigurationRoot Conf;
+        protected IIdentityUnitOfWork UoW;
+        protected DefaultData DefaultData;
+        protected TestData TestData;
 
-        public StartupTests()
+        public BaseRepositoryTests()
         {
             var lib = SearchRoots.ByAssemblyContext("config-lib.json");
 

@@ -1,10 +1,13 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -24,15 +27,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
                 var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-                var newEmail = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser;
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+                var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiUnitTestUser;
 
                 controller.SetUser(user.Id);
 
@@ -46,8 +52,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ChangeEmailV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -56,15 +60,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
                 var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-                var newEmail = RandomValues.CreateBase64String(4) + "-" + Strings.ApiUnitTestUser;
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+                var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiUnitTestUser;
 
                 controller.SetUser(user.Id);
 
@@ -79,8 +86,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ChangeEmailV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -89,14 +94,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
                 var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 controller.SetUser(user.Id);
 
@@ -104,14 +112,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 {
                     UserId = user.Id,
                     CurrentPassword = RandomValues.CreateBase64String(16),
-                    NewPassword = Strings.ApiUnitTestUserPassNew,
-                    NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
+                    NewPassword = Constants.ApiUnitTestUserPassNew,
+                    NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
                 };
 
                 var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -120,30 +126,31 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
                 var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 controller.SetUser(user.Id);
 
                 var model = new UserChangePassword()
                 {
                     UserId = user.Id,
-                    CurrentPassword = Strings.ApiUnitTestUserPassCurrent,
-                    NewPassword = Strings.ApiUnitTestUserPassNew,
-                    NewPasswordConfirm = Strings.ApiUnitTestUserPassNew
+                    CurrentPassword = Constants.ApiUnitTestUserPassCurrent,
+                    NewPassword = Constants.ApiUnitTestUserPassNew,
+                    NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
                 };
 
                 var result = await controller.ChangePasswordV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -152,14 +159,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
                 var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
                 var newPhone = RandomValues.CreateNumberAsString(10);
 
                 controller.SetUser(user.Id);
@@ -174,8 +184,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = await controller.ChangePhoneV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -184,14 +192,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
                 var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
                 var newPhone = RandomValues.CreateNumberAsString(10);
 
                 controller.SetUser(user.Id);
@@ -207,8 +218,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var result = await controller.ChangePhoneV1(model) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
-
-                await _factory.TestData.DestroyAsync();
             }
         }
     }

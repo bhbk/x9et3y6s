@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         .Select(i => i.Value).First())).SingleOrDefault();
 
                 else if (UoW.InstanceType == InstanceContext.UnitTest)
-                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).SingleOrDefault();
+                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).SingleOrDefault();
 
                 else
                 {
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if login provider is local...
             else if ((UoW.InstanceType == InstanceContext.DeployedOrLocal)
-                && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
+                && logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -256,8 +256,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if login provider is transient for unit/integration test...
-            else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
+            else if (logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any()
+                || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin)).Any()
                     && UoW.InstanceType == InstanceContext.UnitTest))
             {
                 //check that password is valid...
@@ -433,7 +433,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            if (!string.Equals(input.grant_type, Strings.AttrResourceOwnerIDV2, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrResourceOwnerIDV2, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -534,7 +534,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if login provider is local...
             else if ((UoW.InstanceType == InstanceContext.DeployedOrLocal)
-                && logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any())
+                && logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any())
             {
                 //check that password is valid...
                 if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -548,8 +548,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if login provider is transient for unit/integration test...
-            else if (logins.Where(x => x.Name == Strings.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.Name.StartsWith(Strings.ApiUnitTestLogin)).Any()
+            else if (logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any()
+                || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin)).Any()
                     && UoW.InstanceType == InstanceContext.UnitTest))
             {
                 //check that password is valid...

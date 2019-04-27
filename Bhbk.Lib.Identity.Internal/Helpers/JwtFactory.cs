@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
     public class JwtFactory
     {
         public static async Task<string>
-            ClientRefreshV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client)
+            ClientRefreshV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateRefreshTokenAsync(client);
 
@@ -79,7 +79,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            ClientResourceOwnerV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client)
+            ClientResourceOwnerV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateAccessTokenAsync(client);
 
@@ -126,7 +126,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         }
 
         public static async Task<string>
-            UserRefreshV1(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Users user)
+            UserRefreshV1(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -188,7 +188,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         }
 
         public static async Task<string>
-            UserRefreshV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Users user)
+            UserRefreshV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
 
@@ -250,7 +250,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1_Legacy(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
+            UserResourceOwnerV1_Legacy(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -298,7 +298,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
+            UserResourceOwnerV1(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -345,7 +345,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         }
 
         public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV2(IIdentityUnitOfWork<IdentityDbContext> uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
+            UserResourceOwnerV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 

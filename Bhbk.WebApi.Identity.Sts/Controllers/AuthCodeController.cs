@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.scope = HttpUtility.UrlDecode(input.scope);
 
-            if (!string.Equals(input.response_type, Strings.AttrAuthCodeResponseIDV1, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.response_type, Constants.AttrAuthCodeResponseIDV1, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
                 return BadRequest(ModelState);
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.code = HttpUtility.UrlDecode(input.code);
             input.state = HttpUtility.UrlDecode(input.state);
 
-            if (!string.Equals(input.grant_type, Strings.AttrAuthCodeIDV1, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrAuthCodeIDV1, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.scope = HttpUtility.UrlDecode(input.scope);
 
-            if (!string.Equals(input.response_type, Strings.AttrAuthCodeResponseIDV2, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.response_type, Constants.AttrAuthCodeResponseIDV2, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
                 return BadRequest(ModelState);
@@ -210,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.code = HttpUtility.UrlDecode(input.code);
             input.state = HttpUtility.UrlDecode(input.state);
 
-            if (!string.Equals(input.grant_type, Strings.AttrAuthCodeIDV2, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrAuthCodeIDV2, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);

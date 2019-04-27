@@ -15,23 +15,19 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [Collection("LibraryTests")]
-    public class StateRepositoryTests
+    public class StateRepositoryTests : BaseRepositoryTests
     {
-        private StartupTests _factory;
-
-        public StateRepositoryTests(StartupTests factory) => _factory = factory;
-
         [Fact(Skip = "NotImplemented")]
         public async Task Lib_StateRepo_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await _factory.UoW.StateRepo.CreateAsync(new StateCreate());
+                await UoW.StateRepo.CreateAsync(new StateCreate());
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await _factory.UoW.StateRepo.CreateAsync(
+                await UoW.StateRepo.CreateAsync(
                     new StateCreate()
                     {
                         IssuerId = Guid.NewGuid(),
@@ -49,13 +45,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_StateRepo_CreateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).First();
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).First();
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).First();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).First();
+            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
 
-            var result = await _factory.UoW.StateRepo.CreateAsync(
+            var result = await UoW.StateRepo.CreateAsync(
                 new StateCreate()
                 {
                     IssuerId = issuer.Id,
@@ -69,7 +65,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 });
             result.Should().BeAssignableTo<tbl_States>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -77,32 +73,32 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.StateRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.StateRepo.DeleteAsync(Guid.NewGuid());
             });
         }
 
         [Fact]
         public async Task Lib_StateRepo_DeleteV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var state = (await _factory.UoW.StateRepo.GetAsync()).First();
+            var state = (await UoW.StateRepo.GetAsync()).First();
 
-            var result = await _factory.UoW.StateRepo.DeleteAsync(state.Id);
+            var result = await UoW.StateRepo.DeleteAsync(state.Id);
             result.Should().BeTrue();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
         public async Task Lib_StateRepo_GetV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.StateRepo.GetAsync();
+            var result = await UoW.StateRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_States>>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -110,7 +106,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.StateRepo.UpdateAsync(new tbl_States());
+                await UoW.StateRepo.UpdateAsync(new tbl_States());
             });
         }
     }

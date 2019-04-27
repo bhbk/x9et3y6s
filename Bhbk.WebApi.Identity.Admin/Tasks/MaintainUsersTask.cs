@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
+﻿using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             {
                 try
                 {
-                    var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
+                    var uow = (IIdentityUnitOfWork)_sp.GetRequiredService<IIdentityUnitOfWork>();
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 

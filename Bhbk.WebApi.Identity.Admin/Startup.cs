@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             sc.AddSingleton(conf);
-            sc.AddScoped<IIdentityUnitOfWork<IdentityDbContext>>(x =>
+            sc.AddScoped<IIdentityUnitOfWork>(x =>
             {
                 return new IdentityUnitOfWork(options, InstanceContext.DeployedOrLocal, conf);
             });
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Admin
             sc.AddSingleton<IAlertService>(new AlertService(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
 
             var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
+            var uow = sp.GetRequiredService<IIdentityUnitOfWork>();
 
             /*
              * only live context allowed to run...

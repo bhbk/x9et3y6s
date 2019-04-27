@@ -14,28 +14,24 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [Collection("LibraryTests")]
-    public class ClientRepositoryTests
+    public class ClientRepositoryTests : BaseRepositoryTests
     {
-        private StartupTests _factory;
-
-        public ClientRepositoryTests(StartupTests factory) => _factory = factory;
-
         [Fact(Skip = "NotImplemented")]
         public async Task Lib_ClientRepo_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await _factory.UoW.ClientRepo.CreateAsync(new ClientCreate());
+                await UoW.ClientRepo.CreateAsync(new ClientCreate());
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await _factory.UoW.ClientRepo.CreateAsync(
+                await UoW.ClientRepo.CreateAsync(
                     new ClientCreate()
                     {
                         IssuerId = Guid.NewGuid(),
-                        Name = Strings.ApiUnitTestClient,
-                        ClientKey = Strings.ApiUnitTestClientKey,
+                        Name = Constants.ApiUnitTestClient,
+                        ClientKey = Constants.ApiUnitTestClientKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -46,23 +42,23 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_ClientRepo_CreateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
 
-            var result = await _factory.UoW.ClientRepo.CreateAsync(
+            var result = await UoW.ClientRepo.CreateAsync(
                 new ClientCreate()
                 {
                     IssuerId = issuer.Id,
-                    Name = Strings.ApiUnitTestClient,
-                    ClientKey = Strings.ApiUnitTestClientKey,
+                    Name = Constants.ApiUnitTestClient,
+                    ClientKey = Constants.ApiUnitTestClientKey,
                     ClientType = ClientType.user_agent.ToString(),
                     Enabled = true,
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<tbl_Clients>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -70,32 +66,32 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.ClientRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.ClientRepo.DeleteAsync(Guid.NewGuid());
             });
         }
 
         [Fact]
         public async Task Lib_ClientRepo_DeleteV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).First();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).First();
 
-            var result = await _factory.UoW.ClientRepo.DeleteAsync(client.Id);
+            var result = await UoW.ClientRepo.DeleteAsync(client.Id);
             result.Should().BeTrue();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
         public async Task Lib_ClientRepo_GetV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.ClientRepo.GetAsync();
+            var result = await UoW.ClientRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Clients>>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -103,22 +99,22 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.ClientRepo.UpdateAsync(new tbl_Clients());
+                await UoW.ClientRepo.UpdateAsync(new tbl_Clients());
             });
         }
 
         [Fact]
         public async Task Lib_ClientRepo_UpdateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).First();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).First();
             client.Name += "(Updated)";
 
-            var result = await _factory.UoW.ClientRepo.UpdateAsync(client);
+            var result = await UoW.ClientRepo.UpdateAsync(client);
             result.Should().BeAssignableTo<tbl_Clients>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
     }
 }

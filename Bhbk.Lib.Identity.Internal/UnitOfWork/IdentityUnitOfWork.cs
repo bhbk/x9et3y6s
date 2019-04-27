@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.UnitOfWork
 {
-    public class IdentityUnitOfWork : IIdentityUnitOfWork<IdentityDbContext>, IDisposable
+    public class IdentityUnitOfWork : IIdentityUnitOfWork, IDisposable
     {
         private readonly IdentityDbContext Context;
         public InstanceContext InstanceType { get; private set; }

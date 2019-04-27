@@ -14,27 +14,23 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [Collection("LibraryTests")]
-    public class UserRepositoryTests
+    public class UserRepositoryTests : BaseRepositoryTests
     {
-        private StartupTests _factory;
-
-        public UserRepositoryTests(StartupTests factory) => _factory = factory;
-
         [Fact(Skip = "NotImplemented")]
         public async Task Lib_UserRepo_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await _factory.UoW.UserRepo.CreateAsync(new UserCreate());
+                await UoW.UserRepo.CreateAsync(new UserCreate());
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await _factory.UoW.UserRepo.CreateAsync(
+                await UoW.UserRepo.CreateAsync(
                     new UserCreate()
                     {
                         Email = RandomValues.CreateAlphaNumericString(4),
-                        PhoneNumber = Strings.ApiUnitTestUserPhone,
+                        PhoneNumber = Constants.ApiUnitTestUserPhone,
                         FirstName = "First-" + RandomValues.CreateBase64String(4),
                         LastName = "Last-" + RandomValues.CreateBase64String(4),
                         LockoutEnabled = false,
@@ -47,13 +43,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_UserRepo_CreateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.UserRepo.CreateAsync(
+            var result = await UoW.UserRepo.CreateAsync(
                 new UserCreate()
                 {
-                    Email = Strings.ApiUnitTestUser,
-                    PhoneNumber = Strings.ApiUnitTestUserPhone,
+                    Email = Constants.ApiUnitTestUser,
+                    PhoneNumber = Constants.ApiUnitTestUserPhone,
                     FirstName = "First-" + RandomValues.CreateBase64String(4),
                     LastName = "Last-" + RandomValues.CreateBase64String(4),
                     LockoutEnabled = false,
@@ -62,7 +58,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 });
             result.Should().BeAssignableTo<tbl_Users>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -70,32 +66,32 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.UserRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.UserRepo.DeleteAsync(Guid.NewGuid());
             });
         }
 
         [Fact]
         public async Task Lib_UserRepo_DeleteV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var issuer = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).First();
+            var issuer = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
 
-            var result = await _factory.UoW.UserRepo.DeleteAsync(issuer.Id);
+            var result = await UoW.UserRepo.DeleteAsync(issuer.Id);
             result.Should().BeTrue();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
         public async Task Lib_UserRepo_GetV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.UserRepo.GetAsync();
+            var result = await UoW.UserRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Users>>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -103,24 +99,24 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await _factory.UoW.UserRepo.UpdateAsync(new tbl_Users());
+                await UoW.UserRepo.UpdateAsync(new tbl_Users());
             });
         }
 
         [Fact]
         public async Task Lib_UserRepo_UpdateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).First();
+            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 
-            var result = await _factory.UoW.UserRepo.UpdateAsync(user);
+            var result = await UoW.UserRepo.UpdateAsync(user);
 
             result.Should().BeAssignableTo<tbl_Users>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
     }
 }

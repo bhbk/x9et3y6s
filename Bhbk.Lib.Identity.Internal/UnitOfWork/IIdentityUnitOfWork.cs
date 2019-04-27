@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Core.Interfaces;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Repositories;
 
 namespace Bhbk.Lib.Identity.Internal.UnitOfWork
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
-    public interface IIdentityUnitOfWork<TContext> : IGenericUnitOfWorkAsync
-        where TContext : IdentityDbContext
+    public interface IIdentityUnitOfWork : IGenericUnitOfWorkAsync
     {
         IMapper Mapper { get; }
         ActivityRepository ActivityRepo { get; }

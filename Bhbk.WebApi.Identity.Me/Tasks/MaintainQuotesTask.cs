@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
@@ -54,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var uow = (IIdentityUnitOfWork<IdentityDbContext>)_sp.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
+            var uow = (IIdentityUnitOfWork)_sp.GetRequiredService<IIdentityUnitOfWork>();
 
             if (uow.InstanceType == InstanceContext.UnitTest)
                 QuoteOfTheDay = JsonConvert.DeserializeObject<QuotesModel>

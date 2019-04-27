@@ -1,12 +1,16 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -32,18 +36,22 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var url = new Uri(Strings.ApiUnitTestUriLink);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var url = new Uri(Constants.ApiUnitTestUriLink);
                 var ask = await controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
                     {
@@ -60,10 +68,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
 
-                HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Strings.ApiUnitTestUriLink);
+                HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Constants.ApiUnitTestUriLink);
                 HttpUtility.ParseQueryString(ask_url.Query).Get("state").Should().NotBeNullOrEmpty();
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -72,19 +78,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
-                var service = new StsRepository(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var url = new Uri(Strings.ApiUnitTestUriLink);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsRepository(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var url = new Uri(Constants.ApiUnitTestUriLink);
                 var ask = await controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
                     {
@@ -101,8 +111,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
                 var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
-                var ask_code = await new ProtectHelper(_factory.UoW.InstanceType.ToString())
-                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
+                var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
+                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
                 var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
                 var ac = await service.AuthCode_UseV2(
@@ -133,8 +143,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                await _factory.UoW.ClientRepo.DeleteAsync(client.Id);
-                await _factory.UoW.CommitAsync();
+                await uow.ClientRepo.DeleteAsync(client.Id);
+                await uow.CommitAsync();
 
                 ac = await service.AuthCode_UseV2(
                     new AuthCodeV2()
@@ -149,8 +159,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -159,17 +167,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
-                var service = new StsRepository(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsRepository(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var ask = await controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
@@ -177,7 +189,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
                         user = user.Id.ToString(),
-                        redirect_uri = Strings.ApiUnitTestUriLink,
+                        redirect_uri = Constants.ApiUnitTestUriLink,
                         response_type = "code",
                         scope = "any",
                     }) as RedirectResult;
@@ -187,12 +199,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
                 var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
-                var ask_code = await new ProtectHelper(_factory.UoW.InstanceType.ToString())
-                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
+                var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
+                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
                 var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
-                await _factory.UoW.IssuerRepo.DeleteAsync(issuer.Id);
-                await _factory.UoW.CommitAsync();
+                await uow.IssuerRepo.DeleteAsync(issuer.Id);
+                await uow.CommitAsync();
 
                 var ac = await service.AuthCode_UseV2(
                     new AuthCodeV2()
@@ -207,8 +219,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -217,19 +227,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
-                var service = new StsRepository(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var url = new Uri(Strings.ApiUnitTestUriLink);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsRepository(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var url = new Uri(Constants.ApiUnitTestUriLink);
                 var ask = await controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
                     {
@@ -246,8 +260,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
                 var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
-                var ask_code = await new ProtectHelper(_factory.UoW.InstanceType.ToString())
-                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
+                var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
+                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
                 var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
                 var ac = await service.AuthCode_UseV2(
@@ -264,8 +278,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                await _factory.UoW.UserRepo.DeleteAsync(user.Id);
-                await _factory.UoW.CommitAsync();
+                await uow.UserRepo.DeleteAsync(user.Id);
+                await uow.CommitAsync();
 
                 ac = await service.AuthCode_UseV2(
                     new AuthCodeV2()
@@ -280,8 +294,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ac.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -290,19 +302,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
-                var service = new StsRepository(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var url = new Uri(Strings.ApiUnitTestUriLink);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsRepository(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var url = new Uri(Constants.ApiUnitTestUriLink);
                 var ask = await controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
                     {
@@ -319,8 +335,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
                 var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
-                var ask_code = await new ProtectHelper(_factory.UoW.InstanceType.ToString())
-                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
+                var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
+                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
                 var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
                 var ac = await service.AuthCode_UseV2(
@@ -364,8 +380,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 ac.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ac.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
 
@@ -374,22 +388,26 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         {
             using (var owin = _factory.CreateClient())
             {
-                await _factory.TestData.CreateAsync();
-
-                var service = new StsRepository(_factory.Conf, _factory.UoW.InstanceType, owin);
-                var issuer = (await _factory.UoW.IssuerRepo.GetAsync(x => x.Name == Strings.ApiUnitTestIssuer)).Single();
-                var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
-                var user = (await _factory.UoW.UserRepo.GetAsync(x => x.Email == Strings.ApiUnitTestUser)).Single();
-
-                var salt = _factory.Conf["IdentityTenants:Salt"];
-                salt.Should().Be(_factory.UoW.IssuerRepo.Salt);
-
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var url = new Uri(Strings.ApiUnitTestUriLink);
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new StsRepository(conf, uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var salt = conf["IdentityTenants:Salt"];
+                salt.Should().Be(uow.IssuerRepo.Salt);
+
+                var url = new Uri(Constants.ApiUnitTestUriLink);
                 var ask = await controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
                     {
@@ -406,8 +424,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
                 var ask_redirect = HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri");
-                var ask_code = await new ProtectHelper(_factory.UoW.InstanceType.ToString())
-                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(_factory.UoW.ConfigRepo.AuthCodeTotpExpire), user);
+                var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
+                    .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
                 var ask_state = HttpUtility.ParseQueryString(ask_url.Query).Get("state");
 
                 var ac = await service.AuthCode_UseV2(
@@ -432,10 +450,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ac_claims = JwtFactory.ReadJwtToken(ac_check.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                ac_claims.Value.Split(':')[0].Should().Be(Strings.ApiUnitTestIssuer);
+                ac_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 ac_claims.Value.Split(':')[1].Should().Be(salt);
-
-                await _factory.TestData.DestroyAsync();
             }
         }
     }

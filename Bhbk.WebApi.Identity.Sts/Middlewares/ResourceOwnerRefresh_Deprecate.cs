@@ -61,24 +61,24 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v2/ropg-rt", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV2)
-                    && context.Request.Form.ContainsKey(Strings.AttrClientIDV2)
-                    && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV2)
-                    && context.Request.Form.ContainsKey(Strings.AttrRefreshTokenIDV2)))
+                && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV2)
+                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV2)
+                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV2)
+                    && context.Request.Form.ContainsKey(Constants.AttrRefreshTokenIDV2)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string issuerValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV2).Value;
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV2).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV2).Value;
-                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrRefreshTokenIDV2).Value;
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrIssuerIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV2).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrRefreshTokenIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
-                    || !grantTypeValue.Equals(Strings.AttrRefreshTokenIDV2, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(Constants.AttrRefreshTokenIDV2, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -222,25 +222,25 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v1/ropg-rt", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Strings.AttrIssuerIDV1)
-                    && context.Request.Form.ContainsKey(Strings.AttrClientIDV1)
-                    && context.Request.Form.ContainsKey(Strings.AttrGrantTypeIDV1)
-                    && context.Request.Form.ContainsKey(Strings.AttrRefreshTokenIDV1)))
+                && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV1)
+                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV1)
+                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV1)
+                    && context.Request.Form.ContainsKey(Constants.AttrRefreshTokenIDV1)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string issuerValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrIssuerIDV1).Value;
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrClientIDV1).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrGrantTypeIDV1).Value;
-                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Strings.AttrRefreshTokenIDV1).Value;
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrIssuerIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV1).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrRefreshTokenIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
                     || string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Strings.AttrRefreshTokenIDV1, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(Constants.AttrRefreshTokenIDV1, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -248,7 +248,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>();
+                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork>();
 
                 if (uow == null)
                     throw new ArgumentNullException();

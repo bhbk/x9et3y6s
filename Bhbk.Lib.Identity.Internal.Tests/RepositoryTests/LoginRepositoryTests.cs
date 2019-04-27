@@ -13,26 +13,22 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [Collection("LibraryTests")]
-    public class LoginRepositoryTests
+    public class LoginRepositoryTests : BaseRepositoryTests
     {
-        private StartupTests _factory;
-
-        public LoginRepositoryTests(StartupTests factory) => _factory = factory;
-
         [Fact(Skip = "NotImplemented")]
         public async Task Lib_LoginRepo_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await _factory.UoW.LoginRepo.CreateAsync(new LoginCreate());
+                await UoW.LoginRepo.CreateAsync(new LoginCreate());
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await _factory.UoW.LoginRepo.CreateAsync(
+                await UoW.LoginRepo.CreateAsync(
                     new LoginCreate()
                     {
-                        Name = Strings.ApiUnitTestLogin,
+                        Name = Constants.ApiUnitTestLogin,
                         Immutable = false,
                     });
             });
@@ -41,17 +37,17 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_LoginRepo_CreateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.LoginRepo.CreateAsync(
+            var result = await UoW.LoginRepo.CreateAsync(
                 new LoginCreate()
                 {
-                    Name = Strings.ApiUnitTestLogin,
+                    Name = Constants.ApiUnitTestLogin,
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<tbl_Logins>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -59,32 +55,32 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.LoginRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.LoginRepo.DeleteAsync(Guid.NewGuid());
             });
         }
 
         [Fact]
         public async Task Lib_LoginRepo_DeleteV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var login = (await _factory.UoW.LoginRepo.GetAsync(x => x.Name == Strings.ApiUnitTestLogin)).First();
+            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).First();
 
-            var result = await _factory.UoW.LoginRepo.DeleteAsync(login.Id);
+            var result = await UoW.LoginRepo.DeleteAsync(login.Id);
             result.Should().BeTrue();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
         public async Task Lib_LoginRepo_GetV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.LoginRepo.GetAsync();
+            var result = await UoW.LoginRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Logins>>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -92,22 +88,22 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.LoginRepo.UpdateAsync(new tbl_Logins());
+                await UoW.LoginRepo.UpdateAsync(new tbl_Logins());
             });
         }
 
         [Fact]
         public async Task Lib_LoginRepo_UpdateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var login = (await _factory.UoW.LoginRepo.GetAsync(x => x.Name == Strings.ApiUnitTestLogin)).First();
+            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).First();
             login.Name += "(Updated)";
 
-            var result = await _factory.UoW.LoginRepo.UpdateAsync(login);
+            var result = await UoW.LoginRepo.UpdateAsync(login);
             result.Should().BeAssignableTo<tbl_Logins>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
     }
 }

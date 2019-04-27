@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Strings.AttrClientSecretIDV1, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrClientSecretIDV1, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Strings.AttrClientSecretIDV2, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(input.grant_type, Constants.AttrClientSecretIDV2, StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
                 return BadRequest(ModelState);

@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
+﻿using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +14,7 @@ namespace Bhbk.WebApi.Alert.Controllers
     public class BaseController : Controller
     {
         protected IConfigurationRoot Conf { get => (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>(); }
-        protected IIdentityUnitOfWork<IdentityDbContext> UoW { get => (IIdentityUnitOfWork<IdentityDbContext>)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork<IdentityDbContext>>(); }
+        protected IIdentityUnitOfWork UoW { get => (IIdentityUnitOfWork)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
 
         public BaseController() { }
@@ -24,6 +23,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         protected Guid GetUserGUID()
         {
             var claims = ControllerContext.HttpContext.User.Identity as ClaimsIdentity;
+
             return Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
         }
     }

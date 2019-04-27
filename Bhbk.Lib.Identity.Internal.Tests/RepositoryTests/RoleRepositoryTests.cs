@@ -13,27 +13,23 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
     [Collection("LibraryTests")]
-    public class RoleRepositoryTests
+    public class RoleRepositoryTests : BaseRepositoryTests
     {
-        private StartupTests _factory;
-
-        public RoleRepositoryTests(StartupTests factory) => _factory = factory;
-
         [Fact(Skip = "NotImplemented")]
         public async Task Lib_RoleRepo_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await _factory.UoW.RoleRepo.CreateAsync(new RoleCreate());
+                await UoW.RoleRepo.CreateAsync(new RoleCreate());
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await _factory.UoW.RoleRepo.CreateAsync(
+                await UoW.RoleRepo.CreateAsync(
                     new RoleCreate()
                     {
                         ClientId = Guid.NewGuid(),
-                        Name = Strings.ApiUnitTestRole,
+                        Name = Constants.ApiUnitTestRole,
                         Enabled = true,
                         Immutable = false,
                     });
@@ -43,21 +39,21 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RoleRepo_CreateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var client = (await _factory.UoW.ClientRepo.GetAsync(x => x.Name == Strings.ApiUnitTestClient)).Single();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-            var result = await _factory.UoW.RoleRepo.CreateAsync(
+            var result = await UoW.RoleRepo.CreateAsync(
                 new RoleCreate()
                 {
                     ClientId = client.Id,
-                    Name = Strings.ApiUnitTestRole,
+                    Name = Constants.ApiUnitTestRole,
                     Enabled = true,
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<tbl_Roles>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -65,32 +61,32 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.RoleRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.RoleRepo.DeleteAsync(Guid.NewGuid());
             });
         }
 
         [Fact]
         public async Task Lib_RoleRepo_DeleteV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole)).First();
+            var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).First();
 
-            var result = await _factory.UoW.RoleRepo.DeleteAsync(role.Id);
+            var result = await UoW.RoleRepo.DeleteAsync(role.Id);
             result.Should().BeTrue();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
         public async Task Lib_RoleRepo_GetV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var result = await _factory.UoW.RoleRepo.GetAsync();
+            var result = await UoW.RoleRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Roles>>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
 
         [Fact]
@@ -98,22 +94,22 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _factory.UoW.RoleRepo.UpdateAsync(new tbl_Roles());
+                await UoW.RoleRepo.UpdateAsync(new tbl_Roles());
             });
         }
 
         [Fact]
         public async Task Lib_RoleRepo_UpdateV1_Success()
         {
-            await _factory.TestData.CreateAsync();
+            await TestData.CreateAsync();
 
-            var role = (await _factory.UoW.RoleRepo.GetAsync(x => x.Name == Strings.ApiUnitTestRole)).First();
+            var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).First();
             role.Name += "(Updated)";
 
-            var result = await _factory.UoW.RoleRepo.UpdateAsync(role);
+            var result = await UoW.RoleRepo.UpdateAsync(role);
             result.Should().BeAssignableTo<tbl_Roles>();
 
-            await _factory.TestData.DestroyAsync();
+            await TestData.DestroyAsync();
         }
     }
 }

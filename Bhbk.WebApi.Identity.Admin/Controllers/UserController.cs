@@ -134,8 +134,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     ToId = result.Id,
                     ToEmail = result.Email,
                     ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
-                    Subject = string.Format("{0} {1}", issuer.Name, Strings.MsgConfirmNewUserSubject),
-                    HtmlContent = Strings.TemplateConfirmNewUser(issuer, result, url)
+                    Subject = string.Format("{0} {1}", issuer.Name, Constants.MsgConfirmNewUserSubject),
+                    HtmlContent = Constants.TemplateConfirmNewUser(issuer, result, url)
                 });
             }
 
