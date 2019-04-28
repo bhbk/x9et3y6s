@@ -37,13 +37,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var ask = await service.HttpClient.DeviceCode_AskV1(
+                var ask = await service.Http.DeviceCode_AskV1(
                     new DeviceCodeAskV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
-                        username = Guid.NewGuid().ToString(),
                         grant_type = "device_code",
+                        username = Guid.NewGuid().ToString(),
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -59,14 +59,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var dc = await service.HttpClient.DeviceCode_UseV1(
+                var dc = await service.Http.DeviceCode_UseV1(
                     new DeviceCodeV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
+                        grant_type = "device_code",
                         user_code = RandomValues.CreateBase64String(32),
                         device_code = RandomValues.CreateBase64String(32),
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
@@ -89,68 +89,68 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var ask = await service.HttpClient.DeviceCode_AskV2(
+                var ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
                         client = client.Id.ToString(),
-                        user = user.Id.ToString(),
                         grant_type = "device_code",
+                        user = user.Id.ToString(),
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                ask = await service.HttpClient.DeviceCode_AskV2(
+                ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = string.Empty,
                         client = client.Id.ToString(),
-                        user = user.Id.ToString(),
                         grant_type = "device_code",
+                        user = user.Id.ToString(),
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                ask = await service.HttpClient.DeviceCode_AskV2(
+                ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = Guid.NewGuid().ToString(),
-                        user = user.Id.ToString(),
                         grant_type = "device_code",
+                        user = user.Id.ToString(),
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                ask = await service.HttpClient.DeviceCode_AskV2(
+                ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Empty,
-                        user = user.Id.ToString(),
                         grant_type = "device_code",
+                        user = user.Id.ToString(),
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                ask = await service.HttpClient.DeviceCode_AskV2(
+                ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
-                        user = Guid.NewGuid().ToString(),
                         grant_type = "device_code",
+                        user = Guid.NewGuid().ToString(),
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                ask = await service.HttpClient.DeviceCode_AskV2(
+                ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
-                        user = string.Empty,
                         grant_type = "device_code",
+                        user = string.Empty,
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -181,8 +181,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
-                        user = user.Id.ToString(),
                         grant_type = "device_code",
+                        user = user.Id.ToString(),
                     });
 
                 ask.Should().BeAssignableTo<DeviceCodeV2>();
@@ -222,74 +222,74 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 await uow.CommitAsync();
 
-                var dc = await service.HttpClient.DeviceCode_UseV2(
+                var dc = await service.Http.DeviceCode_UseV2(
                     new DeviceCodeV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                dc = await service.HttpClient.DeviceCode_UseV2(
+                dc = await service.Http.DeviceCode_UseV2(
                     new DeviceCodeV2()
                     {
                         issuer = string.Empty,
                         client = client.Id.ToString(),
+                        grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                dc = await service.HttpClient.DeviceCode_UseV2(
+                dc = await service.Http.DeviceCode_UseV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = Guid.NewGuid().ToString(),
+                        grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                dc = await service.HttpClient.DeviceCode_UseV2(
+                dc = await service.Http.DeviceCode_UseV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Empty,
+                        grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                dc = await service.HttpClient.DeviceCode_UseV2(
+                dc = await service.Http.DeviceCode_UseV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "device_code",
                         user_code = RandomValues.CreateAlphaNumericString(32),
                         device_code = state.StateValue,
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                dc = await service.HttpClient.DeviceCode_UseV2(
+                dc = await service.Http.DeviceCode_UseV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "device_code",
                         user_code = secret,
                         device_code = RandomValues.CreateAlphaNumericString(32),
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -343,9 +343,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
-                        grant_type = "device_code",
                     });
                 dc.Should().BeAssignableTo<UserJwtV2>();
 

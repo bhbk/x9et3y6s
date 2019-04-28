@@ -34,6 +34,42 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _conf = conf;
         }
 
+        public async Task<bool> AccessFailedAsync(Guid key)
+        {
+            var entity = _context.tbl_Clients.Where(x => x.Id == key).SingleOrDefault();
+
+            entity.LastLoginFailure = DateTime.Now;
+            entity.AccessFailedCount++;
+
+            try
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+                return await Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult(false);
+            }
+        }
+
+        public async Task<bool> AccessSuccessAsync(Guid key)
+        {
+            var entity = _context.tbl_Clients.Where(x => x.Id == key).Single();
+
+            entity.LastLoginSuccess = DateTime.Now;
+            entity.AccessSuccessCount++;
+
+            try
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+                return await Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult(false);
+            }
+        }
+
         public async Task<int> CountAsync(Expression<Func<tbl_Clients, bool>> predicates = null)
         {
             var query = _context.tbl_Clients.AsQueryable();

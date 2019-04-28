@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _conf = conf ?? throw new ArgumentNullException();
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal)
+            if (instance == InstanceContext.DeployedOrLocal || instance == InstanceContext.IntegrationTest)
             {
                 var connect = new HttpClientHandler();
 
@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/email/v1";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/text/v1";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)

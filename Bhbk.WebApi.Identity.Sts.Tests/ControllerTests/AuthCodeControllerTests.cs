@@ -120,6 +120,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         code = RandomValues.CreateBase64String(8),
@@ -151,6 +152,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         code = ask_code,
@@ -211,6 +213,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = ask_redirect,
                         code = ask_code,
@@ -269,6 +272,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = Guid.NewGuid().ToString(),
                         redirect_uri = url.AbsoluteUri,
                         code = ask_code,
@@ -286,6 +290,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         code = ask_code,
@@ -344,6 +349,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = ask_redirect,
                         code = ask_code,
@@ -358,6 +364,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = ask_redirect,
                         code = RandomValues.CreateBase64String(32),
@@ -433,6 +440,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = ask_redirect,
                         code = ask_code,

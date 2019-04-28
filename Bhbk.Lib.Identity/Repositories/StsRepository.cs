@@ -10,7 +10,6 @@ using System.Web;
 
 namespace Bhbk.Lib.Identity.Repositories
 {
-    //https://oauth.com/playground/
     public class StsRepository
     {
         private readonly IConfigurationRoot _conf;
@@ -22,7 +21,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _conf = conf ?? throw new ArgumentNullException();
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal)
+            if (instance == InstanceContext.DeployedOrLocal || instance == InstanceContext.IntegrationTest)
             {
                 var connect = new HttpClientHandler();
 
@@ -48,12 +47,12 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
                 + "&username=" + HttpUtility.UrlEncode(model.username)
                 + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
-                + "&response_type=code"
+                + "&response_type=" + model.response_type
                 + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
             var endpoint = "/oauth2/v1/acg-ask";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -68,12 +67,12 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&client=" + HttpUtility.UrlEncode(model.client)
                 + "&user=" + HttpUtility.UrlEncode(model.user)
                 + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
-                + "&response_type=code"
+                + "&response_type=" + model.response_type
                 + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
             var endpoint = "/oauth2/v2/acg-ask";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -86,15 +85,15 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             var content = Uri.EscapeUriString("?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
                 + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
+                + "&grant_type=" + model.grant_type
                 + "&username=" + HttpUtility.UrlEncode(model.username)
                 + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
-                + "&grant_type=authorization_code"
                 + "&code=" + HttpUtility.UrlEncode(model.code)
                 + "&state=" + HttpUtility.UrlEncode(model.state));
 
             var endpoint = "/oauth2/v1/acg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -107,15 +106,15 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             var content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
                 + "&client=" + HttpUtility.UrlEncode(model.client)
+                + "&grant_type=" + model.grant_type
                 + "&user=" + HttpUtility.UrlEncode(model.user)
                 + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
-                + "&grant_type=authorization_code"
                 + "&code=" + HttpUtility.UrlEncode(model.code)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
             var endpoint = "/oauth2/v2/acg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -134,13 +133,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer_id", model.issuer_id),
                     new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("client_secret", model.client_secret),
-                    new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
 
             var endpoint = "/oauth2/v1/ccg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -155,13 +154,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
                     new KeyValuePair<string, string>("client",  model.client),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("client_secret", model.client_secret),
-                    new KeyValuePair<string, string>("grant_type", "client_secret")
                 });
 
             var endpoint = "/oauth2/v2/ccg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -176,13 +175,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer_id", model.issuer_id),
                     new KeyValuePair<string, string>("client_id", model.client_id),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
             var endpoint = "/oauth2/v1/ccg-rt";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -197,13 +196,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
                     new KeyValuePair<string, string>("client", model.client),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
             var endpoint = "/oauth2/v2/ccg-rt";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -221,13 +220,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer_id", model.issuer_id),
                     new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("username", model.username),
-                    new KeyValuePair<string, string>("grant_type", "device_code")
                 });
 
             var endpoint = "/oauth2/v1/dcg-ask";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -242,13 +241,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
                     new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("user", model.user),
-                    new KeyValuePair<string, string>("grant_type", "device_code")
                 });
 
             var endpoint = "/oauth2/v2/dcg-ask";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -263,14 +262,14 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer_id", model.issuer_id),
                     new KeyValuePair<string, string>("client_id", model.client_id),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("user_code", model.user_code),
                     new KeyValuePair<string, string>("device_code", model.device_code),
-                    new KeyValuePair<string, string>("grant_type", "device_code"),
                 });
 
             var endpoint = "/oauth2/v1/dcg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -285,14 +284,14 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
                     new KeyValuePair<string, string>("client", model.client),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("user_code", model.user_code),
                     new KeyValuePair<string, string>("device_code", model.device_code),
-                    new KeyValuePair<string, string>("grant_type", "device_code"),
                 });
 
             var endpoint = "/oauth2/v2/dcg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -308,15 +307,16 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
                 + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
+                + "&grant_type=" + model.grant_type
                 + "&username=" + HttpUtility.UrlEncode(model.username)
                 + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
-                + "&response_type=token"
+                + "&response_type=" + model.response_type
                 + "&scope=" + HttpUtility.UrlEncode(model.scope)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
             var endpoint = "/oauth2/v1/ig";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -329,15 +329,16 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             string content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
                 + "&client=" + HttpUtility.UrlEncode(model.client)
+                + "&grant_type=" + model.grant_type
                 + "&user=" + HttpUtility.UrlEncode(model.user)
                 + "&redirect_uri=" + HttpUtility.UrlEncode(model.redirect_uri)
-                + "&response_type=token"
+                + "&response_type=" + model.response_type
                 + "&scope=" + HttpUtility.UrlEncode(model.scope)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
             var endpoint = "/oauth2/v2/ig";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -355,14 +356,14 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("client_id", model.client_id),
-                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("username", model.username),
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
             var endpoint = "/oauth2/v1/ropg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -377,14 +378,14 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer_id", model.issuer_id),
                     new KeyValuePair<string, string>("client_id", model.client_id),
-                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("username", model.username),
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
             var endpoint = "/oauth2/v1/ropg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -399,14 +400,14 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
                     new KeyValuePair<string, string>("client", model.client),
-                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("user", model.user),
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
             var endpoint = "/oauth2/v2/ropg";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -421,13 +422,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer_id", model.issuer_id),
                     new KeyValuePair<string, string>("client_id", model.client_id),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
             var endpoint = "/oauth2/v1/ropg-rt";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)
@@ -442,13 +443,13 @@ namespace Bhbk.Lib.Identity.Repositories
                 {
                     new KeyValuePair<string, string>("issuer", model.issuer),
                     new KeyValuePair<string, string>("client", model.client),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("grant_type", model.grant_type),
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
             var endpoint = "/oauth2/v2/ropg-rt";
 
-            if (_instance == InstanceContext.DeployedOrLocal)
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
             if (_instance == InstanceContext.UnitTest)

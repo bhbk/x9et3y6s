@@ -23,6 +23,12 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public string ClientType { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
+        public bool? LockoutEnabled { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
+        public DateTime? LastLoginSuccess { get; set; }
+        public DateTime? LastLoginFailure { get; set; }
+        public int? AccessFailedCount { get; set; }
+        public int? AccessSuccessCount { get; set; }
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 

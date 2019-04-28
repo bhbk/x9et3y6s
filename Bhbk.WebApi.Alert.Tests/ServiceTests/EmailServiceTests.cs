@@ -47,11 +47,11 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Enqueue_EmailV1(rop.token, new EmailCreate());
+                var result = await service.Http.Enqueue_EmailV1(rop.token, new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                result = await service.HttpClient.Enqueue_EmailV1(rop.token,
+                result = await service.Http.Enqueue_EmailV1(rop.token,
                     new EmailCreate()
                     {
                         FromId = Guid.NewGuid(),
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                result = await service.HttpClient.Enqueue_EmailV1(rop.token,
+                result = await service.Http.Enqueue_EmailV1(rop.token,
                     new EmailCreate()
                     {
                         FromId = user.Id,
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Enqueue_EmailV1(rop.token,
+                var result = await service.Http.Enqueue_EmailV1(rop.token,
                     new EmailCreate()
                     {
                         FromId = user.Id,

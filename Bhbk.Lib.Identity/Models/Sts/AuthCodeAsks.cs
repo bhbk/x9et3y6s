@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Models.Sts
     {
         [Required]
         public string redirect_uri { get; set; }
-
+        
         [Required]
         [DefaultValue("code")]
         [RegularExpression("code")]

@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -38,19 +37,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //clean out cruft from encoding...
-            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
-            input.client_id = HttpUtility.UrlDecode(input.client_id);
-            input.username = HttpUtility.UrlDecode(input.username);
-            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
-            input.scope = HttpUtility.UrlDecode(input.scope);
-
-            if (!string.Equals(input.response_type, Constants.AttrAuthCodeResponseIDV1, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
-                return BadRequest(ModelState);
-            }
-
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
@@ -59,20 +45,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            //clean out cruft from encoding...
-            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
-            input.client_id = HttpUtility.UrlDecode(input.client_id);
-            input.username = HttpUtility.UrlDecode(input.username);
-            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
-            input.code = HttpUtility.UrlDecode(input.code);
-            input.state = HttpUtility.UrlDecode(input.state);
-
-            if (!string.Equals(input.grant_type, Constants.AttrAuthCodeIDV1, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
 
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
@@ -89,12 +61,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.user = HttpUtility.UrlDecode(input.user);
             input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
             input.scope = HttpUtility.UrlDecode(input.scope);
-
-            if (!string.Equals(input.response_type, Constants.AttrAuthCodeResponseIDV2, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.response_type}");
-                return BadRequest(ModelState);
-            }
 
             Guid issuerID;
             tbl_Issuers issuer;
@@ -210,12 +176,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             input.code = HttpUtility.UrlDecode(input.code);
             input.state = HttpUtility.UrlDecode(input.state);
 
-            if (!string.Equals(input.grant_type, Constants.AttrAuthCodeIDV2, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
-            else if (!Uri.IsWellFormedUriString(input.redirect_uri, UriKind.Absolute))
+            if (!Uri.IsWellFormedUriString(input.redirect_uri, UriKind.Absolute))
             {
                 ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                 return BadRequest(ModelState);
@@ -349,6 +310,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
+
+            //adjust counter(s) for login success...
+            await UoW.UserRepo.AccessSuccessAsync(user.Id);
+            await UoW.CommitAsync();
 
             return Ok(result);
         }

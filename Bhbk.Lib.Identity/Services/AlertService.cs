@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Services
         public AlertService(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
         {
             _jwt = new ResourceOwnerHelper(conf, instance, client);
-            HttpClient = new AlertRepository(conf, instance, client);
+            Http = new AlertRepository(conf, instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -25,28 +25,28 @@ namespace Bhbk.Lib.Identity.Services
             set { _jwt.JwtV2 = value; }
         }
 
-        public AlertRepository HttpClient { get; }
+        public AlertRepository Http { get; }
 
         public bool Email_EnqueueV1(EmailCreate model)
         {
-            var response = HttpClient.Enqueue_EmailV1(_jwt.JwtV2.RawData, model).Result;
+            var response = Http.Enqueue_EmailV1(_jwt.JwtV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;
 
-            throw new HttpRequestException(response.RequestMessage
-                + Environment.NewLine + response);
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
         }
 
         public bool Text_EnqueueV1(TextCreate model)
         {
-            var response = HttpClient.Enqueue_TextV1(_jwt.JwtV2.RawData, model).Result;
+            var response = Http.Enqueue_TextV1(_jwt.JwtV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;
 
-            throw new HttpRequestException(response.RequestMessage
-                + Environment.NewLine + response);
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
         }
     }
 }

@@ -74,6 +74,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "token",

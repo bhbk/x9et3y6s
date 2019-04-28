@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var ask = await service.HttpClient.AuthCode_AskV1(
+                var ask = await service.Http.AuthCode_AskV1(
                     new AuthCodeAskV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -57,11 +57,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var ac = await service.HttpClient.AuthCode_UseV1(
+                var ac = await service.Http.AuthCode_UseV1(
                     new AuthCodeV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
+                        grant_type = "authorization_code",
                         username = Guid.NewGuid().ToString(),
                         redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
                         code = RandomValues.CreateBase64String(8),
@@ -89,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var url = new Uri(Constants.ApiUnitTestUriLink);
-                var ask = await service.HttpClient.AuthCode_AskV2(
+                var ask = await service.Http.AuthCode_AskV2(
                     new AuthCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -102,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                ask = await service.HttpClient.AuthCode_AskV2(
+                ask = await service.Http.AuthCode_AskV2(
                     new AuthCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -134,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var url = new Uri(Constants.ApiUnitTestUriLink);
-                var ask = await service.HttpClient.AuthCode_AskV2(
+                var ask = await service.Http.AuthCode_AskV2(
                     new AuthCodeAskV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -166,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = Guid.NewGuid();
 
                 var url = new Uri(Constants.ApiUnitTestUriLink);
-                var ask = await service.HttpClient.AuthCode_AskV2(
+                var ask = await service.Http.AuthCode_AskV2(
                     new AuthCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),

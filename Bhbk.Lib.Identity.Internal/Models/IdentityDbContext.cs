@@ -118,6 +118,10 @@ namespace Bhbk.Lib.Identity.Internal.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.AccessFailedCount).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.AccessSuccessCount).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.ClientKey).IsRequired();
 
                 entity.Property(e => e.ClientType)
@@ -383,10 +387,6 @@ namespace Bhbk.Lib.Identity.Internal.Models
                 entity.Property(e => e.Email).IsRequired();
 
                 entity.Property(e => e.FirstName).IsRequired();
-
-                entity.Property(e => e.LastLoginFailure).HasColumnType("datetime");
-
-                entity.Property(e => e.LastLoginSuccess).HasColumnType("datetime");
 
                 entity.Property(e => e.LastName).IsRequired();
 

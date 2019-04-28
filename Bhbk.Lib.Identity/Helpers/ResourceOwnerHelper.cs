@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Helpers
             _conf = conf ?? throw new ArgumentNullException();
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal)
+            if (instance == InstanceContext.DeployedOrLocal || instance == InstanceContext.IntegrationTest)
             {
                 var connect = new HttpClientHandler();
 
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
                     var endpoint = "/oauth2/v1/ropg-rt";
 
-                    if (_instance == InstanceContext.DeployedOrLocal)
+                    if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
@@ -84,8 +84,8 @@ namespace Bhbk.Lib.Identity.Helpers
                         return _access;
                     }
 
-                    throw new HttpRequestException(response.RequestMessage
-                        + Environment.NewLine + response);
+                    throw new HttpRequestException(response.ToString(),
+                        new Exception(response.RequestMessage.ToString()));
                 }
 
                 else
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
                     var endpoint = "/oauth2/v1/ropg";
 
-                    if (_instance == InstanceContext.DeployedOrLocal)
+                    if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
@@ -121,8 +121,8 @@ namespace Bhbk.Lib.Identity.Helpers
                         return _access;
                     }
 
-                    throw new HttpRequestException(response.RequestMessage
-                        + Environment.NewLine + response);
+                    throw new HttpRequestException(response.ToString(),
+                        new Exception(response.RequestMessage.ToString()));
                 }
             }
             set { _access = value; }
@@ -155,7 +155,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
                     var endpoint = "/oauth2/v2/ropg-rt";
 
-                    if (_instance == InstanceContext.DeployedOrLocal)
+                    if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
@@ -174,8 +174,8 @@ namespace Bhbk.Lib.Identity.Helpers
                         return _access;
                     }
 
-                    throw new HttpRequestException(response.RequestMessage
-                        + Environment.NewLine + response);
+                    throw new HttpRequestException(response.ToString(),
+                        new Exception(response.RequestMessage.ToString()));
                 }
 
                 else
@@ -192,7 +192,7 @@ namespace Bhbk.Lib.Identity.Helpers
 
                     var endpoint = "/oauth2/v2/ropg";
 
-                    if (_instance == InstanceContext.DeployedOrLocal)
+                    if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
@@ -211,8 +211,8 @@ namespace Bhbk.Lib.Identity.Helpers
                         return _access;
                     }
 
-                    throw new HttpRequestException(response.RequestMessage
-                        + Environment.NewLine + response);
+                    throw new HttpRequestException(response.ToString(),
+                        new Exception(response.RequestMessage.ToString()));
                 }
             }
             set { _access = value; }

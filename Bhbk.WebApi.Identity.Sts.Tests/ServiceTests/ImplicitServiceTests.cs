@@ -33,11 +33,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var imp = await service.HttpClient.Implicit_UseV1(
+                var imp = await service.Http.Implicit_UseV1(
                     new ImplicitV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
+                        grant_type = "implicit",
                         username = Guid.NewGuid().ToString(),
                         redirect_uri = RandomValues.CreateBase64String(8),
                         response_type = "token",
@@ -67,11 +68,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(Constants.ApiUnitTestUriLink);
                 var state = RandomValues.CreateBase64String(8);
-                var imp = await service.HttpClient.Implicit_UseV2(
+                var imp = await service.Http.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "token",
@@ -81,11 +83,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                imp = await service.HttpClient.Implicit_UseV2(
+                imp = await service.Http.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = string.Empty,
                         client = client.Id.ToString(),
+                        grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "token",
@@ -95,11 +98,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                imp = await service.HttpClient.Implicit_UseV2(
+                imp = await service.Http.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = Guid.NewGuid().ToString(),
+                        grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "token",
@@ -109,11 +113,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                imp = await service.HttpClient.Implicit_UseV2(
+                imp = await service.Http.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = string.Empty,
+                        grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "token",
@@ -123,11 +128,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 imp.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 imp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                imp = await service.HttpClient.Implicit_UseV2(
+                imp = await service.Http.Implicit_UseV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Empty,
+                        client = client.Id.ToString(),
+                        grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
                         response_type = "token",

@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[tbl_Users] (
+﻿CREATE TABLE [dbo].[tbl_Users] (
     [Id]                   UNIQUEIDENTIFIER   NOT NULL,
     [ActorId]              UNIQUEIDENTIFIER   NULL,
     [Email]                NVARCHAR (MAX)     NOT NULL,
@@ -11,8 +11,8 @@ CREATE TABLE [dbo].[tbl_Users] (
     [LastUpdated]          DATETIME2 (7)      NULL,
     [LockoutEnabled]       BIT                CONSTRAINT [DF_AppUser_LockoutEnabled] DEFAULT ((0)) NOT NULL,
     [LockoutEnd]           DATETIMEOFFSET (7) NULL,
-    [LastLoginSuccess]     DATETIME           NULL,
-    [LastLoginFailure]     DATETIME           NULL,
+    [LastLoginSuccess]     DATETIME2 (7)      NULL,
+    [LastLoginFailure]     DATETIME2 (7)      NULL,
     [AccessFailedCount]    INT                CONSTRAINT [DF_AppUser_LoginFailedCount] DEFAULT ((0)) NOT NULL,
     [AccessSuccessCount]   INT                CONSTRAINT [DF_AppUser_AccessSuccessCount] DEFAULT ((0)) NOT NULL,
     [ConcurrencyStamp]     NVARCHAR (MAX)     NULL,
@@ -24,6 +24,8 @@ CREATE TABLE [dbo].[tbl_Users] (
     [Immutable]            BIT                CONSTRAINT [DF_AppUser_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

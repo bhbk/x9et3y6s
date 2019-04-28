@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -36,12 +35,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.Equals(input.grant_type, Constants.AttrClientSecretIDV1, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
-
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
@@ -59,12 +52,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (!string.Equals(input.grant_type, Constants.AttrClientSecretIDV2, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
 
             Guid issuerID;
             tbl_Issuers issuer;
@@ -103,6 +90,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else if (!client.Enabled
                 || input.client_secret != client.ClientKey)
             {
+                //adjust counter(s) for login success...
+                await UoW.ClientRepo.AccessFailedAsync(client.Id);
+                await UoW.CommitAsync();
+
                 ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
             }
@@ -122,6 +113,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(cc.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
+
+            //adjust counter(s) for login success...
+            await UoW.ClientRepo.AccessSuccessAsync(client.Id);
+            await UoW.CommitAsync();
 
             return Ok(result);
         }

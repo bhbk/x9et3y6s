@@ -35,14 +35,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //clean out cruft from encoding...
-            input.issuer_id = HttpUtility.UrlDecode(input.issuer_id);
-            input.client_id = HttpUtility.UrlDecode(input.client_id);
-            input.username = HttpUtility.UrlDecode(input.username);
-            input.redirect_uri = HttpUtility.UrlDecode(input.redirect_uri);
-            input.scope = HttpUtility.UrlDecode(input.scope);
-            input.state = HttpUtility.UrlDecode(input.state);
-
             return StatusCode((int)HttpStatusCode.NotImplemented);
         }
 
@@ -159,10 +151,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //no reuse of state after this...
             state.StateConsume = true;
+            await UoW.StateRepo.UpdateAsync(state);
 
             //adjust counter(s) for login success...
             await UoW.UserRepo.AccessSuccessAsync(user.Id);
-            await UoW.StateRepo.UpdateAsync(state);
             await UoW.CommitAsync();
 
             return RedirectPermanent(result.AbsoluteUri);

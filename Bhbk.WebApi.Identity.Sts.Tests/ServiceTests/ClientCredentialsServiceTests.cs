@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var rt = await service.HttpClient.ClientCredentialRefresh_UseV1(
+                var rt = await service.Http.ClientCredentialRefresh_UseV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -58,11 +58,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
                 var service = new StsService(conf, uow.InstanceType, owin);
 
-                var cc = await service.HttpClient.ClientCredential_UseV1(
+                var cc = await service.Http.ClientCredential_UseV1(
                     new ClientCredentialV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
                         client_id = Guid.NewGuid().ToString(),
+                        grant_type = "client_secret",
                         client_secret = RandomValues.CreateAlphaNumericString(8),
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -90,10 +91,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
 
-                var rt = await service.HttpClient.ClientCredentialRefresh_UseV2(
+                var rt = await service.Http.ClientCredentialRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -109,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 await uow.ClientRepo.UpdateAsync(client);
                 await uow.CommitAsync();
 
-                rt = await service.HttpClient.ClientCredentialRefresh_UseV2(
+                rt = await service.Http.ClientCredentialRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -142,10 +144,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
 
-                var rt = await service.HttpClient.ClientCredentialRefresh_UseV2(
+                var rt = await service.Http.ClientCredentialRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -156,7 +159,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                rt = await service.HttpClient.ClientCredentialRefresh_UseV2(
+                rt = await service.Http.ClientCredentialRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = string.Empty,
@@ -172,7 +175,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 await uow.IssuerRepo.UpdateAsync(issuer);
                 await uow.CommitAsync();
 
-                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
+                rt = await service.Http.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -212,13 +215,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
 
                 uow.ConfigRepo.ResourceOwnerRefreshFake = false;
                 uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
-                var rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
+                var rt = await service.Http.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -239,13 +243,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
 
                 uow.ConfigRepo.ResourceOwnerRefreshFake = false;
                 uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
 
-                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
+                rt = await service.Http.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -263,12 +268,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
 
                 var cc_pos = random.Next((cc.refresh_token).Length - 8);
 
-                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
+                rt = await service.Http.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -286,10 +292,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
 
-                rt = await service.HttpClient.ResourceOwnerRefresh_UseV2(
+                rt = await service.Http.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -317,21 +324,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                var cc = await service.HttpClient.ClientCredential_UseV2(
+                var cc = await service.Http.ClientCredential_UseV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = Guid.NewGuid().ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-                cc = await service.HttpClient.ClientCredential_UseV2(
+                cc = await service.Http.ClientCredential_UseV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = RandomValues.CreateBase64String(16),
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -342,11 +351,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 await uow.ClientRepo.UpdateAsync(client);
                 await uow.CommitAsync();
 
-                cc = await service.HttpClient.ClientCredential_UseV2(
+                cc = await service.Http.ClientCredential_UseV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -369,11 +379,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                var cc = await service.HttpClient.ClientCredential_UseV2(
+                var cc = await service.Http.ClientCredential_UseV2(
                     new ClientCredentialV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -384,11 +395,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 await uow.IssuerRepo.UpdateAsync(issuer);
                 await uow.CommitAsync();
 
-                cc = await service.HttpClient.ClientCredential_UseV2(
+                cc = await service.Http.ClientCredential_UseV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -419,6 +431,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
+                        grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
                 cc.Should().BeAssignableTo<ClientJwtV2>();

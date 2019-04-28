@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Services
     public interface IAlertService
     {
         JwtSecurityToken Jwt { get; set; }
-        AlertRepository HttpClient { get; }
+        AlertRepository Http { get; }
 
         bool Email_EnqueueV1(EmailCreate model);
         bool Text_EnqueueV1(TextCreate model);

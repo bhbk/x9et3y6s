@@ -7,6 +7,11 @@ namespace Bhbk.Lib.Identity.Models.Sts
     public abstract class Implicits
     {
         [Required]
+        [DefaultValue("implicit")]
+        [RegularExpression("implicit")]
+        public string grant_type { get; set; }
+
+        [Required]
         public string redirect_uri { get; set; }
 
         [Required]

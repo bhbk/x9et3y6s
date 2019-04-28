@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Services
     public interface IMeService
     {
         JwtSecurityToken Jwt { get; set; }
-        MeRepository HttpClient { get; }
+        MeRepository Http { get; }
 
         /*
          * info

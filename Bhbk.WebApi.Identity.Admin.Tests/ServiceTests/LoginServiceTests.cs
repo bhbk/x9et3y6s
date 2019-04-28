@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Login_CreateV1(rop.token, new LoginCreate());
+                var result = await service.Http.Login_CreateV1(rop.token, new LoginCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.HttpClient.Login_CreateV1(rop.token, new LoginCreate());
+                result = await service.Http.Login_CreateV1(rop.token, new LoginCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.HttpClient.Login_CreateV1(rop.token, new LoginCreate());
+                result = await service.Http.Login_CreateV1(rop.token, new LoginCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Immutable = false
                 };
 
-                var result = await service.HttpClient.Login_CreateV1(rop.token, create);
+                var result = await service.Http.Login_CreateV1(rop.token, create);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Login_DeleteV1(rop.token, Guid.NewGuid());
+                var result = await service.Http.Login_DeleteV1(rop.token, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.HttpClient.Login_DeleteV1(rop.token, Guid.NewGuid());
+                result = await service.Http.Login_DeleteV1(rop.token, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.HttpClient.Login_DeleteV1(rop.token, Guid.NewGuid());
+                result = await service.Http.Login_DeleteV1(rop.token, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
@@ -172,7 +172,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 await uow.LoginRepo.UpdateAsync(testLogin);
                 await uow.CommitAsync();
 
-                result = await service.HttpClient.Login_DeleteV1(rop.token, testLogin.Id);
+                result = await service.Http.Login_DeleteV1(rop.token, testLogin.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -198,7 +198,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Login_DeleteV1(rop.token, testLogin.Id);
+                var result = await service.Http.Login_DeleteV1(rop.token, testLogin.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
@@ -230,7 +230,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("name", "asc"));
 
-                var result = await service.HttpClient.Login_GetV1(rop.token,
+                var result = await service.Http.Login_GetV1(rop.token,
                     new CascadePager()
                     {
                         Filter = string.Empty,
@@ -249,14 +249,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 list.Count().Should().Be(take);
                 count.Should().Be(await uow.IssuerRepo.CountAsync());
 
-                result = await service.HttpClient.Login_GetV1(rop.token, list.First().Id.ToString());
+                result = await service.Http.Login_GetV1(rop.token, list.First().Id.ToString());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.OK);
 
                 ok = JObject.Parse(await result.Content.ReadAsStringAsync());
                 ok.ToObject<LoginModel>().Should().BeAssignableTo<LoginModel>();
 
-                result = await service.HttpClient.Login_GetV1(rop.token, list.First().Name.ToString());
+                result = await service.Http.Login_GetV1(rop.token, list.First().Name.ToString());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Login_UpdateV1(rop.token, new LoginModel());
+                var result = await service.Http.Login_UpdateV1(rop.token, new LoginModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -297,7 +297,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.HttpClient.Login_UpdateV1(rop.token, new LoginModel());
+                result = await service.Http.Login_UpdateV1(rop.token, new LoginModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
@@ -311,7 +311,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.HttpClient.Login_UpdateV1(rop.token, new LoginModel());
+                result = await service.Http.Login_UpdateV1(rop.token, new LoginModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -338,7 +338,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.HttpClient.Login_UpdateV1(rop.token, uow.Mapper.Map<LoginModel>(testLogin));
+                var result = await service.Http.Login_UpdateV1(rop.token, uow.Mapper.Map<LoginModel>(testLogin));
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.OK);
 

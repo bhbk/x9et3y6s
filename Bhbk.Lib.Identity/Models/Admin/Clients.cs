@@ -27,6 +27,10 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public string ClientType { get; set; }
 
+        public DateTime Created { get; set; }
+
+        public bool LockoutEnabled { get; set; }
+
         [Required]
         [DefaultValue(true)]
         public bool Enabled { get; set; }
@@ -46,10 +50,17 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        [Required]
-        public DateTime Created { get; set; }
-
         public DateTime? LastUpdated { get; set; }
+
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
+
+        public Nullable<DateTime> LastLoginFailure { get; set; }
+
+        public Nullable<DateTime> LastLoginSuccess { get; set; }
+
+        public int AccessFailedCount { get; set; }
+
+        public int AccessSuccessCount { get; set; }
 
         public ICollection<string> Roles { get; set; }
     }

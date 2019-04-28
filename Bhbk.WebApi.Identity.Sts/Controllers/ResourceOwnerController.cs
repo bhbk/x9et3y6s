@@ -276,9 +276,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //adjust counter(s) for login success...
-            await UoW.UserRepo.AccessSuccessAsync(user.Id);
-
             if (UoW.ConfigRepo.LegacyModeIssuer
                 && string.IsNullOrEmpty(input.issuer_id))
             {
@@ -290,6 +287,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     access_token = access.token,
                     expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
+
+                //adjust counter(s) for login success...
+                await UoW.UserRepo.AccessSuccessAsync(user.Id);
+                await UoW.CommitAsync();
 
                 return Ok(result);
             }
@@ -308,6 +309,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                     expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
+
+                //adjust counter(s) for login success...
+                await UoW.UserRepo.AccessSuccessAsync(user.Id);
+                await UoW.CommitAsync();
 
                 return Ok(result);
             }
@@ -412,7 +417,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
             var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
 
-
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
@@ -433,12 +437,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            if (!string.Equals(input.grant_type, Constants.AttrResourceOwnerIDV2, StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(MessageType.ParametersInvalid.ToString(), $"Grant type:{input.grant_type}");
-                return BadRequest(ModelState);
-            }
-
             Guid issuerID;
             tbl_Issuers issuer;
 
@@ -568,9 +566,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //adjust counter(s) for login success...
-            await UoW.UserRepo.AccessSuccessAsync(user.Id);
-
             var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
             var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
 
@@ -584,6 +579,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
+
+            //adjust counter(s) for login success...
+            await UoW.UserRepo.AccessSuccessAsync(user.Id);
+            await UoW.CommitAsync();
 
             return Ok(result);
         }
