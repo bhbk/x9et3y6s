@@ -23,10 +23,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly InstanceContext _instance;
         private readonly IMapper _mapper;
-        private readonly IConfigurationRoot _conf;
+        private readonly IConfiguration _conf;
         private readonly IdentityDbContext _context;
 
-        public ClientRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, IConfigurationRoot conf)
+        public ClientRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, IConfiguration conf)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;

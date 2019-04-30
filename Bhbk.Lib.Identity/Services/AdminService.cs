@@ -3,8 +3,8 @@ using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,10 +17,13 @@ namespace Bhbk.Lib.Identity.Services
     {
         private readonly ResourceOwnerHelper _jwt;
 
-        public AdminService(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+        public AdminService()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+
+        public AdminService(InstanceContext instance, HttpClient client)
         {
-            _jwt = new ResourceOwnerHelper(conf, instance, client);
-            Http = new AdminRepository(conf, instance, client);
+            _jwt = new ResourceOwnerHelper(instance, client);
+            Http = new AdminRepository(instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -491,6 +494,23 @@ namespace Bhbk.Lib.Identity.Services
 
             if (response.IsSuccessStatusCode)
                 return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public Tuple<int, IEnumerable<MotDType1Model>> User_GetMOTDsV1(CascadePager model)
+        {
+            var response = Http.User_GetMOTDsV1(_jwt.JwtV2.RawData, model).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<MotDType1Model>>();
+                var count = (int)ok["count"];
+
+                return new Tuple<int, IEnumerable<MotDType1Model>>(count, list);
+            }
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

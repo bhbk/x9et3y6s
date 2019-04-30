@@ -32,9 +32,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -98,9 +97,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -164,9 +162,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -227,9 +224,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -332,9 +328,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -393,9 +388,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -451,9 +445,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -512,9 +505,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -585,9 +577,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -654,9 +645,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -734,9 +725,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -789,9 +779,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -855,9 +844,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -980,9 +968,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -1041,9 +1028,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -1090,9 +1076,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -1151,9 +1136,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -1224,9 +1208,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(conf, uow.InstanceType, owin);
+                var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

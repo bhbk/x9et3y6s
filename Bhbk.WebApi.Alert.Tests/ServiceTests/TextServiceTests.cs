@@ -6,7 +6,6 @@ using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -31,9 +30,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AlertService(conf, uow.InstanceType, owin);
+                var service = new AlertService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -81,9 +79,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AlertService(conf, uow.InstanceType, owin);
+                var service = new AlertService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

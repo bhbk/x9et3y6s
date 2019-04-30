@@ -14,6 +14,7 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public virtual DbSet<tbl_Exceptions> tbl_Exceptions { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
+        public virtual DbSet<tbl_MotD_Type1> tbl_MotD_Type1 { get; set; }
         public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
@@ -118,10 +119,6 @@ namespace Bhbk.Lib.Identity.Internal.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AccessFailedCount).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.AccessSuccessCount).HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.ClientKey).IsRequired();
 
                 entity.Property(e => e.ClientType)
@@ -191,6 +188,30 @@ namespace Bhbk.Lib.Identity.Internal.Models
                     .WithMany(p => p.tbl_Logins)
                     .HasForeignKey(d => d.ActorId)
                     .HasConstraintName("FK_Logins_ActorID");
+            });
+
+            modelBuilder.Entity<tbl_MotD_Type1>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasMaxLength(128)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Author)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Background).IsUnicode(false);
+
+                entity.Property(e => e.Category).IsUnicode(false);
+
+                entity.Property(e => e.Quote)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Tags).IsUnicode(false);
+
+                entity.Property(e => e.Title).IsUnicode(false);
             });
 
             modelBuilder.Entity<tbl_Refreshes>(entity =>

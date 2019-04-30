@@ -13,7 +13,7 @@ namespace Bhbk.WebApi.Alert.Controllers
     [Authorize(Policy = "UsersPolicy")]
     public class BaseController : Controller
     {
-        protected IConfigurationRoot Conf { get => (IConfigurationRoot)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfigurationRoot>(); }
+        protected IConfiguration Conf { get => (IConfiguration)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
         protected IIdentityUnitOfWork UoW { get => (IIdentityUnitOfWork)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
 

@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
@@ -83,9 +83,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(conf, uow.InstanceType, owin);
+                var service = new StsRepository(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -174,9 +173,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(conf, uow.InstanceType, owin);
+                var service = new StsRepository(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -235,9 +233,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(conf, uow.InstanceType, owin);
+                var service = new StsRepository(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -312,9 +309,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(conf, uow.InstanceType, owin);
+                var service = new StsRepository(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -400,9 +396,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(conf, uow.InstanceType, owin);
+                var service = new StsRepository(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
 using System;
 using System.Collections.Generic;
@@ -79,6 +80,7 @@ namespace Bhbk.Lib.Identity.Services
         bool User_DeleteRefreshesV1(Guid userID);
         bool User_DeleteRefreshV1(Guid userID, Guid refreshID);
         Tuple<int, IEnumerable<UserModel>> User_GetV1(CascadePager model);
+        Tuple<int, IEnumerable<MotDType1Model>> User_GetMOTDsV1(CascadePager model);
         UserModel User_GetV1(string userValue);
         IEnumerable<ClientModel> User_GetClientsV1(string userValue);
         IEnumerable<LoginModel> User_GetLoginsV1(string userValue);

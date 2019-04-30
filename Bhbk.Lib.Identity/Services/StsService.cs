@@ -3,10 +3,9 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;
-using Microsoft.Extensions.Configuration;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
-using System;
 
 namespace Bhbk.Lib.Identity.Services
 {
@@ -14,10 +13,13 @@ namespace Bhbk.Lib.Identity.Services
     {
         private readonly ResourceOwnerHelper _jwt;
 
-        public StsService(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+        public StsService()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+
+        public StsService(InstanceContext instance, HttpClient client)
         {
-            _jwt = new ResourceOwnerHelper(conf, instance, client);
-            Http = new StsRepository(conf, instance, client);
+            _jwt = new ResourceOwnerHelper(instance, client);
+            Http = new StsRepository(instance, client);
         }
 
         public JwtSecurityToken Jwt

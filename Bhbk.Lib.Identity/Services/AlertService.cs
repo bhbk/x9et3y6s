@@ -2,7 +2,6 @@
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Repositories;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
@@ -13,10 +12,13 @@ namespace Bhbk.Lib.Identity.Services
     {
         private readonly ResourceOwnerHelper _jwt;
 
-        public AlertService(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+        public AlertService()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+
+        public AlertService(InstanceContext instance, HttpClient client)
         {
-            _jwt = new ResourceOwnerHelper(conf, instance, client);
-            Http = new AlertRepository(conf, instance, client);
+            _jwt = new ResourceOwnerHelper(instance, client);
+            Http = new AlertRepository(instance, client);
         }
 
         public JwtSecurityToken Jwt

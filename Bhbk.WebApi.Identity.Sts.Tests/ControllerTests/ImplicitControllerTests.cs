@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();

@@ -1,14 +1,18 @@
-﻿using Bhbk.Lib.Identity.Internal.Models;
+﻿using Bhbk.Lib.Core.Models;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.WebApi.Identity.Me.Tasks;
+using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
@@ -32,13 +36,18 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             return Ok(UoW.Mapper.Map<UserModel>(user));
         }
 
-        [Route("v1/quote-of-the-day"), HttpGet]
+        [Route("v1/msg-of-the-day"), HttpGet]
         [AllowAnonymous]
-        public IActionResult GetQOTDV1()
+        public async Task<IActionResult> GetMOTDV1()
         {
-            var task = (MaintainQuotesTask)Tasks.Single(x => x.GetType() == typeof(MaintainQuotesTask));
+            var blah = await UoW.UserRepo.CountMOTDAsync();
 
-            return Ok(task.QuoteOfTheDay);
+            var random = new Random();
+            var skip = random.Next(1, await UoW.UserRepo.CountMOTDAsync());
+
+            var quote = (await UoW.UserRepo.GetMOTDAsync(null, null, x => x.OrderBy(y => y.Id), skip, 1)).SingleOrDefault();
+
+            return Ok(UoW.Mapper.Map<MotDType1Model>(quote));
         }
 
         [Route("v1/code"), HttpGet]

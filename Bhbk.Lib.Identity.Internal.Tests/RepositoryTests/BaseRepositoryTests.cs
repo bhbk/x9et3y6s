@@ -17,18 +17,18 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 
     public class BaseRepositoryTests
     {
-        protected IConfigurationRoot Conf;
+        protected IConfiguration Conf;
         protected IIdentityUnitOfWork UoW;
         protected DefaultData DefaultData;
         protected TestData TestData;
 
         public BaseRepositoryTests()
         {
-            var lib = SearchRoots.ByAssemblyContext("config-lib.json");
+            var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
             var conf = new ConfigurationBuilder()
-                .SetBasePath(lib.DirectoryName)
-                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(file.DirectoryName)
+                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 

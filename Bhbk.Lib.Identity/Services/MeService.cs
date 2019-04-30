@@ -4,7 +4,6 @@ using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,10 +15,13 @@ namespace Bhbk.Lib.Identity.Services
     {
         private readonly ResourceOwnerHelper _jwt;
 
-        public MeService(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+        public MeService()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+
+        public MeService(InstanceContext instance, HttpClient client)
         {
-            _jwt = new ResourceOwnerHelper(conf, instance, client);
-            Http = new MeRepository(conf, instance, client);
+            _jwt = new ResourceOwnerHelper(instance, client);
+            Http = new MeRepository(instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -96,12 +98,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public QuotesModel Info_GetQOTDV1()
+        public MotDType1Model Info_GetMOTDV1()
         {
             var response = Http.Info_GetQOTDV1().Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<QuotesModel>().Result;
+                return response.Content.ReadAsJsonAsync<MotDType1Model>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

@@ -21,8 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="config-me.json" />
-    <Content Remove="config-quotes.json" />
+    <Content Remove="appsettings.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,10 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="config-quotes.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="config-me.json">
+    <None Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -27,17 +27,18 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         public string Status { get; private set; }
 
-        public QueueTextTask(IServiceCollection sc, IConfigurationRoot conf)
+        public QueueTextTask(IServiceCollection sc)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
+
+            var conf = _sp.GetRequiredService<IConfiguration>();
 
             _delay = int.Parse(conf["Tasks:QueueText:PollingDelay"]);
             _expire = int.Parse(conf["Tasks:QueueText:ExpireDelay"]);

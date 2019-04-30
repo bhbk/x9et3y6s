@@ -7,21 +7,19 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     public class ConfigRepository
     {
         private readonly InstanceContext _instance;
-        private readonly IConfigurationRoot _conf;
-        private bool _legacyModeClaims;
-        private bool _legacyModeIssuer;
+        private readonly IConfiguration _conf;
         private bool _resourceOwnerRefreshFake;
         private bool _resourceOwnerTokenFake;
         private DateTime _resourceOwnerRefreshFakeUtcNow;
         private DateTime _resourceOwnerTokenFakeUtcNow;
 
-        public ConfigRepository(InstanceContext instance, IConfigurationRoot conf)
+        public ConfigRepository(InstanceContext instance, IConfiguration conf)
         {
             _instance = instance;
             _conf = conf;
 
-            _legacyModeClaims = bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]);
-            _legacyModeIssuer = bool.Parse(_conf["IdentityDefaults:LegacyModeIssuer"]);
+            LegacyModeClaims = bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]);
+            LegacyModeIssuer = bool.Parse(_conf["IdentityDefaults:LegacyModeIssuer"]);
             _resourceOwnerTokenFake = false;
             _resourceOwnerTokenFakeUtcNow = DateTime.UtcNow;
             _resourceOwnerRefreshFake = false;
@@ -84,17 +82,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
-        public bool LegacyModeClaims
-        {
-            get { return _legacyModeClaims; }
-            set { _legacyModeClaims = value; }
-        }
+        public bool LegacyModeClaims { get; set; }
 
-        public bool LegacyModeIssuer
-        {
-            get { return _legacyModeIssuer; }
-            set { _legacyModeIssuer = value; }
-        }
+        public bool LegacyModeIssuer { get; set; }
 
         public uint ResourceOwnerRefreshExpire => uint.Parse(_conf["IdentityDefaults:ResourceOwnerRefreshExpire"]);
 

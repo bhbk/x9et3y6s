@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.FileSystem;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,14 +12,24 @@ namespace Bhbk.Lib.Identity.Helpers
 {
     public class ResourceOwnerHelper : IResourceOwnerHelper
     {
-        private readonly IConfigurationRoot _conf;
+        private readonly IConfiguration _conf;
         private readonly InstanceContext _instance;
         private readonly HttpClient _client;
         private JwtSecurityToken _access, _refresh;
 
-        public ResourceOwnerHelper(IConfigurationRoot conf, InstanceContext instance, HttpClient client)
+        public ResourceOwnerHelper()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+
+        public ResourceOwnerHelper(InstanceContext instance, HttpClient client)
         {
-            _conf = conf ?? throw new ArgumentNullException();
+            var file = SearchRoots.ByAssemblyContext("appsettings.json");
+
+            _conf = new ConfigurationBuilder()
+                .SetBasePath(file.DirectoryName)
+                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             _instance = instance;
 
             if (instance == InstanceContext.DeployedOrLocal || instance == InstanceContext.IntegrationTest)

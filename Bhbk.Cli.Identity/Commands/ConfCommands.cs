@@ -25,13 +25,11 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var lib = SearchRoots.ByAssemblyContext("config-lib.json");
-                var cli = SearchRoots.ByAssemblyContext("config-cli.json");
+                var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
                 var conf = new ConfigurationBuilder()
-                    .SetBasePath(lib.DirectoryName)
-                    .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
-                    .AddJsonFile(cli.Name, optional: false, reloadOnChange: true)
+                    .SetBasePath(file.DirectoryName)
+                    .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables()
                     .Build();
 
@@ -39,7 +37,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .UseSqlServer(conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                var uow = new IdentityUnitOfWork(builder, InstanceContext.DeployedOrLocal, conf);
+                var uow = new IdentityUnitOfWork(builder, conf);
 
                 if (ReadConfig)
                 {

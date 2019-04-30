@@ -6,9 +6,9 @@ using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
@@ -40,9 +40,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -80,9 +79,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -132,9 +130,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -168,9 +165,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -220,9 +216,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+               var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -275,9 +270,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -337,9 +331,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -366,9 +359,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -414,9 +406,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -449,9 +440,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -504,13 +494,56 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
+        public async Task Admin_UserV1_GetMOTDs_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            {
+                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var service = new AdminService(uow.InstanceType, owin);
+
+                await new TestData(uow).DestroyAsync();
+                await new TestData(uow).CreateAsync();
+                await new TestData(uow).CreateRandomAsync(3);
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
+
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+
+                var take = 3;
+                var orders = new List<Tuple<string, string>>();
+                orders.Add(new Tuple<string, string>("author", "asc"));
+
+                var result = await service.Http.User_GetMOTDsV1(rop.token,
+                    new CascadePager()
+                    {
+                        Filter = string.Empty,
+                        Orders = orders,
+                        Skip = 1,
+                        Take = take,
+                    });
+
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+                var ok = JObject.Parse(await result.Content.ReadAsStringAsync());
+                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<MotDType1Model>>();
+                var count = (int)ok["count"];
+
+                list.Should().BeAssignableTo<IEnumerable<MotDType1Model>>();
+                list.Count().Should().Be(take);
+                count.Should().Be(await uow.UserRepo.CountMOTDAsync());
+            }
+        }
+
+        [Fact]
         public async Task Admin_UserV1_GetClaims_Success()
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -535,9 +568,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -562,9 +594,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -589,9 +620,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -617,9 +647,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -650,9 +679,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -695,9 +723,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -747,9 +774,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -776,9 +802,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -828,9 +853,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -864,9 +888,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -916,9 +939,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(conf, uow.InstanceType, owin);
+                var service = new AdminService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

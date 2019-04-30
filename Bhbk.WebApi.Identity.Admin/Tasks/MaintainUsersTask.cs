@@ -19,18 +19,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainUsersTask(IServiceCollection sc, IConfigurationRoot conf)
+        public MaintainUsersTask(IServiceCollection sc)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-            _delay = int.Parse(conf["Tasks:MaintainUsers:PollingDelay"]);
-
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
+
+            var conf = _sp.GetRequiredService<IConfiguration>();
+
+            _delay = int.Parse(conf["Tasks:MaintainUsers:PollingDelay"]);
 
             Status = JsonConvert.SerializeObject(
                 new

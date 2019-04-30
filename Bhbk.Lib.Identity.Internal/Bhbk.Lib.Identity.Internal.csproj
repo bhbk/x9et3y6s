@@ -37,10 +37,4 @@
     <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="config-lib.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

@@ -18,20 +18,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
-        public MaintainActivityTask(IServiceCollection sc, IConfigurationRoot conf)
+        public MaintainActivityTask(IServiceCollection sc)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-            _delay = int.Parse(conf["Tasks:MaintainActivity:PollingDelay"]);
-            _auditable = int.Parse(conf["Tasks:MaintainActivity:HoldAuditable"]);
-            _transient = int.Parse(conf["Tasks:MaintainActivity:HoldTransient"]);
-
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
+
+            var conf = _sp.GetRequiredService<IConfiguration>();
+
+            _delay = int.Parse(conf["Tasks:MaintainActivity:PollingDelay"]);
+            _auditable = int.Parse(conf["Tasks:MaintainActivity:HoldAuditable"]);
+            _transient = int.Parse(conf["Tasks:MaintainActivity:HoldTransient"]);
 
             Status = JsonConvert.SerializeObject(
                 new

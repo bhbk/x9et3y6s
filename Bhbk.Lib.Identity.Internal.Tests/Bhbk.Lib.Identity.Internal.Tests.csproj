@@ -31,4 +31,17 @@
     <ProjectReference Include="..\Bhbk.Lib.Identity.Internal\Bhbk.Lib.Identity.Internal.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Generator></Generator>
+    </None>
+  </ItemGroup>
+
 </Project>

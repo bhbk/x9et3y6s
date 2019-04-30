@@ -30,19 +30,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         public InfoServiceTests(StartupTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Me_InfoV1_GetQOTD_Success()
+        public async Task Me_InfoV1_GetMOTD_Success()
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new MeService(conf, uow.InstanceType, owin);
+                var service = new MeService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
 
-                var result = service.Info_GetQOTDV1();
-                result.Should().BeAssignableTo<QuotesModel>();
+                var result = service.Info_GetMOTDV1();
+                result.Should().BeAssignableTo<MotDType1Model>();
             }
         }
 
@@ -51,9 +50,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new MeService(conf, uow.InstanceType, owin);
+                var service = new MeService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -100,9 +98,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         {
             using (var owin = _factory.CreateClient())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfigurationRoot>();
+                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
                 var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new MeService(conf, uow.InstanceType, owin);
+                var service = new MeService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

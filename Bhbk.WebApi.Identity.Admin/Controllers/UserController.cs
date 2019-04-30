@@ -6,6 +6,7 @@ using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
+using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -240,6 +241,42 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             await UoW.CommitAsync();
 
             return NoContent();
+        }
+
+        [Route("v1/msg-of-the-day/page"), HttpPost]
+        public async Task<IActionResult> GetMOTDsV1([FromBody] CascadePager model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            /*
+             * tidbits below need enhancment, just tinkering...
+             */
+
+            Expression<Func<tbl_MotD_Type1, bool>> preds;
+
+            if (string.IsNullOrEmpty(model.Filter))
+                preds = x => true;
+            else
+                preds = x => x.Author.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
+                || x.Quote.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
+
+            try
+            {
+                var total = await UoW.UserRepo.CountMOTDAsync(preds);
+                var result = await UoW.UserRepo.GetMOTDAsync(preds,
+                    null,
+                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    model.Skip,
+                    model.Take);
+
+                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<MotDType1Model>>(result) });
+            }
+            catch (ParseException ex)
+            {
+                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
+                return BadRequest(ModelState);
+            }
         }
 
         [Route("v1/{userValue}"), HttpGet]

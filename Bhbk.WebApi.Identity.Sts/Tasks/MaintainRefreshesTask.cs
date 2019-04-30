@@ -18,18 +18,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainRefreshesTask(IServiceCollection sc, IConfigurationRoot conf)
+        public MaintainRefreshesTask(IServiceCollection sc)
         {
             if (sc == null)
                 throw new ArgumentNullException();
 
             _sp = sc.BuildServiceProvider();
-            _delay = int.Parse(conf["Tasks:MaintainRefreshes:PollingDelay"]);
-
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
+
+            var conf = _sp.GetRequiredService<IConfiguration>();
+
+            _delay = int.Parse(conf["Tasks:MaintainRefreshes:PollingDelay"]);
 
             Status = JsonConvert.SerializeObject(
                 new

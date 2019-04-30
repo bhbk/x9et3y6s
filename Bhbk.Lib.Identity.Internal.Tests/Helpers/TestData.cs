@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
 using System.Threading.Tasks;
@@ -131,41 +132,62 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
             await _uow.CommitAsync();
 
             //create activity
-            await _uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    Immutable = false,
-                });
+            for (int i = 0; i < 3; i++)
+                await _uow.ActivityRepo.CreateAsync(
+                    new ActivityCreate()
+                    {
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                        Immutable = false,
+                    });
 
             //create refreshes
-            await _uow.RefreshRepo.CreateAsync(
-                new RefreshCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
-                    RefreshValue = RandomValues.CreateBase64String(8),
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
-                });
+            for (int i = 0; i < 3; i++)
+                await _uow.RefreshRepo.CreateAsync(
+                    new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = RandomValues.CreateBase64String(8),
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                    });
 
             //create states
-            await _uow.StateRepo.CreateAsync(
-                new StateCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
-                    StateType = StateType.Device.ToString(),
-                    StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
-                });
+            for (int i = 0; i < 3; i++)
+                await _uow.StateRepo.CreateAsync(
+                    new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
+                    });
+
+            await _uow.CommitAsync();
+
+            //create motds
+            for (int i = 0; i < 3; i++)
+                await _uow.UserRepo.CreateMOTDAsync(
+                    new tbl_MotD_Type1()
+                    {
+                        Id = RandomValues.CreateAlphaNumericString(8),
+                        Date = DateTime.Now,
+                        Author = "Test Author",
+                        Quote = "Test Quote",
+                        Length = 666,
+                        Category = "Test Category",
+                        Title = "Test Title",
+                        Background = "Test Background",
+                        Tags = "tag1,tag2,tag3",
+                    });
 
             await _uow.CommitAsync();
         }
@@ -285,41 +307,62 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 await _uow.CommitAsync();
 
                 //create activity
-                await _uow.ActivityRepo.CreateAsync(
-                    new ActivityCreate()
-                    {
-                        ClientId = client.Id,
-                        UserId = user.Id,
-                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
-                    });
+                for (int j = 0; j < 3; j++)
+                    await _uow.ActivityRepo.CreateAsync(
+                        new ActivityCreate()
+                        {
+                            ClientId = client.Id,
+                            UserId = user.Id,
+                            ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                            Immutable = false,
+                        });
 
                 //create refreshes
-                await _uow.RefreshRepo.CreateAsync(
-                    new RefreshCreate()
-                    {
-                        IssuerId = issuer.Id,
-                        ClientId = client.Id,
-                        UserId = user.Id,
-                        RefreshType = RefreshType.User.ToString(),
-                        RefreshValue = RandomValues.CreateBase64String(8),
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
-                    });
+                for (int j = 0; j < 3; j++)
+                    await _uow.RefreshRepo.CreateAsync(
+                        new RefreshCreate()
+                        {
+                            IssuerId = issuer.Id,
+                            ClientId = client.Id,
+                            UserId = user.Id,
+                            RefreshType = RefreshType.User.ToString(),
+                            RefreshValue = RandomValues.CreateBase64String(8),
+                            ValidFromUtc = DateTime.UtcNow,
+                            ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                        });
 
                 //create states
-                await _uow.StateRepo.CreateAsync(
-                    new StateCreate()
-                    {
-                        IssuerId = issuer.Id,
-                        ClientId = client.Id,
-                        UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
-                    });
+                for (int j = 0; j < 3; j++)
+                    await _uow.StateRepo.CreateAsync(
+                        new StateCreate()
+                        {
+                            IssuerId = issuer.Id,
+                            ClientId = client.Id,
+                            UserId = user.Id,
+                            StateValue = RandomValues.CreateBase64String(32),
+                            StateType = StateType.Device.ToString(),
+                            StateConsume = false,
+                            ValidFromUtc = DateTime.UtcNow,
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
+                        });
+
+                await _uow.CommitAsync();
+
+                //create motds
+                for (int j = 0; j < 3; j++)
+                    await _uow.UserRepo.CreateMOTDAsync(
+                        new tbl_MotD_Type1()
+                        {
+                            Id = RandomValues.CreateAlphaNumericString(8),
+                            Date = DateTime.Now,
+                            Author = "Test Author",
+                            Quote = "Test Quote",
+                            Length = 666,
+                            Category = "Test Category",
+                            Title = "Test Title",
+                            Background = "Test Background",
+                            Tags = "tag1,tag2,tag3",
+                        });
 
                 await _uow.CommitAsync();
             }

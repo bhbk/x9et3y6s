@@ -35,13 +35,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var lib = SearchRoots.ByAssemblyContext("config-lib.json");
-            var api = SearchRoots.ByAssemblyContext("config-sts.json");
+            var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = new ConfigurationBuilder()
-                .SetBasePath(lib.DirectoryName)
-                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
-                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
+            var conf = (IConfiguration)new ConfigurationBuilder()
+                .SetBasePath(file.DirectoryName)
+                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -53,6 +51,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
                 sc.AddSingleton(conf);
+                sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
 
                 /*
                  * keep use singleton below instead of scoped for tests that require uow/ef context persist
@@ -60,11 +61,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                  */
 
                 sc.AddSingleton<IIdentityUnitOfWork>(new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf));
-                sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc, conf));
-                sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc, conf));
-                sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
-                sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
-                sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
+                sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc));
+                sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc));
 
                 var sp = sc.BuildServiceProvider();
                 var uow = sp.GetRequiredService<IIdentityUnitOfWork>();

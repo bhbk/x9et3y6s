@@ -23,7 +23,6 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 
 namespace Bhbk.WebApi.Identity.Admin
@@ -32,13 +31,11 @@ namespace Bhbk.WebApi.Identity.Admin
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var lib = SearchRoots.ByAssemblyContext("config-lib.json");
-            var api = SearchRoots.ByAssemblyContext("config-admin.json");
+            var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = new ConfigurationBuilder()
-                .SetBasePath(lib.DirectoryName)
-                .AddJsonFile(lib.Name, optional: false, reloadOnChange: true)
-                .AddJsonFile(api.Name, optional: false, reloadOnChange: true)
+            var conf = (IConfiguration)new ConfigurationBuilder()
+                .SetBasePath(file.DirectoryName)
+                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -46,16 +43,16 @@ namespace Bhbk.WebApi.Identity.Admin
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             sc.AddSingleton(conf);
-            sc.AddScoped<IIdentityUnitOfWork>(x =>
-            {
-                return new IdentityUnitOfWork(options, InstanceContext.DeployedOrLocal, conf);
-            });
-            sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc, conf));
-            sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc, conf));
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddSingleton<IAlertService>(new AlertService(conf, InstanceContext.DeployedOrLocal, new HttpClient()));
+            sc.AddScoped<IIdentityUnitOfWork>(x =>
+            {
+                return new IdentityUnitOfWork(options, conf);
+            });
+            sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc));
+            sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc));
+            sc.AddSingleton<IAlertService>(new AlertService());
 
             var sp = sc.BuildServiceProvider();
             var uow = sp.GetRequiredService<IIdentityUnitOfWork>();

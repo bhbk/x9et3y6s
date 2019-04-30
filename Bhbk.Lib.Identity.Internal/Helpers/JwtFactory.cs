@@ -265,7 +265,6 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
-
             if (uow.InstanceType == InstanceContext.UnitTest
                 && uow.ConfigRepo.ResourceOwnerTokenFake)
             {
@@ -273,7 +272,10 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(86400);
             }
 
-            //do not use issuer salt for compatibility here...
+            /*
+             * do not salt issuer for backward compatibility here...
+             */
+
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
                     issuer: issuer.Name.ToString(),
