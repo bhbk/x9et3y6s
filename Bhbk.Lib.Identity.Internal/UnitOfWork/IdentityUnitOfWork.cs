@@ -27,18 +27,18 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
         public UserRepository UserRepo { get; private set; }
 
         public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, IConfiguration conf)
-            : this(new IdentityDbContext(optionsBuilder.Options), InstanceContext.DeployedOrLocal, conf)
+            : this(new IdentityDbContext(optionsBuilder.Options), conf, InstanceContext.DeployedOrLocal)
         {
 
         }
 
-        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, InstanceContext instance, IConfiguration conf)
-            : this(new IdentityDbContext(optionsBuilder.Options), instance, conf)
+        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, IConfiguration conf, InstanceContext instance)
+            : this(new IdentityDbContext(optionsBuilder.Options), conf, instance)
         {
 
         }
 
-        private IdentityUnitOfWork(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
+        private IdentityUnitOfWork(IdentityDbContext context, IConfiguration conf, InstanceContext instance)
         {
             Context = context ?? throw new ArgumentNullException();
             InstanceType = instance;

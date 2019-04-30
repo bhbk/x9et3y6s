@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
             {
                 try
                 {
-                    var uow = (IIdentityUnitOfWork)_sp.GetRequiredService<IIdentityUnitOfWork>();
+                    var uow = _sp.GetRequiredService<IIdentityUnitOfWork>();
 
                     await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 

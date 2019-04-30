@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public MotDType1Model Info_GetMOTDV1()
         {
-            var response = Http.Info_GetQOTDV1().Result;
+            var response = Http.Info_GetMOTDV1().Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<MotDType1Model>().Result;

@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            UoW = new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf);
+            UoW = new IdentityUnitOfWork(options, conf, InstanceContext.UnitTest);
             DefaultData = new DefaultData(UoW);
             TestData = new TestData(UoW);
 

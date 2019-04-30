@@ -7,11 +7,13 @@ using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -126,8 +128,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), result));
 
                 var url = UrlHelper.GenerateConfirmEmail(Conf, result, code);
+                var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-                Alerts.Email_EnqueueV1(new EmailCreate()
+                alert.Email_EnqueueV1(new EmailCreate()
                 {
                     FromId = result.Id,
                     FromEmail = result.Email,

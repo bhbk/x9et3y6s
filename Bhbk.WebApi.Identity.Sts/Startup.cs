@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Options;
+﻿using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Models;
@@ -22,6 +21,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -38,11 +38,9 @@ namespace Bhbk.WebApi.Identity.Sts
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var file = SearchRoots.ByAssemblyContext("appsettings.json");
-
             var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(file.DirectoryName)
-                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 

@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -13,8 +12,7 @@ namespace Bhbk.WebApi.Alert.Controllers
     [Authorize(Policy = "UsersPolicy")]
     public class BaseController : Controller
     {
-        protected IConfiguration Conf { get => (IConfiguration)ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
-        protected IIdentityUnitOfWork UoW { get => (IIdentityUnitOfWork)ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork>(); }
+        protected IIdentityUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IIdentityUnitOfWork>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
 
         public BaseController() { }

@@ -1,10 +1,10 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Models;
+﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -23,11 +23,9 @@ namespace Bhbk.Lib.Identity.Repositories
 
         public AdminRepository(InstanceContext instance, HttpClient http)
         {
-            var file = SearchRoots.ByAssemblyContext("appsettings.json");
-
             _conf = new ConfigurationBuilder()
-                .SetBasePath(file.DirectoryName)
-                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 

@@ -40,10 +40,11 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetMOTDV1()
         {
-            var blah = await UoW.UserRepo.CountMOTDAsync();
-
             var random = new Random();
             var skip = random.Next(1, await UoW.UserRepo.CountMOTDAsync());
+
+            if (skip == 1)
+                skip = 0;
 
             var quote = (await UoW.UserRepo.GetMOTDAsync(null, null, x => x.OrderBy(y => y.Id), skip, 1)).SingleOrDefault();
 

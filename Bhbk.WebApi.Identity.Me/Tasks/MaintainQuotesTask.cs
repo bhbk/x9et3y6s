@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                 try
                 {
-                    var uow = (IIdentityUnitOfWork)_sp.GetRequiredService<IIdentityUnitOfWork>();
+                    var uow = _sp.GetRequiredService<IIdentityUnitOfWork>();
 
                     if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                     {
@@ -65,10 +65,10 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                         if (motdtype1_response.IsSuccessStatusCode)
                         {
                             var model = uow.Mapper.Map<tbl_MotD_Type1>(motdtype1.contents.quotes[0]);
-                            var result = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author 
+                            var motd = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author 
                                 && x.Quote == model.Quote).Result.SingleOrDefault();
 
-                            if(result == null)
+                            if(motd == null)
                             {
                                 /*
                                  * parts of model are broken and need be fixed...
@@ -77,6 +77,13 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     model.Id = Guid.NewGuid().ToString();
 
                                 uow.UserRepo.CreateMOTDAsync(model).Wait();
+                                uow.CommitAsync().Wait();
+                            }
+                            else if (motd.Id != model.Id)
+                            {
+                                motd.Id = model.Id;
+
+                                uow.UserRepo.CreateMOTDAsync(motd).Wait();
                                 uow.CommitAsync().Wait();
                             }
 

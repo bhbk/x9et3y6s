@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
+﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -22,11 +22,9 @@ namespace Bhbk.Lib.Identity.Repositories
 
         public StsRepository(InstanceContext instance, HttpClient http)
         {
-            var file = SearchRoots.ByAssemblyContext("appsettings.json");
-
             _conf = new ConfigurationBuilder()
-                .SetBasePath(file.DirectoryName)
-                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 

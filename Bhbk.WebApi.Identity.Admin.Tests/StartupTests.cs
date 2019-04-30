@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                  * across multiple requests. need adjustment to tests to rememdy long term. 
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork>(new IdentityUnitOfWork(options, InstanceContext.UnitTest, conf));
+                sc.AddSingleton<IIdentityUnitOfWork>(new IdentityUnitOfWork(options, conf, InstanceContext.UnitTest));
                 sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc));
                 sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc));
 

@@ -4,8 +4,10 @@ using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
+using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -47,8 +49,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return Ok(token);
 
             var url = UrlHelper.GenerateConfirmEmail(Conf, user, token);
+            var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            Alerts.Email_EnqueueV1(new EmailCreate()
+            alert.Email_EnqueueV1(new EmailCreate()
             {
                 FromId = user.Id,
                 FromEmail = user.Email,
@@ -96,8 +99,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return Ok(token);
 
             var url = UrlHelper.GenerateConfirmPassword(Conf, user, token);
+            var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            Alerts.Email_EnqueueV1(new EmailCreate()
+            alert.Email_EnqueueV1(new EmailCreate()
             {
                 FromId = user.Id,
                 FromEmail = user.Email,
@@ -144,8 +148,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return Ok(token);
 
             var url = UrlHelper.GenerateConfirmPassword(Conf, user, token);
+            var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            Alerts.Text_EnqueueV1(new TextCreate()
+            alert.Text_EnqueueV1(new TextCreate()
             {
                 FromId = user.Id,
                 FromPhoneNumber = model.NewPhoneNumber,
