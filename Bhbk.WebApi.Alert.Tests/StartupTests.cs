@@ -3,8 +3,8 @@ using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +22,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Alert.Tests
 {
-    [CollectionDefinition("AlertTests")]
+    [CollectionDefinition("AlertTestsCollection")]
     public class StartupTestCollection : ICollectionFixture<StartupTests> { }
 
     public class StartupTests : WebApplicationFactory<Startup>
@@ -43,7 +44,7 @@ namespace Bhbk.WebApi.Alert.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
-            builder.ConfigureServices((sc) =>
+            builder.ConfigureServices(sc =>
             {
                 var options = new DbContextOptionsBuilder<IdentityDbContext>()
                     .EnableSensitiveDataLogging();
@@ -54,47 +55,46 @@ namespace Bhbk.WebApi.Alert.Tests
                 sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
+                {
+                    var sandbox = new UnitOfWork(options, conf, InstanceContext.UnitTest);
+                    new DefaultData(sandbox).CreateAsync().Wait();
+
+                    return sandbox;
+                });
+                sc.AddSingleton<IHostedService, QueueEmailTask>();
+                sc.AddSingleton<IHostedService, QueueTextTask>();
 
                 /*
-                 * keep use singleton below instead of scoped for tests that require uow/ef context persist
-                 * across multiple requests. need adjustment to tests to rememdy long term. 
+                 * do not use dependency inject for unit of work below. is used 
+                 * only for owin authentication configuration.
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork>(new IdentityUnitOfWork(options, conf, InstanceContext.UnitTest));
-                sc.AddSingleton<IHostedService>(new QueueEmailTask(sc));
-                sc.AddSingleton<IHostedService>(new QueueTextTask(sc));
-
-                var sp = sc.BuildServiceProvider();
-                var uow = sp.GetRequiredService<IIdentityUnitOfWork>();
-
-                /*
-                 * must add seed data for good bearer setup...
-                 */
-
-                new DefaultData(uow).CreateAsync().Wait();
+                var owin = new UnitOfWork(options, conf, InstanceContext.UnitTest);
+                new DefaultData(owin).CreateAsync().Wait();
 
                 /*
                  * only test context allowed to run...
                  */
 
-                if (uow.InstanceType != InstanceContext.UnitTest)
+                if (owin.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
 
-                var issuers = (uow.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
+                var issuers = (owin.IssuerRepo.GetAsync().Result)
+                    .Select(x => x.Name + ":" + owin.IssuerRepo.Salt);
 
-                var issuerKeys = (uow.IssuerRepo.GetAsync().Result)
+                var issuerKeys = (owin.IssuerRepo.GetAsync().Result)
                     .Select(x => x.IssuerKey);
 
-                var clients = (uow.ClientRepo.GetAsync().Result)
+                var clients = (owin.ClientRepo.GetAsync().Result)
                     .Select(x => x.Name);
 
                 /*
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (uow.ConfigRepo.LegacyModeIssuer)
-                    issuers = (uow.IssuerRepo.GetAsync().Result)
+                if (owin.ConfigRepo.LegacyModeIssuer)
+                    issuers = (owin.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 
                 sc.AddCors();

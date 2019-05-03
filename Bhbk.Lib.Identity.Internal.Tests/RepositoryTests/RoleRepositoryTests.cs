@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class RoleRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -20,19 +20,20 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.RoleRepo.CreateAsync(new RoleCreate());
+                await UoW.RoleRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Roles>(new RoleCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.RoleRepo.CreateAsync(
-                    new RoleCreate()
-                    {
-                        ClientId = Guid.NewGuid(),
-                        Name = Constants.ApiUnitTestRole,
-                        Enabled = true,
-                        Immutable = false,
-                    });
+                    UoW.Mapper.Map<tbl_Roles>(new RoleCreate()
+                        {
+                            ClientId = Guid.NewGuid(),
+                            Name = Constants.ApiUnitTestRole,
+                            Enabled = true,
+                            Immutable = false,
+                        }));
             });
         }
 
@@ -44,13 +45,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
             var result = await UoW.RoleRepo.CreateAsync(
-                new RoleCreate()
-                {
-                    ClientId = client.Id,
-                    Name = Constants.ApiUnitTestRole,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                UoW.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    {
+                        ClientId = client.Id,
+                        Name = Constants.ApiUnitTestRole,
+                        Enabled = true,
+                        Immutable = false,
+                    }));
             result.Should().BeAssignableTo<tbl_Roles>();
 
             await TestData.DestroyAsync();

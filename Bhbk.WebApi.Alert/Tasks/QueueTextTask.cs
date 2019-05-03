@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Providers;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +17,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 {
     public class QueueTextTask : BackgroundService
     {
-        private readonly IServiceProvider _sp;
+        private readonly IServiceScopeFactory _factory;
         private readonly JsonSerializerSettings _serializer;
         private readonly ConcurrentQueue<TextCreate> _queue;
         private readonly TwilioProvider _provider;
@@ -27,18 +27,16 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         public string Status { get; private set; }
 
-        public QueueTextTask(IServiceCollection sc)
+        public QueueTextTask(IServiceScopeFactory factory)
         {
-            if (sc == null)
-                throw new ArgumentNullException();
-
-            _sp = sc.BuildServiceProvider();
+            _factory = factory;
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
 
-            var conf = _sp.GetRequiredService<IConfiguration>();
+            var scope = _factory.CreateScope();
+            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
             _delay = int.Parse(conf["Tasks:QueueText:PollingDelay"]);
             _expire = int.Parse(conf["Tasks:QueueText:ExpireDelay"]);
@@ -64,7 +62,8 @@ namespace Bhbk.WebApi.Alert.Tasks
                 if (!_enabled || _queue.IsEmpty)
                     continue;
 
-                var uow = _sp.GetRequiredService<IIdentityUnitOfWork>();
+                var scope = _factory.CreateScope();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 foreach (var entry in _queue)
                 {

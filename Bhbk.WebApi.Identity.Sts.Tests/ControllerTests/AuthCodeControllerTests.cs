@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
@@ -24,25 +24,29 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
-    [Collection("StsTests")]
-    public class AuthCodeControllerTests
+    public class AuthCodeControllerTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
+        private readonly HttpClient _owin;
 
-        public AuthCodeControllerTests(StartupTests factory) => _factory = factory;
+        public AuthCodeControllerTests(StartupTests factory)
+        {
+            _factory = factory;
+            _owin = _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -76,15 +80,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_Client()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsRepository(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -166,15 +170,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_Issuer()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsRepository(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -226,15 +230,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_User()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsRepository(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -302,15 +306,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Use_Fail_Validate()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsRepository(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -389,16 +393,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Use_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new AuthCodeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsRepository(uow.InstanceType, owin);
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsRepository(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

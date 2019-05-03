@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class LoginRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -20,17 +20,18 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.LoginRepo.CreateAsync(new LoginCreate());
+                await UoW.LoginRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Logins>(new LoginCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.LoginRepo.CreateAsync(
-                    new LoginCreate()
+                    UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = Constants.ApiUnitTestLogin,
                         Immutable = false,
-                    });
+                    }));
             });
         }
 
@@ -40,11 +41,11 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             await TestData.CreateAsync();
 
             var result = await UoW.LoginRepo.CreateAsync(
-                new LoginCreate()
+                UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
                 {
                     Name = Constants.ApiUnitTestLogin,
                     Immutable = false,
-                });
+                }));
             result.Should().BeAssignableTo<tbl_Logins>();
 
             await TestData.DestroyAsync();

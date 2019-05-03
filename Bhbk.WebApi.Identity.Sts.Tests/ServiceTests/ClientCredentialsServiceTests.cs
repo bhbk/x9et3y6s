@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
@@ -20,20 +20,24 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    [Collection("StsTests")]
-    public class ClientCredentialsServiceTests
+    public class ClientCredentialsServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
+        private readonly HttpClient _owin;
 
-        public ClientCredentialsServiceTests(StartupTests factory) => _factory = factory;
+        public ClientCredentialsServiceTests(StartupTests factory)
+        {
+            _factory = factory;
+            _owin = _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV1_Refresh_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 var rt = await service.Http.ClientCredentialRefresh_UseV1(
                     new RefreshTokenV1()
@@ -51,10 +55,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV1_Use_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 var cc = await service.Http.ClientCredential_UseV1(
                     new ClientCredentialV1()
@@ -72,10 +76,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV2_Refresh_FailClient()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -91,6 +95,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
+                cc.Should().BeAssignableTo<ClientJwtV2>();
 
                 var rt = await service.Http.ClientCredentialRefresh_UseV2(
                     new RefreshTokenV2()
@@ -124,10 +129,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV2_Refresh_FailIssuer()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -143,6 +148,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
+                cc.Should().BeAssignableTo<ClientJwtV2>();
 
                 var rt = await service.Http.ClientCredentialRefresh_UseV2(
                     new RefreshTokenV2()
@@ -187,10 +193,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV2_Refresh_FailToken()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -213,6 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
+                cc.Should().BeAssignableTo<ClientJwtV2>();
 
                 uow.ConfigRepo.ResourceOwnerRefreshFake = false;
                 uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
@@ -241,6 +248,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
+                cc.Should().BeAssignableTo<ClientJwtV2>();
 
                 uow.ConfigRepo.ResourceOwnerRefreshFake = false;
                 uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
@@ -266,6 +274,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
+                cc.Should().BeAssignableTo<ClientJwtV2>();
 
                 var cc_pos = random.Next((cc.refresh_token).Length - 8);
 
@@ -290,6 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
+                cc.Should().BeAssignableTo<ClientJwtV2>();
 
                 rt = await service.Http.ResourceOwnerRefresh_UseV2(
                     new RefreshTokenV2()
@@ -307,10 +317,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV2_Use_FailClient()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -361,10 +371,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV2_Use_FailIssuer()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -404,11 +414,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ClientCredentialV2_Use_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

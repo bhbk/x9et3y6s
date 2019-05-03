@@ -61,6 +61,34 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
+        [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
+
+            if (claim == null)
+            {
+                ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{claimID}");
+                return NotFound(ModelState);
+            }
+
+            if (!await UoW.UserRepo.AddToClaimAsync(user, claim))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
         [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
@@ -115,7 +143,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = true;
 
-            var result = await UoW.UserRepo.CreateAsync(model);
+            var result = await UoW.UserRepo.CreateAsync(UoW.Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -164,7 +192,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = false;
 
-            var result = await UoW.UserRepo.CreateAsync(model);
+            var result = await UoW.UserRepo.CreateAsync(UoW.Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

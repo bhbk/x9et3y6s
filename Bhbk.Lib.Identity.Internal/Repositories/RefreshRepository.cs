@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
+﻿using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -12,25 +10,20 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class RefreshRepository : IGenericRepositoryAsync<RefreshCreate, tbl_Refreshes, Guid>
+    public class RefreshRepository : IGenericRepositoryAsync<tbl_Refreshes, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public RefreshRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
+        public RefreshRepository(IdentityDbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _mapper = mapper;
         }
 
-        public async Task<tbl_Refreshes> CreateAsync(RefreshCreate model)
+        public async Task<tbl_Refreshes> CreateAsync(tbl_Refreshes entity)
         {
-            var entity = _mapper.Map<tbl_Refreshes>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
         public async Task<bool> DeleteAsync(Guid key)

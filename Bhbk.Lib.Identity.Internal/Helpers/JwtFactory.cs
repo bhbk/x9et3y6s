@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -16,32 +16,43 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
 {
     public class JwtFactory
     {
-        public static async Task<string>
-            ClientRefreshV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
+        public static async Task<JwtSecurityToken>
+            ClientRefreshV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateRefreshTokenAsync(client);
-
-            DateTime validFromUtc, validToUtc;
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            var validFromUtc = DateTime.UtcNow;
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ClientCredRefreshExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerRefreshFake)
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ClientCredRefreshExpire);
-            }
-            else
-            {
-                validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ClientCredRefreshExpire);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerRefreshFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ClientCredRefreshExpire);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -55,31 +66,29 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.RefreshRepo.CreateAsync(
-                new RefreshCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    RefreshType = RefreshType.Client.ToString(),
-                    RefreshValue = result,
-                    ValidFromUtc = validFromUtc,
-                    ValidToUtc = validToUtc
-                });
+                uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshValue = result,
+                        ValidFromUtc = validFromUtc,
+                        ValidToUtc = validToUtc
+                    }));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    ClientId = client.Id,
-                    ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        ClientId = client.Id,
+                        ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return result;
+            return new JwtSecurityToken(result);
         }
 
-        public static async Task<(string token, DateTime begin, DateTime end)>
-            ClientResourceOwnerV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
+        public static async Task<JwtSecurityToken>
+            ClientResourceOwnerV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateAccessTokenAsync(client);
 
@@ -95,11 +104,26 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerTokenFake)
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ClientCredTokenExpire);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerTokenFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ClientCredTokenExpire);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -113,44 +137,53 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    ClientId = client.Id,
-                    ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        ClientId = client.Id,
+                        ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return (result, validFromUtc, validToUtc);
+            return new JwtSecurityToken(result);
         }
 
-        public static async Task<string>
-            UserRefreshV1(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
+        public static async Task<JwtSecurityToken>
+            UserRefreshV1(IUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
-
-            DateTime validFromUtc, validToUtc;
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            var validFromUtc = DateTime.UtcNow;
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerRefreshFake)
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
-            }
-            else
-            {
-                validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerRefreshFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -164,55 +197,64 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.RefreshRepo.CreateAsync(
-                new RefreshCreate()
-                {
-                    IssuerId = issuer.Id,
-                    UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
-                    RefreshValue = result,
-                    ValidFromUtc = validFromUtc,
-                    ValidToUtc = validToUtc,
-                });
+                uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = result,
+                        ValidFromUtc = validFromUtc,
+                        ValidToUtc = validToUtc,
+                    }));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return result;
+            return new JwtSecurityToken(result);
         }
 
-        public static async Task<string>
-            UserRefreshV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
+        public static async Task<JwtSecurityToken>
+            UserRefreshV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshTokenAsync(user);
-
-            DateTime validFromUtc, validToUtc;
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
+
+            var validFromUtc = DateTime.UtcNow;
+            var validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
 
             /*
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerRefreshFake)
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
-            }
-            else
-            {
-                validFromUtc = DateTime.UtcNow;
-                validToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerRefreshFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerRefreshExpire);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -226,31 +268,29 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.RefreshRepo.CreateAsync(
-                new RefreshCreate()
-                {
-                    IssuerId = issuer.Id,
-                    UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
-                    RefreshValue = result,
-                    ValidFromUtc = validFromUtc,
-                    ValidToUtc = validToUtc
-                });
+                uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = result,
+                        ValidFromUtc = validFromUtc,
+                        ValidToUtc = validToUtc
+                    }));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return result;
+            return new JwtSecurityToken(result);
         }
 
-        public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1_Legacy(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
+        public static async Task<JwtSecurityToken>
+            UserResourceOwnerV1_Legacy(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -265,11 +305,27 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * redo with https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.isystemclock
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerTokenFake)
+
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(86400);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerTokenFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(86400);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             /*
@@ -287,20 +343,18 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return (result, validFromUtc, validToUtc);
+            return new JwtSecurityToken(result);
         }
 
-        public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV1(IIdentityUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
+        public static async Task<JwtSecurityToken>
+            UserResourceOwnerV1(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -316,11 +370,26 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerTokenFake)
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerTokenFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             var result = new JwtSecurityTokenHandler().WriteToken(
@@ -334,20 +403,18 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return (result, validFromUtc, validToUtc);
+            return new JwtSecurityToken(result);
         }
 
-        public static async Task<(string token, DateTime begin, DateTime end)>
-            UserResourceOwnerV2(IIdentityUnitOfWork uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
+        public static async Task<JwtSecurityToken>
+            UserResourceOwnerV2(IUnitOfWork uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessTokenAsync(user);
 
@@ -363,11 +430,26 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * because this is gross. prefer removal of test check below and muck with clock in test context. 
              */
 
-            if (uow.InstanceType == InstanceContext.UnitTest
-                && uow.ConfigRepo.ResourceOwnerTokenFake)
+            switch (uow.InstanceType)
             {
-                validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
-                validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
+                case InstanceContext.DeployedOrLocal:
+                    {
+
+                    }
+                    break;
+
+                case InstanceContext.UnitTest:
+                    {
+                        if (uow.ConfigRepo.ResourceOwnerTokenFake)
+                        {
+                            validFromUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow;
+                            validToUtc = uow.ConfigRepo.ResourceOwnerTokenFakeUtcNow.AddSeconds(uow.ConfigRepo.ResourceOwnerTokenExpire);
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             string clientList = string.Empty;
@@ -389,16 +471,14 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    Immutable = false
-                });
+                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                        Immutable = false
+                    }));
 
-            await uow.CommitAsync();
-
-            return (result, validFromUtc, validToUtc);
+            return new JwtSecurityToken(result);
         }
 
         public static bool CanReadToken(string jwt)

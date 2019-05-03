@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,13 +25,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-/*
- * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
- * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
- * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
- */
-
 namespace Bhbk.WebApi.Identity.Sts
 {
     public class Startup
@@ -51,16 +44,20 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddScoped<IIdentityUnitOfWork>(x =>
+            sc.AddSingleton<IUnitOfWork, UnitOfWork>(x =>
             {
-                return new IdentityUnitOfWork(options, conf);
+                return new UnitOfWork(options, conf);
             });
-            sc.AddSingleton<IHostedService>(new MaintainRefreshesTask(sc));
-            sc.AddSingleton<IHostedService>(new MaintainStatesTask(sc));
+            sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
+            sc.AddSingleton<IHostedService, MaintainStatesTask>();
             sc.AddSingleton<IAlertService>(new AlertService());
 
-            var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityUnitOfWork>();
+            /*
+             * do not use dependency inject for unit of work below. is used 
+             * only for owin authentication configuration.
+             */
+
+            var uow = new UnitOfWork(options, conf);
 
             /*
              * only live context allowed to run...

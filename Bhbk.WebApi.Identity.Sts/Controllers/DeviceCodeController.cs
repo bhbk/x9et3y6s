@@ -114,17 +114,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             };
 
             var state = await UoW.StateRepo.CreateAsync(
-                new StateCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    StateValue = nonce,
-                    StateType = StateType.Device.ToString(),
-                    StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DeviceCodeTokenExpire),
-                });
+                UoW.Mapper.Map<tbl_States>(new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = nonce,
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DeviceCodeTokenExpire),
+                    }));
 
             await UoW.CommitAsync();
 
@@ -251,9 +251,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = dc.token,
-                refresh_token = rt,
-                expires_in = (int)(new DateTimeOffset(dc.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                access_token = dc.RawData,
+                refresh_token = rt.RawData,
+                expires_in = (int)(new DateTimeOffset(dc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             //adjust state...

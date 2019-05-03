@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class ClaimRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -21,19 +21,20 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.ClaimRepo.CreateAsync(new ClaimCreate());
+                await UoW.ClaimRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.ClaimRepo.CreateAsync(
-                    new ClaimCreate()
+                    UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = Guid.NewGuid(),
                         Type = Constants.ApiUnitTestClaim,
                         Value = RandomValues.CreateBase64String(8),
                         Immutable = false,
-                    });
+                    }));
             });
         }
 
@@ -45,13 +46,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
 
             var result = await UoW.ClaimRepo.CreateAsync(
-                new ClaimCreate()
+                UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()
                 {
                     IssuerId = issuer.Id,
                     Type = Constants.ApiUnitTestClaim,
                     Value = RandomValues.CreateBase64String(8),
                     Immutable = false,
-                });
+                }));
             result.Should().BeAssignableTo<tbl_Claims>();
 
             await TestData.DestroyAsync();

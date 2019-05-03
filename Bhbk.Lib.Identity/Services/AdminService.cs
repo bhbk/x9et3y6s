@@ -422,6 +422,17 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
+        public bool User_AddClaimV1(Guid userID, Guid claimID)
+        {
+            var response = Http.User_AddClaimV1(_jwt.JwtV2.RawData, userID, claimID).Result;
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
         public bool User_AddLoginV1(Guid userID, Guid loginID)
         {
             var response = Http.User_AddLoginV1(_jwt.JwtV2.RawData, userID, loginID).Result;

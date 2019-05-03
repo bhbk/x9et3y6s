@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
@@ -16,19 +16,23 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    [Collection("StsTests")]
-    public class AuthCodeServiceTests
+    public class AuthCodeServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
+        private readonly HttpClient owin;
 
-        public AuthCodeServiceTests(StartupTests factory) => _factory = factory;
+        public AuthCodeServiceTests(StartupTests factory)
+        {
+            _factory = factory;
+            owin = _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, owin);
 
                 var ask = await service.Http.AuthCode_AskV1(
@@ -49,9 +53,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Use_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, owin);
 
                 var ac = await service.Http.AuthCode_UseV1(
@@ -73,9 +77,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_Client()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
@@ -117,9 +121,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_Issuer()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();
@@ -148,9 +152,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_User()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, owin);
 
                 await new TestData(uow).DestroyAsync();

@@ -8,11 +8,11 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Internal.UnitOfWork
+namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
-    public class IdentityUnitOfWork : IIdentityUnitOfWork, IDisposable
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        private readonly IdentityDbContext Context;
+        private readonly IdentityDbContext _context;
         public InstanceContext InstanceType { get; private set; }
         public IMapper Mapper { get; private set; }
         public ActivityRepository ActivityRepo { get; private set; }
@@ -26,47 +26,48 @@ namespace Bhbk.Lib.Identity.Internal.UnitOfWork
         public StateRepository StateRepo { get; private set; }
         public UserRepository UserRepo { get; private set; }
 
-        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, IConfiguration conf)
+        public UnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, IConfiguration conf)
             : this(new IdentityDbContext(optionsBuilder.Options), conf, InstanceContext.DeployedOrLocal)
         {
 
         }
 
-        public IdentityUnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, IConfiguration conf, InstanceContext instance)
+        public UnitOfWork(DbContextOptionsBuilder<IdentityDbContext> optionsBuilder, IConfiguration conf, InstanceContext instance)
             : this(new IdentityDbContext(optionsBuilder.Options), conf, instance)
         {
 
         }
 
-        private IdentityUnitOfWork(IdentityDbContext context, IConfiguration conf, InstanceContext instance)
+        private UnitOfWork(IdentityDbContext context, IConfiguration conf, InstanceContext instance)
         {
-            Context = context ?? throw new ArgumentNullException();
+            _context = context ?? throw new ArgumentNullException();
+
             InstanceType = instance;
             Mapper = new MapperConfiguration(x =>
             {
                 x.AddProfile<MapperProfile>();
             }).CreateMapper();
-
-            ActivityRepo = new ActivityRepository(Context, InstanceType, Mapper);
-            ClaimRepo = new ClaimRepository(Context, InstanceType, Mapper);
-            ClientRepo = new ClientRepository(Context, InstanceType, Mapper, conf);
-            ConfigRepo = new ConfigRepository(InstanceType, conf);
-            IssuerRepo = new IssuerRepository(Context, InstanceType, Mapper, conf["IdentityTenants:Salt"]);
-            LoginRepo = new LoginRepository(Context, InstanceType, Mapper);
-            RoleRepo = new RoleRepository(Context, InstanceType, Mapper);
-            RefreshRepo = new RefreshRepository(Context, InstanceType, Mapper);
-            StateRepo = new StateRepository(Context, InstanceType, Mapper);
-            UserRepo = new UserRepository(Context, InstanceType, Mapper, conf);
+            
+            ActivityRepo = new ActivityRepository(context, instance);
+            ClaimRepo = new ClaimRepository(context, instance);
+            ClientRepo = new ClientRepository(context, instance, conf);
+            ConfigRepo = new ConfigRepository(instance, conf);
+            IssuerRepo = new IssuerRepository(context, instance, conf["IdentityTenants:Salt"]);
+            LoginRepo = new LoginRepository(context, instance);
+            RoleRepo = new RoleRepository(context, instance);
+            RefreshRepo = new RefreshRepository(context, instance);
+            StateRepo = new StateRepository(context, instance);
+            UserRepo = new UserRepository(context, instance, conf);
         }
 
         public async Task CommitAsync()
         {
-            await Context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public void Dispose()
         {
-            Context.Dispose();
+            _context.Dispose();
         }
     }
 }

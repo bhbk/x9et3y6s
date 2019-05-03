@@ -3,7 +3,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,13 +12,13 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [CollectionDefinition("LibraryTests")]
+    [CollectionDefinition("LibraryTestsCollection")]
     public class StartupTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
 
     public class BaseRepositoryTests
     {
         protected IConfiguration Conf;
-        protected IIdentityUnitOfWork UoW;
+        protected IUnitOfWork UoW;
         protected DefaultData DefaultData;
         protected TestData TestData;
 
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 
             InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
 
-            UoW = new IdentityUnitOfWork(options, conf, InstanceContext.UnitTest);
+            UoW = new UnitOfWork(options, conf, InstanceContext.UnitTest);
             DefaultData = new DefaultData(UoW);
             TestData = new TestData(UoW);
 

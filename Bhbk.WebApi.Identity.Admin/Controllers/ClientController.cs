@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClientRepo.CreateAsync(model);
+            var result = await UoW.ClientRepo.CreateAsync(UoW.Mapper.Map<tbl_Clients>(model));
 
             await UoW.CommitAsync();
 

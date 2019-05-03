@@ -1,9 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
@@ -21,20 +22,24 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    [Collection("StsTests")]
-    public class DeviceCodeServiceTests
+    public class DeviceCodeServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
+        private readonly HttpClient _owin;
 
-        public DeviceCodeServiceTests(StartupTests factory) => _factory = factory;
+        public DeviceCodeServiceTests(StartupTests factory)
+        {
+            _factory = factory;
+            _owin = _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV1_Ask_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 var ask = await service.Http.DeviceCode_AskV1(
                     new DeviceCodeAskV1()
@@ -52,10 +57,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV1_Use_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 var dc = await service.Http.DeviceCode_UseV1(
                     new DeviceCodeV1()
@@ -74,10 +79,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -157,11 +162,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV2_Ask_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -181,7 +186,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "device_code",
                         user = user.Id.ToString(),
                     });
-
                 ask.Should().BeAssignableTo<DeviceCodeV2>();
             }
         }
@@ -189,10 +193,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV2_Use_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -204,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
 
                 var state = await uow.StateRepo.CreateAsync(
-                    new StateCreate()
+                    uow.Mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -214,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
-                    });
+                    }));
 
                 await uow.CommitAsync();
 
@@ -295,11 +299,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_DeviceCodeV2_Use_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -314,7 +318,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
 
                 var state = await uow.StateRepo.CreateAsync(
-                    new StateCreate()
+                    uow.Mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -324,11 +328,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
-                    });
+                    }));
 
                 await uow.CommitAsync();
 
-                //the state needs to be approved... would be done by user...
+                /*
+                 * the state needs to be approved... would be done by user...
+                 */
                 state.StateDecision = true;
 
                 await uow.StateRepo.UpdateAsync(state);

@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class IssuerRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -20,19 +20,20 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.IssuerRepo.CreateAsync(new IssuerCreate());
+                await UoW.IssuerRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Issuers>(new IssuerCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.IssuerRepo.CreateAsync(
-                    new IssuerCreate()
-                    {
-                        Name = Constants.ApiUnitTestIssuer,
-                        IssuerKey = Constants.ApiUnitTestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
-                    });
+                    UoW.Mapper.Map<tbl_Issuers>(new IssuerCreate()
+                        {
+                            Name = Constants.ApiUnitTestIssuer,
+                            IssuerKey = Constants.ApiUnitTestIssuerKey,
+                            Enabled = true,
+                            Immutable = false,
+                        }));
             });
         }
 
@@ -42,13 +43,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             await TestData.CreateAsync();
 
             var result = await UoW.IssuerRepo.CreateAsync(
-                new IssuerCreate()
-                {
-                    Name = Constants.ApiUnitTestIssuer,
-                    IssuerKey = Constants.ApiUnitTestIssuerKey,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                UoW.Mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    {
+                        Name = Constants.ApiUnitTestIssuer,
+                        IssuerKey = Constants.ApiUnitTestIssuerKey,
+                        Enabled = true,
+                        Immutable = false,
+                    }));
             result.Should().BeAssignableTo<tbl_Issuers>();
 
             await TestData.DestroyAsync();

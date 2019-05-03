@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
@@ -16,26 +16,30 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
 
+
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
-    [Collection("MeTests")]
-    public class InfoControllerTests
+    public class InfoControllerTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
 
-        public InfoControllerTests(StartupTests factory) => _factory = factory;
+        public InfoControllerTests(StartupTests factory)
+        {
+            _factory = factory;
+            _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Me_InfoV1_DeleteRefreshes_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -52,14 +56,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_DeleteRefreshes_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -82,14 +86,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_Get_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -109,14 +113,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_GetRefreshes_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -134,14 +138,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_SetPassword_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -167,14 +171,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_SetPassword_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -200,14 +204,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_SetTwoFactor_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -227,14 +231,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_Update_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new InfoController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

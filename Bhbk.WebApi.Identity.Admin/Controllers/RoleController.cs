@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var create = await UoW.RoleRepo.CreateAsync(model);
+            var create = await UoW.RoleRepo.CreateAsync(UoW.Mapper.Map<tbl_Roles>(model));
 
             await UoW.CommitAsync();
 

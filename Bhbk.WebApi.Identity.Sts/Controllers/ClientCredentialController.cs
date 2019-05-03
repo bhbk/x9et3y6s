@@ -107,11 +107,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new ClientJwtV2()
             {
                 token_type = "bearer",
-                access_token = cc.token,
-                refresh_token = rt,
+                access_token = cc.RawData,
+                refresh_token = rt.RawData,
                 client = client.Id.ToString(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(cc.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             //adjust counter(s) for login success...
@@ -190,12 +190,16 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new ClientJwtV2()
             {
                 token_type = "bearer",
-                access_token = cc.token,
-                refresh_token = rt,
+                access_token = cc.RawData,
+                refresh_token = rt.RawData,
                 client = client.Id.ToString(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(cc.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
+
+            //adjust counter(s) for login success...
+            await UoW.ClientRepo.AccessSuccessAsync(client.Id);
+            await UoW.CommitAsync();
 
             return Ok(result);
         }

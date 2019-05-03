@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -44,16 +44,20 @@ namespace Bhbk.WebApi.Identity.Admin
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddScoped<IIdentityUnitOfWork>(x =>
+            sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
             {
-                return new IdentityUnitOfWork(options, conf);
+                return new UnitOfWork(options, conf);
             });
-            sc.AddSingleton<IHostedService>(new MaintainActivityTask(sc));
-            sc.AddSingleton<IHostedService>(new MaintainUsersTask(sc));
+            sc.AddSingleton<IHostedService, MaintainActivityTask>();
+            sc.AddSingleton<IHostedService, MaintainUsersTask>();
             sc.AddSingleton<IAlertService>(new AlertService());
 
-            var sp = sc.BuildServiceProvider();
-            var uow = sp.GetRequiredService<IIdentityUnitOfWork>();
+            /*
+             * do not use dependency inject for unit of work below. is used 
+             * only for owin authentication configuration.
+             */
+
+            var uow = new UnitOfWork(options, conf);
 
             /*
              * only live context allowed to run...

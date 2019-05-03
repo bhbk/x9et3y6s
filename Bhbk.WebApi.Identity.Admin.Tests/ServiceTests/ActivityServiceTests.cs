@@ -1,17 +1,16 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -21,20 +20,24 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
-    [Collection("AdminTests")]
-    public class ActivityServiceTests
+    public class ActivityServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
+        private readonly HttpClient _owin;
 
-        public ActivityServiceTests(StartupTests factory) => _factory = factory;
+        public ActivityServiceTests(StartupTests factory)
+        {
+            _factory = factory;
+            _owin = _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Admin_ActivityV1_Get_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new AdminService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -43,22 +46,39 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                  * check model and/or action...
                  */
 
+                var result = await service.Http.Activity_GetV1(RandomValues.CreateBase64String(8), new CascadePager());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+
+                result = await service.Http.Activity_GetV1(rop.RawData, new CascadePager());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+                /*
+                 * check model and/or action...
+                 */
+
+                issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+
+                rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("created", "desc"));
 
-                var result = await service.Http.Activity_GetV1(rop.token,
+                result = await service.Http.Activity_GetV1(rop.RawData,
                     new CascadePager()
                     {
                         Filter = string.Empty,
                         Orders = orders,
                     });
-
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -67,10 +87,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         [Fact]
         public async Task Admin_ActivityV1_Get_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new AdminService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -80,31 +100,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
-                service.Jwt = new JwtSecurityToken(rop.token);
+                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var take = 3;
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("created", "asc"));
 
-                for (int i = 0; i <= take; i++)
-                    await uow.ActivityRepo.CreateAsync(new ActivityCreate()
-                    {
-                        UserId = user.Id,
-                        ActivityType = "ActivityTest-" + RandomValues.CreateBase64String(32),
-                        Immutable = false
-                    });
-
-                await uow.CommitAsync();
-
-                var result = service.Activity_GetV1(new CascadePager()
-                {
-                    Filter = string.Empty,
-                    Orders = orders,
-                    Skip = 1,
-                    Take = take,
-                });
-
+                var result = service.Activity_GetV1(
+                    new CascadePager()
+                        {
+                            Filter = string.Empty,
+                            Orders = orders,
+                            Skip = 1,
+                            Take = take,
+                        });
                 result.Item1.Should().Be(await uow.ActivityRepo.CountAsync());
                 result.Item2.Should().BeAssignableTo<IEnumerable<ActivityModel>>();
                 result.Item2.Count().Should().Be(take);

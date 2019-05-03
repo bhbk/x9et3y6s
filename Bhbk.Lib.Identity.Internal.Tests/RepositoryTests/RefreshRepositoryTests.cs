@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class RefreshRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -22,22 +22,23 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.RefreshRepo.CreateAsync(new RefreshCreate());
+                await UoW.RefreshRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Refreshes>(new RefreshCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.RefreshRepo.CreateAsync(
-                    new RefreshCreate()
-                    {
-                        IssuerId = Guid.NewGuid(),
-                        ClientId = Guid.NewGuid(),
-                        UserId = Guid.NewGuid(),
-                        RefreshType = RefreshType.User.ToString(),
-                        RefreshValue = RandomValues.CreateBase64String(8),
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    });
+                    UoW.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        {
+                            IssuerId = Guid.NewGuid(),
+                            ClientId = Guid.NewGuid(),
+                            UserId = Guid.NewGuid(),
+                            RefreshType = RefreshType.User.ToString(),
+                            RefreshValue = RandomValues.CreateBase64String(8),
+                            ValidFromUtc = DateTime.UtcNow,
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                        }));
             });
         }
 
@@ -51,16 +52,16 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
             var result = await UoW.RefreshRepo.CreateAsync(
-                new RefreshCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
-                    RefreshValue = RandomValues.CreateBase64String(8),
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                });
+                UoW.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = RandomValues.CreateBase64String(8),
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    }));
             result.Should().BeAssignableTo<tbl_Refreshes>();
 
             await TestData.DestroyAsync();

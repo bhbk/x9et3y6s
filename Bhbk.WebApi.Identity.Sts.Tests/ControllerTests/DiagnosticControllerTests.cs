@@ -4,22 +4,26 @@ using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
-    [Collection("StsTests")]
-    public class DiagnosticControllerTests
+    public class DiagnosticControllerTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
 
-        public DiagnosticControllerTests(StartupTests factory) => _factory = factory;
+        public DiagnosticControllerTests(StartupTests factory)
+        {
+            _factory = factory;
+            _factory.CreateClient();
+        }
 
         [Fact]
         public void Sts_DiagV1_GetStatus_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();
@@ -34,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public void Sts_DiagV1_GetStatus_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();
@@ -52,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public void Sts_DiagV1_GetVersion_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();

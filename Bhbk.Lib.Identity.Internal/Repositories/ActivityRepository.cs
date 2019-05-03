@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
+﻿using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -13,17 +11,15 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ActivityRepository : IGenericRepositoryAsync<ActivityCreate, tbl_Activities, Guid>
+    public class ActivityRepository : IGenericRepositoryAsync<tbl_Activities, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public ActivityRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
+        public ActivityRepository(IdentityDbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _mapper = mapper;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Activities, bool>> predicates = null)
@@ -36,12 +32,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<tbl_Activities> CreateAsync(ActivityCreate model)
+        public async Task<tbl_Activities> CreateAsync(tbl_Activities entity)
         {
-            var entity = _mapper.Map<tbl_Activities>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
         public async Task<bool> DeleteAsync(Guid key)

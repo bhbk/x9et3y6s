@@ -3,8 +3,8 @@ using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +29,7 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Me.Tests
 {
-    [CollectionDefinition("MeTests")]
+    [CollectionDefinition("MeTestsCollection")]
     public class StartupTestCollection : ICollectionFixture<StartupTests> { }
 
     public class StartupTests : WebApplicationFactory<Startup>
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
-            builder.ConfigureServices((sc) =>
+            builder.ConfigureServices(sc =>
             {
                 var options = new DbContextOptionsBuilder<IdentityDbContext>()
                     .EnableSensitiveDataLogging();
@@ -57,44 +57,49 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
 
                 /*
-                 * keep use singleton below instead of scoped for tests that require uow/ef context persist
-                 * across multiple requests. need adjustment to tests to rememdy long term. 
+                 * need some structural changes to tests before can go
+                 * from singleton to scoped (per request) for unit of work.
                  */
 
-                sc.AddSingleton<IIdentityUnitOfWork>(new IdentityUnitOfWork(options, conf, InstanceContext.UnitTest));
-                sc.AddSingleton<IHostedService>(new MaintainQuotesTask(sc));
+                sc.AddSingleton<IUnitOfWork, UnitOfWork>(x =>
+                {
+                    var sandbox = new UnitOfWork(options, conf, InstanceContext.UnitTest);
+                    new DefaultData(sandbox).CreateAsync().Wait();
 
-                var sp = sc.BuildServiceProvider();
-                var uow = sp.GetRequiredService<IIdentityUnitOfWork>();
+                    return sandbox;
+                });
+                sc.AddSingleton<IHostedService, MaintainQuotesTask>();
 
                 /*
-                 * must add seed data for good bearer setup...
+                 * do not use dependency inject for unit of work below. is used 
+                 * only for owin authentication configuration.
                  */
 
-                new DefaultData(uow).CreateAsync().Wait();
+                var owin = new UnitOfWork(options, conf, InstanceContext.UnitTest);
+                new DefaultData(owin).CreateAsync().Wait();
 
                 /*
                  * only test context allowed to run...
                  */
 
-                if (uow.InstanceType != InstanceContext.UnitTest)
+                if (owin.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
 
-                var issuers = (uow.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
+                var issuers = (owin.IssuerRepo.GetAsync().Result)
+                    .Select(x => x.Name + ":" + owin.IssuerRepo.Salt);
 
-                var issuerKeys = (uow.IssuerRepo.GetAsync().Result)
+                var issuerKeys = (owin.IssuerRepo.GetAsync().Result)
                     .Select(x => x.IssuerKey);
 
-                var clients = (uow.ClientRepo.GetAsync().Result)
+                var clients = (owin.ClientRepo.GetAsync().Result)
                     .Select(x => x.Name);
 
                 /*
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (uow.ConfigRepo.LegacyModeIssuer)
-                    issuers = (uow.IssuerRepo.GetAsync().Result)
+                if (owin.ConfigRepo.LegacyModeIssuer)
+                    issuers = (owin.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 
                 sc.AddCors();

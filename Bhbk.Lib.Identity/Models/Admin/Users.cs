@@ -27,11 +27,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool LockoutEnabled { get; set; }
 
         [Required]
-        [DefaultValue(false)]
         public bool HumanBeing { get; set; }
 
         [Required]
-        [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 

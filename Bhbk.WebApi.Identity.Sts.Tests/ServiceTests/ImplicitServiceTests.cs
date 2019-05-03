@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
@@ -16,20 +16,24 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    [Collection("StsTests")]
-    public class ImplicitServiceTests
+    public class ImplicitServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
+        private readonly HttpClient _owin;
 
-        public ImplicitServiceTests(StartupTests factory) => _factory = factory;
+        public ImplicitServiceTests(StartupTests factory)
+        {
+            _factory = factory;
+            _owin = _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Sts_OAuth2_ImplicitV1_Use_NotImplemented()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 var imp = await service.Http.Implicit_UseV1(
                     new ImplicitV1()
@@ -51,10 +55,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         [Fact]
         public async Task Sts_OAuth2_ImplicitV2_Use_Fail()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
-                var service = new StsService(uow.InstanceType, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();

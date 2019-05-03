@@ -143,8 +143,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no refresh token as part of this flow...
             var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
 
-            var result = new Uri(redirect.AbsoluteUri + "#access_token=" + HttpUtility.UrlEncode(rop.token)
-                + "&expires_in=" + HttpUtility.UrlEncode(((int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds).ToString())
+            var result = new Uri(redirect.AbsoluteUri + "#access_token=" + HttpUtility.UrlEncode(rop.RawData)
+                + "&expires_in=" + HttpUtility.UrlEncode(((int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds).ToString())
                 + "&grant_type=implicit"
                 + "&token_type=bearer"
                 + "&state=" + HttpUtility.UrlEncode(input.state));

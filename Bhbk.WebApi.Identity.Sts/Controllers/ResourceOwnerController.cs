@@ -118,12 +118,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new UserJwtV1()
             {
                 token_type = "bearer",
-                access_token = rop.token,
-                refresh_token = rt,
+                access_token = rop.RawData,
+                refresh_token = rt.RawData,
                 user_id = user.Id.ToString(),
                 client_id = client.Id.ToString(),
                 issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             return Ok(result);
@@ -158,10 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).SingleOrDefault();
 
                 else
-                {
-                    ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{input.issuer_id}");
-                    return BadRequest(ModelState);
-                }
+                    throw new NotImplementedException();
             }
             else
             {
@@ -233,47 +230,70 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var loginList = await UoW.UserRepo.GetLoginsAsync(user.Id);
             var logins = await UoW.LoginRepo.GetAsync(x => loginList.Contains(x));
 
-            //check that login provider exists...
-            if (loginList == null)
+            switch (UoW.InstanceType)
             {
-                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
-                return NotFound(ModelState);
-            }
+                case InstanceContext.DeployedOrLocal:
+                    {
+                        //check if login provider is local...
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        {
+                            //check that password is valid...
+                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            {
+                                //adjust counter(s) for login failure...
+                                await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                await UoW.CommitAsync();
 
-            //check if login provider is local...
-            else if ((UoW.InstanceType == InstanceContext.DeployedOrLocal)
-                && logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any())
-            {
-                //check that password is valid...
-                if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
-                {
-                    //adjust counter(s) for login failure...
-                    await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                                return BadRequest(ModelState);
+                            }
+                            else
+                            {
+                                //adjust counter(s) for login success...
+                                await UoW.UserRepo.AccessSuccessAsync(user.Id);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            return NotFound(ModelState);
+                        }
+                    }
+                    break;
 
-                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
-                    return BadRequest(ModelState);
-                }
-            }
+                case InstanceContext.UnitTest:
+                    {
+                        //check if login provider is local or test...
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        {
+                            //check that password is valid...
+                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            {
+                                //adjust counter(s) for login failure...
+                                await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                await UoW.CommitAsync();
 
-            //check if login provider is transient for unit/integration test...
-            else if (logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin)).Any()
-                    && UoW.InstanceType == InstanceContext.UnitTest))
-            {
-                //check that password is valid...
-                if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
-                {
-                    //adjust counter(s) for login failure...
-                    await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                                return BadRequest(ModelState);
+                            }
+                            else
+                            {
+                                //adjust counter(s) for login success...
+                                await UoW.UserRepo.AccessSuccessAsync(user.Id);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            return NotFound(ModelState);
+                        }
 
-                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
-                    return BadRequest(ModelState);
-                }
-            }
-            else
-            {
-                ModelState.AddModelError(MessageType.LoginInvalid.ToString(), $"Login for user:{user.Id}");
-                return BadRequest(ModelState);
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             if (UoW.ConfigRepo.LegacyModeIssuer
@@ -284,12 +304,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var result = new UserJwtV1Legacy()
                 {
                     token_type = "bearer",
-                    access_token = access.token,
-                    expires_in = (int)(new DateTimeOffset(access.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                    access_token = access.RawData,
+                    expires_in = (int)(new DateTimeOffset(access.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
-                //adjust counter(s) for login success...
-                await UoW.UserRepo.AccessSuccessAsync(user.Id);
                 await UoW.CommitAsync();
 
                 return Ok(result);
@@ -302,16 +320,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var result = new UserJwtV1()
                 {
                     token_type = "bearer",
-                    access_token = rop.token,
-                    refresh_token = rt,
+                    access_token = rop.RawData,
+                    refresh_token = rt.RawData,
                     user_id = user.Id.ToString(),
                     client_id = client.Id.ToString(),
                     issuer_id = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                    expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                    expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
-                //adjust counter(s) for login success...
-                await UoW.UserRepo.AccessSuccessAsync(user.Id);
                 await UoW.CommitAsync();
 
                 return Ok(result);
@@ -420,12 +436,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = rop.token,
-                refresh_token = rt,
+                access_token = rop.RawData,
+                refresh_token = rt.RawData,
                 user = user.Id.ToString(),
                 client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             return Ok(result);
@@ -436,7 +452,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             Guid issuerID;
             tbl_Issuers issuer;
 
@@ -523,47 +539,70 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var loginList = await UoW.UserRepo.GetLoginsAsync(user.Id);
             var logins = (await UoW.LoginRepo.GetAsync(x => loginList.Contains(x))).ToList();
 
-            //check that login provider exists...
-            if (loginList == null)
+            switch (UoW.InstanceType)
             {
-                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
-                return NotFound(ModelState);
-            }
+                case InstanceContext.DeployedOrLocal:
+                    {
+                        //check if login provider is local...
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        {
+                            //check that password is valid...
+                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            {
+                                //adjust counter(s) for login failure...
+                                await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                await UoW.CommitAsync();
 
-            //check if login provider is local...
-            else if ((UoW.InstanceType == InstanceContext.DeployedOrLocal)
-                && logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any())
-            {
-                //check that password is valid...
-                if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
-                {
-                    //adjust counter(s) for login failure...
-                    await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                                return BadRequest(ModelState);
+                            }
+                            else
+                            {
+                                //adjust counter(s) for login success...
+                                await UoW.UserRepo.AccessSuccessAsync(user.Id);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            return NotFound(ModelState);
+                        }
+                    }
+                    break;
 
-                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
-                    return BadRequest(ModelState);
-                }
-            }
+                case InstanceContext.UnitTest:
+                    {
+                        //check if login provider is local or test...
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        {
+                            //check that password is valid...
+                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            {
+                                //adjust counter(s) for login failure...
+                                await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                await UoW.CommitAsync();
 
-            //check if login provider is transient for unit/integration test...
-            else if (logins.Where(x => x.Name == Constants.ApiDefaultLogin).Any()
-                || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin)).Any()
-                    && UoW.InstanceType == InstanceContext.UnitTest))
-            {
-                //check that password is valid...
-                if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
-                {
-                    //adjust counter(s) for login failure...
-                    await UoW.UserRepo.AccessFailedAsync(user.Id);
+                                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                                return BadRequest(ModelState);
+                            }
+                            else
+                            {
+                                //adjust counter(s) for login success...
+                                await UoW.UserRepo.AccessSuccessAsync(user.Id);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            return NotFound(ModelState);
+                        }
 
-                    ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
-                    return BadRequest(ModelState);
-                }
-            }
-            else
-            {
-                ModelState.AddModelError(MessageType.LoginInvalid.ToString(), $"Login for user:{user.Id}");
-                return BadRequest(ModelState);
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
             var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
@@ -572,16 +611,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = rop.token,
-                refresh_token = rt,
+                access_token = rop.RawData,
+                refresh_token = rt.RawData,
                 user = user.Id.ToString(),
                 client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
-            //adjust counter(s) for login success...
-            await UoW.UserRepo.AccessSuccessAsync(user.Id);
             await UoW.CommitAsync();
 
             return Ok(result);

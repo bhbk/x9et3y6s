@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = context.RequestServices.GetRequiredService<IUnitOfWork>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -192,20 +192,21 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 var result = new
                 {
                     token_type = "bearer",
-                    access_token = rop.token,
-                    refresh_token = rt,
+                    access_token = rop.RawData,
+                    refresh_token = rt.RawData,
                     user = user.Id.ToString(),
                     client = clients.Select(x => x.Id.ToString()),
                     issuer = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
                 //add activity entry...
-                uow.ActivityRepo.CreateAsync(new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    Immutable = false
-                }).Wait();
+                uow.ActivityRepo.CreateAsync(
+                    uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
+                        Immutable = false
+                    })).Wait();
 
                 uow.CommitAsync().Wait();
 
@@ -248,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IIdentityUnitOfWork>();
+                var uow = context.RequestServices.GetRequiredService<IUnitOfWork>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -332,26 +333,27 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var access = JwtFactory.UserResourceOwnerV1(uow, issuer, client, user).Result;
-                var refresh = JwtFactory.UserRefreshV1(uow, issuer, user).Result;
+                var rop = JwtFactory.UserResourceOwnerV1(uow, issuer, client, user).Result;
+                var rt = JwtFactory.UserRefreshV1(uow, issuer, user).Result;
 
                 var result = new
                 {
                     token_type = "bearer",
-                    access_token = access.token,
-                    refresh_token = refresh,
+                    access_token = rop.RawData,
+                    refresh_token = rt.RawData,
                     user_id = user.Id.ToString(),
                     client_id = client.Id.ToString(),
                     issuer_id = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
                 };
 
                 //add activity entry...
-                uow.ActivityRepo.CreateAsync(new ActivityCreate()
-                {
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
-                    Immutable = false
-                }).Wait();
+                uow.ActivityRepo.CreateAsync(
+                    uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    {
+                        UserId = user.Id,
+                        ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
+                        Immutable = false
+                    })).Wait();
 
                 uow.CommitAsync().Wait();
 

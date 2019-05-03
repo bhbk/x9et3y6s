@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class StateRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -22,23 +22,24 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.StateRepo.CreateAsync(new StateCreate());
+                await UoW.StateRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_States>(new StateCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.StateRepo.CreateAsync(
-                    new StateCreate()
-                    {
-                        IssuerId = Guid.NewGuid(),
-                        ClientId = Guid.NewGuid(),
-                        UserId = Guid.NewGuid(),
-                        StateValue = RandomValues.CreateBase64String(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    });
+                    UoW.Mapper.Map<tbl_States>(new StateCreate()
+                        {
+                            IssuerId = Guid.NewGuid(),
+                            ClientId = Guid.NewGuid(),
+                            UserId = Guid.NewGuid(),
+                            StateValue = RandomValues.CreateBase64String(32),
+                            StateType = StateType.Device.ToString(),
+                            StateConsume = false,
+                            ValidFromUtc = DateTime.UtcNow,
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                        }));
             });
         }
 
@@ -52,17 +53,17 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
 
             var result = await UoW.StateRepo.CreateAsync(
-                new StateCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
-                    StateType = StateType.Device.ToString(),
-                    StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                });
+                UoW.Mapper.Map<tbl_States>(new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    }));
             result.Should().BeAssignableTo<tbl_States>();
 
             await TestData.DestroyAsync();

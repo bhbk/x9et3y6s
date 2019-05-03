@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Validators;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -28,21 +27,20 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : IGenericRepositoryAsync<UserCreate, tbl_Users, Guid>
+    public class UserRepository : IGenericRepositoryAsync<tbl_Users, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IMapper _mapper;
         private readonly IConfiguration _conf;
+        private readonly ISystemClock _clock;
         private readonly IdentityDbContext _context;
         public readonly PasswordValidator passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, IConfiguration conf)
+        public UserRepository(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _mapper = mapper;
             _conf = conf;
 
             passwordValidator = new PasswordValidator();
@@ -93,7 +91,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             if (!string.IsNullOrEmpty(entity.PasswordHash))
                 throw new InvalidOperationException();
 
-            return await UpdatePassword(entity, password);
+            return await InternalUpdatePassword(entity, password);
         }
 
         public async Task<bool> AddToClaimAsync(tbl_Users user, tbl_Claims claim)
@@ -142,7 +140,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
-            if (await VerifyPasswordAsync(entity, password) != PasswordVerificationResult.Failed)
+            if (await InternalVerifyPasswordAsync(entity, password) != PasswordVerificationResult.Failed)
                 return true;
 
             return false;
@@ -168,35 +166,22 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        internal async Task<tbl_Users> CreateAsync(tbl_Users model)
+        public async Task<tbl_Users> CreateAsync(tbl_Users entity)
         {
-            if (!(await userValidator.ValidateAsync(model)).Succeeded)
-                throw new InvalidOperationException();
-
-            if (!model.HumanBeing)
-                model.EmailConfirmed = true;
-
-            return await Task.FromResult(_context.Add(model).Entity);
-        }
-
-        public async Task<tbl_Users> CreateAsync(UserCreate model)
-        {
-            var entity = _mapper.Map<tbl_Users>(model);
-            var create = await CreateAsync(entity);
+            var create = await InternalCreateAsync(entity);
 
             _context.SaveChanges();
 
             return await Task.FromResult(create);
         }
 
-        public async Task<tbl_Users> CreateAsync(UserCreate model, string password)
+        public async Task<tbl_Users> CreateAsync(tbl_Users entity, string password)
         {
-            var entity = _mapper.Map<tbl_Users>(model);
-            var create = await CreateAsync(entity);
+            var create = await InternalCreateAsync(entity);
 
             _context.SaveChanges();
 
-            await UpdatePassword(entity, password);
+            await InternalUpdatePassword(entity, password);
 
             return await Task.FromResult(create);
         }
@@ -400,6 +385,70 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(result);
         }
 
+        internal async Task<tbl_Users> InternalCreateAsync(tbl_Users entity)
+        {
+            if (!(await userValidator.ValidateAsync(entity)).Succeeded)
+                throw new InvalidOperationException();
+
+            if (!entity.HumanBeing)
+                entity.EmailConfirmed = true;
+
+            return await Task.FromResult(_context.Add(entity).Entity);
+        }
+
+        internal async Task<bool> InternalSetPasswordHashAsync(tbl_Users user, string passwordHash)
+        {
+            user.PasswordHash = passwordHash;
+            user.LastUpdated = DateTime.Now;
+
+            _context.Entry(user).State = EntityState.Modified;
+
+            return await Task.FromResult(true);
+        }
+
+        internal async Task<bool> InternalSetSecurityStampAsync(tbl_Users user, string stamp)
+        {
+            user.SecurityStamp = stamp;
+            user.LastUpdated = DateTime.Now;
+
+            _context.Entry(user).State = EntityState.Modified;
+
+            return await Task.FromResult(true);
+        }
+
+        internal async Task<bool> InternalUpdatePassword(tbl_Users user, string password)
+        {
+            if (passwordValidator == null)
+                throw new NotSupportedException();
+
+            var result = await passwordValidator.ValidateAsync(user, password);
+
+            if (!result.Succeeded)
+                throw new InvalidOperationException();
+
+            if (passwordHasher == null)
+                throw new NotSupportedException();
+
+            var hash = passwordHasher.HashPassword(user, password);
+
+            if (!await InternalSetPasswordHashAsync(user, hash)
+                || !await InternalSetSecurityStampAsync(user, RandomValues.CreateBase64String(32)))
+                return false;
+
+            return true;
+        }
+
+        internal async Task<PasswordVerificationResult> InternalVerifyPasswordAsync(tbl_Users model, string password)
+        {
+            if (passwordHasher == null)
+                throw new NotSupportedException();
+
+            if (passwordHasher.VerifyHashedPassword(model, model.PasswordHash, password) != PasswordVerificationResult.Failed)
+                return PasswordVerificationResult.Success;
+
+            return await Task.FromResult(PasswordVerificationResult.Failed);
+        }
+
         public async Task<bool> IsInClaimAsync(Guid userKey, Guid claimKey)
         {
             /*
@@ -439,7 +488,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                     entity.LockoutEnabled = false;
                     entity.LockoutEnd = null;
 
-                    await UpdateAsync(_mapper.Map<tbl_Users>(entity));
+                    await UpdateAsync(entity);
 
                     return false;
                 }
@@ -449,7 +498,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             else
             {
                 entity.LockoutEnd = null;
-                await UpdateAsync(_mapper.Map<tbl_Users>(entity));
+                await UpdateAsync(entity);
 
                 return false;
             }
@@ -499,7 +548,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
-            return await SetPasswordHashAsync(entity, null);
+            return await InternalSetPasswordHashAsync(entity, null);
         }
 
         public async Task<bool> SetConfirmedEmailAsync(Guid key, bool confirmed)
@@ -546,26 +595,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             entity.LastUpdated = DateTime.Now;
 
             _context.Entry(entity).State = EntityState.Modified;
-
-            return await Task.FromResult(true);
-        }
-
-        internal async Task<bool> SetPasswordHashAsync(tbl_Users user, string passwordHash)
-        {
-            user.PasswordHash = passwordHash;
-            user.LastUpdated = DateTime.Now;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return await Task.FromResult(true);
-        }
-
-        internal async Task<bool> SetSecurityStampAsync(tbl_Users user, string stamp)
-        {
-            user.SecurityStamp = stamp;
-            user.LastUpdated = DateTime.Now;
-
-            _context.Entry(user).State = EntityState.Modified;
 
             return await Task.FromResult(true);
         }
@@ -618,47 +647,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.Update(entity).Entity);
         }
 
-        internal async Task<bool> UpdatePassword(tbl_Users user, string password)
-        {
-            if (passwordValidator == null)
-                throw new NotSupportedException();
-
-            var result = await passwordValidator.ValidateAsync(user, password);
-
-            if (!result.Succeeded)
-                throw new InvalidOperationException();
-
-            if (passwordHasher == null)
-                throw new NotSupportedException();
-
-            var hash = passwordHasher.HashPassword(user, password);
-
-            if (!await SetPasswordHashAsync(user, hash)
-                || !await SetSecurityStampAsync(user, RandomValues.CreateBase64String(32)))
-                return false;
-
-            return true;
-        }
-
         public async Task<bool> UpdatePassword(Guid key, string password)
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
-            if (!await UpdatePassword(entity, password))
+            if (!await InternalUpdatePassword(entity, password))
                 return false;
 
             return true;
-        }
-
-        internal async Task<PasswordVerificationResult> VerifyPasswordAsync(tbl_Users model, string password)
-        {
-            if (passwordHasher == null)
-                throw new NotSupportedException();
-
-            if (passwordHasher.VerifyHashedPassword(model, model.PasswordHash, password) != PasswordVerificationResult.Failed)
-                return PasswordVerificationResult.Success;
-
-            return await Task.FromResult(PasswordVerificationResult.Failed);
         }
     }
 }

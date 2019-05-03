@@ -30,12 +30,15 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
 
         #region Configuration Constants
 
-        public const string ApiDefaultClientUi = "Bhbk.WebUi.Identity";
-        public const string ApiDefaultClientApi = "Bhbk.WebApi.Identity";
-        public const string ApiDefaultIssuer = "Bhbk";
-        public const string ApiDefaultLogin = "local";
-        public const string ApiDefaultLoginKey = "local";
-        public const string ApiDefaultLoginName = "local";
+        public const string ApiDefaultClientUi = "Local.Ui";
+        public const string ApiDefaultClientUiKey = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb9HUAw6n2ZwY";
+        public const string ApiDefaultClientApi = "Local.Api";
+        public const string ApiDefaultClientApiKey = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV6euTTDO0Xvo";
+        public const string ApiDefaultIssuer = "Local";
+        public const string ApiDefaultIssuerKey = "8G3zyoTJB4HpL5n3V-htSaN1KFWZGeFgWcUenGZofmw";
+        public const string ApiDefaultLogin = "Local";
+        public const string ApiDefaultLoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwnJ1KHDX61K48";
+        public const string ApiDefaultLoginName = "Local";
         public const string ApiDefaultRoleForAdmin = "(Built-In) Admins";
         public const string ApiDefaultRoleForSystem = "(Built-In) Services";
         public const string ApiDefaultRoleForUser = "(Built-In) Users";

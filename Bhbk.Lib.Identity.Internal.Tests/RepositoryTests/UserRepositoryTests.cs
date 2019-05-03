@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class UserRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -21,22 +21,23 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.UserRepo.CreateAsync(new UserCreate());
+                await UoW.UserRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Users>(new UserCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.UserRepo.CreateAsync(
-                    new UserCreate()
-                    {
-                        Email = RandomValues.CreateAlphaNumericString(4),
-                        PhoneNumber = Constants.ApiUnitTestUserPhone,
-                        FirstName = "First-" + RandomValues.CreateBase64String(4),
-                        LastName = "Last-" + RandomValues.CreateBase64String(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
-                    });
+                    UoW.Mapper.Map<tbl_Users>(new UserCreate()
+                        {
+                            Email = RandomValues.CreateAlphaNumericString(4),
+                            PhoneNumber = Constants.ApiUnitTestUserPhone,
+                            FirstName = "First-" + RandomValues.CreateBase64String(4),
+                            LastName = "Last-" + RandomValues.CreateBase64String(4),
+                            LockoutEnabled = false,
+                            HumanBeing = true,
+                            Immutable = false,
+                        }));
             });
         }
 
@@ -46,16 +47,16 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             await TestData.CreateAsync();
 
             var result = await UoW.UserRepo.CreateAsync(
-                new UserCreate()
-                {
-                    Email = Constants.ApiUnitTestUser,
-                    PhoneNumber = Constants.ApiUnitTestUserPhone,
-                    FirstName = "First-" + RandomValues.CreateBase64String(4),
-                    LastName = "Last-" + RandomValues.CreateBase64String(4),
-                    LockoutEnabled = false,
-                    HumanBeing = true,
-                    Immutable = false,
-                });
+                UoW.Mapper.Map<tbl_Users>(new UserCreate()
+                    {
+                        Email = Constants.ApiUnitTestUser,
+                        PhoneNumber = Constants.ApiUnitTestUserPhone,
+                        FirstName = "First-" + RandomValues.CreateBase64String(4),
+                        LastName = "Last-" + RandomValues.CreateBase64String(4),
+                        LockoutEnabled = false,
+                        HumanBeing = true,
+                        Immutable = false,
+                    }));
             result.Should().BeAssignableTo<tbl_Users>();
 
             await TestData.DestroyAsync();

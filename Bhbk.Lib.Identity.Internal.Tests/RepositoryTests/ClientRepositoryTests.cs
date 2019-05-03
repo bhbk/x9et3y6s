@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class ClientRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -21,21 +21,22 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.ClientRepo.CreateAsync(new ClientCreate());
+                await UoW.ClientRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Clients>(new ClientCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.ClientRepo.CreateAsync(
-                    new ClientCreate()
-                    {
-                        IssuerId = Guid.NewGuid(),
-                        Name = Constants.ApiUnitTestClient,
-                        ClientKey = Constants.ApiUnitTestClientKey,
-                        ClientType = ClientType.user_agent.ToString(),
-                        Enabled = true,
-                        Immutable = false,
-                    });
+                    UoW.Mapper.Map<tbl_Clients>(new ClientCreate()
+                        {
+                            IssuerId = Guid.NewGuid(),
+                            Name = Constants.ApiUnitTestClient,
+                            ClientKey = Constants.ApiUnitTestClientKey,
+                            ClientType = ClientType.user_agent.ToString(),
+                            Enabled = true,
+                            Immutable = false,
+                        }));
             });
         }
 
@@ -47,15 +48,15 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
 
             var result = await UoW.ClientRepo.CreateAsync(
-                new ClientCreate()
-                {
-                    IssuerId = issuer.Id,
-                    Name = Constants.ApiUnitTestClient,
-                    ClientKey = Constants.ApiUnitTestClientKey,
-                    ClientType = ClientType.user_agent.ToString(),
-                    Enabled = true,
-                    Immutable = false,
-                });
+                UoW.Mapper.Map<tbl_Clients>(new ClientCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        Name = Constants.ApiUnitTestClient,
+                        ClientKey = Constants.ApiUnitTestClientKey,
+                        ClientType = ClientType.user_agent.ToString(),
+                        Enabled = true,
+                        Immutable = false,
+                    }));
             result.Should().BeAssignableTo<tbl_Clients>();
 
             await TestData.DestroyAsync();

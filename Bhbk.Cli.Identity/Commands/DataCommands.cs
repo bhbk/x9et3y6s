@@ -3,7 +3,7 @@ using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using ManyConsole;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +40,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .UseSqlServer(conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 
-                var uow = new IdentityUnitOfWork(builder, conf);
+                var uow = new UnitOfWork(builder, conf);
                 var data = new DefaultData(uow);
 
                 if (CreateDefault)

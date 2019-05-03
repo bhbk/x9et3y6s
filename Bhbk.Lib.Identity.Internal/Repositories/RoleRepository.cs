@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
+﻿using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -21,17 +19,15 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : IGenericRepositoryAsync<RoleCreate, tbl_Roles, Guid>
+    public class RoleRepository : IGenericRepositoryAsync<tbl_Roles, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public RoleRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
+        public RoleRepository(IdentityDbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _mapper = mapper;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Roles, bool>> predicates = null)
@@ -44,12 +40,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<tbl_Roles> CreateAsync(RoleCreate model)
+        public async Task<tbl_Roles> CreateAsync(tbl_Roles entity)
         {
-            var entity = _mapper.Map<tbl_Roles>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
         public async Task<bool> DeleteAsync(Guid key)

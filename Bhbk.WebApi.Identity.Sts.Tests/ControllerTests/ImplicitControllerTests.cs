@@ -1,9 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
-using Bhbk.Lib.Identity.Internal.UnitOfWork;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.WebApi.Identity.Sts.Controllers;
@@ -22,25 +23,28 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
-    [Collection("StsTests")]
-    public class ImplicitControllerTests
+    public class ImplicitControllerTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
 
-        public ImplicitControllerTests(StartupTests factory) => _factory = factory;
+        public ImplicitControllerTests(StartupTests factory)
+        {
+            _factory = factory;
+            _factory.CreateClient();
+        }
 
         [Fact]
         public async Task Sts_OAuth2_ImplicitV2_Use_Success()
         {
-            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var controller = new ImplicitController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-                var uow = _factory.Server.Host.Services.GetRequiredService<IIdentityUnitOfWork>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 await new TestData(uow).DestroyAsync();
                 await new TestData(uow).CreateAsync();
@@ -55,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var url = new Uri(Constants.ApiUnitTestUriLink);
 
                 var state = await uow.StateRepo.CreateAsync(
-                    new StateCreate()
+                    uow.Mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -65,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ImplicitTokenExpire),
-                    });
+                    }));
 
                 await uow.CommitAsync();
 

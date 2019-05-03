@@ -138,17 +138,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var create = await UoW.StateRepo.CreateAsync(
-                new StateCreate()
-                {
-                    IssuerId = issuer.Id,
-                    ClientId = client.Id,
-                    UserId = user.Id,
-                    StateValue = RandomValues.CreateBase64String(32),
-                    StateType = StateType.User.ToString(),
-                    StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.AuthCodeTotpExpire),
-                });
+                UoW.Mapper.Map<tbl_States>(new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.User.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.AuthCodeTotpExpire),
+                    }));
 
             await UoW.CommitAsync();
 
@@ -303,12 +303,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = rop.token,
-                refresh_token = rt,
+                access_token = rop.RawData,
+                refresh_token = rt.RawData,
                 user = user.Id.ToString(),
                 client = clients.Select(x => x.Id.ToString()).ToList(),
                 issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
-                expires_in = (int)(new DateTimeOffset(rop.end).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             //adjust counter(s) for login success...

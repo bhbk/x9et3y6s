@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 {
-    [Collection("LibraryTests")]
+    [Collection("LibraryTestsCollection")]
     public class ActivityRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
@@ -21,19 +21,20 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.ActivityRepo.CreateAsync(new ActivityCreate());
+                await UoW.ActivityRepo.CreateAsync(
+                    UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.ActivityRepo.CreateAsync(
-                    new ActivityCreate()
+                    UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         ClientId = Guid.NewGuid(),
                         UserId = Guid.NewGuid(),
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                         Immutable = false,
-                    });
+                    }));
             });
         }
 
@@ -45,13 +46,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
 
             var result = await UoW.ActivityRepo.CreateAsync(
-                new ActivityCreate()
+                UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     ClientId = Guid.NewGuid(),
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                     Immutable = false,
-                });
+                }));
             result.Should().BeAssignableTo<tbl_Activities>();
 
             await TestData.DestroyAsync();

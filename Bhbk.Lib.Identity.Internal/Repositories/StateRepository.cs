@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
+﻿using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -14,25 +12,20 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class StateRepository : IGenericRepositoryAsync<StateCreate, tbl_States, Guid>
+    public class StateRepository : IGenericRepositoryAsync<tbl_States, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IMapper _mapper;
         private readonly IdentityDbContext _context;
 
-        public StateRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper)
+        public StateRepository(IdentityDbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _mapper = mapper;
         }
 
-        public async Task<tbl_States> CreateAsync(StateCreate model)
+        public async Task<tbl_States> CreateAsync(tbl_States entity)
         {
-            var entity = _mapper.Map<tbl_States>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
         public async Task<bool> DeleteAsync(Guid key)

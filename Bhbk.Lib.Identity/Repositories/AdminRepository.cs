@@ -544,6 +544,21 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
+        public async Task<HttpResponseMessage> User_AddClaimV1(string jwt, Guid userID, Guid claimID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/user/v1/" + userID.ToString() + "/add-to-claim/" + claimID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
         public async Task<HttpResponseMessage> User_AddLoginV1(string jwt, Guid userID, Guid loginID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);

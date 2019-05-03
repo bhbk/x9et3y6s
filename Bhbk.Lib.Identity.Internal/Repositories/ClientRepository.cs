@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Cryptography;
+﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -19,18 +18,17 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
-    public class ClientRepository : IGenericRepositoryAsync<ClientCreate, tbl_Clients, Guid>
+    public class ClientRepository : IGenericRepositoryAsync<tbl_Clients, Guid>
     {
         private readonly InstanceContext _instance;
-        private readonly IMapper _mapper;
         private readonly IConfiguration _conf;
+        private readonly IClockService _clock;
         private readonly IdentityDbContext _context;
 
-        public ClientRepository(IdentityDbContext context, InstanceContext instance, IMapper mapper, IConfiguration conf)
+        public ClientRepository(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _mapper = mapper;
             _conf = conf;
         }
 
@@ -80,20 +78,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<tbl_Clients> CreateAsync(ClientCreate model)
+        public async Task<tbl_Clients> CreateAsync(tbl_Clients entity)
         {
-            var entity = _mapper.Map<tbl_Clients>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
-        public async Task<tbl_Urls> CreateUriAsync(UrlCreate model)
+        public async Task<tbl_Urls> CreateUriAsync(tbl_Urls entity)
         {
-            var entity = _mapper.Map<tbl_Urls>(model);
-            var create = _context.Add(entity).Entity;
-
-            return await Task.FromResult(create);
+            return await Task.FromResult(_context.Add(entity).Entity);
         }
 
         public async Task<bool> DeleteAsync(Guid key)
@@ -165,7 +157,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Clients model)
         {
             var claims = new List<Claim>();
-
+            
             //defaults...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
 
@@ -195,6 +187,32 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             int? take = null)
         {
             var query = _context.tbl_Clients.AsQueryable();
+
+            if (predicates != null)
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            //query = query.Include(x => x.Roles);
+
+            if (orders != null)
+            {
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
+            }
+
+            return await Task.FromResult(query);
+        }
+
+        public async Task<IEnumerable<tbl_Urls>> GetUrisAsync(Expression<Func<tbl_Urls, bool>> predicates = null,
+            Func<IQueryable<tbl_Urls>, IIncludableQueryable<tbl_Urls, object>> includes = null,
+            Func<IQueryable<tbl_Urls>, IOrderedQueryable<tbl_Urls>> orders = null,
+            int? skip = null,
+            int? take = null)
+        {
+            var query = _context.tbl_Urls.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
