@@ -40,39 +40,48 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
+                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
+
                 try
                 {
-                    var scope = _factory.CreateScope();
-                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    /*
+                     * async database calls from background services should be
+                     * avoided so threading issues do not occur.
+                     * 
+                     * when calling scoped service (unit of work) from a singleton
+                     * service (background task) wrap in using block to mimic transient.
+                     */
 
-                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-
-                    var expired = await uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
-                            || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true));
-
-                    var expiredCount = expired.Count();
-
-                    if (expired.Any())
+                    using (var scope = _factory.CreateScope())
                     {
-                        foreach (var entry in expired.ToList())
-                            await uow.ActivityRepo.DeleteAsync(entry.Id);
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        await uow.CommitAsync();
+                        var expired = uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
+                                || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).Result;
+                        var expiredCount = expired.Count();
 
-                        var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
-                                + expiredCount.ToString() + " expired activity entries.";
+                        if (expired.Any())
+                        {
+                            foreach (var entry in expired.ToList())
+                                uow.ActivityRepo.DeleteAsync(entry.Id).Wait();
 
-                        Status = JsonConvert.SerializeObject(
-                            new
-                            {
-                                status = msg
-                            }, _serializer);
+                            uow.CommitAsync().Wait();
 
-                        Log.Information(msg);
+                            var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                                    + expiredCount.ToString() + " expired activity entries.";
+
+                            Status = JsonConvert.SerializeObject(
+                                new
+                                {
+                                    status = msg
+                                }, _serializer);
+
+                            Log.Information(msg);
+                        }
                     }
                 }
                 catch (Exception ex)

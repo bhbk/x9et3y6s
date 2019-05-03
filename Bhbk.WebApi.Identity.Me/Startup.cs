@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddSingleton<IUnitOfWork, UnitOfWork>(x =>
+            sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
             {
                 return new UnitOfWork(options, conf);
             });
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton<IAlertService>(new AlertService());
 
             /*
-             * do not use dependency inject for unit of work below. is used 
+             * do not use dependency injection for unit of work below. is used 
              * only for owin authentication configuration.
              */
 

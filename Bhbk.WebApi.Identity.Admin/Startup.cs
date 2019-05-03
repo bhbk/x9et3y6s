@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin
             sc.AddSingleton<IAlertService>(new AlertService());
 
             /*
-             * do not use dependency inject for unit of work below. is used 
+             * do not use dependency injection for unit of work below. is used 
              * only for owin authentication configuration.
              */
 

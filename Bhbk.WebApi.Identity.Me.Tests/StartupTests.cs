@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                 sc.AddSingleton<IHostedService, MaintainQuotesTask>();
 
                 /*
-                 * do not use dependency inject for unit of work below. is used 
+                 * do not use dependency injection for unit of work below. is used 
                  * only for owin authentication configuration.
                  */
 

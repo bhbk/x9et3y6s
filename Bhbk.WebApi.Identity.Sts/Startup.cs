@@ -25,6 +25,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+/*
+ * https://jonhilton.net/2017/10/11/secure-your-asp.net-core-2.0-api-part-1---issuing-a-jwt/
+ * https://jonhilton.net/security/apis/secure-your-asp.net-core-2.0-api-part-2---jwt-bearer-authentication/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ * https://jonhilton.net/identify-users-permissions-with-jwts-and-asp-net-core-webapi/
+ */
+
 namespace Bhbk.WebApi.Identity.Sts
 {
     public class Startup
@@ -44,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddSingleton<IUnitOfWork, UnitOfWork>(x =>
+            sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
             {
                 return new UnitOfWork(options, conf);
             });
@@ -53,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IAlertService>(new AlertService());
 
             /*
-             * do not use dependency inject for unit of work below. is used 
+             * do not use dependency injection for unit of work below. is used 
              * only for owin authentication configuration.
              */
 

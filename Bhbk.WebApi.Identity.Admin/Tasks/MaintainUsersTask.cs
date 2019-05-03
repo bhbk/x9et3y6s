@@ -39,37 +39,47 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
+                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
+
                 try
                 {
-                    var scope = _factory.CreateScope();
-                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    /*
+                     * async database calls from background services should be
+                     * avoided so threading issues do not occur.
+                     * 
+                     * when calling scoped service (unit of work) from a singleton
+                     * service (background task) wrap in using block to mimic transient.
+                     */
 
-                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-
-                    var disabled = (await uow.UserRepo.GetAsync(x => x.LockoutEnd < DateTime.UtcNow)).ToList();
-                    var disabledCount = disabled.Count();
-
-                    if (disabled.Any())
+                    using (var scope = _factory.CreateScope())
                     {
-                        foreach (var entry in disabled.ToList())
-                            await uow.UserRepo.DeleteAsync(entry.Id);
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        await uow.CommitAsync();
+                        var disabled = (uow.UserRepo.GetAsync(x => x.LockoutEnd < DateTime.UtcNow).Result).ToList();
+                        var disabledCount = disabled.Count();
 
-                        var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
-                                + disabledCount.ToString() + " users with expired lock-outs.";
+                        if (disabled.Any())
+                        {
+                            foreach (var entry in disabled.ToList())
+                                uow.UserRepo.DeleteAsync(entry.Id).Wait();
 
-                        Status = JsonConvert.SerializeObject(
-                            new
-                            {
-                                status = msg
-                            }, _serializer);
+                            uow.CommitAsync().Wait();
 
-                        Log.Information(msg);
+                            var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
+                                    + disabledCount.ToString() + " users with expired lock-outs.";
+
+                            Status = JsonConvert.SerializeObject(
+                                new
+                                {
+                                    status = msg
+                                }, _serializer);
+
+                            Log.Information(msg);
+                        }
                     }
                 }
                 catch (Exception ex)

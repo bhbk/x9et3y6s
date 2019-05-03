@@ -95,7 +95,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              */
 
             var url = new Uri(Constants.ApiUnitTestUriLink);
-            var foundClientUrl = (await _uow.ClientRepo.GetUrisAsync(x => x.ClientId == foundClient.Id
+            var foundClientUrl = (await _uow.ClientRepo.GetUrlsAsync(x => x.ClientId == foundClient.Id
                 && x.UrlHost == (url.Scheme + "://" + url.Host)
                 && x.UrlPath == url.AbsolutePath)).SingleOrDefault();
 

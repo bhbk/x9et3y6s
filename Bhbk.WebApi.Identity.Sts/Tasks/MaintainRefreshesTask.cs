@@ -38,37 +38,47 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
+                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
+
                 try
                 {
-                    var scope = _factory.CreateScope();
-                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    /*
+                     * async database calls from background services should be
+                     * avoided so threading issues do not occur.
+                     * 
+                     * when calling scoped service (unit of work) from a singleton
+                     * service (background task) wrap in using block to mimic transient.
+                     */
 
-                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-
-                    var invalid = (await uow.RefreshRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow)).ToList();
-                    var invalidCount = invalid.Count();
-
-                    if (invalid.Any())
+                    using (var scope = _factory.CreateScope())
                     {
-                        foreach (var entry in invalid.ToList())
-                            await uow.RefreshRepo.DeleteAsync(entry.Id);
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        await uow.CommitAsync();
+                        var invalid = (uow.RefreshRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).Result).ToList();
+                        var invalidCount = invalid.Count();
 
-                        var msg = typeof(MaintainRefreshesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
-                                + invalidCount.ToString() + " invalid refresh tokens.";
+                        if (invalid.Any())
+                        {
+                            foreach (var entry in invalid.ToList())
+                                uow.RefreshRepo.DeleteAsync(entry.Id).Wait();
 
-                        Status = JsonConvert.SerializeObject(
-                            new
-                            {
-                                status = msg
-                            }, _serializer);
+                            uow.CommitAsync().Wait();
 
-                        Log.Information(msg);
+                            var msg = typeof(MaintainRefreshesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                                    + invalidCount.ToString() + " invalid refresh tokens.";
+
+                            Status = JsonConvert.SerializeObject(
+                                new
+                                {
+                                    status = msg
+                                }, _serializer);
+
+                            Log.Information(msg);
+                        }
                     }
                 }
                 catch (Exception ex)

@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddSingleton<IUnitOfWork, UnitOfWork>(x =>
+            sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
             {
                 return new UnitOfWork(options, conf);
             });

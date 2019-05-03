@@ -206,7 +206,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<tbl_Urls>> GetUrisAsync(Expression<Func<tbl_Urls, bool>> predicates = null,
+        public async Task<IEnumerable<tbl_Urls>> GetUrlsAsync(Expression<Func<tbl_Urls, bool>> predicates = null,
             Func<IQueryable<tbl_Urls>, IIncludableQueryable<tbl_Urls, object>> includes = null,
             Func<IQueryable<tbl_Urls>, IOrderedQueryable<tbl_Urls>> orders = null,
             int? skip = null,
@@ -219,8 +219,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             if (includes != null)
                 query = includes(query);
-
-            //query = query.Include(x => x.Roles);
 
             if (orders != null)
             {
@@ -249,7 +247,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<tbl_Urls>> GetUrisAsync(Guid key)
+        public async Task<IEnumerable<tbl_Urls>> GetUrlsAsync(Guid key)
         {
             var result = _context.tbl_Urls.Where(x => x.ClientId == key).ToList();
 

@@ -53,66 +53,76 @@ namespace Bhbk.WebApi.Alert.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
 
                 if (!_enabled || _queue.IsEmpty)
                     continue;
 
-                var scope = _factory.CreateScope();
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                /*
+                 * async database calls from background services should be
+                 * avoided so threading issues do not occur.
+                 * 
+                 * when calling scoped service (unit of work) from a singleton
+                 * service (background task) wrap in using block to mimic transient.
+                 */
 
-                foreach (var entry in _queue)
+                using (var scope = _factory.CreateScope())
                 {
-                    try
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+                    foreach (var entry in _queue)
                     {
-                        TextCreate model;
-
-                        if (!_queue.TryPeek(out model))
-                            break;
-
-                        if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
+                        try
                         {
-                            _queue.TryDequeue(out model);
+                            TextCreate model;
 
-                            Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The text was created on "
-                                + model.Created + " and is being deleted now.");
-
-                            continue;
-                        }
-
-                        if (uow.InstanceType == InstanceContext.DeployedOrLocal)
-                        {
-                            await _provider.TryTextHandoff(_providerSid, _providerToken, model);
-
-                            if (!_queue.TryDequeue(out model))
+                            if (!_queue.TryPeek(out model))
                                 break;
 
-                            Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
+                            if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
+                            {
+                                _queue.TryDequeue(out model);
+
+                                Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The text was created on "
+                                    + model.Created + " and is being deleted now.");
+
+                                continue;
+                            }
+
+                            if (uow.InstanceType == InstanceContext.DeployedOrLocal)
+                            {
+                                await _provider.TryTextHandoff(_providerSid, _providerToken, model);
+
+                                if (!_queue.TryDequeue(out model))
+                                    break;
+
+                                Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex.ToString());
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex.ToString());
-                    }
+
+                    var msg = typeof(QueueTextTask).Name + " contains " + _queue.Count() + " text messages queued for hand-off.";
+
+                    Status = JsonConvert.SerializeObject(
+                        new
+                        {
+                            status = msg,
+                            queue = _queue.Select(x => new {
+                                Id = x.Id.ToString(),
+                                Created = x.Created,
+                                From = x.FromPhoneNumber,
+                                To = x.ToPhoneNumber
+                            })
+                        }, _serializer);
                 }
-
-                var msg = typeof(QueueTextTask).Name + " contains " + _queue.Count() + " text messages queued for hand-off.";
-
-                Status = JsonConvert.SerializeObject(
-                    new
-                    {
-                        status = msg,
-                        queue = _queue.Select(x => new {
-                            Id = x.Id.ToString(),
-                            Created = x.Created,
-                            From = x.FromPhoneNumber,
-                            To = x.ToPhoneNumber
-                        })
-                    }, _serializer);
             }
         }
 

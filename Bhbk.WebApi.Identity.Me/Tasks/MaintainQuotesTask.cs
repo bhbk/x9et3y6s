@@ -45,72 +45,82 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
 
                 try
                 {
-                    var scope = _factory.CreateScope();
-                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    /*
+                     * async database calls from background services should be
+                     * avoided so threading issues do not occur.
+                     * 
+                     * when calling scoped service (unit of work) from a singleton
+                     * service (background task) wrap in using block to mimic transient.
+                     */
 
-                    if (uow.InstanceType == InstanceContext.DeployedOrLocal)
+                    using (var scope = _factory.CreateScope())
                     {
-                        var motdtype1_response = new HttpClient().GetAsync(_url, cancellationToken).Result;
-                        var motdtype1 = JsonConvert.DeserializeObject<MotDType1Response>(motdtype1_response.Content.ReadAsStringAsync().Result);
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        if (motdtype1_response.IsSuccessStatusCode)
+                        if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
-                            var model = uow.Mapper.Map<tbl_MotD_Type1>(motdtype1.contents.quotes[0]);
-                            var motd = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author 
-                                && x.Quote == model.Quote).Result.SingleOrDefault();
+                            var motdtype1_response = new HttpClient().GetAsync(_url, stoppingToken).Result;
+                            var motdtype1 = JsonConvert.DeserializeObject<MotDType1Response>(motdtype1_response.Content.ReadAsStringAsync().Result);
 
-                            if(motd == null)
+                            if (motdtype1_response.IsSuccessStatusCode)
                             {
-                                /*
-                                 * parts of model are broken and need be fixed...
-                                 */
-                                if (model.Id == null)
-                                    model.Id = Guid.NewGuid().ToString();
+                                var model = uow.Mapper.Map<tbl_MotD_Type1>(motdtype1.contents.quotes[0]);
+                                var motd = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author
+                                    && x.Quote == model.Quote).Result.SingleOrDefault();
 
-                                uow.UserRepo.CreateMOTDAsync(model).Wait();
-                                uow.CommitAsync().Wait();
+                                if (motd == null)
+                                {
+                                    /*
+                                     * parts of model are broken and need be fixed...
+                                     */
+                                    if (model.Id == null)
+                                        model.Id = Guid.NewGuid().ToString();
+
+                                    uow.UserRepo.CreateMOTDAsync(model).Wait();
+                                    uow.CommitAsync().Wait();
+                                }
+                                else if (motd.Id != model.Id)
+                                {
+                                    motd.Id = model.Id;
+
+                                    uow.UserRepo.CreateMOTDAsync(motd).Wait();
+                                    uow.CommitAsync().Wait();
+                                }
+
+                                var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
+
+                                Status = JsonConvert.SerializeObject(
+                                    new
+                                    {
+                                        status = msg
+                                    }, _serializer);
+
+                                Log.Information(msg);
                             }
-                            else if (motd.Id != model.Id)
+                            else
                             {
-                                motd.Id = model.Id;
+                                var msg = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
 
-                                uow.UserRepo.CreateMOTDAsync(motd).Wait();
-                                uow.CommitAsync().Wait();
+                                Status = JsonConvert.SerializeObject(
+                                    new
+                                    {
+                                        status = msg,
+                                        request = motdtype1_response.RequestMessage.ToString(),
+                                        response = motdtype1_response.ToString()
+                                    }, _serializer);
+
+                                Log.Error(msg
+                                    + Environment.NewLine + motdtype1_response.RequestMessage.ToString()
+                                    + Environment.NewLine + motdtype1_response.ToString());
                             }
-
-                            var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
-
-                            Status = JsonConvert.SerializeObject(
-                                new
-                                {
-                                    status = msg
-                                }, _serializer);
-
-                            Log.Information(msg);
-                        }
-                        else
-                        {
-                            var msg = typeof(MaintainQuotesTask).Name + " fail on " + DateTime.Now.ToString();
-
-                            Status = JsonConvert.SerializeObject(
-                                new
-                                {
-                                    status = msg,
-                                    request = motdtype1_response.RequestMessage.ToString(),
-                                    response = motdtype1_response.ToString()
-                                }, _serializer);
-
-                            Log.Error(msg
-                                + Environment.NewLine + motdtype1_response.RequestMessage.ToString()
-                                + Environment.NewLine + motdtype1_response.ToString());
                         }
                     }
                 }

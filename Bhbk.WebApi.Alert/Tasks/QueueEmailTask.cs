@@ -53,72 +53,82 @@ namespace Bhbk.WebApi.Alert.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
 
                 if (!_enabled || _queue.IsEmpty)
                     continue;
 
-                var scope = _factory.CreateScope();
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                /*
+                 * async database calls from background services should be
+                 * avoided so threading issues do not occur.
+                 * 
+                 * when calling scoped service (unit of work) from a singleton
+                 * service (background task) wrap in using block to mimic transient.
+                 */
 
-                foreach (var entry in _queue)
+                using (var scope = _factory.CreateScope())
                 {
-                    try
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+                    foreach (var entry in _queue)
                     {
-                        EmailCreate model;
-
-                        if (!_queue.TryPeek(out model))
-                            break;
-
-                        if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
+                        try
                         {
-                            _queue.TryDequeue(out model);
+                            EmailCreate model;
 
-                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The email was created on "
-                                + model.Created + " and is being deleted now.");
+                            if (!_queue.TryPeek(out model))
+                                break;
 
-                            continue;
-                        }
-
-                        if (uow.InstanceType == InstanceContext.DeployedOrLocal)
-                        {
-                            var result = await _provider.TryEmailHandoff(_providerApiKey, model);
-
-                            if (result.StatusCode == HttpStatusCode.Accepted)
+                            if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
                             {
-                                if (!_queue.TryDequeue(out model))
-                                    break;
+                                _queue.TryDequeue(out model);
 
-                                Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
+                                Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The email was created on "
+                                    + model.Created + " and is being deleted now.");
+
+                                continue;
                             }
-                            else
-                                Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed. Error=" + result.StatusCode);
+
+                            if (uow.InstanceType == InstanceContext.DeployedOrLocal)
+                            {
+                                var result = await _provider.TryEmailHandoff(_providerApiKey, model);
+
+                                if (result.StatusCode == HttpStatusCode.Accepted)
+                                {
+                                    if (!_queue.TryDequeue(out model))
+                                        break;
+
+                                    Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
+                                }
+                                else
+                                    Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed. Error=" + result.StatusCode);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex.ToString());
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex.ToString());
-                    }
+
+                    var msg = typeof(QueueEmailTask).Name + " contains " + _queue.Count() + " email messages queued for hand-off.";
+
+                    Status = JsonConvert.SerializeObject(
+                        new
+                        {
+                            status = msg,
+                            queue = _queue.Select(x => new {
+                                Id = x.Id.ToString(),
+                                Created = x.Created,
+                                From = x.FromDisplay + " <" + x.FromEmail + ">",
+                                To = x.ToDisplay + " <" + x.ToEmail + ">",
+                                Subject = x.Subject
+                            })
+                        }, _serializer);
                 }
-
-                var msg = typeof(QueueEmailTask).Name + " contains " + _queue.Count() + " email messages queued for hand-off.";
-
-                Status = JsonConvert.SerializeObject(
-                    new
-                    {
-                        status = msg,
-                        queue = _queue.Select(x => new {
-                            Id = x.Id.ToString(),
-                            Created = x.Created,
-                            From = x.FromDisplay + " <" + x.FromEmail + ">",
-                            To = x.ToDisplay + " <" + x.ToEmail + ">",
-                            Subject = x.Subject
-                        })
-                    }, _serializer);
             }
         }
 

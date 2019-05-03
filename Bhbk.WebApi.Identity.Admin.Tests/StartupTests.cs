@@ -71,6 +71,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests
                 sc.AddSingleton<IHostedService, MaintainActivityTask>();
                 sc.AddSingleton<IHostedService, MaintainUsersTask>();
 
+                /*
+                 * do not use dependency injection for unit of work below. is used 
+                 * only for owin authentication configuration.
+                 */
+
                 var owin = new UnitOfWork(options, conf, InstanceContext.UnitTest);
                 new DefaultData(owin).CreateAsync().Wait();
 
