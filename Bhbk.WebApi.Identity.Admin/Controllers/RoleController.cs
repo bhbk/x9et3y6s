@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.UserRepo.AddToRoleAsync(user, role))
+            if (!await UoW.UserRepo.AddRoleAsync(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

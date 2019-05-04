@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public ClientCredentialController() { }
 
         [Route("v1/ccg"), HttpPost]
-        public IActionResult ClientCredentialV1_Use([FromForm] ClientCredentialV1 input)
+        public IActionResult ClientCredentialV1_Auth([FromForm] ClientCredentialV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg"), HttpPost]
-        public async Task<IActionResult> ClientCredentialV2_Use([FromForm] ClientCredentialV2 input)
+        public async Task<IActionResult> ClientCredentialV2_Auth([FromForm] ClientCredentialV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -109,8 +109,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
-                client = client.Id.ToString(),
-                issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                client = client.Name,
+                issuer = issuer.Name + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
@@ -192,8 +192,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
-                client = client.Id.ToString(),
-                issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                client = client.Name,
+                issuer = issuer.Name + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

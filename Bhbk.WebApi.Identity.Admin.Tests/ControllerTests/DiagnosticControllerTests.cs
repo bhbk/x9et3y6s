@@ -48,10 +48,18 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
                 var result = controller.GetStatusV1(TaskType.MaintainActivity.ToString()) as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+            }
 
-                result = controller.GetStatusV1(TaskType.MaintainUsers.ToString()) as OkObjectResult;
-                ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                data = ok.Value.Should().BeAssignableTo<string>().Subject;
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var controller = new DiagnosticController();
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+                var result = controller.GetStatusV1(TaskType.MaintainUsers.ToString()) as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<string>().Subject;
             }
         }
 

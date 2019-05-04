@@ -9,13 +9,13 @@ namespace Bhbk.Lib.Identity.Validators
     {
         public static bool Multiple(IEnumerable<string> clients, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
-            var clientList = new List<string>();
+            var list = new List<string>();
 
-            foreach (string first in clients)
-                foreach (string second in first.Split(','))
-                    clientList.Add(second.Trim());
+            foreach (string entry in clients)
+                foreach (string entity in entry.Split(','))
+                    list.Add(entity.Trim());
 
-            foreach (string entry in clientList)
+            foreach (string entry in list)
                 if (validationParameters.ValidAudiences.Contains(entry))
                     return true;
 
@@ -24,7 +24,10 @@ namespace Bhbk.Lib.Identity.Validators
 
         public static bool Single(string client, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
-            throw new NotImplementedException();
+            if (validationParameters.ValidAudiences.Contains(client))
+                return true;
+
+            return false;
         }
     }
 }

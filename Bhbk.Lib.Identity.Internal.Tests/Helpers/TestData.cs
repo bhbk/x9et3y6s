@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              * create test issuer
              */
 
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestIssuer))).FirstOrDefault();
+            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).SingleOrDefault();
 
             if (foundIssuer == null)
             {
@@ -51,7 +51,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              * create test client
              */
 
-            var foundClient = (await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestClient))).FirstOrDefault();
+            var foundClient = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).SingleOrDefault();
 
             if (foundClient == null)
             {
@@ -95,13 +95,14 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              */
 
             var url = new Uri(Constants.ApiUnitTestUriLink);
+
             var foundClientUrl = (await _uow.ClientRepo.GetUrlsAsync(x => x.ClientId == foundClient.Id
                 && x.UrlHost == (url.Scheme + "://" + url.Host)
                 && x.UrlPath == url.AbsolutePath)).SingleOrDefault();
 
             if (foundClientUrl == null)
             {
-                foundClientUrl = await _uow.ClientRepo.CreateUriAsync(
+                foundClientUrl = await _uow.ClientRepo.CreateUrlAsync(
                     _uow.Mapper.Map<tbl_Urls>(new UrlCreate()
                     {
                         ClientId = foundClient.Id,
@@ -117,7 +118,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              * create test claim
              */
 
-            var foundClaim = (await _uow.ClaimRepo.GetAsync(x => x.Type.Contains(Constants.ApiUnitTestClaim))).FirstOrDefault();
+            var foundClaim = (await _uow.ClaimRepo.GetAsync(x => x.Type == Constants.ApiUnitTestClaim)).SingleOrDefault();
 
             if (foundClaim == null)
             {
@@ -137,7 +138,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              * create test login
              */
 
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestLogin))).FirstOrDefault();
+            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).SingleOrDefault();
 
             if (foundLogin == null)
             {
@@ -155,7 +156,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              * create test role
              */
 
-            var foundRole = (await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Constants.ApiUnitTestRole))).FirstOrDefault();
+            var foundRole = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).SingleOrDefault();
 
             if (foundRole == null)
             {
@@ -175,7 +176,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              * create test user
              */
 
-            var foundUser = (await _uow.UserRepo.GetAsync(x => x.Email.Contains(Constants.ApiUnitTestUser))).FirstOrDefault();
+            var foundUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).SingleOrDefault();
 
             if (foundUser == null)
             {
@@ -239,13 +240,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              */
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRole.Id))
-                await _uow.UserRepo.AddToRoleAsync(foundUser, foundRole);
+                await _uow.UserRepo.AddRoleAsync(foundUser, foundRole);
 
             if (!await _uow.UserRepo.IsInLoginAsync(foundUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddToLoginAsync(foundUser, foundLogin);
+                await _uow.UserRepo.AddLoginAsync(foundUser, foundLogin);
 
             if (!await _uow.UserRepo.IsInClaimAsync(foundUser.Id, foundClaim.Id))
-                await _uow.UserRepo.AddToClaimAsync(foundUser, foundClaim);
+                await _uow.UserRepo.AddClaimAsync(foundUser, foundClaim);
 
             await _uow.CommitAsync();
 
@@ -344,7 +345,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
 
                 var clientUrl = new Uri(Constants.ApiUnitTestUriLink);
 
-                url = await _uow.ClientRepo.CreateUriAsync(
+                url = await _uow.ClientRepo.CreateUrlAsync(
                     _uow.Mapper.Map<tbl_Urls>(new UrlCreate()
                     {
                         ClientId = client.Id,
@@ -463,13 +464,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                 await _uow.CommitAsync();
 
                 if (!await _uow.UserRepo.IsInRoleAsync(user.Id, role.Id))
-                    await _uow.UserRepo.AddToRoleAsync(user, role);
+                    await _uow.UserRepo.AddRoleAsync(user, role);
 
                 if (!await _uow.UserRepo.IsInLoginAsync(user.Id, login.Id))
-                    await _uow.UserRepo.AddToLoginAsync(user, login);
+                    await _uow.UserRepo.AddLoginAsync(user, login);
 
                 if (!await _uow.UserRepo.IsInClaimAsync(user.Id, claim.Id))
-                    await _uow.UserRepo.AddToClaimAsync(user, claim);
+                    await _uow.UserRepo.AddClaimAsync(user, claim);
 
                 await _uow.CommitAsync();
 

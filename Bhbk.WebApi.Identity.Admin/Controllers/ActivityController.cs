@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -20,6 +21,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public ActivityController() { }
 
         [Route("v1/page"), HttpGet]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> GetActivityV1([FromQuery] SimplePager model)
         {
             if (!ModelState.IsValid)
@@ -55,6 +57,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
+        [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> GetActivityV1([FromBody] CascadePager model)
         {
             if (!ModelState.IsValid)

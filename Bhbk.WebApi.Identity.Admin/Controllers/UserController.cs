@@ -30,37 +30,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public UserController() { }
 
-        [Route("v1/{userID:guid}/add-password"), HttpPut]
-        [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> AddPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
-                return NotFound(ModelState);
-            }
-
-            user.ActorId = GetUserGUID();
-
-            if (model.NewPassword != model.NewPasswordConfirm)
-            {
-                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
-                return BadRequest(ModelState);
-            }
-
-            if (!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
@@ -81,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.UserRepo.AddToClaimAsync(user, claim))
+            if (!await UoW.UserRepo.AddClaimAsync(user, claim))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -109,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.UserRepo.AddToLoginAsync(user, login))
+            if (!await UoW.UserRepo.AddLoginAsync(user, login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -501,7 +470,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> RemoveLoginFromUserV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public async Task<IActionResult> RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -580,10 +549,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!await UoW.UserRepo.RemovePasswordAsync(user.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            if (!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
+            if (!await UoW.UserRepo.SetPasswordAsync(user.Id, model.NewPassword))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

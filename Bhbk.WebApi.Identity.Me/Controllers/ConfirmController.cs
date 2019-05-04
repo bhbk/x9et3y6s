@@ -36,7 +36,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             await UoW.UserRepo.SetConfirmedEmailAsync(user.Id, true);
-
             await UoW.CommitAsync();
 
             return NoContent();
@@ -63,7 +62,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             await UoW.UserRepo.SetConfirmedPasswordAsync(user.Id, true);
-
             await UoW.CommitAsync();
 
             return NoContent();
@@ -90,7 +88,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             await UoW.UserRepo.SetConfirmedPhoneNumberAsync(user.Id, true);
-
             await UoW.CommitAsync();
 
             return NoContent();

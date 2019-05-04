@@ -52,9 +52,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV1 AuthCode_UseV1(AuthCodeV1 model)
+        public UserJwtV1 AuthCode_AuthV1(AuthCodeV1 model)
         {
-            var response = Http.AuthCode_UseV1(model).Result;
+            var response = Http.AuthCode_AuthV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
@@ -63,9 +63,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV2 AuthCode_UseV2(AuthCodeV2 model)
+        public UserJwtV2 AuthCode_AuthV2(AuthCodeV2 model)
         {
-            var response = Http.AuthCode_UseV2(model).Result;
+            var response = Http.AuthCode_AuthV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
@@ -74,9 +74,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientJwtV1 ClientCredential_UseV1(ClientCredentialV1 model)
+        public ClientJwtV1 ClientCredential_AuthV1(ClientCredentialV1 model)
         {
-            var response = Http.ClientCredential_UseV1(model).Result;
+            var response = Http.ClientCredential_AuthV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<ClientJwtV1>().Result;
@@ -85,9 +85,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientJwtV2 ClientCredential_UseV2(ClientCredentialV2 model)
+        public ClientJwtV2 ClientCredential_AuthV2(ClientCredentialV2 model)
         {
-            var response = Http.ClientCredential_UseV2(model).Result;
+            var response = Http.ClientCredential_AuthV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<ClientJwtV2>().Result;
@@ -96,9 +96,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientJwtV1 ClientCredentialRefresh_UseV1(RefreshTokenV1 model)
+        public ClientJwtV1 ClientCredential_RefreshV1(RefreshTokenV1 model)
         {
-            var response = Http.ClientCredentialRefresh_UseV1(model).Result;
+            var response = Http.ClientCredential_RefreshV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<ClientJwtV1>().Result;
@@ -107,9 +107,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientJwtV2 ClientCredentialRefresh_UseV2(RefreshTokenV2 model)
+        public ClientJwtV2 ClientCredential_RefreshV2(RefreshTokenV2 model)
         {
-            var response = Http.ClientCredentialRefresh_UseV2(model).Result;
+            var response = Http.ClientCredential_RefreshV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<ClientJwtV2>().Result;
@@ -140,9 +140,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV1 DeviceCode_UseV1(DeviceCodeV1 model)
+        public UserJwtV1 DeviceCode_AuthV1(DeviceCodeV1 model)
         {
-            var response = Http.DeviceCode_UseV1(model).Result;
+            var response = Http.DeviceCode_AuthV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
@@ -151,9 +151,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV2 DeviceCode_UseV2(DeviceCodeV2 model)
+        public UserJwtV2 DeviceCode_AuthV2(DeviceCodeV2 model)
         {
-            var response = Http.DeviceCode_UseV2(model).Result;
+            var response = Http.DeviceCode_AuthV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
@@ -162,9 +162,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV1 Implicit_UseV1(ImplicitV1 model)
+        public UserJwtV1 Implicit_AuthV1(ImplicitV1 model)
         {
-            var response = Http.Implicit_UseV1(model).Result;
+            var response = Http.Implicit_AuthV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
@@ -173,9 +173,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV2 Implicit_UseV2(ImplicitV2 model)
+        public UserJwtV2 Implicit_AuthV2(ImplicitV2 model)
         {
-            var response = Http.Implicit_UseV2(model).Result;
+            var response = Http.Implicit_AuthV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
@@ -184,9 +184,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV1Legacy ResourceOwner_UseV1Legacy(ResourceOwnerV1 model)
+        public UserJwtV1Legacy ResourceOwner_AuthV1Legacy(ResourceOwnerV1 model)
         {
-            var response = Http.ResourceOwner_UseV1Legacy(model).Result;
+            var response = Http.ResourceOwner_AuthV1Legacy(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV1Legacy>().Result;
@@ -195,9 +195,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV1 ResourceOwner_UseV1(ResourceOwnerV1 model)
+        public UserJwtV1 ResourceOwner_AuthV1(ResourceOwnerV1 model)
         {
-            var response = Http.ResourceOwner_UseV1(model).Result;
+            var response = Http.ResourceOwner_AuthV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
@@ -206,9 +206,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV2 ResourceOwner_UseV2(ResourceOwnerV2 model)
+        public UserJwtV2 ResourceOwner_AuthV2(ResourceOwnerV2 model)
         {
-            var response = Http.ResourceOwner_UseV2(model).Result;
+            var response = Http.ResourceOwner_AuthV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;
@@ -217,9 +217,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV1 ResourceOwnerRefresh_UseV1(RefreshTokenV1 model)
+        public UserJwtV1 ResourceOwner_RefreshV1(RefreshTokenV1 model)
         {
-            var response = Http.ResourceOwnerRefresh_UseV1(model).Result;
+            var response = Http.ResourceOwner_RefreshV1(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV1>().Result;
@@ -228,9 +228,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserJwtV2 ResourceOwnerRefresh_UseV2(RefreshTokenV2 model)
+        public UserJwtV2 ResourceOwner_RefreshV2(RefreshTokenV2 model)
         {
-            var response = Http.ResourceOwnerRefresh_UseV2(model).Result;
+            var response = Http.ResourceOwner_RefreshV2(model).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsJsonAsync<UserJwtV2>().Result;

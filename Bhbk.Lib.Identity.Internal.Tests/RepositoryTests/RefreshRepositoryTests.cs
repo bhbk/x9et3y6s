@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RefreshRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -64,7 +64,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     }));
             result.Should().BeAssignableTo<tbl_Refreshes>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -79,25 +79,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RefreshRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var refresh = (await UoW.RefreshRepo.GetAsync()).First();
 
             var result = await UoW.RefreshRepo.DeleteAsync(refresh.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_RefreshRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.RefreshRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Refreshes>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]

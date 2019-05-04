@@ -27,17 +27,9 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         public string Status { get; private set; }
 
-        public QueueTextTask(IServiceScopeFactory factory)
+        public QueueTextTask(IServiceScopeFactory factory, IConfiguration conf)
         {
             _factory = factory;
-            _serializer = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
-
-            var scope = _factory.CreateScope();
-            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
             _delay = int.Parse(conf["Tasks:QueueText:PollingDelay"]);
             _expire = int.Parse(conf["Tasks:QueueText:ExpireDelay"]);
             _enabled = bool.Parse(conf["Tasks:QueueText:Enabled"]);
@@ -45,6 +37,10 @@ namespace Bhbk.WebApi.Alert.Tasks
             _providerToken = conf["Tasks:QueueText:ProviderToken"];
             _queue = new ConcurrentQueue<TextCreate>();
             _provider = new TwilioProvider();
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
 
             Status = JsonConvert.SerializeObject(
                 new

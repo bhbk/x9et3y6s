@@ -29,176 +29,158 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_ConfirmV1_Email_Fail()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new ConfirmController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var token = await new ProtectHelper(uow.InstanceType.ToString())
-                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
-                token.Should().NotBeNullOrEmpty();
+            var token = await new ProtectHelper(uow.InstanceType.ToString())
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
+            token.Should().NotBeNullOrEmpty();
 
-                var result = await controller.ConfirmEmailV1(user.Id, newEmail,
-                    RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
-                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-            }
+            var result = await controller.ConfirmEmailV1(user.Id, newEmail,
+                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [Fact]
         public async Task Me_ConfirmV1_Email_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new ConfirmController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var token = await new ProtectHelper(uow.InstanceType.ToString())
-                    .GenerateAsync(newEmail, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
-                token.Should().NotBeNullOrEmpty();
+            var token = await new ProtectHelper(uow.InstanceType.ToString())
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
+            token.Should().NotBeNullOrEmpty();
 
-                var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
-                result.Should().BeAssignableTo(typeof(NoContentResult));
-            }
+            var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [Fact]
         public async Task Me_ConfirmV1_Password_Fail()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new ConfirmController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var newPassword = RandomValues.CreateBase64String(12);
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var newPassword = RandomValues.CreateBase64String(12);
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var token = await new ProtectHelper(uow.InstanceType.ToString())
-                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
-                token.Should().NotBeNullOrEmpty();
+            var token = await new ProtectHelper(uow.InstanceType.ToString())
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
+            token.Should().NotBeNullOrEmpty();
 
-                var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
-                    RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
-                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-            }
+            var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
+                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [Fact]
         public async Task Me_ConfirmV1_Password_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new ConfirmController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var newPassword = RandomValues.CreateBase64String(12);
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var newPassword = RandomValues.CreateBase64String(12);
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var token = await new ProtectHelper(uow.InstanceType.ToString())
-                    .GenerateAsync(newPassword, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
-                token.Should().NotBeNullOrEmpty();
+            var token = await new ProtectHelper(uow.InstanceType.ToString())
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(uow.ConfigRepo.AuthCodeTotpExpire), user);
+            token.Should().NotBeNullOrEmpty();
 
-                var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
-                result.Should().BeAssignableTo(typeof(NoContentResult));
-            }
+            var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [Fact]
         public async Task Me_ConfirmV1_PhoneNumber_Fail()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new ConfirmController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var newPhoneNumber = RandomValues.CreateNumberAsString(10);
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var token = await new TotpHelper(8, 10).GenerateAsync(newPhoneNumber, user);
-                token.Should().NotBeNullOrEmpty();
+            var token = await new TotpHelper(8, 10).GenerateAsync(newPhoneNumber, user);
+            token.Should().NotBeNullOrEmpty();
 
-                var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber,
-                    RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
-                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-            }
+            var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber,
+                RandomValues.CreateBase64String(token.Length)) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
         }
 
         [Fact]
         public async Task Me_ConfirmV1_PhoneNumber_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new ConfirmController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new ConfirmController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var newPhoneNumber = RandomValues.CreateNumberAsString(10);
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var token = await new TotpHelper(8, 10).GenerateAsync(newPhoneNumber, user);
-                token.Should().NotBeNullOrEmpty();
+            var token = await new TotpHelper(8, 10).GenerateAsync(newPhoneNumber, user);
+            token.Should().NotBeNullOrEmpty();
 
-                var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber, token) as NoContentResult;
-                result.Should().BeAssignableTo(typeof(NoContentResult));
-            }
+            var result = await controller.ConfirmPhoneV1(user.Id, newPhoneNumber, token) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
     }
 }

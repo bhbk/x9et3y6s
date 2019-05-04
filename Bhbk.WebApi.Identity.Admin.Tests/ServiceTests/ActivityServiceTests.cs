@@ -39,16 +39,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new AdminService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
-
-                /*
-                 * check model and/or action...
-                 */
-
                 var result = await service.Http.Activity_GetV1(RandomValues.CreateBase64String(8), new CascadePager());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            }
+
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new AdminService(uow.InstanceType, _owin);
+
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
@@ -56,24 +57,26 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                result = await service.Http.Activity_GetV1(rop.RawData, new CascadePager());
+                var result = await service.Http.Activity_GetV1(rop.RawData, new CascadePager());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            }
 
-                /*
-                 * check model and/or action...
-                 */
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new AdminService(uow.InstanceType, _owin);
 
-                issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
 
-                rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("created", "desc"));
 
-                result = await service.Http.Activity_GetV1(rop.RawData,
+                var result = await service.Http.Activity_GetV1(rop.RawData,
                     new CascadePager()
                     {
                         Filter = string.Empty,
@@ -92,9 +95,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new AdminService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
-                await new TestData(uow).CreateRandomAsync(3);
+                new TestData(uow).CreateRandomAsync(3).Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
@@ -102,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var take = 3;
+                var take = 2;
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("created", "asc"));
 

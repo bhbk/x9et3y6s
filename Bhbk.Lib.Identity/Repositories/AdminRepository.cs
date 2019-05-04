@@ -574,22 +574,6 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_AddPasswordV1(string jwt, Guid userID, UserAddPassword model)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/user/v1/" + userID.ToString() + "/add-password";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
         public async Task<HttpResponseMessage> User_CreateV1(string jwt, UserCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);

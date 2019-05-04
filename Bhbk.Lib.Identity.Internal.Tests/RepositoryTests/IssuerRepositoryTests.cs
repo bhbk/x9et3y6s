@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_IssuerRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.IssuerRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Issuers>(new IssuerCreate()
@@ -52,7 +52,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     }));
             result.Should().BeAssignableTo<tbl_Issuers>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -67,25 +67,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_IssuerRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
 
             var result = await UoW.IssuerRepo.DeleteAsync(issuer.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_IssuerRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.IssuerRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Issuers>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_IssuerRepo_UpdateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
             issuer.Name += "(Updated)";
@@ -108,7 +108,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.IssuerRepo.UpdateAsync(issuer);
             result.Should().BeAssignableTo<tbl_Issuers>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
     }
 }

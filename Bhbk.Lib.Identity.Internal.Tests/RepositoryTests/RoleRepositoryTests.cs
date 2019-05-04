@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RoleRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     }));
             result.Should().BeAssignableTo<tbl_Roles>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -69,25 +69,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RoleRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).First();
 
             var result = await UoW.RoleRepo.DeleteAsync(role.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_RoleRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.RoleRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Roles>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_RoleRepo_UpdateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).First();
             role.Name += "(Updated)";
@@ -110,7 +110,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.RoleRepo.UpdateAsync(role);
             result.Should().BeAssignableTo<tbl_Roles>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
     }
 }

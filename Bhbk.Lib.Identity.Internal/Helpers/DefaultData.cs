@@ -190,16 +190,16 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              */
 
             if (!await _uow.UserRepo.IsInLoginAsync(foundAdminUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddToLoginAsync(foundAdminUser, foundLogin);
+                await _uow.UserRepo.AddLoginAsync(foundAdminUser, foundLogin);
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundAdminUser.Id, foundRoleForAdmin.Id))
-                await _uow.UserRepo.AddToRoleAsync(foundAdminUser, foundRoleForAdmin);
+                await _uow.UserRepo.AddRoleAsync(foundAdminUser, foundRoleForAdmin);
 
             if (!await _uow.UserRepo.IsInLoginAsync(foundNormalUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddToLoginAsync(foundNormalUser, foundLogin);
+                await _uow.UserRepo.AddLoginAsync(foundNormalUser, foundLogin);
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundNormalUser.Id, foundRoleForUser.Id))
-                await _uow.UserRepo.AddToRoleAsync(foundNormalUser, foundRoleForUser);
+                await _uow.UserRepo.AddRoleAsync(foundNormalUser, foundRoleForUser);
         }
 
         public async Task DestroyAsync()

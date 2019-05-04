@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_ActivityRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
 
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 }));
             result.Should().BeAssignableTo<tbl_Activities>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -70,25 +70,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_ActivityRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var activity = (await UoW.ActivityRepo.GetAsync()).First();
 
             var result = await UoW.ActivityRepo.DeleteAsync(activity.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_ActivityRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.ActivityRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Activities>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]

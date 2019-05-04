@@ -83,7 +83,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.Add(entity).Entity);
         }
 
-        public async Task<tbl_Urls> CreateUriAsync(tbl_Urls entity)
+        public async Task<tbl_Urls> CreateUrlAsync(tbl_Urls entity)
         {
             return await Task.FromResult(_context.Add(entity).Entity);
         }
@@ -193,8 +193,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             if (includes != null)
                 query = includes(query);
-
-            //query = query.Include(x => x.Roles);
 
             if (orders != null)
             {

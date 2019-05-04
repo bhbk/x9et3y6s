@@ -55,14 +55,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV1_Use_NotImplemented()
+        public async Task Sts_OAuth2_DeviceCodeV1_Auth_NotImplemented()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                var dc = await service.Http.DeviceCode_UseV1(
+                var dc = await service.Http.DeviceCode_AuthV1(
                     new DeviceCodeV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -77,17 +77,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail()
+        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_IssuerNotExist()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
-
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
@@ -101,19 +97,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
 
-                ask = await service.Http.DeviceCode_AskV2(
-                    new DeviceCodeAskV2()
-                    {
-                        issuer = string.Empty,
-                        client = client.Id.ToString(),
-                        grant_type = "device_code",
-                        user = user.Id.ToString(),
-                    });
-                ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        [Fact]
+        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_ClientNotExist()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
-                ask = await service.Http.DeviceCode_AskV2(
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -123,19 +124,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
 
-                ask = await service.Http.DeviceCode_AskV2(
-                    new DeviceCodeAskV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Empty,
-                        grant_type = "device_code",
-                        user = user.Id.ToString(),
-                    });
-                ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        [Fact]
+        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_UserNotExist()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
-                ask = await service.Http.DeviceCode_AskV2(
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                var ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -145,17 +151,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 ask.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                ask = await service.Http.DeviceCode_AskV2(
-                    new DeviceCodeAskV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "device_code",
-                        user = string.Empty,
-                    });
-                ask.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                ask.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
         }
 
@@ -168,8 +163,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -191,22 +186,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Use_Fail()
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_ClientNotExist()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
-
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
                     {
@@ -220,33 +214,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
                     }));
 
-                await uow.CommitAsync();
+                uow.CommitAsync().Wait();
 
-                var dc = await service.Http.DeviceCode_UseV2(
-                    new DeviceCodeV2()
-                    {
-                        issuer = Guid.NewGuid().ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "device_code",
-                        user_code = secret,
-                        device_code = state.StateValue,
-                    });
-                dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                dc = await service.Http.DeviceCode_UseV2(
-                    new DeviceCodeV2()
-                    {
-                        issuer = string.Empty,
-                        client = client.Id.ToString(),
-                        grant_type = "device_code",
-                        user_code = secret,
-                        device_code = state.StateValue,
-                    });
-                dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                dc = await service.Http.DeviceCode_UseV2(
+                var dc = await service.Http.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -257,32 +227,41 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
 
-                dc = await service.Http.DeviceCode_UseV2(
-                    new DeviceCodeV2()
+        [Fact]
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_DeviceCodeNotExist()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
+                var state = await uow.StateRepo.CreateAsync(
+                    uow.Mapper.Map<tbl_States>(new StateCreate()
                     {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Empty,
-                        grant_type = "device_code",
-                        user_code = secret,
-                        device_code = state.StateValue,
-                    });
-                dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                    }));
 
-                dc = await service.Http.DeviceCode_UseV2(
-                    new DeviceCodeV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "device_code",
-                        user_code = RandomValues.CreateAlphaNumericString(32),
-                        device_code = state.StateValue,
-                    });
-                dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                uow.CommitAsync().Wait();
 
-                dc = await service.Http.DeviceCode_UseV2(
+                var dc = await service.Http.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -297,26 +276,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Use_Success()
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_IssuerNotExist()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
-
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
                     {
@@ -330,17 +304,111 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
                     }));
 
-                await uow.CommitAsync();
+                uow.CommitAsync().Wait();
+
+                var dc = await service.Http.DeviceCode_AuthV2(
+                    new DeviceCodeV2()
+                    {
+                        issuer = Guid.NewGuid().ToString(),
+                        client = client.Id.ToString(),
+                        grant_type = "device_code",
+                        user_code = secret,
+                        device_code = state.StateValue,
+                    });
+                dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_UserCodeNotExist()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
+                var state = await uow.StateRepo.CreateAsync(
+                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                    }));
+
+                uow.CommitAsync().Wait();
+
+                var dc = await service.Http.DeviceCode_AuthV2(
+                    new DeviceCodeV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = client.Id.ToString(),
+                        grant_type = "device_code",
+                        user_code = RandomValues.CreateAlphaNumericString(32),
+                        device_code = state.StateValue,
+                    });
+                dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Success()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                var salt = conf["IdentityTenants:Salt"];
+                salt.Should().Be(uow.IssuerRepo.Salt);
+
+                var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
+                var state = await uow.StateRepo.CreateAsync(
+                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        ClientId = client.Id,
+                        UserId = user.Id,
+                        StateValue = RandomValues.CreateBase64String(32),
+                        StateType = StateType.Device.ToString(),
+                        StateConsume = false,
+                        ValidFromUtc = DateTime.UtcNow,
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                    }));
+
+                uow.CommitAsync().Wait();
 
                 /*
                  * the state needs to be approved... would be done by user...
                  */
                 state.StateDecision = true;
 
-                await uow.StateRepo.UpdateAsync(state);
-                await uow.CommitAsync();
+                uow.StateRepo.UpdateAsync(state).Wait();
+                uow.CommitAsync().Wait();
 
-                var dc = service.DeviceCode_UseV2(
+                var dc = service.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),

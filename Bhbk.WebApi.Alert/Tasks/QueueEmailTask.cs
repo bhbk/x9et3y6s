@@ -28,23 +28,19 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         public string Status { get; private set; }
 
-        public QueueEmailTask(IServiceScopeFactory factory)
+        public QueueEmailTask(IServiceScopeFactory factory, IConfiguration conf)
         {
             _factory = factory;
-            _serializer = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
-
-            var scope = _factory.CreateScope();
-            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
             _delay = int.Parse(conf["Tasks:QueueEmail:PollingDelay"]);
             _expire = int.Parse(conf["Tasks:QueueEmail:ExpireDelay"]);
             _enabled = bool.Parse(conf["Tasks:QueueEmail:Enabled"]);
             _providerApiKey = conf["Tasks:QueueEmail:ProviderApiKey"];
             _queue = new ConcurrentQueue<EmailCreate>();
             _provider = new SendgridProvider();
+            _serializer = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
 
             Status = JsonConvert.SerializeObject(
                 new

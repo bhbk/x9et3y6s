@@ -90,7 +90,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthCode_UseV1(AuthCodeV1 model)
+        public async Task<HttpResponseMessage> AuthCode_AuthV1(AuthCodeV1 model)
         {
             var content = Uri.EscapeUriString("?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
                 + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> AuthCode_UseV2(AuthCodeV2 model)
+        public async Task<HttpResponseMessage> AuthCode_AuthV2(AuthCodeV2 model)
         {
             var content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
                 + "&client=" + HttpUtility.UrlEncode(model.client)
@@ -136,7 +136,7 @@ namespace Bhbk.Lib.Identity.Repositories
          * https://oauth.net/2/grant-types/client-credentials/
          * https://oauth.net/2/grant-types/refresh-token/
          */
-        public async Task<HttpResponseMessage> ClientCredential_UseV1(ClientCredentialV1 model)
+        public async Task<HttpResponseMessage> ClientCredential_AuthV1(ClientCredentialV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -157,7 +157,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCredential_UseV2(ClientCredentialV2 model)
+        public async Task<HttpResponseMessage> ClientCredential_AuthV2(ClientCredentialV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -178,7 +178,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCredentialRefresh_UseV1(RefreshTokenV1 model)
+        public async Task<HttpResponseMessage> ClientCredential_RefreshV1(RefreshTokenV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -199,7 +199,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ClientCredentialRefresh_UseV2(RefreshTokenV2 model)
+        public async Task<HttpResponseMessage> ClientCredential_RefreshV2(RefreshTokenV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -265,7 +265,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_UseV1(DeviceCodeV1 model)
+        public async Task<HttpResponseMessage> DeviceCode_AuthV1(DeviceCodeV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -287,7 +287,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> DeviceCode_UseV2(DeviceCodeV2 model)
+        public async Task<HttpResponseMessage> DeviceCode_AuthV2(DeviceCodeV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -312,7 +312,7 @@ namespace Bhbk.Lib.Identity.Repositories
         /* 
          * https://oauth.net/2/grant-types/implicit/
          */
-        public async Task<HttpResponseMessage> Implicit_UseV1(ImplicitV1 model)
+        public async Task<HttpResponseMessage> Implicit_AuthV1(ImplicitV1 model)
         {
             string content = "?issuer_id=" + HttpUtility.UrlEncode(model.issuer_id)
                 + "&client_id=" + HttpUtility.UrlEncode(model.client_id)
@@ -334,7 +334,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Implicit_UseV2(ImplicitV2 model)
+        public async Task<HttpResponseMessage> Implicit_AuthV2(ImplicitV2 model)
         {
             string content = "?issuer=" + HttpUtility.UrlEncode(model.issuer)
                 + "&client=" + HttpUtility.UrlEncode(model.client)
@@ -360,7 +360,7 @@ namespace Bhbk.Lib.Identity.Repositories
          * https://oauth.net/2/grant-types/password/
          * https://oauth.net/2/grant-types/refresh-token/
          */
-        public async Task<HttpResponseMessage> ResourceOwner_UseV1Legacy(ResourceOwnerV1 model)
+        public async Task<HttpResponseMessage> ResourceOwner_AuthV1Legacy(ResourceOwnerV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -381,7 +381,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ResourceOwner_UseV1(ResourceOwnerV1 model)
+        public async Task<HttpResponseMessage> ResourceOwner_AuthV1(ResourceOwnerV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -403,7 +403,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ResourceOwner_UseV2(ResourceOwnerV2 model)
+        public async Task<HttpResponseMessage> ResourceOwner_AuthV2(ResourceOwnerV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -425,7 +425,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ResourceOwnerRefresh_UseV1(RefreshTokenV1 model)
+        public async Task<HttpResponseMessage> ResourceOwner_RefreshV1(RefreshTokenV1 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {
@@ -446,7 +446,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> ResourceOwnerRefresh_UseV2(RefreshTokenV2 model)
+        public async Task<HttpResponseMessage> ResourceOwner_RefreshV2(RefreshTokenV2 model)
         {
             var content = new FormUrlEncodedContent(new[]
                 {

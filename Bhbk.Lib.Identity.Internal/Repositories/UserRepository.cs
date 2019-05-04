@@ -84,17 +84,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
-        public async Task<bool> AddPasswordAsync(Guid key, string password)
-        {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            if (!string.IsNullOrEmpty(entity.PasswordHash))
-                throw new InvalidOperationException();
-
-            return await InternalUpdatePassword(entity, password);
-        }
-
-        public async Task<bool> AddToClaimAsync(tbl_Users user, tbl_Claims claim)
+        public async Task<bool> AddClaimAsync(tbl_Users user, tbl_Claims claim)
         {
             _context.tbl_UserClaims.Add(
                 new tbl_UserClaims()
@@ -108,7 +98,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddToLoginAsync(tbl_Users user, tbl_Logins login)
+        public async Task<bool> AddLoginAsync(tbl_Users user, tbl_Logins login)
         {
             _context.tbl_UserLogins.Add(
                 new tbl_UserLogins()
@@ -122,7 +112,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddToRoleAsync(tbl_Users user, tbl_Roles role)
+        public async Task<bool> AddRoleAsync(tbl_Users user, tbl_Roles role)
         {
             _context.tbl_UserRoles.Add(
                 new tbl_UserRoles()
@@ -181,7 +171,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             _context.SaveChanges();
 
-            await InternalUpdatePassword(entity, password);
+            await InternalSetPasswordAsync(entity, password);
 
             return await Task.FromResult(create);
         }
@@ -321,8 +311,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             if (includes != null)
                 query = includes(query);
 
-            //query = query.Include(x => x.UserRoles);
-
             if (orders != null)
             {
                 query = orders(query)
@@ -416,7 +404,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        internal async Task<bool> InternalUpdatePassword(tbl_Users user, string password)
+        internal async Task<bool> InternalSetPasswordAsync(tbl_Users user, string password)
         {
             if (passwordValidator == null)
                 throw new NotSupportedException();
@@ -503,7 +491,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 return false;
             }
         }
-
+        
         public async Task<bool> IsPasswordSetAsync(Guid key)
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).SingleOrDefault();
@@ -519,27 +507,27 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<bool> RemoveFromClaimAsync(tbl_Users user, tbl_Claims claim)
         {
-            var result = _context.tbl_UserClaims.Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
+            var entity = _context.tbl_UserClaims.Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
 
-            _context.tbl_UserClaims.Remove(result);
+            _context.tbl_UserClaims.Remove(entity);
 
             return await Task.FromResult(true);
         }
 
         public async Task<bool> RemoveFromLoginAsync(tbl_Users user, tbl_Logins login)
         {
-            var result = _context.tbl_UserLogins.Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
+            var entity = _context.tbl_UserLogins.Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
 
-            _context.tbl_UserLogins.Remove(result);
+            _context.tbl_UserLogins.Remove(entity);
 
             return await Task.FromResult(true);
         }
 
         public async Task<bool> RemoveFromRoleAsync(tbl_Users user, tbl_Roles role)
         {
-            var result = _context.tbl_UserRoles.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
+            var entity = _context.tbl_UserRoles.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
-            _context.tbl_UserRoles.Remove(result);
+            _context.tbl_UserRoles.Remove(entity);
 
             return await Task.FromResult(true);
         }
@@ -599,6 +587,13 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
+        public async Task<bool> SetPasswordAsync(Guid key, string password)
+        {
+            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+
+            return await InternalSetPasswordAsync(entity, password);
+        }
+
         public async Task<bool> SetTwoFactorEnabledAsync(Guid key, bool enabled)
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
@@ -645,16 +640,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _context.Entry(entity).State = EntityState.Modified;
 
             return await Task.FromResult(_context.Update(entity).Entity);
-        }
-
-        public async Task<bool> UpdatePassword(Guid key, string password)
-        {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            if (!await InternalUpdatePassword(entity, password))
-                return false;
-
-            return true;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_StateRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
             var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).First();
@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     }));
             result.Should().BeAssignableTo<tbl_States>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -81,25 +81,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_StateRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var state = (await UoW.StateRepo.GetAsync()).First();
 
             var result = await UoW.StateRepo.DeleteAsync(state.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_StateRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.StateRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_States>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]

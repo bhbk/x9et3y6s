@@ -7,6 +7,7 @@ using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/acg"), HttpGet]
-        public IActionResult AuthCodeV1_Use([FromQuery] AuthCodeV1 input)
+        public IActionResult AuthCodeV1_Auth([FromQuery] AuthCodeV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -137,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var create = await UoW.StateRepo.CreateAsync(
+            var state = await UoW.StateRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
@@ -152,18 +153,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             await UoW.CommitAsync();
 
-            var result = new Uri(authorize.AbsoluteUri + "?issuer=" + HttpUtility.UrlEncode(create.IssuerId.ToString())
-                + "&client=" + HttpUtility.UrlEncode(create.ClientId.ToString())
-                + "&user=" + HttpUtility.UrlEncode(create.UserId.ToString())
-                + "&response_type=code"
-                + "&redirect_uri=" + HttpUtility.UrlEncode(redirect.AbsoluteUri)
-                + "&state=" + HttpUtility.UrlEncode(create.StateValue));
-
-            return RedirectPermanent(result.AbsoluteUri);
+            return RedirectPermanent(UrlHelper.GenerateAuthorizationCode(authorize, redirect, state).AbsoluteUri);
         }
 
         [Route("v2/acg"), HttpGet]
-        public async Task<IActionResult> AuthCodeV2_Use([FromQuery] AuthCodeV2 input)
+        public async Task<IActionResult> AuthCodeV2_Auth([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -245,9 +239,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
-                        client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                        client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID, y => y.Include(z => z.tbl_Urls))).SingleOrDefault();
                     else
-                        client = (await UoW.ClientRepo.GetAsync(x => x.Name == entry.Trim())).SingleOrDefault();
+                        client = (await UoW.ClientRepo.GetAsync(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Urls))).SingleOrDefault();
 
                     if (client == null)
                     {
@@ -270,8 +264,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             foreach (var entry in clients)
             {
-                if (!entry.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath)
-                    && !entry.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+                if (!entry.tbl_Urls.Where(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath).Any()
+                    && !entry.tbl_Urls.Where(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri).Any())
                 {
                     ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                     return BadRequest(ModelState);
@@ -305,9 +299,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
-                user = user.Id.ToString(),
-                client = clients.Select(x => x.Id.ToString()).ToList(),
-                issuer = issuer.Id.ToString() + ":" + UoW.IssuerRepo.Salt,
+                user = user.Email,
+                client = clients.Select(x => x.Name).ToList(),
+                issuer = issuer.Name + ":" + UoW.IssuerRepo.Salt,
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

@@ -24,19 +24,15 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainQuotesTask(IServiceScopeFactory factory)
+        public MaintainQuotesTask(IServiceScopeFactory factory, IConfiguration conf)
         {
             _factory = factory;
+            _delay = int.Parse(conf["Tasks:MaintainQuotes:PollingDelay"]);
+            _url = conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
-
-            var scope = _factory.CreateScope();
-            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-            _delay = int.Parse(conf["Tasks:MaintainQuotes:PollingDelay"]);
-            _url = conf["Tasks:MaintainQuotes:QuoteOfDayUrl"];
 
             Status = JsonConvert.SerializeObject(
                 new

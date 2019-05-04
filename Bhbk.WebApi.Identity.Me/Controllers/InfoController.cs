@@ -224,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password"), HttpPut]
-        public async Task<IActionResult> SetPasswordV1([FromBody] UserChangePassword model)
+        public async Task<IActionResult> SetUserPasswordV1([FromBody] UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -253,7 +253,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!await UoW.UserRepo.RemovePasswordAsync(user.Id))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            if (!await UoW.UserRepo.AddPasswordAsync(user.Id, model.NewPassword))
+            if (!await UoW.UserRepo.SetPasswordAsync(user.Id, model.NewPassword))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

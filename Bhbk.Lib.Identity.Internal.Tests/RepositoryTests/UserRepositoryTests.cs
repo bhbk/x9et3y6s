@@ -44,7 +44,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_UserRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.UserRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Users>(new UserCreate()
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     }));
             result.Should().BeAssignableTo<tbl_Users>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -74,25 +74,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_UserRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
 
             var result = await UoW.UserRepo.DeleteAsync(issuer.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_UserRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.UserRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Users>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_UserRepo_UpdateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
             user.FirstName += "(Updated)";
@@ -117,7 +117,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
 
             result.Should().BeAssignableTo<tbl_Users>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
     }
 }

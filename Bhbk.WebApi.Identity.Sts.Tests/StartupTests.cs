@@ -55,13 +55,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-
-                /*
-                 * need some structural changes to tests before can go
-                 * from singleton to scoped (per request) for unit of work.
-                 */
-
-                sc.AddSingleton<IUnitOfWork, UnitOfWork>(x =>
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
                 {
                     var sandbox = new UnitOfWork(options, conf, InstanceContext.UnitTest);
                     new DefaultData(sandbox).CreateAsync().Wait();

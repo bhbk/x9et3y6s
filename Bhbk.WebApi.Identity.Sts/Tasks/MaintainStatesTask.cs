@@ -18,18 +18,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainStatesTask(IServiceScopeFactory factory)
+        public MaintainStatesTask(IServiceScopeFactory factory, IConfiguration conf)
         {
             _factory = factory;
+            _delay = int.Parse(conf["Tasks:MaintainStates:PollingDelay"]);
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
-
-            var scope = _factory.CreateScope();
-            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-            _delay = int.Parse(conf["Tasks:MaintainStates:PollingDelay"]);
 
             Status = JsonConvert.SerializeObject(
                 new

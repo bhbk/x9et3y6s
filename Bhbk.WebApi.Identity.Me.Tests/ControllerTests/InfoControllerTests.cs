@@ -32,239 +32,215 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_DeleteRefreshes_Fail()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var result = await controller.DeleteUserRefreshV1(Guid.NewGuid()) as NotFoundObjectResult;
-                result = await controller.DeleteUserRefreshesV1() as NotFoundObjectResult;
-            }
+            var result = await controller.DeleteUserRefreshV1(Guid.NewGuid()) as NotFoundObjectResult;
+            result = await controller.DeleteUserRefreshesV1() as NotFoundObjectResult;
         }
 
         [Fact]
         public async Task Me_InfoV1_DeleteRefreshes_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                for (int i = 0; i < 3; i++)
-                    await JwtFactory.UserRefreshV2(uow, issuer, user);
+            for (int i = 0; i < 3; i++)
+                await JwtFactory.UserRefreshV2(uow, issuer, user);
 
-                var refresh = (await uow.RefreshRepo.GetAsync(x => x.UserId == user.Id)).First();
+            var refresh = (await uow.RefreshRepo.GetAsync(x => x.UserId == user.Id)).First();
 
-                var result = await controller.DeleteUserRefreshV1(refresh.Id) as OkObjectResult;
-                result = await controller.DeleteUserRefreshesV1() as OkObjectResult;
-            }
+            var result = await controller.DeleteUserRefreshV1(refresh.Id) as OkObjectResult;
+            result = await controller.DeleteUserRefreshesV1() as OkObjectResult;
         }
 
         [Fact]
         public async Task Me_InfoV1_Get_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var result = await controller.GetUserV1() as OkObjectResult;
-                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
+            var result = await controller.GetUserV1() as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
 
-                data.Id.Should().Be(user.Id);
-            }
+            data.Id.Should().Be(user.Id);
         }
 
         [Fact]
         public async Task Me_InfoV1_GetRefreshes_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var result = await controller.GetUserRefreshesV1() as OkObjectResult;
-                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<IEnumerable<RefreshModel>>().Subject;
-            }
+            var result = await controller.GetUserRefreshesV1() as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<IEnumerable<RefreshModel>>().Subject;
         }
 
         [Fact]
         public async Task Me_InfoV1_SetPassword_Fail()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
+
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var model = new UserChangePassword()
             {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                CurrentPassword = Constants.ApiUnitTestUserPassCurrent,
+                NewPassword = RandomValues.CreateBase64String(16),
+                NewPasswordConfirm = RandomValues.CreateBase64String(16)
+            };
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            controller.SetUser(user.Id);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            var result = await controller.SetUserPasswordV1(model) as BadRequestObjectResult;
+            result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var model = new UserChangePassword()
-                {
-                    CurrentPassword = Constants.ApiUnitTestUserPassCurrent,
-                    NewPassword = RandomValues.CreateBase64String(16),
-                    NewPasswordConfirm = RandomValues.CreateBase64String(16)
-                };
-
-                controller.SetUser(user.Id);
-
-                var result = await controller.SetPasswordV1(model) as BadRequestObjectResult;
-                result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
-
-                var check = await uow.UserRepo.CheckPasswordAsync(user.Id, model.NewPassword);
-                check.Should().BeFalse();
-            }
+            var check = await uow.UserRepo.CheckPasswordAsync(user.Id, model.NewPassword);
+            check.Should().BeFalse();
         }
 
         [Fact]
         public async Task Me_InfoV1_SetPassword_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
+
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var model = new UserChangePassword()
             {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                CurrentPassword = Constants.ApiUnitTestUserPassCurrent,
+                NewPassword = Constants.ApiUnitTestUserPassNew,
+                NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
+            };
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            controller.SetUser(user.Id);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            var result = await controller.SetUserPasswordV1(model) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-                var model = new UserChangePassword()
-                {
-                    CurrentPassword = Constants.ApiUnitTestUserPassCurrent,
-                    NewPassword = Constants.ApiUnitTestUserPassNew,
-                    NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
-                };
-
-                controller.SetUser(user.Id);
-
-                var result = await controller.SetPasswordV1(model) as NoContentResult;
-                result.Should().BeAssignableTo(typeof(NoContentResult));
-
-                var check = await uow.UserRepo.CheckPasswordAsync(user.Id, model.NewPassword);
-                check.Should().BeTrue();
-            }
+            var check = await uow.UserRepo.CheckPasswordAsync(user.Id, model.NewPassword);
+            check.Should().BeTrue();
         }
 
         [Fact]
         public async Task Me_InfoV1_SetTwoFactor_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
 
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                controller.SetUser(user.Id);
+            controller.SetUser(user.Id);
 
-                var status = await uow.UserRepo.SetTwoFactorEnabledAsync(user.Id, false);
-                status.Should().BeTrue();
+            var status = await uow.UserRepo.SetTwoFactorEnabledAsync(user.Id, false);
+            status.Should().BeTrue();
 
-                var result = await controller.SetTwoFactorV1(true) as NoContentResult;
-                result.Should().BeAssignableTo(typeof(NoContentResult));
-            }
+            var result = await controller.SetTwoFactorV1(true) as NoContentResult;
+            result.Should().BeAssignableTo(typeof(NoContentResult));
         }
 
         [Fact]
         public async Task Me_InfoV1_Update_Success()
         {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
+            var controller = new InfoController();
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+
+            new TestData(uow).DestroyAsync().Wait();
+            new TestData(uow).CreateAsync().Wait();
+
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+            controller.SetUser(user.Id);
+
+            var model = new UserModel()
             {
-                var controller = new InfoController();
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                Id = user.Id,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                FirstName = user.FirstName + "(Updated)",
+                LastName = user.LastName + "(Updated)",
+                HumanBeing = false,
+                Immutable = false,
+            };
 
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var result = await controller.UpdateUserV1(model) as OkObjectResult;
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
-
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-
-                controller.SetUser(user.Id);
-
-                var model = new UserModel()
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    FirstName = user.FirstName + "(Updated)",
-                    LastName = user.LastName + "(Updated)",
-                    HumanBeing = false,
-                    Immutable = false,
-                };
-
-                var result = await controller.UpdateUserV1(model) as OkObjectResult;
-                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                var data = ok.Value.Should().BeAssignableTo<UserModel>().Subject;
-
-                data.FirstName.Should().Be(model.FirstName);
-                data.LastName.Should().Be(model.LastName);
-            }
+            data.FirstName.Should().Be(model.FirstName);
+            data.LastName.Should().Be(model.LastName);
         }
     }
 }

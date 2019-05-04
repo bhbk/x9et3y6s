@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

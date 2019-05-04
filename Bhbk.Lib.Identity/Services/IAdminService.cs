@@ -74,7 +74,6 @@ namespace Bhbk.Lib.Identity.Services
          */
         bool User_AddClaimV1(Guid userID, Guid claimID);
         bool User_AddLoginV1(Guid userID, Guid loginID);
-        bool User_AddPasswordV1(Guid userID, UserAddPassword model);
         UserModel User_CreateV1(UserCreate model);
         UserModel User_CreateV1NoConfirm(UserCreate model);
         bool User_DeleteV1(Guid userID);

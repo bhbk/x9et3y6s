@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_ClaimRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
 
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 }));
             result.Should().BeAssignableTo<tbl_Claims>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -70,25 +70,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_ClaimRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiUnitTestClaim)).First();
 
             var result = await UoW.ClaimRepo.DeleteAsync(claim.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_ClaimRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.ClaimRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Claims>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_ClaimRepo_UpdateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiUnitTestClaim)).First();
             claim.Value += "(Updated)";
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.ClaimRepo.UpdateAsync(claim);
             result.Should().BeAssignableTo<tbl_Claims>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
     }
 }

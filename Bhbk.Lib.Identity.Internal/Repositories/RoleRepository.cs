@@ -80,8 +80,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             if (includes != null)
                 query = includes(query);
 
-            //query = query.Include(x => x.UserRoles);
-
             if (orders != null)
             {
                 query = orders(query)

@@ -18,20 +18,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
         private readonly int _delay, _transient, _auditable;
         public string Status { get; private set; }
 
-        public MaintainActivityTask(IServiceScopeFactory factory)
+        public MaintainActivityTask(IServiceScopeFactory factory, IConfiguration conf)
         {
             _factory = factory;
+            _delay = int.Parse(conf["Tasks:MaintainActivity:PollingDelay"]);
+            _auditable = int.Parse(conf["Tasks:MaintainActivity:HoldAuditable"]);
+            _transient = int.Parse(conf["Tasks:MaintainActivity:HoldTransient"]);
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
-
-            var scope = _factory.CreateScope();
-            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-            _delay = int.Parse(conf["Tasks:MaintainActivity:PollingDelay"]);
-            _auditable = int.Parse(conf["Tasks:MaintainActivity:HoldAuditable"]);
-            _transient = int.Parse(conf["Tasks:MaintainActivity:HoldTransient"]);
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -69,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             foreach (var entry in expired.ToList())
                                 uow.ActivityRepo.DeleteAsync(entry.Id).Wait();
 
-                            uow.CommitAsync().Wait();
+                            await uow.CommitAsync();
 
                             var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + expiredCount.ToString() + " expired activity entries.";

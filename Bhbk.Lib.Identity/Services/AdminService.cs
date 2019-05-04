@@ -444,17 +444,6 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_AddPasswordV1(Guid userID, UserAddPassword model)
-        {
-            var response = Http.User_AddPasswordV1(_jwt.JwtV2.RawData, userID, model).Result;
-
-            if (response.IsSuccessStatusCode)
-                return true;
-
-            throw new HttpRequestException(response.ToString(),
-                new Exception(response.RequestMessage.ToString()));
-        }
-
         public UserModel User_CreateV1(UserCreate model)
         {
             var response = Http.User_CreateV1(_jwt.JwtV2.RawData, model).Result;

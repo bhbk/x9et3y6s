@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public ImplicitController() { }
 
         [Route("v1/ig"), HttpGet]
-        public IActionResult ImplicitV1_Use([FromQuery] ImplicitV1 input)
+        public IActionResult ImplicitV1_Auth([FromQuery] ImplicitV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ig"), HttpGet]
-        public async Task<IActionResult> ImplicitV2_Use([FromQuery] ImplicitV2 input)
+        public async Task<IActionResult> ImplicitV2_Auth([FromQuery] ImplicitV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

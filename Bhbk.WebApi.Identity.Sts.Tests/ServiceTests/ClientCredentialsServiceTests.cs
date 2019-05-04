@@ -32,35 +32,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV1_Refresh_NotImplemented()
+        public async Task Sts_OAuth2_ClientCredentialV1_Auth_NotImplemented()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                var rt = await service.Http.ClientCredentialRefresh_UseV1(
-                    new RefreshTokenV1()
-                    {
-                        issuer_id = Guid.NewGuid().ToString(),
-                        client_id = Guid.NewGuid().ToString(),
-                        grant_type = "refresh_token",
-                        refresh_token = RandomValues.CreateAlphaNumericString(8),
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
-            }
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV1_Use_NotImplemented()
-        {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new StsService(uow.InstanceType, _owin);
-
-                var cc = await service.Http.ClientCredential_UseV1(
+                var cc = await service.Http.ClientCredential_AuthV1(
                     new ClientCredentialV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -74,261 +53,73 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_FailClient()
+        public async Task Sts_OAuth2_ClientCredentialV1_Refresh_NotImplemented()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                var rt = await service.Http.ClientCredential_RefreshV1(
+                    new RefreshTokenV1()
+                    {
+                        issuer_id = Guid.NewGuid().ToString(),
+                        client_id = Guid.NewGuid().ToString(),
+                        grant_type = "refresh_token",
+                        refresh_token = RandomValues.CreateAlphaNumericString(8),
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_ClientDisabled()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-
-                var cc = service.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
-
-                var rt = await service.Http.ClientCredentialRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { Guid.NewGuid().ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
                 client.Enabled = false;
 
-                await uow.ClientRepo.UpdateAsync(client);
-                await uow.CommitAsync();
+                uow.ClientRepo.UpdateAsync(client).Wait();
+                uow.CommitAsync().Wait();
 
-                rt = await service.Http.ClientCredentialRefresh_UseV2(
-                    new RefreshTokenV2()
+                var cc = await service.Http.ClientCredential_AuthV2(
+                    new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
+                        client = client.Id.ToString(),
+                        grant_type = "client_secret",
+                        client_secret = client.ClientKey,
                     });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_FailIssuer()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_ClientNotExist()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                var cc = service.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
-
-                var rt = await service.Http.ClientCredentialRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = Guid.NewGuid().ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                rt = await service.Http.ClientCredentialRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = string.Empty,
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                issuer.Enabled = false;
-
-                await uow.IssuerRepo.UpdateAsync(issuer);
-                await uow.CommitAsync();
-
-                rt = await service.Http.ResourceOwnerRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            }
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_FailToken()
-        {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new StsService(uow.InstanceType, _owin);
-
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
-
-                var random = new Random();
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-
-                /*
-                 */
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
-
-                var cc = service.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
-
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
-
-                var rt = await service.Http.ResourceOwnerRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                /*
-                 */
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
-
-                cc = service.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
-
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
-
-                rt = await service.Http.ResourceOwnerRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-                /*
-                 */
-                cc = service.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
-
-                var cc_pos = random.Next((cc.refresh_token).Length - 8);
-
-                rt = await service.Http.ResourceOwnerRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = (cc.refresh_token).Remove(cc_pos, 8).Insert(cc_pos, RandomValues.CreateBase64String(8)),
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                /*
-                 */
-                cc = service.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
-
-                rt = await service.Http.ResourceOwnerRefresh_UseV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = string.Empty,
-                    });
-                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            }
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Use_FailClient()
-        {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new StsService(uow.InstanceType, _owin);
-
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
-
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-
-                var cc = await service.Http.ClientCredential_UseV2(
+                var cc = await service.Http.ClientCredential_AuthV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -338,24 +129,29 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
 
-                cc = await service.Http.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = RandomValues.CreateBase64String(16),
-                    });
-                cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_IssuerDisabled()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
 
-                client.Enabled = false;
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
-                await uow.ClientRepo.UpdateAsync(client);
-                await uow.CommitAsync();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                cc = await service.Http.ClientCredential_UseV2(
+                issuer.Enabled = false;
+
+                uow.IssuerRepo.UpdateAsync(issuer).Wait();
+                uow.CommitAsync().Wait();
+
+                var cc = await service.Http.ClientCredential_AuthV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -369,20 +165,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Use_FailIssuer()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_IssuerNotExist()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                var cc = await service.Http.ClientCredential_UseV2(
+                var cc = await service.Http.ClientCredential_AuthV2(
                     new ClientCredentialV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -392,36 +187,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-                issuer.Enabled = false;
-
-                await uow.IssuerRepo.UpdateAsync(issuer);
-                await uow.CommitAsync();
-
-                cc = await service.Http.ClientCredential_UseV2(
-                    new ClientCredentialV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
-                        grant_type = "client_secret",
-                        client_secret = client.ClientKey,
-                    });
-                cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Use_Success()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Success()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                await new TestData(uow).DestroyAsync();
-                await new TestData(uow).CreateAsync();
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -429,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var salt = conf["IdentityTenants:Salt"];
                 salt.Should().Be(uow.IssuerRepo.Salt);
 
-                var cc = service.ClientCredential_UseV2(
+                var cc = service.ClientCredential_AuthV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -441,18 +220,243 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(cc.access_token).Should().BeTrue();
 
-                var cc_claims = JwtFactory.ReadJwtToken(cc.access_token).Claims
+                var rt_claims = JwtFactory.ReadJwtToken(cc.access_token).Claims
                     .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                cc_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                cc_claims.Value.Split(':')[1].Should().Be(salt);
+                rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                rt_claims.Value.Split(':')[1].Should().Be(salt);
+            }
+        }
 
-                var rt = service.ClientCredentialRefresh_UseV2(
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_ClientDisabled()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                client.Enabled = false;
+
+                uow.ClientRepo.UpdateAsync(client).Wait();
+                uow.CommitAsync().Wait();
+
+                var rt = await service.Http.ClientCredential_RefreshV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
                         grant_type = "refresh_token",
-                        refresh_token = cc.refresh_token,
+                        refresh_token = cc.RawData,
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_ClientNotExist()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                var rt = await service.Http.ClientCredential_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = string.Join(",", new List<string> { Guid.NewGuid().ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = cc.RawData,
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_IssuerDisabled()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                issuer.Enabled = false;
+
+                uow.IssuerRepo.UpdateAsync(issuer).Wait();
+                uow.CommitAsync().Wait();
+
+                var rt = await service.Http.ClientCredential_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = cc.RawData,
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_IssuerNotExist()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                var rt = await service.Http.ClientCredential_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = Guid.NewGuid().ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = cc.RawData,
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_TimeValidBefore()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+
+                var rt = await service.Http.ResourceOwner_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = cc.RawData,
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_TimeValidTo()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+
+                var rt = await service.Http.ResourceOwner_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = cc.RawData,
+                    });
+                rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Success()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+
+                var salt = conf["IdentityTenants:Salt"];
+                salt.Should().Be(uow.IssuerRepo.Salt);
+
+                var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
+                uow.CommitAsync().Wait();
+
+                var rt = service.ClientCredential_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = cc.RawData,
                     });
                 rt.Should().BeAssignableTo<ClientJwtV2>();
 

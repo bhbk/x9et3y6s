@@ -19,18 +19,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
         private readonly int _delay;
         public string Status { get; private set; }
 
-        public MaintainUsersTask(IServiceScopeFactory factory)
+        public MaintainUsersTask(IServiceScopeFactory factory, IConfiguration conf)
         {
             _factory = factory;
+            _delay = int.Parse(conf["Tasks:MaintainUsers:PollingDelay"]);
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
-
-            var scope = _factory.CreateScope();
-            var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-            _delay = int.Parse(conf["Tasks:MaintainUsers:PollingDelay"]);
 
             Status = JsonConvert.SerializeObject(
                 new
@@ -67,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             foreach (var entry in disabled.ToList())
                                 uow.UserRepo.DeleteAsync(entry.Id).Wait();
 
-                            uow.CommitAsync().Wait();
+                            await uow.CommitAsync();
 
                             var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                     + disabledCount.ToString() + " users with expired lock-outs.";

@@ -1,11 +1,22 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Web;
 
 namespace Bhbk.Lib.Identity.Internal.Helpers
 {
     public class UrlHelper
     {
+        public static Uri GenerateAuthorizationCode(Uri authorize, Uri redirect, tbl_States state)
+        {
+            return new Uri(authorize.AbsoluteUri + "?issuer=" + HttpUtility.UrlEncode(state.IssuerId.ToString())
+                + "&client=" + HttpUtility.UrlEncode(state.ClientId.ToString())
+                + "&user=" + HttpUtility.UrlEncode(state.UserId.ToString())
+                + "&response_type=code"
+                + "&redirect_uri=" + HttpUtility.UrlEncode(redirect.AbsoluteUri)
+                + "&state=" + HttpUtility.UrlEncode(state.StateValue));
+        }
+
         public static Uri GenerateConfirmEmail(IConfiguration conf, tbl_Users user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");

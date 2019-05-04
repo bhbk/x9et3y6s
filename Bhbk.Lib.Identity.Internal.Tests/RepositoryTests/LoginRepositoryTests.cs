@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_LoginRepo_CreateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.LoginRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 }));
             result.Should().BeAssignableTo<tbl_Logins>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -63,25 +63,25 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_LoginRepo_DeleteV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).First();
 
             var result = await UoW.LoginRepo.DeleteAsync(login.Id);
             result.Should().BeTrue();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_LoginRepo_GetV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var result = await UoW.LoginRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Logins>>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         [Fact]
         public async Task Lib_LoginRepo_UpdateV1_Success()
         {
-            await TestData.CreateAsync();
+            TestData.CreateAsync().Wait();
 
             var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).First();
             login.Name += "(Updated)";
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.LoginRepo.UpdateAsync(login);
             result.Should().BeAssignableTo<tbl_Logins>();
 
-            await TestData.DestroyAsync();
+            TestData.DestroyAsync().Wait();
         }
     }
 }
