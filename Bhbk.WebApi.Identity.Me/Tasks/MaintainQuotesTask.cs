@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                             if (motdtype1_response.IsSuccessStatusCode)
                             {
-                                var model = uow.Mapper.Map<tbl_MotD_Type1>(motdtype1.contents.quotes[0]);
+                                var model = uow.Mapper.Map<tbl_MotDType1>(motdtype1.contents.quotes[0]);
                                 var motd = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author
                                     && x.Quote == model.Quote).Result.SingleOrDefault();
 

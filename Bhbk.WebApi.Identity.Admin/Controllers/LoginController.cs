@@ -92,38 +92,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Mapper.Map<LoginModel>(login));
         }
 
-        [Route("v1/page"), HttpGet]
-        public async Task<IActionResult> GetLoginsV1([FromQuery] SimplePager model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            Expression<Func<tbl_Logins, bool>> preds;
-
-            if (string.IsNullOrEmpty(model.Filter))
-                preds = x => true;
-            else
-                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
-
-            try
-            {
-                var total = await UoW.LoginRepo.CountAsync(preds);
-                var result = await UoW.LoginRepo.GetAsync(preds,
-                    x => x.Include(l => l.tbl_UserLogins),
-                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<LoginModel>>(result) });
-            }
-            catch (ParseException ex)
-            {
-                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-                return BadRequest(ModelState);
-            }
-
-        }
-
         [Route("v1/page"), HttpPost]
         public async Task<IActionResult> GetLoginsV1([FromBody] CascadePager model)
         {
@@ -145,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.LoginRepo.CountAsync(preds);
                 var result = await UoW.LoginRepo.GetAsync(preds,
-                    x => x.Include(l => l.tbl_UserLogins),
+                    x => x.Include(l => l.tbl_UserLogins).ThenInclude(l => l.User),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);

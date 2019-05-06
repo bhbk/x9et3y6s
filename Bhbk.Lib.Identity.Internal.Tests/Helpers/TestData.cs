@@ -255,7 +255,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
              */
 
             await _uow.UserRepo.CreateMOTDAsync(
-                new tbl_MotD_Type1()
+                new tbl_MotDType1()
                 {
                     Id = RandomValues.CreateAlphaNumericString(8),
                     Date = DateTime.Now,
@@ -479,7 +479,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                  */
 
                 await _uow.UserRepo.CreateMOTDAsync(
-                    new tbl_MotD_Type1()
+                    new tbl_MotDType1()
                     {
                         Id = RandomValues.CreateAlphaNumericString(8),
                         Date = DateTime.Now,

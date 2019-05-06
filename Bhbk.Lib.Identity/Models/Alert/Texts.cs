@@ -23,16 +23,20 @@ namespace Bhbk.Lib.Identity.Models.Alert
         [Required]
         public string Body { get; set; }
 
+        [Required]
         public DateTime Created { get; set; }
+
+        [Required]
+        public DateTime SendAt { get; set; }
     }
 
     public class TextCreate : Texts
     {
-        public Guid Id { get; set; }
+
     }
 
     public class TextModel : Texts
     {
-
+        public Guid Id { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
-            var url = UrlHelper.GenerateConfirmEmail(Conf, user, token);
+            var url = UrlHelper.GenerateConfirmEmailV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             alert.Email_EnqueueV1(new EmailCreate()
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
-            var url = UrlHelper.GenerateConfirmPassword(Conf, user, token);
+            var url = UrlHelper.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             alert.Email_EnqueueV1(new EmailCreate()
@@ -147,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
-            var url = UrlHelper.GenerateConfirmPassword(Conf, user, token);
+            var url = UrlHelper.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             alert.Text_EnqueueV1(new TextCreate()

@@ -14,7 +14,9 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public virtual DbSet<tbl_Exceptions> tbl_Exceptions { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
-        public virtual DbSet<tbl_MotD_Type1> tbl_MotD_Type1 { get; set; }
+        public virtual DbSet<tbl_MotDType1> tbl_MotDType1 { get; set; }
+        public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
+        public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
         public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
@@ -190,8 +192,12 @@ namespace Bhbk.Lib.Identity.Internal.Models
                     .HasConstraintName("FK_Logins_ActorID");
             });
 
-            modelBuilder.Entity<tbl_MotD_Type1>(entity =>
+            modelBuilder.Entity<tbl_MotDType1>(entity =>
             {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_tbl_MotDType1")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .HasMaxLength(128)
                     .IsUnicode(false)
@@ -212,6 +218,62 @@ namespace Bhbk.Lib.Identity.Internal.Models
                 entity.Property(e => e.Tags).IsUnicode(false);
 
                 entity.Property(e => e.Title).IsUnicode(false);
+            });
+
+            modelBuilder.Entity<tbl_QueueEmails>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_tbl_QueueEmails")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.FromDisplay).IsUnicode(false);
+
+                entity.Property(e => e.FromEmail).IsUnicode(false);
+
+                entity.Property(e => e.HtmlContent).IsUnicode(false);
+
+                entity.Property(e => e.PlaintextContent).IsUnicode(false);
+
+                entity.Property(e => e.Subject)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ToDisplay).IsUnicode(false);
+
+                entity.Property(e => e.ToEmail).IsUnicode(false);
+
+                entity.HasOne(d => d.From)
+                    .WithMany(p => p.tbl_QueueEmails)
+                    .HasForeignKey(d => d.FromId)
+                    .HasConstraintName("FK_QueueEmails_UserID");
+            });
+
+            modelBuilder.Entity<tbl_QueueTexts>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_tbl_QueueTexts")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Body)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FromPhoneNumber)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ToPhoneNumber)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.From)
+                    .WithMany(p => p.tbl_QueueTexts)
+                    .HasForeignKey(d => d.FromId)
+                    .HasConstraintName("FK_QueueTexts_UserID");
             });
 
             modelBuilder.Entity<tbl_Refreshes>(entity =>

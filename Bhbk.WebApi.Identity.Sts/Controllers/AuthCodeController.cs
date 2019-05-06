@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             await UoW.CommitAsync();
 
-            return RedirectPermanent(UrlHelper.GenerateAuthorizationCode(authorize, redirect, state).AbsoluteUri);
+            return RedirectPermanent(UrlHelper.GenerateAuthCodeV2(authorize, redirect, state).AbsoluteUri);
         }
 
         [Route("v2/acg"), HttpGet]

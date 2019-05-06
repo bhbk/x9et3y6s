@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Models.Alert;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
@@ -8,7 +8,7 @@ namespace Bhbk.WebApi.Alert.Providers
 {
     public class SendgridProvider
     {
-        public async Task<Response> TryEmailHandoff(string apiKey, EmailCreate model)
+        public async Task<Response> TryEmailHandoff(string apiKey, tbl_QueueEmails model)
         {
             var client = new SendGridClient(apiKey);
 

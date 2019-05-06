@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_ClientDisabled()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -103,11 +103,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_ClientNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -133,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_IssuerDisabled()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -162,11 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_IssuerNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -228,7 +220,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_ClientDisabled()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -260,11 +252,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_ClientNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -293,7 +281,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_IssuerDisabled()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -325,11 +313,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_IssuerNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -358,7 +342,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_TimeValidBefore()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Time()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -391,11 +375,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 rt.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 rt.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_TimeValidTo()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();

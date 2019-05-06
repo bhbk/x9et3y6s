@@ -10,6 +10,8 @@ namespace Bhbk.Lib.Identity.Internal.Models
             tbl_Activities = new HashSet<tbl_Activities>();
             tbl_Claims = new HashSet<tbl_Claims>();
             tbl_Logins = new HashSet<tbl_Logins>();
+            tbl_QueueEmails = new HashSet<tbl_QueueEmails>();
+            tbl_QueueTexts = new HashSet<tbl_QueueTexts>();
             tbl_Refreshes = new HashSet<tbl_Refreshes>();
             tbl_States = new HashSet<tbl_States>();
             tbl_UserClaims = new HashSet<tbl_UserClaims>();
@@ -44,6 +46,8 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public virtual ICollection<tbl_Activities> tbl_Activities { get; set; }
         public virtual ICollection<tbl_Claims> tbl_Claims { get; set; }
         public virtual ICollection<tbl_Logins> tbl_Logins { get; set; }
+        public virtual ICollection<tbl_QueueEmails> tbl_QueueEmails { get; set; }
+        public virtual ICollection<tbl_QueueTexts> tbl_QueueTexts { get; set; }
         public virtual ICollection<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_States> tbl_States { get; set; }
         public virtual ICollection<tbl_UserClaims> tbl_UserClaims { get; set; }

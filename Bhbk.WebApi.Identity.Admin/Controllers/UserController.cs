@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var code = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), result));
 
-                var url = UrlHelper.GenerateConfirmEmail(Conf, result, code);
+                var url = UrlHelper.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
                 alert.Email_EnqueueV1(new EmailCreate()
@@ -253,7 +253,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
              * tidbits below need enhancment, just tinkering...
              */
 
-            Expression<Func<tbl_MotD_Type1, bool>> preds;
+            Expression<Func<tbl_MotDType1, bool>> preds;
 
             if (string.IsNullOrEmpty(model.Filter))
                 preds = x => true;
@@ -394,41 +394,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(result);
         }
 
-        [Route("v1/page"), HttpGet]
-        public async Task<IActionResult> GetUsersV1([FromQuery] SimplePager model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            Expression<Func<tbl_Users, bool>> preds;
-
-            if (string.IsNullOrEmpty(model.Filter))
-                preds = x => true;
-            else
-                preds = x => x.Email.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.PhoneNumber.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.FirstName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.LastName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
-
-            try
-            {
-                var total = await UoW.UserRepo.CountAsync(preds);
-                var result = await UoW.UserRepo.GetAsync(preds,
-                    x => x.Include(r => r.tbl_UserRoles),
-                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<UserModel>>(result) });
-            }
-            catch (ParseException ex)
-            {
-                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
-                return BadRequest(ModelState);
-            }
-        }
-
         [Route("v1/page"), HttpPost]
         public async Task<IActionResult> GetUsersV1([FromBody] CascadePager model)
         {
@@ -453,7 +418,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.UserRepo.CountAsync(preds);
                 var result = await UoW.UserRepo.GetAsync(preds,
-                    x => x.Include(r => r.tbl_UserRoles),
+                    x => x.Include(r => r.tbl_UserRoles).ThenInclude(r => r.Role),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);

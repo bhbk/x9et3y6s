@@ -1,6 +1,8 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Linq;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Alert.Controllers
 {
     [Route("email")]
+    //[Authorize(Policy = "UsersPolicy")]
     public class EmailController : BaseController
     {
         public EmailController() { }
@@ -29,9 +32,11 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             var queue = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
 
-            if (!queue.TryEnqueueEmail(model))
+            var msg = UoW.Mapper.Map<tbl_QueueEmails>(model);
+
+            if (!queue.TryEnqueueEmail(msg))
             {
-                ModelState.AddModelError(MessageType.EmailEnueueError.ToString(), $"MessageID:{model.Id} SenderEmail:{model.FromEmail}");
+                ModelState.AddModelError(MessageType.EmailEnueueError.ToString(), $"MessageID:{msg.Id} SenderEmail:{model.FromEmail}");
                 return BadRequest(ModelState);
             }
 

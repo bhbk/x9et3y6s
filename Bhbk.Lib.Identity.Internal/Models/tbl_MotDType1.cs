@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Internal.Models
 {
-    public partial class tbl_MotD_Type1
+    public partial class tbl_MotDType1
     {
         public string Id { get; set; }
         public string Title { get; set; }

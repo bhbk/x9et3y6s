@@ -128,39 +128,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(UoW.Mapper.Map<RoleModel>(role));
         }
 
-        [Route("v1/page"), HttpGet]
-        public async Task<IActionResult> GetRolesV1([FromQuery] SimplePager model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            Expression<Func<tbl_Roles, bool>> preds;
-
-            if (string.IsNullOrEmpty(model.Filter))
-                preds = x => true;
-            else
-                preds = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
-
-            try
-            {
-                var total = await UoW.RoleRepo.CountAsync(preds);
-                var result = await UoW.RoleRepo.GetAsync(preds,
-                    x => x.Include(r => r.tbl_UserRoles),
-                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<RoleModel>>(result) });
-            }
-            catch (ParseException ex)
-            {
-                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
-                return BadRequest(ModelState);
-            }
-        }
-
         [Route("v1/page"), HttpPost]
         public async Task<IActionResult> GetRolesV1([FromBody] CascadePager model)
         {
@@ -183,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var total = await UoW.RoleRepo.CountAsync(preds);
                 var result = await UoW.RoleRepo.GetAsync(preds,
-                    x => x.Include(r => r.tbl_UserRoles),
+                    x => x.Include(r => r.tbl_UserRoles).ThenInclude(r => r.User),
                     x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
                     model.Skip,
                     model.Take);

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Models.Alert;
+﻿using Bhbk.Lib.Identity.Internal.Models;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
@@ -7,7 +7,7 @@ namespace Bhbk.WebApi.Alert.Providers
 {
     public class TwilioProvider
     {
-        public async Task TryTextHandoff(string sid, string token, TextCreate model)
+        public async Task TryTextHandoff(string sid, string token, tbl_QueueTexts model)
         {
             TwilioClient.Init(sid, token);
 

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Models.Alert;
+using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.WebApi.Alert.Providers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Net;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,8 +20,6 @@ namespace Bhbk.WebApi.Alert.Tasks
     {
         private readonly IServiceScopeFactory _factory;
         private readonly JsonSerializerSettings _serializer;
-        private readonly ConcurrentQueue<EmailCreate> _queue;
-        private readonly SendgridProvider _provider;
         private readonly int _delay, _expire;
         private readonly bool _enabled;
         private readonly string _providerApiKey;
@@ -35,8 +33,6 @@ namespace Bhbk.WebApi.Alert.Tasks
             _expire = int.Parse(conf["Tasks:QueueEmail:ExpireDelay"]);
             _enabled = bool.Parse(conf["Tasks:QueueEmail:Enabled"]);
             _providerApiKey = conf["Tasks:QueueEmail:ProviderApiKey"];
-            _queue = new ConcurrentQueue<EmailCreate>();
-            _provider = new SendgridProvider();
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
@@ -51,72 +47,50 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var provider = new SendgridProvider();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
 
-                if (!_enabled || _queue.IsEmpty)
-                    continue;
-
-                /*
-                 * async database calls from background services should be
-                 * avoided so threading issues do not occur.
-                 * 
-                 * when calling scoped service (unit of work) from a singleton
-                 * service (background task) wrap in using block to mimic transient.
-                 */
-
-                using (var scope = _factory.CreateScope())
+                try
                 {
-                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var queue = new ConcurrentQueue<tbl_QueueEmails>();
 
-                    foreach (var entry in _queue)
+                    /*
+                     * async database calls from background services should be
+                     * avoided so threading issues do not occur.
+                     * 
+                     * when calling scoped service (unit of work) from a singleton
+                     * service (background task) wrap in using block to mimic transient.
+                     */
+
+                    using (var scope = _factory.CreateScope())
                     {
-                        try
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+                        foreach (var entry in uow.UserRepo.GetEmailAsync(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).Result)
                         {
-                            EmailCreate model;
+                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
+                                "The email was created on " + entry.Created + " and is being deleted now.");
 
-                            if (!_queue.TryPeek(out model))
-                                break;
-
-                            if (model.Created < DateTime.Now.AddSeconds(-(_expire)))
-                            {
-                                _queue.TryDequeue(out model);
-
-                                Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed many times. The email was created on "
-                                    + model.Created + " and is being deleted now.");
-
-                                continue;
-                            }
-
-                            if (uow.InstanceType == InstanceContext.DeployedOrLocal)
-                            {
-                                var result = await _provider.TryEmailHandoff(_providerApiKey, model);
-
-                                if (result.StatusCode == HttpStatusCode.Accepted)
-                                {
-                                    if (!_queue.TryDequeue(out model))
-                                        break;
-
-                                    Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider was successfull.");
-                                }
-                                else
-                                    Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + model.Id.ToString() + ") to upstream provider failed. Error=" + result.StatusCode);
-                            }
+                            uow.UserRepo.DeleteEmailAsync(entry.Id.ToString()).Wait();
                         }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex.ToString());
-                        }
+
+                        uow.CommitAsync().Wait();
+
+                        foreach (var entry in uow.UserRepo.GetEmailAsync(x => x.SendAt < DateTime.Now).Result)
+                            queue.Enqueue(entry);
+
+                        if (!_enabled || queue.IsEmpty)
+                            continue;
                     }
-
-                    var msg = typeof(QueueEmailTask).Name + " contains " + _queue.Count() + " email messages queued for hand-off.";
 
                     Status = JsonConvert.SerializeObject(
                         new
                         {
-                            status = msg,
-                            queue = _queue.Select(x => new {
+                            status = typeof(QueueEmailTask).Name + " contains " + queue.Count() + " email messages queued for hand-off.",
+                            queue = queue.Select(x => new {
                                 Id = x.Id.ToString(),
                                 Created = x.Created,
                                 From = x.FromDisplay + " <" + x.FromEmail + ">",
@@ -124,23 +98,72 @@ namespace Bhbk.WebApi.Alert.Tasks
                                 Subject = x.Subject
                             })
                         }, _serializer);
+
+                    using (var scope = _factory.CreateScope())
+                    {
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+                        foreach (var msg in queue.OrderBy(x => x.Created))
+                        {
+                            switch (uow.InstanceType)
+                            {
+                                case InstanceContext.DeployedOrLocal:
+                                    {
+#if RELEASE
+                                        var response = provider.TryEmailHandoff(_providerApiKey, msg).Result;
+
+                                        if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
+                                        {
+                                            uow.UserRepo.DeleteEmailAsync(msg.Id.ToString()).Wait();
+                                            Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
+                                        }
+                                        else
+                                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
+                                                "Error=" + response.StatusCode);
+#elif !RELEASE
+                                        uow.UserRepo.DeleteEmailAsync(msg.Id.ToString()).Wait();
+                                        Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
+#endif
+                                    }
+                                    break;
+
+                                case InstanceContext.UnitTest:
+                                    {
+                                        uow.UserRepo.DeleteEmailAsync(msg.Id.ToString()).Wait();
+                                        Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
+                                    }
+                                    break;
+
+                                default:
+                                    throw new NotImplementedException();
+
+                            }
+                        }
+
+                        uow.CommitAsync().Wait();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToString());
                 }
             }
         }
 
-        public bool TryEnqueueEmail(EmailCreate model)
+        public bool TryEnqueueEmail(tbl_QueueEmails model)
         {
             try
             {
-                //set unique id for message...
-                model.Id = Guid.NewGuid();
-                model.Created = DateTime.Now;
+                using (var scope = _factory.CreateScope())
+                {
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                _queue.Enqueue(model);
+                    uow.UserRepo.CreateEmailAsync(model).Wait();
+                    uow.CommitAsync().Wait();
+                }
 
-                //verify message is in queue...
-                if (_queue.Where(x => x.Id == model.Id).Any())
-                    return true;
+                return true;
             }
             catch (Exception ex)
             {

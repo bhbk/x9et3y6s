@@ -146,9 +146,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<int> CountMOTDAsync(Expression<Func<tbl_MotD_Type1, bool>> predicates = null)
+        public async Task<int> CountMOTDAsync(Expression<Func<tbl_MotDType1, bool>> predicates = null)
         {
-            var query = _context.tbl_MotD_Type1.AsQueryable();
+            var query = _context.tbl_MotDType1.AsQueryable();
 
             if (predicates != null)
                 return await query.Where(predicates).CountAsync();
@@ -176,7 +176,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<tbl_MotD_Type1> CreateMOTDAsync(tbl_MotD_Type1 model)
+        public async Task<tbl_QueueEmails> CreateEmailAsync(tbl_QueueEmails model)
+        {
+            return await Task.FromResult(_context.Add(model).Entity);
+        }
+
+        public async Task<tbl_MotDType1> CreateMOTDAsync(tbl_MotDType1 model)
+        {
+            return await Task.FromResult(_context.Add(model).Entity);
+        }
+
+        public async Task<tbl_QueueTexts> CreateTextAsync(tbl_QueueTexts model)
         {
             return await Task.FromResult(_context.Add(model).Entity);
         }
@@ -205,9 +215,41 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
+        public async Task<bool> DeleteEmailAsync(string key)
+        {
+            var entity = _context.tbl_QueueEmails.Where(x => x.Id.ToString() == key).Single();
+
+            try
+            {
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult(false);
+            }
+        }
+
         public async Task<bool> DeleteMOTDAsync(string key)
         {
-            var entity = _context.tbl_MotD_Type1.Where(x => x.Id == key).Single();
+            var entity = _context.tbl_MotDType1.Where(x => x.Id == key).Single();
+
+            try
+            {
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult(false);
+            }
+        }
+
+        public async Task<bool> DeleteTextAsync(string key)
+        {
+            var entity = _context.tbl_QueueTexts.Where(x => x.Id.ToString() == key).Single();
 
             try
             {
@@ -321,13 +363,61 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<tbl_MotD_Type1>> GetMOTDAsync(Expression<Func<tbl_MotD_Type1, bool>> predicates = null,
-            Func<IQueryable<tbl_MotD_Type1>, IIncludableQueryable<tbl_MotD_Type1, object>> includes = null,
-            Func<IQueryable<tbl_MotD_Type1>, IOrderedQueryable<tbl_MotD_Type1>> orders = null,
+        public async Task<IEnumerable<tbl_QueueEmails>> GetEmailAsync(Expression<Func<tbl_QueueEmails, bool>> predicates = null,
+            Func<IQueryable<tbl_QueueEmails>, IIncludableQueryable<tbl_QueueEmails, object>> includes = null,
+            Func<IQueryable<tbl_QueueEmails>, IOrderedQueryable<tbl_QueueEmails>> orders = null,
             int? skip = null,
             int? take = null)
         {
-            var query = _context.tbl_MotD_Type1.AsQueryable();
+            var query = _context.tbl_QueueEmails.AsQueryable();
+
+            if (predicates != null)
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            if (orders != null)
+            {
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
+            }
+
+            return await Task.FromResult(query);
+        }
+
+        public async Task<IEnumerable<tbl_MotDType1>> GetMOTDAsync(Expression<Func<tbl_MotDType1, bool>> predicates = null,
+            Func<IQueryable<tbl_MotDType1>, IIncludableQueryable<tbl_MotDType1, object>> includes = null,
+            Func<IQueryable<tbl_MotDType1>, IOrderedQueryable<tbl_MotDType1>> orders = null,
+            int? skip = null,
+            int? take = null)
+        {
+            var query = _context.tbl_MotDType1.AsQueryable();
+
+            if (predicates != null)
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            if (orders != null)
+            {
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
+            }
+
+            return await Task.FromResult(query);
+        }
+
+        public async Task<IEnumerable<tbl_QueueTexts>> GetTextAsync(Expression<Func<tbl_QueueTexts, bool>> predicates = null,
+            Func<IQueryable<tbl_QueueTexts>, IIncludableQueryable<tbl_QueueTexts, object>> includes = null,
+            Func<IQueryable<tbl_QueueTexts>, IOrderedQueryable<tbl_QueueTexts>> orders = null,
+            int? skip = null,
+            int? take = null)
+        {
+            var query = _context.tbl_QueueTexts.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -629,9 +719,9 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.Update(entity).Entity);
         }
 
-        public async Task<tbl_MotD_Type1> UpdateAsync(tbl_MotD_Type1 model)
+        public async Task<tbl_MotDType1> UpdateAsync(tbl_MotDType1 model)
         {
-            var entity = _context.tbl_MotD_Type1.Where(x => x.Id == model.Id).Single();
+            var entity = _context.tbl_MotDType1.Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.

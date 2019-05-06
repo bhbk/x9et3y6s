@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Alert
@@ -32,19 +31,20 @@ namespace Bhbk.Lib.Identity.Models.Alert
 
         public string PlaintextContent { get; set; }
 
+        [Required]
         public DateTime Created { get; set; }
 
-        [DefaultValue(typeof(DateTime))]
+        [Required]
         public DateTime SendAt { get; set; }
     }
 
     public class EmailCreate : Emails
     {
-        public Guid Id { get; set; }
+
     }
 
     public class EmailModel : Emails
     {
-
+        public Guid Id { get; set; }
     }
 }

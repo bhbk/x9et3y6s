@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_IssuerNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_ClientNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_UserNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Ask_Fail_User()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -186,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_ClientNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -231,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_DeviceCodeNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_DeviceCode()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -276,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_IssuerNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -321,7 +321,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_UserCodeNotExist()
+        public async Task Sts_OAuth2_DeviceCodeV2_Auth_Fail_UserCode()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {

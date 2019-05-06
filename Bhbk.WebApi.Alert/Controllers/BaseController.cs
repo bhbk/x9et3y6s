@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
-    [Authorize(Policy = "UsersPolicy")]
+    [Authorize]
     public class BaseController : Controller
     {
         protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }

@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_ClientDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -65,11 +65,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_ClientNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -99,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_IssuerDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -132,11 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_IssuerNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -166,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_UserBadPassword()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_User()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -194,11 +186,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_UserDisabled()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -231,11 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Fail_UserNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -303,11 +287,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 claims.Value.Split(':')[1].Should().Be(salt);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Auth_Success_Legacy()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -345,7 +325,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_ClientDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -378,11 +358,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_ClientNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -412,7 +388,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_IssuerDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -445,11 +421,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_IssuerNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -479,7 +451,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_UserDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_User()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -513,11 +485,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_UserNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -550,7 +518,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_TimeValidFrom()
+        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_Time()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -584,11 +552,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_TimeValidTo()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -665,7 +629,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_ClientDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -696,11 +660,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_ClientNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -728,7 +688,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_IssuerDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -759,11 +719,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_IssuerNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -791,7 +747,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_UserBadPassword()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_User()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -817,11 +773,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_UserDisabled()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -852,11 +804,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Fail_UserNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -884,7 +832,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Success_Empty()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Success()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -922,11 +870,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 claims.Value.Split(':')[1].Should().Be(salt);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Success_Multiple()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -972,11 +916,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 claims.Value.Split(':')[1].Should().Be(salt);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Auth_Success_Single()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -1016,7 +956,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_ClientDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_Client()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -1049,11 +989,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_ClientNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -1083,7 +1019,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_IssuerDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_Issuer()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -1116,11 +1052,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_IssuerNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -1150,8 +1082,41 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_TimeValidFrom()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_Time()
         {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(uow.InstanceType, _owin);
+
+                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow).CreateAsync().Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+
+                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+
+                var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
+                uow.CommitAsync().Wait();
+
+                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
+                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+
+                var result = await service.Http.ResourceOwner_RefreshV2(
+                    new RefreshTokenV2()
+                    {
+                        issuer = issuer.Id.ToString(),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
+                        grant_type = "refresh_token",
+                        refresh_token = rt.RawData,
+                    });
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -1187,44 +1152,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_TimeValidTo()
-        {
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new StsService(uow.InstanceType, _owin);
-
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
-
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
-
-                var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
-                uow.CommitAsync().Wait();
-
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
-
-                var result = await service.Http.ResourceOwner_RefreshV2(
-                    new RefreshTokenV2()
-                    {
-                        issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Id.ToString() }),
-                        grant_type = "refresh_token",
-                        refresh_token = rt.RawData,
-                    });
-                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            }
-        }
-
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_UserDisabled()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_User()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -1260,11 +1188,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_UserNotExist()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -1296,7 +1220,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Success_Empty()
+        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Success()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -1336,11 +1260,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 claims.Value.Split(':')[1].Should().Be(salt);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Success_Multiple()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -1388,11 +1308,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
                 claims.Value.Split(':')[1].Should().Be(salt);
             }
-        }
 
-        [Fact]
-        public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Success_Single()
-        {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
