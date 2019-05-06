@@ -52,6 +52,12 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string ApiDefaultNormalUserFirstName = "Normal";
         public const string ApiDefaultNormalUserLastName = "User";
         public const string ApiDefaultNormalUserPhone = "+99999999999";
+        public const string ApiDefaultSettingExpireAccess = "ExpireAccess";
+        public const string ApiDefaultSettingExpireRefresh = "ExpireRefresh";
+        public const string ApiDefaultSettingExpireTotp = "ExpireTotp";
+        public const string ApiDefaultSettingPollingMax = "PollingMax";
+        public const string ApiDefaultSettingLegacyClaims = "LegacyModeClaims";
+        public const string ApiDefaultSettingLegacyIssuer = "LegacyModeIssuer";
 
         #endregion
 

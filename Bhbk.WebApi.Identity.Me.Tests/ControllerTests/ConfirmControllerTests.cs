@@ -7,7 +7,6 @@ using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -35,19 +34,21 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
+
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(newEmail, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail,
@@ -63,19 +64,21 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
+
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(newEmail, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(newEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmEmailV1(user.Id, newEmail, token) as NoContentResult;
@@ -90,19 +93,21 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
+
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(newPassword, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword,
@@ -118,19 +123,21 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
+
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(newPassword, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(newPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             token.Should().NotBeNullOrEmpty();
 
             var result = await controller.ConfirmPasswordV1(user.Id, newPassword, token) as NoContentResult;
@@ -150,10 +157,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var token = await new TotpHelper(8, 10).GenerateAsync(newPhoneNumber, user);
             token.Should().NotBeNullOrEmpty();
@@ -176,10 +184,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var token = await new TotpHelper(8, 10).GenerateAsync(newPhoneNumber, user);
             token.Should().NotBeNullOrEmpty();

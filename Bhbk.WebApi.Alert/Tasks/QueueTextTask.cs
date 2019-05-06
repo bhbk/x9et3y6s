@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 #if RELEASE
                                         provider.TryTextHandoff(_providerSid, _providerToken, msg).Wait();
 
-                                        uow.UserRepo.DeleteTextAsync(msg.Id.ToString()).Wait();
+                                        uow.UserRepo.DeleteQueueTextAsync(msg.Id.ToString()).Wait();
                                         Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
 #elif !RELEASE
                                         uow.UserRepo.DeleteQueueTextAsync(msg.Id.ToString()).Wait();

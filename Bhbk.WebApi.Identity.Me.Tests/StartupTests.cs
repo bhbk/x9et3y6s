@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -92,7 +93,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (owin.IssuerRepo.LegacyMode)
+                var legacyIssuer = (owin.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                if (bool.Parse(legacyIssuer.ConfigValue))
                     issuers = (owin.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 

@@ -3,10 +3,10 @@ using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,14 +22,12 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly IdentityDbContext _context;
         private readonly InstanceContext _instance;
-        private readonly IConfiguration _conf;
         private IClockContext _clock;
 
-        public ClientRepository(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
+        public ClientRepository(IdentityDbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _conf = conf;
             _clock = new ClockContext(_instance);
         }
 
@@ -43,7 +41,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.tbl_Clients.Where(x => x.Id == key).SingleOrDefault();
 
-            entity.LastLoginFailure = DateTime.Now;
+            entity.LastLoginFailure = Clock.UtcDateTime;
             entity.AccessFailedCount++;
 
             try
@@ -126,20 +124,22 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.tbl_Clients.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Clients model)
+        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
         {
+            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess).Single();
+
             var claims = new List<Claim>();
 
             //defaults...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
 
             //service identity vs. a user identity
             claims.Add(new Claim(ClaimTypes.System, ClientType.server.ToString()));
 
-            foreach (var role in (await GetRolesAsync(model.Id)).ToList().OrderBy(x => x.Name))
+            foreach (var role in (await GetRolesAsync(client.Id)).ToList().OrderBy(x => x.Name))
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
-            foreach (var claim in (await GetClaimsAsync(model.Id)).ToList().OrderBy(x => x.Type))
+            foreach (var claim in (await GetClaimsAsync(client.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //nonce to enhance entropy
@@ -153,7 +153,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ClientCredTokenExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -161,12 +161,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Clients model)
+        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
         {
+            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireRefresh).Single();
+
             var claims = new List<Claim>();
 
             //defaults...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
 
             //nonce to enhance entropy
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
@@ -179,7 +181,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ClientCredRefreshExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -271,7 +273,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             entity.Name = model.Name;
             entity.Description = model.Description;
             entity.ClientType = model.ClientType;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
             entity.Enabled = model.Enabled;
             entity.Immutable = model.Immutable;
 

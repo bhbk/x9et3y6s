@@ -67,6 +67,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
 
@@ -75,6 +76,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
 
@@ -105,6 +107,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore());
 
             CreateMap<tbl_Issuers, IssuerModel>()
@@ -115,6 +118,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore());
 
             /*
@@ -198,6 +202,18 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
             /*
+             * setting models
+             */
+            CreateMap<SettingCreate, tbl_Settings>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.User, src => src.Ignore());
+
+            CreateMap<tbl_Settings, SettingModel>();
+
+            /*
              * state models
              */
             CreateMap<StateCreate, tbl_States>()
@@ -257,6 +273,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_QueueEmails, src => src.Ignore())
                 .ForMember(dest => dest.tbl_QueueTexts, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
@@ -279,6 +296,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 .ForMember(dest => dest.tbl_QueueEmails, src => src.Ignore())
                 .ForMember(dest => dest.tbl_QueueTexts, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())

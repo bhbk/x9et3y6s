@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -99,6 +100,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var polling = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingPollingMax)).Single();
+
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = RandomValues.CreateBase64String(32);
 
@@ -110,21 +114,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 verification_url = authorize.AbsoluteUri,
                 user_code = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user),
                 device_code = nonce,
-                interval = uint.Parse(Conf["IdentityDefaults:DeviceCodePollMax"]),
+                interval = uint.Parse(polling.ConfigValue),
             };
 
             var state = await UoW.StateRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_States>(new StateCreate()
-                    {
-                        IssuerId = issuer.Id,
-                        ClientId = client.Id,
-                        UserId = user.Id,
-                        StateValue = nonce,
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(Conf["IdentityDefaults:DeviceCodeTokenExpire"])),
-                    }));
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    UserId = user.Id,
+                    StateValue = nonce,
+                    StateType = StateType.Device.ToString(),
+                    StateConsume = false,
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                }));
 
             await UoW.CommitAsync();
 
@@ -177,6 +181,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
+            var polling = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingPollingMax)).Single();
+
             //check if state is valid...
             var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == input.device_code
                 && x.StateType == StateType.Device.ToString()
@@ -190,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
             //check if device is polling too frequently...
-            else if (uint.Parse(Conf["IdentityDefaults:DeviceCodePollMax"]) <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
+            else if (uint.Parse(polling.ConfigValue) <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
             {
                 state.LastPolling = DateTime.UtcNow;
                 state.StateConsume = false;

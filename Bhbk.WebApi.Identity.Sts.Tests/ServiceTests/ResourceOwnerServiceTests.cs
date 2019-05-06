@@ -6,7 +6,6 @@ using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -39,10 +38,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -71,10 +76,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -102,10 +113,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -134,10 +151,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -165,10 +188,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -192,10 +221,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -225,10 +260,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -253,22 +294,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
 
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
+
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
-                uow.IssuerRepo.LegacyMode = false;
-
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
                     {
@@ -282,45 +326,56 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
 
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "true";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
+
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
-                uow.IssuerRepo.LegacyMode = true;
-
-                var result = service.ResourceOwner_AuthV1(
+                var result = service.ResourceOwner_AuthV1Legacy(
                     new ResourceOwnerV1()
                     {
-                        issuer_id = string.Empty,
                         client_id = client.Id.ToString(),
                         grant_type = "password",
                         username = user.Email,
                         password = Constants.ApiUnitTestUserPassCurrent,
                     });
-                result.Should().BeAssignableTo<UserJwtV1>();
+                result.Should().BeAssignableTo<UserJwtV1Legacy>();
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Should().Be(Constants.ApiUnitTestIssuer);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Should().Be(Constants.ApiUnitTestIssuer);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(86399, 86400);
             }
         }
 
@@ -588,7 +643,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -599,12 +653,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
                 var rt = await JwtFactory.UserRefreshV1(uow, issuer, user);
                 uow.CommitAsync().Wait();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
                     {
@@ -617,10 +669,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
         }
 
@@ -644,7 +701,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.ClientRepo.UpdateAsync(client).Wait();
                 uow.CommitAsync().Wait();
 
-                var result = await service.Http.ResourceOwner_AuthV2(
+                var rop = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -653,8 +710,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         user = user.Id.ToString(),
                         password = Constants.ApiUnitTestUserPassCurrent,
                     });
-                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
-                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                rop.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                rop.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -832,22 +889,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
@@ -861,22 +921,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -885,15 +955,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var defaultClient = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var defaultRole = (await uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
                 if (client.Id == defaultClient.Id)
                     throw new ArgumentException();
 
                 uow.UserRepo.AddRoleAsync(user, defaultRole).Wait();
                 uow.CommitAsync().Wait();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
@@ -907,30 +975,38 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
@@ -944,10 +1020,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
         }
 
@@ -1123,7 +1204,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                uow.UserRepo.Clock = DateTime.UtcNow.AddYears(1);
+                uow.UserRepo.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
                 uow.CommitAsync().Wait();
@@ -1151,10 +1232,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -1186,10 +1273,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -1216,25 +1309,28 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
                 var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
                 uow.CommitAsync().Wait();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
                     {
@@ -1247,22 +1343,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
@@ -1270,9 +1376,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var defaultClient = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var defaultRole = (await uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).Single();
-
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
 
                 if (client.Id == defaultClient.Id)
                     throw new ArgumentException();
@@ -1283,6 +1386,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
                 uow.CommitAsync().Wait();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
                     {
@@ -1295,33 +1399,41 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.IssuerRepo.LegacyMode = false;
-
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
+
+                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+                legacyIssuer.ConfigValue = "false";
+
+                uow.SettingRepo.UpdateAsync(legacyIssuer).Wait();
+                uow.CommitAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
                 var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
                 uow.CommitAsync().Wait();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var result = service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
                     {
@@ -1334,10 +1446,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var claims = JwtFactory.ReadJwtToken(result.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
         }
     }

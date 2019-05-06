@@ -3,6 +3,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Authorize;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -84,12 +85,15 @@ namespace Bhbk.WebApi.Identity.Me
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            if (uow.IssuerRepo.LegacyMode)
+            var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+
+            if (bool.Parse(legacyIssuer.ConfigValue))
                 issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name).Concat(issuers);
-#if DEBUG
+#if !RELEASE
             /*
-             * check if in debug. add value that is hard coded just for that use.
+             * add value that is hard coded just for non-production use.
              */
 
             issuerKeys = issuerKeys.Concat(conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
@@ -110,7 +114,11 @@ namespace Bhbk.WebApi.Identity.Me
                 auth.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(bearer =>
             {
+#if RELEASE
+                bearer.IncludeErrorDetails = false;
+#elif !RELEASE
                 bearer.IncludeErrorDetails = true;
+#endif
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuers = issuers.ToArray(),

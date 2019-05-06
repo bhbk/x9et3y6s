@@ -9,7 +9,6 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -159,7 +158,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -169,9 +167,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
 
                 var ask = service.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
@@ -190,7 +185,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -201,6 +195,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -212,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -236,7 +231,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -247,6 +241,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -258,7 +253,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -282,7 +277,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -293,6 +287,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -304,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -328,7 +323,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -339,6 +333,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -350,7 +345,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -374,7 +369,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -385,9 +379,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -399,7 +391,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -412,7 +404,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.StateRepo.UpdateAsync(state).Wait();
                 uow.CommitAsync().Wait();
 
-                var dc = service.DeviceCode_AuthV2(
+                var result = service.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -421,14 +413,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         user_code = secret,
                         device_code = state.StateValue,
                     });
-                dc.Should().BeAssignableTo<UserJwtV2>();
+                result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(dc.access_token).Should().BeTrue();
+                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var dc_claims = JwtFactory.ReadJwtToken(dc.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                dc_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                dc_claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
         }
     }

@@ -28,13 +28,5 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             return Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
         }
-
-        [NonAction]
-        public void SetUser(Guid userID)
-        {
-            var user = (UoW.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
-
-            ControllerContext.HttpContext.User = UoW.UserRepo.GenerateAccessClaimsAsync(user).Result;
-        }
     }
 }

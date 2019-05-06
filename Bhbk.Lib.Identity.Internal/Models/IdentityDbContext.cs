@@ -20,6 +20,7 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
+        public virtual DbSet<tbl_Settings> tbl_Settings { get; set; }
         public virtual DbSet<tbl_StateTypes> tbl_StateTypes { get; set; }
         public virtual DbSet<tbl_States> tbl_States { get; set; }
         public virtual DbSet<tbl_Urls> tbl_Urls { get; set; }
@@ -344,6 +345,41 @@ namespace Bhbk.Lib.Identity.Internal.Models
                     .HasForeignKey(d => d.ClientId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Roles_ClientID");
+            });
+
+            modelBuilder.Entity<tbl_Settings>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_Settings")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.ConfigKey)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ConfigValue)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.tbl_Settings)
+                    .HasForeignKey(d => d.ClientId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Settings_ClientID");
+
+                entity.HasOne(d => d.Issuer)
+                    .WithMany(p => p.tbl_Settings)
+                    .HasForeignKey(d => d.IssuerId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Settings_IssuerID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_Settings)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Settings_UserID");
             });
 
             modelBuilder.Entity<tbl_StateTypes>(entity =>

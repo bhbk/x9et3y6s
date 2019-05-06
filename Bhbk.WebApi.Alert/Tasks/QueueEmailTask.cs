@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                         if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
                                         {
-                                            uow.UserRepo.DeleteEmailAsync(msg.Id.ToString()).Wait();
+                                            uow.UserRepo.DeleteQueueEmailAsync(msg.Id.ToString()).Wait();
                                             Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                                         }
                                         else

@@ -79,7 +79,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new MeService(uow.InstanceType, _owin);
 
@@ -87,6 +86,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
 
+                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id
+                    && x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -98,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -116,7 +117,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
@@ -126,9 +126,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(uow.InstanceType, _owin);
                 service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
+                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id
+                    && x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -140,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                         }));
 
                 uow.CommitAsync().Wait();
@@ -151,7 +150,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
@@ -161,9 +159,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(uow.InstanceType, _owin);
                 service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
+                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id
+                    && x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -175,7 +172,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.CommitAsync().Wait();

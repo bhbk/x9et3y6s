@@ -42,8 +42,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(Conf["IdentityDefaults:AuthCodeTotpExpire"])), user));
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
@@ -92,8 +94,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(Conf["IdentityDefaults:AuthCodeTotpExpire"])), user));
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);

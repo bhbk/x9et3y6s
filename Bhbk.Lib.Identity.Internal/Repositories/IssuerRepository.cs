@@ -9,7 +9,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace Bhbk.Lib.Identity.Internal.Repositories
 {
@@ -17,16 +16,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly IdentityDbContext _context;
         private readonly InstanceContext _instance;
-        public bool LegacyMode { get; set; }
         public string Salt { get; }
 
-        public IssuerRepository(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
+        public IssuerRepository(IdentityDbContext context, InstanceContext instance, string salt)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
 
-            LegacyMode = bool.Parse(conf["IdentityDefaults:LegacyModeIssuer"]);
-            Salt = conf["IdentityTenants:Salt"];
+            Salt = salt;
         }
 
         public async Task<int> CountAsync(Expression<Func<tbl_Issuers, bool>> predicates = null)

@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[tbl_Issuers] (
+﻿CREATE TABLE [dbo].[tbl_Issuers] (
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
     [Name]        NVARCHAR (MAX)   NOT NULL,
@@ -10,6 +10,18 @@ CREATE TABLE [dbo].[tbl_Issuers] (
     [Immutable]   BIT              CONSTRAINT [DF_TIssuers_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_Issuers] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

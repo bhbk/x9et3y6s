@@ -12,7 +12,6 @@ using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -190,7 +189,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
 
             new TestData(uow).DestroyAsync().Wait();
@@ -200,9 +198,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            var salt = conf["IdentityTenants:Salt"];
-            salt.Should().Be(uow.IssuerRepo.Salt);
-
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var state = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -214,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(int.Parse(conf["IdentityDefaults:ImplicitTokenExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -249,14 +245,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             HttpUtility.ParseQueryString(imp_frag).Get("grant_type").Should().BeEquivalentTo("implicit");
             HttpUtility.ParseQueryString(imp_frag).Get("token_type").Should().BeEquivalentTo("bearer");
 
-            var imp_rop = HttpUtility.ParseQueryString(imp_frag).Get("access_token");
+            var result = HttpUtility.ParseQueryString(imp_frag).Get("access_token");
 
-            JwtFactory.CanReadToken(imp_rop).Should().BeTrue();
+            JwtFactory.CanReadToken(result).Should().BeTrue();
 
-            var imp_claims = JwtFactory.ReadJwtToken(imp_rop).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            imp_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-            imp_claims.Value.Split(':')[1].Should().Be(salt);
+            var jwt = JwtFactory.ReadJwtToken(result);
+
+            var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+            iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+            var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                .Subtract(DateTime.UtcNow).TotalSeconds);
+            exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
         }
     }
 }

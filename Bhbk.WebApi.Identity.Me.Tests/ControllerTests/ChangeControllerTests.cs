@@ -38,10 +38,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiUnitTestUser;
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangeEmail()
             {
@@ -68,10 +69,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiUnitTestUser;
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangeEmail()
             {
@@ -99,9 +101,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangePassword()
             {
@@ -128,9 +131,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangePassword()
             {
@@ -158,10 +162,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangePhone()
             {
@@ -188,10 +193,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangePhone()
             {

@@ -42,9 +42,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var result = await controller.DeleteUserRefreshV1(Guid.NewGuid()) as NotFoundObjectResult;
             result = await controller.DeleteUserRefreshesV1() as NotFoundObjectResult;
@@ -66,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             for (int i = 0; i < 3; i++)
                 await JwtFactory.UserRefreshV2(uow, issuer, user);
@@ -90,9 +91,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var result = await controller.GetUserV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -114,9 +116,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var result = await controller.GetUserRefreshesV1() as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -136,6 +139,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var model = new UserChangePassword()
             {
@@ -144,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 NewPasswordConfirm = RandomValues.CreateBase64String(16)
             };
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var result = await controller.SetUserPasswordV1(model) as BadRequestObjectResult;
             result.Should().BeAssignableTo(typeof(BadRequestObjectResult));
@@ -166,6 +170,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
             var model = new UserChangePassword()
             {
@@ -174,7 +179,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
             };
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var result = await controller.SetUserPasswordV1(model) as NoContentResult;
             result.Should().BeAssignableTo(typeof(NoContentResult));
@@ -196,9 +201,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var status = await uow.UserRepo.SetTwoFactorEnabledAsync(user.Id, false);
             status.Should().BeTrue();
@@ -220,9 +226,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            controller.SetUser(user.Id);
+            controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserModel()
             {

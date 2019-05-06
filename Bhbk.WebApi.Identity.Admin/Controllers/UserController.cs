@@ -121,8 +121,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
             {
+                var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
                 var code = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(uint.Parse(Conf["IdentityDefaults:AuthCodeTotpExpire"])), result));
+                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
 
                 var url = UrlHelper.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();

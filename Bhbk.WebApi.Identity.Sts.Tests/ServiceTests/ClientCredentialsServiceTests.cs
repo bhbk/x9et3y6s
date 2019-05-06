@@ -6,7 +6,6 @@ using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -188,7 +186,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -198,10 +195,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
-                var cc = service.ClientCredential_AuthV2(
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
+                var result = service.ClientCredential_AuthV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -209,14 +204,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "client_secret",
                         client_secret = client.ClientKey,
                     });
-                cc.Should().BeAssignableTo<ClientJwtV2>();
+                result.Should().BeAssignableTo<ClientJwtV2>();
 
-                JwtFactory.CanReadToken(cc.access_token).Should().BeTrue();
+                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var rt_claims = JwtFactory.ReadJwtToken(cc.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                rt_claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
         }
 
@@ -411,7 +411,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -421,13 +420,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                var salt = conf["IdentityTenants:Salt"];
-                salt.Should().Be(uow.IssuerRepo.Salt);
-
                 var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
                 uow.CommitAsync().Wait();
 
-                var rt = service.ClientCredential_RefreshV2(
+                var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
+                var result = service.ClientCredential_RefreshV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -435,14 +432,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         grant_type = "refresh_token",
                         refresh_token = cc.RawData,
                     });
-                rt.Should().BeAssignableTo<ClientJwtV2>();
+                result.Should().BeAssignableTo<ClientJwtV2>();
 
-                JwtFactory.CanReadToken(rt.access_token).Should().BeTrue();
+                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var rt_claims = JwtFactory.ReadJwtToken(rt.access_token).Claims
-                    .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                rt_claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-                rt_claims.Value.Split(':')[1].Should().Be(salt);
+                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+                var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+                var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                    .Subtract(DateTime.UtcNow).TotalSeconds);
+                exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
             }
         }
     }

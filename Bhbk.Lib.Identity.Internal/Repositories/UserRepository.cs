@@ -3,12 +3,12 @@ using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Validators;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,17 +31,15 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
     {
         private readonly IdentityDbContext _context;
         private readonly InstanceContext _instance;
-        private readonly IConfiguration _conf;
         private IClockContext _clock;
         public readonly PasswordValidator passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
-        public UserRepository(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
+        public UserRepository(IdentityDbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _conf = conf;
             _clock = new ClockContext(_instance);
 
             passwordValidator = new PasswordValidator();
@@ -59,7 +57,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).SingleOrDefault();
 
-            entity.LastLoginFailure = DateTime.Now;
+            entity.LastLoginFailure = Clock.UtcDateTime;
             entity.AccessFailedCount++;
 
             try
@@ -77,7 +75,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
-            entity.LastLoginSuccess = DateTime.Now;
+            entity.LastLoginSuccess = Clock.UtcDateTime;
             entity.AccessSuccessCount++;
 
             try
@@ -98,7 +96,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 {
                     UserId = user.Id,
                     ClaimId = claim.Id,
-                    Created = DateTime.Now,
+                    Created = Clock.UtcDateTime,
                     Immutable = false
                 });
 
@@ -112,7 +110,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 {
                     UserId = user.Id,
                     LoginId = login.Id,
-                    Created = DateTime.Now,
+                    Created = Clock.UtcDateTime,
                     Immutable = false
                 });
 
@@ -126,7 +124,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
-                    Created = DateTime.Now,
+                    Created = Clock.UtcDateTime,
                     Immutable = false
                 });
 
@@ -275,30 +273,35 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.tbl_Users.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Users model)
+        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
+            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess).Single();
+
+            var legacyClaims = _context.tbl_Settings.Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiDefaultSettingLegacyClaims).Single();
+
             var claims = new List<Claim>();
 
             //defaults...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Email, model.Email));
-            claims.Add(new Claim(ClaimTypes.MobilePhone, model.PhoneNumber));
-            claims.Add(new Claim(ClaimTypes.GivenName, model.FirstName));
-            claims.Add(new Claim(ClaimTypes.Surname, model.LastName));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
+            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
             //user identity vs. a service identity
             claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
 
-            foreach (var role in (await GetRolesAsync(model.Id)).ToList().OrderBy(x => x.Name))
+            foreach (var role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x.Name))
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
                 //check compatibility is enabled. pack claim(s) with old name and new name.
-                if (bool.Parse(_conf["IdentityDefaults:LegacyModeClaims"]))
+                if (bool.Parse(legacyClaims.ConfigValue))
                     claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
             }
 
-            foreach (var claim in (await GetClaimsAsync(model.Id)).ToList().OrderBy(x => x.Type))
+            foreach (var claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //nonce to enhance entropy
@@ -312,7 +315,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ResourceOwnerTokenExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -320,12 +323,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Users model)
+        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
+            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireRefresh).Single();
+
             var claims = new List<Claim>();
 
             //defaults...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
 
             //nonce to enhance entropy
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
@@ -338,7 +343,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             //expire on timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ResourceOwnerRefreshExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -484,7 +489,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         internal async Task<bool> InternalSetPasswordHashAsync(tbl_Users user, string passwordHash)
         {
             user.PasswordHash = passwordHash;
-            user.LastUpdated = DateTime.Now;
+            user.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -494,7 +499,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
         internal async Task<bool> InternalSetSecurityStampAsync(tbl_Users user, string stamp)
         {
             user.SecurityStamp = stamp;
-            user.LastUpdated = DateTime.Now;
+            user.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -641,7 +646,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
             entity.EmailConfirmed = confirmed;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(entity).State = EntityState.Modified;
 
@@ -653,7 +658,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
             entity.PasswordConfirmed = confirmed;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(entity).State = EntityState.Modified;
 
@@ -665,7 +670,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
             entity.PhoneNumberConfirmed = confirmed;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(entity).State = EntityState.Modified;
 
@@ -677,7 +682,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
             entity.Immutable = enabled;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(entity).State = EntityState.Modified;
 
@@ -696,7 +701,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
 
             entity.TwoFactorEnabled = enabled;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
 
             _context.Entry(entity).State = EntityState.Modified;
 
@@ -718,7 +723,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             entity.LastName = model.LastName;
             entity.LockoutEnabled = model.LockoutEnabled;
             entity.LockoutEnd = model.LockoutEnd.HasValue ? model.LockoutEnd.Value.ToUniversalTime() : model.LockoutEnd;
-            entity.LastUpdated = DateTime.Now;
+            entity.LastUpdated = Clock.UtcDateTime;
             entity.Immutable = model.Immutable;
 
             _context.Entry(entity).State = EntityState.Modified;

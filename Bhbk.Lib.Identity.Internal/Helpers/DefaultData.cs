@@ -41,6 +41,88 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
+            var foundExpireAccess = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingExpireAccess))).FirstOrDefault();
+
+            if(foundExpireAccess == null)
+            {
+                foundExpireAccess = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.ApiDefaultSettingExpireAccess,
+                        ConfigValue = 600.ToString(),
+                        Immutable = true,
+                    }));
+            }
+
+            var foundExpireRefresh = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingExpireRefresh))).FirstOrDefault();
+
+            if (foundExpireRefresh == null)
+            {
+                foundExpireRefresh = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.ApiDefaultSettingExpireRefresh,
+                        ConfigValue = 86400.ToString(),
+                        Immutable = true,
+                    }));
+            }
+
+            var foundExpireTotp = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingExpireTotp))).FirstOrDefault();
+
+            if (foundExpireTotp == null)
+            {
+                foundExpireTotp = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiDefaultSettingExpireTotp,
+                        ConfigValue = 600.ToString(),
+                        Immutable = true,
+                    }));
+            }
+
+            var foundLegacyIssuer = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingLegacyIssuer))).FirstOrDefault();
+
+            if (foundLegacyIssuer == null)
+            {
+                foundLegacyIssuer = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiDefaultSettingLegacyIssuer,
+                        ConfigValue = "true",
+                        Immutable = true,
+                    }));
+            }
+
+            var foundLegacyClaims = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingLegacyClaims))).FirstOrDefault();
+
+            if (foundLegacyClaims == null)
+            {
+                foundLegacyClaims = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiDefaultSettingLegacyClaims,
+                        ConfigValue = "true",
+                        Immutable = true,
+                    }));
+            }
+
+            var foundPollingMax = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingPollingMax))).FirstOrDefault();
+
+            if (foundPollingMax == null)
+            {
+                foundPollingMax = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiDefaultSettingPollingMax,
+                        ConfigValue = 10.ToString(),
+                        Immutable = true,
+                    }));
+            }
+
+            await _uow.CommitAsync();
+
             /*
              * create default clients
              */

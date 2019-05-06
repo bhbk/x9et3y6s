@@ -15,6 +15,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         LoginRepository LoginRepo { get; }
         RoleRepository RoleRepo { get; }
         RefreshRepository RefreshRepo { get; }
+        SettingRepository SettingRepo { get; }
         StateRepository StateRepo { get; }
         UserRepository UserRepo { get; }
     }

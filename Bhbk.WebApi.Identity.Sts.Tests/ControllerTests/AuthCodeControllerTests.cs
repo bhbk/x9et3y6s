@@ -12,7 +12,6 @@ using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -228,7 +227,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_ClientNotExist()
         {
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -239,8 +237,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             var code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -275,7 +275,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_IssuerNotExist()
         {
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -286,8 +285,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             var code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -299,7 +300,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -322,7 +323,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UrlNotExist()
         {
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -333,8 +333,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             var code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -346,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -369,7 +371,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserNotExist()
         {
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -380,8 +381,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             var code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -393,7 +396,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -416,7 +419,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidCode()
         {
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -427,8 +429,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             var code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -440,7 +444,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -463,7 +467,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidState()
         {
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -474,8 +477,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+
             var code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(Constants.ApiUnitTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -487,7 +492,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.CommitAsync().Wait();
@@ -515,7 +520,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
             var service = new StsService(uow.InstanceType, _owin);
 
@@ -526,8 +530,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-            var salt = conf["IdentityTenants:Salt"];
-            salt.Should().Be(uow.IssuerRepo.Salt);
+            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
 
             var ask = uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -539,15 +542,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 })).Result;
             var ask_url = new Uri(Constants.ApiUnitTestUriLink);
             var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
-                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(conf["IdentityDefaults:AuthCodeTotpExpire"])), user);
+                .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
 
             uow.CommitAsync().Wait();
 
-            var ac = service.AuthCode_AuthV2(
+            var result = service.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -558,14 +561,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     code = ask_code,
                     state = ask.StateValue,
                 });
-            ac.Should().BeAssignableTo<UserJwtV2>();
+            result.Should().BeAssignableTo<UserJwtV2>();
 
-            JwtFactory.CanReadToken(ac.access_token).Should().BeTrue();
+            JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
 
-            var claims = JwtFactory.ReadJwtToken(ac.access_token).Claims
-                .Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            claims.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
-            claims.Value.Split(':')[1].Should().Be(salt);
+            var jwt = JwtFactory.ReadJwtToken(result.access_token);
+
+            var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
+            iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+            iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+
+            var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
+                .Subtract(DateTime.UtcNow).TotalSeconds);
+            exp.Should().BeInRange(uint.Parse(expire.ConfigValue) - 1, uint.Parse(expire.ConfigValue));
         }
     }
 }

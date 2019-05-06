@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             ClientRefreshV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
         {
-            var principal = await uow.ClientRepo.GenerateRefreshClaimsAsync(client);
+            var principal = await uow.ClientRepo.GenerateRefreshClaimsAsync(issuer, client);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -64,7 +64,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             ClientResourceOwnerV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
         {
-            var principal = await uow.ClientRepo.GenerateAccessClaimsAsync(client);
+            var principal = await uow.ClientRepo.GenerateAccessClaimsAsync(issuer, client);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -99,7 +99,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             UserRefreshV1(IUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(user);
+            var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             UserRefreshV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(user);
+            var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -191,7 +191,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             UserResourceOwnerV1_Legacy(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(user);
+            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -199,8 +199,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
 
             var validFromUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(principal.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Nbf).Single().Value)).UtcDateTime;
-            var validToUtc = DateTimeOffset.FromUnixTimeSeconds(
-                long.Parse(principal.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).Single().Value)).UtcDateTime;
+            var validToUtc = validFromUtc.AddSeconds(86400);
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
@@ -226,7 +225,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             UserResourceOwnerV1(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(user);
+            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -261,7 +260,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public static async Task<JwtSecurityToken>
             UserResourceOwnerV2(IUnitOfWork uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(user);
+            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);

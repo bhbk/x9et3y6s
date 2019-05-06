@@ -22,6 +22,7 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         public LoginRepository LoginRepo { get; private set; }
         public RefreshRepository RefreshRepo { get; private set; }
         public RoleRepository RoleRepo { get; private set; }
+        public SettingRepository SettingRepo { get; private set; }
         public StateRepository StateRepo { get; private set; }
         public UserRepository UserRepo { get; private set; }
 
@@ -49,13 +50,14 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
 
             ActivityRepo = new ActivityRepository(context, instance);
             ClaimRepo = new ClaimRepository(context, instance);
-            ClientRepo = new ClientRepository(context, instance, conf);
-            IssuerRepo = new IssuerRepository(context, instance, conf);
+            ClientRepo = new ClientRepository(context, instance);
+            IssuerRepo = new IssuerRepository(context, instance, conf["IdentityTenants:Salt"]);
             LoginRepo = new LoginRepository(context, instance);
             RoleRepo = new RoleRepository(context, instance);
             RefreshRepo = new RefreshRepository(context, instance);
+            SettingRepo = new SettingRepository(context, instance);
             StateRepo = new StateRepository(context, instance);
-            UserRepo = new UserRepository(context, instance, conf);
+            UserRepo = new UserRepository(context, instance);
         }
 
         public async Task CommitAsync()

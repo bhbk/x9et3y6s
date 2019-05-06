@@ -28,11 +28,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [NonAction]
-        public void SetUser(Guid userID)
+        public void SetUser(Guid issuerID, Guid userID)
         {
+            var issuer = (UoW.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
             var user = (UoW.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
 
-            ControllerContext.HttpContext.User = UoW.UserRepo.GenerateAccessClaimsAsync(user).Result;
+            ControllerContext.HttpContext.User = UoW.UserRepo.GenerateAccessClaimsAsync(issuer, user).Result;
         }
     }
 }
