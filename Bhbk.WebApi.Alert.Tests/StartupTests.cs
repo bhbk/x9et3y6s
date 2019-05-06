@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Alert.Tests
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                if (owin.ConfigRepo.LegacyModeIssuer)
+                if (owin.IssuerRepo.LegacyMode)
                     issuers = (owin.IssuerRepo.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 

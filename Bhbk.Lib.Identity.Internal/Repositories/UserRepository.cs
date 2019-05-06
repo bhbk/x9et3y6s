@@ -1,10 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Validators;
 using Bhbk.Lib.Identity.Primitives.Enums;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -29,10 +29,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class UserRepository : IGenericRepositoryAsync<tbl_Users, Guid>
     {
+        private readonly IdentityDbContext _context;
         private readonly InstanceContext _instance;
         private readonly IConfiguration _conf;
-        private readonly ISystemClock _clock;
-        private readonly IdentityDbContext _context;
+        private IClockContext _clock;
         public readonly PasswordValidator passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
@@ -42,10 +42,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _conf = conf;
+            _clock = new ClockContext(_instance);
 
             passwordValidator = new PasswordValidator();
             passwordHasher = new PasswordHasher();
             userValidator = new UserValidator();
+        }
+
+        public DateTimeOffset Clock
+        {
+            get { return _clock.UtcNow; }
+            set { _clock.UtcNow = value; }
         }
 
         public async Task<bool> AccessFailedAsync(Guid key)
@@ -176,17 +183,17 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<tbl_QueueEmails> CreateEmailAsync(tbl_QueueEmails model)
-        {
-            return await Task.FromResult(_context.Add(model).Entity);
-        }
-
         public async Task<tbl_MotDType1> CreateMOTDAsync(tbl_MotDType1 model)
         {
             return await Task.FromResult(_context.Add(model).Entity);
         }
 
-        public async Task<tbl_QueueTexts> CreateTextAsync(tbl_QueueTexts model)
+        public async Task<tbl_QueueEmails> CreateQueueEmailAsync(tbl_QueueEmails model)
+        {
+            return await Task.FromResult(_context.Add(model).Entity);
+        }
+
+        public async Task<tbl_QueueTexts> CreateQueueTextAsync(tbl_QueueTexts model)
         {
             return await Task.FromResult(_context.Add(model).Entity);
         }
@@ -215,22 +222,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
-        public async Task<bool> DeleteEmailAsync(string key)
-        {
-            var entity = _context.tbl_QueueEmails.Where(x => x.Id.ToString() == key).Single();
-
-            try
-            {
-                _context.Remove(entity);
-
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
-        }
-
         public async Task<bool> DeleteMOTDAsync(string key)
         {
             var entity = _context.tbl_MotDType1.Where(x => x.Id == key).Single();
@@ -247,7 +238,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
-        public async Task<bool> DeleteTextAsync(string key)
+        public async Task<bool> DeleteQueueEmailAsync(string key)
+        {
+            var entity = _context.tbl_QueueEmails.Where(x => x.Id.ToString() == key).Single();
+
+            try
+            {
+                _context.Remove(entity);
+
+                return await Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult(false);
+            }
+        }
+
+        public async Task<bool> DeleteQueueTextAsync(string key)
         {
             var entity = _context.tbl_QueueTexts.Where(x => x.Id.ToString() == key).Single();
 
@@ -268,7 +275,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.tbl_Users.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Users model)
+        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Users model)
         {
             var claims = new List<Claim>();
 
@@ -298,14 +305,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ResourceOwnerTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
+                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ResourceOwnerTokenExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -313,7 +320,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Users model)
+        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Users model)
         {
             var claims = new List<Claim>();
 
@@ -324,14 +331,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ResourceOwnerRefreshExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
+                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ResourceOwnerRefreshExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -346,30 +353,6 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             int? take = null)
         {
             var query = _context.tbl_Users.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orders != null)
-            {
-                query = orders(query)
-                    .Skip(skip.Value)
-                    .Take(take.Value);
-            }
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<tbl_QueueEmails>> GetEmailAsync(Expression<Func<tbl_QueueEmails, bool>> predicates = null,
-            Func<IQueryable<tbl_QueueEmails>, IIncludableQueryable<tbl_QueueEmails, object>> includes = null,
-            Func<IQueryable<tbl_QueueEmails>, IOrderedQueryable<tbl_QueueEmails>> orders = null,
-            int? skip = null,
-            int? take = null)
-        {
-            var query = _context.tbl_QueueEmails.AsQueryable();
 
             if (predicates != null)
                 query = query.Where(predicates);
@@ -411,7 +394,31 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(query);
         }
 
-        public async Task<IEnumerable<tbl_QueueTexts>> GetTextAsync(Expression<Func<tbl_QueueTexts, bool>> predicates = null,
+        public async Task<IEnumerable<tbl_QueueEmails>> GetQueueEmailAsync(Expression<Func<tbl_QueueEmails, bool>> predicates = null,
+            Func<IQueryable<tbl_QueueEmails>, IIncludableQueryable<tbl_QueueEmails, object>> includes = null,
+            Func<IQueryable<tbl_QueueEmails>, IOrderedQueryable<tbl_QueueEmails>> orders = null,
+            int? skip = null,
+            int? take = null)
+        {
+            var query = _context.tbl_QueueEmails.AsQueryable();
+
+            if (predicates != null)
+                query = query.Where(predicates);
+
+            if (includes != null)
+                query = includes(query);
+
+            if (orders != null)
+            {
+                query = orders(query)
+                    .Skip(skip.Value)
+                    .Take(take.Value);
+            }
+
+            return await Task.FromResult(query);
+        }
+
+        public async Task<IEnumerable<tbl_QueueTexts>> GetQueueTextAsync(Expression<Func<tbl_QueueTexts, bool>> predicates = null,
             Func<IQueryable<tbl_QueueTexts>, IIncludableQueryable<tbl_QueueTexts, object>> includes = null,
             Func<IQueryable<tbl_QueueTexts>, IOrderedQueryable<tbl_QueueTexts>> orders = null,
             int? skip = null,
@@ -581,7 +588,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 return false;
             }
         }
-        
+
         public async Task<bool> IsPasswordSetAsync(Guid key)
         {
             var entity = _context.tbl_Users.Where(x => x.Id == key).SingleOrDefault();

@@ -21,8 +21,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
     public class RoleRepository : IGenericRepositoryAsync<tbl_Roles, Guid>
     {
-        private readonly InstanceContext _instance;
         private readonly IdentityDbContext _context;
+        private readonly InstanceContext _instance;
 
         public RoleRepository(IdentityDbContext context, InstanceContext instance)
         {

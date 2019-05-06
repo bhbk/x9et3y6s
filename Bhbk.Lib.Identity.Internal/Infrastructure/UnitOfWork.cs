@@ -18,7 +18,6 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         public ActivityRepository ActivityRepo { get; private set; }
         public ClaimRepository ClaimRepo { get; private set; }
         public ClientRepository ClientRepo { get; private set; }
-        public ConfigRepository ConfigRepo { get; private set; }
         public IssuerRepository IssuerRepo { get; private set; }
         public LoginRepository LoginRepo { get; private set; }
         public RefreshRepository RefreshRepo { get; private set; }
@@ -46,13 +45,12 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
             Mapper = new MapperConfiguration(x =>
             {
                 x.AddProfile<MapperProfile>();
-            }).CreateMapper();
-            
+            }).CreateMapper();            
+
             ActivityRepo = new ActivityRepository(context, instance);
             ClaimRepo = new ClaimRepository(context, instance);
             ClientRepo = new ClientRepository(context, instance, conf);
-            ConfigRepo = new ConfigRepository(instance, conf);
-            IssuerRepo = new IssuerRepository(context, instance, conf["IdentityTenants:Salt"]);
+            IssuerRepo = new IssuerRepository(context, instance, conf);
             LoginRepo = new LoginRepository(context, instance);
             RoleRepo = new RoleRepository(context, instance);
             RefreshRepo = new RefreshRepository(context, instance);

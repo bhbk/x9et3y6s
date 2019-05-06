@@ -1,8 +1,7 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Models;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Internal.Models;
 using ManyConsole;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +26,7 @@ namespace Bhbk.Cli.Identity.Commands
             {
                 var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-                var conf = new ConfigurationBuilder()
+                var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables()
@@ -45,7 +44,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to read config data...");
                     Console.ReadKey();
 
-                    Console.Write(uow.ConfigRepo.ToString());
+                    Console.Write(conf.ToString());
 
                     Console.WriteLine("\tCompleted read of config data...");
                     Console.WriteLine();

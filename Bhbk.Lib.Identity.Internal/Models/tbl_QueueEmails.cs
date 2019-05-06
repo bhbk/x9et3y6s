@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public string HtmlContent { get; set; }
         public string PlaintextContent { get; set; }
         public DateTime Created { get; set; }
-        public DateTime? SendAt { get; set; }
+        public DateTime SendAt { get; set; }
 
         public virtual tbl_Users From { get; set; }
     }

@@ -14,8 +14,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class StateRepository : IGenericRepositoryAsync<tbl_States, Guid>
     {
-        private readonly InstanceContext _instance;
         private readonly IdentityDbContext _context;
+        private readonly InstanceContext _instance;
 
         public StateRepository(IdentityDbContext context, InstanceContext instance)
         {

@@ -85,10 +85,9 @@ namespace Bhbk.WebApi.Alert
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            if (uow.ConfigRepo.LegacyModeIssuer)
+            if (uow.IssuerRepo.LegacyMode)
                 issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name).Concat(issuers);
-
 #if DEBUG
             /*
              * check if in debug. add value that is hard coded just for that use.
@@ -97,7 +96,6 @@ namespace Bhbk.WebApi.Alert
             issuerKeys = issuerKeys.Concat(conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
                 .Select(x => x.Value));
 #endif
-
             sc.AddLogging(log =>
             {
                 log.AddSerilog();

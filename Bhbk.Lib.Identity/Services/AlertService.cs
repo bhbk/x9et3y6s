@@ -10,28 +10,28 @@ namespace Bhbk.Lib.Identity.Services
 {
     public class AlertService : IAlertService
     {
-        private readonly ResourceOwnerHelper _jwt;
+        private readonly ResourceOwnerGrant _ropg;
 
         public AlertService()
             : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
         public AlertService(InstanceContext instance, HttpClient client)
         {
-            _jwt = new ResourceOwnerHelper(instance, client);
+            _ropg = new ResourceOwnerGrant(instance, client);
             Http = new AlertRepository(instance, client);
         }
 
         public JwtSecurityToken Jwt
         {
-            get { return _jwt.JwtV2; }
-            set { _jwt.JwtV2 = value; }
+            get { return _ropg.RopgV2; }
+            set { _ropg.RopgV2 = value; }
         }
 
         public AlertRepository Http { get; }
 
         public bool Email_EnqueueV1(EmailCreate model)
         {
-            var response = Http.Enqueue_EmailV1(_jwt.JwtV2.RawData, model).Result;
+            var response = Http.Enqueue_EmailV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public bool Text_EnqueueV1(TextCreate model)
         {
-            var response = Http.Enqueue_TextV1(_jwt.JwtV2.RawData, model).Result;
+            var response = Http.Enqueue_TextV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;

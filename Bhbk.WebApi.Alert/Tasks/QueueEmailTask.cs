@@ -69,21 +69,18 @@ namespace Bhbk.WebApi.Alert.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        foreach (var entry in uow.UserRepo.GetEmailAsync(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).Result)
+                        foreach (var entry in uow.UserRepo.GetQueueEmailAsync(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).Result)
                         {
                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The email was created on " + entry.Created + " and is being deleted now.");
 
-                            uow.UserRepo.DeleteEmailAsync(entry.Id.ToString()).Wait();
+                            uow.UserRepo.DeleteQueueEmailAsync(entry.Id.ToString()).Wait();
                         }
 
                         uow.CommitAsync().Wait();
 
-                        foreach (var entry in uow.UserRepo.GetEmailAsync(x => x.SendAt < DateTime.Now).Result)
+                        foreach (var entry in uow.UserRepo.GetQueueEmailAsync(x => x.SendAt < DateTime.Now).Result)
                             queue.Enqueue(entry);
-
-                        if (!_enabled || queue.IsEmpty)
-                            continue;
                     }
 
                     Status = JsonConvert.SerializeObject(
@@ -98,6 +95,9 @@ namespace Bhbk.WebApi.Alert.Tasks
                                 Subject = x.Subject
                             })
                         }, _serializer);
+
+                    if (!_enabled || queue.IsEmpty)
+                        continue;
 
                     using (var scope = _factory.CreateScope())
                     {
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                                 "Error=" + response.StatusCode);
 #elif !RELEASE
-                                        uow.UserRepo.DeleteEmailAsync(msg.Id.ToString()).Wait();
+                                        uow.UserRepo.DeleteQueueEmailAsync(msg.Id.ToString()).Wait();
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 case InstanceContext.UnitTest:
                                     {
-                                        uow.UserRepo.DeleteEmailAsync(msg.Id.ToString()).Wait();
+                                        uow.UserRepo.DeleteQueueEmailAsync(msg.Id.ToString()).Wait();
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
@@ -159,7 +159,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    uow.UserRepo.CreateEmailAsync(model).Wait();
+                    uow.UserRepo.CreateQueueEmailAsync(model).Wait();
                     uow.CommitAsync().Wait();
                 }
 

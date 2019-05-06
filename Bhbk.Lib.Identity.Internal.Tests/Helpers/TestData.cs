@@ -84,7 +84,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                             RefreshType = RefreshType.Client.ToString(),
                             RefreshValue = RandomValues.CreateBase64String(8),
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
                 await _uow.CommitAsync();
@@ -213,7 +213,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
                 for (int i = 0; i < 3; i++)
@@ -226,7 +226,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                             RefreshType = RefreshType.User.ToString(),
                             RefreshValue = RandomValues.CreateBase64String(8),
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
                 await _uow.UserRepo.SetConfirmedEmailAsync(foundUser.Id, true);
@@ -334,7 +334,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                             RefreshType = RefreshType.Client.ToString(),
                             RefreshValue = RandomValues.CreateBase64String(8),
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
                 await _uow.CommitAsync();
@@ -438,7 +438,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                             StateType = StateType.Device.ToString(),
                             StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddSeconds(_uow.ConfigRepo.DeviceCodeTokenExpire),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
                 for (int j = 0; j < 3; j++)
@@ -451,7 +451,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.Helpers
                             RefreshType = RefreshType.User.ToString(),
                             RefreshValue = RandomValues.CreateBase64String(8),
                             ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddMinutes(_uow.ConfigRepo.ResourceOwnerRefreshExpire),
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
                 /*

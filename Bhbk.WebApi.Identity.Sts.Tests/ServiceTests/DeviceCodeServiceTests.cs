@@ -190,6 +190,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -211,7 +212,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -235,6 +236,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -256,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -280,6 +282,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -301,7 +304,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -325,6 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
@@ -346,7 +350,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
                     }));
 
                 uow.CommitAsync().Wait();
@@ -395,7 +399,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(conf["IdentityDefaults:DeviceCodeTokenExpire"])),
                     }));
 
                 uow.CommitAsync().Wait();

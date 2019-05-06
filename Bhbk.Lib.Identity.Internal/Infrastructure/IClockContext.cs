@@ -2,8 +2,8 @@
 
 namespace Bhbk.Lib.Identity.Internal.Infrastructure
 {
-    public interface IClockService
+    public interface IClockContext
     {
-        DateTime GetCurrentTime();
+        DateTimeOffset UtcNow { get; set; }
     }
 }

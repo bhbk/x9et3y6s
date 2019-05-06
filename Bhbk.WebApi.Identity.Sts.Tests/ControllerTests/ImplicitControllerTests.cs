@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     StateType = StateType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uow.ConfigRepo.ImplicitTokenExpire),
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(int.Parse(conf["IdentityDefaults:ImplicitTokenExpire"])),
                 }));
 
             uow.CommitAsync().Wait();

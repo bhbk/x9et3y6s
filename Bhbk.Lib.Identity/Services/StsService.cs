@@ -11,21 +11,21 @@ namespace Bhbk.Lib.Identity.Services
 {
     public class StsService : IStsService
     {
-        private readonly ResourceOwnerHelper _jwt;
+        private readonly ResourceOwnerGrant _ropg;
 
         public StsService()
             : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
         public StsService(InstanceContext instance, HttpClient client)
         {
-            _jwt = new ResourceOwnerHelper(instance, client);
+            _ropg = new ResourceOwnerGrant(instance, client);
             Http = new StsRepository(instance, client);
         }
 
         public JwtSecurityToken Jwt
         {
-            get { return _jwt.JwtV2; }
-            set { _jwt.JwtV2 = value; }
+            get { return _ropg.RopgV2; }
+            set { _ropg.RopgV2 = value; }
         }
 
         public StsRepository Http { get; }

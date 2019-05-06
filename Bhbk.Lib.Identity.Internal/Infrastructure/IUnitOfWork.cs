@@ -11,7 +11,6 @@ namespace Bhbk.Lib.Identity.Internal.Infrastructure
         ActivityRepository ActivityRepo { get; }
         ClaimRepository ClaimRepo { get; }
         ClientRepository ClientRepo { get; }
-        ConfigRepository ConfigRepo { get; }
         IssuerRepository IssuerRepo { get; }
         LoginRepository LoginRepo { get; }
         RoleRepository RoleRepo { get; }

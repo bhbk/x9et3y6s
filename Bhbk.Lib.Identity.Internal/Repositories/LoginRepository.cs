@@ -14,8 +14,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class LoginRepository : IGenericRepositoryAsync<tbl_Logins, Guid>
     {
-        private readonly InstanceContext _instance;
         private readonly IdentityDbContext _context;
+        private readonly InstanceContext _instance;
 
         public LoginRepository(IdentityDbContext context, InstanceContext instance)
         {

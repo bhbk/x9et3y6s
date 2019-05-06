@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Internal.Models
         public string ToPhoneNumber { get; set; }
         public string Body { get; set; }
         public DateTime Created { get; set; }
-        public DateTime? SendAt { get; set; }
+        public DateTime SendAt { get; set; }
 
         public virtual tbl_Users From { get; set; }
     }

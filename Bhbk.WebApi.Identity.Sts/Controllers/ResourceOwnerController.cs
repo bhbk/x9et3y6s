@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             //check if issuer compatibility mode enabled.
-            if (!UoW.ConfigRepo.LegacyModeIssuer
+            if (!UoW.IssuerRepo.LegacyMode
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:None");
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             Guid issuerID;
             tbl_Issuers issuer;
 
-            if (UoW.ConfigRepo.LegacyModeIssuer
+            if (UoW.IssuerRepo.LegacyMode
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 //really gross but needed for backward compatibility. can be lame if more than one issuer.
@@ -199,7 +199,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     throw new NotImplementedException();
             }
 
-            if (UoW.ConfigRepo.LegacyModeIssuer
+            if (UoW.IssuerRepo.LegacyMode
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 var access = await JwtFactory.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);

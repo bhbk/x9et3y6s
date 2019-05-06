@@ -14,8 +14,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ClaimRepository : IGenericRepositoryAsync<tbl_Claims, Guid>
     {
-        private readonly InstanceContext _instance;
         private readonly IdentityDbContext _context;
+        private readonly InstanceContext _instance;
 
         public ClaimRepository(IdentityDbContext context, InstanceContext instance)
         {

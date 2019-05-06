@@ -479,7 +479,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     throw new ArgumentNullException();
 
                 //check if issuer compatibility mode enabled.
-                if (!uow.ConfigRepo.LegacyModeIssuer)
+                if (!uow.IssuerRepo.LegacyMode)
                     return _next(context);
 
                 /*

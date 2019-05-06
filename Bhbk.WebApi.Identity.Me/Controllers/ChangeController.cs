@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
+                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(Conf["IdentityDefaults:AuthCodeTotpExpire"])), user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
@@ -93,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(UoW.ConfigRepo.AuthCodeTotpExpire), user));
+                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(Conf["IdentityDefaults:AuthCodeTotpExpire"])), user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);

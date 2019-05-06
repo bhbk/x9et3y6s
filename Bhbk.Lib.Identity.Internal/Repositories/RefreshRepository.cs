@@ -12,8 +12,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class RefreshRepository : IGenericRepositoryAsync<tbl_Refreshes, Guid>
     {
-        private readonly InstanceContext _instance;
         private readonly IdentityDbContext _context;
+        private readonly InstanceContext _instance;
 
         public RefreshRepository(IdentityDbContext context, InstanceContext instance)
         {

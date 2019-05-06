@@ -13,8 +13,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ActivityRepository : IGenericRepositoryAsync<tbl_Activities, Guid>
     {
-        private readonly InstanceContext _instance;
         private readonly IdentityDbContext _context;
+        private readonly InstanceContext _instance;
 
         public ActivityRepository(IdentityDbContext context, InstanceContext instance)
         {

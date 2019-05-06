@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -165,7 +165,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -192,7 +192,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -267,7 +267,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var salt = conf["IdentityTenants:Salt"];
                 salt.Should().Be(uow.IssuerRepo.Salt);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 var result = service.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -303,7 +303,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var salt = conf["IdentityTenants:Salt"];
                 salt.Should().Be(uow.IssuerRepo.Salt);
 
-                uow.ConfigRepo.LegacyModeIssuer = true;
+                uow.IssuerRepo.LegacyMode = true;
 
                 var result = service.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -532,14 +532,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+                uow.UserRepo.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt = await JwtFactory.UserRefreshV1(uow, issuer, user);
                 uow.CommitAsync().Wait();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.UserRepo.Clock = DateTime.UtcNow;
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -565,14 +563,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+                uow.UserRepo.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var rt = await JwtFactory.UserRefreshV1(uow, issuer, user);
                 uow.CommitAsync().Wait();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.UserRepo.Clock = DateTime.UtcNow;
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -840,7 +836,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -877,7 +873,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -923,7 +919,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -1096,14 +1092,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+                uow.UserRepo.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
                 uow.CommitAsync().Wait();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.UserRepo.Clock = DateTime.UtcNow;
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1129,14 +1123,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+                uow.UserRepo.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
                 uow.CommitAsync().Wait();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.UserRepo.Clock = DateTime.UtcNow;
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1159,7 +1151,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -1194,7 +1186,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -1228,7 +1220,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -1267,7 +1259,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();
@@ -1315,7 +1307,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new StsService(uow.InstanceType, _owin);
 
-                uow.ConfigRepo.LegacyModeIssuer = false;
+                uow.IssuerRepo.LegacyMode = false;
 
                 new TestData(uow).DestroyAsync().Wait();
                 new TestData(uow).CreateAsync().Wait();

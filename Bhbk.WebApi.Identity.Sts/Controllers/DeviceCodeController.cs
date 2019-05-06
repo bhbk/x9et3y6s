@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 verification_url = authorize.AbsoluteUri,
                 user_code = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user),
                 device_code = nonce,
-                interval = UoW.ConfigRepo.DeviceCodePollMax,
+                interval = uint.Parse(Conf["IdentityDefaults:DeviceCodePollMax"]),
             };
 
             var state = await UoW.StateRepo.CreateAsync(
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         StateType = StateType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(UoW.ConfigRepo.DeviceCodeTokenExpire),
+                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(Conf["IdentityDefaults:DeviceCodeTokenExpire"])),
                     }));
 
             await UoW.CommitAsync();
@@ -190,7 +190,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
             //check if device is polling too frequently...
-            else if (UoW.ConfigRepo.DeviceCodePollMax <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
+            else if (uint.Parse(Conf["IdentityDefaults:DeviceCodePollMax"]) <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
             {
                 state.LastPolling = DateTime.UtcNow;
                 state.StateConsume = false;

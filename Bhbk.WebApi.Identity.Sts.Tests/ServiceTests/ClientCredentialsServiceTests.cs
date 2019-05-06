@@ -15,6 +15,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -355,14 +356,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(1);
+                uow.ClientRepo.Clock = DateTime.UtcNow.AddYears(1);
 
                 var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
                 uow.CommitAsync().Wait();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.ClientRepo.Clock = DateTime.UtcNow;
 
                 var rt = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -387,14 +386,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = true;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow.AddYears(-1);
+                uow.ClientRepo.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var cc = JwtFactory.ClientRefreshV2(uow, issuer, client).Result;
                 uow.CommitAsync().Wait();
 
-                uow.ConfigRepo.ResourceOwnerRefreshFake = false;
-                uow.ConfigRepo.ResourceOwnerRefreshFakeUtcNow = DateTime.UtcNow;
+                uow.ClientRepo.Clock = DateTime.UtcNow;
 
                 var rt = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()

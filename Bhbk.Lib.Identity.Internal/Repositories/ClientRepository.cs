@@ -20,16 +20,23 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 {
     public class ClientRepository : IGenericRepositoryAsync<tbl_Clients, Guid>
     {
+        private readonly IdentityDbContext _context;
         private readonly InstanceContext _instance;
         private readonly IConfiguration _conf;
-        private readonly IClockService _clock;
-        private readonly IdentityDbContext _context;
+        private IClockContext _clock;
 
         public ClientRepository(IdentityDbContext context, InstanceContext instance, IConfiguration conf)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
             _conf = conf;
+            _clock = new ClockContext(_instance);
+        }
+
+        public DateTimeOffset Clock
+        {
+            get { return _clock.UtcNow; }
+            set { _clock.UtcNow = value; }
         }
 
         public async Task<bool> AccessFailedAsync(Guid key)
@@ -119,7 +126,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(_context.tbl_Clients.Any(x => x.Id == key));
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessTokenAsync(tbl_Clients model)
+        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Clients model)
         {
             var claims = new List<Claim>();
 
@@ -139,14 +146,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ClientCredTokenExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
+                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ClientCredTokenExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);
@@ -154,10 +161,10 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshTokenAsync(tbl_Clients model)
+        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Clients model)
         {
             var claims = new List<Claim>();
-            
+
             //defaults...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()));
 
@@ -165,14 +172,14 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, RandomValues.CreateBase64String(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.UtcNow)
-                .Add(new TimeSpan(UInt32.Parse(_conf["IdentityDefaults:ClientCredRefreshExpire"]))).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
+                .AddSeconds(UInt32.Parse(_conf["IdentityDefaults:ClientCredRefreshExpire"])).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var identity = new ClaimsIdentity(claims, "JWT");
             var result = new ClaimsPrincipal(identity);

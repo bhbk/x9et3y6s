@@ -10,17 +10,17 @@ using System.Net.Http.Headers;
 
 namespace Bhbk.Lib.Identity.Helpers
 {
-    public class ClientCredentialHelper : IClientCredentialHelper
+    public class ClientCredentialGrant : IClientCredentialGrant
     {
         private readonly IConfiguration _conf;
         private readonly InstanceContext _instance;
-        private readonly HttpClient _client;
+        private readonly HttpClient _http;
         private JwtSecurityToken _access, _refresh;
 
-        public ClientCredentialHelper()
+        public ClientCredentialGrant()
             : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public ClientCredentialHelper(InstanceContext instance, HttpClient client)
+        public ClientCredentialGrant(InstanceContext instance, HttpClient http)
         {
             _conf = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -37,14 +37,14 @@ namespace Bhbk.Lib.Identity.Helpers
                 //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
                 connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
 
-                _client = new HttpClient(connect);
+                _http = new HttpClient(connect);
             }
 
             if (instance == InstanceContext.UnitTest)
-                _client = client;
+                _http = http;
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public JwtSecurityToken JwtV1
@@ -75,10 +75,10 @@ namespace Bhbk.Lib.Identity.Helpers
                     var endpoint = "/oauth2/v1/ccg-rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                        response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
+                        response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
-                        response = _client.PostAsync(endpoint, content).Result;
+                        response = _http.PostAsync(endpoint, content).Result;
 
                     else
                         throw new NotImplementedException();
@@ -111,10 +111,10 @@ namespace Bhbk.Lib.Identity.Helpers
                     var endpoint = "/oauth2/v1/ccg";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                        response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
+                        response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
-                        response = _client.PostAsync(endpoint, content).Result;
+                        response = _http.PostAsync(endpoint, content).Result;
 
                     else
                         throw new NotImplementedException();
@@ -136,7 +136,7 @@ namespace Bhbk.Lib.Identity.Helpers
             set { _access = value; }
         }
 
-        public JwtSecurityToken JwtV2
+        public JwtSecurityToken CcgV2
         {
             get
             {
@@ -164,10 +164,10 @@ namespace Bhbk.Lib.Identity.Helpers
                     var endpoint = "/oauth2/v2/ccg-rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                        response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
+                        response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
-                        response = _client.PostAsync(endpoint, content).Result;
+                        response = _http.PostAsync(endpoint, content).Result;
 
                     else
                         throw new NotImplementedException();
@@ -200,10 +200,10 @@ namespace Bhbk.Lib.Identity.Helpers
                     var endpoint = "/oauth2/v2/ccg";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                        response = _client.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
+                        response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
 
                     else if (_instance == InstanceContext.UnitTest)
-                        response = _client.PostAsync(endpoint, content).Result;
+                        response = _http.PostAsync(endpoint, content).Result;
 
                     else
                         throw new NotImplementedException();
