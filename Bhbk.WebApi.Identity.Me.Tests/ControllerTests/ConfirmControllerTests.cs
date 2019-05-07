@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
@@ -13,6 +12,8 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
+using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
@@ -39,13 +40,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(issuer.Id, user.Id);
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(newEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -69,13 +71,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
             var newEmail = string.Format("{0}{1}", RandomValues.CreateBase64String(4), user.Email);
 
             controller.SetUser(issuer.Id, user.Id);
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(newEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -98,13 +101,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(issuer.Id, user.Id);
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(newPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -128,13 +132,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
             var newPassword = RandomValues.CreateBase64String(12);
 
             controller.SetUser(issuer.Id, user.Id);
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire)).Single();
 
             var token = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(newPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -157,8 +162,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(issuer.Id, user.Id);
@@ -184,8 +189,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
             var newPhoneNumber = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(issuer.Id, user.Id);

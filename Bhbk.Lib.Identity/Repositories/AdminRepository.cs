@@ -436,21 +436,6 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_AddUserV1(string jwt, Guid roleID, Guid userID)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/role/v1/" + roleID.ToString() + "/add/" + userID.ToString();
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
         public async Task<HttpResponseMessage> Role_CreateV1(string jwt, RoleCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -513,21 +498,6 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_RemoveUserV1(string jwt, Guid roleID, Guid userID)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/role/v1/" + roleID.ToString() + "/remove/" + userID.ToString();
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
         public async Task<HttpResponseMessage> Role_UpdateV1(string jwt, RoleModel model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -544,7 +514,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_AddClaimV1(string jwt, Guid userID, Guid claimID)
+        public async Task<HttpResponseMessage> User_AddToClaimV1(string jwt, Guid userID, Guid claimID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -559,11 +529,26 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_AddLoginV1(string jwt, Guid userID, Guid loginID)
+        public async Task<HttpResponseMessage> User_AddToLoginV1(string jwt, Guid userID, Guid loginID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
             var endpoint = "/user/v1/" + userID.ToString() + "/add-to-login/" + loginID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_AddToRoleV1(string jwt, Guid userID, Guid roleID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/user/v1/" + userID.ToString() + "/add-to-role/" + roleID.ToString();
 
             if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -773,11 +758,41 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_RemoveLoginV1(string jwt, Guid userID, Guid loginID)
+        public async Task<HttpResponseMessage> User_RemoveFromClaimV1(string jwt, Guid userID, Guid claimID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/user/v1/" + userID.ToString() + "/remove-from-claim/" + claimID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_RemoveFromLoginV1(string jwt, Guid userID, Guid loginID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
             var endpoint = "/user/v1/" + userID.ToString() + "/remove-from-login/" + loginID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> User_RemoveFromRoleV1(string jwt, Guid userID, Guid roleID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/user/v1/" + userID.ToString() + "/remove-from-role/" + roleID.ToString();
 
             if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));

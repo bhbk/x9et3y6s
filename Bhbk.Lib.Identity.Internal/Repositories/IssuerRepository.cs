@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Internal.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -38,6 +39,50 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<tbl_Issuers> CreateAsync(tbl_Issuers entity)
         {
+            entity.tbl_Settings.Add(
+                new tbl_Settings()
+                {
+                    Id = Guid.NewGuid(),
+                    IssuerId = entity.Id,
+                    ConfigKey = Constants.ApiSettingAccessExpire,
+                    ConfigValue = 600.ToString(),
+                    Created = DateTime.UtcNow,
+                    Immutable = true,
+                });
+
+            entity.tbl_Settings.Add(
+                new tbl_Settings()
+                {
+                    Id = Guid.NewGuid(),
+                    IssuerId = entity.Id,
+                    ConfigKey = Constants.ApiSettingRefreshExpire,
+                    ConfigValue = 86400.ToString(),
+                    Created = DateTime.UtcNow,
+                    Immutable = true,
+                });
+
+            entity.tbl_Settings.Add(
+                new tbl_Settings()
+                {
+                    Id = Guid.NewGuid(),
+                    IssuerId = entity.Id,
+                    ConfigKey = Constants.ApiSettingTotpExpire,
+                    ConfigValue = 600.ToString(),
+                    Created = DateTime.UtcNow,
+                    Immutable = true,
+                });
+
+            entity.tbl_Settings.Add(
+                new tbl_Settings()
+                {
+                    Id = Guid.NewGuid(),
+                    IssuerId = entity.Id,
+                    ConfigKey = Constants.ApiSettingPollingMax,
+                    ConfigValue = 10.ToString(),
+                    Created = DateTime.UtcNow,
+                    Immutable = true,
+                });
+
             return await Task.FromResult(_context.Add(entity).Entity);
         }
 
@@ -49,6 +94,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var clients = _context.tbl_Clients.Where(x => x.IssuerId == key);
             var roles = _context.tbl_Roles.Where(x => x.Client.IssuerId == key);
             var refreshes = _context.tbl_Refreshes.Where(x => x.IssuerId == key);
+            var settings = _context.tbl_Settings.Where(x => x.IssuerId == key);
             var states = _context.tbl_States.Where(x => x.IssuerId == key);
 
             try
@@ -57,8 +103,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 _context.RemoveRange(clients);
                 _context.RemoveRange(roles);
                 _context.RemoveRange(refreshes);
+                _context.RemoveRange(settings);
                 _context.RemoveRange(states);
-
                 _context.Remove(entity);
 
                 return await Task.FromResult(true);

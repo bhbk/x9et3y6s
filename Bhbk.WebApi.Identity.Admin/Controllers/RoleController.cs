@@ -22,37 +22,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         public RoleController() { }
 
-        [Route("v1/{roleID:guid}/add/{userID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> AddRoleToUserV1([FromRoute] Guid roleID, [FromRoute] Guid userID)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
-
-            if (role == null)
-            {
-                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
-                return NotFound(ModelState);
-            }
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
-                return NotFound(ModelState);
-            }
-
-            if (!await UoW.UserRepo.AddRoleAsync(user, role))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
-        }
-
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> CreateRoleV1([FromBody] RoleCreate model)
@@ -179,37 +148,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var users = await UoW.RoleRepo.GetUsersListAsync(role.Id);
 
             return Ok(UoW.Mapper.Map<IEnumerable<UserModel>>(users));
-        }
-
-        [Route("v1/{roleID:guid}/remove/{userID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> RemoveRoleFromUserV1([FromRoute] Guid roleID, [FromRoute] Guid userID)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
-
-            if (role == null)
-            {
-                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
-                return NotFound(ModelState);
-            }
-
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
-
-            if (user == null)
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
-                return NotFound(ModelState);
-            }
-
-            if (!await UoW.UserRepo.RemoveFromRoleAsync(user, role))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            await UoW.CommitAsync();
-
-            return NoContent();
         }
 
         [Route("v1"), HttpPut]

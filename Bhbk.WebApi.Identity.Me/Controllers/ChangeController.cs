@@ -42,7 +42,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).Single();
 
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
                 .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
@@ -94,7 +95,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).Single();
 
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
                 .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));

@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
 
 /*
  * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
@@ -61,24 +62,24 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v2/ropg-rt", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrRefreshTokenIDV2)))
+                && (context.Request.Form.ContainsKey(RealConstants.AttrIssuerIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrClientIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrGrantTypeIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrRefreshTokenIDV2)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string issuerValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrIssuerIDV2).Value;
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV2).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV2).Value;
-                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrRefreshTokenIDV2).Value;
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrIssuerIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrClientIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrGrantTypeIDV2).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrRefreshTokenIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
-                    || !grantTypeValue.Equals(Constants.AttrRefreshTokenIDV2, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(RealConstants.AttrRefreshTokenIDV2, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -223,25 +224,25 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v1/ropg-rt", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrRefreshTokenIDV1)))
+                && (context.Request.Form.ContainsKey(RealConstants.AttrIssuerIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrClientIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrGrantTypeIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrRefreshTokenIDV1)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string issuerValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrIssuerIDV1).Value;
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV1).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV1).Value;
-                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrRefreshTokenIDV1).Value;
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrIssuerIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrClientIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrGrantTypeIDV1).Value;
+                string refreshTokenValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrRefreshTokenIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
                     || string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Constants.AttrRefreshTokenIDV1, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(RealConstants.AttrRefreshTokenIDV1, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(refreshTokenValue))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;

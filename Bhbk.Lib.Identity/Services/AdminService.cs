@@ -339,17 +339,6 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Role_AddUserV1(Guid roleID, Guid userID)
-        {
-            var response = Http.Role_AddUserV1(_ropg.RopgV2.RawData, roleID, userID).Result;
-
-            if (response.IsSuccessStatusCode)
-                return true;
-
-            throw new HttpRequestException(response.ToString(),
-                new Exception(response.RequestMessage.ToString()));
-        }
-
         public RoleModel Role_CreateV1(RoleCreate model)
         {
             var response = Http.Role_CreateV1(_ropg.RopgV2.RawData, model).Result;
@@ -400,17 +389,6 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Role_RemoveUserV1(Guid roleID, Guid userID)
-        {
-            var response = Http.Role_RemoveUserV1(_ropg.RopgV2.RawData, roleID, userID).Result;
-
-            if (response.IsSuccessStatusCode)
-                return true;
-
-            throw new HttpRequestException(response.ToString(),
-                new Exception(response.RequestMessage.ToString()));
-        }
-
         public RoleModel Role_UpdateV1(RoleModel model)
         {
             var response = Http.Role_UpdateV1(_ropg.RopgV2.RawData, model).Result;
@@ -422,9 +400,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_AddClaimV1(Guid userID, Guid claimID)
+        public bool User_AddToClaimV1(Guid userID, Guid claimID)
         {
-            var response = Http.User_AddClaimV1(_ropg.RopgV2.RawData, userID, claimID).Result;
+            var response = Http.User_AddToClaimV1(_ropg.RopgV2.RawData, userID, claimID).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -433,9 +411,20 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_AddLoginV1(Guid userID, Guid loginID)
+        public bool User_AddToLoginV1(Guid userID, Guid loginID)
         {
-            var response = Http.User_AddLoginV1(_ropg.RopgV2.RawData, userID, loginID).Result;
+            var response = Http.User_AddToLoginV1(_ropg.RopgV2.RawData, userID, loginID).Result;
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public bool User_AddToRoleV1(Guid userID, Guid roleID)
+        {
+            var response = Http.User_AddToRoleV1(_ropg.RopgV2.RawData, userID, roleID).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -599,9 +588,31 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_RemoveLoginV1(Guid roleID, Guid userID)
+        public bool User_RemoveFromClaimV1(Guid userID, Guid claimID)
         {
-            var response = Http.User_RemoveLoginV1(_ropg.RopgV2.RawData, roleID, userID).Result;
+            var response = Http.User_RemoveFromClaimV1(_ropg.RopgV2.RawData, userID, claimID).Result;
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public bool User_RemoveFromLoginV1(Guid userID, Guid loginID)
+        {
+            var response = Http.User_RemoveFromLoginV1(_ropg.RopgV2.RawData, userID, loginID).Result;
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public bool User_RemoveFromRoleV1(Guid userID, Guid roleID)
+        {
+            var response = Http.User_RemoveFromRoleV1(_ropg.RopgV2.RawData, userID, roleID).Result;
 
             if (response.IsSuccessStatusCode)
                 return true;

@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Alert.Tests
                  */
 
                 var legacyIssuer = (owin.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+                    && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
                 if (bool.Parse(legacyIssuer.ConfigValue))
                     issuers = (owin.IssuerRepo.GetAsync().Result)

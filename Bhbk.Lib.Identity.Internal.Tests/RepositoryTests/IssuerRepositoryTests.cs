@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +29,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 await UoW.IssuerRepo.CreateAsync(
                     UoW.Mapper.Map<tbl_Issuers>(new IssuerCreate()
                         {
-                            Name = Constants.ApiUnitTestIssuer,
-                            IssuerKey = Constants.ApiUnitTestIssuerKey,
+                            Name = Constants.ApiTestIssuer,
+                            IssuerKey = Constants.ApiTestIssuerKey,
                             Enabled = true,
                             Immutable = false,
                         }));
@@ -45,8 +45,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.IssuerRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
-                        Name = Constants.ApiUnitTestIssuer,
-                        IssuerKey = Constants.ApiUnitTestIssuerKey,
+                        Name = Constants.ApiTestIssuer,
+                        IssuerKey = Constants.ApiTestIssuerKey,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).First();
 
             var result = await UoW.IssuerRepo.DeleteAsync(issuer.Id);
             result.Should().BeTrue();
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).First();
             issuer.Name += "(Updated)";
 
             var result = await UoW.IssuerRepo.UpdateAsync(issuer);

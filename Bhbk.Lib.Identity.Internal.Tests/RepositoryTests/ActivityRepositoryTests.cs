@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
+            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).First();
 
             var result = await UoW.ActivityRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()

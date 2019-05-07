@@ -61,19 +61,18 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * roles
          */
-        bool Role_AddUserV1(Guid roleID, Guid userID);
         RoleModel Role_CreateV1(RoleCreate model);
         bool Role_DeleteV1(Guid roleID);
         Tuple<int, IEnumerable<RoleModel>> Role_GetV1(CascadePager model);
         RoleModel Role_GetV1(string roleValue);
-        bool Role_RemoveUserV1(Guid roleID, Guid userID);
         RoleModel Role_UpdateV1(RoleModel model);
 
         /*
          * users
          */
-        bool User_AddClaimV1(Guid userID, Guid claimID);
-        bool User_AddLoginV1(Guid userID, Guid loginID);
+        bool User_AddToClaimV1(Guid userID, Guid claimID);
+        bool User_AddToLoginV1(Guid userID, Guid loginID);
+        bool User_AddToRoleV1(Guid userID, Guid roleID);
         UserModel User_CreateV1(UserCreate model);
         UserModel User_CreateV1NoConfirm(UserCreate model);
         bool User_DeleteV1(Guid userID);
@@ -86,7 +85,9 @@ namespace Bhbk.Lib.Identity.Services
         IEnumerable<LoginModel> User_GetLoginsV1(string userValue);
         IEnumerable<RefreshModel> User_GetRefreshesV1(string userValue);
         IEnumerable<RoleModel> User_GetRolesV1(string userValue);
-        bool User_RemoveLoginV1(Guid roleID, Guid userID);
+        bool User_RemoveFromClaimV1(Guid userID, Guid claimID);
+        bool User_RemoveFromLoginV1(Guid userID, Guid loginID);
+        bool User_RemoveFromRoleV1(Guid userID, Guid roleID);
         bool User_RemovePasswordV1(Guid userID);
         bool User_SetPasswordV1(Guid userID, UserAddPassword model);
         UserModel User_UpdateV1(UserModel model);

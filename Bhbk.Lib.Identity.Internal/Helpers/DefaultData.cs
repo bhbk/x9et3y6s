@@ -22,10 +22,56 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
         public async Task CreateAsync()
         {
             /*
+             * create settings
+             */
+
+            var foundGlobalLegacyClaims = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims)).SingleOrDefault();
+
+            if (foundGlobalLegacyClaims == null)
+            {
+                foundGlobalLegacyClaims = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiSettingGlobalLegacyClaims,
+                        ConfigValue = "true",
+                        Immutable = true,
+                    }));
+            }
+
+            var foundGlobalLegacyIssuer = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).SingleOrDefault();
+
+            if (foundGlobalLegacyIssuer == null)
+            {
+                foundGlobalLegacyIssuer = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiSettingGlobalLegacyIssuer,
+                        ConfigValue = "true",
+                        Immutable = true,
+                    }));
+            }
+
+            var foundGlobalTotpExpire = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).SingleOrDefault();
+
+            if (foundGlobalTotpExpire == null)
+            {
+                foundGlobalTotpExpire = await _uow.SettingRepo.CreateAsync(
+                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    {
+                        ConfigKey = Constants.ApiSettingGlobalTotpExpire,
+                        ConfigValue = 1200.ToString(),
+                        Immutable = true,
+                    }));
+            }
+
+            /*
              * create default issuer
              */
 
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultIssuer))).FirstOrDefault();
+            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).SingleOrDefault();
 
             if (foundIssuer == null)
             {
@@ -41,93 +87,11 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundExpireAccess = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingExpireAccess))).FirstOrDefault();
-
-            if(foundExpireAccess == null)
-            {
-                foundExpireAccess = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
-                    {
-                        IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.ApiDefaultSettingExpireAccess,
-                        ConfigValue = 600.ToString(),
-                        Immutable = true,
-                    }));
-            }
-
-            var foundExpireRefresh = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingExpireRefresh))).FirstOrDefault();
-
-            if (foundExpireRefresh == null)
-            {
-                foundExpireRefresh = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
-                    {
-                        IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.ApiDefaultSettingExpireRefresh,
-                        ConfigValue = 86400.ToString(),
-                        Immutable = true,
-                    }));
-            }
-
-            var foundExpireTotp = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingExpireTotp))).FirstOrDefault();
-
-            if (foundExpireTotp == null)
-            {
-                foundExpireTotp = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
-                    {
-                        ConfigKey = Constants.ApiDefaultSettingExpireTotp,
-                        ConfigValue = 600.ToString(),
-                        Immutable = true,
-                    }));
-            }
-
-            var foundLegacyIssuer = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingLegacyIssuer))).FirstOrDefault();
-
-            if (foundLegacyIssuer == null)
-            {
-                foundLegacyIssuer = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
-                    {
-                        ConfigKey = Constants.ApiDefaultSettingLegacyIssuer,
-                        ConfigValue = "true",
-                        Immutable = true,
-                    }));
-            }
-
-            var foundLegacyClaims = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingLegacyClaims))).FirstOrDefault();
-
-            if (foundLegacyClaims == null)
-            {
-                foundLegacyClaims = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
-                    {
-                        ConfigKey = Constants.ApiDefaultSettingLegacyClaims,
-                        ConfigValue = "true",
-                        Immutable = true,
-                    }));
-            }
-
-            var foundPollingMax = (await _uow.SettingRepo.GetAsync(x => x.ConfigKey.Contains(Constants.ApiDefaultSettingPollingMax))).FirstOrDefault();
-
-            if (foundPollingMax == null)
-            {
-                foundPollingMax = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
-                    {
-                        ConfigKey = Constants.ApiDefaultSettingPollingMax,
-                        ConfigValue = 10.ToString(),
-                        Immutable = true,
-                    }));
-            }
-
-            await _uow.CommitAsync();
-
             /*
              * create default clients
              */
 
-            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultClientUi))).FirstOrDefault();
+            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).SingleOrDefault();
 
             if (foundClientUi == null)
             {
@@ -145,7 +109,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultClientApi))).FirstOrDefault();
+            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientApi)).SingleOrDefault();
 
             if (foundClientApi == null)
             {
@@ -167,7 +131,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * create default login
              */
 
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultLogin))).FirstOrDefault();
+            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Constants.ApiDefaultLogin)).SingleOrDefault();
 
             if (foundLogin == null)
             {
@@ -187,7 +151,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * create default roles
              */
 
-            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultRoleForAdmin))).FirstOrDefault();
+            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForAdmin)).SingleOrDefault();
 
             if (foundRoleForAdmin == null)
             {
@@ -203,7 +167,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultRoleForUser))).FirstOrDefault();
+            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).SingleOrDefault();
 
             if (foundRoleForUser == null)
             {
@@ -223,7 +187,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * create default users
              */
 
-            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email.Contains(Constants.ApiDefaultAdminUser))).FirstOrDefault();
+            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).SingleOrDefault();
 
             if (foundAdminUser == null)
             {
@@ -245,7 +209,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email.Contains(Constants.ApiDefaultNormalUser))).FirstOrDefault();
+            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).SingleOrDefault();
 
             if (foundNormalUser == null)
             {
@@ -272,16 +236,16 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              */
 
             if (!await _uow.UserRepo.IsInLoginAsync(foundAdminUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddLoginAsync(foundAdminUser, foundLogin);
+                await _uow.UserRepo.AddToLoginAsync(foundAdminUser, foundLogin);
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundAdminUser.Id, foundRoleForAdmin.Id))
-                await _uow.UserRepo.AddRoleAsync(foundAdminUser, foundRoleForAdmin);
+                await _uow.UserRepo.AddToRoleAsync(foundAdminUser, foundRoleForAdmin);
 
             if (!await _uow.UserRepo.IsInLoginAsync(foundNormalUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddLoginAsync(foundNormalUser, foundLogin);
+                await _uow.UserRepo.AddToLoginAsync(foundNormalUser, foundLogin);
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundNormalUser.Id, foundRoleForUser.Id))
-                await _uow.UserRepo.AddRoleAsync(foundNormalUser, foundRoleForUser);
+                await _uow.UserRepo.AddToRoleAsync(foundNormalUser, foundRoleForUser);
         }
 
         public async Task DestroyAsync()
@@ -290,7 +254,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * delete default users
              */
 
-            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email.Contains(Constants.ApiDefaultAdminUser))).SingleOrDefault();
+            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).SingleOrDefault();
 
             if (foundAdminUser != null)
             {
@@ -298,7 +262,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email.Contains(Constants.ApiDefaultNormalUser))).SingleOrDefault();
+            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).SingleOrDefault();
 
             if (foundNormalUser != null)
             {
@@ -310,7 +274,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * delete default roles
              */
 
-            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultRoleForAdmin))).SingleOrDefault();
+            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForAdmin)).SingleOrDefault();
 
             if (foundRoleForAdmin != null)
             {
@@ -318,7 +282,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultRoleForUser))).SingleOrDefault();
+            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == Constants.ApiDefaultRoleForUser)).SingleOrDefault();
 
             if (foundRoleForUser != null)
             {
@@ -330,7 +294,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * delete default logins
              */
 
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultLogin))).SingleOrDefault();
+            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == Constants.ApiDefaultLogin)).SingleOrDefault();
 
             if (foundLogin != null)
             {
@@ -342,7 +306,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * delete default clients
              */
 
-            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultClientUi))).SingleOrDefault();
+            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).SingleOrDefault();
 
             if (foundClientUi != null)
             {
@@ -350,7 +314,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultClientApi))).SingleOrDefault();
+            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientApi)).SingleOrDefault();
 
             if (foundClientApi != null)
             {
@@ -362,7 +326,7 @@ namespace Bhbk.Lib.Identity.Internal.Helpers
              * delete default issuers
              */
 
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name.Contains(Constants.ApiDefaultIssuer))).SingleOrDefault();
+            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).SingleOrDefault();
 
             if (foundIssuer != null)
             {

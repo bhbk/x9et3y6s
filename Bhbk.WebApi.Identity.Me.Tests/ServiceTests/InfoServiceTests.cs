@@ -9,7 +9,6 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -86,8 +85,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
 
-                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id
-                    && x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
+                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -126,8 +125,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(uow.InstanceType, _owin);
                 service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id
-                    && x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
+                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -159,8 +158,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(uow.InstanceType, _owin);
                 service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id
-                    && x.ConfigKey == Constants.ApiDefaultSettingExpireAccess)).Single();
+                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
                     uow.Mapper.Map<tbl_States>(new StateCreate()

@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using FluentAssertions;
@@ -31,8 +31,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     UoW.Mapper.Map<tbl_Clients>(new ClientCreate()
                         {
                             IssuerId = Guid.NewGuid(),
-                            Name = Constants.ApiUnitTestClient,
-                            ClientKey = Constants.ApiUnitTestClientKey,
+                            Name = Constants.ApiTestClient,
+                            ClientKey = Constants.ApiTestClientKey,
                             ClientType = ClientType.user_agent.ToString(),
                             Enabled = true,
                             Immutable = false,
@@ -45,14 +45,14 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
 
             var result = await UoW.ClientRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = issuer.Id,
-                        Name = Constants.ApiUnitTestClient,
-                        ClientKey = Constants.ApiUnitTestClientKey,
+                        Name = Constants.ApiTestClient,
+                        ClientKey = Constants.ApiTestClientKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -76,7 +76,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).First();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiTestClient)).First();
 
             var result = await UoW.ClientRepo.DeleteAsync(client.Id);
             result.Should().BeTrue();
@@ -109,7 +109,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).First();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiTestClient)).First();
             client.Name += "(Updated)";
 
             var result = await UoW.ClientRepo.UpdateAsync(client);

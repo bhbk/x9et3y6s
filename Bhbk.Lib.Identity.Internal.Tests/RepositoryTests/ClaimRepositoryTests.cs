@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = Guid.NewGuid(),
-                        Type = Constants.ApiUnitTestClaim,
+                        Type = Constants.ApiTestClaim,
                         Value = RandomValues.CreateBase64String(8),
                         Immutable = false,
                     }));
@@ -43,13 +43,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).First();
+            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).First();
 
             var result = await UoW.ClaimRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()
                 {
                     IssuerId = issuer.Id,
-                    Type = Constants.ApiUnitTestClaim,
+                    Type = Constants.ApiTestClaim,
                     Value = RandomValues.CreateBase64String(8),
                     Immutable = false,
                 }));
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiUnitTestClaim)).First();
+            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiTestClaim)).First();
 
             var result = await UoW.ClaimRepo.DeleteAsync(claim.Id);
             result.Should().BeTrue();
@@ -105,7 +105,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiUnitTestClaim)).First();
+            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiTestClaim)).First();
             claim.Value += "(Updated)";
 
             var result = await UoW.ClaimRepo.UpdateAsync(claim);

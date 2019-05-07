@@ -2,7 +2,6 @@
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Services;
@@ -16,6 +15,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
+using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
 
 namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 {
@@ -48,9 +49,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var service = new AlertService(uow.InstanceType, _owin);
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
@@ -66,13 +67,13 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 new TestData(uow).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailCreate()
                     {
@@ -80,8 +81,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = user.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = Constants.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = Constants.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        Subject = FakeConstants.ApiTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
+                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -94,13 +95,13 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 new TestData(uow).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailCreate()
                     {
@@ -108,8 +109,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = testUser.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = Constants.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = Constants.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        Subject = FakeConstants.ApiTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
+                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -126,13 +127,13 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 new TestData(uow).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+                var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailCreate()
                     {
@@ -140,8 +141,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = user.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = Constants.ApiUnitTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
-                        HtmlContent = Constants.ApiUnitTestEmailContent + "-" + RandomValues.CreateBase64String(4)
+                        Subject = FakeConstants.ApiTestEmailSubject + "-" + RandomValues.CreateBase64String(4),
+                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + RandomValues.CreateBase64String(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NoContent);

@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.UserRepo.AddClaimAsync(user, claim))
+            if (!await UoW.UserRepo.AddToClaimAsync(user, claim))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -78,7 +78,35 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.UserRepo.AddLoginAsync(user, login))
+            if (!await UoW.UserRepo.AddToLoginAsync(user, login))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
+        [Route("v1/{userID:guid}/add-to-role/{roleID:guid}"), HttpGet]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+
+            if (role == null)
+            {
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
+
+            if (!await UoW.UserRepo.AddToRoleAsync(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
@@ -121,7 +149,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
             {
-                var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+                var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
 
                 var code = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
                     .GenerateAsync(result.Email, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
@@ -435,6 +464,33 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
+        [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
+
+            if (claim == null)
+            {
+                ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{claimID}");
+                return NotFound(ModelState);
+            }
+            else if (!await UoW.UserRepo.RemoveFromClaimAsync(user, claim))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
@@ -455,6 +511,33 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
             else if (!await UoW.UserRepo.RemoveFromLoginAsync(user, login))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            await UoW.CommitAsync();
+
+            return NoContent();
+        }
+
+        [Route("v1/{userID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public async Task<IActionResult> RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
+        {
+            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+
+            var role = (await UoW.RoleRepo.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+
+            if (role == null)
+            {
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
+            else if (!await UoW.UserRepo.RemoveFromRoleAsync(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();

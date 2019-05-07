@@ -139,20 +139,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
 
             var state = await UoW.StateRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_States>(new StateCreate()
-                    {
-                        IssuerId = issuer.Id,
-                        ClientId = client.Id,
-                        UserId = user.Id,
-                        StateValue = RandomValues.CreateBase64String(32),
-                        StateType = StateType.User.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
-                    }));
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    UserId = user.Id,
+                    StateValue = RandomValues.CreateBase64String(32),
+                    StateType = StateType.User.ToString(),
+                    StateConsume = false,
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                }));
 
             await UoW.CommitAsync();
 

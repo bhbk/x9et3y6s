@@ -2,7 +2,6 @@
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
 
 /*
  * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
@@ -62,26 +63,26 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v2/ropg", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrUserIDV2)
-                    && context.Request.Form.ContainsKey(Constants.AttrResourceOwnerIDV2)))
+                && (context.Request.Form.ContainsKey(RealConstants.AttrIssuerIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrClientIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrGrantTypeIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrUserIDV2)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrResourceOwnerIDV2)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string issuerValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrIssuerIDV2).Value;
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV2).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV2).Value;
-                string userValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrUserIDV2).Value;
-                string passwordValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrResourceOwnerIDV2).Value;
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrIssuerIDV2).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrClientIDV2).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrGrantTypeIDV2).Value;
+                string userValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrUserIDV2).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrResourceOwnerIDV2).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
-                    || !grantTypeValue.Equals(Constants.AttrResourceOwnerIDV2, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(RealConstants.AttrResourceOwnerIDV2, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -199,8 +200,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
-                else if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                    || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                else if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                    || (logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any()
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
@@ -261,27 +262,27 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v1/ropg", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrUserIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrResourceOwnerIDV1)))
+                && (context.Request.Form.ContainsKey(RealConstants.AttrIssuerIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrClientIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrGrantTypeIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrUserIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrResourceOwnerIDV1)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string issuerValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrIssuerIDV1).Value;
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV1).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV1).Value;
-                string userValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrUserIDV1).Value;
-                string passwordValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrResourceOwnerIDV1).Value;
+                string issuerValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrIssuerIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrClientIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrGrantTypeIDV1).Value;
+                string userValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrUserIDV1).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrResourceOwnerIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(issuerValue)
                     || string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Constants.AttrResourceOwnerIDV1, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(RealConstants.AttrResourceOwnerIDV1, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -383,8 +384,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
-                else if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                    || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                else if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                    || (logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any()
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
@@ -446,25 +447,25 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
             if (context.Request.Path.Equals("/oauth2/v1/ropg", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
-                && (!context.Request.Form.ContainsKey(Constants.AttrIssuerIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrClientIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrGrantTypeIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrUserIDV1)
-                    && context.Request.Form.ContainsKey(Constants.AttrResourceOwnerIDV1)))
+                && (!context.Request.Form.ContainsKey(RealConstants.AttrIssuerIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrClientIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrGrantTypeIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrUserIDV1)
+                    && context.Request.Form.ContainsKey(RealConstants.AttrResourceOwnerIDV1)))
             {
                 //logic below ported from middleware to controller so open api (swagger) can do its job easier...
                 throw new InvalidOperationException();
 
                 var formValues = context.Request.ReadFormAsync().Result;
 
-                string clientValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrClientIDV1).Value;
-                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV1).Value;
-                string userValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrUserIDV1).Value;
-                string passwordValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrResourceOwnerIDV1).Value;
+                string clientValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrClientIDV1).Value;
+                string grantTypeValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrGrantTypeIDV1).Value;
+                string userValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrUserIDV1).Value;
+                string passwordValue = formValues.FirstOrDefault(x => x.Key == RealConstants.AttrResourceOwnerIDV1).Value;
 
                 //check for correct parameter format
                 if (string.IsNullOrEmpty(clientValue)
-                    || !grantTypeValue.Equals(Constants.AttrResourceOwnerIDV1, StringComparison.OrdinalIgnoreCase)
+                    || !grantTypeValue.Equals(RealConstants.AttrResourceOwnerIDV1, StringComparison.OrdinalIgnoreCase)
                     || string.IsNullOrEmpty(userValue)
                     || string.IsNullOrEmpty(passwordValue))
                 {
@@ -480,7 +481,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if issuer compatibility mode enabled.
                 var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
                 if (!bool.Parse(legacyIssuer.ConfigValue))
                     return _next(context);
@@ -561,8 +562,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if login provider is local...
                 //check if login provider is transient for unit/integration test...
-                else if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                    || (logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                else if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                    || (logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any()
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...

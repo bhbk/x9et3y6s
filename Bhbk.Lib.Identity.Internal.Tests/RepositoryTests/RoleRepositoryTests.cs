@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     UoW.Mapper.Map<tbl_Roles>(new RoleCreate()
                         {
                             ClientId = Guid.NewGuid(),
-                            Name = Constants.ApiUnitTestRole,
+                            Name = Constants.ApiTestRole,
                             Enabled = true,
                             Immutable = false,
                         }));
@@ -42,13 +42,13 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
 
             var result = await UoW.RoleRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
-                        Name = Constants.ApiUnitTestRole,
+                        Name = Constants.ApiTestRole,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).First();
+            var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiTestRole)).First();
 
             var result = await UoW.RoleRepo.DeleteAsync(role.Id);
             result.Should().BeTrue();
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiUnitTestRole)).First();
+            var role = (await UoW.RoleRepo.GetAsync(x => x.Name == Constants.ApiTestRole)).First();
             role.Name += "(Updated)";
 
             var result = await UoW.RoleRepo.UpdateAsync(role);

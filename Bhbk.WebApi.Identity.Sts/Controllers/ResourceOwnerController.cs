@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
 
 /*
  * https://tools.ietf.org/html/rfc6749#section-4.3
@@ -40,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if issuer compatibility mode enabled.
             var legacyIssuer = (UoW.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
             if (!bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
@@ -61,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         .Select(i => i.Value).First())).SingleOrDefault();
 
                 else if (UoW.InstanceType == InstanceContext.UnitTest)
-                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).SingleOrDefault();
+                    issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).SingleOrDefault();
 
                 else
                     throw new NotImplementedException();
@@ -141,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.DeployedOrLocal:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -170,8 +171,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.UnitTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -434,7 +435,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.DeployedOrLocal:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
@@ -463,8 +464,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.UnitTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(Constants.ApiUnitTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))

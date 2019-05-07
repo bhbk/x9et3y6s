@@ -46,40 +46,19 @@ namespace Bhbk.Lib.Identity.Internal.Primitives
         public const string ApiDefaultAdminUserPassword = "pa$$word01!";
         public const string ApiDefaultAdminUserFirstName = "Administrator";
         public const string ApiDefaultAdminUserLastName = "User";
-        public const string ApiDefaultAdminUserPhone = "+99999999999";
+        public const string ApiDefaultAdminUserPhone = "+00000000000";
         public const string ApiDefaultNormalUser = "user@local";
         public const string ApiDefaultNormalUserPassword = "pa$$word02!";
         public const string ApiDefaultNormalUserFirstName = "Normal";
         public const string ApiDefaultNormalUserLastName = "User";
-        public const string ApiDefaultNormalUserPhone = "+99999999999";
-        public const string ApiDefaultSettingExpireAccess = "ExpireAccess";
-        public const string ApiDefaultSettingExpireRefresh = "ExpireRefresh";
-        public const string ApiDefaultSettingExpireTotp = "ExpireTotp";
-        public const string ApiDefaultSettingPollingMax = "PollingMax";
-        public const string ApiDefaultSettingLegacyClaims = "LegacyModeClaims";
-        public const string ApiDefaultSettingLegacyIssuer = "LegacyModeIssuer";
-
-        #endregion
-
-        #region Configuration Constants (Unit Tests)
-
-        public const string ApiUnitTestClient = "ClientUnitTests";
-        public const string ApiUnitTestClientKey = "ClientUnitTestsKey";
-        public const string ApiUnitTestClaim = "ClaimUnitTests";
-        public const string ApiUnitTestEmailContent = "EmailUnitTestsContent";
-        public const string ApiUnitTestEmailSubject = "EmailUnitTestsSubject";
-        public const string ApiUnitTestIssuer = "IssuerUnitTests";
-        public const string ApiUnitTestIssuerKey = "IssuerUnitTestsKey";
-        public const string ApiUnitTestLogin = "LoginUnitTests";
-        public const string ApiUnitTestLoginKey = "LoginUnitTestsKey";
-        public const string ApiUnitTestRole = "RoleUnitTests";
-        public const string ApiUnitTestTextBody = "TextUnitTestsContent";
-        public const string ApiUnitTestUser = "unittestuser1@local";
-        public const string ApiUnitTestUserPhone = "+11111111111";
-        public const string ApiUnitTestUserPassCurrent = "te$tpa$$word01!";
-        public const string ApiUnitTestUserPassNew = "te$tpa$$word01!new";
-        public const string ApiUnitTestUri = "UrlUnitTests";
-        public const string ApiUnitTestUriLink = "https://app.test.net/1/callback";
+        public const string ApiDefaultNormalUserPhone = "+00000000000";
+        public const string ApiSettingAccessExpire = "AccessExpire";
+        public const string ApiSettingRefreshExpire = "RefreshExpire";
+        public const string ApiSettingTotpExpire = "TotpExpire";
+        public const string ApiSettingPollingMax = "PollingMax";
+        public const string ApiSettingGlobalLegacyClaims = "GlobalLegacyClaims";
+        public const string ApiSettingGlobalLegacyIssuer = "GlobalLegacyIssuer";
+        public const string ApiSettingGlobalTotpExpire = "GlobalTotpExpire";
 
         #endregion
 

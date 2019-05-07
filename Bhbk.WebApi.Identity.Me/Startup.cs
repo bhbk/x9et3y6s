@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Me
              */
 
             var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiDefaultSettingLegacyIssuer)).Result.Single();
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
                 issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)

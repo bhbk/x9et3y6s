@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                     UoW.Mapper.Map<tbl_Users>(new UserCreate()
                         {
                             Email = RandomValues.CreateAlphaNumericString(4),
-                            PhoneNumber = Constants.ApiUnitTestUserPhone,
+                            PhoneNumber = Constants.ApiTestUserPhone,
                             FirstName = "First-" + RandomValues.CreateBase64String(4),
                             LastName = "Last-" + RandomValues.CreateBase64String(4),
                             LockoutEnabled = false,
@@ -49,8 +49,8 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.UserRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Users>(new UserCreate()
                     {
-                        Email = Constants.ApiUnitTestUser,
-                        PhoneNumber = Constants.ApiUnitTestUserPhone,
+                        Email = Constants.ApiTestUser,
+                        PhoneNumber = Constants.ApiTestUserPhone,
                         FirstName = "First-" + RandomValues.CreateBase64String(4),
                         LastName = "Last-" + RandomValues.CreateBase64String(4),
                         LockoutEnabled = false,
@@ -76,7 +76,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var issuer = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
+            var issuer = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).First();
 
             var result = await UoW.UserRepo.DeleteAsync(issuer.Id);
             result.Should().BeTrue();
@@ -109,7 +109,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).First();
+            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).First();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 

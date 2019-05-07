@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
@@ -38,9 +38,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-            var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiUnitTestUser;
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiTestUser;
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -69,9 +69,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
-            var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiUnitTestUser;
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var newEmail = RandomValues.CreateBase64String(4) + "-" + Constants.ApiTestUser;
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -101,8 +101,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
 
             controller.SetUser(issuer.Id, user.Id);
 
@@ -110,8 +110,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             {
                 UserId = user.Id,
                 CurrentPassword = RandomValues.CreateBase64String(16),
-                NewPassword = Constants.ApiUnitTestUserPassNew,
-                NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
+                NewPassword = Constants.ApiTestUserPassNew,
+                NewPasswordConfirm = Constants.ApiTestUserPassNew
             };
 
             var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
@@ -131,17 +131,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
 
             controller.SetUser(issuer.Id, user.Id);
 
             var model = new UserChangePassword()
             {
                 UserId = user.Id,
-                CurrentPassword = Constants.ApiUnitTestUserPassCurrent,
-                NewPassword = Constants.ApiUnitTestUserPassNew,
-                NewPasswordConfirm = Constants.ApiUnitTestUserPassNew
+                CurrentPassword = Constants.ApiTestUserPassCurrent,
+                NewPassword = Constants.ApiTestUserPassNew,
+                NewPasswordConfirm = Constants.ApiTestUserPassNew
             };
 
             var result = await controller.ChangePasswordV1(model) as OkObjectResult;
@@ -162,8 +162,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(issuer.Id, user.Id);
@@ -193,8 +193,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
             var newPhone = RandomValues.CreateNumberAsString(10);
 
             controller.SetUser(issuer.Id, user.Id);

@@ -2,7 +2,6 @@
 using Bhbk.Lib.Identity.Internal.Helpers;
 using Bhbk.Lib.Identity.Internal.Infrastructure;
 using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
 using Bhbk.Lib.Identity.Internal.Primitives.Enums;
 using Bhbk.Lib.Identity.Internal.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -22,6 +21,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Xunit;
+using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
@@ -86,10 +87,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var ask = await service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
@@ -113,10 +114,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var ask = await service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
@@ -140,10 +141,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
 
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var ask = await service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
@@ -167,11 +168,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var ask = await service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
@@ -199,11 +200,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var ask = await controller.AuthCodeV2_Ask(
                 new AuthCodeAskV2()
                 {
@@ -220,7 +221,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             var ask_url = new Uri(ask.Url);
 
-            HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Constants.ApiUnitTestUriLink);
+            HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(FakeConstants.ApiTestUriLink);
             HttpUtility.ParseQueryString(ask_url.Query).Get("state").Should().NotBeNullOrEmpty();
         }
 
@@ -233,15 +234,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
                 {
@@ -281,15 +283,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
                 {
@@ -329,15 +332,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
                 {
@@ -377,15 +381,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
                 {
@@ -425,15 +430,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
                 {
@@ -473,15 +479,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
-            var url = new Uri(Constants.ApiUnitTestUriLink);
+            var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
                 {
@@ -526,11 +533,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
 
-            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiUnitTestIssuer)).Single();
-            var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiUnitTestClient)).Single();
-            var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiUnitTestUser)).Single();
+            var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+            var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+            var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-            var expire = (await uow.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
+            var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var ask = uow.StateRepo.CreateAsync(
                 uow.Mapper.Map<tbl_States>(new StateCreate()
@@ -544,7 +552,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 })).Result;
-            var ask_url = new Uri(Constants.ApiUnitTestUriLink);
+            var ask_url = new Uri(FakeConstants.ApiTestUriLink);
             var ask_code = await new ProtectHelper(uow.InstanceType.ToString())
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
 
@@ -568,7 +576,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var jwt = JwtFactory.ReadJwtToken(result.access_token);
 
             var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-            iss.Value.Split(':')[0].Should().Be(Constants.ApiUnitTestIssuer);
+            iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
             iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
 
             var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))

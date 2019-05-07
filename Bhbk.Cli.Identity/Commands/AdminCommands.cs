@@ -279,14 +279,14 @@ namespace Bhbk.Cli.Identity.Commands
 
                         if (_create)
                         {
-                            if (_service.Role_AddUserV1(role.Id, user.Id))
+                            if (_service.User_AddToRoleV1(user.Id, role.Id))
                                 Console.WriteLine(Environment.NewLine + "SUCCESS add role \"" + roleName + "\" to user \"" + userName + "\"");
                             else
                                 Console.WriteLine(Environment.NewLine + "FAILED add role \"" + roleName + "\" to user \"" + userName + "\"");
                         }
                         else if (_destroy)
                         {
-                            if (_service.Role_RemoveUserV1(role.Id, user.Id))
+                            if (_service.User_RemoveFromRoleV1(user.Id, role.Id))
                                 Console.WriteLine(Environment.NewLine + "SUCCESS remove role \"" + roleName + "\" from user \"" + userName + "\"");
                             else
                                 Console.WriteLine(Environment.NewLine + "FAILED remove role \"" + roleName + "\" from user \"" + userName + "\"");
@@ -333,7 +333,7 @@ namespace Bhbk.Cli.Identity.Commands
                             else
                                 throw new ConsoleHelpAsException("FAILED find login \"" + loginName + "\"");
 
-                            if (_service.User_AddLoginV1(user.Id, login.Id))
+                            if (_service.User_AddToLoginV1(user.Id, login.Id))
                                 Console.WriteLine(Environment.NewLine + "SUCCESS add login \"" + loginName + "\" to user \"" + userName + "\"");
                             else
                                 throw new ConsoleHelpAsException("FAILED add login \"" + loginName + "\" to user \"" + userName + "\"");

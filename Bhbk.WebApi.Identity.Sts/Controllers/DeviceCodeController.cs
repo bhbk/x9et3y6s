@@ -100,8 +100,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            var expire = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingExpireTotp)).Single();
-            var polling = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingPollingMax)).Single();
+            var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
+            var polling = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingPollingMax)).Single();
 
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = RandomValues.CreateBase64String(32);
@@ -181,7 +183,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var polling = (await UoW.SettingRepo.GetAsync(x => x.ConfigKey == Constants.ApiDefaultSettingPollingMax)).Single();
+            var polling = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingPollingMax)).Single();
 
             //check if state is valid...
             var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == input.device_code

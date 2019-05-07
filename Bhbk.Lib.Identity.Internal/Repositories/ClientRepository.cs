@@ -100,6 +100,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             var activity = _context.tbl_Activities.Where(x => x.ClientId == key);
             var roles = _context.tbl_Roles.Where(x => x.ClientId == key);
             var refreshes = _context.tbl_Refreshes.Where(x => x.ClientId == key);
+            var settings = _context.tbl_Settings.Where(x => x.ClientId == key);
             var states = _context.tbl_States.Where(x => x.ClientId == key);
 
             try
@@ -107,8 +108,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
                 _context.RemoveRange(activity);
                 _context.RemoveRange(roles);
                 _context.RemoveRange(refreshes);
+                _context.RemoveRange(settings);
                 _context.RemoveRange(states);
-
                 _context.Remove(entity);
 
                 return await Task.FromResult(true);
@@ -126,7 +127,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
         {
-            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess).Single();
+            var expire = _context.tbl_Settings.Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
             var claims = new List<Claim>();
 
@@ -163,7 +165,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
         {
-            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireRefresh).Single();
+            var expire = _context.tbl_Settings.Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
 

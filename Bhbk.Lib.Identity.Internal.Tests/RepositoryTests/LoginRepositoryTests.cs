@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Internal.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
                 await UoW.LoginRepo.CreateAsync(
                     UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
                     {
-                        Name = Constants.ApiUnitTestLogin,
+                        Name = Constants.ApiTestLogin,
                         Immutable = false,
                     }));
             });
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
             var result = await UoW.LoginRepo.CreateAsync(
                 UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
                 {
-                    Name = Constants.ApiUnitTestLogin,
+                    Name = Constants.ApiTestLogin,
                     Immutable = false,
                 }));
             result.Should().BeAssignableTo<tbl_Logins>();
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).First();
+            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiTestLogin)).First();
 
             var result = await UoW.LoginRepo.DeleteAsync(login.Id);
             result.Should().BeTrue();
@@ -98,7 +98,7 @@ namespace Bhbk.Lib.Identity.Internal.Tests.RepositoryTests
         {
             TestData.CreateAsync().Wait();
 
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiUnitTestLogin)).First();
+            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiTestLogin)).First();
             login.Name += "(Updated)";
 
             var result = await UoW.LoginRepo.UpdateAsync(login);

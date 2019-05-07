@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             }
         }
 
-        public async Task<bool> AddClaimAsync(tbl_Users user, tbl_Claims claim)
+        public async Task<bool> AddToClaimAsync(tbl_Users user, tbl_Claims claim)
         {
             _context.tbl_UserClaims.Add(
                 new tbl_UserClaims()
@@ -103,7 +103,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddLoginAsync(tbl_Users user, tbl_Logins login)
+        public async Task<bool> AddToLoginAsync(tbl_Users user, tbl_Logins login)
         {
             _context.tbl_UserLogins.Add(
                 new tbl_UserLogins()
@@ -117,7 +117,7 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddRoleAsync(tbl_Users user, tbl_Roles role)
+        public async Task<bool> AddToRoleAsync(tbl_Users user, tbl_Roles role)
         {
             _context.tbl_UserRoles.Add(
                 new tbl_UserRoles()
@@ -202,14 +202,15 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
             var activity = _context.tbl_Activities.Where(x => x.UserId == key);
             var refreshes = _context.tbl_Refreshes.Where(x => x.UserId == key);
+            var settings = _context.tbl_Settings.Where(x => x.UserId == key);
             var states = _context.tbl_States.Where(x => x.UserId == key);
 
             try
             {
                 _context.RemoveRange(activity);
                 _context.RemoveRange(refreshes);
+                _context.RemoveRange(settings);
                 _context.RemoveRange(states);
-
                 _context.Remove(entity);
 
                 return await Task.FromResult(true);
@@ -275,10 +276,11 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
-            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireAccess).Single();
+            var expire = _context.tbl_Settings.Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
             var legacyClaims = _context.tbl_Settings.Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiDefaultSettingLegacyClaims).Single();
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
 
@@ -325,7 +327,8 @@ namespace Bhbk.Lib.Identity.Internal.Repositories
 
         public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
-            var expire = _context.tbl_Settings.Where(x => x.ConfigKey == Constants.ApiDefaultSettingExpireRefresh).Single();
+            var expire = _context.tbl_Settings.Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
 
