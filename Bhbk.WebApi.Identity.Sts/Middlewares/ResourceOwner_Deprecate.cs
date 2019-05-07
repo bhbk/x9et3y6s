@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Helpers;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -13,8 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
+using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 /*
  * https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware

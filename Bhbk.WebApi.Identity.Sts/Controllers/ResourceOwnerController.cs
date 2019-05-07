@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Helpers;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
+using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 /*
  * https://tools.ietf.org/html/rfc6749#section-4.3

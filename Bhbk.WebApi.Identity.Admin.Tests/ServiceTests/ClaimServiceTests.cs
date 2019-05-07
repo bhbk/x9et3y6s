@@ -1,12 +1,14 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Models;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Helpers;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -16,20 +18,24 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
+using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
     public class ClaimServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _owin;
+        private readonly AdminService _service;
 
         public ClaimServiceTests(StartupTests factory)
         {
             _factory = factory;
-            _owin = _factory.CreateClient();
+
+            var http = _factory.CreateClient();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+
+            _service = new AdminService(conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
@@ -38,9 +44,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
-                var result = await service.Http.Claim_CreateV1(RandomValues.CreateBase64String(8), new ClaimCreate());
+                var result = await _service.Http.Claim_CreateV1(RandomValues.CreateBase64String(8), new ClaimCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -48,7 +53,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 new TestData(uow).CreateAsync().Wait();
 
@@ -58,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.Http.Claim_CreateV1(rop.RawData, new ClaimCreate());
+                var result = await _service.Http.Claim_CreateV1(rop.RawData, new ClaimCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -66,7 +70,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -74,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.Http.Claim_CreateV1(rop.RawData, new ClaimCreate());
+                var result = await _service.Http.Claim_CreateV1(rop.RawData, new ClaimCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -91,10 +94,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var service = new AdminService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = service.Claim_CreateV1(
+                var result = _service.Claim_CreateV1(
                     new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
@@ -114,9 +116,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
-                var result = await service.Http.Claim_DeleteV1(RandomValues.CreateBase64String(8), Guid.NewGuid());
+                var result = await _service.Http.Claim_DeleteV1(RandomValues.CreateBase64String(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -124,7 +125,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 new TestData(uow).CreateAsync().Wait();
 
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.Http.Claim_DeleteV1(rop.RawData, Guid.NewGuid());
+                var result = await _service.Http.Claim_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -142,7 +142,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -150,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.Http.Claim_DeleteV1(rop.RawData, Guid.NewGuid());
+                var result = await _service.Http.Claim_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -158,7 +157,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 new TestData(uow).CreateAsync().Wait();
 
@@ -174,7 +172,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 uow.ClaimRepo.UpdateAsync(testClaim).Wait();
                 uow.CommitAsync().Wait();
 
-                var result = await service.Http.Claim_DeleteV1(rop.RawData, testClaim.Id);
+                var result = await _service.Http.Claim_DeleteV1(rop.RawData, testClaim.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -193,12 +191,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var service = new AdminService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var testClaim = (await uow.ClaimRepo.GetAsync(x => x.Type == FakeConstants.ApiTestClaim)).Single();
 
-                var result = service.Claim_DeleteV1(testClaim.Id);
+                var result = _service.Claim_DeleteV1(testClaim.Id);
                 result.Should().BeTrue();
 
                 var check = (await uow.ClaimRepo.GetAsync(x => x.Id == testClaim.Id)).Any();
@@ -219,14 +216,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                var service = new AdminService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var take = 2;
                 var orders = new List<Tuple<string, string>>();
                 orders.Add(new Tuple<string, string>("type", "asc"));
 
-                var result = service.Claim_GetV1(
+                var result = _service.Claim_GetV1(
                     new CascadePager()
                     {
                         Filter = string.Empty,
@@ -249,12 +245,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                var service = new AdminService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var testClaim = (await uow.ClaimRepo.GetAsync(x => x.Type == FakeConstants.ApiTestClaim)).Single();
 
-                var result = service.Claim_GetV1(testClaim.Id.ToString());
+                var result = _service.Claim_GetV1(testClaim.Id.ToString());
                 result.Should().BeAssignableTo<ClaimModel>();
             }
         }
@@ -265,9 +260,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
-                var result = await service.Http.Claim_UpdateV1(RandomValues.CreateBase64String(8), new ClaimModel());
+                var result = await _service.Http.Claim_UpdateV1(RandomValues.CreateBase64String(8), new ClaimModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -275,7 +269,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 new TestData(uow).CreateAsync().Wait();
 
@@ -285,7 +278,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.Http.Claim_UpdateV1(rop.RawData, new ClaimModel());
+                var result = await _service.Http.Claim_UpdateV1(rop.RawData, new ClaimModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -293,7 +286,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new AdminService(uow.InstanceType, _owin);
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -301,7 +293,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await service.Http.Claim_UpdateV1(rop.RawData, new ClaimModel());
+                var result = await _service.Http.Claim_UpdateV1(rop.RawData, new ClaimModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -320,13 +312,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var service = new AdminService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var testClaim = (await uow.ClaimRepo.GetAsync(x => x.Type == FakeConstants.ApiTestClaim)).Single();
                 testClaim.Value += "(Updated)";
 
-                var result = service.Claim_UpdateV1(uow.Mapper.Map<ClaimModel>(testClaim));
+                var result = _service.Claim_UpdateV1(uow.Mapper.Map<ClaimModel>(testClaim));
                 result.Should().BeAssignableTo<ClaimModel>();
                 result.Value.Should().Be(testClaim.Value);
             }

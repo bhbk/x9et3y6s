@@ -1,11 +1,11 @@
 ﻿using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Authorize;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Domain.Authorize;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests
 
             builder.ConfigureServices(sc =>
             {
-                var options = new DbContextOptionsBuilder<IdentityDbContext>()
+                var options = new DbContextOptionsBuilder<_DbContext>()
                     .EnableSensitiveDataLogging();
 
                 InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");

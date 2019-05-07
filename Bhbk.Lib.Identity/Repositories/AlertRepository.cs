@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.Models.Alert;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,17 +16,12 @@ namespace Bhbk.Lib.Identity.Repositories
         private readonly InstanceContext _instance;
         private readonly HttpClient _http;
 
-        public AlertRepository()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public AlertRepository(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public AlertRepository(InstanceContext instance, HttpClient http)
+        public AlertRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
+            _conf = conf;
             _instance = instance;
 
             if (instance == InstanceContext.DeployedOrLocal || instance == InstanceContext.IntegrationTest)

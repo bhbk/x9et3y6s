@@ -1,14 +1,16 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Helpers;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -24,12 +26,16 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
     public class InfoServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _owin;
+        private readonly MeService _service;
 
         public InfoServiceTests(StartupTests factory)
         {
             _factory = factory;
-            _owin = _factory.CreateClient();
+
+            var http = _factory.CreateClient();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+
+            _service = new MeService(conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
@@ -38,11 +44,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new MeService(uow.InstanceType, _owin);
 
                 new TestData(uow).CreateAsync().Wait();
 
-                var result = service.Info_GetMOTDV1();
+                var result = _service.Info_GetMOTDV1();
                 result.Should().BeAssignableTo<MotDType1Model>();
             }
         }
@@ -53,9 +58,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new MeService(uow.InstanceType, _owin);
 
-                var dc = await service.Http.Info_UpdateCodeV1(RandomValues.CreateBase64String(8), RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
+                var dc = await _service.Http.Info_UpdateCodeV1(RandomValues.CreateBase64String(8), RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -63,7 +67,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new MeService(uow.InstanceType, _owin);
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
@@ -71,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await service.Http.Info_UpdateCodeV1(rop.RawData, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
+                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, RandomValues.CreateBase64String(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -79,7 +82,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var service = new MeService(uow.InstanceType, _owin);
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
@@ -105,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await service.Http.Info_UpdateCodeV1(rop.RawData, state.StateValue, RandomValues.CreateAlphaNumericString(8));
+                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, state.StateValue, RandomValues.CreateAlphaNumericString(8));
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -122,8 +124,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
 
-                var service = new MeService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
@@ -143,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 uow.CommitAsync().Wait();
 
-                var dc = service.Info_UpdateCodeV1(state.StateValue, ActionType.Allow.ToString());
+                var dc = _service.Info_UpdateCodeV1(state.StateValue, ActionType.Allow.ToString());
                 dc.Should().BeTrue();
             }
 
@@ -155,8 +156,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
 
-                var service = new MeService(uow.InstanceType, _owin);
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
 
                 var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 uow.CommitAsync().Wait();
 
-                var dc = service.Info_UpdateCodeV1(state.StateValue, ActionType.Deny.ToString());
+                var dc = _service.Info_UpdateCodeV1(state.StateValue, ActionType.Deny.ToString());
                 dc.Should().BeTrue();
             }
         }

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

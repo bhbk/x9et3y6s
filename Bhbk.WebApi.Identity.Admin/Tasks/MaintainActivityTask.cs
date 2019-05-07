@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Infrastructure;
+﻿using Bhbk.Lib.Identity.Data.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

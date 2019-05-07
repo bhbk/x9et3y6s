@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -17,17 +16,12 @@ namespace Bhbk.Lib.Identity.Repositories
         private readonly InstanceContext _instance;
         private readonly HttpClient _http;
 
-        public StsRepository()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public StsRepository(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public StsRepository(InstanceContext instance, HttpClient http)
+        public StsRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _conf = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-
+            _conf = conf;
             _instance = instance;
 
             if (instance == InstanceContext.DeployedOrLocal || instance == InstanceContext.IntegrationTest)

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
@@ -65,7 +65,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddEnvironmentVariables()
                     .Build();
 
-                _service = new AdminService();
+                _service = new AdminService(conf);
                 _jwt = _service.Jwt;
 
                 if (_create == false && _destroy == false)

@@ -3,6 +3,7 @@ using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
@@ -12,14 +13,15 @@ namespace Bhbk.Lib.Identity.Services
     public class StsService : IStsService
     {
         private readonly ResourceOwnerGrant _ropg;
+        private readonly StsRepository _http;
 
-        public StsService()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public StsService(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public StsService(InstanceContext instance, HttpClient client)
+        public StsService(IConfiguration conf, InstanceContext instance, HttpClient client)
         {
             _ropg = new ResourceOwnerGrant(instance, client);
-            Http = new StsRepository(instance, client);
+            _http = new StsRepository(conf, instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -28,7 +30,10 @@ namespace Bhbk.Lib.Identity.Services
             set { _ropg.RopgV2 = value; }
         }
 
-        public StsRepository Http { get; }
+        public StsRepository Http
+        {
+            get { return _http; }
+        }
 
         public AuthCodeV1 AuthCode_AskV1(AuthCodeAskV1 model)
         {

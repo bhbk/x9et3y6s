@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Internal.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;

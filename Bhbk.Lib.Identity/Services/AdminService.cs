@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,15 @@ namespace Bhbk.Lib.Identity.Services
     public class AdminService : IAdminService
     {
         private readonly ResourceOwnerGrant _ropg;
+        private readonly AdminRepository _http;
 
-        public AdminService()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public AdminService(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public AdminService(InstanceContext instance, HttpClient client)
+        public AdminService(IConfiguration conf, InstanceContext instance, HttpClient client)
         {
             _ropg = new ResourceOwnerGrant(instance, client);
-            Http = new AdminRepository(instance, client);
+            _http = new AdminRepository(conf, instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -32,7 +34,10 @@ namespace Bhbk.Lib.Identity.Services
             set { _ropg.RopgV2 = value; }
         }
 
-        public AdminRepository Http { get; }
+        public AdminRepository Http
+        {
+            get { return _http; }
+        }
 
         public Tuple<int, IEnumerable<ActivityModel>> Activity_GetV1(CascadePager model)
         {

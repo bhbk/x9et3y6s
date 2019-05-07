@@ -4,6 +4,7 @@ using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,14 +15,15 @@ namespace Bhbk.Lib.Identity.Services
     public class MeService : IMeService
     {
         private readonly ResourceOwnerGrant _ropg;
+        private readonly MeRepository _http;
 
-        public MeService()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public MeService(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public MeService(InstanceContext instance, HttpClient client)
+        public MeService(IConfiguration conf, InstanceContext instance, HttpClient client)
         {
             _ropg = new ResourceOwnerGrant(instance, client);
-            Http = new MeRepository(instance, client);
+            _http = new MeRepository(conf, instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -30,7 +32,10 @@ namespace Bhbk.Lib.Identity.Services
             set { _ropg.RopgV2 = value; }
         }
 
-        public MeRepository Http { get; }
+        public MeRepository Http
+        {
+            get { return _http; }
+        }
 
         public bool Info_DeleteCodesV1()
         {

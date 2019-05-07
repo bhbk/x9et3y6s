@@ -1,9 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Helpers;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
@@ -11,6 +12,7 @@ using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,29 +23,32 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
+using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
     public class ImplicitControllerTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _owin;
+        private readonly StsService _service;
 
         public ImplicitControllerTests(StartupTests factory)
         {
             _factory = factory;
-            _owin = _factory.CreateClient();
+
+            var http = _factory.CreateClient();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+
+            _service = new StsService(conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
         public async Task Sts_OAuth2_ImplicitV1_Auth_NotImplemented()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
-            var imp = await service.Http.Implicit_AuthV1(
+            var imp = await _service.Http.Implicit_AuthV1(
                 new ImplicitV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -63,7 +68,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_ClientNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -74,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var state = RandomValues.CreateBase64String(8);
-            var imp = await service.Http.Implicit_AuthV2(
+            var imp = await _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -94,7 +98,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_IssuerNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -104,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var state = RandomValues.CreateBase64String(8);
-            var imp = await service.Http.Implicit_AuthV2(
+            var imp = await _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -124,7 +127,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_UrlNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -135,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var state = RandomValues.CreateBase64String(8);
-            var imp = service.Http.Implicit_AuthV2(
+            var imp = _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -155,7 +157,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_UserNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -166,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var state = RandomValues.CreateBase64String(8);
-            var imp = service.Http.Implicit_AuthV2(
+            var imp = _service.Http.Implicit_AuthV2(
                 new ImplicitV2()
                 {
                     issuer = user.Id.ToString(),

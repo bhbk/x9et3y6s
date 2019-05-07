@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Authorize;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<IdentityDbContext>()
+            var options = new DbContextOptionsBuilder<_DbContext>()
                 .UseSqlServer(conf["Databases:IdentityEntities"]);
 
             sc.AddSingleton(conf);
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Me
                 return new UnitOfWork(options, conf);
             });
             sc.AddSingleton<IHostedService, MaintainQuotesTask>();
-            sc.AddSingleton<IAlertService>(new AlertService());
+            sc.AddSingleton<IAlertService, AlertService>();
 
             /*
              * do not use dependency injection for unit of work below. is used 

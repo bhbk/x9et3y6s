@@ -1,9 +1,10 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Internal.Helpers;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Tests.Helpers;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Helpers;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
@@ -11,6 +12,7 @@ using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,29 +23,32 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Internal.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Internal.Primitives.Constants;
+using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
     public class AuthCodeControllerTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _owin;
+        private readonly StsService _service;
 
         public AuthCodeControllerTests(StartupTests factory)
         {
             _factory = factory;
-            _owin = _factory.CreateClient();
+
+            var http = _factory.CreateClient();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+
+            _service = new StsService(conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
-            var ask = await service.Http.AuthCode_AskV1(
+            var ask = await _service.Http.AuthCode_AskV1(
                 new AuthCodeAskV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -61,9 +66,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV1_Auth_NotImplemented()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
-            var ac = await service.Http.AuthCode_AuthV1(
+            var ac = await _service.Http.AuthCode_AuthV1(
                 new AuthCodeV1()
                 {
                     issuer_id = Guid.NewGuid().ToString(),
@@ -82,7 +86,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_ClientNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -91,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var ask = await service.Http.AuthCode_AskV2(
+            var ask = await _service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -109,7 +112,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_IssuerNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -118,7 +120,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var ask = await service.Http.AuthCode_AskV2(
+            var ask = await _service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -136,7 +138,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_UserNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -145,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var ask = await service.Http.AuthCode_AskV2(
+            var ask = await _service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -163,7 +164,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_UrlNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -173,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
-            var ask = await service.Http.AuthCode_AskV2(
+            var ask = await _service.Http.AuthCode_AskV2(
                 new AuthCodeAskV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -229,7 +229,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_ClientNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -259,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var ac = await service.Http.AuthCode_AuthV2(
+            var ac = await _service.Http.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -278,7 +277,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_IssuerNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -308,7 +306,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var ac = await service.Http.AuthCode_AuthV2(
+            var ac = await _service.Http.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = Guid.NewGuid().ToString(),
@@ -327,7 +325,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UrlNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -357,7 +354,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var ac = await service.Http.AuthCode_AuthV2(
+            var ac = await _service.Http.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -376,7 +373,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserNotExist()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -406,7 +402,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var ac = await service.Http.AuthCode_AuthV2(
+            var ac = await _service.Http.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -425,7 +421,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidCode()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -455,7 +450,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var ac = await service.Http.AuthCode_AuthV2(
+            var ac = await _service.Http.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -474,7 +469,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidState()
         {
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -504,7 +498,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var ac = await service.Http.AuthCode_AuthV2(
+            var ac = await _service.Http.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),
@@ -528,7 +522,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
-            var service = new StsService(uow.InstanceType, _owin);
 
             new TestData(uow).DestroyAsync().Wait();
             new TestData(uow).CreateAsync().Wait();
@@ -558,7 +551,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
             uow.CommitAsync().Wait();
 
-            var result = service.AuthCode_AuthV2(
+            var result = _service.AuthCode_AuthV2(
                 new AuthCodeV2()
                 {
                     issuer = issuer.Id.ToString(),

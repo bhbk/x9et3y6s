@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Internal.Models;
-using Bhbk.Lib.Identity.Internal.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Infrastructure;
 using ManyConsole;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +34,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddEnvironmentVariables()
                     .Build();
 
-                var builder = new DbContextOptionsBuilder<IdentityDbContext>()
+                var builder = new DbContextOptionsBuilder<_DbContext>()
                     .UseSqlServer(conf["Databases:IdentityEntities"])
                     .EnableSensitiveDataLogging();
 

@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Repositories;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
@@ -11,14 +12,15 @@ namespace Bhbk.Lib.Identity.Services
     public class AlertService : IAlertService
     {
         private readonly ResourceOwnerGrant _ropg;
+        private readonly AlertRepository _http;
 
-        public AlertService()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public AlertService(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public AlertService(InstanceContext instance, HttpClient client)
+        public AlertService(IConfiguration conf, InstanceContext instance, HttpClient client)
         {
             _ropg = new ResourceOwnerGrant(instance, client);
-            Http = new AlertRepository(instance, client);
+            _http = new AlertRepository(conf, instance, client);
         }
 
         public JwtSecurityToken Jwt
@@ -27,7 +29,10 @@ namespace Bhbk.Lib.Identity.Services
             set { _ropg.RopgV2 = value; }
         }
 
-        public AlertRepository Http { get; }
+        public AlertRepository Http
+        {
+            get { return _http; }
+        }
 
         public bool Email_EnqueueV1(EmailCreate model)
         {
