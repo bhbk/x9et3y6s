@@ -1,7 +1,10 @@
 ﻿using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -12,7 +15,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Route("diagnostic")]
     public class DiagnosticController : BaseController
     {
-        public DiagnosticController() { }
+        private DiagnosticProvider _provider;
+
+        public DiagnosticController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new DiagnosticProvider(conf, instance);
+        }
 
         [Route("v1/status/{name}"), HttpGet]
         public IActionResult GetStatusV1([FromRoute] string name)

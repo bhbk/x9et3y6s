@@ -4,7 +4,7 @@ using OtpNet;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Data.Helpers
+namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     public class TotpHelper
     {

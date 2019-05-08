@@ -4,7 +4,7 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Data.Helpers
+namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     //https://andrewlock.net/implementing-custom-token-providers-for-passwordless-authentication-in-asp-net-core-identity/
 

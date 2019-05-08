@@ -1,11 +1,14 @@
 ﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -16,7 +19,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Route("info")]
     public class InfoController : BaseController
     {
-        public InfoController() { }
+        private InfoProvider _provider;
+
+        public InfoController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new InfoProvider(conf, instance);
+        }
 
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetUserV1()
@@ -29,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Mapper.Map<UserModel>(user));
+            return Ok(Mapper.Map<UserModel>(user));
         }
 
         [Route("v1/msg-of-the-day"), HttpGet]
@@ -44,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var quote = (await UoW.UserRepo.GetMOTDAsync(null, null, x => x.OrderBy(y => y.Id), skip, 1)).SingleOrDefault();
 
-            return Ok(UoW.Mapper.Map<MotDType1Model>(quote));
+            return Ok(Mapper.Map<MotDType1Model>(quote));
         }
 
         [Route("v1/code"), HttpGet]
@@ -60,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var states = await UoW.StateRepo.GetAsync(x => x.UserId == user.Id);
 
-            var result = states.Select(x => UoW.Mapper.Map<StateModel>(x));
+            var result = states.Select(x => Mapper.Map<StateModel>(x));
 
             return Ok(result);
         }
@@ -176,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == user.Id);
 
-            var result = tokens.Select(x => UoW.Mapper.Map<RefreshModel>(x));
+            var result = tokens.Select(x => Mapper.Map<RefreshModel>(x));
 
             return Ok(result);
         }
@@ -310,14 +318,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Mapper.Map<tbl_Users>(model));
+            var result = await UoW.UserRepo.UpdateAsync(Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserModel>(result));
         }
     }
 }

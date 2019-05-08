@@ -1,10 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -12,10 +14,14 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Alert.Controllers
 {
     [Route("email")]
-    //[Authorize(Policy = "UsersPolicy")]
     public class EmailController : BaseController
     {
-        public EmailController() { }
+        private EmailProvider _provider;
+
+        public EmailController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new EmailProvider(conf, instance);
+        }
 
         [Route("v1"), HttpPost]
         public async Task<IActionResult> SendEmailV1([FromBody] EmailCreate model)
@@ -32,7 +38,7 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             var queue = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
 
-            var msg = UoW.Mapper.Map<tbl_QueueEmails>(model);
+            var msg = Mapper.Map<tbl_QueueEmails>(model);
 
             if (!queue.TryEnqueueEmail(msg))
             {

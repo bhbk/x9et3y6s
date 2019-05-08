@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -9,7 +8,6 @@ using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 
 namespace Bhbk.Cli.Identity.Commands
 {
@@ -59,7 +57,7 @@ namespace Bhbk.Cli.Identity.Commands
             {
                 var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-                var conf = new ConfigurationBuilder()
+                var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables()

@@ -1,10 +1,13 @@
-﻿using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +30,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [AllowAnonymous]
     public class ImplicitController : BaseController
     {
-        public ImplicitController() { }
+        private ImplicitProvider _provider;
+
+        public ImplicitController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new ImplicitProvider(conf, instance);
+        }
 
         [Route("v1/ig"), HttpGet]
         public IActionResult ImplicitV1_Auth([FromQuery] ImplicitV1 input)
@@ -141,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //no refresh token as part of this flow...
-            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, new List<tbl_Clients> { client }, user);
 
             var result = new Uri(redirect.AbsoluteUri + "#access_token=" + HttpUtility.UrlEncode(rop.RawData)
                 + "&expires_in=" + HttpUtility.UrlEncode(((int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds).ToString())

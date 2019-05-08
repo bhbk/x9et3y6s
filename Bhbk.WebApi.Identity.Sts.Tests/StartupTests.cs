@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Core.FileSystem;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
-using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.WebApi.Identity.Sts.Tasks;
@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -45,21 +44,21 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
+            var instance = new ContextService(InstanceContext.UnitTest);
+            var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+
             builder.ConfigureServices(sc =>
             {
-                var options = new DbContextOptionsBuilder<_DbContext>()
-                    .EnableSensitiveDataLogging();
-
-                InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
-
-                sc.AddSingleton(conf);
+                sc.AddSingleton<IConfiguration>(conf);
+                sc.AddSingleton<IContextService>(instance);
+                sc.AddSingleton<IMapper>(mapper);
                 sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-                sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
+                sc.AddScoped<IUoWService, UoWService>(x =>
                 {
-                    var sandbox = new UnitOfWork(options, conf, InstanceContext.UnitTest);
-                    new DefaultData(sandbox).CreateAsync().Wait();
+                    var sandbox = new UoWService(conf, instance);
+                    new DefaultData(sandbox, mapper).CreateAsync().Wait();
 
                     return sandbox;
                 });
@@ -71,8 +70,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests
                  * only for owin authentication configuration.
                  */
 
-                var owin = new UnitOfWork(options, conf, InstanceContext.UnitTest);
-                new DefaultData(owin).CreateAsync().Wait();
+                var owin = new UoWService(conf, instance);
+                new DefaultData(owin, mapper).CreateAsync().Wait();
 
                 /*
                  * only test context allowed to run...

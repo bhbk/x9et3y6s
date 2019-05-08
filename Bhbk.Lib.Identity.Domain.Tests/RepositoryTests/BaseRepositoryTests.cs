@@ -1,10 +1,9 @@
-﻿using Bhbk.Lib.Core.FileSystem;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.FileSystem;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
-using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using Xunit;
@@ -17,8 +16,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 
     public class BaseRepositoryTests
     {
-        protected IConfiguration Conf;
-        protected IUnitOfWork UoW;
+        protected IUoWService UoW;
+        protected IMapper Mapper;
         protected DefaultData DefaultData;
         protected TestData TestData;
 
@@ -26,26 +25,24 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         {
             var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = new ConfigurationBuilder()
+            var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<_DbContext>()
-                .EnableSensitiveDataLogging();
+            var instance = new ContextService(InstanceContext.UnitTest);
 
-            InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
-
-            UoW = new UnitOfWork(options, conf, InstanceContext.UnitTest);
-            DefaultData = new DefaultData(UoW);
-            TestData = new TestData(UoW);
+            UoW = new UoWService(conf, instance);
+            Mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+            DefaultData = new DefaultData(UoW, Mapper);
+            TestData = new TestData(UoW, Mapper);
 
             /*
              * only test context allowed to run...
              */
 
-            if (UoW.InstanceType != InstanceContext.UnitTest)
+            if (instance.InstanceType != InstanceContext.UnitTest)
                 throw new NotSupportedException();
         }
     }

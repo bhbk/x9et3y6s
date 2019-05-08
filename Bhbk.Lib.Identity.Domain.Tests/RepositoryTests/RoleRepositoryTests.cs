@@ -21,13 +21,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await UoW.RoleRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Roles>(new RoleCreate()));
+                    Mapper.Map<tbl_Roles>(new RoleCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.RoleRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    Mapper.Map<tbl_Roles>(new RoleCreate()
                         {
                             ClientId = Guid.NewGuid(),
                             Name = Constants.ApiTestRole,
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
 
             var result = await UoW.RoleRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_Roles>(new RoleCreate()
+                Mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
                         Name = Constants.ApiTestRole,

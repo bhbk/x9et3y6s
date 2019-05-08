@@ -1,9 +1,10 @@
-﻿using Bhbk.Lib.Core.Options;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Options;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
-using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,7 +13,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,33 +38,35 @@ namespace Bhbk.WebApi.Alert
                 .AddEnvironmentVariables()
                 .Build();
 
-            var options = new DbContextOptionsBuilder<_DbContext>()
-                .UseSqlServer(conf["Databases:IdentityEntities"]);
+            var instance = new ContextService(InstanceContext.DeployedOrLocal);
+            var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
 
-            sc.AddSingleton(conf);
+            sc.AddSingleton<IConfiguration>(conf);
+            sc.AddSingleton<IContextService>(instance);
+            sc.AddSingleton<IMapper>(mapper);
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
+            sc.AddScoped<IUoWService, UoWService>(x =>
             {
-                return new UnitOfWork(options, conf);
+                return new UoWService(conf, instance);
             });
             sc.AddSingleton<IHostedService, QueueEmailTask>();
             sc.AddSingleton<IHostedService, QueueTextTask>();
             sc.AddSingleton<IAlertService, AlertService>();
 
             /*
-             * do not use dependency inject for unit of work below. is used 
-             * only for owin authentication configuration.
-             */
+            * do not use dependency inject for unit of work below. is used 
+            * only for owin authentication configuration.
+            */
 
-            var uow = new UnitOfWork(options, conf);
+            var owin = new UoWService(conf, instance);
 
             /*
              * only live context allowed to run...
              */
 
-            if (uow.InstanceType != InstanceContext.DeployedOrLocal)
+            if (owin.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
@@ -73,24 +75,24 @@ namespace Bhbk.WebApi.Alert
             var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
                 .Select(x => x.Value);
 
-            var issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
-                .Select(x => x.Name + ":" + uow.IssuerRepo.Salt);
+            var issuers = (owin.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                .Select(x => x.Name + ":" + owin.IssuerRepo.Salt);
 
-            var issuerKeys = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+            var issuerKeys = (owin.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                 .Select(x => x.IssuerKey);
 
-            var clients = (uow.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
+            var clients = (owin.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
                 .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyIssuer = (owin.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = (uow.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                issuers = (owin.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name).Concat(issuers);
 #if !RELEASE
             /*
@@ -141,7 +143,7 @@ namespace Bhbk.WebApi.Alert
                 json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
-            sc.AddAuthorization(auth => 
+            sc.AddAuthorization(auth =>
             {
                 auth.AddPolicy("AdministratorsPolicy", admins =>
                 {
@@ -169,7 +171,7 @@ namespace Bhbk.WebApi.Alert
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
+                app.UseDatabaseErrorPage();
             }
             else
             {

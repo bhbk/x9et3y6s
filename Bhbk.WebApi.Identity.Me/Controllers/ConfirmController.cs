@@ -1,8 +1,11 @@
-﻿using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -13,7 +16,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Route("confirm")]
     public class ConfirmController : BaseController
     {
-        public ConfirmController() { }
+        private ConfirmProvider _provider;
+
+        public ConfirmController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new ConfirmProvider(conf, instance);
+        }
 
         [Route("v1/email/{userID:guid}"), HttpPut]
         [AllowAnonymous]

@@ -1,19 +1,19 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
 using System;
 
-namespace Bhbk.Lib.Identity.Data.Infrastructure
+namespace Bhbk.Lib.Identity.Data.Services
 {
-    public class ClockContext : IClockContext
+    public class ClockService : IClockService
     {
         private readonly InstanceContext _instance;
         private DateTimeOffset _moment;
         private TimeSpan _offset;
         private bool _future;
 
-        public ClockContext()
+        public ClockService()
             : this(InstanceContext.DeployedOrLocal) { }
 
-        public ClockContext(InstanceContext instance)
+        public ClockService(InstanceContext instance)
         {
             _instance = instance;
             _moment = DateTime.UtcNow;

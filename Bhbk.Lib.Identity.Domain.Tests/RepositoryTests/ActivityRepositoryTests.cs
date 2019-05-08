@@ -22,13 +22,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await UoW.ActivityRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()));
+                    Mapper.Map<tbl_Activities>(new ActivityCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.ActivityRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    Mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         ClientId = Guid.NewGuid(),
                         UserId = Guid.NewGuid(),
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
 
             var result = await UoW.ActivityRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     ClientId = Guid.NewGuid(),
                     UserId = user.Id,

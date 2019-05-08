@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,12 +12,12 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Data.Helpers
+namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     public class JwtFactory
     {
         public static async Task<JwtSecurityToken>
-            ClientRefreshV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
+            ClientRefreshV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateRefreshClaimsAsync(issuer, client);
 
@@ -40,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.RefreshRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -51,7 +52,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                 }));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     ClientId = client.Id,
                     ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
@@ -62,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
         }
 
         public static async Task<JwtSecurityToken>
-            ClientResourceOwnerV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client)
+            ClientResourceOwnerV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.ClientRepo.GenerateAccessClaimsAsync(issuer, client);
 
@@ -86,7 +87,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     ClientId = client.Id,
                     ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
@@ -97,7 +98,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
         }
 
         public static async Task<JwtSecurityToken>
-            UserRefreshV1(IUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
+            UserRefreshV1(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(issuer, user);
 
@@ -121,7 +122,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.RefreshRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -132,7 +133,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                 }));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
@@ -143,7 +144,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
         }
 
         public static async Task<JwtSecurityToken>
-            UserRefreshV2(IUnitOfWork uow, tbl_Issuers issuer, tbl_Users user)
+            UserRefreshV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(issuer, user);
 
@@ -167,7 +168,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.RefreshRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -178,7 +179,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                 }));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
@@ -189,7 +190,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
         }
 
         public static async Task<JwtSecurityToken>
-            UserResourceOwnerV1_Legacy(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
+            UserResourceOwnerV1_Legacy(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
 
@@ -212,7 +213,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
@@ -223,7 +224,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
         }
 
         public static async Task<JwtSecurityToken>
-            UserResourceOwnerV1(IUnitOfWork uow, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
+            UserResourceOwnerV1(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
 
@@ -247,7 +248,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
@@ -258,7 +259,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
         }
 
         public static async Task<JwtSecurityToken>
-            UserResourceOwnerV2(IUnitOfWork uow, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
+            UserResourceOwnerV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
             var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
 
@@ -290,7 +291,7 @@ namespace Bhbk.Lib.Identity.Data.Helpers
                     ));
 
             await uow.ActivityRepo.CreateAsync(
-                uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),

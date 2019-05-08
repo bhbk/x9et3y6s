@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
@@ -12,11 +13,13 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     public class DefaultData
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUoWService _uow;
+        private readonly IMapper _mapper;
 
-        public DefaultData(IUnitOfWork uow)
+        public DefaultData(IUoWService uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
+            _mapper = mapper ?? throw new ArgumentNullException();
         }
 
         public async Task CreateAsync()
@@ -31,7 +34,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = Constants.ApiSettingGlobalLegacyClaims,
                         ConfigValue = "true",
@@ -45,7 +48,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = Constants.ApiSettingGlobalLegacyIssuer,
                         ConfigValue = "true",
@@ -59,7 +62,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = Constants.ApiSettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
@@ -76,7 +79,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundIssuer == null)
             {
                 foundIssuer = await _uow.IssuerRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
                         Name = Constants.ApiDefaultIssuer,
                         IssuerKey = Constants.ApiDefaultIssuerKey,
@@ -96,7 +99,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundClientUi == null)
             {
                 foundClientUi = await _uow.ClientRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Clients>(new ClientCreate()
+                    _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.ApiDefaultClientUi,
@@ -114,7 +117,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundClientApi == null)
             {
                 foundClientApi = await _uow.ClientRepo.CreateAsync(
-                     _uow.Mapper.Map<tbl_Clients>(new ClientCreate()
+                     _mapper.Map<tbl_Clients>(new ClientCreate()
                      {
                          IssuerId = foundIssuer.Id,
                          Name = Constants.ApiDefaultClientApi,
@@ -136,7 +139,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundLogin == null)
             {
                 foundLogin = await _uow.LoginRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = Constants.ApiDefaultLogin,
                         LoginKey = Constants.ApiDefaultLoginKey,
@@ -156,7 +159,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundRoleForAdmin == null)
             {
                 foundRoleForAdmin = await _uow.RoleRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = foundClientUi.Id,
                         Name = Constants.ApiDefaultRoleForAdmin,
@@ -172,7 +175,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundRoleForUser == null)
             {
                 foundRoleForUser = await _uow.RoleRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = foundClientUi.Id,
                         Name = Constants.ApiDefaultRoleForUser,
@@ -192,7 +195,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundAdminUser == null)
             {
                 foundAdminUser = await _uow.UserRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Users>(new UserCreate()
+                    _mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = Constants.ApiDefaultAdminUser,
                         PhoneNumber = Constants.ApiDefaultAdminUserPhone,
@@ -214,7 +217,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundNormalUser == null)
             {
                 foundNormalUser = await _uow.UserRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Users>(new UserCreate()
+                    _mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = Constants.ApiDefaultNormalUser,
                         PhoneNumber = Constants.ApiDefaultNormalUserPhone,

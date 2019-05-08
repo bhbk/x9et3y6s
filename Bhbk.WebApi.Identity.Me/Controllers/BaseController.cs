@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
+using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,11 +14,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize(Policy = "UsersPolicy")]
     public class BaseController : Controller
     {
-        protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
+        protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
+        protected IUoWService UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUoWService>(); }
         protected IConfiguration Conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
-
-        public BaseController() { }
 
         [NonAction]
         protected Guid GetUserGUID()

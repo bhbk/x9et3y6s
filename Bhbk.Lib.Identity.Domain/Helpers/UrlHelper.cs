@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Web;
 
-namespace Bhbk.Lib.Identity.Data.Helpers
+namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     public class UrlHelper
     {

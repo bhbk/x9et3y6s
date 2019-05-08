@@ -1,9 +1,10 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
@@ -26,6 +27,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
     public class UserServiceTests : IClassFixture<StartupTests>
     {
+        private readonly IConfiguration _conf;
+        private readonly IMapper _mapper;
         private readonly StartupTests _factory;
         private readonly AdminService _service;
 
@@ -34,9 +37,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             _factory = factory;
 
             var http = _factory.CreateClient();
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
 
-            _service = new AdminService(conf, InstanceContext.UnitTest, http);
+            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
+            _service = new AdminService(_conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
@@ -44,19 +48,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testClaim = await uow.ClaimRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_Claims>(new ClaimCreate()
+                    _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
                         Type = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestClaim,
@@ -79,19 +83,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testLogin = await uow.LoginRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestLogin,
                         LoginKey = FakeConstants.ApiTestLoginKey,
@@ -114,19 +118,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testRole = await uow.RoleRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
                         Name = RandomValues.CreateBase64String(4) + "-" + FakeConstants.ApiTestLogin,
@@ -149,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var result = await _service.Http.User_CreateV1(RandomValues.CreateBase64String(8), new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -158,15 +162,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = await _service.Http.User_CreateV1(rop.RawData, new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -175,13 +179,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = await _service.Http.User_CreateV1(rop.RawData, new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -194,15 +198,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = _service.User_CreateV1NoConfirm(
                     new UserCreate()
@@ -222,15 +226,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = _service.User_CreateV1(
                     new UserCreate()
@@ -255,7 +259,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var result = await _service.Http.User_DeleteV1(RandomValues.CreateBase64String(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -264,13 +268,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = await _service.Http.User_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -279,15 +283,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 testUser.Immutable = true;
@@ -299,7 +303,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-                new TestData(uow).DestroyAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
             }
         }
 
@@ -308,15 +312,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
@@ -333,15 +337,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                await JwtFactory.UserRefreshV2(uow, issuer, user);
+                await JwtFactory.UserRefreshV2(uow, _mapper, issuer, user);
                 uow.CommitAsync().Wait();
 
                 var result = await _service.Http.User_DeleteRefreshesV1(rop.RawData, user.Id);
@@ -351,15 +355,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var rt = await JwtFactory.UserRefreshV2(uow, issuer, user);
+                var rt = await JwtFactory.UserRefreshV2(uow, _mapper, issuer, user);
                 uow.CommitAsync().Wait();
 
                 var refresh = (await uow.RefreshRepo.GetAsync(x => x.UserId == user.Id
@@ -376,15 +380,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateRandomAsync(3).Wait();
+                new TestData(uow, _mapper).CreateRandomAsync(3).Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var take = 2;
                 var orders = new List<Tuple<string, string>>();
@@ -405,15 +409,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
@@ -427,13 +431,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = _service.User_GetClaimsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClaimModel>>();
@@ -446,13 +450,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = _service.User_GetClientsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClientModel>>();
@@ -465,13 +469,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = _service.User_GetLoginsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<LoginModel>>();
@@ -484,15 +488,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateRandomAsync(3).Wait();
+                new TestData(uow, _mapper).CreateRandomAsync(3).Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var take = 2;
                 var orders = new List<Tuple<string, string>>();
@@ -517,16 +521,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 for (int i = 0; i < 3; i++)
-                    await JwtFactory.UserRefreshV2(uow, issuer, user);
+                    await JwtFactory.UserRefreshV2(uow, _mapper, issuer, user);
                 uow.CommitAsync().Wait();
 
                 var result = _service.User_GetRefreshesV1(user.Id.ToString());
@@ -540,13 +544,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = _service.User_GetRolesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RoleModel>>();
@@ -559,15 +563,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testClaim = (await uow.ClaimRepo.GetAsync(x => x.Type == FakeConstants.ApiTestClaim)).Single();
@@ -585,15 +589,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testLogin = (await uow.LoginRepo.GetAsync(x => x.Name == FakeConstants.ApiTestLogin)).Single();
@@ -611,15 +615,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testRole = (await uow.RoleRepo.GetAsync(x => x.Name == FakeConstants.ApiTestRole)).Single();
@@ -637,15 +641,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
@@ -659,15 +663,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var testUserPassword = new UserAddPassword()
@@ -687,7 +691,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var result = await _service.Http.User_UpdateV1(RandomValues.CreateBase64String(8), new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -696,15 +700,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = await _service.Http.User_UpdateV1(rop.RawData, new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -713,13 +717,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = await _service.Http.User_UpdateV1(rop.RawData, new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -732,20 +736,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 testUser.FirstName += "(Updated)";
 
-                var result = _service.User_UpdateV1(uow.Mapper.Map<UserModel>(testUser));
+                var result = _service.User_UpdateV1(_mapper.Map<UserModel>(testUser));
                 result.Should().BeAssignableTo<UserModel>();
                 result.FirstName.Should().Be(testUser.FirstName);
             }

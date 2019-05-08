@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                         var disabled = (uow.UserRepo.GetAsync(x => x.LockoutEnd < DateTime.UtcNow).Result).ToList();
                         var disabledCount = disabled.Count();

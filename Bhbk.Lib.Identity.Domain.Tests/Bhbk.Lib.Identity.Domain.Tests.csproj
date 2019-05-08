@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.1.1" />
     <PackageReference Include="coverlet.msbuild" Version="2.6.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -16,7 +17,6 @@
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bhbk.Lib.Identity.Data\Bhbk.Lib.Identity.Data.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity.Domain\Bhbk.Lib.Identity.Domain.csproj" />
-    <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +42,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Generator></Generator>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ProviderTests\" />
   </ItemGroup>
 
 </Project>

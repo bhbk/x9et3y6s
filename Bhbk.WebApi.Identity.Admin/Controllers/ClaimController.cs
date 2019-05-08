@@ -1,11 +1,14 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +22,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("claim")]
     public class ClaimController : BaseController
     {
-        public ClaimController() { }
+        private ClaimProvider _provider;
+
+        public ClaimController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new ClaimProvider(conf, instance);
+        }
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
@@ -37,11 +45,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClaimRepo.CreateAsync(UoW.Mapper.Map<tbl_Claims>(model));
+            var result = await UoW.ClaimRepo.CreateAsync(Mapper.Map<tbl_Claims>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<ClaimModel>(result));
+            return Ok(Mapper.Map<ClaimModel>(result));
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
@@ -87,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Mapper.Map<ClaimModel>(claim));
+            return Ok(Mapper.Map<ClaimModel>(claim));
         }
 
         [Route("v1/page"), HttpGet]
@@ -118,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<ClaimModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -156,7 +164,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<ClaimModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -189,11 +197,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClaimRepo.UpdateAsync(UoW.Mapper.Map<tbl_Claims>(model));
+            var result = await UoW.ClaimRepo.UpdateAsync(Mapper.Map<tbl_Claims>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<ClaimModel>(result));
+            return Ok(Mapper.Map<ClaimModel>(result));
         }
     }
 }

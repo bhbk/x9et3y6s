@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +23,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("issuer")]
     public class IssuerController : BaseController
     {
-        public IssuerController() { }
+        private IssuerProvider _provider;
+
+        public IssuerController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new IssuerProvider(conf, instance);
+        }
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
@@ -37,11 +45,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.IssuerRepo.CreateAsync(UoW.Mapper.Map<tbl_Issuers>(model));
+            var result = await UoW.IssuerRepo.CreateAsync(Mapper.Map<tbl_Issuers>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<IssuerModel>(result));
+            return Ok(Mapper.Map<IssuerModel>(result));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
@@ -88,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Mapper.Map<IssuerModel>(issuer));
+            return Ok(Mapper.Map<IssuerModel>(issuer));
         }
 
         [Route("v1/page"), HttpPost]
@@ -118,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<IssuerModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -166,11 +174,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.IssuerRepo.UpdateAsync(UoW.Mapper.Map<tbl_Issuers>(model));
+            var result = await UoW.IssuerRepo.UpdateAsync(Mapper.Map<tbl_Issuers>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<IssuerModel>(result));
+            return Ok(Mapper.Map<IssuerModel>(result));
         }
     }
 }

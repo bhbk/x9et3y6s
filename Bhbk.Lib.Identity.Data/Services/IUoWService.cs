@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Core.Interfaces;
+﻿using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Identity.Data.Repositories;
 
-namespace Bhbk.Lib.Identity.Data.Infrastructure
+namespace Bhbk.Lib.Identity.Data.Services
 {
     //https://en.wikipedia.org/wiki/Dependency_inversion_principle
-    public interface IUnitOfWork : IGenericUnitOfWorkAsync
+    public interface IUoWService : IGenericUnitOfWorkAsync
     {
-        IMapper Mapper { get; }
         ActivityRepository ActivityRepo { get; }
         ClaimRepository ClaimRepo { get; }
         ClientRepository ClientRepo { get; }

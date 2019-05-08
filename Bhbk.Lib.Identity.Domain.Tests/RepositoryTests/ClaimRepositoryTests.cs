@@ -22,13 +22,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await UoW.ClaimRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()));
+                    Mapper.Map<tbl_Claims>(new ClaimCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.ClaimRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()
+                    Mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = Guid.NewGuid(),
                         Type = Constants.ApiTestClaim,
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
 
             var result = await UoW.ClaimRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_Claims>(new ClaimCreate()
+                Mapper.Map<tbl_Claims>(new ClaimCreate()
                 {
                     IssuerId = issuer.Id,
                     Type = Constants.ApiTestClaim,

@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using Bhbk.Lib.Identity.Data.Services;
+using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http;
@@ -10,12 +12,12 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
     public class DiagnosticServiceTests : IClassFixture<StartupTests>
     {
         private readonly StartupTests _factory;
-        private readonly HttpClient _owin;
+        private readonly HttpClient _http;
 
         public DiagnosticServiceTests(StartupTests factory)
         {
             _factory = factory;
-            _owin = _factory.CreateClient();
+            _http = _factory.CreateClient();
         }
 
         [Fact]
@@ -23,7 +25,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var result = await _owin.GetAsync($"help/index.html");
+                var result = await _http.GetAsync($"help/index.html");
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.OK);
             }

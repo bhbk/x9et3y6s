@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.WebApi.Alert.Providers;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.WebApi.Alert.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -47,8 +47,6 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var provider = new SendgridProvider();
-
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
@@ -67,7 +65,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                         foreach (var entry in uow.UserRepo.GetQueueEmailAsync(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).Result)
                         {
@@ -101,7 +99,8 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                        var provider = new SendGridProvider();
 
                         foreach (var msg in queue.OrderBy(x => x.Created))
                         {
@@ -136,13 +135,11 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 default:
                                     throw new NotImplementedException();
-
                             }
                         }
 
                         uow.CommitAsync().Wait();
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -157,7 +154,7 @@ namespace Bhbk.WebApi.Alert.Tasks
             {
                 using (var scope = _factory.CreateScope())
                 {
-                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                     uow.UserRepo.CreateQueueEmailAsync(model).Wait();
                     uow.CommitAsync().Wait();

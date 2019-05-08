@@ -1,8 +1,9 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Services;
@@ -24,6 +25,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 {
     public class EmailServiceTests : IClassFixture<StartupTests>
     {
+        private readonly IConfiguration _conf;
+        private readonly IMapper _mapper;
         private readonly StartupTests _factory;
         private readonly AlertService _service;
 
@@ -32,9 +35,10 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             _factory = factory;
 
             var http = _factory.CreateClient();
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
 
-            _service = new AlertService(conf, InstanceContext.UnitTest, http);
+            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
+            _service = new AlertService(_conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
@@ -42,7 +46,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var result = await _service.Http.Enqueue_EmailV1(RandomValues.CreateBase64String(8), new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -51,13 +55,13 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var result = await _service.Http.Enqueue_EmailV1(rop.RawData, new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -66,15 +70,15 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var result = await _service.Http.Enqueue_EmailV1(rop.RawData,
@@ -93,15 +97,15 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var result = await _service.Http.Enqueue_EmailV1(rop.RawData,
@@ -124,15 +128,15 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, issuer, new List<tbl_Clients> { client }, user);
+                var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var testUser = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
                 var result = await _service.Http.Enqueue_EmailV1(rop.RawData,

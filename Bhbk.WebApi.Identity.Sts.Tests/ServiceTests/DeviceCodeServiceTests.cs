@@ -1,9 +1,10 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -26,6 +27,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
     public class DeviceCodeServiceTests : IClassFixture<StartupTests>
     {
+        private readonly IConfiguration _conf;
+        private readonly IMapper _mapper;
         private readonly StartupTests _factory;
         private readonly StsService _service;
 
@@ -34,9 +37,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             _factory = factory;
 
             var http = _factory.CreateClient();
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
 
-            _service = new StsService(conf, InstanceContext.UnitTest, http);
+            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
+            _service = new StsService(_conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
@@ -44,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var ask = await _service.Http.DeviceCode_AskV1(
                     new DeviceCodeAskV1()
@@ -64,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var dc = await _service.Http.DeviceCode_AuthV1(
                     new DeviceCodeV1()
@@ -85,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -108,10 +112,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -134,10 +138,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -160,10 +164,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -186,10 +190,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -199,7 +203,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -232,10 +236,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -245,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -278,10 +282,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -291,7 +295,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -324,10 +328,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -337,7 +341,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,
@@ -370,10 +374,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow).DestroyAsync().Wait();
-                new TestData(uow).CreateAsync().Wait();
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -383,7 +387,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
                 var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
                 var state = await uow.StateRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
                         ClientId = client.Id,

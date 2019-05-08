@@ -21,13 +21,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await UoW.LoginRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Logins>(new LoginCreate()));
+                    Mapper.Map<tbl_Logins>(new LoginCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.LoginRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
+                    Mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = Constants.ApiTestLogin,
                         Immutable = false,
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             TestData.CreateAsync().Wait();
 
             var result = await UoW.LoginRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_Logins>(new LoginCreate()
+                Mapper.Map<tbl_Logins>(new LoginCreate()
                 {
                     Name = Constants.ApiTestLogin,
                     Immutable = false,

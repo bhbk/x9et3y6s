@@ -1,10 +1,10 @@
-﻿using Bhbk.Lib.Core.CommandLine;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.CommandLine;
 using Bhbk.Lib.Core.FileSystem;
-using Bhbk.Lib.Identity.Data.Infrastructure;
-using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Core.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using ManyConsole;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -29,18 +29,16 @@ namespace Bhbk.Cli.Identity.Commands
             {
                 var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-                var conf = new ConfigurationBuilder()
+                var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables()
                     .Build();
 
-                var builder = new DbContextOptionsBuilder<_DbContext>()
-                    .UseSqlServer(conf["Databases:IdentityEntities"])
-                    .EnableSensitiveDataLogging();
-
-                var uow = new UnitOfWork(builder, conf);
-                var data = new DefaultData(uow);
+                var instance = new ContextService(InstanceContext.DeployedOrLocal);
+                var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+                var uow = new UoWService(conf, instance);
+                var data = new DefaultData(uow, mapper);
 
                 if (CreateDefault)
                 {

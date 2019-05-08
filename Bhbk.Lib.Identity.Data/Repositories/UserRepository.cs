@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Data.Validators;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
     {
         private readonly _DbContext _context;
         private readonly InstanceContext _instance;
-        private IClockContext _clock;
+        private IClockService _clock;
         public readonly PasswordValidator passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _clock = new ClockContext(_instance);
+            _clock = new ClockService(_instance);
 
             passwordValidator = new PasswordValidator();
             passwordHasher = new PasswordHasher();

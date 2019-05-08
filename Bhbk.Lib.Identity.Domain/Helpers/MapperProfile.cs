@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Data.Helpers
+namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     public class MapperProfile : Profile
     {
@@ -29,6 +29,8 @@ namespace Bhbk.Lib.Identity.Data.Helpers
             CreateMap<ActivityModel, tbl_Activities>()
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
+
+            CreateMap<tbl_Activities, ActivityModel>();
 
             /*
              * claim models

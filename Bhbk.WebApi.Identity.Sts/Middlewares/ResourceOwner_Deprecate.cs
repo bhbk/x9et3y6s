@@ -1,8 +1,9 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +58,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
         public Task Invoke(HttpContext context)
         {
+            var mapper = context.RequestServices.GetRequiredService<IMapper>();
+
             #region v2 end-point
 
             //check if correct v2 path, method, content and params...
@@ -91,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IUnitOfWork>();
+                var uow = context.RequestServices.GetRequiredService<IUoWService>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -225,8 +228,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var rop = JwtFactory.UserResourceOwnerV2(uow, issuer, clients, user).Result;
-                var rt = JwtFactory.UserRefreshV2(uow, issuer, user).Result;
+                var rop = JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, clients, user).Result;
+                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
 
                 var result = new
                 {
@@ -240,7 +243,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //add activity entry...
                 uow.ActivityRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
@@ -291,7 +294,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IUnitOfWork>();
+                var uow = context.RequestServices.GetRequiredService<IUoWService>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -409,8 +412,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var rop = JwtFactory.UserResourceOwnerV1(uow, issuer, client, user).Result;
-                var rt = JwtFactory.UserRefreshV1(uow, issuer, user).Result;
+                var rop = JwtFactory.UserResourceOwnerV1(uow, mapper, issuer, client, user).Result;
+                var rt = JwtFactory.UserRefreshV1(uow, mapper, issuer, user).Result;
 
                 var result = new
                 {
@@ -424,7 +427,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //add activity entry...
                 uow.ActivityRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
@@ -474,7 +477,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = MessageType.ParametersInvalid.ToString() }, _serializer));
                 }
 
-                var uow = context.RequestServices.GetRequiredService<IUnitOfWork>();
+                var uow = context.RequestServices.GetRequiredService<IUoWService>();
 
                 if (uow == null)
                     throw new ArgumentNullException();
@@ -587,7 +590,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 //adjust counter(s) for login success...
                 uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
 
-                var access = JwtFactory.UserResourceOwnerV1_Legacy(uow, issuer, client, user).Result;
+                var access = JwtFactory.UserResourceOwnerV1_Legacy(uow, mapper, issuer, client, user).Result;
 
                 var result = new
                 {
@@ -598,7 +601,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //add activity entry...
                 uow.ActivityRepo.CreateAsync(
-                    uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),

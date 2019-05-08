@@ -1,14 +1,17 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Data.Helpers;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +34,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [AllowAnonymous]
     public class AuthCodeController : BaseController
     {
-        public AuthCodeController() { }
+        private AuthCodeProvider _provider;
+
+        public AuthCodeController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new AuthCodeProvider(conf, instance);
+        }
 
         [Route("v1/acg-ask"), HttpGet]
         public IActionResult AuthCodeV1_Ask([FromQuery] AuthCodeAskV1 input)
@@ -143,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
 
             var state = await UoW.StateRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_States>(new StateCreate()
+                Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -295,8 +303,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, clients, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, Mapper, issuer, user);
 
             var result = new UserJwtV2()
             {

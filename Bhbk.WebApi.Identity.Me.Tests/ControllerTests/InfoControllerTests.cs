@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -8,6 +9,7 @@ using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,26 +22,33 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
     public class InfoControllerTests : IClassFixture<StartupTests>
     {
+        private readonly IConfiguration _conf;
+        private readonly IContextService _instance;
+        private readonly IMapper _mapper;
         private readonly StartupTests _factory;
 
         public InfoControllerTests(StartupTests factory)
         {
             _factory = factory;
             _factory.CreateClient();
+
+            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            _instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
         }
 
         [Fact]
         public async Task Me_InfoV1_DeleteRefreshes_Fail()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -53,15 +62,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_DeleteRefreshes_Success()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -69,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             controller.SetUser(issuer.Id, user.Id);
 
             for (int i = 0; i < 3; i++)
-                await JwtFactory.UserRefreshV2(uow, issuer, user);
+                await JwtFactory.UserRefreshV2(uow, _mapper, issuer, user);
 
             var refresh = (await uow.RefreshRepo.GetAsync(x => x.UserId == user.Id)).First();
 
@@ -80,15 +89,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_Get_Success()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -105,15 +114,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_GetRefreshes_Success()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -128,15 +137,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_SetPassword_Fail()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -159,15 +168,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_SetPassword_Success()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -190,15 +199,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_SetTwoFactor_Success()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
@@ -215,15 +224,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_InfoV1_Update_Success()
         {
-            var controller = new InfoController();
+            var controller = new InfoController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();

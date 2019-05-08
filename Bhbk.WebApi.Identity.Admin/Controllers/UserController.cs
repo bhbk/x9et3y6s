@@ -1,9 +1,11 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -28,7 +31,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("user")]
     public class UserController : BaseController
     {
-        public UserController() { }
+        private UserProvider _provider;
+
+        public UserController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new UserProvider(conf, instance);
+        }
 
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
@@ -140,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = true;
 
-            var result = await UoW.UserRepo.CreateAsync(UoW.Mapper.Map<tbl_Users>(model));
+            var result = await UoW.UserRepo.CreateAsync(Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -171,7 +179,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 });
             }
 
-            return Ok(UoW.Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserModel>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -192,14 +200,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = false;
 
-            var result = await UoW.UserRepo.CreateAsync(UoW.Mapper.Map<tbl_Users>(model));
+            var result = await UoW.UserRepo.CreateAsync(Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserModel>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -301,7 +309,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<MotDType1Model>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<MotDType1Model>>(result) });
             }
             catch (ParseException ex)
             {
@@ -328,7 +336,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Mapper.Map<UserModel>(user));
+            return Ok(Mapper.Map<UserModel>(user));
         }
 
         [Route("v1/{userID:guid}/claims"), HttpGet]
@@ -345,7 +353,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var claims = await UoW.UserRepo.GetClaimsAsync(user.Id);
 
             var result = (await UoW.ClaimRepo.GetAsync(x => claims.Contains(x)))
-                .Select(x => UoW.Mapper.Map<ClaimModel>(x));
+                .Select(x => Mapper.Map<ClaimModel>(x));
 
             return Ok(result);
         }
@@ -364,7 +372,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var clients = await UoW.UserRepo.GetClientsAsync(user.Id);
 
             var result = (await UoW.ClientRepo.GetAsync(x => clients.Contains(x)))
-                .Select(x => UoW.Mapper.Map<ClientModel>(x));
+                .Select(x => Mapper.Map<ClientModel>(x));
 
             return Ok(result);
         }
@@ -383,7 +391,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = await UoW.UserRepo.GetLoginsAsync(user.Id);
 
             var result = (await UoW.LoginRepo.GetAsync(x => logins.Contains(x)))
-                .Select(x => UoW.Mapper.Map<LoginModel>(x));
+                .Select(x => Mapper.Map<LoginModel>(x));
 
             return Ok(result);
         }
@@ -401,7 +409,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var refreshes = await UoW.RefreshRepo.GetAsync(x => x.UserId == userID);
 
-            var result = refreshes.Select(x => UoW.Mapper.Map<RefreshModel>(x));
+            var result = refreshes.Select(x => Mapper.Map<RefreshModel>(x));
 
             return Ok(result);
         }
@@ -420,7 +428,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = await UoW.UserRepo.GetRolesAsync(user.Id);
 
             var result = (await UoW.RoleRepo.GetAsync(x => roles.Contains(x)))
-                .Select(x => UoW.Mapper.Map<RoleModel>(x));
+                .Select(x => Mapper.Map<RoleModel>(x));
 
             return Ok(result);
         }
@@ -454,7 +462,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<UserModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -630,11 +638,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.UserRepo.UpdateAsync(UoW.Mapper.Map<tbl_Users>(model));
+            var result = await UoW.UserRepo.UpdateAsync(Mapper.Map<tbl_Users>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserModel>(result));
         }
     }
 }

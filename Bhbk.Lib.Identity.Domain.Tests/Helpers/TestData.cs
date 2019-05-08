@@ -1,8 +1,9 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
@@ -16,11 +17,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 {
     public class TestData
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUoWService _uow;
+        private readonly IMapper _mapper;
 
-        public TestData(IUnitOfWork uow)
+        public TestData(IUoWService uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
+            _mapper = mapper ?? throw new ArgumentNullException();
         }
 
         public async Task CreateAsync()
@@ -38,7 +41,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalLegacyClaims,
                         ConfigValue = "true",
@@ -52,7 +55,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalLegacyIssuer,
                         ConfigValue = "true",
@@ -66,7 +69,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = await _uow.SettingRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
@@ -83,7 +86,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundIssuer == null)
             {
                 foundIssuer = await _uow.IssuerRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
                         Name = FakeConstants.ApiTestIssuer,
                         IssuerKey = FakeConstants.ApiTestIssuerKey,
@@ -103,7 +106,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundClient == null)
             {
                 foundClient = await _uow.ClientRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Clients>(new ClientCreate()
+                    _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = FakeConstants.ApiTestClient,
@@ -115,7 +118,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int i = 0; i < 3; i++)
                     await _uow.ActivityRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                        _mapper.Map<tbl_Activities>(new ActivityCreate()
                         {
                             ClientId = foundClient.Id,
                             ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
@@ -124,7 +127,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int i = 0; i < 3; i++)
                     await _uow.RefreshRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                         {
                             IssuerId = foundIssuer.Id,
                             ClientId = foundClient.Id,
@@ -150,7 +153,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundClientUrl == null)
             {
                 foundClientUrl = await _uow.ClientRepo.CreateUrlAsync(
-                    _uow.Mapper.Map<tbl_Urls>(new UrlCreate()
+                    _mapper.Map<tbl_Urls>(new UrlCreate()
                     {
                         ClientId = foundClient.Id,
                         UrlHost = url.Scheme + "://" + url.Host,
@@ -170,7 +173,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundClaim == null)
             {
                 foundClaim = await _uow.ClaimRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Claims>(new ClaimCreate()
+                    _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = foundIssuer.Id,
                         Type = FakeConstants.ApiTestClaim,
@@ -190,7 +193,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundLogin == null)
             {
                 foundLogin = await _uow.LoginRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = FakeConstants.ApiTestLogin,
                         Immutable = false,
@@ -208,7 +211,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundRole == null)
             {
                 foundRole = await _uow.RoleRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = foundClient.Id,
                         Name = FakeConstants.ApiTestRole,
@@ -228,7 +231,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             if (foundUser == null)
             {
                 foundUser = await _uow.UserRepo.CreateAsync(
-                _uow.Mapper.Map<tbl_Users>(new UserCreate()
+                _mapper.Map<tbl_Users>(new UserCreate()
                 {
                     Email = FakeConstants.ApiTestUser,
                     PhoneNumber = FakeConstants.ApiTestUserPhone,
@@ -241,7 +244,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int i = 0; i < 3; i++)
                     await _uow.ActivityRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                        _mapper.Map<tbl_Activities>(new ActivityCreate()
                         {
                             ClientId = foundClient.Id,
                             UserId = foundUser.Id,
@@ -251,7 +254,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int i = 0; i < 3; i++)
                     await _uow.StateRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_States>(new StateCreate()
+                        _mapper.Map<tbl_States>(new StateCreate()
                         {
                             IssuerId = foundIssuer.Id,
                             ClientId = foundClient.Id,
@@ -265,7 +268,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int i = 0; i < 3; i++)
                     await _uow.RefreshRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                         {
                             IssuerId = foundIssuer.Id,
                             ClientId = foundClient.Id,
@@ -338,7 +341,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  */
 
                 issuer = await _uow.IssuerRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
                         Name = FakeConstants.ApiTestIssuer + "-" + RandomValues.CreateBase64String(4),
                         IssuerKey = FakeConstants.ApiTestIssuerKey,
@@ -353,7 +356,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  */
 
                 client = await _uow.ClientRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Clients>(new ClientCreate()
+                    _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = issuer.Id,
                         Name = FakeConstants.ApiTestClient + "-" + RandomValues.CreateBase64String(4),
@@ -365,7 +368,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int j = 0; j < 3; j++)
                     await _uow.ActivityRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                        _mapper.Map<tbl_Activities>(new ActivityCreate()
                         {
                             ClientId = client.Id,
                             ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
@@ -374,7 +377,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int j = 0; j < 3; j++)
                     await _uow.RefreshRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                         {
                             IssuerId = issuer.Id,
                             ClientId = client.Id,
@@ -393,7 +396,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 var clientUrl = new Uri(FakeConstants.ApiTestUriLink);
 
                 url = await _uow.ClientRepo.CreateUrlAsync(
-                    _uow.Mapper.Map<tbl_Urls>(new UrlCreate()
+                    _mapper.Map<tbl_Urls>(new UrlCreate()
                     {
                         ClientId = client.Id,
                         UrlHost = clientUrl.Scheme + "://" + clientUrl.Host,
@@ -408,7 +411,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  */
 
                 claim = await _uow.ClaimRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Claims>(new ClaimCreate()
+                    _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
                         Type = FakeConstants.ApiTestClaim + "-" + RandomValues.CreateBase64String(4),
@@ -423,7 +426,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  */
 
                 login = await _uow.LoginRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = FakeConstants.ApiTestLogin + "-" + RandomValues.CreateBase64String(4),
                         LoginKey = FakeConstants.ApiTestLoginKey,
@@ -438,7 +441,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  */
 
                 role = await _uow.RoleRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
                         Name = FakeConstants.ApiTestRole + "-" + RandomValues.CreateBase64String(4),
@@ -453,7 +456,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  */
 
                 user = await _uow.UserRepo.CreateAsync(
-                    _uow.Mapper.Map<tbl_Users>(new UserCreate()
+                    _mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = RandomValues.CreateAlphaNumericString(4) + "-" + FakeConstants.ApiTestUser,
                         PhoneNumber = FakeConstants.ApiTestUserPhone + RandomValues.CreateNumberAsString(1),
@@ -466,7 +469,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int j = 0; j < 3; j++)
                     await _uow.ActivityRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Activities>(new ActivityCreate()
+                        _mapper.Map<tbl_Activities>(new ActivityCreate()
                         {
                             ClientId = client.Id,
                             UserId = user.Id,
@@ -476,7 +479,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int j = 0; j < 3; j++)
                     await _uow.StateRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_States>(new StateCreate()
+                        _mapper.Map<tbl_States>(new StateCreate()
                         {
                             IssuerId = issuer.Id,
                             ClientId = client.Id,
@@ -490,7 +493,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 for (int j = 0; j < 3; j++)
                     await _uow.RefreshRepo.CreateAsync(
-                        _uow.Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                         {
                             IssuerId = issuer.Id,
                             ClientId = client.Id,

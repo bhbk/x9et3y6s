@@ -22,13 +22,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await UoW.UserRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Users>(new UserCreate()));
+                    Mapper.Map<tbl_Users>(new UserCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.UserRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Users>(new UserCreate()
+                    Mapper.Map<tbl_Users>(new UserCreate()
                         {
                             Email = RandomValues.CreateAlphaNumericString(4),
                             PhoneNumber = Constants.ApiTestUserPhone,
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             TestData.CreateAsync().Wait();
 
             var result = await UoW.UserRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_Users>(new UserCreate()
+                Mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone,

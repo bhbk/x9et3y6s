@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                         var expired = uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                                 || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).Result;

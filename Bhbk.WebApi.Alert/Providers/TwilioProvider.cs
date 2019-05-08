@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
-namespace Bhbk.WebApi.Alert.Providers
+namespace Bhbk.WebApi.Alert.Helpers
 {
     public class TwilioProvider
     {

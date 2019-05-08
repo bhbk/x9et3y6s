@@ -18,7 +18,6 @@ namespace Bhbk.WebApi.Identity.Sts
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
-                .UseIISIntegration()
                 .UseKestrel(options =>
                 {
                     options.ConfigureEndpoints();

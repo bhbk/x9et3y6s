@@ -1,10 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -12,10 +14,14 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Alert.Controllers
 {
     [Route("text")]
-    //[Authorize(Policy = "UsersPolicy")]
     public class TextController : BaseController
     {
-        public TextController() { }
+        private TextProvider _provider;
+
+        public TextController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new TextProvider(conf, instance);
+        }
 
         [Route("v1"), HttpPost]
         public async Task<IActionResult> SendTextV1([FromBody] TextCreate model)
@@ -32,7 +38,7 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             var queue = (QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask));
 
-            var msg = UoW.Mapper.Map<tbl_QueueTexts>(model);
+            var msg = Mapper.Map<tbl_QueueTexts>(model);
 
             if (!queue.TryEnqueueText(msg))
             {

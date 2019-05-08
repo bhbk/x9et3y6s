@@ -1,13 +1,16 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Data.Helpers;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +32,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [AllowAnonymous]
     public class DeviceCodeController : BaseController
     {
-        public DeviceCodeController() { }
+        private DeviceCodeProvider _provider;
+
+        public DeviceCodeController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new DeviceCodeProvider(conf, instance);
+        }
 
         [Route("v1/dcg-ask"), HttpPost]
         public IActionResult DeviceCodeV1_Ask([FromForm] DeviceCodeAskV1 input)
@@ -120,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             };
 
             var state = await UoW.StateRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_States>(new StateCreate()
+                Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -254,8 +262,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
 
-            var dc = await JwtFactory.UserResourceOwnerV2(UoW, issuer, new List<tbl_Clients> { client }, user);
-            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
+            var dc = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, new List<tbl_Clients> { client }, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, Mapper, issuer, user);
 
             var result = new UserJwtV2()
             {

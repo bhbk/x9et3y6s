@@ -1,9 +1,10 @@
-﻿using Bhbk.Lib.Core.Cryptography;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -30,6 +31,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
     public class AuthCodeControllerTests : IClassFixture<StartupTests>
     {
+        private readonly IConfiguration _conf;
+        private readonly IContextService _instance;
+        private readonly IMapper _mapper;
         private readonly StartupTests _factory;
         private readonly StsService _service;
 
@@ -38,15 +42,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             _factory = factory;
 
             var http = _factory.CreateClient();
-            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
 
-            _service = new StsService(conf, InstanceContext.UnitTest, http);
+            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            _instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
+            _service = new StsService(_conf, InstanceContext.UnitTest, http);
         }
 
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
             var ask = await _service.Http.AuthCode_AskV1(
                 new AuthCodeAskV1()
@@ -65,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV1_Auth_NotImplemented()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
             var ac = await _service.Http.AuthCode_AuthV1(
                 new AuthCodeV1()
@@ -85,10 +91,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_ClientNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -111,10 +117,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_IssuerNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -137,10 +143,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_UserNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -163,10 +169,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_UrlNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -190,15 +196,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Ask_Success()
         {
-            var controller = new AuthCodeController();
+            var controller = new AuthCodeController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -228,10 +234,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_ClientNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -244,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -276,10 +282,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_IssuerNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -292,7 +298,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -324,10 +330,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UrlNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -340,7 +346,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -372,10 +378,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserNotExist()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -388,7 +394,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -420,10 +426,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidCode()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -436,7 +442,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -468,10 +474,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidState()
         {
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -484,7 +490,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .GenerateAsync(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
             var url = new Uri(FakeConstants.ApiTestUriLink);
             var model = await uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,
@@ -516,15 +522,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         [Fact]
         public async Task Sts_OAuth2_AuthCodeV2_Auth_Success()
         {
-            var controller = new AuthCodeController();
+            var controller = new AuthCodeController(_conf, _instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -534,7 +540,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 && x.ConfigKey == RealConstants.ApiSettingTotpExpire)).Single();
 
             var ask = uow.StateRepo.CreateAsync(
-                uow.Mapper.Map<tbl_States>(new StateCreate()
+                _mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
                     ClientId = client.Id,

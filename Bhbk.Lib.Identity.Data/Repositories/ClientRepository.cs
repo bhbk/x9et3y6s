@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Core.Cryptography;
 using Bhbk.Lib.Core.Interfaces;
 using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -22,13 +22,13 @@ namespace Bhbk.Lib.Identity.Data.Repositories
     {
         private readonly _DbContext _context;
         private readonly InstanceContext _instance;
-        private IClockContext _clock;
+        private IClockService _clock;
 
         public ClientRepository(_DbContext context, InstanceContext instance)
         {
             _context = context ?? throw new NullReferenceException();
             _instance = instance;
-            _clock = new ClockContext(_instance);
+            _clock = new ClockService(_instance);
         }
 
         public DateTimeOffset Clock

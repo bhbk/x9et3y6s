@@ -22,13 +22,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await UoW.ClientRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Clients>(new ClientCreate()));
+                    Mapper.Map<tbl_Clients>(new ClientCreate()));
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
                 await UoW.ClientRepo.CreateAsync(
-                    UoW.Mapper.Map<tbl_Clients>(new ClientCreate()
+                    Mapper.Map<tbl_Clients>(new ClientCreate()
                         {
                             IssuerId = Guid.NewGuid(),
                             Name = Constants.ApiTestClient,
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
 
             var result = await UoW.ClientRepo.CreateAsync(
-                UoW.Mapper.Map<tbl_Clients>(new ClientCreate()
+                Mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.ApiTestClient,

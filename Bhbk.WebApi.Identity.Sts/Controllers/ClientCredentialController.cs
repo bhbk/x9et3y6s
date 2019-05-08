@@ -1,10 +1,13 @@
-﻿using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -27,7 +30,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [AllowAnonymous]
     public class ClientCredentialController : BaseController
     {
-        public ClientCredentialController() { }
+        private ClientCredentialProvider _provider;
+
+        public ClientCredentialController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new ClientCredentialProvider(conf, instance);
+        }
 
         [Route("v1/ccg"), HttpPost]
         public IActionResult ClientCredentialV1_Auth([FromForm] ClientCredentialV1 input)
@@ -101,8 +109,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, issuer, client);
-            var rt = await JwtFactory.ClientRefreshV2(UoW, issuer, client);
+            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, Mapper, issuer, client);
+            var rt = await JwtFactory.ClientRefreshV2(UoW, Mapper, issuer, client);
 
             var result = new ClientJwtV2()
             {
@@ -184,8 +192,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, issuer, client);
-            var rt = await JwtFactory.ClientRefreshV2(UoW, issuer, client);
+            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, Mapper, issuer, client);
+            var rt = await JwtFactory.ClientRefreshV2(UoW, Mapper, issuer, client);
 
             var result = new ClientJwtV2()
             {

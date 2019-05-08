@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +23,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("role")]
     public class RoleController : BaseController
     {
-        public RoleController() { }
+        private RoleProvider _provider;
+
+        public RoleController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new RoleProvider(conf, instance);
+        }
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
@@ -38,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var create = await UoW.RoleRepo.CreateAsync(UoW.Mapper.Map<tbl_Roles>(model));
+            var create = await UoW.RoleRepo.CreateAsync(Mapper.Map<tbl_Roles>(model));
 
             await UoW.CommitAsync();
 
@@ -47,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(UoW.Mapper.Map<RoleModel>(result));
+            return Ok(Mapper.Map<RoleModel>(result));
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
@@ -94,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Mapper.Map<RoleModel>(role));
+            return Ok(Mapper.Map<RoleModel>(role));
         }
 
         [Route("v1/page"), HttpPost]
@@ -124,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<RoleModel>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<RoleModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -147,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.RoleRepo.GetUsersListAsync(role.Id);
 
-            return Ok(UoW.Mapper.Map<IEnumerable<UserModel>>(users));
+            return Ok(Mapper.Map<IEnumerable<UserModel>>(users));
         }
 
         [Route("v1"), HttpPut]
@@ -173,11 +181,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.RoleRepo.UpdateAsync(UoW.Mapper.Map<tbl_Roles>(model));
+            var result = await UoW.RoleRepo.UpdateAsync(Mapper.Map<tbl_Roles>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<RoleModel>(result));
+            return Ok(Mapper.Map<RoleModel>(result));
         }
     }
 }

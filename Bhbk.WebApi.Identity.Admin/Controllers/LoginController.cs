@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Core.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +23,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("login")]
     public class LoginController : BaseController
     {
-        public LoginController() { }
+        private LoginProvider _provider;
+
+        public LoginController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new LoginProvider(conf, instance);
+        }
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
@@ -37,11 +45,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.LoginRepo.CreateAsync(UoW.Mapper.Map<tbl_Logins>(model));
+            var result = await UoW.LoginRepo.CreateAsync(Mapper.Map<tbl_Logins>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<LoginModel>(result));
+            return Ok(Mapper.Map<LoginModel>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -89,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(UoW.Mapper.Map<LoginModel>(login));
+            return Ok(Mapper.Map<LoginModel>(login));
         }
 
         [Route("v1/page"), HttpPost]
@@ -118,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = UoW.Mapper.Map<IEnumerable<LoginModel>>(result) });
+                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<LoginModel>>(result) });
             }
             catch (ParseException ex)
             {
@@ -140,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var users = await UoW.LoginRepo.GetUsersAsync(loginID);
 
-            var result = users.Select(x => UoW.Mapper.Map<UserModel>(x));
+            var result = users.Select(x => Mapper.Map<UserModel>(x));
 
             return Ok(result);
         }
@@ -168,11 +176,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.LoginRepo.UpdateAsync(UoW.Mapper.Map<tbl_Logins>(model));
+            var result = await UoW.LoginRepo.UpdateAsync(Mapper.Map<tbl_Logins>(model));
 
             await UoW.CommitAsync();
 
-            return Ok(UoW.Mapper.Map<LoginModel>(result));
+            return Ok(Mapper.Map<LoginModel>(result));
         }
     }
 }

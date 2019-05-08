@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,7 +60,8 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
                         if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
@@ -68,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                             if (motdtype1_response.IsSuccessStatusCode)
                             {
-                                var model = uow.Mapper.Map<tbl_MotDType1>(motdtype1.contents.quotes[0]);
+                                var model = mapper.Map<tbl_MotDType1>(motdtype1.contents.quotes[0]);
                                 var motd = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author
                                     && x.Quote == model.Quote).Result.SingleOrDefault();
 

@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +34,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [AllowAnonymous]
     public class ResourceOwnerController : BaseController
     {
-        public ResourceOwnerController() { }
+        private ResourceOwnerProvider _provider;
+
+        public ResourceOwnerController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new ResourceOwnerProvider(conf, instance);
+        }
 
         [Route("v1/ropg"), HttpPost]
         public async Task<IActionResult> ResourceOwnerV1_Auth([FromForm] ResourceOwnerV1 input)
@@ -206,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
             {
-                var access = await JwtFactory.UserResourceOwnerV1_Legacy(UoW, issuer, client, user);
+                var access = await JwtFactory.UserResourceOwnerV1_Legacy(UoW, Mapper, issuer, client, user);
 
                 var result = new UserJwtV1Legacy()
                 {
@@ -221,8 +229,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             else
             {
-                var rop = await JwtFactory.UserResourceOwnerV1(UoW, issuer, client, user);
-                var rt = await JwtFactory.UserRefreshV1(UoW, issuer, user);
+                var rop = await JwtFactory.UserResourceOwnerV1(UoW, Mapper, issuer, client, user);
+                var rt = await JwtFactory.UserRefreshV1(UoW, Mapper, issuer, user);
 
                 var result = new UserJwtV1()
                 {
@@ -321,8 +329,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var rop = await JwtFactory.UserResourceOwnerV1(UoW, issuer, client, user);
-            var rt = await JwtFactory.UserRefreshV1(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV1(UoW, Mapper, issuer, client, user);
+            var rt = await JwtFactory.UserRefreshV1(UoW, Mapper, issuer, user);
 
             var result = new UserJwtV1()
             {
@@ -496,8 +504,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     throw new NotImplementedException();
             }
 
-            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, clients, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, Mapper, issuer, user);
 
             var result = new UserJwtV2()
             {
@@ -611,8 +619,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            var rop = await JwtFactory.UserResourceOwnerV2(UoW, issuer, clients, user);
-            var rt = await JwtFactory.UserRefreshV2(UoW, issuer, user);
+            var rop = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, clients, user);
+            var rt = await JwtFactory.UserRefreshV2(UoW, Mapper, issuer, user);
 
             var result = new UserJwtV2()
             {

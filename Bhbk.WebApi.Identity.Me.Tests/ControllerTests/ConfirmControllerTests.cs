@@ -1,11 +1,13 @@
-﻿using Bhbk.Lib.Core.Cryptography;
-using Bhbk.Lib.Identity.Data.Helpers;
-using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using AutoMapper;
+using Bhbk.Lib.Core.Cryptography;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -19,26 +21,36 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
     public class ConfirmControllerTests : IClassFixture<StartupTests>
     {
+        private readonly IConfiguration _conf;
+        private readonly IContextService _instance;
+        private readonly IMapper _mapper;
         private readonly StartupTests _factory;
 
         public ConfirmControllerTests(StartupTests factory)
         {
             _factory = factory;
             _factory.CreateClient();
+
+            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            _instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
         }
 
         [Fact]
         public async Task Me_ConfirmV1_Email_Fail()
         {
-            var controller = new ConfirmController();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            var instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+
+            var controller = new ConfirmController(conf, instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -61,15 +73,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_ConfirmV1_Email_Success()
         {
-            var controller = new ConfirmController();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            var instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+
+            var controller = new ConfirmController(conf, instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -91,15 +106,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_ConfirmV1_Password_Fail()
         {
-            var controller = new ConfirmController();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            var instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+
+            var controller = new ConfirmController(conf, instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -122,15 +140,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_ConfirmV1_Password_Success()
         {
-            var controller = new ConfirmController();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            var instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+
+            var controller = new ConfirmController(conf, instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -152,15 +173,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_ConfirmV1_PhoneNumber_Fail()
         {
-            var controller = new ConfirmController();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            var instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+
+            var controller = new ConfirmController(conf, instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -179,15 +203,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         [Fact]
         public async Task Me_ConfirmV1_PhoneNumber_Success()
         {
-            var controller = new ConfirmController();
+            var conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
+            var instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
+
+            var controller = new ConfirmController(conf, instance);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            var uow = _factory.Server.Host.Services.GetRequiredService<IUnitOfWork>();
+            var uow = _factory.Server.Host.Services.GetRequiredService<IUoWService>();
 
-            new TestData(uow).DestroyAsync().Wait();
-            new TestData(uow).CreateAsync().Wait();
+            new TestData(uow, _mapper).DestroyAsync().Wait();
+            new TestData(uow, _mapper).CreateAsync().Wait();
 
             var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
             var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();

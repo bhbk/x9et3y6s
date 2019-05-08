@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+﻿using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                         var invalid = (uow.StateRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).Result).ToList();
                         var invalidCount = invalid.Count();

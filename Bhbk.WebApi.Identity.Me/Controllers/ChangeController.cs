@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Core.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Helpers;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -19,7 +22,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Route("change")]
     public class ChangeController : BaseController
     {
-        public ChangeController() { }
+        private ChangeProvider _provider;
+
+        public ChangeController(IConfiguration conf, IContextService instance)
+        {
+            _provider = new ChangeProvider(conf, instance);
+        }
 
         [Route("v1/email"), HttpPut]
         public async Task<IActionResult> ChangeEmailV1([FromBody] UserChangeEmail model)

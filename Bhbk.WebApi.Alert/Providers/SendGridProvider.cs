@@ -4,9 +4,9 @@ using SendGrid.Helpers.Mail;
 using System;
 using System.Threading.Tasks;
 
-namespace Bhbk.WebApi.Alert.Providers
+namespace Bhbk.WebApi.Alert.Helpers
 {
-    public class SendgridProvider
+    public class SendGridProvider
     {
         public async Task<Response> TryEmailHandoff(string apiKey, tbl_QueueEmails model)
         {
