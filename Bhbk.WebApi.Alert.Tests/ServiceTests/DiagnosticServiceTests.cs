@@ -1,6 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Services;
-using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http;
@@ -17,7 +16,11 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         public DiagnosticServiceTests(StartupTests factory)
         {
             _factory = factory;
-            _http = _factory.CreateClient();
+            _http = _factory.CreateClient(
+                new WebApplicationFactoryClientOptions
+                {
+                    AllowAutoRedirect = false
+                });
         }
 
         [Fact]

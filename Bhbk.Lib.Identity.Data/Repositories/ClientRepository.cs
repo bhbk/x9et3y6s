@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -98,18 +97,18 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             var entity = _context.tbl_Clients.Where(x => x.Id == key).Single();
 
             var activity = _context.tbl_Activities.Where(x => x.ClientId == key);
-            var roles = _context.tbl_Roles.Where(x => x.ClientId == key);
             var refreshes = _context.tbl_Refreshes.Where(x => x.ClientId == key);
             var settings = _context.tbl_Settings.Where(x => x.ClientId == key);
             var states = _context.tbl_States.Where(x => x.ClientId == key);
+            var roles = _context.tbl_Roles.Where(x => x.ClientId == key);
 
             try
             {
                 _context.RemoveRange(activity);
-                _context.RemoveRange(roles);
                 _context.RemoveRange(refreshes);
                 _context.RemoveRange(settings);
                 _context.RemoveRange(states);
+                _context.RemoveRange(roles);
                 _context.Remove(entity);
 
                 return await Task.FromResult(true);

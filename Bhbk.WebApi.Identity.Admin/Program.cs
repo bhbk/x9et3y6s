@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using System.Diagnostics;
 using System.IO;
 
 namespace Bhbk.WebApi.Identity.Admin
 {
     public class Program
     {
-        public static IWebHostBuilder CreateHostBuilder(string[] args) =>
+        public static IWebHostBuilder CreateIISHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .CaptureStartupErrors(true)
             .ConfigureAppConfiguration((hostingContext, config) =>
@@ -18,7 +19,17 @@ namespace Bhbk.WebApi.Identity.Admin
                 config.SetBasePath(Directory.GetCurrentDirectory());
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             })
-            //.UseIIS()
+            .UseIISIntegration()
+            .UseStartup<Startup>();
+
+        public static IWebHostBuilder CreateKestrelHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+            .CaptureStartupErrors(true)
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            })
             .UseKestrel(options =>
             {
                 options.ConfigureEndpoints();
@@ -33,7 +44,13 @@ namespace Bhbk.WebApi.Identity.Admin
                 .WriteTo.RollingFile(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
                 .CreateLogger();
 
-            CreateHostBuilder(args).Build().Run();
+            var process = Process.GetCurrentProcess();
+
+            if (process.ProcessName.ToLower().Contains("iis"))
+                CreateIISHostBuilder(args).Build().Run();
+
+            else
+                CreateKestrelHostBuilder(args).Build().Run();
         }
     }
 }

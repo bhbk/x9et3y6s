@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Hosting.Options;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
@@ -12,13 +11,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
@@ -105,6 +103,11 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 opt.AddSerilog();
             });
+            sc.AddControllers()
+                .AddNewtonsoftJson(opt =>
+                {
+                    opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                });
             sc.AddCors();
             sc.AddAuthentication(opt =>
             {
@@ -136,14 +139,6 @@ namespace Bhbk.WebApi.Identity.Sts
                     ClockSkew = TimeSpan.Zero,
                 };
             });
-            sc.AddMvc(opt =>
-            {
-                opt.EnableEndpointRouting = false;
-            }).AddNewtonsoftJson(json =>
-            {
-                json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
             sc.AddAuthorization(opt =>
             {
                 opt.AddPolicy("AdministratorsPolicy", admins =>
@@ -159,11 +154,14 @@ namespace Bhbk.WebApi.Identity.Sts
                     users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
             });
+            sc.AddSwaggerGen(opt =>
+            {
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Reference", Version = "v1" });
+            });
             sc.Configure<ForwardedHeadersOptions>(opt =>
             {
                 opt.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-            //sc.AddSwaggerGen(SwaggerOptions.ConfigureSwaggerGen);
         }
 
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory log)
@@ -180,18 +178,29 @@ namespace Bhbk.WebApi.Identity.Sts
 
             app.UseForwardedHeaders();
             app.UseStaticFiles();
+            app.UseSwagger(opt =>
+            {
+                opt.RouteTemplate = "help/{documentName}/index.json";
+            });
+            app.UseSwaggerUI(opt =>
+            {
+                opt.RoutePrefix = "help";
+                opt.SwaggerEndpoint("v1/index.json", "Reference");
+            });
+            app.UseRouting();
             app.UseCors(opt => opt
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseAuthorization();
+            app.UseEndpoints(opt =>
+            {
+                opt.MapControllers();
+            });
 
             //app.UseMiddleware<ResourceOwner_Deprecate>();
             //app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
-
-            //app.UseSwagger(SwaggerOptions.ConfigureSwagger);
-            //app.UseSwaggerUI(SwaggerOptions.ConfigureSwaggerUI);
         }
     }
 }

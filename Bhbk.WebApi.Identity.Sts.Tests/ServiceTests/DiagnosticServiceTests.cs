@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http;
@@ -15,7 +16,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         public DiagnosticServiceTests(StartupTests factory)
         {
             _factory = factory;
-            _http = _factory.CreateClient();
+            _http = _factory.CreateClient(
+                new WebApplicationFactoryClientOptions
+                {
+                    AllowAutoRedirect = false
+                });
         }
 
         [Fact]

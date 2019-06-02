@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,12 +7,9 @@
     <PackageTags>Bhbk Cli Identity</PackageTags>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;1705;CS0108;CS0114</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.4.21.119" />
+    <PackageReference Include="Bhbk.Lib.CommandLine" Version="2019.6.1.2358" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2019.6.1.2358" />
     <PackageReference Include="ManyConsole" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.1">

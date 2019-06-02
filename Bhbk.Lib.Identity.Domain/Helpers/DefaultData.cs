@@ -6,7 +6,6 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Domain.Helpers

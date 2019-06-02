@@ -4,11 +4,13 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Bhbk.Lib.Identity</RootNamespace>
     <Authors>Bhbk</Authors>
+    <Description>Library for Identity purposes.</Description>
+    <PackageProjectUrl>https://gitlab.com/bhbk/3as8kpsf</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.4.21.119" />
-    <PackageReference Include="Bhbk.Lib.Paging" Version="2019.4.21.119" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2019.6.1.2358" />
+    <PackageReference Include="Bhbk.Lib.Paging" Version="2019.6.1.2358" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />

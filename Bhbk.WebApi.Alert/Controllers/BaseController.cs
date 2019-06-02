@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace Bhbk.WebApi.Alert.Controllers
 {
     [Authorize(Policy = "UsersPolicy")]
-    public class BaseController : ControllerBase
+    public class BaseController : Controller
     {
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
         protected IUoWService UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUoWService>(); }

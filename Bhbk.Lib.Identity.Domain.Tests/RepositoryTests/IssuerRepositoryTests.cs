@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -40,6 +39,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         [Fact]
         public async Task Lib_IssuerRepo_CreateV1_Success()
         {
+            TestData.DestroyAsync().Wait();
             TestData.CreateAsync().Wait();
 
             var result = await UoW.IssuerRepo.CreateAsync(
@@ -51,8 +51,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         Immutable = false,
                     }));
             result.Should().BeAssignableTo<tbl_Issuers>();
-
-            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -67,25 +65,23 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         [Fact]
         public async Task Lib_IssuerRepo_DeleteV1_Success()
         {
+            TestData.DestroyAsync().Wait();
             TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
 
             var result = await UoW.IssuerRepo.DeleteAsync(issuer.Id);
             result.Should().BeTrue();
-
-            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
         public async Task Lib_IssuerRepo_GetV1_Success()
         {
+            TestData.DestroyAsync().Wait();
             TestData.CreateAsync().Wait();
 
             var result = await UoW.IssuerRepo.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Issuers>>();
-
-            TestData.DestroyAsync().Wait();
         }
 
         [Fact]
@@ -100,6 +96,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         [Fact]
         public async Task Lib_IssuerRepo_UpdateV1_Success()
         {
+            TestData.DestroyAsync().Wait();
             TestData.CreateAsync().Wait();
 
             var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
@@ -107,8 +104,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 
             var result = await UoW.IssuerRepo.UpdateAsync(issuer);
             result.Should().BeAssignableTo<tbl_Issuers>();
-
-            TestData.DestroyAsync().Wait();
         }
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -91,20 +90,20 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             var entity = _context.tbl_Issuers.Where(x => x.Id == key).Single();
 
             var claims = _context.tbl_Claims.Where(x => x.IssuerId == key);
-            var clients = _context.tbl_Clients.Where(x => x.IssuerId == key);
-            var roles = _context.tbl_Roles.Where(x => x.Client.IssuerId == key);
             var refreshes = _context.tbl_Refreshes.Where(x => x.IssuerId == key);
             var settings = _context.tbl_Settings.Where(x => x.IssuerId == key);
             var states = _context.tbl_States.Where(x => x.IssuerId == key);
+            var roles = _context.tbl_Roles.Where(x => x.Client.IssuerId == key);
+            var clients = _context.tbl_Clients.Where(x => x.IssuerId == key);
 
             try
             {
                 _context.RemoveRange(claims);
-                _context.RemoveRange(clients);
-                _context.RemoveRange(roles);
                 _context.RemoveRange(refreshes);
                 _context.RemoveRange(settings);
                 _context.RemoveRange(states);
+                _context.RemoveRange(roles);
+                _context.RemoveRange(clients);
                 _context.Remove(entity);
 
                 return await Task.FromResult(true);

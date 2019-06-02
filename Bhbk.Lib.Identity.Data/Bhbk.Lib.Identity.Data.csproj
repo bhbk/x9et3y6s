@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Authors>Bhbk</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,9 +15,9 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.4.21.119" />
-    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2019.4.21.1946" />
-    <PackageReference Include="Bhbk.Lib.DataAccess" Version="2019.4.21.119" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2019.6.1.2358" />
+    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2019.6.1.2358" />
+    <PackageReference Include="Bhbk.Lib.DataAccess" Version="2019.6.1.2358" />
     <PackageReference Include="CryptoHelper" Version="3.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.1">
@@ -31,7 +32,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Otp.NET" Version="1.2.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
   </ItemGroup>
 
   <ItemGroup>
