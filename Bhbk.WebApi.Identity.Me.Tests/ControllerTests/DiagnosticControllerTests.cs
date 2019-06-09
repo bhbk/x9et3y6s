@@ -12,13 +12,13 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
-    public class DiagnosticControllerTests : IClassFixture<StartupTests>
+    public class DiagnosticControllerTests : IClassFixture<BaseControllerTests>
     {
         private readonly IConfiguration _conf;
         private readonly IContextService _instance;
-        private readonly StartupTests _factory;
+        private readonly BaseControllerTests _factory;
 
-        public DiagnosticControllerTests(StartupTests factory)
+        public DiagnosticControllerTests(BaseControllerTests factory)
         {
             _factory = factory;
             _factory.CreateClient();
@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var result = controller.GetStatusV1(AlphaNumeric.CreateString(8)) as BadRequestResult;
-            var ok = result.Should().BeOfType<BadRequestResult>().Subject;
+            result.Should().BeOfType<BadRequestResult>();
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
             var result = controller.GetStatusV1(TaskType.MaintainQuotes.ToString()) as OkObjectResult;
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+            ok.Value.Should().BeAssignableTo<string>();
         }
 
         [Fact]

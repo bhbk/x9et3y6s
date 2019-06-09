@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
@@ -9,7 +10,6 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
-using Bhbk.Lib.Paging.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -283,7 +283,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/msg-of-the-day/page"), HttpPost]
-        public async Task<IActionResult> GetMOTDsV1([FromBody] CascadePager model)
+        public async Task<IActionResult> GetMOTDsV1([FromBody] DataPagerV3 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -294,22 +294,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             Expression<Func<tbl_MotDType1, bool>> preds;
 
-            if (string.IsNullOrEmpty(model.Filter))
+            if (string.IsNullOrEmpty(model.Filter.First().Value))
                 preds = x => true;
             else
-                preds = x => x.Author.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.Quote.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
+                preds = x => x.Author.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.Quote.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.UserRepo.CountMOTDAsync(preds);
                 var result = await UoW.UserRepo.GetMOTDAsync(preds,
                     null,
-                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<MotDType1Model>>(result) });
+                return Ok(new
+                {
+                    Data = Mapper.Map<IEnumerable<MOTDType1Model>>(result),
+                    Total = total
+                });
             }
             catch (ParseException ex)
             {
@@ -434,7 +438,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetUsersV1([FromBody] CascadePager model)
+        public async Task<IActionResult> GetUsersV1([FromBody] DataPagerV3 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -445,24 +449,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             Expression<Func<tbl_Users, bool>> predicates;
 
-            if (string.IsNullOrEmpty(model.Filter))
+            if (string.IsNullOrEmpty(model.Filter.First().Value))
                 predicates = x => true;
             else
-                predicates = x => x.Email.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.PhoneNumber.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.FirstName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.LastName.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
+                predicates = x => x.Email.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.PhoneNumber.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.FirstName.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.LastName.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.UserRepo.CountAsync(predicates);
                 var result = await UoW.UserRepo.GetAsync(predicates,
                     x => x.Include(r => r.tbl_UserRoles).ThenInclude(r => r.Role),
-                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<UserModel>>(result) });
+                return Ok(new
+                {
+                    Data = Mapper.Map<IEnumerable<UserModel>>(result),
+                    Total = total
+                });
             }
             catch (ParseException ex)
             {

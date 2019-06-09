@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var quote = (await UoW.UserRepo.GetMOTDAsync(null, null, x => x.OrderBy(y => y.Id), skip, 1)).SingleOrDefault();
 
-            return Ok(Mapper.Map<MotDType1Model>(quote));
+            return Ok(Mapper.Map<MOTDType1Model>(quote));
         }
 
         [Route("v1/code"), HttpGet]
@@ -249,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, model.CurrentPassword)
+            else if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
@@ -257,9 +257,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             user.ActorId = GetUserGUID();
-
-            if (!await UoW.UserRepo.RemovePasswordAsync(user.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
 
             if (!await UoW.UserRepo.SetPasswordAsync(user.Id, model.NewPassword))
                 return StatusCode(StatusCodes.Status500InternalServerError);

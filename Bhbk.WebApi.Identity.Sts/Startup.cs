@@ -5,6 +5,9 @@ using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Services;
+#if MIDDLEWARE
+using Bhbk.WebApi.Identity.Sts.Middlewares;
+#endif
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -30,13 +33,13 @@ namespace Bhbk.WebApi.Identity.Sts
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var conf = (IConfiguration)new ConfigurationBuilder()
+            var conf = (IConfiguration) new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
@@ -194,13 +197,14 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AllowAnyMethod());
             app.UseAuthentication();
             app.UseAuthorization();
+#if MIDDLEWARE
+                app.UseMiddleware<ResourceOwner_Deprecate>();
+                app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
+#endif
             app.UseEndpoints(opt =>
             {
                 opt.MapControllers();
             });
-
-            //app.UseMiddleware<ResourceOwner_Deprecate>();
-            //app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
         }
     }
 }

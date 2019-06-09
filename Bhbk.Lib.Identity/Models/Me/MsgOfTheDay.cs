@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string author { get; set; }
     }
 
-    public class MotDType1Response
+    public class MOTDType1Response
     {
         public Success success { get; set; }
 
@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Models.Me
 
         public class Contents
         {
-            public List<MotDType1Model> quotes { get; set; }
+            public List<MOTDType1Model> quotes { get; set; }
         }
 
         public class Success
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Models.Me
         }
     }
 
-    public class MotDType1Model : MsgOfTheDay
+    public class MOTDType1Model : MsgOfTheDay
     {
         public string length { get; set; }
 

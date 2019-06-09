@@ -23,6 +23,7 @@ namespace Bhbk.Lib.Identity.Data.Primitives.Enums
 
     public enum MessageType
     {
+        ActivityNotFound,
         ClaimAlreadyExists,
         ClaimImmutable,
         ClaimInvalid,

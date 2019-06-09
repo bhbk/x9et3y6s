@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 throw new InvalidOperationException();
 
             /*
-             * create settings
+             * create test settings
              */
 
             var foundGlobalLegacyClaims = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
@@ -77,7 +77,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test issuer
+             * create test issuers
              */
 
             var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).SingleOrDefault();
@@ -97,7 +97,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test client
+             * create test clients
              */
 
             var foundClient = (await _uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).SingleOrDefault();
@@ -115,7 +115,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                     await _uow.ActivityRepo.CreateAsync(
                         _mapper.Map<tbl_Activities>(new ActivityCreate()
                         {
@@ -124,7 +124,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             Immutable = false,
                         }));
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                     await _uow.RefreshRepo.CreateAsync(
                         _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                         {
@@ -140,7 +140,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test client url
+             * create test client urls
              */
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -164,7 +164,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test claim
+             * create test claims
              */
 
             var foundClaim = (await _uow.ClaimRepo.GetAsync(x => x.Type == FakeConstants.ApiTestClaim)).SingleOrDefault();
@@ -184,7 +184,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test login
+             * create test logins
              */
 
             var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == FakeConstants.ApiTestLogin)).SingleOrDefault();
@@ -202,7 +202,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test role
+             * create test roles
              */
 
             var foundRole = (await _uow.RoleRepo.GetAsync(x => x.Name == FakeConstants.ApiTestRole)).SingleOrDefault();
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * create test user
+             * create test users
              */
 
             var foundUser = (await _uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).SingleOrDefault();
@@ -241,7 +241,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     Immutable = false,
                 }), FakeConstants.ApiTestUserPassCurrent);
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                     await _uow.ActivityRepo.CreateAsync(
                         _mapper.Map<tbl_Activities>(new ActivityCreate()
                         {
@@ -251,7 +251,20 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             Immutable = false,
                         }));
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
+                    await _uow.RefreshRepo.CreateAsync(
+                        _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        {
+                            IssuerId = foundIssuer.Id,
+                            ClientId = foundClient.Id,
+                            UserId = foundUser.Id,
+                            RefreshType = RefreshType.User.ToString(),
+                            RefreshValue = Base64.CreateString(8),
+                            ValidFromUtc = DateTime.UtcNow,
+                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                        }));
+
+                for (int i = 0; i < 2; i++)
                     await _uow.StateRepo.CreateAsync(
                         _mapper.Map<tbl_States>(new StateCreate()
                         {
@@ -265,15 +278,16 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
 
-                for (int i = 0; i < 3; i++)
-                    await _uow.RefreshRepo.CreateAsync(
-                        _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                for (int i = 0; i < 2; i++)
+                    await _uow.StateRepo.CreateAsync(
+                        _mapper.Map<tbl_States>(new StateCreate()
                         {
                             IssuerId = foundIssuer.Id,
                             ClientId = foundClient.Id,
                             UserId = foundUser.Id,
-                            RefreshType = RefreshType.User.ToString(),
-                            RefreshValue = Base64.CreateString(8),
+                            StateValue = Base64.CreateString(32),
+                            StateType = StateType.User.ToString(),
+                            StateConsume = false,
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
@@ -281,11 +295,12 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.UserRepo.SetConfirmedEmailAsync(foundUser.Id, true);
                 await _uow.UserRepo.SetConfirmedPasswordAsync(foundUser.Id, true);
                 await _uow.UserRepo.SetConfirmedPhoneNumberAsync(foundUser.Id, true);
+
                 await _uow.CommitAsync();
             }
 
             /*
-             * assign roles, claims & logins to user
+             * assign roles, claims & logins to users
              */
 
             if (!await _uow.UserRepo.IsInRoleAsync(foundUser.Id, foundRole.Id))
@@ -298,29 +313,9 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.UserRepo.AddToClaimAsync(foundUser, foundClaim);
 
             await _uow.CommitAsync();
-
-            /*
-             * create test msg of the day
-             */
-
-            await _uow.UserRepo.CreateMOTDAsync(
-                new tbl_MotDType1()
-                {
-                    Id = AlphaNumeric.CreateString(8),
-                    Date = DateTime.Now,
-                    Author = "Test Author",
-                    Quote = "Test Quote",
-                    Length = 666,
-                    Category = "Test Category",
-                    Title = "Test Title",
-                    Background = "Test Background",
-                    Tags = "tag1,tag2,tag3",
-                });
-
-            await _uow.CommitAsync();
         }
 
-        public async Task CreateRandomAsync(uint sets)
+        public async Task CreateAsync(uint sets)
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -336,7 +331,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 tbl_Claims claim;
 
                 /*
-                 * create random issuer
+                 * create random issuers
                  */
 
                 issuer = await _uow.IssuerRepo.CreateAsync(
@@ -351,7 +346,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.CommitAsync();
 
                 /*
-                 * create random client
+                 * create random clients
                  */
 
                 client = await _uow.ClientRepo.CreateAsync(
@@ -389,7 +384,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.CommitAsync();
 
                 /*
-                 * create random client url
+                 * create random client urls
                  */
 
                 var clientUrl = new Uri(FakeConstants.ApiTestUriLink);
@@ -406,7 +401,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.CommitAsync();
 
                 /*
-                 * create random claim
+                 * create random claims
                  */
 
                 claim = await _uow.ClaimRepo.CreateAsync(
@@ -421,7 +416,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.CommitAsync();
 
                 /*
-                 * create random login
+                 * create random logins
                  */
 
                 login = await _uow.LoginRepo.CreateAsync(
@@ -436,7 +431,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.CommitAsync();
 
                 /*
-                 * create random role
+                 * create random roles
                  */
 
                 role = await _uow.RoleRepo.CreateAsync(
@@ -451,7 +446,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 await _uow.CommitAsync();
 
                 /*
-                 * create random user
+                 * create random users
                  */
 
                 user = await _uow.UserRepo.CreateAsync(
@@ -504,7 +499,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         }));
 
                 /*
-                 * assign roles, claims & logins to random user
+                 * assign roles, claims & logins to random users
                  */
 
                 await _uow.UserRepo.SetConfirmedEmailAsync(user.Id, true);
@@ -522,11 +517,16 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     await _uow.UserRepo.AddToClaimAsync(user, claim);
 
                 await _uow.CommitAsync();
+            }
+        }
 
-                /*
-                 * create random msg of the day
-                 */
+        public async Task CreateMOTDAsync(uint sets)
+        {
+            if (_uow.InstanceType != InstanceContext.UnitTest)
+                throw new InvalidOperationException();
 
+            for (int i = 0; i < sets; i++)
+            {
                 await _uow.UserRepo.CreateMOTDAsync(
                     new tbl_MotDType1()
                     {
@@ -613,6 +613,17 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
             foreach (var issuer in issuers)
                 await _uow.IssuerRepo.DeleteAsync(issuer.Id);
+
+            await _uow.CommitAsync();
+
+            /*
+             * delete test msg of the day
+             */
+
+            var motds = await _uow.UserRepo.GetMOTDAsync();
+
+            foreach (var motd in motds)
+                await _uow.UserRepo.DeleteMOTDAsync(motd.Id);
 
             await _uow.CommitAsync();
         }

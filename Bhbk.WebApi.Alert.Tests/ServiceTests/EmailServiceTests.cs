@@ -23,14 +23,14 @@ using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 {
-    public class EmailServiceTests : IClassFixture<StartupTests>
+    public class EmailServiceTests : IClassFixture<BaseServiceTests>
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _mapper;
-        private readonly StartupTests _factory;
+        private readonly BaseServiceTests _factory;
         private readonly AlertService _service;
 
-        public EmailServiceTests(StartupTests factory)
+        public EmailServiceTests(BaseServiceTests factory)
         {
             _factory = factory;
 
@@ -46,15 +46,10 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 var result = await _service.Http.Enqueue_EmailV1(Base64.CreateString(8), new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            }
 
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
@@ -63,7 +58,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await _service.Http.Enqueue_EmailV1(rop.RawData, new EmailCreate());
+                result = await _service.Http.Enqueue_EmailV1(rop.RawData, new EmailCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }

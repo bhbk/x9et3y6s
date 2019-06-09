@@ -11,7 +11,7 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [CollectionDefinition("LibraryTestsCollection")]
+    [CollectionDefinition("LibraryRepositoryTests")]
     public class StartupTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
 
     public class BaseRepositoryTests
@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         {
             var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = (IConfiguration)new ConfigurationBuilder()
+            var conf = (IConfiguration) new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var instance = new ContextService(InstanceContext.UnitTest);
 
             UoW = new UoWService(conf, instance);
-            Mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
             DefaultData = new DefaultData(UoW, Mapper);
             TestData = new TestData(UoW, Mapper);
 

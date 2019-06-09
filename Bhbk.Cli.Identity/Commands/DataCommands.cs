@@ -29,13 +29,13 @@ namespace Bhbk.Cli.Identity.Commands
             {
                 var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-                var conf = (IConfiguration)new ConfigurationBuilder()
+                var conf = (IConfiguration) new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+                var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
                 var uow = new UoWService(conf, instance);
                 var data = new DefaultData(uow, mapper);
 

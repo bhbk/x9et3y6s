@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                         if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
                             var motdtype1_response = new HttpClient().GetAsync(_url, stoppingToken).Result;
-                            var motdtype1 = JsonConvert.DeserializeObject<MotDType1Response>(motdtype1_response.Content.ReadAsStringAsync().Result);
+                            var motdtype1 = JsonConvert.DeserializeObject<MOTDType1Response>(motdtype1_response.Content.ReadAsStringAsync().Result);
 
                             if (motdtype1_response.IsSuccessStatusCode)
                             {

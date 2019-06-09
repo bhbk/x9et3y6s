@@ -30,13 +30,13 @@ namespace Bhbk.WebApi.Identity.Me
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var conf = (IConfiguration)new ConfigurationBuilder()
+            var conf = (IConfiguration) new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);

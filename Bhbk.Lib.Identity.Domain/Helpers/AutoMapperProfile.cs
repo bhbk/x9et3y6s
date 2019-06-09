@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Domain.Helpers
 {
-    public class MapperProfile : Profile
+    public class AutoMapperProfile : Profile
     {
-        public MapperProfile()
+        public AutoMapperProfile()
         {
             /*
              * activity models
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * message of the day models
              */
-            CreateMap<MotDType1Model, tbl_MotDType1>()
+            CreateMap<MOTDType1Model, tbl_MotDType1>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.id))
                 .ForMember(dest => dest.Title, src => src.MapFrom(val => val.title))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
@@ -156,7 +156,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Length, src => src.MapFrom(val => val.length))
                 .ForMember(dest => dest.Background, src => src.MapFrom(val => val.background));
 
-            CreateMap<tbl_MotDType1, MotDType1Model>()
+            CreateMap<tbl_MotDType1, MOTDType1Model>()
                 .ForMember(dest => dest.id, src => src.MapFrom(val => val.Id))
                 .ForMember(dest => dest.title, src => src.MapFrom(val => val.Title))
                 .ForMember(dest => dest.author, src => src.MapFrom(val => val.Author))

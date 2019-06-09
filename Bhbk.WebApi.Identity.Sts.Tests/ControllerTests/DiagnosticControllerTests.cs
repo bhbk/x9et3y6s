@@ -12,13 +12,13 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
-    public class DiagnosticControllerTests : IClassFixture<StartupTests>
+    public class DiagnosticControllerTests : IClassFixture<BaseControllerTests>
     {
         private readonly IConfiguration _conf;
         private readonly IContextService _instance;
-        private readonly StartupTests _factory;
+        private readonly BaseControllerTests _factory;
 
-        public DiagnosticControllerTests(StartupTests factory)
+        public DiagnosticControllerTests(BaseControllerTests factory)
         {
             _factory = factory;
             _factory.CreateClient();
@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var result = controller.GetStatusV1(AlphaNumeric.CreateString(8)) as BadRequestResult;
-            var ok = result.Should().BeOfType<BadRequestResult>().Subject;
+            result.Should().BeOfType<BadRequestResult>();
         }
 
         [Fact]
@@ -48,10 +48,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
             var result = controller.GetStatusV1(TaskType.MaintainRefreshes.ToString()) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            result.Should().BeOfType<OkObjectResult>();
 
             result = controller.GetStatusV1(TaskType.MaintainStates.ToString()) as OkObjectResult;
-            ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            result.Should().BeOfType<OkObjectResult>();
         }
 
         [Fact]

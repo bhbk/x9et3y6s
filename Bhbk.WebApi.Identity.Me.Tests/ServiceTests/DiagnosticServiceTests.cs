@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http;
@@ -8,19 +7,15 @@ using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 {
-    public class DiagnosticServiceTests : IClassFixture<StartupTests>
+    public class DiagnosticServiceTests : IClassFixture<BaseServiceTests>
     {
-        private readonly StartupTests _factory;
+        private readonly BaseServiceTests _factory;
         private readonly HttpClient _http;
 
-        public DiagnosticServiceTests(StartupTests factory)
+        public DiagnosticServiceTests(BaseServiceTests factory)
         {
             _factory = factory;
-            _http = _factory.CreateClient(
-                new WebApplicationFactoryClientOptions
-                {
-                    AllowAutoRedirect = false
-                });
+            _http = _factory.CreateClient();
         }
 
         [Fact]

@@ -1,12 +1,11 @@
 ﻿using Bhbk.Lib.Common.Extensions;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
-using Bhbk.Lib.Paging.Models;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,18 +38,23 @@ namespace Bhbk.Lib.Identity.Services
             get { return _http; }
         }
 
-        public Tuple<int, IEnumerable<ActivityModel>> Activity_GetV1(CascadePager model)
+        public DataResultV3<ActivityModel> Activity_GetV1(DataPagerV3 model)
         {
             var response = Http.Activity_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ActivityModel>>();
-                var count = (int)ok["count"];
+                return response.Content.ReadAsJsonAsync<DataResultV3<ActivityModel>>().Result;
 
-                return new Tuple<int, IEnumerable<ActivityModel>>(count, list);
-            }
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public ActivityModel Activity_GetV1(string activityValue)
+        {
+            var response = Http.Activity_GetV1(_ropg.RopgV2.RawData, activityValue).Result;
+
+            if (response.IsSuccessStatusCode)
+                return response.Content.ReadAsJsonAsync<ActivityModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -78,18 +82,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<ClaimModel>> Claim_GetV1(CascadePager model)
+        public DataResultV3<ClaimModel> Claim_GetV1(DataPagerV3 model)
         {
             var response = Http.Claim_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ClaimModel>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<ClaimModel>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<ClaimModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -161,18 +159,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<ClientModel>> Client_GetV1(CascadePager model)
+        public DataResultV3<ClientModel> Client_GetV1(DataPagerV3 model)
         {
             var response = Http.Client_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<ClientModel>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<ClientModel>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<ClientModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -244,18 +236,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<IssuerModel>> Issuer_GetV1(CascadePager model)
+        public DataResultV3<IssuerModel> Issuer_GetV1(DataPagerV3 model)
         {
             var response = Http.Issuer_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<IssuerModel>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<IssuerModel>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<IssuerModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -305,18 +291,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<LoginModel>> Login_GetV1(CascadePager model)
+        public DataResultV3<LoginModel> Login_GetV1(DataPagerV3 model)
         {
             var response = Http.Login_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<LoginModel>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<LoginModel>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<LoginModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -366,18 +346,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<RoleModel>> Role_GetV1(CascadePager model)
+        public DataResultV3<RoleModel> Role_GetV1(DataPagerV3 model)
         {
             var response = Http.Role_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<RoleModel>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<RoleModel>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<RoleModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -493,18 +467,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<MotDType1Model>> User_GetMOTDsV1(CascadePager model)
+        public DataResultV3<MOTDType1Model> User_GetMOTDsV1(DataPagerV3 model)
         {
             var response = Http.User_GetMOTDsV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<MotDType1Model>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<MotDType1Model>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<MOTDType1Model>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -565,18 +533,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public Tuple<int, IEnumerable<UserModel>> User_GetV1(CascadePager model)
+        public DataResultV3<UserModel> User_GetV1(DataPagerV3 model)
         {
             var response = Http.User_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-            {
-                var ok = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                var list = JArray.Parse(ok["list"].ToString()).ToObject<IEnumerable<UserModel>>();
-                var count = (int)ok["count"];
-
-                return new Tuple<int, IEnumerable<UserModel>>(count, list);
-            }
+                return response.Content.ReadAsJsonAsync<DataResultV3<UserModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Services
         bool Info_DeleteCodeV1(Guid codeID);
         bool Info_DeleteRefreshesV1();
         bool Info_DeleteRefreshV1(Guid refreshID);
-        MotDType1Model Info_GetMOTDV1();
+        MOTDType1Model Info_GetMOTDV1();
         IEnumerable<StateModel> Info_GetCodesV1();
         IEnumerable<RefreshModel> Info_GetRefreshesV1();
         UserModel Info_GetV1();

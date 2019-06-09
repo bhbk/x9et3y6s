@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Paging.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -55,6 +55,21 @@ namespace Bhbk.Lib.Identity.Repositories
 
             if (_instance == InstanceContext.UnitTest)
                 return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async Task<HttpResponseMessage> Activity_GetV1(string jwt, string activityValue)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/activity/v1/" + activityValue;
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
         }
@@ -105,7 +120,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Claim_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -213,7 +228,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Client_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Client_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -321,7 +336,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Issuer_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -399,7 +414,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Login_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Login_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -477,7 +492,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Role_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> Role_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -631,7 +646,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetMOTDsV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> User_GetMOTDsV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -737,7 +752,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> User_GetV1(string jwt, CascadePager model)
+        public async Task<HttpResponseMessage> User_GetV1(string jwt, DataPagerV3 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

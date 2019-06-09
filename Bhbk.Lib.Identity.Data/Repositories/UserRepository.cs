@@ -130,16 +130,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> CheckPasswordAsync(Guid key, string password)
-        {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            if (await InternalVerifyPasswordAsync(entity, password) != PasswordVerificationResult.Failed)
-                return true;
-
-            return false;
-        }
-
         public async Task<int> CountAsync(Expression<Func<tbl_Users, bool>> predicates = null)
         {
             var query = _context.tbl_Users.AsQueryable();
@@ -744,6 +734,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.Entry(entity).State = EntityState.Modified;
 
             return await Task.FromResult(_context.Update(entity).Entity);
+        }
+
+        public async Task<bool> VerifyPasswordAsync(Guid key, string password)
+        {
+            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+
+            if (await InternalVerifyPasswordAsync(entity, password) != PasswordVerificationResult.Failed)
+                return true;
+
+            return false;
         }
     }
 }

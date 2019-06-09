@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 await UoW.UserRepo.AccessFailedAsync(user.Id);
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 await UoW.UserRepo.AccessFailedAsync(user.Id);
@@ -446,7 +446,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 await UoW.UserRepo.AccessFailedAsync(user.Id);
@@ -476,7 +476,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!await UoW.UserRepo.CheckPasswordAsync(user.Id, input.password))
+                            if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 await UoW.UserRepo.AccessFailedAsync(user.Id);

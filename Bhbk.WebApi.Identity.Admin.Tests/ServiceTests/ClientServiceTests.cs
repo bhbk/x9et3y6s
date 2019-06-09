@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -8,7 +9,6 @@ using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
-using Bhbk.Lib.Paging.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,19 +20,20 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
+using static Bhbk.Lib.DataState.Models.DataPagerV3;
 using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
 using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
-    public class ClientServiceTests : IClassFixture<StartupTests>
+    public class ClientServiceTests : IClassFixture<BaseServiceTests>
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _mapper;
-        private readonly StartupTests _factory;
+        private readonly BaseServiceTests _factory;
         private readonly AdminService _service;
 
-        public ClientServiceTests(StartupTests factory)
+        public ClientServiceTests(BaseServiceTests factory)
         {
             _factory = factory;
 
@@ -48,15 +49,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 var result = await _service.Http.Client_CreateV1(Base64.CreateString(8), new ClientCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            }
 
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 new TestData(uow, _mapper).CreateAsync().Wait();
@@ -67,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await _service.Http.Client_CreateV1(rop.RawData, new ClientCreate());
+                result = await _service.Http.Client_CreateV1(rop.RawData, new ClientCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -122,15 +118,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 var result = await _service.Http.Client_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            }
 
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 new TestData(uow, _mapper).CreateAsync().Wait();
@@ -141,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await _service.Http.Client_DeleteV1(rop.RawData, Guid.NewGuid());
+                result = await _service.Http.Client_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -263,35 +254,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow, _mapper).CreateRandomAsync(3).Wait();
-
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
-
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
-
-                var take = 2;
-                var orders = new List<Tuple<string, string>>();
-                orders.Add(new Tuple<string, string>("name", "asc"));
-
-                var result = _service.Client_GetV1(
-                    new CascadePager()
-                    {
-                        Filter = string.Empty,
-                        Orders = orders,
-                        Skip = 1,
-                        Take = take,
-                    });
-                result.Item1.Should().Be(await uow.ClientRepo.CountAsync());
-                result.Item2.Should().BeAssignableTo<IEnumerable<ClientModel>>();
-                result.Item2.Count().Should().Be(take);
-            }
-
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
@@ -304,6 +266,38 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = _service.Client_GetV1(testClient.Id.ToString());
                 result.Should().BeAssignableTo<ClientModel>();
+            }
+
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+
+                new TestData(uow, _mapper).CreateAsync(3).Wait();
+
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+
+                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
+
+                int take = 2;
+                var state = new DataPagerV3()
+                {
+                    Filter = new List<FilterDescriptor>()
+                    {
+                        new FilterDescriptor(){ Field = string.Empty, Value = string.Empty }
+                    },
+                    Sort = new List<SortDescriptor>() 
+                    {
+                        new SortDescriptor() { Field = "name", Dir = "asc" }
+                    },
+                    Skip = 0,
+                    Take = take
+                };
+
+                var result = _service.Client_GetV1(state);
+                result.Data.ToDynamicList().Count().Should().Be(take);
+                result.Total.Should().Be(await uow.ClientRepo.CountAsync());
             }
         }
 
@@ -336,15 +330,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 var result = await _service.Http.Client_UpdateV1(Base64.CreateString(8), new ClientModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            }
 
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 new TestData(uow, _mapper).CreateAsync().Wait();
@@ -355,7 +344,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var result = await _service.Http.Client_UpdateV1(rop.RawData, new ClientModel());
+                result = await _service.Http.Client_UpdateV1(rop.RawData, new ClientModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }

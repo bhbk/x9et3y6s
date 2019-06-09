@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [Collection("LibraryTestsCollection")]
+    [Collection("LibraryRepositoryTests")]
     public class RefreshRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]

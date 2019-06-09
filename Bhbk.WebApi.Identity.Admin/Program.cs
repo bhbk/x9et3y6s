@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Hosting.Options;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -11,30 +10,37 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Program
     {
-        public static IWebHostBuilder CreateIISHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-            .CaptureStartupErrors(true)
-            .ConfigureAppConfiguration((hostingContext, config) =>
+        public static IHostBuilder CreateIISHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(opt =>
             {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
-            .UseIISIntegration()
-            .UseStartup<Startup>();
+                opt.CaptureStartupErrors(true);
+                opt.ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(Directory.GetCurrentDirectory());
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                });
+                opt.UseIISIntegration();
+                opt.UseStartup<Startup>();
+            });
 
-        public static IWebHostBuilder CreateKestrelHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-            .CaptureStartupErrors(true)
-            .ConfigureAppConfiguration((hostingContext, config) =>
+        public static IHostBuilder CreateKestrelHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(opt =>
             {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
-            .UseKestrel(options =>
-            {
-                options.ConfigureEndpoints();
-            })
-            .UseStartup<Startup>();
+                opt.CaptureStartupErrors(true);
+                opt.ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(Directory.GetCurrentDirectory());
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                });
+                opt.UseKestrel(options =>
+                {
+                    options.ConfigureEndpoints();
+                });
+                opt.UseUrls();
+                opt.UseStartup<Startup>();
+            });
 
         public static void Main(string[] args)
         {

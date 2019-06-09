@@ -5,7 +5,11 @@ using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
-using Bhbk.WebApi.Alert.Tasks;
+#if MIDDLEWARE
+using Bhbk.WebApi.Identity.Sts.Middlewares;
+#endif
+using Bhbk.WebApi.Identity.Sts.Controllers;
+using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -25,24 +29,21 @@ using System.Text;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
-namespace Bhbk.WebApi.Alert.Tests
+namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    [CollectionDefinition("AlertTestsCollection")]
-    public class StartupTestCollection : ICollectionFixture<StartupTests> { }
-
-    public class StartupTests : WebApplicationFactory<Startup>
+    public class BaseServiceTests : WebApplicationFactory<Startup>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = (IConfiguration)new ConfigurationBuilder()
+            var conf = (IConfiguration) new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
 
             var instance = new ContextService(InstanceContext.UnitTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<MapperProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -54,13 +55,13 @@ namespace Bhbk.WebApi.Alert.Tests
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
-                    var sandbox = new UoWService(conf, instance);
-                    new DefaultData(sandbox, mapper).CreateAsync().Wait();
+                    var uow = new UoWService(conf, instance);
+                    new DefaultData(uow, mapper).CreateAsync().Wait();
 
-                    return sandbox;
+                    return uow;
                 });
-                sc.AddSingleton<IHostedService, QueueEmailTask>();
-                sc.AddSingleton<IHostedService, QueueTextTask>();
+                sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
+                sc.AddSingleton<IHostedService, MaintainStatesTask>();
 
                 /*
                  * do not use dependency injection for unit of work below. is used 
@@ -101,7 +102,9 @@ namespace Bhbk.WebApi.Alert.Tests
                     .AddNewtonsoftJson(opt =>
                     {
                         opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    });
+                    })
+                    //https://github.com/aspnet/Mvc/issues/5992
+                    .AddApplicationPart(typeof(BaseController).Assembly);
                 sc.AddCors();
                 sc.AddAuthentication(opt =>
                 {
@@ -148,7 +151,7 @@ namespace Bhbk.WebApi.Alert.Tests
                 {
                     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Reference", Version = "v1" });
                 });
-                sc.Configure((ForwardedHeadersOptions opt) =>
+                sc.Configure<ForwardedHeadersOptions>(opt =>
                 {
                     opt.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 });
@@ -174,6 +177,10 @@ namespace Bhbk.WebApi.Alert.Tests
                     .AllowAnyMethod());
                 app.UseAuthentication();
                 app.UseAuthorization();
+#if MIDDLEWARE
+                app.UseMiddleware<ResourceOwner_Deprecate>();
+                app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
+#endif
                 app.UseEndpoints(opt =>
                 {
                     opt.MapControllers();

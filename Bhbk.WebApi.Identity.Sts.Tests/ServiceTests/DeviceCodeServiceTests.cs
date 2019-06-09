@@ -25,14 +25,14 @@ using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    public class DeviceCodeServiceTests : IClassFixture<StartupTests>
+    public class DeviceCodeServiceTests : IClassFixture<BaseServiceTests>
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _mapper;
-        private readonly StartupTests _factory;
+        private readonly BaseServiceTests _factory;
         private readonly StsService _service;
 
-        public DeviceCodeServiceTests(StartupTests factory)
+        public DeviceCodeServiceTests(BaseServiceTests factory)
         {
             _factory = factory;
 
@@ -48,8 +48,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 var ask = await _service.Http.DeviceCode_AskV1(
                     new DeviceCodeAskV1()
                     {
@@ -68,8 +66,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
                 var dc = await _service.Http.DeviceCode_AuthV1(
                     new DeviceCodeV1()
                     {
@@ -90,6 +86,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+
+                new TestData(uow, _mapper).DestroyAsync().Wait();
+                new TestData(uow, _mapper).CreateAsync().Wait();
 
                 var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
                 var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();

@@ -103,12 +103,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public MotDType1Model Info_GetMOTDV1()
+        public MOTDType1Model Info_GetMOTDV1()
         {
             var response = Http.Info_GetMOTDV1().Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<MotDType1Model>().Result;
+                return response.Content.ReadAsJsonAsync<MOTDType1Model>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

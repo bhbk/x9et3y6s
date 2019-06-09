@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.DataState.Models;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Paging.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetIssuersV1([FromBody] CascadePager model)
+        public async Task<IActionResult> GetIssuersV1([FromBody] DataPagerV3 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -111,22 +111,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             Expression<Func<tbl_Issuers, bool>> predicates;
 
-            if (string.IsNullOrEmpty(model.Filter))
+            if (string.IsNullOrEmpty(model.Filter.First().Value))
                 predicates = x => true;
             else
-                predicates = x => x.Name.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.Description.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
+                predicates = x => x.Name.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.Description.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.IssuerRepo.CountAsync(predicates);
                 var result = await UoW.IssuerRepo.GetAsync(predicates,
                     x => x.Include(c => c.tbl_Clients),
-                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<IssuerModel>>(result) });
+                return Ok(new
+                {
+                    Data = Mapper.Map<IEnumerable<IssuerModel>>(result),
+                    Total = total
+                });
             }
             catch (ParseException ex)
             {

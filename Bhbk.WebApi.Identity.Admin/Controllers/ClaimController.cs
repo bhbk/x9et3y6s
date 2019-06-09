@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.DataState.Models;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Paging.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -98,46 +98,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(Mapper.Map<ClaimModel>(claim));
         }
 
-        [Route("v1/page"), HttpGet]
-        public async Task<IActionResult> GetClaimsV1([FromQuery] SimplePager model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            /*
-             * tidbits below need enhancment, just tinkering...
-             */
-
-            Expression<Func<tbl_Claims, bool>> predicates;
-
-            if (string.IsNullOrEmpty(model.Filter))
-                predicates = x => true;
-            else
-                predicates = x => x.Type.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.Value.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.ValueType.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
-
-            try
-            {
-                var total = await UoW.ClaimRepo.CountAsync(predicates);
-                var result = await UoW.ClaimRepo.GetAsync(predicates,
-                    null,
-                    x => x.OrderBy(string.Format("{0} {1}", model.OrderBy, model.Order)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<ClaimModel>>(result) });
-            }
-            catch (ParseException ex)
-            {
-                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
-                return BadRequest(ModelState);
-            }
-        }
-
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetClaimsV1([FromBody] CascadePager model)
+        public async Task<IActionResult> GetClaimsV1([FromBody] DataPagerV3 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -148,23 +110,27 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             Expression<Func<tbl_Claims, bool>> preds;
 
-            if (string.IsNullOrEmpty(model.Filter))
+            if (string.IsNullOrEmpty(model.Filter.First().Value))
                 preds = x => true;
             else
-                preds = x => x.Type.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.Value.Contains(model.Filter, StringComparison.OrdinalIgnoreCase)
-                || x.ValueType.Contains(model.Filter, StringComparison.OrdinalIgnoreCase);
+                preds = x => x.Type.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.Value.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
+                || x.ValueType.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
 
             try
             {
                 var total = await UoW.ClaimRepo.CountAsync(preds);
                 var result = await UoW.ClaimRepo.GetAsync(preds,
                     null,
-                    x => x.OrderBy(string.Format("{0} {1}", model.Orders.First().Item1, model.Orders.First().Item2)),
+                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
                     model.Skip,
                     model.Take);
 
-                return Ok(new { Count = total, List = Mapper.Map<IEnumerable<ClaimModel>>(result) });
+                return Ok(new
+                {
+                    Data = Mapper.Map<IEnumerable<ClaimModel>>(result),
+                    Total = total
+                });
             }
             catch (ParseException ex)
             {

@@ -2,7 +2,6 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -21,17 +20,18 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 {
-    public class InfoServiceTests : IClassFixture<StartupTests>
+    public class InfoServiceTests : IClassFixture<BaseServiceTests>
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _mapper;
-        private readonly StartupTests _factory;
+        private readonly BaseServiceTests _factory;
         private readonly MeService _service;
 
-        public InfoServiceTests(StartupTests factory)
+        public InfoServiceTests(BaseServiceTests factory)
         {
             _factory = factory;
 
@@ -49,10 +49,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow, _mapper).CreateAsync().Wait();
+                new TestData(uow, _mapper).CreateMOTDAsync(3).Wait();
 
                 var result = _service.Info_GetMOTDV1();
-                result.Should().BeAssignableTo<MotDType1Model>();
+                result.Should().BeAssignableTo<MOTDType1Model>();
             }
         }
 
@@ -61,24 +61,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-
-                var dc = await _service.Http.Info_UpdateCodeV1(Base64.CreateString(8), Base64.CreateString(32), ActionType.Allow.ToString());
+                var dc = await _service.Http.Info_UpdateCodeV1(Base64.CreateString(8), AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            }
 
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, Base64.CreateString(32), ActionType.Allow.ToString());
+                dc = await _service.Http.Info_UpdateCodeV1(rop.RawData, AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -87,13 +82,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
                 var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
-                var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
+
                 var state = await uow.StateRepo.CreateAsync(
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
@@ -124,15 +119,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
                 _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
-                var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
+
                 var state = await uow.StateRepo.CreateAsync(
                     _mapper.Map<tbl_States>(new StateCreate()
                         {
@@ -156,15 +151,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == Constants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == Constants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == Constants.ApiDefaultNormalUser)).Single();
+                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
 
                 _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingAccessExpire)).Single();
-                var secret = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user);
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
+
                 var state = await uow.StateRepo.CreateAsync(
                     _mapper.Map<tbl_States>(new StateCreate()
                     {

@@ -208,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
+                    if (!uow.UserRepo.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
                         uow.UserRepo.AccessFailedAsync(user.Id).Wait();
@@ -392,7 +392,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
+                    if (!uow.UserRepo.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
                         uow.UserRepo.AccessFailedAsync(user.Id).Wait();
@@ -570,7 +570,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.CheckPasswordAsync(user.Id, passwordValue).Result)
+                    if (!uow.UserRepo.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
                         uow.UserRepo.AccessFailedAsync(user.Id).Wait();

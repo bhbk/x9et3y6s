@@ -23,14 +23,14 @@ using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
-    public class ResourceOwnerServiceTests : IClassFixture<StartupTests>
+    public class ResourceOwnerServiceTests : IClassFixture<BaseServiceTests>
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _mapper;
-        private readonly StartupTests _factory;
+        private readonly BaseServiceTests _factory;
         private readonly StsService _service;
 
-        public ResourceOwnerServiceTests(StartupTests factory)
+        public ResourceOwnerServiceTests(BaseServiceTests factory)
         {
             _factory = factory;
 
