@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!(await UoW.UserRepo.GetAsync(x => x.Id == model.FromId
+            if (!(await UoW.Users.GetAsync(x => x.Id == model.FromId
                 && x.PhoneNumber == model.FromPhoneNumber)).Any())
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderPhone:{model.FromPhoneNumber}");

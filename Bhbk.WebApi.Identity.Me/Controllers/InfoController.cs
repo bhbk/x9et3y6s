@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -29,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1"), HttpGet]
         public async Task<IActionResult> GetUserV1()
         {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -45,20 +47,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         public async Task<IActionResult> GetMOTDV1()
         {
             var random = new Random();
-            var skip = random.Next(1, await UoW.UserRepo.CountMOTDAsync());
+            var skip = random.Next(1, await UoW.MOTDs.CountAsync());
 
             if (skip == 1)
                 skip = 0;
 
-            var quote = (await UoW.UserRepo.GetMOTDAsync(null, null, x => x.OrderBy(y => y.Id), skip, 1)).SingleOrDefault();
+            var motd = (await UoW.MOTDs.GetAsync(
+                new QueryExpression<tbl_MotDType1>().OrderBy("id").Skip(skip).Take(1).ToLambda())).SingleOrDefault();
 
-            return Ok(Mapper.Map<MOTDType1Model>(quote));
+            return Ok(Mapper.Map<MOTDType1Model>(motd));
         }
 
         [Route("v1/code"), HttpGet]
         public async Task<IActionResult> GetUserCodesV1()
         {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -66,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            var states = await UoW.StateRepo.GetAsync(x => x.UserId == user.Id);
+            var states = await UoW.States.GetAsync(x => x.UserId == user.Id);
 
             var result = states.Select(x => Mapper.Map<StateModel>(x));
 
@@ -76,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/code/revoke"), HttpDelete]
         public async Task<IActionResult> DeleteUserCodesV1()
         {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -84,12 +87,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            foreach (var token in await UoW.StateRepo.GetAsync(x => x.UserId == user.Id))
-            {
-                if (!await UoW.StateRepo.DeleteAsync(token.Id))
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
+            await UoW.States.DeleteAsync(new QueryExpression<tbl_States>()
+                .Where(x => x.UserId == user.Id).ToLambda());
             await UoW.CommitAsync();
 
             return NoContent();
@@ -98,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/code/{codeID}/revoke"), HttpDelete]
         public async Task<IActionResult> DeleteUserCodeV1([FromRoute] Guid codeID)
         {
-            var code = (await UoW.StateRepo.GetAsync(x => x.UserId == GetUserGUID()
+            var code = (await UoW.States.GetAsync(x => x.UserId == GetUserGUID()
                 && x.Id == codeID)).SingleOrDefault();
 
             if (code == null)
@@ -107,9 +106,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.StateRepo.DeleteAsync(code.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.States.DeleteAsync(new QueryExpression<tbl_States>()
+                .Where(x => x.Id == code.Id).ToLambda());
             await UoW.CommitAsync();
 
             return NoContent();
@@ -126,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == codeValue)).SingleOrDefault();
+            var state = (await UoW.States.GetAsync(x => x.StateValue == codeValue)).SingleOrDefault();
 
             if (state == null)
             {
@@ -140,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null
                 || user.Id != state.UserId)
@@ -150,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+            else if (await UoW.Users.IsLockedOutAsync(user.Id)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -165,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else
                 throw new NotImplementedException();
 
-            await UoW.StateRepo.UpdateAsync(state);
+            await UoW.States.UpdateAsync(state);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -174,25 +172,24 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh"), HttpGet]
         public async Task<IActionResult> GetUserRefreshesV1()
         {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var expr = new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.UserId == GetUserGUID()).ToLambda();
 
-            if (user == null)
+            if (!await UoW.Refreshes.ExistsAsync(expr))
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
                 return NotFound(ModelState);
             }
 
-            var tokens = await UoW.RefreshRepo.GetAsync(x => x.UserId == user.Id);
+            var refreshes = await UoW.Refreshes.GetAsync(expr);
 
-            var result = tokens.Select(x => Mapper.Map<RefreshModel>(x));
-
-            return Ok(result);
+            return Ok(Mapper.Map<IEnumerable<RefreshModel>>(refreshes));
         }
 
         [Route("v1/refresh/revoke"), HttpDelete]
         public async Task<IActionResult> DeleteUserRefreshesV1()
         {
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -200,11 +197,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            foreach (var token in await UoW.RefreshRepo.GetAsync(x => x.UserId == user.Id))
-            {
-                if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            await UoW.Refreshes.DeleteAsync(new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.UserId == user.Id).ToLambda());
 
             await UoW.CommitAsync();
 
@@ -214,18 +208,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh/{refreshID}/revoke"), HttpDelete]
         public async Task<IActionResult> DeleteUserRefreshV1([FromRoute] Guid refreshID)
         {
-            var token = (await UoW.RefreshRepo.GetAsync(x => x.UserId == GetUserGUID()
-                && x.Id == refreshID)).SingleOrDefault();
+            var expr = new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.UserId == GetUserGUID() && x.Id == refreshID).ToLambda();
 
-            if (token == null)
+            if (!await UoW.Refreshes.ExistsAsync(expr))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{GetUserGUID()}");
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.RefreshRepo.DeleteAsync(token.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Refreshes.DeleteAsync(expr);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -237,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -249,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, model.CurrentPassword)
+            else if (!await UoW.Users.VerifyPasswordAsync(user.Id, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
@@ -258,9 +250,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             user.ActorId = GetUserGUID();
 
-            if (!await UoW.UserRepo.SetPasswordAsync(user.Id, model.NewPassword))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Users.SetPasswordAsync(user, model.NewPassword);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -272,7 +262,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -286,9 +276,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!await UoW.UserRepo.SetTwoFactorEnabledAsync(user.Id, statusValue))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Users.SetTwoFactorEnabledAsync(user, statusValue);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -300,7 +288,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -315,7 +303,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await UoW.UserRepo.UpdateAsync(Mapper.Map<tbl_Users>(model));
+            var result = await UoW.Users.UpdateAsync(Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

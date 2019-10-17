@@ -15,80 +15,74 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.DataPagerV3;
+using static Bhbk.Lib.DataState.Models.PageState;
 using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
     public class ActivityServiceTests : IClassFixture<BaseServiceTests>
     {
-        private readonly IConfiguration _conf;
-        private readonly IMapper _mapper;
         private readonly BaseServiceTests _factory;
-        private readonly AdminService _service;
 
-        public ActivityServiceTests(BaseServiceTests factory)
-        {
-            _factory = factory;
-
-            var http = _factory.CreateClient();
-
-            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
-            _service = new AdminService(_conf, InstanceContext.UnitTest, http);
-        }
+        public ActivityServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
         public async Task Admin_ActivityV1_Get_Success()
         {
+            using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, _mapper).CreateAsync().Wait();
+                new TestData(uow, mapper).DestroyAsync().Wait();
+                new TestData(uow, mapper).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
+                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
 
-                var testActivity = (await uow.ActivityRepo.GetAsync()).First();
+                var testActivity = (await uow.Activities.GetAsync()).First();
 
-                var result = _service.Activity_GetV1(testActivity.Id.ToString());
+                var result = service.Activity_GetV1(testActivity.Id.ToString());
                 result.Should().BeAssignableTo<ActivityModel>();
             }
 
+            using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, _mapper).CreateAsync(3).Wait();
+                new TestData(uow, mapper).DestroyAsync().Wait();
+                new TestData(uow, mapper).CreateAsync().Wait();
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
+                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
+                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
 
-                _service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, _mapper, issuer, new List<tbl_Clients> { client }, user);
+                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
 
                 int take = 2;
-                var state = new DataPagerV3()
+                var state = new PageState()
                 {
-                    Filter = new List<FilterDescriptor>()
+                    Sort = new List<SortModel>() 
                     {
-                        new FilterDescriptor(){ Field = string.Empty, Value = string.Empty }
-                    },
-                    Sort = new List<SortDescriptor>() 
-                    {
-                        new SortDescriptor() { Field = "created", Dir = "asc" }
+                        new SortModel() { Field = "created", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
                 };
 
-                var result = _service.Activity_GetV1(state);
+                var result = service.Activity_GetV1(state);
                 result.Data.ToDynamicList().Count().Should().Be(take);
-                result.Total.Should().Be(await uow.ActivityRepo.CountAsync());
+                result.Total.Should().Be(await uow.Activities.CountAsync());
             }
         }
     }

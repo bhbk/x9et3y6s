@@ -38,12 +38,12 @@ namespace Bhbk.Lib.Identity.Services
             get { return _http; }
         }
 
-        public DataResultV3<ActivityModel> Activity_GetV1(DataPagerV3 model)
+        public PageStateResult<ActivityModel> Activity_GetV1(PageState model)
         {
             var response = Http.Activity_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<ActivityModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<ActivityModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -82,12 +82,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<ClaimModel> Claim_GetV1(DataPagerV3 model)
+        public PageStateResult<ClaimModel> Claim_GetV1(PageState model)
         {
             var response = Http.Claim_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<ClaimModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<ClaimModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -159,12 +159,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<ClientModel> Client_GetV1(DataPagerV3 model)
+        public PageStateResult<ClientModel> Client_GetV1(PageState model)
         {
             var response = Http.Client_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<ClientModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<ClientModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -236,12 +236,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<IssuerModel> Issuer_GetV1(DataPagerV3 model)
+        public PageStateResult<IssuerModel> Issuer_GetV1(PageState model)
         {
             var response = Http.Issuer_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<IssuerModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<IssuerModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -291,12 +291,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<LoginModel> Login_GetV1(DataPagerV3 model)
+        public PageStateResult<LoginModel> Login_GetV1(PageState model)
         {
             var response = Http.Login_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<LoginModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<LoginModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -346,12 +346,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<RoleModel> Role_GetV1(DataPagerV3 model)
+        public PageStateResult<RoleModel> Role_GetV1(PageState model)
         {
             var response = Http.Role_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<RoleModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<RoleModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -467,12 +467,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<MOTDType1Model> User_GetMOTDsV1(DataPagerV3 model)
+        public PageStateResult<MOTDType1Model> User_GetMOTDsV1(PageState model)
         {
             var response = Http.User_GetMOTDsV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<MOTDType1Model>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<MOTDType1Model>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -533,12 +533,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public DataResultV3<UserModel> User_GetV1(DataPagerV3 model)
+        public PageStateResult<UserModel> User_GetV1(PageState model)
         {
             var response = Http.User_GetV1(_ropg.RopgV2.RawData, model).Result;
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<DataResultV3<UserModel>>().Result;
+                return response.Content.ReadAsJsonAsync<PageStateResult<UserModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

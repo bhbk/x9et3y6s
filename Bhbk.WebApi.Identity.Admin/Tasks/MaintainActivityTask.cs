@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Data.Services;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -6,6 +8,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,16 +59,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                        var expired = uow.ActivityRepo.GetAsync(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
-                                || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).Result;
+                        var expiredExpr = new QueryExpression<tbl_Activities>()
+                            .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
+                                || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).ToLambda();
+
+                        var expired = uow.Activities.GetAsync(expiredExpr).Result;
                         var expiredCount = expired.Count();
 
                         if (expired.Any())
                         {
-                            foreach (var entry in expired.ToList())
-                                uow.ActivityRepo.DeleteAsync(entry.Id).Wait();
-
-                            await uow.CommitAsync();
+                            uow.Activities.DeleteAsync(expired).Wait();
+                            uow.CommitAsync().Wait();
 
                             var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + expiredCount.ToString() + " expired activity entries.";

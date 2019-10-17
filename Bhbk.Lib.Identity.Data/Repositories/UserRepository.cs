@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataAccess.Repositories;
+using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
@@ -8,12 +8,10 @@ using Bhbk.Lib.Identity.Data.Validators;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -26,19 +24,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : IGenericRepositoryAsync<tbl_Users, Guid>
+    public class UserRepository : GenericRepositoryAsync<tbl_Users>
     {
-        private readonly _DbContext _context;
-        private readonly InstanceContext _instance;
         private IClockService _clock;
         public readonly PasswordValidator passwordValidator;
         public readonly PasswordHasher passwordHasher;
         public readonly UserValidator userValidator;
 
         public UserRepository(_DbContext context, InstanceContext instance)
+            : base(context, instance)
         {
-            _context = context ?? throw new NullReferenceException();
-            _instance = instance;
             _clock = new ClockService(_instance);
 
             passwordValidator = new PasswordValidator();
@@ -52,45 +47,29 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public async Task<bool> AccessFailedAsync(Guid key)
+        public async Task<tbl_Users> AccessFailedAsync(tbl_Users user)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).SingleOrDefault();
+            user.LastLoginFailure = Clock.UtcDateTime;
+            user.AccessFailedCount++;
 
-            entity.LastLoginFailure = Clock.UtcDateTime;
-            entity.AccessFailedCount++;
+            _context.Entry(user).State = EntityState.Modified;
 
-            try
-            {
-                _context.Entry(entity).State = EntityState.Modified;
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
+            return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<bool> AccessSuccessAsync(Guid key)
+        public async Task<tbl_Users> AccessSuccessAsync(tbl_Users user)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+            user.LastLoginSuccess = Clock.UtcDateTime;
+            user.AccessSuccessCount++;
 
-            entity.LastLoginSuccess = Clock.UtcDateTime;
-            entity.AccessSuccessCount++;
+            _context.Entry(user).State = EntityState.Modified;
 
-            try
-            {
-                _context.Entry(entity).State = EntityState.Modified;
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
+            return await Task.FromResult(_context.Entry(user).Entity);
         }
 
         public async Task<bool> AddToClaimAsync(tbl_Users user, tbl_Claims claim)
         {
-            _context.tbl_UserClaims.Add(
+            _context.Set<tbl_UserClaims>().Add(
                 new tbl_UserClaims()
                 {
                     UserId = user.Id,
@@ -104,7 +83,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> AddToLoginAsync(tbl_Users user, tbl_Logins login)
         {
-            _context.tbl_UserLogins.Add(
+            _context.Set<tbl_UserLogins>().Add(
                 new tbl_UserLogins()
                 {
                     UserId = user.Id,
@@ -118,7 +97,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> AddToRoleAsync(tbl_Users user, tbl_Roles role)
         {
-            _context.tbl_UserRoles.Add(
+            _context.Set<tbl_UserRoles>().Add(
                 new tbl_UserRoles()
                 {
                     UserId = user.Id,
@@ -130,145 +109,47 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<int> CountAsync(Expression<Func<tbl_Users, bool>> predicates = null)
+        public override async Task<tbl_Users> CreateAsync(tbl_Users user)
         {
-            var query = _context.tbl_Users.AsQueryable();
-
-            if (predicates != null)
-                return await query.Where(predicates).CountAsync();
-
-            return await query.CountAsync();
-        }
-
-        public async Task<int> CountMOTDAsync(Expression<Func<tbl_MotDType1, bool>> predicates = null)
-        {
-            var query = _context.tbl_MotDType1.AsQueryable();
-
-            if (predicates != null)
-                return await query.Where(predicates).CountAsync();
-
-            return await query.CountAsync();
-        }
-
-        public async Task<tbl_Users> CreateAsync(tbl_Users entity)
-        {
-            var create = await InternalCreateAsync(entity);
+            var create = await InternalCreateAsync(user);
 
             _context.SaveChanges();
 
             return await Task.FromResult(create);
         }
 
-        public async Task<tbl_Users> CreateAsync(tbl_Users entity, string password)
+        public async Task<tbl_Users> CreateAsync(tbl_Users user, string password)
         {
-            var create = await InternalCreateAsync(entity);
+            var create = await InternalCreateAsync(user);
 
             _context.SaveChanges();
 
-            await InternalSetPasswordAsync(entity, password);
+            await InternalSetPasswordAsync(user, password);
 
             return await Task.FromResult(create);
         }
 
-        public async Task<tbl_MotDType1> CreateMOTDAsync(tbl_MotDType1 model)
+        public override async Task<tbl_Users> DeleteAsync(tbl_Users user)
         {
-            return await Task.FromResult(_context.Add(model).Entity);
-        }
+            var activity = _context.Set<tbl_Activities>().Where(x => x.UserId == user.Id);
+            var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.UserId == user.Id);
+            var settings = _context.Set<tbl_Settings>().Where(x => x.UserId == user.Id);
+            var states = _context.Set<tbl_States>().Where(x => x.UserId == user.Id);
 
-        public async Task<tbl_QueueEmails> CreateQueueEmailAsync(tbl_QueueEmails model)
-        {
-            return await Task.FromResult(_context.Add(model).Entity);
-        }
+            _context.RemoveRange(activity);
+            _context.RemoveRange(refreshes);
+            _context.RemoveRange(settings);
+            _context.RemoveRange(states);
 
-        public async Task<tbl_QueueTexts> CreateQueueTextAsync(tbl_QueueTexts model)
-        {
-            return await Task.FromResult(_context.Add(model).Entity);
-        }
-
-        public async Task<bool> DeleteAsync(Guid key)
-        {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            var activity = _context.tbl_Activities.Where(x => x.UserId == key);
-            var refreshes = _context.tbl_Refreshes.Where(x => x.UserId == key);
-            var settings = _context.tbl_Settings.Where(x => x.UserId == key);
-            var states = _context.tbl_States.Where(x => x.UserId == key);
-
-            try
-            {
-                _context.RemoveRange(activity);
-                _context.RemoveRange(refreshes);
-                _context.RemoveRange(settings);
-                _context.RemoveRange(states);
-                _context.Remove(entity);
-
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
-        }
-
-        public async Task<bool> DeleteMOTDAsync(string key)
-        {
-            var entity = _context.tbl_MotDType1.Where(x => x.Id == key).Single();
-
-            try
-            {
-                _context.Remove(entity);
-
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
-        }
-
-        public async Task<bool> DeleteQueueEmailAsync(string key)
-        {
-            var entity = _context.tbl_QueueEmails.Where(x => x.Id.ToString() == key).Single();
-
-            try
-            {
-                _context.Remove(entity);
-
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
-        }
-
-        public async Task<bool> DeleteQueueTextAsync(string key)
-        {
-            var entity = _context.tbl_QueueTexts.Where(x => x.Id.ToString() == key).Single();
-
-            try
-            {
-                _context.Remove(entity);
-
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
-        }
-
-        public async Task<bool> ExistsAsync(Guid key)
-        {
-            return await Task.FromResult(_context.tbl_Users.Any(x => x.Id == key));
+            return await Task.FromResult(_context.Remove(user).Entity);
         }
 
         public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
-            var expire = _context.tbl_Settings.Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
-            var legacyClaims = _context.tbl_Settings.Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
@@ -283,7 +164,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             //user identity vs. a service identity
             claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
 
-            foreach (var role in (await GetRolesAsync(user.Id)).ToList().OrderBy(x => x.Name))
+            var userRoles = _context.Set<tbl_Roles>()
+                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
+
+            foreach (var role in userRoles.OrderBy(x => x.Name))
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
@@ -292,7 +176,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                     claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
             }
 
-            foreach (var claim in (await GetClaimsAsync(user.Id)).ToList().OrderBy(x => x.Type))
+            var userClaims = _context.Set<tbl_Claims>()
+                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToList();
+
+            foreach (var claim in userClaims.OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //nonce to enhance entropy
@@ -316,7 +203,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
-            var expire = _context.tbl_Settings.Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
@@ -343,139 +230,15 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<IEnumerable<tbl_Users>> GetAsync(Expression<Func<tbl_Users, bool>> predicates = null,
-            Func<IQueryable<tbl_Users>, IIncludableQueryable<tbl_Users, object>> includes = null,
-            Func<IQueryable<tbl_Users>, IOrderedQueryable<tbl_Users>> orders = null,
-            int? skip = null,
-            int? take = null)
+        internal async Task<tbl_Users> InternalCreateAsync(tbl_Users user)
         {
-            var query = _context.tbl_Users.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orders != null)
-            {
-                query = orders(query)
-                    .Skip(skip.Value)
-                    .Take(take.Value);
-            }
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<tbl_MotDType1>> GetMOTDAsync(Expression<Func<tbl_MotDType1, bool>> predicates = null,
-            Func<IQueryable<tbl_MotDType1>, IIncludableQueryable<tbl_MotDType1, object>> includes = null,
-            Func<IQueryable<tbl_MotDType1>, IOrderedQueryable<tbl_MotDType1>> orders = null,
-            int? skip = null,
-            int? take = null)
-        {
-            var query = _context.tbl_MotDType1.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orders != null)
-            {
-                query = orders(query)
-                    .Skip(skip.Value)
-                    .Take(take.Value);
-            }
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<tbl_QueueEmails>> GetQueueEmailAsync(Expression<Func<tbl_QueueEmails, bool>> predicates = null,
-            Func<IQueryable<tbl_QueueEmails>, IIncludableQueryable<tbl_QueueEmails, object>> includes = null,
-            Func<IQueryable<tbl_QueueEmails>, IOrderedQueryable<tbl_QueueEmails>> orders = null,
-            int? skip = null,
-            int? take = null)
-        {
-            var query = _context.tbl_QueueEmails.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orders != null)
-            {
-                query = orders(query)
-                    .Skip(skip.Value)
-                    .Take(take.Value);
-            }
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<tbl_QueueTexts>> GetQueueTextAsync(Expression<Func<tbl_QueueTexts, bool>> predicates = null,
-            Func<IQueryable<tbl_QueueTexts>, IIncludableQueryable<tbl_QueueTexts, object>> includes = null,
-            Func<IQueryable<tbl_QueueTexts>, IOrderedQueryable<tbl_QueueTexts>> orders = null,
-            int? skip = null,
-            int? take = null)
-        {
-            var query = _context.tbl_QueueTexts.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orders != null)
-            {
-                query = orders(query)
-                    .Skip(skip.Value)
-                    .Take(take.Value);
-            }
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<tbl_Claims>> GetClaimsAsync(Guid key)
-        {
-            var result = _context.tbl_Claims.Where(x => x.tbl_UserClaims.Any(y => y.UserId == key)).ToList();
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<IEnumerable<tbl_Clients>> GetClientsAsync(Guid key)
-        {
-            var result = _context.tbl_Clients.Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == key))).ToList();
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<IEnumerable<tbl_Logins>> GetLoginsAsync(Guid key)
-        {
-            var result = _context.tbl_Logins.Where(x => x.tbl_UserLogins.Any(y => y.UserId == key)).ToList();
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<IEnumerable<tbl_Roles>> GetRolesAsync(Guid key)
-        {
-            var result = _context.tbl_Roles.Where(x => x.tbl_UserRoles.Any(y => y.UserId == key)).ToList();
-
-            return await Task.FromResult(result);
-        }
-
-        internal async Task<tbl_Users> InternalCreateAsync(tbl_Users entity)
-        {
-            if (!(await userValidator.ValidateAsync(entity)).Succeeded)
+            if (!(await userValidator.ValidateAsync(user)).Succeeded)
                 throw new InvalidOperationException();
 
-            if (!entity.HumanBeing)
-                entity.EmailConfirmed = true;
+            if (!user.HumanBeing)
+                user.EmailConfirmed = true;
 
-            return await Task.FromResult(_context.Add(entity).Entity);
+            return await Task.FromResult(_context.Add(user).Entity);
         }
 
         internal async Task<bool> InternalSetPasswordHashAsync(tbl_Users user, string passwordHash)
@@ -520,12 +283,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return true;
         }
 
-        internal async Task<PasswordVerificationResult> InternalVerifyPasswordAsync(tbl_Users model, string password)
+        internal async Task<PasswordVerificationResult> InternalVerifyPasswordAsync(tbl_Users user, string password)
         {
             if (passwordHasher == null)
                 throw new NotSupportedException();
 
-            if (passwordHasher.VerifyHashedPassword(model, model.PasswordHash, password) != PasswordVerificationResult.Failed)
+            if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
                 return PasswordVerificationResult.Success;
 
             return await Task.FromResult(PasswordVerificationResult.Failed);
@@ -537,7 +300,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
              * TODO need to add check for role based claims...
              */
 
-            if (_context.tbl_UserClaims.Any(x => x.UserId == userKey && x.ClaimId == claimKey))
+            if (_context.Set<tbl_UserClaims>().Any(x => x.UserId == userKey && x.ClaimId == claimKey))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -545,7 +308,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> IsInLoginAsync(Guid userKey, Guid loginKey)
         {
-            if (_context.tbl_UserLogins.Any(x => x.UserId == userKey && x.LoginId == loginKey))
+            if (_context.Set<tbl_UserLogins>().Any(x => x.UserId == userKey && x.LoginId == loginKey))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -553,7 +316,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> IsInRoleAsync(Guid userKey, Guid roleKey)
         {
-            if (_context.tbl_UserRoles.Any(x => x.UserId == userKey && x.RoleId == roleKey))
+            if (_context.Set<tbl_UserRoles>().Any(x => x.UserId == userKey && x.RoleId == roleKey))
                 return await Task.FromResult(true);
 
             return await Task.FromResult(false);
@@ -561,7 +324,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> IsLockedOutAsync(Guid key)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).SingleOrDefault();
+            var entity = _context.Set<tbl_Users>().Where(x => x.Id == key).SingleOrDefault();
 
             if (entity.LockoutEnabled)
             {
@@ -588,7 +351,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> IsPasswordSetAsync(Guid key)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).SingleOrDefault();
+            var entity = _context.Set<tbl_Users>().Where(x => x.Id == key).SingleOrDefault();
 
             if (entity == null)
                 return await Task.FromResult(false);
@@ -601,135 +364,110 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> RemoveFromClaimAsync(tbl_Users user, tbl_Claims claim)
         {
-            var entity = _context.tbl_UserClaims.Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
+            var entity = _context.Set<tbl_UserClaims>().Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
 
-            _context.tbl_UserClaims.Remove(entity);
+            _context.Set<tbl_UserClaims>().Remove(entity);
 
             return await Task.FromResult(true);
         }
 
         public async Task<bool> RemoveFromLoginAsync(tbl_Users user, tbl_Logins login)
         {
-            var entity = _context.tbl_UserLogins.Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
+            var entity = _context.Set<tbl_UserLogins>().Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
 
-            _context.tbl_UserLogins.Remove(entity);
+            _context.Set<tbl_UserLogins>().Remove(entity);
 
             return await Task.FromResult(true);
         }
 
         public async Task<bool> RemoveFromRoleAsync(tbl_Users user, tbl_Roles role)
         {
-            var entity = _context.tbl_UserRoles.Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
+            var entity = _context.Set<tbl_UserRoles>().Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
-            _context.tbl_UserRoles.Remove(entity);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> RemovePasswordAsync(Guid key)
-        {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            return await InternalSetPasswordHashAsync(entity, null);
-        }
-
-        public async Task<bool> SetConfirmedEmailAsync(Guid key, bool confirmed)
-        {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            entity.EmailConfirmed = confirmed;
-            entity.LastUpdated = Clock.UtcDateTime;
-
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Set<tbl_UserRoles>().Remove(entity);
 
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> SetConfirmedPasswordAsync(Guid key, bool confirmed)
+        public async Task<bool> RemovePasswordAsync(tbl_Users user)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
-
-            entity.PasswordConfirmed = confirmed;
-            entity.LastUpdated = Clock.UtcDateTime;
-
-            _context.Entry(entity).State = EntityState.Modified;
-
-            return await Task.FromResult(true);
+            return await InternalSetPasswordHashAsync(user, null);
         }
 
-        public async Task<bool> SetConfirmedPhoneNumberAsync(Guid key, bool confirmed)
+        public async Task<tbl_Users> SetConfirmedEmailAsync(tbl_Users user, bool confirmed)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+            user.EmailConfirmed = confirmed;
+            user.LastUpdated = Clock.UtcDateTime;
 
-            entity.PhoneNumberConfirmed = confirmed;
-            entity.LastUpdated = Clock.UtcDateTime;
+            _context.Entry(user).State = EntityState.Modified;
 
-            _context.Entry(entity).State = EntityState.Modified;
-
-            return await Task.FromResult(true);
+            return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<bool> SetImmutableAsync(Guid key, bool enabled)
+        public async Task<tbl_Users> SetConfirmedPasswordAsync(tbl_Users user, bool confirmed)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+            user.PasswordConfirmed = confirmed;
+            user.LastUpdated = Clock.UtcDateTime;
 
-            entity.Immutable = enabled;
-            entity.LastUpdated = Clock.UtcDateTime;
+            _context.Entry(user).State = EntityState.Modified;
 
-            _context.Entry(entity).State = EntityState.Modified;
-
-            return await Task.FromResult(true);
+            return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<bool> SetPasswordAsync(Guid key, string password)
+        public async Task<tbl_Users> SetConfirmedPhoneNumberAsync(tbl_Users user, bool confirmed)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+            user.PhoneNumberConfirmed = confirmed;
+            user.LastUpdated = Clock.UtcDateTime;
 
-            return await InternalSetPasswordAsync(entity, password);
+            _context.Entry(user).State = EntityState.Modified;
+
+            return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<bool> SetTwoFactorEnabledAsync(Guid key, bool enabled)
+        public async Task<tbl_Users> SetImmutableAsync(tbl_Users user, bool enabled)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+            user.Immutable = enabled;
+            user.LastUpdated = Clock.UtcDateTime;
 
-            entity.TwoFactorEnabled = enabled;
-            entity.LastUpdated = Clock.UtcDateTime;
+            _context.Entry(user).State = EntityState.Modified;
 
-            _context.Entry(entity).State = EntityState.Modified;
-
-            return await Task.FromResult(true);
+            return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> UpdateAsync(tbl_Users model)
+        public async Task<tbl_Users> SetPasswordAsync(tbl_Users user, string password)
         {
-            if (!(await userValidator.ValidateAsync(model)).Succeeded)
+            await InternalSetPasswordAsync(user, password);
+
+            return await Task.FromResult(_context.Entry(user).Entity);
+        }
+
+        public async Task<tbl_Users> SetTwoFactorEnabledAsync(tbl_Users user, bool enabled)
+        {
+            user.TwoFactorEnabled = enabled;
+            user.LastUpdated = Clock.UtcDateTime;
+
+            _context.Entry(user).State = EntityState.Modified;
+
+            return await Task.FromResult(_context.Entry(user).Entity);
+        }
+
+        public override async Task<tbl_Users> UpdateAsync(tbl_Users user)
+        {
+            if (!(await userValidator.ValidateAsync(user)).Succeeded)
                 throw new InvalidOperationException();
 
-            var entity = _context.tbl_Users.Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<tbl_Users>().Where(x => x.Id == user.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            entity.FirstName = model.FirstName;
-            entity.LastName = model.LastName;
-            entity.LockoutEnabled = model.LockoutEnabled;
-            entity.LockoutEnd = model.LockoutEnd.HasValue ? model.LockoutEnd.Value.ToUniversalTime() : model.LockoutEnd;
+            entity.FirstName = user.FirstName;
+            entity.LastName = user.LastName;
+            entity.LockoutEnabled = user.LockoutEnabled;
+            entity.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
             entity.LastUpdated = Clock.UtcDateTime;
-            entity.Immutable = model.Immutable;
-
-            _context.Entry(entity).State = EntityState.Modified;
-
-            return await Task.FromResult(_context.Update(entity).Entity);
-        }
-
-        public async Task<tbl_MotDType1> UpdateAsync(tbl_MotDType1 model)
-        {
-            var entity = _context.tbl_MotDType1.Where(x => x.Id == model.Id).Single();
-
-            /*
-             * only persist certain fields.
-             */
+            entity.Immutable = user.Immutable;
 
             _context.Entry(entity).State = EntityState.Modified;
 
@@ -738,7 +476,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public async Task<bool> VerifyPasswordAsync(Guid key, string password)
         {
-            var entity = _context.tbl_Users.Where(x => x.Id == key).Single();
+            var entity = _context.Set<tbl_Users>().Where(x => x.Id == key).Single();
 
             if (await InternalVerifyPasswordAsync(entity, password) != PasswordVerificationResult.Failed)
                 return true;

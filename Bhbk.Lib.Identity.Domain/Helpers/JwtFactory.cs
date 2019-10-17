@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             ClientRefreshV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client)
         {
-            var principal = await uow.ClientRepo.GenerateRefreshClaimsAsync(issuer, client);
+            var principal = await uow.Clients.GenerateRefreshClaimsAsync(issuer, client);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.Issuers.Salt,
                     audience: null,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            await uow.RefreshRepo.CreateAsync(
+            await uow.Refreshes.CreateAsync(
                 mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     ValidToUtc = validToUtc,
                 }));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     ClientId = client.Id,
@@ -64,7 +64,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             ClientResourceOwnerV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client)
         {
-            var principal = await uow.ClientRepo.GenerateAccessClaimsAsync(issuer, client);
+            var principal = await uow.Clients.GenerateAccessClaimsAsync(issuer, client);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -77,7 +77,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.Issuers.Salt,
                     audience: client.Name.ToString(),
                     claims: principal.Claims,
                     notBefore: validFromUtc,
@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     ClientId = client.Id,
@@ -99,7 +99,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             UserRefreshV1(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(issuer, user);
+            var principal = await uow.Users.GenerateRefreshClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -112,7 +112,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.Issuers.Salt,
                     audience: null,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
@@ -120,7 +120,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                     ));
 
-            await uow.RefreshRepo.CreateAsync(
+            await uow.Refreshes.CreateAsync(
                 mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
@@ -131,7 +131,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     ValidToUtc = validToUtc,
                 }));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             UserRefreshV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateRefreshClaimsAsync(issuer, user);
+            var principal = await uow.Users.GenerateRefreshClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -158,7 +158,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.Issuers.Salt,
                     audience: null,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
@@ -166,7 +166,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            await uow.RefreshRepo.CreateAsync(
+            await uow.Refreshes.CreateAsync(
                 mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
@@ -177,7 +177,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     ValidToUtc = validToUtc
                 }));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -191,7 +191,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             UserResourceOwnerV1_Legacy(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
+            var principal = await uow.Users.GenerateAccessClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -211,7 +211,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                     ));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -225,7 +225,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             UserResourceOwnerV1(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
+            var principal = await uow.Users.GenerateAccessClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -238,7 +238,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.Issuers.Salt,
                     audience: client.Name.ToString(),
                     claims: principal.Claims,
                     notBefore: validFromUtc,
@@ -246,7 +246,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                     ));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -260,7 +260,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static async Task<JwtSecurityToken>
             UserResourceOwnerV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
-            var principal = await uow.UserRepo.GenerateAccessClaimsAsync(issuer, user);
+            var principal = await uow.Users.GenerateAccessClaimsAsync(issuer, user);
 
             var symmetricKeyAsBase64 = issuer.IssuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -281,7 +281,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
-                    issuer: issuer.Name.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer: issuer.Name.ToString() + ":" + uow.Issuers.Salt,
                     audience: clientList,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
@@ -289,7 +289,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
-            await uow.ActivityRepo.CreateAsync(
+            await uow.Activities.CreateAsync(
                 mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,

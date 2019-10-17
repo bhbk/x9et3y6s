@@ -10,6 +10,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public virtual DbSet<tbl_ActivityTypes> tbl_ActivityTypes { get; set; }
         public virtual DbSet<tbl_ClaimTypes> tbl_ClaimTypes { get; set; }
         public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
+        public virtual DbSet<tbl_ClientRoles> tbl_ClientRoles { get; set; }
         public virtual DbSet<tbl_Clients> tbl_Clients { get; set; }
         public virtual DbSet<tbl_Exceptions> tbl_Exceptions { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
@@ -39,8 +40,6 @@ namespace Bhbk.Lib.Identity.Data.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
-
             modelBuilder.Entity<tbl_Activities>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -112,6 +111,27 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .HasForeignKey(d => d.IssuerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Claims_IssuerID");
+            });
+
+            modelBuilder.Entity<tbl_ClientRoles>(entity =>
+            {
+                entity.HasKey(e => new { e.ClientId, e.RoleId })
+                    .HasName("PK_ClientRoles");
+
+                entity.HasIndex(e => new { e.ClientId, e.RoleId })
+                    .HasName("IX_ClientRoles")
+                    .IsUnique();
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.tbl_ClientRoles)
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK_ClientRoles_ClientID");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.tbl_ClientRoles)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ClientRoles_RoleID");
             });
 
             modelBuilder.Entity<tbl_Clients>(entity =>
@@ -201,8 +221,7 @@ namespace Bhbk.Lib.Identity.Data.Models
 
                 entity.Property(e => e.Id)
                     .HasMaxLength(128)
-                    .IsUnicode(false)
-                    .ValueGeneratedNever();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Author)
                     .IsRequired()
@@ -513,6 +532,10 @@ namespace Bhbk.Lib.Identity.Data.Models
 
                 entity.Property(e => e.PhoneNumberConfirmed).HasDefaultValueSql("((0))");
             });
+
+            OnModelCreatingPartial(modelBuilder);
         }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

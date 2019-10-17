@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -28,12 +28,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default settings
              */
 
-            var foundGlobalLegacyClaims = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var foundGlobalLegacyClaims = (await _uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyClaims)).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
-                foundGlobalLegacyClaims = await _uow.SettingRepo.CreateAsync(
+                foundGlobalLegacyClaims = await _uow.Settings.CreateAsync(
                     _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalLegacyClaims,
@@ -42,12 +42,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     }));
             }
 
-            var foundGlobalLegacyIssuer = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var foundGlobalLegacyIssuer = (await _uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
-                foundGlobalLegacyIssuer = await _uow.SettingRepo.CreateAsync(
+                foundGlobalLegacyIssuer = await _uow.Settings.CreateAsync(
                     _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalLegacyIssuer,
@@ -56,12 +56,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     }));
             }
 
-            var foundGlobalTotpExpire = (await _uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var foundGlobalTotpExpire = (await _uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire)).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
-                foundGlobalTotpExpire = await _uow.SettingRepo.CreateAsync(
+                foundGlobalTotpExpire = await _uow.Settings.CreateAsync(
                     _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalTotpExpire,
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default msg of the day
              */
 
-            await _uow.UserRepo.CreateMOTDAsync(
+            await _uow.MOTDs.CreateAsync(
                 new tbl_MotDType1()
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     Tags = "imagination,inspire,t-shirt,tod",
                 });
 
-            await _uow.UserRepo.CreateMOTDAsync(
+            await _uow.MOTDs.CreateAsync(
                 new tbl_MotDType1()
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -108,11 +108,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default issuers
              */
 
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).SingleOrDefault();
+            var foundIssuer = (await _uow.Issuers.GetAsync(new QueryExpression<tbl_Issuers>()
+                .Where(x => x.Name == RealConstants.ApiDefaultIssuer).ToLambda())).SingleOrDefault();
 
             if (foundIssuer == null)
             {
-                foundIssuer = await _uow.IssuerRepo.CreateAsync(
+                foundIssuer = await _uow.Issuers.CreateAsync(
                     _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
                         Name = RealConstants.ApiDefaultIssuer,
@@ -128,11 +129,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default clients
              */
 
-            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).SingleOrDefault();
+            var foundClientUi = (await _uow.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+                .Where(x => x.Name == RealConstants.ApiDefaultClientUi).ToLambda())).SingleOrDefault();
 
             if (foundClientUi == null)
             {
-                foundClientUi = await _uow.ClientRepo.CreateAsync(
+                foundClientUi = await _uow.Clients.CreateAsync(
                     _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -146,11 +148,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientApi)).SingleOrDefault();
+            var foundClientApi = (await _uow.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+                .Where(x => x.Name == RealConstants.ApiDefaultClientApi).ToLambda())).SingleOrDefault();
 
             if (foundClientApi == null)
             {
-                foundClientApi = await _uow.ClientRepo.CreateAsync(
+                foundClientApi = await _uow.Clients.CreateAsync(
                      _mapper.Map<tbl_Clients>(new ClientCreate()
                      {
                          IssuerId = foundIssuer.Id,
@@ -168,11 +171,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default logins
              */
 
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultLogin)).SingleOrDefault();
+            var foundLogin = (await _uow.Logins.GetAsync(new QueryExpression<tbl_Logins>()
+                .Where(x => x.Name == RealConstants.ApiDefaultLogin).ToLambda())).SingleOrDefault();
 
             if (foundLogin == null)
             {
-                foundLogin = await _uow.LoginRepo.CreateAsync(
+                foundLogin = await _uow.Logins.CreateAsync(
                     _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = RealConstants.ApiDefaultLogin,
@@ -188,11 +192,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default roles
              */
 
-            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultRoleForAdmin)).SingleOrDefault();
+            var foundRoleForAdmin = (await _uow.Roles.GetAsync(new QueryExpression<tbl_Roles>()
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForAdmin).ToLambda())).SingleOrDefault();
 
             if (foundRoleForAdmin == null)
             {
-                foundRoleForAdmin = await _uow.RoleRepo.CreateAsync(
+                foundRoleForAdmin = await _uow.Roles.CreateAsync(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = foundClientUi.Id,
@@ -204,11 +209,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 await _uow.CommitAsync();
             }
 
-            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultRoleForUser)).SingleOrDefault();
+            var foundRoleForUser = (await _uow.Roles.GetAsync(new QueryExpression<tbl_Roles>()
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForUser).ToLambda())).SingleOrDefault();
 
             if (foundRoleForUser == null)
             {
-                foundRoleForUser = await _uow.RoleRepo.CreateAsync(
+                foundRoleForUser = await _uow.Roles.CreateAsync(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = foundClientUi.Id,
@@ -224,11 +230,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default users
              */
 
-            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).SingleOrDefault();
+            var foundAdminUser = (await _uow.Users.GetAsync(new QueryExpression<tbl_Users>()
+                .Where(x => x.Email == RealConstants.ApiDefaultAdminUser).ToLambda())).SingleOrDefault();
 
             if (foundAdminUser == null)
             {
-                foundAdminUser = await _uow.UserRepo.CreateAsync(
+                foundAdminUser = await _uow.Users.CreateAsync(
                     _mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = RealConstants.ApiDefaultAdminUser,
@@ -240,17 +247,18 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                         Immutable = true,
                     }), RealConstants.ApiDefaultAdminUserPassword);
 
-                await _uow.UserRepo.SetConfirmedEmailAsync(foundAdminUser.Id, true);
-                await _uow.UserRepo.SetConfirmedPasswordAsync(foundAdminUser.Id, true);
-                await _uow.UserRepo.SetConfirmedPhoneNumberAsync(foundAdminUser.Id, true);
+                await _uow.Users.SetConfirmedEmailAsync(foundAdminUser, true);
+                await _uow.Users.SetConfirmedPasswordAsync(foundAdminUser, true);
+                await _uow.Users.SetConfirmedPhoneNumberAsync(foundAdminUser, true);
                 await _uow.CommitAsync();
             }
 
-            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).SingleOrDefault();
+            var foundNormalUser = (await _uow.Users.GetAsync(new QueryExpression<tbl_Users>()
+                .Where(x => x.Email == RealConstants.ApiDefaultNormalUser).ToLambda())).SingleOrDefault();
 
             if (foundNormalUser == null)
             {
-                foundNormalUser = await _uow.UserRepo.CreateAsync(
+                foundNormalUser = await _uow.Users.CreateAsync(
                     _mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = RealConstants.ApiDefaultNormalUser,
@@ -262,9 +270,9 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                         Immutable = true,
                     }), RealConstants.ApiDefaultNormalUserPassword);
 
-                await _uow.UserRepo.SetConfirmedEmailAsync(foundNormalUser.Id, true);
-                await _uow.UserRepo.SetConfirmedPasswordAsync(foundNormalUser.Id, true);
-                await _uow.UserRepo.SetConfirmedPhoneNumberAsync(foundNormalUser.Id, true);
+                await _uow.Users.SetConfirmedEmailAsync(foundNormalUser, true);
+                await _uow.Users.SetConfirmedPasswordAsync(foundNormalUser, true);
+                await _uow.Users.SetConfirmedPhoneNumberAsync(foundNormalUser, true);
                 await _uow.CommitAsync();
             }
 
@@ -272,17 +280,17 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * assign roles, claims & logins to users
              */
 
-            if (!await _uow.UserRepo.IsInLoginAsync(foundAdminUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddToLoginAsync(foundAdminUser, foundLogin);
+            if (!await _uow.Users.IsInLoginAsync(foundAdminUser.Id, foundLogin.Id))
+                await _uow.Users.AddToLoginAsync(foundAdminUser, foundLogin);
 
-            if (!await _uow.UserRepo.IsInRoleAsync(foundAdminUser.Id, foundRoleForAdmin.Id))
-                await _uow.UserRepo.AddToRoleAsync(foundAdminUser, foundRoleForAdmin);
+            if (!await _uow.Users.IsInRoleAsync(foundAdminUser.Id, foundRoleForAdmin.Id))
+                await _uow.Users.AddToRoleAsync(foundAdminUser, foundRoleForAdmin);
 
-            if (!await _uow.UserRepo.IsInLoginAsync(foundNormalUser.Id, foundLogin.Id))
-                await _uow.UserRepo.AddToLoginAsync(foundNormalUser, foundLogin);
+            if (!await _uow.Users.IsInLoginAsync(foundNormalUser.Id, foundLogin.Id))
+                await _uow.Users.AddToLoginAsync(foundNormalUser, foundLogin);
 
-            if (!await _uow.UserRepo.IsInRoleAsync(foundNormalUser.Id, foundRoleForUser.Id))
-                await _uow.UserRepo.AddToRoleAsync(foundNormalUser, foundRoleForUser);
+            if (!await _uow.Users.IsInRoleAsync(foundNormalUser.Id, foundRoleForUser.Id))
+                await _uow.Users.AddToRoleAsync(foundNormalUser, foundRoleForUser);
 
             await _uow.CommitAsync();
         }
@@ -293,85 +301,55 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * delete default users
              */
 
-            var foundAdminUser = (await _uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).SingleOrDefault();
+            await _uow.Users.DeleteAsync(new QueryExpression<tbl_Users>()
+                .Where(x => x.Email == RealConstants.ApiDefaultAdminUser).ToLambda());
 
-            if (foundAdminUser != null)
-            {
-                await _uow.UserRepo.DeleteAsync(foundAdminUser.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.Users.DeleteAsync(new QueryExpression<tbl_Users>()
+                .Where(x => x.Email == RealConstants.ApiDefaultNormalUser).ToLambda());
 
-            var foundNormalUser = (await _uow.UserRepo.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).SingleOrDefault();
-
-            if (foundNormalUser != null)
-            {
-                await _uow.UserRepo.DeleteAsync(foundNormalUser.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.CommitAsync();
 
             /*
              * delete default roles
              */
 
-            var foundRoleForAdmin = (await _uow.RoleRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultRoleForAdmin)).SingleOrDefault();
+            await _uow.Roles.DeleteAsync(new QueryExpression<tbl_Roles>()
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForAdmin).ToLambda());
 
-            if (foundRoleForAdmin != null)
-            {
-                await _uow.RoleRepo.DeleteAsync(foundRoleForAdmin.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.Roles.DeleteAsync(new QueryExpression<tbl_Roles>()
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForUser).ToLambda());
 
-            var foundRoleForUser = (await _uow.RoleRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultRoleForUser)).SingleOrDefault();
-
-            if (foundRoleForUser != null)
-            {
-                await _uow.RoleRepo.DeleteAsync(foundRoleForUser.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.CommitAsync();
 
             /*
              * delete default logins
              */
 
-            var foundLogin = (await _uow.LoginRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultLogin)).SingleOrDefault();
+            await _uow.Logins.DeleteAsync(new QueryExpression<tbl_Logins>()
+                .Where(x => x.Name == RealConstants.ApiDefaultLogin).ToLambda());
 
-            if (foundLogin != null)
-            {
-                await _uow.LoginRepo.DeleteAsync(foundLogin.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.CommitAsync();
 
             /*
              * delete default clients
              */
 
-            var foundClientUi = (await _uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).SingleOrDefault();
+            await _uow.Clients.DeleteAsync(new QueryExpression<tbl_Clients>()
+                .Where(x => x.Name == RealConstants.ApiDefaultClientUi).ToLambda());
 
-            if (foundClientUi != null)
-            {
-                await _uow.ClientRepo.DeleteAsync(foundClientUi.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.Clients.DeleteAsync(new QueryExpression<tbl_Clients>()
+                .Where(x => x.Name == RealConstants.ApiDefaultClientApi).ToLambda());
 
-            var foundClientApi = (await _uow.ClientRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultClientApi)).SingleOrDefault();
-
-            if (foundClientApi != null)
-            {
-                await _uow.ClientRepo.DeleteAsync(foundClientApi.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.CommitAsync();
 
             /*
              * delete default issuers
              */
 
-            var foundIssuer = (await _uow.IssuerRepo.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).SingleOrDefault();
+            await _uow.Issuers.DeleteAsync(new QueryExpression<tbl_Issuers>()
+                .Where(x => x.Name == RealConstants.ApiDefaultIssuer).ToLambda());
 
-            if (foundIssuer != null)
-            {
-                await _uow.IssuerRepo.DeleteAsync(foundIssuer.Id);
-                await _uow.CommitAsync();
-            }
+            await _uow.CommitAsync();
         }
     }
 }

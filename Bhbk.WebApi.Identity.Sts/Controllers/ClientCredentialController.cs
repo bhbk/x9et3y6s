@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -66,9 +67,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
             else
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -86,9 +87,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
             else
-                client = (await UoW.ClientRepo.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Name == input.client)).SingleOrDefault();
 
             if (client == null)
             {
@@ -99,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || input.client_secret != client.ClientKey)
             {
                 //adjust counter(s) for login success...
-                await UoW.ClientRepo.AccessFailedAsync(client.Id);
+                await UoW.Clients.AccessFailedAsync(client);
                 await UoW.CommitAsync();
 
                 ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
@@ -118,12 +119,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = client.Name,
-                issuer = issuer.Name + ":" + UoW.IssuerRepo.Salt,
+                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             //adjust counter(s) for login success...
-            await UoW.ClientRepo.AccessSuccessAsync(client.Id);
+            await UoW.Clients.AccessSuccessAsync(client);
             await UoW.CommitAsync();
 
             return Ok(result);
@@ -135,7 +136,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = (await UoW.RefreshRepo.GetAsync(x => x.RefreshValue == input.refresh_token)).SingleOrDefault();
+            var refresh = (await UoW.Refreshes.GetAsync(new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.RefreshValue == input.refresh_token).ToLambda())).SingleOrDefault();
 
             if (refresh == null)
             {
@@ -154,9 +156,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
             else
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -174,9 +176,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
             else
-                client = (await UoW.ClientRepo.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Name == input.client)).SingleOrDefault();
 
             if (client == null)
             {
@@ -201,12 +203,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = client.Name,
-                issuer = issuer.Name + ":" + UoW.IssuerRepo.Salt,
+                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
             //adjust counter(s) for login success...
-            await UoW.ClientRepo.AccessSuccessAsync(client.Id);
+            await UoW.Clients.AccessSuccessAsync(client);
             await UoW.CommitAsync();
 
             return Ok(result);

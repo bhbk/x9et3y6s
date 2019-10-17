@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).Single();
 
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {
@@ -96,14 +96,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!await UoW.UserRepo.VerifyPasswordAsync(user.Id, model.CurrentPassword)
+            else if (!await UoW.Users.VerifyPasswordAsync(user.Id, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).Single();
 
             string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
             if (user == null)
             {

@@ -24,46 +24,39 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
     public class ImplicitControllerTests : IClassFixture<BaseControllerTests>
     {
-        private readonly IConfiguration _conf;
-        private readonly IContextService _instance;
-        private readonly IMapper _mapper;
         private readonly BaseControllerTests _factory;
 
-        public ImplicitControllerTests(BaseControllerTests factory)
-        {
-            _factory = factory;
-            _factory.CreateClient();
-
-            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-            _instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
-            _mapper = _factory.Server.Host.Services.GetRequiredService<IMapper>();
-        }
+        public ImplicitControllerTests(BaseControllerTests factory) => _factory = factory;
 
         [Fact]
         public async Task Sts_OAuth2_ImplicitV2_Auth_Success()
         {
-            var controller = new ImplicitController(_conf, _instance);
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
-
+            using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                new TestData(uow, _mapper).DestroyAsync().Wait();
-                new TestData(uow, _mapper).CreateAsync().Wait();
+                var controller = new ImplicitController(conf, instance);
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var issuer = (await uow.IssuerRepo.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.ClientRepo.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.UserRepo.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                new TestData(uow, mapper).DestroyAsync().Wait();
+                new TestData(uow, mapper).CreateAsync().Wait();
 
-                var expire = (await uow.SettingRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
+                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
+                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+
+                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = (await uow.StateRepo.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = (await uow.States.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow)).First();
 
@@ -105,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.IssuerRepo.Salt);
+                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);

@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.DataState.Models;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -12,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -36,7 +37,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Activities activity = null;
 
             if (Guid.TryParse(activityValue, out activityID))
-                activity = (await UoW.ActivityRepo.GetAsync(x => x.Id == activityID)).SingleOrDefault();
+                activity = (await UoW.Activities.GetAsync(new QueryExpression<tbl_Activities>()
+                    .Where(x => x.Id == activityID)
+                    .ToLambda())).SingleOrDefault();
 
             if (activity == null)
             {
@@ -49,40 +52,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/page"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> GetActivitiesV1([FromBody] DataPagerV3 model)
+        public async Task<IActionResult> GetActivitiesV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            /*
-             * tidbits below need enhancment, just tinkering...
-             */
-
-            Expression<Func<tbl_Activities, bool>> predicates;
-
-            if (string.IsNullOrEmpty(model.Filter.First().Value))
-                predicates = x => true;
-            else
-                predicates = x => x.ActivityType.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.TableName.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.OriginalValues.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.CurrentValues.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
-
             try
             {
-                var total = await UoW.ActivityRepo.CountAsync(predicates);
-                var result = await UoW.ActivityRepo.GetAsync(predicates,
-                    null,
-                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
-                    model.Skip,
-                    model.Take);
+                var result = new PageStateResult<ActivityModel>
+                {
+                    Data = Mapper.Map<IEnumerable<ActivityModel>>(
+                        await UoW.Activities.GetAsync(
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
+                                model.ToExpression<tbl_Activities>()))),
 
-                return Ok(new { 
-                    Data = Mapper.Map<IEnumerable<ActivityModel>>(result), 
-                    Total = total 
-                });
+                    Total = await UoW.Activities.CountAsync(
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
+                            model.ToPredicateExpression<tbl_Activities>()))
+                };
+
+                return Ok(result);
             }
-            catch (ParseException ex)
+            catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 

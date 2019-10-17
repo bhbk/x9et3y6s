@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -104,9 +105,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
-                    issuer = (uow.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
+                    issuer = (uow.Issuers.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
                 else
-                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
+                    issuer = (uow.Issuers.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
 
                 if (issuer == null)
                 {
@@ -126,9 +127,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
-                    user = (uow.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
+                    user = (uow.Users.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
                 else
-                    user = (uow.UserRepo.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
+                    user = (uow.Users.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
 
                 if (user == null)
                 {
@@ -142,7 +143,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
+                if (uow.Users.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -151,12 +152,13 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var clientList = uow.UserRepo.GetClientsAsync(user.Id).Result;
+                var clientList = uow.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+                        .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()).Result;
                 var clients = new List<tbl_Clients>();
 
                 //check if client is single, multiple or undefined...
                 if (string.IsNullOrEmpty(clientValue))
-                    clients = uow.ClientRepo.GetAsync(x => clientList.Contains(x)
+                    clients = uow.Clients.GetAsync(x => clientList.Contains(x)
                         && x.Enabled == true).Result.ToList();
                 else
                 {
@@ -167,9 +169,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                         //check if identifier is guid. resolve to guid if not.
                         if (Guid.TryParse(entry.Trim(), out clientID))
-                            client = (uow.ClientRepo.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
+                            client = (uow.Clients.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
                         else
-                            client = (uow.ClientRepo.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
+                            client = (uow.Clients.GetAsync(x => x.Name == entry.Trim()).Result).SingleOrDefault();
 
                         if (client == null)
                         {
@@ -190,11 +192,11 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     }
                 }
 
-                var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
-                var logins = uow.LoginRepo.GetAsync(x => loginList.Contains(x)).Result.ToList();
+                var logins = uow.Logins.GetAsync(new QueryExpression<tbl_Logins>()
+                    .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()).Result;
 
                 //check that login provider exists...
-                if (loginList == null)
+                if (logins == null)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
@@ -208,10 +210,10 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.VerifyPasswordAsync(user.Id, passwordValue).Result)
+                    if (!uow.Users.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.UserRepo.AccessFailedAsync(user.Id).Wait();
+                        uow.Users.AccessFailedAsync(user).Wait();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -226,7 +228,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 //adjust counter(s) for login success...
-                uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
+                uow.Users.AccessSuccessAsync(user).Wait();
 
                 var rop = JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, clients, user).Result;
                 var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
@@ -238,11 +240,11 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     refresh_token = rt,
                     user = user.Id.ToString(),
                     client = clients.Select(x => x.Id.ToString()),
-                    issuer = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer = issuer.Id.ToString() + ":" + uow.Issuers.Salt,
                 };
 
                 //add activity entry...
-                uow.ActivityRepo.CreateAsync(
+                uow.Activities.CreateAsync(
                     mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
@@ -304,9 +306,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(issuerValue, out issuerID))
-                    issuer = (uow.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
+                    issuer = (uow.Issuers.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
                 else
-                    issuer = (uow.IssuerRepo.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
+                    issuer = (uow.Issuers.GetAsync(x => x.Name == issuerValue).Result).SingleOrDefault();
 
                 if (issuer == null)
                 {
@@ -326,9 +328,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
-                    client = (uow.ClientRepo.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
+                    client = (uow.Clients.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
                 else
-                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
+                    client = (uow.Clients.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
 
                 if (client == null)
                 {
@@ -349,9 +351,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
-                    user = (uow.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
+                    user = (uow.Users.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
                 else
-                    user = (uow.UserRepo.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
+                    user = (uow.Users.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
 
                 if (user == null)
                 {
@@ -365,7 +367,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
+                if (uow.Users.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -374,11 +376,11 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
-                var logins = uow.LoginRepo.GetAsync(x => loginList.Contains(x)).Result;
+                var logins = uow.Logins.GetAsync(new QueryExpression<tbl_Logins>()
+                    .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()).Result;
 
                 //check that login provider exists...
-                if (loginList == null)
+                if (logins == null)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
@@ -392,10 +394,10 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.VerifyPasswordAsync(user.Id, passwordValue).Result)
+                    if (!uow.Users.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.UserRepo.AccessFailedAsync(user.Id).Wait();
+                        uow.Users.AccessFailedAsync(user).Wait();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -410,7 +412,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 //adjust counter(s) for login success...
-                uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
+                uow.Users.AccessSuccessAsync(user).Wait();
 
                 var rop = JwtFactory.UserResourceOwnerV1(uow, mapper, issuer, client, user).Result;
                 var rt = JwtFactory.UserRefreshV1(uow, mapper, issuer, user).Result;
@@ -422,11 +424,11 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     refresh_token = rt.RawData,
                     user_id = user.Id.ToString(),
                     client_id = client.Id.ToString(),
-                    issuer_id = issuer.Id.ToString() + ":" + uow.IssuerRepo.Salt,
+                    issuer_id = issuer.Id.ToString() + ":" + uow.Issuers.Salt,
                 };
 
                 //add activity entry...
-                uow.ActivityRepo.CreateAsync(
+                uow.Activities.CreateAsync(
                     mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
@@ -483,7 +485,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     throw new ArgumentNullException();
 
                 //check if issuer compatibility mode enabled.
-                var legacyIssuer = (uow.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
                 if (!bool.Parse(legacyIssuer.ConfigValue))
@@ -496,16 +498,16 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                  * we just need any valid issuer defined in configuration on resource server side.
                  * 
                  */
-                var issuer = uow.IssuerRepo.GetAsync().Result.First();
+                var issuer = uow.Issuers.GetAsync().Result.First();
 
                 Guid clientID;
                 tbl_Clients client;
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(clientValue, out clientID))
-                    client = (uow.ClientRepo.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
+                    client = (uow.Clients.GetAsync(x => x.Id == clientID).Result).SingleOrDefault();
                 else
-                    client = (uow.ClientRepo.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
+                    client = (uow.Clients.GetAsync(x => x.Name == clientValue).Result).SingleOrDefault();
 
                 if (issuer == null
                     || client == null)
@@ -527,9 +529,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check if identifier is guid. resolve to guid if not.
                 if (Guid.TryParse(userValue, out userID))
-                    user = (uow.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
+                    user = (uow.Users.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
                 else
-                    user = (uow.UserRepo.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
+                    user = (uow.Users.GetAsync(x => x.Email == userValue).Result).SingleOrDefault();
 
                 if (user == null)
                 {
@@ -543,7 +545,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
                 //check that user is confirmed...
                 //check that user is not locked...
-                if (uow.UserRepo.IsLockedOutAsync(user.Id).Result
+                if (uow.Users.IsLockedOutAsync(user.Id).Result
                     || !user.EmailConfirmed
                     || !user.PasswordConfirmed)
                 {
@@ -552,11 +554,11 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     return context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = $"User:{user.Id}" }, _serializer));
                 }
 
-                var loginList = uow.UserRepo.GetLoginsAsync(user.Id).Result;
-                var logins = uow.LoginRepo.GetAsync(x => loginList.Contains(x)).Result;
+                var logins = uow.Logins.GetAsync(new QueryExpression<tbl_Logins>()
+                    .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda()).Result;
 
                 //check that login provider exists...
-                if (loginList == null)
+                if (logins == null)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.ContentType = "application/json";
@@ -570,10 +572,10 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         && uow.InstanceType == InstanceContext.UnitTest))
                 {
                     //check that password is valid...
-                    if (!uow.UserRepo.VerifyPasswordAsync(user.Id, passwordValue).Result)
+                    if (!uow.Users.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.UserRepo.AccessFailedAsync(user.Id).Wait();
+                        uow.Users.AccessFailedAsync(user).Wait();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -588,7 +590,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 //adjust counter(s) for login success...
-                uow.UserRepo.AccessSuccessAsync(user.Id).Wait();
+                uow.Users.AccessSuccessAsync(user).Wait();
 
                 var access = JwtFactory.UserResourceOwnerV1_Legacy(uow, mapper, issuer, client, user).Result;
 
@@ -600,7 +602,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 };
 
                 //add activity entry...
-                uow.ActivityRepo.CreateAsync(
+                uow.Activities.CreateAsync(
                     mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,

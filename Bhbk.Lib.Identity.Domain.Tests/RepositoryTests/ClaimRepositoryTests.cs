@@ -1,5 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
@@ -16,17 +18,19 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     public class ClaimRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async Task Lib_ClaimRepo_CreateV1_Fail()
+        public async Task Repo_Claims_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.ClaimRepo.CreateAsync(
+                await UoW.Claims.CreateAsync(
                     Mapper.Map<tbl_Claims>(new ClaimCreate()));
+
+                await UoW.CommitAsync();
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await UoW.ClaimRepo.CreateAsync(
+                await UoW.Claims.CreateAsync(
                     Mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = Guid.NewGuid(),
@@ -34,18 +38,20 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         Value = Base64.CreateString(8),
                         Immutable = false,
                     }));
+
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_ClaimRepo_CreateV1_Success()
+        public async Task Repo_Claims_CreateV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var issuer = (await UoW.Issuers.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
 
-            var result = await UoW.ClaimRepo.CreateAsync(
+            var result = await UoW.Claims.CreateAsync(
                 Mapper.Map<tbl_Claims>(new ClaimCreate()
                 {
                     IssuerId = issuer.Id,
@@ -54,59 +60,71 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                     Immutable = false,
                 }));
             result.Should().BeAssignableTo<tbl_Claims>();
+
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_ClaimRepo_DeleteV1_Fail()
+        public async Task Repo_Claims_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
             {
-                await UoW.ClaimRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.Claims.DeleteAsync(new tbl_Claims());
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_ClaimRepo_DeleteV1_Success()
+        public async Task Repo_Claims_DeleteV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiTestClaim)).Single();
+            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Type == Constants.ApiTestClaim).ToLambda()))
+                .Single();
 
-            var result = await UoW.ClaimRepo.DeleteAsync(claim.Id);
-            result.Should().BeTrue();
+            await UoW.Claims.DeleteAsync(claim);
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_ClaimRepo_GetV1_Success()
+        public async Task Repo_Claims_GetV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var result = await UoW.ClaimRepo.GetAsync();
+            var result = await UoW.Claims.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Claims>>();
+
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_ClaimRepo_UpdateV1_Fail()
+        public async Task Repo_Claims_UpdateV1_Fail()
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await UoW.ClaimRepo.UpdateAsync(new tbl_Claims());
+                await UoW.Claims.UpdateAsync(new tbl_Claims());
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_ClaimRepo_UpdateV1_Success()
+        public async Task Repo_Claims_UpdateV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Type == Constants.ApiTestClaim)).Single();
+            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Type == Constants.ApiTestClaim)
+                .ToLambda())).Single();
             claim.Value += "(Updated)";
 
-            var result = await UoW.ClaimRepo.UpdateAsync(claim);
+            var result = await UoW.Claims.UpdateAsync(claim);
             result.Should().BeAssignableTo<tbl_Claims>();
+
+            await UoW.CommitAsync();
         }
     }
 }

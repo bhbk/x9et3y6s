@@ -68,6 +68,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
@@ -76,6 +77,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             CreateMap<ClientModel, tbl_Clients>()
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
+                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
@@ -190,6 +192,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => Base64.CreateString(32)))
                 .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
@@ -200,6 +203,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             CreateMap<RoleModel, tbl_Roles>()
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
+                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 

@@ -8,6 +8,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public tbl_Clients()
         {
             tbl_Activities = new HashSet<tbl_Activities>();
+            tbl_ClientRoles = new HashSet<tbl_ClientRoles>();
             tbl_Refreshes = new HashSet<tbl_Refreshes>();
             tbl_Roles = new HashSet<tbl_Roles>();
             tbl_Settings = new HashSet<tbl_Settings>();
@@ -35,6 +36,7 @@ namespace Bhbk.Lib.Identity.Data.Models
 
         public virtual tbl_Issuers Issuer { get; set; }
         public virtual ICollection<tbl_Activities> tbl_Activities { get; set; }
+        public virtual ICollection<tbl_ClientRoles> tbl_ClientRoles { get; set; }
         public virtual ICollection<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Roles> tbl_Roles { get; set; }
         public virtual ICollection<tbl_Settings> tbl_Settings { get; set; }

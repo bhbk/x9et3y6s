@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Data.Services;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -54,14 +56,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                        var invalid = (uow.StateRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).Result).ToList();
+                        var invalidExpr = new QueryExpression<tbl_States>()
+                                .Where(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).ToLambda();
+
+                        var invalid = uow.States.GetAsync(invalidExpr).Result;
                         var invalidCount = invalid.Count();
 
                         if (invalid.Any())
                         {
-                            foreach (var entry in invalid.ToList())
-                                uow.StateRepo.DeleteAsync(entry.Id).Wait();
-
+                            uow.States.DeleteAsync(invalid).Wait();
                             uow.CommitAsync().Wait();
 
                             var msg = typeof(MaintainStatesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "

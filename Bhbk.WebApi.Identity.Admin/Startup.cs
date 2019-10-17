@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
-            var conf = (IConfiguration) new ConfigurationBuilder()
+            var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
@@ -72,24 +72,24 @@ namespace Bhbk.WebApi.Identity.Admin
             var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
                 .Select(x => x.Value);
 
-            var issuers = (owin.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
-                .Select(x => x.Name + ":" + owin.IssuerRepo.Salt);
+            var issuers = (owin.Issuers.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                .Select(x => x.Name + ":" + owin.Issuers.Salt);
 
-            var issuerKeys = (owin.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+            var issuerKeys = (owin.Issuers.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                 .Select(x => x.IssuerKey);
 
-            var clients = (owin.ClientRepo.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
+            var clients = (owin.Clients.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
                 .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            var legacyIssuer = (owin.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyIssuer = (owin.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = (owin.IssuerRepo.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                issuers = (owin.Issuers.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
                     .Select(x => x.Name).Concat(issuers);
 #if !RELEASE
             /*

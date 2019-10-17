@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.DataState.Models;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
@@ -6,16 +8,13 @@ using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -38,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.ClientRepo.GetAsync(x => x.IssuerId == model.IssuerId
+            if ((await UoW.Clients.GetAsync(x => x.IssuerId == model.IssuerId
                 && x.Name == model.Name)).Any())
             {
                 ModelState.AddModelError(MessageType.ClientAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Client:{model.Name}");
@@ -55,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClientRepo.CreateAsync(Mapper.Map<tbl_Clients>(model));
+            var result = await UoW.Clients.CreateAsync(Mapper.Map<tbl_Clients>(model));
 
             await UoW.CommitAsync();
 
@@ -66,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteClientV1([FromRoute] Guid clientID)
         {
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
             if (client == null)
             {
@@ -81,9 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             client.ActorId = GetUserGUID();
 
-            if (!await UoW.ClientRepo.DeleteAsync(client.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Clients.DeleteAsync(client);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -93,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteClientRefreshesV1([FromRoute] Guid clientID)
         {
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
             if (client == null)
             {
@@ -101,11 +98,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            foreach (var refreshes in await UoW.RefreshRepo.GetAsync(x => x.ClientId == clientID))
-            {
-                if (!await UoW.RefreshRepo.DeleteAsync(refreshes.Id))
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            await UoW.Refreshes.DeleteAsync(new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.ClientId == clientID).ToLambda());
 
             await UoW.CommitAsync();
 
@@ -116,18 +110,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteClientRefreshV1([FromRoute] Guid clientID, [FromRoute] Guid refreshID)
         {
-            var refresh = (await UoW.RefreshRepo.GetAsync(x => x.ClientId == clientID
-                && x.Id == refreshID)).SingleOrDefault();
+            var expr = new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.ClientId == clientID && x.Id == refreshID).ToLambda();
 
-            if (refresh == null)
+            if (!await UoW.Refreshes.ExistsAsync(expr))
             {
-                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{clientID}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{refreshID}");
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.RefreshRepo.DeleteAsync(refresh.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Refreshes.DeleteAsync(expr);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -140,9 +132,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Clients client = null;
 
             if (Guid.TryParse(clientValue, out clientID))
-                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
             else
-                client = (await UoW.ClientRepo.GetAsync(x => x.Name == clientValue)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Name == clientValue)).SingleOrDefault();
 
             if (client == null)
             {
@@ -154,39 +146,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetClientsV1([FromBody] DataPagerV3 model)
+        public async Task<IActionResult> GetClientsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            /*
-             * tidbits below need enhancment, just tinkering...
-             */
-
-            Expression<Func<tbl_Clients, bool>> predicates;
-
-            if (string.IsNullOrEmpty(model.Filter.First().Value))
-                predicates = x => true;
-            else
-                predicates = x => x.Name.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.Description.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
-
             try
             {
-                var total = await UoW.ClientRepo.CountAsync(predicates);
-                var result = await UoW.ClientRepo.GetAsync(predicates,
-                    x => x.Include(r => r.tbl_Roles),
-                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new
+                var result = new PageStateResult<ClientModel>
                 {
-                    Data = Mapper.Map<IEnumerable<ClientModel>>(result),
-                    Total = total
-                });
+                    Data = Mapper.Map<IEnumerable<ClientModel>>(
+                        await UoW.Clients.GetAsync(
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Clients>, IQueryable<tbl_Clients>>>>(
+                                model.ToExpression<tbl_Clients>()))),
+
+                    Total = await UoW.Clients.CountAsync(
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Clients>, IQueryable<tbl_Clients>>>>(
+                            model.ToPredicateExpression<tbl_Clients>()))
+                };
+
+                return Ok(result);
             }
-            catch (ParseException ex)
+            catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
@@ -197,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{clientID:guid}/refreshes"), HttpGet]
         public async Task<IActionResult> GetClientRefreshesV1([FromRoute] Guid clientID)
         {
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
             if (client == null)
             {
@@ -205,17 +186,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var refreshes = await UoW.RefreshRepo.GetAsync(x => x.ClientId == clientID);
+            var refreshes = await UoW.Refreshes.GetAsync(new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.ClientId == client.Id).ToLambda());
 
-            var result = refreshes.Select(x => Mapper.Map<RefreshModel>(x));
-
-            return Ok(result);
+            return Ok(Mapper.Map<IEnumerable<RefreshModel>>(refreshes));
         }
 
         [Route("v1/{clientID:guid}/roles"), HttpGet]
         public async Task<IActionResult> GetClientRolesV1([FromRoute] Guid clientID)
         {
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+            var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
             if (client == null)
             {
@@ -223,9 +203,27 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = await UoW.ClientRepo.GetRolesAsync(clientID);
+            var roles = await UoW.Roles.GetAsync(new QueryExpression<tbl_Roles>()
+                .Where(x => x.ClientId == client.Id).ToLambda());
 
-            return Ok(roles);
+            return Ok(Mapper.Map<IEnumerable<RoleModel>>(roles));
+        }
+
+        [Route("v1/{clientID:guid}/urls"), HttpGet]
+        public async Task<IActionResult> GetClientUrlsV1([FromRoute] Guid clientID)
+        {
+            var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+
+            if (client == null)
+            {
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientID}");
+                return NotFound(ModelState);
+            }
+
+            var urls = await UoW.Urls.GetAsync(new QueryExpression<tbl_Urls>()
+                .Where(x => x.ClientId == client.Id).ToLambda());
+
+            return Ok(Mapper.Map<IEnumerable<UrlModel>>(urls));
         }
 
         [Route("v1"), HttpPut]
@@ -235,7 +233,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
+            var client = (await UoW.Clients.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (client == null)
             {
@@ -251,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClientRepo.UpdateAsync(Mapper.Map<tbl_Clients>(model));
+            var result = await UoW.Clients.UpdateAsync(Mapper.Map<tbl_Clients>(model));
 
             await UoW.CommitAsync();
 

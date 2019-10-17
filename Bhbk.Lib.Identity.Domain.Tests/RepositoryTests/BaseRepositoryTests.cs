@@ -18,14 +18,12 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     {
         protected IUoWService UoW;
         protected IMapper Mapper;
-        protected DefaultData DefaultData;
-        protected TestData TestData;
 
         public BaseRepositoryTests()
         {
             var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = (IConfiguration) new ConfigurationBuilder()
+            var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
@@ -34,8 +32,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 
             UoW = new UoWService(conf, instance);
             Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
-            DefaultData = new DefaultData(UoW, Mapper);
-            TestData = new TestData(UoW, Mapper);
 
             /*
              * only test context allowed to run...

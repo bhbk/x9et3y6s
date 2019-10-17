@@ -12,16 +12,20 @@ namespace Bhbk.Lib.Identity.Data.Services
     {
         private readonly _DbContext _context;
         public InstanceContext InstanceType { get; private set; }
-        public ActivityRepository ActivityRepo { get; private set; }
-        public ClaimRepository ClaimRepo { get; private set; }
-        public ClientRepository ClientRepo { get; private set; }
-        public IssuerRepository IssuerRepo { get; private set; }
-        public LoginRepository LoginRepo { get; private set; }
-        public RefreshRepository RefreshRepo { get; private set; }
-        public RoleRepository RoleRepo { get; private set; }
-        public SettingRepository SettingRepo { get; private set; }
-        public StateRepository StateRepo { get; private set; }
-        public UserRepository UserRepo { get; private set; }
+        public ActivityRepository Activities { get; private set; }
+        public ClaimRepository Claims { get; private set; }
+        public ClientRepository Clients { get; private set; }
+        public IssuerRepository Issuers { get; private set; }
+        public LoginRepository Logins { get; private set; }
+        public MotDRepository MOTDs { get; private set; }
+        public QueueEmailRepository QueueEmails { get; private set; }
+        public QueueTextRepository QueueTexts { get; private set; }
+        public RefreshRepository Refreshes { get; private set; }
+        public RoleRepository Roles { get; private set; }
+        public SettingRepository Settings { get; private set; }
+        public StateRepository States { get; private set; }
+        public UrlRepository Urls { get; private set; }
+        public UserRepository Users { get; private set; }
 
         public UoWService(IConfiguration conf)
             : this(conf, new ContextService(InstanceContext.DeployedOrLocal)) { }
@@ -61,16 +65,20 @@ namespace Bhbk.Lib.Identity.Data.Services
 
             InstanceType = instance.InstanceType;
 
-            ActivityRepo = new ActivityRepository(_context, instance.InstanceType);
-            ClaimRepo = new ClaimRepository(_context, instance.InstanceType);
-            ClientRepo = new ClientRepository(_context, instance.InstanceType);
-            IssuerRepo = new IssuerRepository(_context, instance.InstanceType, conf["IdentityTenants:Salt"]);
-            LoginRepo = new LoginRepository(_context, instance.InstanceType);
-            RoleRepo = new RoleRepository(_context, instance.InstanceType);
-            RefreshRepo = new RefreshRepository(_context, instance.InstanceType);
-            SettingRepo = new SettingRepository(_context, instance.InstanceType);
-            StateRepo = new StateRepository(_context, instance.InstanceType);
-            UserRepo = new UserRepository(_context, instance.InstanceType);
+            Activities = new ActivityRepository(_context, instance.InstanceType);
+            Claims = new ClaimRepository(_context, instance.InstanceType);
+            Clients = new ClientRepository(_context, instance.InstanceType);
+            Issuers = new IssuerRepository(_context, instance.InstanceType, conf["IdentityTenants:Salt"]);
+            Logins = new LoginRepository(_context, instance.InstanceType);
+            MOTDs = new MotDRepository(_context, instance.InstanceType);
+            QueueEmails = new QueueEmailRepository(_context, instance.InstanceType);
+            QueueTexts = new QueueTextRepository(_context, instance.InstanceType);
+            Refreshes = new RefreshRepository(_context, instance.InstanceType);
+            Roles = new RoleRepository(_context, instance.InstanceType);
+            Settings = new SettingRepository(_context, instance.InstanceType);
+            States = new StateRepository(_context, instance.InstanceType);
+            Urls = new UrlRepository(_context, instance.InstanceType);
+            Users = new UserRepository(_context, instance.InstanceType);
         }
 
         public async Task CommitAsync()

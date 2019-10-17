@@ -7,6 +7,7 @@ namespace Bhbk.Lib.Identity.Data.Models
     {
         public tbl_Roles()
         {
+            tbl_ClientRoles = new HashSet<tbl_ClientRoles>();
             tbl_RoleClaims = new HashSet<tbl_RoleClaims>();
             tbl_UserRoles = new HashSet<tbl_UserRoles>();
         }
@@ -23,6 +24,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public bool Immutable { get; set; }
 
         public virtual tbl_Clients Client { get; set; }
+        public virtual ICollection<tbl_ClientRoles> tbl_ClientRoles { get; set; }
         public virtual ICollection<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual ICollection<tbl_UserRoles> tbl_UserRoles { get; set; }
     }

@@ -7,6 +7,7 @@ using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -65,9 +66,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
             else
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -80,9 +81,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.ClientRepo.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Id == clientID, x => x.Include(u => u.tbl_Urls))).SingleOrDefault();
             else
-                client = (await UoW.ClientRepo.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = (await UoW.Clients.GetAsync(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls))).SingleOrDefault();
 
             if (client == null)
             {
@@ -95,9 +96,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
-                user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
             else
-                user = (await UoW.UserRepo.GetAsync(x => x.Email == input.user)).SingleOrDefault();
+                user = (await UoW.Users.GetAsync(x => x.Email == input.user)).SingleOrDefault();
 
             if (user == null)
             {
@@ -106,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (await UoW.UserRepo.IsLockedOutAsync(user.Id)
+            else if (await UoW.Users.IsLockedOutAsync(user.Id)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -118,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             //check if state is valid...
-            var state = (await UoW.StateRepo.GetAsync(x => x.StateValue == input.state
+            var state = (await UoW.States.GetAsync(x => x.StateValue == input.state
                 && x.StateType == StateType.User.ToString()
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow)).SingleOrDefault();
@@ -159,10 +160,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //no reuse of state after this...
             state.StateConsume = true;
-            await UoW.StateRepo.UpdateAsync(state);
+            await UoW.States.UpdateAsync(state);
 
             //adjust counter(s) for login success...
-            await UoW.UserRepo.AccessSuccessAsync(user.Id);
+            await UoW.Users.AccessSuccessAsync(user);
             await UoW.CommitAsync();
 
             return RedirectPermanent(result.AbsoluteUri);

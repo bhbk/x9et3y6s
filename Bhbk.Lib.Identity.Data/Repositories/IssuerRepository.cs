@@ -1,169 +1,107 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.Repositories;
+using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class IssuerRepository : IGenericRepositoryAsync<tbl_Issuers, Guid>
+    public class IssuerRepository : GenericRepositoryAsync<tbl_Issuers>
     {
-        private readonly _DbContext _context;
-        private readonly InstanceContext _instance;
         public string Salt { get; }
 
         public IssuerRepository(_DbContext context, InstanceContext instance, string salt)
+            : base(context, instance)
         {
-            _context = context ?? throw new NullReferenceException();
-            _instance = instance;
-
             Salt = salt;
         }
 
-        public async Task<int> CountAsync(Expression<Func<tbl_Issuers, bool>> predicates = null)
+        public override async Task<tbl_Issuers> CreateAsync(tbl_Issuers issuer)
         {
-            var query = _context.tbl_Issuers.AsQueryable();
-
-            if (predicates != null)
-                return await query.Where(predicates).CountAsync();
-
-            return await query.CountAsync();
-        }
-
-        public async Task<tbl_Issuers> CreateAsync(tbl_Issuers entity)
-        {
-            entity.tbl_Settings.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Settings()
                 {
                     Id = Guid.NewGuid(),
-                    IssuerId = entity.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.ApiSettingAccessExpire,
                     ConfigValue = 600.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
                 });
 
-            entity.tbl_Settings.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Settings()
                 {
                     Id = Guid.NewGuid(),
-                    IssuerId = entity.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.ApiSettingRefreshExpire,
                     ConfigValue = 86400.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
                 });
 
-            entity.tbl_Settings.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Settings()
                 {
                     Id = Guid.NewGuid(),
-                    IssuerId = entity.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.ApiSettingTotpExpire,
                     ConfigValue = 600.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
                 });
 
-            entity.tbl_Settings.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Settings()
                 {
                     Id = Guid.NewGuid(),
-                    IssuerId = entity.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.ApiSettingPollingMax,
                     ConfigValue = 10.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
                 });
 
-            return await Task.FromResult(_context.Add(entity).Entity);
+            return await Task.FromResult(_context.Add(issuer).Entity);
         }
 
-        public async Task<bool> DeleteAsync(Guid key)
+        public override async Task<tbl_Issuers> DeleteAsync(tbl_Issuers issuer)
         {
-            var entity = _context.tbl_Issuers.Where(x => x.Id == key).Single();
+            var claims = _context.Set<tbl_Claims>().Where(x => x.IssuerId == issuer.Id);
+            var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.IssuerId == issuer.Id);
+            var settings = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id);
+            var states = _context.Set<tbl_States>().Where(x => x.IssuerId == issuer.Id);
+            var roles = _context.Set<tbl_Roles>().Where(x => x.Client.IssuerId == issuer.Id);
+            var clients = _context.Set<tbl_Clients>().Where(x => x.IssuerId == issuer.Id);
 
-            var claims = _context.tbl_Claims.Where(x => x.IssuerId == key);
-            var refreshes = _context.tbl_Refreshes.Where(x => x.IssuerId == key);
-            var settings = _context.tbl_Settings.Where(x => x.IssuerId == key);
-            var states = _context.tbl_States.Where(x => x.IssuerId == key);
-            var roles = _context.tbl_Roles.Where(x => x.Client.IssuerId == key);
-            var clients = _context.tbl_Clients.Where(x => x.IssuerId == key);
+            _context.RemoveRange(claims);
+            _context.RemoveRange(refreshes);
+            _context.RemoveRange(settings);
+            _context.RemoveRange(states);
+            _context.RemoveRange(roles);
+            _context.RemoveRange(clients);
+            _context.Remove(issuer);
 
-            try
-            {
-                _context.RemoveRange(claims);
-                _context.RemoveRange(refreshes);
-                _context.RemoveRange(settings);
-                _context.RemoveRange(states);
-                _context.RemoveRange(roles);
-                _context.RemoveRange(clients);
-                _context.Remove(entity);
-
-                return await Task.FromResult(true);
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(false);
-            }
+            return await Task.FromResult(_context.Remove(issuer).Entity);
         }
 
-        public async Task<bool> ExistsAsync(Guid key)
+        public override async Task<tbl_Issuers> UpdateAsync(tbl_Issuers issuer)
         {
-            return await Task.FromResult(_context.tbl_Issuers.Any(x => x.Id == key));
-        }
-
-        public async Task<IEnumerable<tbl_Issuers>> GetAsync(Expression<Func<tbl_Issuers, bool>> predicates = null,
-            Func<IQueryable<tbl_Issuers>, IIncludableQueryable<tbl_Issuers, object>> includes = null,
-            Func<IQueryable<tbl_Issuers>, IOrderedQueryable<tbl_Issuers>> orders = null,
-            int? skip = null,
-            int? take = null)
-        {
-            var query = _context.tbl_Issuers.AsQueryable();
-
-            if (predicates != null)
-                query = query.Where(predicates);
-
-            if (includes != null)
-                query = includes(query);
-
-            if (orders != null)
-            {
-                query = orders(query)
-                    .Skip(skip.Value)
-                    .Take(take.Value);
-            }
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IEnumerable<tbl_Clients>> GetClientsAsync(Guid key)
-        {
-            var result = _context.tbl_Clients.Where(x => x.IssuerId == key).AsQueryable();
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<tbl_Issuers> UpdateAsync(tbl_Issuers model)
-        {
-            var entity = _context.tbl_Issuers.Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<tbl_Issuers>().Where(x => x.Id == issuer.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            entity.Name = model.Name;
-            entity.Description = model.Description;
-            entity.IssuerKey = model.IssuerKey;
+            entity.Name = issuer.Name;
+            entity.Description = issuer.Description;
+            entity.IssuerKey = issuer.IssuerKey;
             entity.LastUpdated = DateTime.Now;
-            entity.Enabled = model.Enabled;
-            entity.Immutable = model.Immutable;
+            entity.Enabled = issuer.Enabled;
+            entity.Immutable = issuer.Immutable;
 
             _context.Entry(entity).State = EntityState.Modified;
 

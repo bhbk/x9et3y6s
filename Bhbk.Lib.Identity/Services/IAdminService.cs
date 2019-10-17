@@ -5,7 +5,6 @@ using Bhbk.Lib.Identity.Repositories;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using static Bhbk.Lib.DataState.Models.DataPagerV3;
 
 namespace Bhbk.Lib.Identity.Services
 {
@@ -17,14 +16,14 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * activity
          */
-        DataResultV3<ActivityModel> Activity_GetV1(DataPagerV3 model);
+        PageStateResult<ActivityModel> Activity_GetV1(PageState model);
 
         /*
          * claims
          */
         ClaimModel Claim_CreateV1(ClaimCreate model);
         bool Claim_DeleteV1(Guid claimID);
-        DataResultV3<ClaimModel> Claim_GetV1(DataPagerV3 model);
+        PageStateResult<ClaimModel> Claim_GetV1(PageState model);
         ClaimModel Claim_GetV1(string claimValue);
         ClaimModel Claim_UpdateV1(ClaimModel model);
 
@@ -35,7 +34,7 @@ namespace Bhbk.Lib.Identity.Services
         bool Client_DeleteV1(Guid clientID);
         bool Client_DeleteRefreshesV1(Guid clientID);
         bool Client_DeleteRefreshV1(Guid clientID, Guid refreshID);
-        DataResultV3<ClientModel> Client_GetV1(DataPagerV3 model);
+        PageStateResult<ClientModel> Client_GetV1(PageState model);
         ClientModel Client_GetV1(string clientValue);
         IEnumerable<RefreshModel> Client_GetRefreshesV1(string clientValue);
         ClientModel Client_UpdateV1(ClientModel model);
@@ -46,7 +45,7 @@ namespace Bhbk.Lib.Identity.Services
         IssuerModel Issuer_CreateV1(IssuerCreate model);
         bool Issuer_DeleteV1(Guid issuerID);
         IEnumerable<ClientModel> Issuer_GetClientsV1(string issuerValue);
-        DataResultV3<IssuerModel> Issuer_GetV1(DataPagerV3 model);
+        PageStateResult<IssuerModel> Issuer_GetV1(PageState model);
         IssuerModel Issuer_GetV1(string issuerValue);
         IssuerModel Issuer_UpdateV1(IssuerModel model);
 
@@ -55,7 +54,7 @@ namespace Bhbk.Lib.Identity.Services
          */
         LoginModel Login_CreateV1(LoginCreate model);
         bool Login_DeleteV1(Guid loginID);
-        DataResultV3<LoginModel> Login_GetV1(DataPagerV3 model);
+        PageStateResult<LoginModel> Login_GetV1(PageState model);
         LoginModel Login_GetV1(string loginValue);
         LoginModel Login_UpdateV1(LoginModel model);
 
@@ -64,7 +63,7 @@ namespace Bhbk.Lib.Identity.Services
          */
         RoleModel Role_CreateV1(RoleCreate model);
         bool Role_DeleteV1(Guid roleID);
-        DataResultV3<RoleModel> Role_GetV1(DataPagerV3 model);
+        PageStateResult<RoleModel> Role_GetV1(PageState model);
         RoleModel Role_GetV1(string roleValue);
         RoleModel Role_UpdateV1(RoleModel model);
 
@@ -79,8 +78,8 @@ namespace Bhbk.Lib.Identity.Services
         bool User_DeleteV1(Guid userID);
         bool User_DeleteRefreshesV1(Guid userID);
         bool User_DeleteRefreshV1(Guid userID, Guid refreshID);
-        DataResultV3<UserModel> User_GetV1(DataPagerV3 model);
-        DataResultV3<MOTDType1Model> User_GetMOTDsV1(DataPagerV3 model);
+        PageStateResult<UserModel> User_GetV1(PageState model);
+        PageStateResult<MOTDType1Model> User_GetMOTDsV1(PageState model);
         UserModel User_GetV1(string userValue);
         IEnumerable<ClientModel> User_GetClientsV1(string userValue);
         IEnumerable<LoginModel> User_GetLoginsV1(string userValue);

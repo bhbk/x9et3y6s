@@ -1,11 +1,12 @@
-﻿using Bhbk.Lib.DataState.Models;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -36,8 +36,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.ClaimRepo.GetAsync(x => x.IssuerId == model.IssuerId
-                && x.Type == model.Type)).Any())
+            if ((await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+                .Where(x => x.IssuerId == model.IssuerId && x.Type == model.Type).ToLambda()))
+                .Any())
             {
                 ModelState.AddModelError(MessageType.ClaimAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Claim:{model.Type}");
                 return BadRequest(ModelState);
@@ -45,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClaimRepo.CreateAsync(Mapper.Map<tbl_Claims>(model));
+            var result = await UoW.Claims.CreateAsync(Mapper.Map<tbl_Claims>(model));
 
             await UoW.CommitAsync();
 
@@ -56,7 +57,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteClaimV1([FromRoute] Guid claimID)
         {
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
+            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Id == claimID).ToLambda()))
+                .SingleOrDefault();
 
             if (claim == null)
             {
@@ -72,9 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             claim.ActorId = GetUserGUID();
 
-            if (!await UoW.ClaimRepo.DeleteAsync(claim.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Claims.DeleteAsync(claim);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -87,7 +88,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Claims claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
-                claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == claimID)).SingleOrDefault();
+                claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+                    .Where(x => x.Id == claimID).ToLambda()))
+                    .SingleOrDefault();
 
             if (claim == null)
             {
@@ -99,40 +102,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetClaimsV1([FromBody] DataPagerV3 model)
+        public async Task<IActionResult> GetClaimsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            /*
-             * tidbits below need enhancment, just tinkering...
-             */
-
-            Expression<Func<tbl_Claims, bool>> preds;
-
-            if (string.IsNullOrEmpty(model.Filter.First().Value))
-                preds = x => true;
-            else
-                preds = x => x.Type.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.Value.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.ValueType.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
-
             try
             {
-                var total = await UoW.ClaimRepo.CountAsync(preds);
-                var result = await UoW.ClaimRepo.GetAsync(preds,
-                    null,
-                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new
+                var result = new PageStateResult<ClaimModel>
                 {
-                    Data = Mapper.Map<IEnumerable<ClaimModel>>(result),
-                    Total = total
-                });
+                    Data = Mapper.Map<IEnumerable<ClaimModel>>(
+                        await UoW.Claims.GetAsync(
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
+                                model.ToExpression<tbl_Claims>()))),
+
+                    Total = await UoW.Claims.CountAsync(
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
+                            model.ToPredicateExpression<tbl_Claims>()))
+                };
+
+                return Ok(result);
             }
-            catch (ParseException ex)
+            catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
 
@@ -147,7 +138,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var claim = (await UoW.ClaimRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
+            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Id == model.Id).ToLambda()))
+                .SingleOrDefault();
 
             if (claim == null)
             {
@@ -163,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.ClaimRepo.UpdateAsync(Mapper.Map<tbl_Claims>(model));
+            var result = await UoW.Claims.UpdateAsync(Mapper.Map<tbl_Claims>(model));
 
             await UoW.CommitAsync();
 

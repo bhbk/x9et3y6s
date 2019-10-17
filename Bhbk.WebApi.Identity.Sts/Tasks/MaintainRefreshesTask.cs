@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Data.Services;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,15 +55,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                     using (var scope = _factory.CreateScope())
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                        
+                        var invalidExpr = new QueryExpression<tbl_Refreshes>()
+                                .Where(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).ToLambda();
 
-                        var invalid = (uow.RefreshRepo.GetAsync(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).Result).ToList();
+                        var invalid = uow.Refreshes.GetAsync(invalidExpr).Result;
                         var invalidCount = invalid.Count();
 
                         if (invalid.Any())
                         {
-                            foreach (var entry in invalid.ToList())
-                                uow.RefreshRepo.DeleteAsync(entry.Id).Wait();
-
+                            uow.Refreshes.DeleteAsync(invalid).Wait();
                             uow.CommitAsync().Wait();
 
                             var msg = typeof(MaintainRefreshesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "

@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.WebApi.Alert.Helpers;
@@ -67,18 +68,20 @@ namespace Bhbk.WebApi.Alert.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                        foreach (var entry in uow.UserRepo.GetQueueEmailAsync(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).Result)
+                        foreach (var entry in uow.QueueEmails.GetAsync(new QueryExpression<tbl_QueueEmails>()
+                            .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()).Result)
                         {
                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The email was created on " + entry.Created + " and is being deleted now.");
 
-                            uow.UserRepo.DeleteQueueEmailAsync(entry.Id.ToString()).Wait();
+                            uow.QueueEmails.DeleteAsync(entry).Wait();
                         }
 
                         uow.CommitAsync().Wait();
 
-                        foreach (var entry in uow.UserRepo.GetQueueEmailAsync(x => x.SendAt < DateTime.Now).Result)
-                            queue.Enqueue(entry);
+                        foreach (var entry in uow.QueueEmails.GetAsync(new QueryExpression<tbl_QueueEmails>()
+                            .Where(x => x.SendAt < DateTime.Now).ToLambda()).Result)
+                                queue.Enqueue(entry);
                     }
 
                     Status = JsonConvert.SerializeObject(
@@ -113,14 +116,14 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                         if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
                                         {
-                                            uow.UserRepo.DeleteQueueEmailAsync(msg.Id.ToString()).Wait();
+                                            uow.UserRepo.DeleteQueueEmailAsync(msg).Wait();
                                             Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                                         }
                                         else
                                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                                 "Error=" + response.StatusCode);
 #elif !RELEASE
-                                        uow.UserRepo.DeleteQueueEmailAsync(msg.Id.ToString()).Wait();
+                                        uow.QueueEmails.DeleteAsync(msg).Wait();
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
@@ -128,7 +131,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 case InstanceContext.UnitTest:
                                     {
-                                        uow.UserRepo.DeleteQueueEmailAsync(msg.Id.ToString()).Wait();
+                                        uow.QueueEmails.DeleteAsync(msg).Wait();
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
@@ -156,7 +159,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                    uow.UserRepo.CreateQueueEmailAsync(model).Wait();
+                    uow.QueueEmails.CreateAsync(model).Wait();
                     uow.CommitAsync().Wait();
                 }
 

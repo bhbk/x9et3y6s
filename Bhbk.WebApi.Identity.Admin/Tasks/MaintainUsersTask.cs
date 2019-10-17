@@ -1,4 +1,6 @@
-﻿using Bhbk.Lib.Identity.Data.Services;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,15 +57,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                        var disabled = (uow.UserRepo.GetAsync(x => x.LockoutEnd < DateTime.UtcNow).Result).ToList();
+                        var disabledExpr = new QueryExpression<tbl_Users>()
+                                .Where(x => x.LockoutEnd < DateTime.UtcNow).ToLambda();
+
+                        var disabled = uow.Users.GetAsync(disabledExpr).Result;
                         var disabledCount = disabled.Count();
 
                         if (disabled.Any())
                         {
-                            foreach (var entry in disabled.ToList())
-                                uow.UserRepo.DeleteAsync(entry.Id).Wait();
-
-                            await uow.CommitAsync();
+                            uow.Users.DeleteAsync(disabled).Wait();
+                            uow.CommitAsync().Wait();
 
                             var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                     + disabledCount.ToString() + " users with expired lock-outs.";

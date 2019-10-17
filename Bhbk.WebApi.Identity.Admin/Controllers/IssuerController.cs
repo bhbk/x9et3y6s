@@ -1,20 +1,19 @@
-﻿using Bhbk.Lib.DataState.Models;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -37,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.IssuerRepo.GetAsync(x => x.Name == model.Name)).Any())
+            if ((await UoW.Issuers.GetAsync(x => x.Name == model.Name)).Any())
             {
                 ModelState.AddModelError(MessageType.IssuerAlreadyExists.ToString(), $"Issuer:{model.Name}");
                 return BadRequest(ModelState);
@@ -45,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.IssuerRepo.CreateAsync(Mapper.Map<tbl_Issuers>(model));
+            var result = await UoW.Issuers.CreateAsync(Mapper.Map<tbl_Issuers>(model));
 
             await UoW.CommitAsync();
 
@@ -56,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteIssuerV1([FromRoute] Guid issuerID)
         {
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+            var issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -71,9 +70,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             issuer.ActorId = GetUserGUID();
 
-            if (!await UoW.IssuerRepo.DeleteAsync(issuer.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Issuers.DeleteAsync(issuer);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -86,9 +83,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Issuers issuer = null;
 
             if (Guid.TryParse(issuerValue, out issuerID))
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
             else
-                issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
+                issuer = (await UoW.Issuers.GetAsync(x => x.Name == issuerValue)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -100,39 +97,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetIssuersV1([FromBody] DataPagerV3 model)
+        public async Task<IActionResult> GetIssuersV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            /*
-             * tidbits below need enhancment, just tinkering...
-             */
-
-            Expression<Func<tbl_Issuers, bool>> predicates;
-
-            if (string.IsNullOrEmpty(model.Filter.First().Value))
-                predicates = x => true;
-            else
-                predicates = x => x.Name.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase)
-                || x.Description.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
-
             try
             {
-                var total = await UoW.IssuerRepo.CountAsync(predicates);
-                var result = await UoW.IssuerRepo.GetAsync(predicates,
-                    x => x.Include(c => c.tbl_Clients),
-                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new
+                var result = new PageStateResult<IssuerModel>
                 {
-                    Data = Mapper.Map<IEnumerable<IssuerModel>>(result),
-                    Total = total
-                });
+                    Data = Mapper.Map<IEnumerable<IssuerModel>>(
+                        await UoW.Issuers.GetAsync(
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
+                                model.ToExpression<tbl_Issuers>()))),
+
+                    Total = await UoW.Issuers.CountAsync(
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
+                            model.ToPredicateExpression<tbl_Issuers>()))
+                };
+
+                return Ok(result);
             }
-            catch (ParseException ex)
+            catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
@@ -142,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{issuerID:guid}/clients"), HttpGet]
         public async Task<IActionResult> GetIssuerClientsV1([FromRoute] Guid issuerID)
         {
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+            var issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -150,9 +136,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var clients = await UoW.IssuerRepo.GetClientsAsync(issuerID);
+            var clients = await UoW.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+                .Where(x => x.IssuerId == issuerID).ToLambda());
 
-            return Ok(clients);
+            return Ok(Mapper.Map<ClientModel>(clients));
         }
 
         [Route("v1"), HttpPut]
@@ -162,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
+            var issuer = (await UoW.Issuers.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -178,7 +165,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.IssuerRepo.UpdateAsync(Mapper.Map<tbl_Issuers>(model));
+            var result = await UoW.Issuers.UpdateAsync(Mapper.Map<tbl_Issuers>(model));
 
             await UoW.CommitAsync();
 

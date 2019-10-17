@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
@@ -17,17 +18,18 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     public class RefreshRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async Task Lib_RefreshRepo_CreateV1_Fail()
+        public async Task Repo_Refreshes_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.RefreshRepo.CreateAsync(
+                await UoW.Refreshes.CreateAsync(
                     Mapper.Map<tbl_Refreshes>(new RefreshCreate()));
+                await UoW.CommitAsync();
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await UoW.RefreshRepo.CreateAsync(
+                await UoW.Refreshes.CreateAsync(
                     Mapper.Map<tbl_Refreshes>(new RefreshCreate()
                         {
                             IssuerId = Guid.NewGuid(),
@@ -38,20 +40,21 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                             ValidFromUtc = DateTime.UtcNow,
                             ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                         }));
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_RefreshRepo_CreateV1_Success()
+        public async Task Repo_Refreshes_CreateV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var issuer = (await UoW.IssuerRepo.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
-            var client = (await UoW.ClientRepo.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
-            var user = (await UoW.UserRepo.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var issuer = (await UoW.Issuers.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var client = (await UoW.Clients.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
+            var user = (await UoW.Users.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
 
-            var result = await UoW.RefreshRepo.CreateAsync(
+            var result = await UoW.Refreshes.CreateAsync(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
@@ -63,45 +66,49 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
             result.Should().BeAssignableTo<tbl_Refreshes>();
+
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_RefreshRepo_DeleteV1_Fail()
+        public async Task Repo_Refreshes_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
             {
-                await UoW.RefreshRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.Refreshes.DeleteAsync(new tbl_Refreshes());
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_RefreshRepo_DeleteV1_Success()
+        public async Task Repo_Refreshes_DeleteV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var refresh = (await UoW.RefreshRepo.GetAsync()).First();
+            var refresh = (await UoW.Refreshes.GetAsync()).First();
 
-            var result = await UoW.RefreshRepo.DeleteAsync(refresh.Id);
-            result.Should().BeTrue();
+            await UoW.Refreshes.DeleteAsync(refresh);
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_RefreshRepo_GetV1_Success()
+        public async Task Repo_Refreshes_GetV1_Success()
         {
-            TestData.DestroyAsync().Wait();
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var result = await UoW.RefreshRepo.GetAsync();
+            var result = await UoW.Refreshes.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Refreshes>>();
         }
 
         [Fact]
-        public async Task Lib_RefreshRepo_UpdateV1_Fail()
+        public async Task Repo_Refreshes_UpdateV1_Fail()
         {
             await Assert.ThrowsAsync<NotImplementedException>(async () =>
             {
-                await UoW.RefreshRepo.UpdateAsync(new tbl_Refreshes());
+                await UoW.Refreshes.UpdateAsync(new tbl_Refreshes());
+                await UoW.CommitAsync();
             });
         }
     }

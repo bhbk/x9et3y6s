@@ -1,20 +1,23 @@
-﻿using Bhbk.Lib.DataAccess.UnitOfWork;
+﻿using Bhbk.Lib.DataAccess.EFCore.Interfaces;
 using Bhbk.Lib.Identity.Data.Repositories;
 
 namespace Bhbk.Lib.Identity.Data.Services
 {
-    //https://en.wikipedia.org/wiki/Dependency_inversion_principle
     public interface IUoWService : IGenericUnitOfWorkAsync
     {
-        ActivityRepository ActivityRepo { get; }
-        ClaimRepository ClaimRepo { get; }
-        ClientRepository ClientRepo { get; }
-        IssuerRepository IssuerRepo { get; }
-        LoginRepository LoginRepo { get; }
-        RoleRepository RoleRepo { get; }
-        RefreshRepository RefreshRepo { get; }
-        SettingRepository SettingRepo { get; }
-        StateRepository StateRepo { get; }
-        UserRepository UserRepo { get; }
+        ActivityRepository Activities { get; }
+        ClaimRepository Claims { get; }
+        ClientRepository Clients { get; }
+        IssuerRepository Issuers { get; }
+        LoginRepository Logins { get; }
+        MotDRepository MOTDs { get; }
+        QueueEmailRepository QueueEmails { get; }
+        QueueTextRepository QueueTexts { get; }
+        RoleRepository Roles { get; }
+        RefreshRepository Refreshes { get; }
+        SettingRepository Settings { get; }
+        StateRepository States { get; }
+        UrlRepository Urls { get; }
+        UserRepository Users { get; }
     }
 }

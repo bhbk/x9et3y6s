@@ -1,20 +1,19 @@
-﻿using Bhbk.Lib.DataState.Models;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -37,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.LoginRepo.GetAsync(x => x.Name == model.Name)).Any())
+            if ((await UoW.Logins.GetAsync(x => x.Name == model.Name)).Any())
             {
                 ModelState.AddModelError(MessageType.LoginAlreadyExists.ToString(), $"Login:{model.Name}");
                 return BadRequest(ModelState);
@@ -45,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.LoginRepo.CreateAsync(Mapper.Map<tbl_Logins>(model));
+            var result = await UoW.Logins.CreateAsync(Mapper.Map<tbl_Logins>(model));
 
             await UoW.CommitAsync();
 
@@ -56,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public async Task<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
         {
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
+            var login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
             if (login == null)
             {
@@ -71,9 +70,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             login.ActorId = GetUserGUID();
 
-            if (!await UoW.LoginRepo.DeleteAsync(login.Id))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            await UoW.Logins.DeleteAsync(login);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -87,9 +84,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
-                login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
+                login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
             else
-                login = (await UoW.LoginRepo.GetAsync(x => x.Name == loginValue)).SingleOrDefault();
+                login = (await UoW.Logins.GetAsync(x => x.Name == loginValue)).SingleOrDefault();
 
             if (login == null)
             {
@@ -101,38 +98,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetLoginsV1([FromBody] DataPagerV3 model)
+        public async Task<IActionResult> GetLoginsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            /*
-             * tidbits below need enhancment, just tinkering...
-             */
-
-            Expression<Func<tbl_Logins, bool>> predicates;
-
-            if (string.IsNullOrEmpty(model.Filter.First().Value))
-                predicates = x => true;
-            else
-                predicates = x => x.Name.Contains(model.Filter.First().Value, StringComparison.OrdinalIgnoreCase);
-
             try
             {
-                var total = await UoW.LoginRepo.CountAsync(predicates);
-                var result = await UoW.LoginRepo.GetAsync(predicates,
-                    x => x.Include(l => l.tbl_UserLogins).ThenInclude(l => l.User),
-                    x => x.OrderBy(string.Format("{0} {1}", model.Sort.First().Field, model.Sort.First().Dir)),
-                    model.Skip,
-                    model.Take);
-
-                return Ok(new
+                var result = new PageStateResult<LoginModel>
                 {
-                    Data = Mapper.Map<IEnumerable<LoginModel>>(result),
-                    Total = total
-                });
+                    Data = Mapper.Map<IEnumerable<LoginModel>>(
+                        await UoW.Logins.GetAsync(
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
+                                model.ToExpression<tbl_Logins>()))),
+
+                    Total = await UoW.Logins.CountAsync(
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
+                            model.ToPredicateExpression<tbl_Logins>()))
+                };
+
+                return Ok(result);
             }
-            catch (ParseException ex)
+            catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
                 return BadRequest(ModelState);
@@ -142,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{loginID:guid}/users"), HttpGet]
         public async Task<IActionResult> GetLoginUsersV1([FromRoute] Guid loginID)
         {
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Id == loginID)).SingleOrDefault();
+            var login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
             if (login == null)
             {
@@ -150,11 +137,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = await UoW.LoginRepo.GetUsersAsync(loginID);
+            var users = await UoW.Users.GetAsync(new QueryExpression<tbl_Users>()
+                .Where(x => x.tbl_UserLogins.Any(y => y.LoginId == loginID)).ToLambda());
 
-            var result = users.Select(x => Mapper.Map<UserModel>(x));
-
-            return Ok(result);
+            return Ok(Mapper.Map<UserModel>(users));
         }
 
         [Route("v1"), HttpPut]
@@ -164,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
+            var login = (await UoW.Logins.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
 
             if (login == null)
             {
@@ -180,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.LoginRepo.UpdateAsync(Mapper.Map<tbl_Logins>(model));
+            var result = await UoW.Logins.UpdateAsync(Mapper.Map<tbl_Logins>(model));
 
             await UoW.CommitAsync();
 

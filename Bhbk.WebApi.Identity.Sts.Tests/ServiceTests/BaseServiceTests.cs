@@ -5,9 +5,6 @@ using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
-#if MIDDLEWARE
-using Bhbk.WebApi.Identity.Sts.Middlewares;
-#endif
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,6 +24,9 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using Xunit;
+#if MIDDLEWARE
+using Bhbk.WebApi.Identity.Sts.Middlewares;
+#endif
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         {
             var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-            var conf = (IConfiguration) new ConfigurationBuilder()
+            var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
@@ -78,24 +78,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 if (owin.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
 
-                var issuers = (owin.IssuerRepo.GetAsync().Result)
-                    .Select(x => x.Name + ":" + owin.IssuerRepo.Salt);
+                var issuers = (owin.Issuers.GetAsync().Result)
+                    .Select(x => x.Name + ":" + owin.Issuers.Salt);
 
-                var issuerKeys = (owin.IssuerRepo.GetAsync().Result)
+                var issuerKeys = (owin.Issuers.GetAsync().Result)
                     .Select(x => x.IssuerKey);
 
-                var clients = (owin.ClientRepo.GetAsync().Result)
+                var clients = (owin.Clients.GetAsync().Result)
                     .Select(x => x.Name);
 
                 /*
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                var legacyIssuer = (owin.SettingRepo.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = (owin.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
 
                 if (bool.Parse(legacyIssuer.ConfigValue))
-                    issuers = (owin.IssuerRepo.GetAsync().Result)
+                    issuers = (owin.Issuers.GetAsync().Result)
                         .Select(x => x.Name).Concat(issuers);
 
                 sc.AddControllers()

@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
@@ -15,31 +16,34 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     public class LoginRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async Task Lib_LoginRepo_CreateV1_Fail()
+        public async Task Repo_Logins_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
-                await UoW.LoginRepo.CreateAsync(
+                await UoW.Logins.CreateAsync(
                     Mapper.Map<tbl_Logins>(new LoginCreate()));
+                await UoW.CommitAsync();
             });
 
             await Assert.ThrowsAsync<DbUpdateException>(async () =>
             {
-                await UoW.LoginRepo.CreateAsync(
+                await UoW.Logins.CreateAsync(
                     Mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = Constants.ApiTestLogin,
                         Immutable = false,
                     }));
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_LoginRepo_CreateV1_Success()
+        public async Task Repo_Logins_CreateV1_Success()
         {
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var result = await UoW.LoginRepo.CreateAsync(
+            var result = await UoW.Logins.CreateAsync(
                 Mapper.Map<tbl_Logins>(new LoginCreate()
                 {
                     Name = Constants.ApiTestLogin,
@@ -47,63 +51,66 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                 }));
             result.Should().BeAssignableTo<tbl_Logins>();
 
-            TestData.DestroyAsync().Wait();
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_LoginRepo_DeleteV1_Fail()
+        public async Task Repo_Logins_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
             {
-                await UoW.LoginRepo.DeleteAsync(Guid.NewGuid());
+                await UoW.Logins.DeleteAsync(new tbl_Logins());
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_LoginRepo_DeleteV1_Success()
+        public async Task Repo_Logins_DeleteV1_Success()
         {
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiTestLogin)).Single();
+            var login = (await UoW.Logins.GetAsync(x => x.Name == Constants.ApiTestLogin)).Single();
 
-            var result = await UoW.LoginRepo.DeleteAsync(login.Id);
-            result.Should().BeTrue();
-
-            TestData.DestroyAsync().Wait();
+            await UoW.Logins.DeleteAsync(login);
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_LoginRepo_GetV1_Success()
+        public async Task Repo_Logins_GetV1_Success()
         {
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var result = await UoW.LoginRepo.GetAsync();
+            var result = await UoW.Logins.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Logins>>();
 
-            TestData.DestroyAsync().Wait();
+            await UoW.CommitAsync();
         }
 
         [Fact]
-        public async Task Lib_LoginRepo_UpdateV1_Fail()
+        public async Task Repo_Logins_UpdateV1_Fail()
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await UoW.LoginRepo.UpdateAsync(new tbl_Logins());
+                await UoW.Logins.UpdateAsync(new tbl_Logins());
+                await UoW.CommitAsync();
             });
         }
 
         [Fact]
-        public async Task Lib_LoginRepo_UpdateV1_Success()
+        public async Task Repo_Logins_UpdateV1_Success()
         {
-            TestData.CreateAsync().Wait();
+            new TestData(UoW, Mapper).DestroyAsync().Wait();
+            new TestData(UoW, Mapper).CreateAsync().Wait();
 
-            var login = (await UoW.LoginRepo.GetAsync(x => x.Name == Constants.ApiTestLogin)).Single();
+            var login = (await UoW.Logins.GetAsync(x => x.Name == Constants.ApiTestLogin)).Single();
             login.Name += "(Updated)";
 
-            var result = await UoW.LoginRepo.UpdateAsync(login);
+            var result = await UoW.Logins.UpdateAsync(login);
             result.Should().BeAssignableTo<tbl_Logins>();
 
-            TestData.DestroyAsync().Wait();
+            await UoW.CommitAsync();
         }
     }
 }

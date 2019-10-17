@@ -32,10 +32,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         [NonAction]
         public void SetUser(Guid issuerID, Guid userID)
         {
-            var issuer = (UoW.IssuerRepo.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
-            var user = (UoW.UserRepo.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
+            var issuer = (UoW.Issuers.GetAsync(x => x.Id == issuerID).Result).SingleOrDefault();
+            var user = (UoW.Users.GetAsync(x => x.Id == userID).Result).SingleOrDefault();
 
-            ControllerContext.HttpContext.User = UoW.UserRepo.GenerateAccessClaimsAsync(issuer, user).Result;
+            ControllerContext.HttpContext.User = UoW.Users.GenerateAccessClaimsAsync(issuer, user).Result;
         }
     }
 }

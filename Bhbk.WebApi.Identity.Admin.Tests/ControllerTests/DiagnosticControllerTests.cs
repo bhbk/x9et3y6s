@@ -14,61 +14,73 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
 {
     public class DiagnosticControllerTests : IClassFixture<BaseControllerTests>
     {
-        private readonly IConfiguration _conf;
-        private readonly IContextService _instance;
         private readonly BaseControllerTests _factory;
 
-        public DiagnosticControllerTests(BaseControllerTests factory)
-        {
-            _factory = factory;
-            _factory.CreateClient();
-
-            _conf = _factory.Server.Host.Services.GetRequiredService<IConfiguration>();
-            _instance = _factory.Server.Host.Services.GetRequiredService<IContextService>();
-        }
+        public DiagnosticControllerTests(BaseControllerTests factory) => _factory = factory;
 
         [Fact]
         public void Admin_DiagV1_GetStatus_Fail()
         {
-            var controller = new DiagnosticController(_conf, _instance);
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-            var result = controller.GetStatusV1(AlphaNumeric.CreateString(8)) as BadRequestResult;
-            result.Should().BeOfType<BadRequestResult>();
+                var controller = new DiagnosticController(conf, instance);
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+
+                var result = controller.GetStatusV1(AlphaNumeric.CreateString(8)) as BadRequestResult;
+                result.Should().BeOfType<BadRequestResult>();
+            }
         }
 
         [Fact]
         public void Admin_DiagV1_GetStatus_Success()
         {
-            var controller = new DiagnosticController(_conf, _instance);
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-            var result = controller.GetStatusV1(TaskType.MaintainActivity.ToString()) as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<string>();
+                var controller = new DiagnosticController(conf, instance);
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            result = controller.GetStatusV1(TaskType.MaintainUsers.ToString()) as OkObjectResult;
-            ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<string>();
+                var result = controller.GetStatusV1(TaskType.MaintainActivity.ToString()) as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                ok.Value.Should().BeAssignableTo<string>();
+
+                result = controller.GetStatusV1(TaskType.MaintainUsers.ToString()) as OkObjectResult;
+                ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                ok.Value.Should().BeAssignableTo<string>();
+            }
         }
 
         [Fact]
         public void Admin_DiagV1_GetVersion_Success()
         {
-            var controller = new DiagnosticController(_conf, _instance);
-            controller.ControllerContext = new ControllerContext();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-            var result = controller.GetVersionV1() as OkObjectResult;
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+                var controller = new DiagnosticController(conf, instance);
+                controller.ControllerContext = new ControllerContext();
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-            data.Should().Be(Assembly.GetAssembly(typeof(DiagnosticController)).GetName().Version.ToString());
+                var result = controller.GetVersionV1() as OkObjectResult;
+                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+                var data = ok.Value.Should().BeAssignableTo<string>().Subject;
+
+                data.Should().Be(Assembly.GetAssembly(typeof(DiagnosticController)).GetName().Version.ToString());
+            }
         }
     }
 }

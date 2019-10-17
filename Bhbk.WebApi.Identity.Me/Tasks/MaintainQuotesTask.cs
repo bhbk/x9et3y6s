@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Models.Me;
@@ -71,8 +72,10 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                             if (motdtype1_response.IsSuccessStatusCode)
                             {
                                 var model = mapper.Map<tbl_MotDType1>(motdtype1.contents.quotes[0]);
-                                var motd = uow.UserRepo.GetMOTDAsync(x => x.Author == model.Author
-                                    && x.Quote == model.Quote).Result.SingleOrDefault();
+
+                                var motd = uow.MOTDs.GetAsync(new QueryExpression<tbl_MotDType1>()
+                                    .Where(x => x.Author == model.Author && x.Quote == model.Quote)
+                                    .ToLambda()).Result.SingleOrDefault();
 
                                 if (motd == null)
                                 {
@@ -82,14 +85,14 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     if (model.Id == null)
                                         model.Id = Guid.NewGuid().ToString();
 
-                                    uow.UserRepo.CreateMOTDAsync(model).Wait();
+                                    uow.MOTDs.CreateAsync(model).Wait();
                                     uow.CommitAsync().Wait();
                                 }
                                 else if (motd.Id != model.Id)
                                 {
                                     motd.Id = model.Id;
 
-                                    uow.UserRepo.CreateMOTDAsync(motd).Wait();
+                                    uow.MOTDs.CreateAsync(motd).Wait();
                                     uow.CommitAsync().Wait();
                                 }
 

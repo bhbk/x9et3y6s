@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
             {
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            await UoW.UserRepo.SetConfirmedEmailAsync(user.Id, true);
+            await UoW.Users.SetConfirmedEmailAsync(user, true);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
             {
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            await UoW.UserRepo.SetConfirmedPasswordAsync(user.Id, true);
+            await UoW.Users.SetConfirmedPasswordAsync(user, true);
             await UoW.CommitAsync();
 
             return NoContent();
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.UserRepo.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
             if (user == null)
             {
@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            await UoW.UserRepo.SetConfirmedPhoneNumberAsync(user.Id, true);
+            await UoW.Users.SetConfirmedPhoneNumberAsync(user, true);
             await UoW.CommitAsync();
 
             return NoContent();

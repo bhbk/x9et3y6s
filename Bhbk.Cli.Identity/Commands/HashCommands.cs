@@ -26,7 +26,7 @@ namespace Bhbk.Cli.Identity.Commands
             {
                 var file = SearchRoots.ByAssemblyContext("appsettings.json");
 
-                var conf = (IConfiguration) new ConfigurationBuilder()
+                var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
                     .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                     .Build();
@@ -38,9 +38,9 @@ namespace Bhbk.Cli.Identity.Commands
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = StandardInput.GetHiddenInput();
-                    var hashvalue = uow.UserRepo.passwordHasher.HashPassword(null, cleartext);
+                    var hashvalue = uow.Users.passwordHasher.HashPassword(null, cleartext);
 
-                    if (uow.UserRepo.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (uow.Users.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {
