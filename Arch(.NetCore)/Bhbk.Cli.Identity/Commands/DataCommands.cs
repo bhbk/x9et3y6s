@@ -27,7 +27,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var file = SearchRoots.ByAssemblyContext("appsettings.json");
+                var file = SearchRoots.ByAssemblyContext("clisettings.json");
 
                 var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)
@@ -45,7 +45,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    data.CreateAsync().Wait();
+                    data.CreateAsync().AsTask();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -56,7 +56,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    data.DestroyAsync().Wait();
+                    data.DestroyAsync().AsTask();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -67,7 +67,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    data.DestroyAsync().Wait();
+                    data.DestroyAsync().AsTask();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

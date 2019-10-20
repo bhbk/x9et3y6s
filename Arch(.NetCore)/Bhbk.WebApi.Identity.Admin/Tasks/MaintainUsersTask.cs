@@ -65,8 +65,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                         if (disabled.Any())
                         {
-                            uow.Users.DeleteAsync(disabled).Wait();
-                            uow.CommitAsync().Wait();
+                            await uow.Users.DeleteAsync(disabled);
+                            await uow.CommitAsync();
 
                             var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                     + disabledCount.ToString() + " users with expired lock-outs.";

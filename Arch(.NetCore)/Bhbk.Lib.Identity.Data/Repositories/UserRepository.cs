@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public async Task<tbl_Users> AccessFailedAsync(tbl_Users user)
+        public async ValueTask<tbl_Users> AccessFailedAsync(tbl_Users user)
         {
             user.LastLoginFailure = Clock.UtcDateTime;
             user.AccessFailedCount++;
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> AccessSuccessAsync(tbl_Users user)
+        public async ValueTask<tbl_Users> AccessSuccessAsync(tbl_Users user)
         {
             user.LastLoginSuccess = Clock.UtcDateTime;
             user.AccessSuccessCount++;
@@ -67,7 +67,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<bool> AddToClaimAsync(tbl_Users user, tbl_Claims claim)
+        public async ValueTask<bool> AddToClaimAsync(tbl_Users user, tbl_Claims claim)
         {
             _context.Set<tbl_UserClaims>().Add(
                 new tbl_UserClaims()
@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddToLoginAsync(tbl_Users user, tbl_Logins login)
+        public async ValueTask<bool> AddToLoginAsync(tbl_Users user, tbl_Logins login)
         {
             _context.Set<tbl_UserLogins>().Add(
                 new tbl_UserLogins()
@@ -95,7 +95,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> AddToRoleAsync(tbl_Users user, tbl_Roles role)
+        public async ValueTask<bool> AddToRoleAsync(tbl_Users user, tbl_Roles role)
         {
             _context.Set<tbl_UserRoles>().Add(
                 new tbl_UserRoles()
@@ -109,7 +109,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public override async Task<tbl_Users> CreateAsync(tbl_Users user)
+        public override async ValueTask<tbl_Users> CreateAsync(tbl_Users user)
         {
             var create = await InternalCreateAsync(user);
 
@@ -118,7 +118,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(create);
         }
 
-        public async Task<tbl_Users> CreateAsync(tbl_Users user, string password)
+        public async ValueTask<tbl_Users> CreateAsync(tbl_Users user, string password)
         {
             var create = await InternalCreateAsync(user);
 
@@ -129,7 +129,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(create);
         }
 
-        public override async Task<tbl_Users> DeleteAsync(tbl_Users user)
+        public override async ValueTask<tbl_Users> DeleteAsync(tbl_Users user)
         {
             var activity = _context.Set<tbl_Activities>().Where(x => x.UserId == user.Id);
             var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.UserId == user.Id);
@@ -144,7 +144,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Remove(user).Entity);
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Users user)
+        public async ValueTask<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
@@ -201,7 +201,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Users user)
+        public async ValueTask<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Users user)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
@@ -294,7 +294,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(PasswordVerificationResult.Failed);
         }
 
-        public async Task<bool> IsInClaimAsync(Guid userKey, Guid claimKey)
+        public async ValueTask<bool> IsInClaimAsync(Guid userKey, Guid claimKey)
         {
             /*
              * TODO need to add check for role based claims...
@@ -306,7 +306,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(false);
         }
 
-        public async Task<bool> IsInLoginAsync(Guid userKey, Guid loginKey)
+        public async ValueTask<bool> IsInLoginAsync(Guid userKey, Guid loginKey)
         {
             if (_context.Set<tbl_UserLogins>().Any(x => x.UserId == userKey && x.LoginId == loginKey))
                 return await Task.FromResult(true);
@@ -314,7 +314,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(false);
         }
 
-        public async Task<bool> IsInRoleAsync(Guid userKey, Guid roleKey)
+        public async ValueTask<bool> IsInRoleAsync(Guid userKey, Guid roleKey)
         {
             if (_context.Set<tbl_UserRoles>().Any(x => x.UserId == userKey && x.RoleId == roleKey))
                 return await Task.FromResult(true);
@@ -322,7 +322,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(false);
         }
 
-        public async Task<bool> IsLockedOutAsync(Guid key)
+        public async ValueTask<bool> IsLockedOutAsync(Guid key)
         {
             var entity = _context.Set<tbl_Users>().Where(x => x.Id == key).SingleOrDefault();
 
@@ -349,7 +349,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             }
         }
 
-        public async Task<bool> IsPasswordSetAsync(Guid key)
+        public async ValueTask<bool> IsPasswordSetAsync(Guid key)
         {
             var entity = _context.Set<tbl_Users>().Where(x => x.Id == key).SingleOrDefault();
 
@@ -362,7 +362,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveFromClaimAsync(tbl_Users user, tbl_Claims claim)
+        public async ValueTask<bool> RemoveFromClaimAsync(tbl_Users user, tbl_Claims claim)
         {
             var entity = _context.Set<tbl_UserClaims>().Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
 
@@ -371,7 +371,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveFromLoginAsync(tbl_Users user, tbl_Logins login)
+        public async ValueTask<bool> RemoveFromLoginAsync(tbl_Users user, tbl_Logins login)
         {
             var entity = _context.Set<tbl_UserLogins>().Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
 
@@ -380,7 +380,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemoveFromRoleAsync(tbl_Users user, tbl_Roles role)
+        public async ValueTask<bool> RemoveFromRoleAsync(tbl_Users user, tbl_Roles role)
         {
             var entity = _context.Set<tbl_UserRoles>().Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
@@ -389,12 +389,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> RemovePasswordAsync(tbl_Users user)
+        public async ValueTask<bool> RemovePasswordAsync(tbl_Users user)
         {
             return await InternalSetPasswordHashAsync(user, null);
         }
 
-        public async Task<tbl_Users> SetConfirmedEmailAsync(tbl_Users user, bool confirmed)
+        public async ValueTask<tbl_Users> SetConfirmedEmailAsync(tbl_Users user, bool confirmed)
         {
             user.EmailConfirmed = confirmed;
             user.LastUpdated = Clock.UtcDateTime;
@@ -404,7 +404,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> SetConfirmedPasswordAsync(tbl_Users user, bool confirmed)
+        public async ValueTask<tbl_Users> SetConfirmedPasswordAsync(tbl_Users user, bool confirmed)
         {
             user.PasswordConfirmed = confirmed;
             user.LastUpdated = Clock.UtcDateTime;
@@ -414,7 +414,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> SetConfirmedPhoneNumberAsync(tbl_Users user, bool confirmed)
+        public async ValueTask<tbl_Users> SetConfirmedPhoneNumberAsync(tbl_Users user, bool confirmed)
         {
             user.PhoneNumberConfirmed = confirmed;
             user.LastUpdated = Clock.UtcDateTime;
@@ -424,7 +424,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> SetImmutableAsync(tbl_Users user, bool enabled)
+        public async ValueTask<tbl_Users> SetImmutableAsync(tbl_Users user, bool enabled)
         {
             user.Immutable = enabled;
             user.LastUpdated = Clock.UtcDateTime;
@@ -434,14 +434,14 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> SetPasswordAsync(tbl_Users user, string password)
+        public async ValueTask<tbl_Users> SetPasswordAsync(tbl_Users user, string password)
         {
             await InternalSetPasswordAsync(user, password);
 
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public async Task<tbl_Users> SetTwoFactorEnabledAsync(tbl_Users user, bool enabled)
+        public async ValueTask<tbl_Users> SetTwoFactorEnabledAsync(tbl_Users user, bool enabled)
         {
             user.TwoFactorEnabled = enabled;
             user.LastUpdated = Clock.UtcDateTime;
@@ -451,7 +451,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(user).Entity);
         }
 
-        public override async Task<tbl_Users> UpdateAsync(tbl_Users user)
+        public override async ValueTask<tbl_Users> UpdateAsync(tbl_Users user)
         {
             if (!(await userValidator.ValidateAsync(user)).Succeeded)
                 throw new InvalidOperationException();
@@ -474,7 +474,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Update(entity).Entity);
         }
 
-        public async Task<bool> VerifyPasswordAsync(Guid key, string password)
+        public async ValueTask<bool> VerifyPasswordAsync(Guid key, string password)
         {
             var entity = _context.Set<tbl_Users>().Where(x => x.Id == key).Single();
 

@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateIssuerV1([FromBody] IssuerCreate model)
+        public async ValueTask<IActionResult> CreateIssuerV1([FromBody] IssuerCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteIssuerV1([FromRoute] Guid issuerID)
+        public async ValueTask<IActionResult> DeleteIssuerV1([FromRoute] Guid issuerID)
         {
             var issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerValue}"), HttpGet]
-        public async Task<IActionResult> GetIssuerV1([FromRoute] string issuerValue)
+        public async ValueTask<IActionResult> GetIssuerV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
             tbl_Issuers issuer = null;
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetIssuersV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetIssuersV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}/clients"), HttpGet]
-        public async Task<IActionResult> GetIssuerClientsV1([FromRoute] Guid issuerID)
+        public async ValueTask<IActionResult> GetIssuerClientsV1([FromRoute] Guid issuerID)
         {
             var issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
 
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> UpdateIssuerV1([FromBody] IssuerModel model)
+        public async ValueTask<IActionResult> UpdateIssuerV1([FromBody] IssuerModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

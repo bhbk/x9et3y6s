@@ -3,10 +3,11 @@ using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Domain.Providers.Me
 {
-    public class BaseProvider : IDisposable
+    public class BaseProvider : IAsyncDisposable
     {
         protected IUoWService UoW;
         protected IMapper Mapper => new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
@@ -16,9 +17,9 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Me
             UoW = new UoWService(conf, instance);
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            UoW.Dispose();
+            await UoW.DisposeAsync();
         }
     }
 }

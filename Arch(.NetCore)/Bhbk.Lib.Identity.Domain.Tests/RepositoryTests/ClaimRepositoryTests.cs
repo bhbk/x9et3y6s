@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     public class ClaimRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async Task Repo_Claims_CreateV1_Fail()
+        public async ValueTask Repo_Claims_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
@@ -44,10 +44,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Claims_CreateV1_Success()
+        public async ValueTask Repo_Claims_CreateV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var issuer = (await UoW.Issuers.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
 
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Claims_DeleteV1_Fail()
+        public async ValueTask Repo_Claims_DeleteV1_Fail()
         {
             await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
             {
@@ -75,10 +75,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Claims_DeleteV1_Success()
+        public async ValueTask Repo_Claims_DeleteV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda()))
@@ -89,10 +89,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Claims_GetV1_Success()
+        public async ValueTask Repo_Claims_GetV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var result = await UoW.Claims.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Claims>>();
@@ -101,7 +101,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Claims_UpdateV1_Fail()
+        public async ValueTask Repo_Claims_UpdateV1_Fail()
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
@@ -111,10 +111,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Claims_UpdateV1_Success()
+        public async ValueTask Repo_Claims_UpdateV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim)

@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email"), HttpPut]
-        public async Task<IActionResult> ChangeEmailV1([FromBody] UserChangeEmail model)
+        public async ValueTask<IActionResult> ChangeEmailV1([FromBody] UserChangeEmail model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password"), HttpPut]
-        public async Task<IActionResult> ChangePasswordV1([FromBody] UserChangePassword model)
+        public async ValueTask<IActionResult> ChangePasswordV1([FromBody] UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone"), HttpPut]
-        public async Task<IActionResult> ChangePhoneV1([FromBody] UserChangePhone model)
+        public async ValueTask<IActionResult> ChangePhoneV1([FromBody] UserChangePhone model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

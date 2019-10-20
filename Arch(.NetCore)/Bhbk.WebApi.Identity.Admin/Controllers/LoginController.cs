@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateLoginV1([FromBody] LoginCreate model)
+        public async ValueTask<IActionResult> CreateLoginV1([FromBody] LoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
+        public async ValueTask<IActionResult> DeleteLoginV1([FromRoute] Guid loginID)
         {
             var login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginValue}"), HttpGet]
-        public async Task<IActionResult> GetLoginV1([FromRoute] string loginValue)
+        public async ValueTask<IActionResult> GetLoginV1([FromRoute] string loginValue)
         {
             Guid loginID;
             tbl_Logins login = null;
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetLoginsV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetLoginsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID:guid}/users"), HttpGet]
-        public async Task<IActionResult> GetLoginUsersV1([FromRoute] Guid loginID)
+        public async ValueTask<IActionResult> GetLoginUsersV1([FromRoute] Guid loginID)
         {
             var login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
 
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> UpdateLoginV1([FromBody] LoginModel model)
+        public async ValueTask<IActionResult> UpdateLoginV1([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public async Task<IActionResult> GetUserV1()
+        public async ValueTask<IActionResult> GetUserV1()
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
         [Route("v1/msg-of-the-day"), HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetMOTDV1()
+        public async ValueTask<IActionResult> GetMOTDV1()
         {
             var random = new Random();
             var skip = random.Next(1, await UoW.MOTDs.CountAsync());
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code"), HttpGet]
-        public async Task<IActionResult> GetUserCodesV1()
+        public async ValueTask<IActionResult> GetUserCodesV1()
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code/revoke"), HttpDelete]
-        public async Task<IActionResult> DeleteUserCodesV1()
+        public async ValueTask<IActionResult> DeleteUserCodesV1()
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code/{codeID}/revoke"), HttpDelete]
-        public async Task<IActionResult> DeleteUserCodeV1([FromRoute] Guid codeID)
+        public async ValueTask<IActionResult> DeleteUserCodeV1([FromRoute] Guid codeID)
         {
             var code = (await UoW.States.GetAsync(x => x.UserId == GetUserGUID()
                 && x.Id == codeID)).SingleOrDefault();
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code/{codeValue}/{actionValue}"), HttpGet]
-        public async Task<IActionResult> UpdateUserCodeV1([FromRoute] string codeValue, string actionValue)
+        public async ValueTask<IActionResult> UpdateUserCodeV1([FromRoute] string codeValue, string actionValue)
         {
             ActionType actionType;
 
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/refresh"), HttpGet]
-        public async Task<IActionResult> GetUserRefreshesV1()
+        public async ValueTask<IActionResult> GetUserRefreshesV1()
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == GetUserGUID()).ToLambda();
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/refresh/revoke"), HttpDelete]
-        public async Task<IActionResult> DeleteUserRefreshesV1()
+        public async ValueTask<IActionResult> DeleteUserRefreshesV1()
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
 
@@ -206,7 +206,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/refresh/{refreshID}/revoke"), HttpDelete]
-        public async Task<IActionResult> DeleteUserRefreshV1([FromRoute] Guid refreshID)
+        public async ValueTask<IActionResult> DeleteUserRefreshV1([FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == GetUserGUID() && x.Id == refreshID).ToLambda();
@@ -224,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password"), HttpPut]
-        public async Task<IActionResult> SetUserPasswordV1([FromBody] UserChangePassword model)
+        public async ValueTask<IActionResult> SetUserPasswordV1([FromBody] UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -257,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-two-factor/{statusValue}"), HttpPut]
-        public async Task<IActionResult> SetTwoFactorV1([FromRoute] bool statusValue)
+        public async ValueTask<IActionResult> SetTwoFactorV1([FromRoute] bool statusValue)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -283,7 +283,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpPut]
-        public async Task<IActionResult> UpdateUserV1([FromBody] UserModel model)
+        public async ValueTask<IActionResult> UpdateUserV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

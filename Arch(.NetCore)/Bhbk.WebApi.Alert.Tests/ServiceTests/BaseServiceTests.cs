@@ -53,7 +53,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).CreateAsync().Wait();
+                    new DefaultData(uow, mapper).CreateAsync().AsTask();
 
                     return uow;
                 });
@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                  */
 
                 var owin = new UoWService(conf, instance);
-                new DefaultData(owin, mapper).CreateAsync().Wait();
+                new DefaultData(owin, mapper).CreateAsync().AsTask();
 
                 /*
                  * only test context allowed to run...

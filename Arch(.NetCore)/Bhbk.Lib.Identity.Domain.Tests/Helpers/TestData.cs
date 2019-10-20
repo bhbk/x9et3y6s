@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             _mapper = mapper ?? throw new ArgumentNullException();
         }
 
-        public async Task CreateAsync()
+        public async ValueTask CreateAsync()
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -324,7 +324,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             await _uow.CommitAsync();
         }
 
-        public async Task CreateAsync(uint sets)
+        public async ValueTask CreateAsync(uint sets)
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -524,7 +524,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
         }
 
-        public async Task CreateMOTDAsync(uint sets)
+        public async ValueTask CreateMOTDAsync(uint sets)
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -549,7 +549,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
         }
 
-        public async Task DestroyAsync()
+        public async ValueTask DestroyAsync()
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();

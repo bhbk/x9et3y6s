@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{activityValue}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> GetActivityV1([FromRoute] string activityValue)
+        public async ValueTask<IActionResult> GetActivityV1([FromRoute] string activityValue)
         {
             Guid activityID;
             tbl_Activities activity = null;
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/page"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> GetActivitiesV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetActivitiesV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -64,8 +64,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                         if (invalid.Any())
                         {
-                            uow.Refreshes.DeleteAsync(invalid).Wait();
-                            uow.CommitAsync().Wait();
+                            await uow.Refreshes.DeleteAsync(invalid);
+                            await uow.CommitAsync();
 
                             var msg = typeof(MaintainRefreshesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + invalidCount.ToString() + " invalid refresh tokens.";

@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         public ImplicitServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Sts_OAuth2_ImplicitV1_Auth_NotImplemented()
+        public async ValueTask Sts_OAuth2_ImplicitV1_Auth_NotImplemented()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_ClientNotExist()
+        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_ClientNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -62,8 +62,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_IssuerNotExist()
+        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_IssuerNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -99,8 +99,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
                 var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_UrlNotExist()
+        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_UrlNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -135,8 +135,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_UserNotExist()
+        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_UserNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -172,8 +172,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();

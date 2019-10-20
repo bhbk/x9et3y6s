@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public RefreshRepository(_DbContext context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override Task<tbl_Refreshes> UpdateAsync(tbl_Refreshes entity)
+        public override ValueTask<tbl_Refreshes> UpdateAsync(tbl_Refreshes entity)
         {
             throw new NotImplementedException();
         }

@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg-ask"), HttpPost]
-        public async Task<IActionResult> DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
+        public async ValueTask<IActionResult> DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -146,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg"), HttpPost]
-        public async Task<IActionResult> DeviceCodeV2_Auth([FromForm] DeviceCodeV2 input)
+        public async ValueTask<IActionResult> DeviceCodeV2_Auth([FromForm] DeviceCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

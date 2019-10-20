@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg"), HttpPost]
-        public async Task<IActionResult> ClientCredentialV2_Auth([FromForm] ClientCredentialV2 input)
+        public async ValueTask<IActionResult> ClientCredentialV2_Auth([FromForm] ClientCredentialV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg-rt"), HttpPost]
-        public async Task<IActionResult> ClientCredentialV2_Refresh([FromForm] RefreshTokenV2 input)
+        public async ValueTask<IActionResult> ClientCredentialV2_Refresh([FromForm] RefreshTokenV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        public async ValueTask<IActionResult> AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public async ValueTask<IActionResult> AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/add-to-role/{roleID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
+        public async ValueTask<IActionResult> AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateUserV1([FromBody] UserCreate model)
+        public async ValueTask<IActionResult> CreateUserV1([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -186,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/no-confirm"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateUserV1NoConfirm([FromBody] UserCreate model)
+        public async ValueTask<IActionResult> CreateUserV1NoConfirm([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteUserV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> DeleteUserV1([FromRoute] Guid userID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -240,7 +240,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/refresh"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteUserRefreshesV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> DeleteUserRefreshesV1([FromRoute] Guid userID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -260,7 +260,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/refresh/{refreshID}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteUserRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
+        public async ValueTask<IActionResult> DeleteUserRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID && x.Id == refreshID).ToLambda();
@@ -278,7 +278,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/msg-of-the-day/page"), HttpPost]
-        public async Task<IActionResult> GetMOTDsV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetMOTDsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -307,7 +307,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userValue}"), HttpGet]
-        public async Task<IActionResult> GetUserV1([FromRoute] string userValue)
+        public async ValueTask<IActionResult> GetUserV1([FromRoute] string userValue)
         {
             Guid userID;
             tbl_Users user = null;
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/claims"), HttpGet]
-        public async Task<IActionResult> GetUserClaimsV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> GetUserClaimsV1([FromRoute] Guid userID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -345,7 +345,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/clients"), HttpGet]
-        public async Task<IActionResult> GetUserClientsV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> GetUserClientsV1([FromRoute] Guid userID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -362,7 +362,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/logins"), HttpGet]
-        public async Task<IActionResult> GetUserLoginsV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> GetUserLoginsV1([FromRoute] Guid userID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -379,7 +379,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/refreshes"), HttpGet]
-        public async Task<IActionResult> GetUserRefreshesV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> GetUserRefreshesV1([FromRoute] Guid userID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID).ToLambda();
@@ -396,7 +396,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/roles"), HttpGet]
-        public async Task<IActionResult> GetUserRolesV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> GetUserRolesV1([FromRoute] Guid userID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -413,7 +413,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetUsersV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetUsersV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -444,7 +444,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        public async ValueTask<IActionResult> RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -473,7 +473,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public async ValueTask<IActionResult> RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -500,7 +500,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
+        public async ValueTask<IActionResult> RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
             var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
 
@@ -527,7 +527,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/remove-password"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> RemovePasswordV1([FromRoute] Guid userID)
+        public async ValueTask<IActionResult> RemovePasswordV1([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -558,7 +558,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
+        public async ValueTask<IActionResult> SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -587,7 +587,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> UpdateUserV1([FromBody] UserModel model)
+        public async ValueTask<IActionResult> UpdateUserV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

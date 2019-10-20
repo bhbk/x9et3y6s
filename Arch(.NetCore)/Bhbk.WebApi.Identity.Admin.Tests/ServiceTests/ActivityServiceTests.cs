@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         public ActivityServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Admin_ActivityV1_Get_Success()
+        public async ValueTask Admin_ActivityV1_Get_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -37,8 +37,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -60,8 +60,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -72,9 +72,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 int take = 2;
                 var state = new PageState()
                 {
-                    Sort = new List<SortModel>() 
+                    Sort = new List<PageStateSort>() 
                     {
-                        new SortModel() { Field = "created", Dir = "asc" }
+                        new PageStateSort() { Field = "created", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take

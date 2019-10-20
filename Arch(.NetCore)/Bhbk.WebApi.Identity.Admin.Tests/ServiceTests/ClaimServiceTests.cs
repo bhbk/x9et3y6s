@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         public ClaimServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Admin_ClaimV1_Create_Fail()
+        public async ValueTask Admin_ClaimV1_Create_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -47,8 +47,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Admin_ClaimV1_Create_Success()
+        public async ValueTask Admin_ClaimV1_Create_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Admin_ClaimV1_Delete_Fail()
+        public async ValueTask Admin_ClaimV1_Delete_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -167,8 +167,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -181,8 +181,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     .Single();
                 testClaim.Immutable = true;
 
-                uow.Claims.UpdateAsync(testClaim).Wait();
-                uow.CommitAsync().Wait();
+                await uow.Claims.UpdateAsync(testClaim);
+                await uow.CommitAsync();
 
                 var result = await service.Http.Claim_DeleteV1(rop.RawData, testClaim.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -191,7 +191,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Admin_ClaimV1_Delete_Success()
+        public async ValueTask Admin_ClaimV1_Delete_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -201,8 +201,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Admin_ClaimV1_Get_Success()
+        public async ValueTask Admin_ClaimV1_Get_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -235,8 +235,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -260,8 +260,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync(3).Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync(3);
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -272,9 +272,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 int take = 2;
                 var state = new PageState()
                 {
-                    Sort = new List<SortModel>() 
+                    Sort = new List<PageStateSort>() 
                     {
-                        new SortModel() { Field = "type", Dir = "asc" }
+                        new PageStateSort() { Field = "type", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Admin_ClaimV1_Update_Fail()
+        public async ValueTask Admin_ClaimV1_Update_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -301,8 +301,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
@@ -336,7 +336,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Admin_ClaimV1_Update_Success()
+        public async ValueTask Admin_ClaimV1_Update_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -346,8 +346,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Services
 {
-    public class UoWService : IUoWService, IDisposable
+    public class UoWService : IUoWService, IAsyncDisposable, IDisposable
     {
         private readonly _DbContext _context;
         public InstanceContext InstanceType { get; private set; }
@@ -81,9 +81,14 @@ namespace Bhbk.Lib.Identity.Data.Services
             Users = new UserRepository(_context, instance.InstanceType);
         }
 
-        public async Task CommitAsync()
+        public async ValueTask CommitAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await _context.DisposeAsync();
         }
 
         public void Dispose()

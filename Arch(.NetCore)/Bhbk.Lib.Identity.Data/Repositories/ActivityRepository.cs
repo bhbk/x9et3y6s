@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public ActivityRepository(_DbContext context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override Task<tbl_Activities> UpdateAsync(tbl_Activities entity)
+        public override ValueTask<tbl_Activities> UpdateAsync(tbl_Activities entity)
         {
             throw new NotImplementedException();
         }

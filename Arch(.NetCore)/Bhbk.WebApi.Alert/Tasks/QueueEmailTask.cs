@@ -74,10 +74,10 @@ namespace Bhbk.WebApi.Alert.Tasks
                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The email was created on " + entry.Created + " and is being deleted now.");
 
-                            uow.QueueEmails.DeleteAsync(entry).Wait();
+                            await uow.QueueEmails.DeleteAsync(entry);
                         }
 
-                        uow.CommitAsync().Wait();
+                        await uow.CommitAsync();
 
                         foreach (var entry in uow.QueueEmails.GetAsync(new QueryExpression<tbl_QueueEmails>()
                             .Where(x => x.SendAt < DateTime.Now).ToLambda()).Result)
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                                 "Error=" + response.StatusCode);
 #elif !RELEASE
-                                        uow.QueueEmails.DeleteAsync(msg).Wait();
+                                        await uow.QueueEmails.DeleteAsync(msg);
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 case InstanceContext.UnitTest:
                                     {
-                                        uow.QueueEmails.DeleteAsync(msg).Wait();
+                                        await uow.QueueEmails.DeleteAsync(msg);
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             }
                         }
 
-                        uow.CommitAsync().Wait();
+                        await uow.CommitAsync();
                     }
                 }
                 catch (Exception ex)
@@ -159,8 +159,8 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                    uow.QueueEmails.CreateAsync(model).Wait();
-                    uow.CommitAsync().Wait();
+                    uow.QueueEmails.CreateAsync(model);
+                    uow.CommitAsync();
                 }
 
                 return true;

@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public async Task<tbl_Clients> AccessFailedAsync(tbl_Clients client)
+        public async ValueTask<tbl_Clients> AccessFailedAsync(tbl_Clients client)
         {
             client.LastLoginFailure = Clock.UtcDateTime;
             client.AccessFailedCount++;
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(client).Entity);
         }
 
-        public async Task<tbl_Clients> AccessSuccessAsync(tbl_Clients client)
+        public async ValueTask<tbl_Clients> AccessSuccessAsync(tbl_Clients client)
         {
             client.LastLoginSuccess = Clock.UtcDateTime;
             client.AccessSuccessCount++;
@@ -51,7 +51,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Entry(client).Entity);
         }
 
-        public override async Task<tbl_Clients> DeleteAsync(tbl_Clients client)
+        public override async ValueTask<tbl_Clients> DeleteAsync(tbl_Clients client)
         {
             var activity = _context.Set<tbl_Activities>().Where(x => x.ClientId == client.Id);
             var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.ClientId == client.Id);
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Remove(client).Entity);
         }
 
-        public async Task<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
+        public async ValueTask<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
@@ -107,7 +107,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.Run(() => result);
         }
 
-        public async Task<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
+        public async ValueTask<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
@@ -136,7 +136,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.Run(() => result);
         }
 
-        public override async Task<tbl_Clients> UpdateAsync(tbl_Clients client)
+        public override async ValueTask<tbl_Clients> UpdateAsync(tbl_Clients client)
         {
             var entity = _context.Set<tbl_Clients>().Where(x => x.Id == client.Id).Single();
 

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.DataAccess.EFCore.Interfaces;
+﻿using Bhbk.Lib.DataAccess.EFCore.UnitOfWorks;
 using Bhbk.Lib.Identity.Data.Repositories;
 
 namespace Bhbk.Lib.Identity.Data.Services

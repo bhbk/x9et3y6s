@@ -212,9 +212,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
                         Immutable = false
-                    })).Wait();
+                    }));
 
-                uow.CommitAsync().Wait();
+                uow.CommitAsync();
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.ContentType = "application/json";
@@ -360,9 +360,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
                         Immutable = false
-                    })).Wait();
+                    }));
 
-                uow.CommitAsync().Wait();
+                uow.CommitAsync();
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.ContentType = "application/json";

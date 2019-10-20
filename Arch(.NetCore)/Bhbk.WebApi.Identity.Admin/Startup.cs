@@ -44,10 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddScoped<IUoWService, UoWService>(x =>
-            {
-                return new UoWService(conf, instance);
-            });
+            sc.AddScoped<IUoWService, UoWService>();
             sc.AddSingleton<IHostedService, MaintainActivityTask>();
             sc.AddSingleton<IHostedService, MaintainUsersTask>();
             sc.AddSingleton<IAlertService, AlertService>();

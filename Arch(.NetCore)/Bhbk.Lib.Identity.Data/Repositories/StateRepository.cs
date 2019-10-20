@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public StateRepository(_DbContext context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override async Task<tbl_States> UpdateAsync(tbl_States model)
+        public override async ValueTask<tbl_States> UpdateAsync(tbl_States model)
         {
             var entity = _context.Set<tbl_States>().Where(x => x.Id == model.Id).Single();
 

@@ -68,8 +68,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
                         if (expired.Any())
                         {
-                            uow.Activities.DeleteAsync(expired).Wait();
-                            uow.CommitAsync().Wait();
+                            await uow.Activities.DeleteAsync(expired);
+                            await uow.CommitAsync();
 
                             var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + expiredCount.ToString() + " expired activity entries.";

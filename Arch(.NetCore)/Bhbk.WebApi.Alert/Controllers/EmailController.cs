@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         }
 
         [Route("v1"), HttpPost]
-        public async Task<IActionResult> SendEmailV1([FromBody] EmailCreate model)
+        public async ValueTask<IActionResult> SendEmailV1([FromBody] EmailCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     public class RoleRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async Task Repo_Roles_CreateV1_Fail()
+        public async ValueTask Repo_Roles_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
@@ -40,10 +40,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Roles_CreateV1_Success()
+        public async ValueTask Repo_Roles_CreateV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var client = (await UoW.Clients.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
 
@@ -60,7 +60,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Roles_DeleteV1_Fail()
+        public async ValueTask Repo_Roles_DeleteV1_Fail()
         {
             await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
             {
@@ -70,10 +70,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Roles_DeleteV1_Success()
+        public async ValueTask Repo_Roles_DeleteV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var role = (await UoW.Roles.GetAsync(x => x.Name == Constants.ApiTestRole)).Single();
 
@@ -82,10 +82,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Roles_GetV1_Success()
+        public async ValueTask Repo_Roles_GetV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var result = await UoW.Roles.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Roles>>();
@@ -93,7 +93,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Roles_UpdateV1_Fail()
+        public async ValueTask Repo_Roles_UpdateV1_Fail()
         {
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
@@ -103,10 +103,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Roles_UpdateV1_Success()
+        public async ValueTask Repo_Roles_UpdateV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var role = (await UoW.Roles.GetAsync(x => x.Name == Constants.ApiTestRole)).Single();
             role.Name += "(Updated)";

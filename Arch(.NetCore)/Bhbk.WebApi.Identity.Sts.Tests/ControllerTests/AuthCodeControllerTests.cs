@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public AuthCodeControllerTests(BaseControllerTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Sts_OAuth2_AuthCodeV2_Ask_Success()
+        public async ValueTask Sts_OAuth2_AuthCodeV2_Ask_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -40,8 +40,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).DestroyAsync().Wait();
-                new TestData(uow, mapper).CreateAsync().Wait();
+                await new TestData(uow, mapper).DestroyAsync();
+                await new TestData(uow, mapper).CreateAsync();
 
                 var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
                 var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();

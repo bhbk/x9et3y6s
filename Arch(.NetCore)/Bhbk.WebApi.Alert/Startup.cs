@@ -44,10 +44,7 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddScoped<IUoWService, UoWService>(x =>
-            {
-                return new UoWService(conf, instance);
-            });
+            sc.AddScoped<IUoWService, UoWService>();
             sc.AddSingleton<IHostedService, QueueEmailTask>();
             sc.AddSingleton<IHostedService, QueueTextTask>();
             sc.AddSingleton<IAlertService, AlertService>();

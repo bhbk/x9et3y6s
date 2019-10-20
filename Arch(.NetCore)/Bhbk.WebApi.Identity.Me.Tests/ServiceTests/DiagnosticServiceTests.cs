@@ -14,7 +14,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         public DiagnosticServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Me_DiagV1_CheckSwagger_Success()
+        public async ValueTask Me_DiagV1_CheckSwagger_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())

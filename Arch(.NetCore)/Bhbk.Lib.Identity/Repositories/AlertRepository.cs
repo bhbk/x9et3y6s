@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<HttpResponseMessage> Enqueue_EmailV1(string jwt, EmailCreate model)
+        public async ValueTask<HttpResponseMessage> Enqueue_EmailV1(string jwt, EmailCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async Task<HttpResponseMessage> Enqueue_TextV1(string jwt, TextCreate model)
+        public async ValueTask<HttpResponseMessage> Enqueue_TextV1(string jwt, TextCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
         [Route("v1/email/{userID:guid}"), HttpPut]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
+        public async ValueTask<IActionResult> ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
         [Route("v1/password/{userID:guid}"), HttpPut]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmPasswordV1([FromRoute] Guid userID, [FromBody] string password, [FromBody] string token)
+        public async ValueTask<IActionResult> ConfirmPasswordV1([FromRoute] Guid userID, [FromBody] string password, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
         [Route("v1/phone/{userID:guid}"), HttpPut]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmPhoneV1([FromRoute] Guid userID, [FromBody] string phoneNumber, [FromBody] string token)
+        public async ValueTask<IActionResult> ConfirmPhoneV1([FromRoute] Guid userID, [FromBody] string phoneNumber, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

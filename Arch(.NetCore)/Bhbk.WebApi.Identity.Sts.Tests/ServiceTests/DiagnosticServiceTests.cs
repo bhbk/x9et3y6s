@@ -19,7 +19,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Sts_DiagV1_CheckSwagger_Success()
+        public async ValueTask Sts_DiagV1_CheckSwagger_Success()
         {
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {

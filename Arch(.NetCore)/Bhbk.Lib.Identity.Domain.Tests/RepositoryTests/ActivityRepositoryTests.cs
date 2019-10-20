@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
     public class ActivityRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async Task Repo_Activities_CreateV1_Fail()
+        public async ValueTask Repo_Activities_CreateV1_Fail()
         {
             await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
@@ -44,10 +44,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Activities_CreateV1_Success()
+        public async ValueTask Repo_Activities_CreateV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var user = (await UoW.Users.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
 
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Activities_DeleteV1_Fail()
+        public async ValueTask Repo_Activities_DeleteV1_Fail()
         {
             await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
             {
@@ -75,10 +75,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Activities_DeleteV1_Success()
+        public async ValueTask Repo_Activities_DeleteV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var activity = (await UoW.Activities.GetAsync(new QueryExpression<tbl_Activities>()
                 .Where(x => x.Immutable == false).ToLambda()));
@@ -88,10 +88,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Activities_GetV1_Success()
+        public async ValueTask Repo_Activities_GetV1_Success()
         {
-            new TestData(UoW, Mapper).DestroyAsync().Wait();
-            new TestData(UoW, Mapper).CreateAsync().Wait();
+            await new TestData(UoW, Mapper).DestroyAsync();
+            await new TestData(UoW, Mapper).CreateAsync();
 
             var result = await UoW.Activities.GetAsync();
             result.Should().BeAssignableTo<IEnumerable<tbl_Activities>>();
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
         }
 
         [Fact]
-        public async Task Repo_Activities_UpdateV1_Fail()
+        public async ValueTask Repo_Activities_UpdateV1_Fail()
         {
             await Assert.ThrowsAsync<NotImplementedException>(async () =>
             {

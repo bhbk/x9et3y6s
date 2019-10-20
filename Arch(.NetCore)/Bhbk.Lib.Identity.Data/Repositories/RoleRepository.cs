@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public RoleRepository(_DbContext context, InstanceContext instance)
             : base(context, instance) { }
 
-        public  override async Task<tbl_Roles> UpdateAsync(tbl_Roles model)
+        public  override async ValueTask<tbl_Roles> UpdateAsync(tbl_Roles model)
         {
             var entity = _context.Set<tbl_Roles>().Where(x => x.Id == model.Id).Single();
 

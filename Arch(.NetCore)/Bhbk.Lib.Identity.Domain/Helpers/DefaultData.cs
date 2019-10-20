@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             _mapper = mapper ?? throw new ArgumentNullException();
         }
 
-        public async Task CreateAsync()
+        public async ValueTask CreateAsync()
         {
             /*
              * create default settings
@@ -295,7 +295,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             await _uow.CommitAsync();
         }
 
-        public async Task DestroyAsync()
+        public async ValueTask DestroyAsync()
         {
             /*
              * delete default users

@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public LoginRepository(_DbContext context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override async Task<tbl_Logins> UpdateAsync(tbl_Logins login)
+        public override async ValueTask<tbl_Logins> UpdateAsync(tbl_Logins login)
         {
             var entity = _context.Set<tbl_Logins>().Where(x => x.Id == login.Id).Single();
 

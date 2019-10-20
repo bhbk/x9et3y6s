@@ -64,8 +64,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
 
                         if (invalid.Any())
                         {
-                            uow.States.DeleteAsync(invalid).Wait();
-                            uow.CommitAsync().Wait();
+                            await uow.States.DeleteAsync(invalid);
+                            await uow.CommitAsync();
 
                             var msg = typeof(MaintainStatesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + invalidCount.ToString() + " invalid states.";

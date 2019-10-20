@@ -213,7 +213,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     if (!uow.Users.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.Users.AccessFailedAsync(user).Wait();
+                        uow.Users.AccessFailedAsync(user).AsTask();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -228,7 +228,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 //adjust counter(s) for login success...
-                uow.Users.AccessSuccessAsync(user).Wait();
+                uow.Users.AccessSuccessAsync(user).AsTask();
 
                 var rop = JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, clients, user).Result;
                 var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
@@ -250,9 +250,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                         Immutable = false
-                    })).Wait();
+                    }));
 
-                uow.CommitAsync().Wait();
+                uow.CommitAsync();
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.ContentType = "application/json";
@@ -397,7 +397,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     if (!uow.Users.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.Users.AccessFailedAsync(user).Wait();
+                        uow.Users.AccessFailedAsync(user).AsTask();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -412,7 +412,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 //adjust counter(s) for login success...
-                uow.Users.AccessSuccessAsync(user).Wait();
+                uow.Users.AccessSuccessAsync(user).AsTask();
 
                 var rop = JwtFactory.UserResourceOwnerV1(uow, mapper, issuer, client, user).Result;
                 var rt = JwtFactory.UserRefreshV1(uow, mapper, issuer, user).Result;
@@ -434,9 +434,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
                         Immutable = false
-                    })).Wait();
+                    }));
 
-                uow.CommitAsync().Wait();
+                uow.CommitAsync();
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.ContentType = "application/json";
@@ -575,7 +575,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                     if (!uow.Users.VerifyPasswordAsync(user.Id, passwordValue).Result)
                     {
                         //adjust counter(s) for login failure...
-                        uow.Users.AccessFailedAsync(user).Wait();
+                        uow.Users.AccessFailedAsync(user).AsTask();
 
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
@@ -590,7 +590,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 }
 
                 //adjust counter(s) for login success...
-                uow.Users.AccessSuccessAsync(user).Wait();
+                uow.Users.AccessSuccessAsync(user).AsTask();
 
                 var access = JwtFactory.UserResourceOwnerV1_Legacy(uow, mapper, issuer, client, user).Result;
 
@@ -608,9 +608,9 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
                         Immutable = false
-                    })).Wait();
+                    }));
 
-                uow.CommitAsync().Wait();
+                uow.CommitAsync();
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.ContentType = "application/json";

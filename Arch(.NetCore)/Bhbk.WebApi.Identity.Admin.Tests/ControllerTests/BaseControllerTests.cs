@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).CreateAsync().Wait();
+                    new DefaultData(uow, mapper).CreateAsync().AsTask();
 
                     return uow;
                 });

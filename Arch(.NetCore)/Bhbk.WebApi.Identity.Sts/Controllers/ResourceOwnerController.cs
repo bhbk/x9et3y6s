@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ropg"), HttpPost]
-        public async Task<IActionResult> ResourceOwnerV1_Auth([FromForm] ResourceOwnerV1 input)
+        public async ValueTask<IActionResult> ResourceOwnerV1_Auth([FromForm] ResourceOwnerV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -251,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ropg-rt"), HttpPost]
-        public async Task<IActionResult> ResourceOwnerV1_Refresh([FromForm] RefreshTokenV1 input)
+        public async ValueTask<IActionResult> ResourceOwnerV1_Refresh([FromForm] RefreshTokenV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -349,7 +349,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ropg"), HttpPost]
-        public async Task<IActionResult> ResourceOwnerV2_Auth([FromForm] ResourceOwnerV2 input)
+        public async ValueTask<IActionResult> ResourceOwnerV2_Auth([FromForm] ResourceOwnerV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -527,7 +527,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ropg-rt"), HttpPost]
-        public async Task<IActionResult> ResourceOwnerV2_Refresh([FromForm] RefreshTokenV2 input)
+        public async ValueTask<IActionResult> ResourceOwnerV2_Refresh([FromForm] RefreshTokenV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 {
     public class JwtFactory
     {
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             ClientRefreshV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.Clients.GenerateRefreshClaimsAsync(issuer, client);
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             return new JwtSecurityToken(result);
         }
 
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             ClientResourceOwnerV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client)
         {
             var principal = await uow.Clients.GenerateAccessClaimsAsync(issuer, client);
@@ -96,7 +96,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             return new JwtSecurityToken(result);
         }
 
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             UserRefreshV1(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.Users.GenerateRefreshClaimsAsync(issuer, user);
@@ -142,7 +142,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             return new JwtSecurityToken(result);
         }
 
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             UserRefreshV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Users user)
         {
             var principal = await uow.Users.GenerateRefreshClaimsAsync(issuer, user);
@@ -188,7 +188,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             return new JwtSecurityToken(result);
         }
 
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             UserResourceOwnerV1_Legacy(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.Users.GenerateAccessClaimsAsync(issuer, user);
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             return new JwtSecurityToken(result);
         }
 
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             UserResourceOwnerV1(IUoWService uow, IMapper mapper, tbl_Issuers issuer, tbl_Clients client, tbl_Users user)
         {
             var principal = await uow.Users.GenerateAccessClaimsAsync(issuer, user);
@@ -257,7 +257,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             return new JwtSecurityToken(result);
         }
 
-        public static async Task<JwtSecurityToken>
+        public static async ValueTask<JwtSecurityToken>
             UserResourceOwnerV2(IUoWService uow, IMapper mapper, tbl_Issuers issuer, List<tbl_Clients> clients, tbl_Users user)
         {
             var principal = await uow.Users.GenerateAccessClaimsAsync(issuer, user);

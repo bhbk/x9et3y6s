@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ig"), HttpGet]
-        public async Task<IActionResult> ImplicitV2_Auth([FromQuery] ImplicitV2 input)
+        public async ValueTask<IActionResult> ImplicitV2_Auth([FromQuery] ImplicitV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

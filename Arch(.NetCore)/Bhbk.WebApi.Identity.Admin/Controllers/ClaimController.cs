@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateClaimV1([FromBody] ClaimCreate model)
+        public async ValueTask<IActionResult> CreateClaimV1([FromBody] ClaimCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteClaimV1([FromRoute] Guid claimID)
+        public async ValueTask<IActionResult> DeleteClaimV1([FromRoute] Guid claimID)
         {
             var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
                 .Where(x => x.Id == claimID).ToLambda()))
@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{claimValue}"), HttpGet]
-        public async Task<IActionResult> GetClaimV1([FromRoute] string claimValue)
+        public async ValueTask<IActionResult> GetClaimV1([FromRoute] string claimValue)
         {
             Guid claimID;
             tbl_Claims claim = null;
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetClaimsV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetClaimsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> UpdateClaimV1([FromBody] ClaimModel model)
+        public async ValueTask<IActionResult> UpdateClaimV1([FromBody] ClaimModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

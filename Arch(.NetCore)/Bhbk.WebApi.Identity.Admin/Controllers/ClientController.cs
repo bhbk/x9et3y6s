@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateClientV1([FromBody] ClientCreate model)
+        public async ValueTask<IActionResult> CreateClientV1([FromBody] ClientCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{clientID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteClientV1([FromRoute] Guid clientID)
+        public async ValueTask<IActionResult> DeleteClientV1([FromRoute] Guid clientID)
         {
             var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{clientID:guid}/refresh"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteClientRefreshesV1([FromRoute] Guid clientID)
+        public async ValueTask<IActionResult> DeleteClientRefreshesV1([FromRoute] Guid clientID)
         {
             var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
@@ -108,7 +108,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{clientID:guid}/refresh/{refreshID}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteClientRefreshV1([FromRoute] Guid clientID, [FromRoute] Guid refreshID)
+        public async ValueTask<IActionResult> DeleteClientRefreshV1([FromRoute] Guid clientID, [FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.ClientId == clientID && x.Id == refreshID).ToLambda();
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{clientValue}"), HttpGet]
-        public async Task<IActionResult> GetClientV1([FromRoute] string clientValue)
+        public async ValueTask<IActionResult> GetClientV1([FromRoute] string clientValue)
         {
             Guid clientID;
             tbl_Clients client = null;
@@ -146,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetClientsV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetClientsV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{clientID:guid}/refreshes"), HttpGet]
-        public async Task<IActionResult> GetClientRefreshesV1([FromRoute] Guid clientID)
+        public async ValueTask<IActionResult> GetClientRefreshesV1([FromRoute] Guid clientID)
         {
             var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
@@ -193,7 +193,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{clientID:guid}/roles"), HttpGet]
-        public async Task<IActionResult> GetClientRolesV1([FromRoute] Guid clientID)
+        public async ValueTask<IActionResult> GetClientRolesV1([FromRoute] Guid clientID)
         {
             var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
@@ -210,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{clientID:guid}/urls"), HttpGet]
-        public async Task<IActionResult> GetClientUrlsV1([FromRoute] Guid clientID)
+        public async ValueTask<IActionResult> GetClientUrlsV1([FromRoute] Guid clientID)
         {
             var client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
 
@@ -228,7 +228,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> UpdateClientV1([FromBody] ClientModel model)
+        public async ValueTask<IActionResult> UpdateClientV1([FromBody] ClientModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -75,10 +75,10 @@ namespace Bhbk.WebApi.Alert.Tasks
                             Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The text was created on " + entry.Created + " and is being deleted now.");
 
-                            uow.QueueTexts.DeleteAsync(entry).Wait();
+                            await uow.QueueTexts.DeleteAsync(entry);
                         }
 
-                        uow.CommitAsync().Wait();
+                        await uow.CommitAsync();
 
                         foreach (var entry in uow.QueueTexts.GetAsync(new QueryExpression<tbl_QueueTexts>()
                             .Where(x => x.SendAt < DateTime.Now).ToLambda()).Result)
@@ -114,10 +114,10 @@ namespace Bhbk.WebApi.Alert.Tasks
 #if RELEASE
                                         provider.TryTextHandoff(_providerSid, _providerToken, msg).Wait();
 
-                                        uow.QueueTexts.DeleteAsync(msg).Wait();
+                                        await uow.QueueTexts.DeleteAsync(msg);
                                         Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
 #elif !RELEASE
-                                        uow.QueueTexts.DeleteAsync(msg).Wait();
+                                        await uow.QueueTexts.DeleteAsync(msg);
                                         Log.Information(typeof(QueueTextTask).Name + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 case InstanceContext.UnitTest:
                                     {
-                                        uow.QueueTexts.DeleteAsync(msg).Wait();
+                                        await uow.QueueTexts.DeleteAsync(msg);
                                         Log.Information(typeof(QueueTextTask).Name + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             }
                         }
 
-                        uow.CommitAsync().Wait();
+                        await uow.CommitAsync();
                     }
                 }
                 catch (Exception ex)
@@ -153,8 +153,8 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                    uow.QueueTexts.CreateAsync(model).Wait();
-                    uow.CommitAsync().Wait();
+                    uow.QueueTexts.CreateAsync(model);
+                    uow.CommitAsync();
                 }
 
                 return true;

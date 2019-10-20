@@ -23,7 +23,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var file = SearchRoots.ByAssemblyContext("appsettings.json");
+                var file = SearchRoots.ByAssemblyContext("clisettings.json");
 
                 var conf = (IConfiguration)new ConfigurationBuilder()
                     .SetBasePath(file.DirectoryName)

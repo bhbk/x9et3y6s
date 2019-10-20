@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> CreateRoleV1([FromBody] RoleCreate model)
+        public async ValueTask<IActionResult> CreateRoleV1([FromBody] RoleCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{roleID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> DeleteRoleV1([FromRoute] Guid roleID)
+        public async ValueTask<IActionResult> DeleteRoleV1([FromRoute] Guid roleID)
         {
             var role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
 
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleValue}"), HttpGet]
-        public async Task<IActionResult> GetRoleV1([FromRoute] string roleValue)
+        public async ValueTask<IActionResult> GetRoleV1([FromRoute] string roleValue)
         {
             Guid roleID;
             tbl_Roles role = null;
@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async Task<IActionResult> GetRolesV1([FromBody] PageState model)
+        public async ValueTask<IActionResult> GetRolesV1([FromBody] PageState model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID:guid}/users"), HttpGet]
-        public async Task<IActionResult> GetRoleUsersV1([FromRoute] Guid roleID)
+        public async ValueTask<IActionResult> GetRoleUsersV1([FromRoute] Guid roleID)
         {
             var role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
 
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async Task<IActionResult> UpdateRoleV1([FromBody] RoleModel model)
+        public async ValueTask<IActionResult> UpdateRoleV1([FromBody] RoleModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

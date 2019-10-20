@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         public InfoServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public void Me_InfoV1_GetMOTD_Success()
+        public async ValueTask Me_InfoV1_GetMOTD_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).CreateMOTDAsync(3).Wait();
+                await new TestData(uow, mapper).CreateMOTDAsync(3);
 
                 var result = service.Info_GetMOTDV1();
                 result.Should().BeAssignableTo<MOTDType1Model>();
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Me_InfoV1_UpdateCode_Fail()
+        public async ValueTask Me_InfoV1_UpdateCode_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
-                uow.CommitAsync().Wait();
+                await uow.CommitAsync();
 
                 var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
 
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
         }
 
         [Fact]
-        public async Task Me_InfoV1_UpdateCode_Success()
+        public async ValueTask Me_InfoV1_UpdateCode_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
-                uow.CommitAsync().Wait();
+                await uow.CommitAsync();
 
                 var dc = service.Info_UpdateCodeV1(state.StateValue, ActionType.Allow.ToString());
                 dc.Should().BeTrue();
@@ -181,7 +181,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
-                uow.CommitAsync().Wait();
+                await uow.CommitAsync();
 
                 var dc = service.Info_UpdateCodeV1(state.StateValue, ActionType.Deny.ToString());
                 dc.Should().BeTrue();

@@ -6,6 +6,9 @@ using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.WebApi.Identity.Sts.Controllers;
+#if MIDDLEWARE
+using Bhbk.WebApi.Identity.Sts.Middlewares;
+#endif
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -24,9 +27,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using Xunit;
-#if MIDDLEWARE
-using Bhbk.WebApi.Identity.Sts.Middlewares;
-#endif
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).CreateAsync().Wait();
+                    new DefaultData(uow, mapper).CreateAsync().AsTask();
 
                     return uow;
                 });
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                  */
 
                 var owin = new UoWService(conf, instance);
-                new DefaultData(owin, mapper).CreateAsync().Wait();
+                new DefaultData(owin, mapper).CreateAsync().AsTask();
 
                 /*
                  * only test context allowed to run...

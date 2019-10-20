@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public ClaimRepository(_DbContext context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override async Task<tbl_Claims> UpdateAsync(tbl_Claims model)
+        public override async ValueTask<tbl_Claims> UpdateAsync(tbl_Claims model)
         {
             var entity = _context.Set<tbl_Claims>().Where(x => x.Id == model.Id).Single();
 

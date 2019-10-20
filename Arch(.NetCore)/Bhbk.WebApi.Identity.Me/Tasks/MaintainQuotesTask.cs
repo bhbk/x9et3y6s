@@ -85,15 +85,15 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     if (model.Id == null)
                                         model.Id = Guid.NewGuid().ToString();
 
-                                    uow.MOTDs.CreateAsync(model).Wait();
-                                    uow.CommitAsync().Wait();
+                                    await uow.MOTDs.CreateAsync(model);
+                                    await uow.CommitAsync();
                                 }
                                 else if (motd.Id != model.Id)
                                 {
                                     motd.Id = model.Id;
 
-                                    uow.MOTDs.CreateAsync(motd).Wait();
-                                    uow.CommitAsync().Wait();
+                                    await uow.MOTDs.CreateAsync(motd);
+                                    await uow.CommitAsync();
                                 }
 
                                 var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();

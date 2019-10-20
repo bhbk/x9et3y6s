@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/acg-ask"), HttpGet]
-        public async Task<IActionResult> AuthCodeV2_Ask([FromQuery] AuthCodeAskV2 input)
+        public async ValueTask<IActionResult> AuthCodeV2_Ask([FromQuery] AuthCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/acg"), HttpGet]
-        public async Task<IActionResult> AuthCodeV2_Auth([FromQuery] AuthCodeV2 input)
+        public async ValueTask<IActionResult> AuthCodeV2_Auth([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

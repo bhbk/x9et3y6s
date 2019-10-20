@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             Salt = salt;
         }
 
-        public override async Task<tbl_Issuers> CreateAsync(tbl_Issuers issuer)
+        public override async ValueTask<tbl_Issuers> CreateAsync(tbl_Issuers issuer)
         {
             issuer.tbl_Settings.Add(
                 new tbl_Settings()
@@ -68,7 +68,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Add(issuer).Entity);
         }
 
-        public override async Task<tbl_Issuers> DeleteAsync(tbl_Issuers issuer)
+        public override async ValueTask<tbl_Issuers> DeleteAsync(tbl_Issuers issuer)
         {
             var claims = _context.Set<tbl_Claims>().Where(x => x.IssuerId == issuer.Id);
             var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.IssuerId == issuer.Id);
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return await Task.FromResult(_context.Remove(issuer).Entity);
         }
 
-        public override async Task<tbl_Issuers> UpdateAsync(tbl_Issuers issuer)
+        public override async ValueTask<tbl_Issuers> UpdateAsync(tbl_Issuers issuer)
         {
             var entity = _context.Set<tbl_Issuers>().Where(x => x.Id == issuer.Id).Single();
 

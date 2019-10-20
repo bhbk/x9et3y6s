@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.17.1354" />
-    <PackageReference Include="Bhbk.Lib.DataState" Version="2019.10.17.1354" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.19.1639" />
+    <PackageReference Include="Bhbk.Lib.DataState" Version="2019.10.19.1639" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
