@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Microsoft.Extensions.Configuration;
 using System;
 using Xunit;
@@ -11,7 +11,7 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [CollectionDefinition("LibraryRepositoryTests")]
+    [CollectionDefinition("RepositoryTests")]
     public class StartupTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
 
     public class BaseRepositoryTests

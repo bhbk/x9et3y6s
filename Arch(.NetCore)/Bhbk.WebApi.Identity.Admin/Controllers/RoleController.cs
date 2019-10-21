@@ -1,9 +1,9 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -32,13 +31,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> CreateRoleV1([FromBody] RoleCreate model)
+        public IActionResult CreateRoleV1([FromBody] RoleCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.Roles.GetAsync(x => x.ClientId == model.ClientId
-                && x.Name == model.Name)).Any())
+            if (UoW.Roles.Get(x => x.ClientId == model.ClientId
+                && x.Name == model.Name).Any())
             {
                 ModelState.AddModelError(MessageType.RoleAlreadyExists.ToString(), $"Client:{model.ClientId} Role:{model.Name}");
                 return BadRequest(ModelState);
@@ -46,11 +45,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var create = await UoW.Roles.CreateAsync(Mapper.Map<tbl_Roles>(model));
+            var create = UoW.Roles.Create(Mapper.Map<tbl_Roles>(model));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
-            var result = (await UoW.Roles.GetAsync(x => x.Name == model.Name)).SingleOrDefault();
+            var result = UoW.Roles.Get(x => x.Name == model.Name).SingleOrDefault();
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -60,9 +59,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{roleID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> DeleteRoleV1([FromRoute] Guid roleID)
+        public IActionResult DeleteRoleV1([FromRoute] Guid roleID)
         {
-            var role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
 
             if (role == null)
             {
@@ -77,22 +76,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             role.ActorId = GetUserGUID();
 
-            await UoW.Roles.DeleteAsync(role);
-            await UoW.CommitAsync();
+            UoW.Roles.Delete(role);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{roleValue}"), HttpGet]
-        public async ValueTask<IActionResult> GetRoleV1([FromRoute] string roleValue)
+        public IActionResult GetRoleV1([FromRoute] string roleValue)
         {
             Guid roleID;
             tbl_Roles role = null;
 
             if (Guid.TryParse(roleValue, out roleID))
-                role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+                role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
             else
-                role = (await UoW.Roles.GetAsync(x => x.Name == roleValue)).SingleOrDefault();
+                role = UoW.Roles.Get(x => x.Name == roleValue).SingleOrDefault();
 
             if (role == null)
             {
@@ -104,21 +103,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async ValueTask<IActionResult> GetRolesV1([FromBody] PageState model)
+        public IActionResult GetRolesV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateResult<RoleModel>
+                var result = new PageStateTypeCResult<RoleModel>
                 {
                     Data = Mapper.Map<IEnumerable<RoleModel>>(
-                        await UoW.Roles.GetAsync(
+                        UoW.Roles.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
                                 model.ToExpression<tbl_Roles>()))),
 
-                    Total = await UoW.Roles.CountAsync(
+                    Total = UoW.Roles.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
                             model.ToPredicateExpression<tbl_Roles>()))
                 };
@@ -134,9 +133,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID:guid}/users"), HttpGet]
-        public async ValueTask<IActionResult> GetRoleUsersV1([FromRoute] Guid roleID)
+        public IActionResult GetRoleUsersV1([FromRoute] Guid roleID)
         {
-            var role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
 
             if (role == null)
             {
@@ -144,7 +143,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = await UoW.Users.GetAsync(new QueryExpression<tbl_Users>()
+            var users = UoW.Users.Get(new QueryExpression<tbl_Users>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.RoleId == roleID)).ToLambda());
 
             return Ok(Mapper.Map<UserModel>(users));
@@ -152,12 +151,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> UpdateRoleV1([FromBody] RoleModel model)
+        public IActionResult UpdateRoleV1([FromBody] RoleModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = (await UoW.Roles.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == model.Id).SingleOrDefault();
 
             if (role == null)
             {
@@ -173,9 +172,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.Roles.UpdateAsync(Mapper.Map<tbl_Roles>(model));
+            var result = UoW.Roles.Update(Mapper.Map<tbl_Roles>(model));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return Ok(Mapper.Map<RoleModel>(result));
         }

@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Cryptography.Entropy;
+﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
-using System.Threading.Tasks;
 using System.Web;
 
 /*
@@ -61,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/acg-ask"), HttpGet]
-        public async ValueTask<IActionResult> AuthCodeV2_Ask([FromQuery] AuthCodeAskV2 input)
+        public IActionResult AuthCodeV2_Ask([FromQuery] AuthCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -78,9 +77,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -93,9 +92,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.Clients.GetAsync(x => x.Id == clientID, x => x.Include(u => u.tbl_Urls))).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Id == clientID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                client = (await UoW.Clients.GetAsync(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls))).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
             if (client == null)
             {
@@ -108,9 +107,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
-                user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = (await UoW.Users.GetAsync(x => x.Email == input.user)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -119,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (await UoW.Users.IsLockedOutAsync(user.Id)
+            else if (UoW.Users.IsLockedOut(user.Id)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -148,10 +147,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
+            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
 
-            var state = await UoW.States.CreateAsync(
+            var state = UoW.States.Create(
                 Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
@@ -164,13 +163,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
-            return RedirectPermanent(UrlHelper.GenerateAuthCodeV2(authorize, redirect, state).AbsoluteUri);
+            return RedirectPermanent(UrlFactory.GenerateAuthCodeV2(authorize, redirect, state).AbsoluteUri);
         }
 
         [Route("v2/acg"), HttpGet]
-        public async ValueTask<IActionResult> AuthCodeV2_Auth([FromQuery] AuthCodeV2 input)
+        public IActionResult AuthCodeV2_Auth([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -194,9 +193,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -214,9 +213,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
-                user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = (await UoW.Users.GetAsync(x => x.Email == input.user)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -225,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (await UoW.Users.IsLockedOutAsync(user.Id)
+            else if (UoW.Users.IsLockedOut(user.Id)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -236,14 +235,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = await UoW.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+            var clientList = UoW.Clients.Get(new QueryExpression<tbl_Clients>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var clients = new List<tbl_Clients>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
-                clients = (await UoW.Clients.GetAsync(x => clientList.Contains(x)
-                    && x.Enabled == true)).ToList();
+                clients = UoW.Clients.Get(x => clientList.Contains(x)
+                    && x.Enabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -253,9 +252,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out clientID))
-                        client = (await UoW.Clients.GetAsync(x => x.Id == clientID, y => y.Include(z => z.tbl_Urls))).SingleOrDefault();
+                        client = UoW.Clients.Get(x => x.Id == clientID, y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
                     else
-                        client = (await UoW.Clients.GetAsync(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Urls))).SingleOrDefault();
+                        client = UoW.Clients.Get(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
 
                     if (client == null)
                     {
@@ -287,10 +286,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if state is valid...
-            var state = (await UoW.States.GetAsync(x => x.StateValue == input.state
+            var state = UoW.States.Get(x => x.StateValue == input.state
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow
-                && x.StateType == StateType.User.ToString())).SingleOrDefault();
+                && x.StateType == StateType.User.ToString()).SingleOrDefault();
 
             if (state == null)
             {
@@ -299,29 +298,60 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check that payload can be decrypted and validated...
-            if (!await new ProtectHelper(UoW.InstanceType.ToString()).ValidateAsync(user.SecurityStamp, input.code, user))
+            if (!new PasswordlessTokenFactory(UoW.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.code}");
                 return BadRequest(ModelState);
             }
 
-            var rop = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, clients, user);
-            var rt = await JwtFactory.UserRefreshV2(UoW, Mapper, issuer, user);
+            //adjust counter(s) for login success...
+            UoW.Users.AccessSuccess(user);
+
+            var ac_claims = UoW.Users.GenerateAccessClaims(issuer, user);
+            var ac = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, clients.Select(x => x.Name).ToList(), ac_claims);
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    UserId = user.Id,
+                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
+            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, clients.Select(x => x.Name).ToList(), rt_claims);
+
+            UoW.Refreshes.Create(
+                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    UserId = user.Id,
+                    RefreshType = RefreshType.User.ToString(),
+                    RefreshValue = rt.RawData,
+                    ValidFromUtc = rt.ValidFrom,
+                    ValidToUtc = rt.ValidTo,
+                }));
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    UserId = user.Id,
+                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            UoW.Commit();
 
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
-                access_token = rop.RawData,
+                access_token = ac.RawData,
                 refresh_token = rt.RawData,
                 user = user.Email,
                 client = clients.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + UoW.Issuers.Salt,
-                expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
+                expires_in = (int)(new DateTimeOffset(ac.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
-
-            //adjust counter(s) for login success...
-            await UoW.Users.AccessSuccessAsync(user);
-            await UoW.CommitAsync();
 
             return Ok(result);
         }

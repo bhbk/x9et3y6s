@@ -59,13 +59,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                         var invalidExpr = new QueryExpression<tbl_Refreshes>()
                                 .Where(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).ToLambda();
 
-                        var invalid = uow.Refreshes.GetAsync(invalidExpr).Result;
+                        var invalid = uow.Refreshes.Get(invalidExpr);
                         var invalidCount = invalid.Count();
 
                         if (invalid.Any())
                         {
-                            await uow.Refreshes.DeleteAsync(invalid);
-                            await uow.CommitAsync();
+                            uow.Refreshes.Delete(invalid);
+                            uow.Commit();
 
                             var msg = typeof(MaintainRefreshesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + invalidCount.ToString() + " invalid refresh tokens.";

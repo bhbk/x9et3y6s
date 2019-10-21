@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Repositories;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Services
 {
@@ -12,40 +13,40 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * authorization code flows
          */
-        AuthCodeV1 AuthCode_AskV1(AuthCodeAskV1 model);
-        AuthCodeV2 AuthCode_AskV2(AuthCodeAskV2 model);
-        UserJwtV1 AuthCode_AuthV1(AuthCodeV1 model);
-        UserJwtV2 AuthCode_AuthV2(AuthCodeV2 model);
+        ValueTask<AuthCodeV1> AuthCode_AskV1(AuthCodeAskV1 model);
+        ValueTask<AuthCodeV2> AuthCode_AskV2(AuthCodeAskV2 model);
+        ValueTask<UserJwtV1> AuthCode_AuthV1(AuthCodeV1 model);
+        ValueTask<UserJwtV2> AuthCode_AuthV2(AuthCodeV2 model);
 
         /*
          * device code flows
          */
-        DeviceCodeV1 DeviceCode_AskV1(DeviceCodeAskV1 model);
-        DeviceCodeV2 DeviceCode_AskV2(DeviceCodeAskV2 model);
-        UserJwtV1 DeviceCode_AuthV1(DeviceCodeV1 model);
-        UserJwtV2 DeviceCode_AuthV2(DeviceCodeV2 model);
+        ValueTask<DeviceCodeV1> DeviceCode_AskV1(DeviceCodeAskV1 model);
+        ValueTask<DeviceCodeV2> DeviceCode_AskV2(DeviceCodeAskV2 model);
+        ValueTask<UserJwtV1> DeviceCode_AuthV1(DeviceCodeV1 model);
+        ValueTask<UserJwtV2> DeviceCode_AuthV2(DeviceCodeV2 model);
 
         /*
          * client credential flows
          */
-        ClientJwtV1 ClientCredential_AuthV1(ClientCredentialV1 model);
-        ClientJwtV2 ClientCredential_AuthV2(ClientCredentialV2 model);
-        ClientJwtV1 ClientCredential_RefreshV1(RefreshTokenV1 model);
-        ClientJwtV2 ClientCredential_RefreshV2(RefreshTokenV2 model);
+        ValueTask<ClientJwtV1> ClientCredential_AuthV1(ClientCredentialV1 model);
+        ValueTask<ClientJwtV2> ClientCredential_AuthV2(ClientCredentialV2 model);
+        ValueTask<ClientJwtV1> ClientCredential_RefreshV1(RefreshTokenV1 model);
+        ValueTask<ClientJwtV2> ClientCredential_RefreshV2(RefreshTokenV2 model);
 
         /*
          * implicit flows
          */
-        UserJwtV1 Implicit_AuthV1(ImplicitV1 model);
-        UserJwtV2 Implicit_AuthV2(ImplicitV2 model);
+        ValueTask<UserJwtV1> Implicit_AuthV1(ImplicitV1 model);
+        ValueTask<UserJwtV2> Implicit_AuthV2(ImplicitV2 model);
 
         /*
          * resource owner flows
          */
-        UserJwtV1Legacy ResourceOwner_AuthV1Legacy(ResourceOwnerV1 model);
-        UserJwtV1 ResourceOwner_AuthV1(ResourceOwnerV1 model);
-        UserJwtV2 ResourceOwner_AuthV2(ResourceOwnerV2 model);
-        UserJwtV1 ResourceOwner_RefreshV1(RefreshTokenV1 model);
-        UserJwtV2 ResourceOwner_RefreshV2(RefreshTokenV2 model);
+        ValueTask<UserJwtV1Legacy> ResourceOwner_AuthV1Legacy(ResourceOwnerV1 model);
+        ValueTask<UserJwtV1> ResourceOwner_AuthV1(ResourceOwnerV1 model);
+        ValueTask<UserJwtV2> ResourceOwner_AuthV2(ResourceOwnerV2 model);
+        ValueTask<UserJwtV1> ResourceOwner_RefreshV1(RefreshTokenV1 model);
+        ValueTask<UserJwtV2> ResourceOwner_RefreshV2(RefreshTokenV2 model);
     }
 }

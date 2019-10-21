@@ -4,9 +4,10 @@ using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
@@ -21,7 +22,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.PageState;
+using static Bhbk.Lib.DataState.Models.PageStateTypeC;
 using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
 using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
@@ -42,19 +43,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-                var testClaim = await uow.Claims.CreateAsync(
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testClaim = uow.Claims.Create(
                     mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
@@ -63,12 +66,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         Immutable = false,
                     }));
 
-                await uow.CommitAsync();
+                uow.Commit();
 
-                var result = service.User_AddToClaimV1(testUser.Id, testClaim.Id);
+                var result = await service.User_AddToClaimV1(testUser.Id, testClaim.Id);
                 result.Should().BeTrue();
 
-                var check = await uow.Users.IsInClaimAsync(testUser.Id, testClaim.Id);
+                var check = uow.Users.IsInClaim(testUser.Id, testClaim.Id);
                 check.Should().BeTrue();
             }
         }
@@ -82,19 +85,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-                var testLogin = await uow.Logins.CreateAsync(
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testLogin = uow.Logins.Create(
                     mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = Base64.CreateString(4) + "-" + FakeConstants.ApiTestLogin,
@@ -103,12 +108,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         Immutable = false,
                     }));
 
-                await uow.CommitAsync();
+                uow.Commit();
 
-                var result = service.User_AddToLoginV1(testUser.Id, testLogin.Id);
+                var result = await service.User_AddToLoginV1(testUser.Id, testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = await uow.Users.IsInLoginAsync(testUser.Id, testLogin.Id);
+                var check = uow.Users.IsInLogin(testUser.Id, testLogin.Id);
                 check.Should().BeTrue();
             }
         }
@@ -122,19 +127,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-                var testRole = await uow.Roles.CreateAsync(
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testRole = uow.Roles.Create(
                     mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
@@ -143,12 +150,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         Immutable = false,
                     }));
 
-                await uow.CommitAsync();
+                uow.Commit();
 
-                var result = service.User_AddToRoleV1(testUser.Id, testRole.Id);
+                var result = await service.User_AddToRoleV1(testUser.Id, testRole.Id);
                 result.Should().BeTrue();
 
-                var check = await uow.Users.IsInRoleAsync(testUser.Id, testRole.Id);
+                var check = uow.Users.IsInRole(testUser.Id, testRole.Id);
                 check.Should().BeTrue();
             }
         }
@@ -162,20 +169,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var result = await service.Http.User_CreateV1(Base64.CreateString(8), new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 result = await service.Http.User_CreateV1(rop.RawData, new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -188,13 +197,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 var result = await service.Http.User_CreateV1(rop.RawData, new UserCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -211,15 +222,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var result = service.User_CreateV1NoConfirm(
+                var result = await service.User_CreateV1NoConfirm(
                     new UserCreate()
                     {
                         Email = Base64.CreateString(4) + "-" + FakeConstants.ApiTestUser,
@@ -231,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserModel>();
 
-                var check = (await uow.Users.GetAsync(x => x.Id == result.Id)).Any();
+                var check = uow.Users.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
             }
 
@@ -241,15 +254,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var result = service.User_CreateV1(
+                var result = await service.User_CreateV1(
                     new UserCreate()
                     {
                         IssuerId = issuer.Id,
@@ -262,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserModel>();
 
-                var check = (await uow.Users.GetAsync(x => x.Id == result.Id)).Any();
+                var check = uow.Users.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
             }
         }
@@ -276,17 +291,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var result = await service.Http.User_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 result = await service.Http.User_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -299,22 +316,24 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 testUser.Immutable = true;
 
-                await uow.Users.UpdateAsync(testUser);
-                await uow.CommitAsync();
+                uow.Users.Update(testUser);
+                uow.Commit();
 
                 var result = await service.Http.User_DeleteV1(rop.RawData, testUser.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -331,23 +350,25 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var result = service.User_DeleteV1(testUser.Id);
+                var result = await service.User_DeleteV1(testUser.Id);
                 result.Should().BeTrue();
 
-                var check = (await uow.Users.GetAsync(x => x.Id == testUser.Id)).Any();
+                var check = uow.Users.Get(x => x.Id == testUser.Id).Any();
                 check.Should().BeFalse();
             }
         }
@@ -361,16 +382,30 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                await JwtFactory.UserRefreshV2(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 var result = await service.Http.User_DeleteRefreshesV1(rop.RawData, user.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -383,19 +418,33 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var rt = await JwtFactory.UserRefreshV2(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
 
-                var refresh = (await uow.Refreshes.GetAsync(new QueryExpression<tbl_Refreshes>()
-                    .Where(x => x.UserId == user.Id && x.RefreshValue == rt.RawData).ToLambda())).Single();
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                var refresh = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                    .Where(x => x.UserId == user.Id && x.RefreshValue == rt.RawData).ToLambda()).Single();
 
                 var result = await service.Http.User_DeleteRefreshV1(rop.RawData, user.Id, refresh.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -412,20 +461,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var result = service.User_GetV1(testUser.Id.ToString());
+                var result = await service.User_GetV1(testUser.Id.ToString());
                 result.Should().BeAssignableTo<UserModel>();
             }
 
@@ -435,31 +486,33 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync(3);
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create(3);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageState()
+                var state = new PageStateTypeC()
                 {
-                    Sort = new List<PageStateSort>()
+                    Sort = new List<PageStateTypeCSort>()
                     {
-                        new PageStateSort() { Field = "email", Dir = "asc" }
+                        new PageStateTypeCSort() { Field = "email", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
                 };
 
-                var result = service.User_GetV1(state);
-                result.Data.ToDynamicList().Count().Should().Be(take);
-                result.Total.Should().Be(await uow.Users.CountAsync());
+                var result = await service.User_GetV1(state);
+                result.Data.Count().Should().Be(take);
+                result.Total.Should().Be(uow.Users.Count());
             }
         }
 
@@ -472,17 +525,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var result = service.User_GetClaimsV1(user.Id.ToString());
+                var result = await service.User_GetClaimsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClaimModel>>();
-                result.Count().Should().Be(await uow.Claims.CountAsync(new QueryExpression<tbl_Claims>()
+                result.Count().Should().Be(uow.Claims.Count(new QueryExpression<tbl_Claims>()
                     .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
@@ -496,17 +551,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var result = service.User_GetClientsV1(user.Id.ToString());
+                var result = await service.User_GetClientsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClientModel>>();
-                result.Count().Should().Be(await uow.Clients.CountAsync(new QueryExpression<tbl_Clients>()
+                result.Count().Should().Be(uow.Clients.Count(new QueryExpression<tbl_Clients>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()));
             }
         }
@@ -520,17 +577,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var result = service.User_GetLoginsV1(user.Id.ToString());
+                var result = await service.User_GetLoginsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<LoginModel>>();
-                result.Count().Should().Be(await uow.Logins.CountAsync(new QueryExpression<tbl_Logins>()
+                result.Count().Should().Be(uow.Logins.Count(new QueryExpression<tbl_Logins>()
                     .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
@@ -544,30 +603,32 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageState()
+                var state = new PageStateTypeC()
                 {
-                    Sort = new List<PageStateSort>() {
-                        new PageStateSort() { Field = "author", Dir = "asc" }
+                    Sort = new List<PageStateTypeCSort>() {
+                        new PageStateTypeCSort() { Field = "author", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
                 };
 
-                var result = service.User_GetMOTDsV1(state);
-                result.Data.ToDynamicList().Count().Should().Be(take);
-                result.Total.Should().Be(await uow.MOTDs.CountAsync());
+                var result = await service.User_GetMOTDsV1(state);
+                result.Data.Count().Should().Be(take);
+                result.Total.Should().Be(uow.MOTDs.Count());
             }
         }
 
@@ -580,22 +641,38 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 for (int i = 0; i < 3; i++)
-                    await JwtFactory.UserRefreshV2(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                {
+                    var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                    var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
 
-                var result = service.User_GetRefreshesV1(user.Id.ToString());
+                    uow.Refreshes.Create(
+                        mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        {
+                            IssuerId = issuer.Id,
+                            UserId = user.Id,
+                            RefreshType = RefreshType.User.ToString(),
+                            RefreshValue = rt.RawData,
+                            ValidFromUtc = rt.ValidFrom,
+                            ValidToUtc = rt.ValidTo,
+                        }));
+                }
+                uow.Commit();
+
+                var result = await service.User_GetRefreshesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
-                result.Count().Should().Be((await uow.Refreshes.GetAsync(new QueryExpression<tbl_Refreshes>()
-                    .Where(x => x.UserId == user.Id).ToLambda())).Count());
+                result.Count().Should().Be(uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                    .Where(x => x.UserId == user.Id).ToLambda()).Count());
             }
         }
 
@@ -608,17 +685,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultNormalUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var result = service.User_GetRolesV1(user.Id.ToString());
+                var result = await service.User_GetRolesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RoleModel>>();
-                result.Count().Should().Be(await uow.Roles.CountAsync(new QueryExpression<tbl_Roles>()
+                result.Count().Should().Be(uow.Roles.Count(new QueryExpression<tbl_Roles>()
                     .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
@@ -632,26 +711,28 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-                var testClaim = (await uow.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                    .Where(x => x.Type == FakeConstants.ApiTestClaim).ToLambda()))
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testClaim = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                    .Where(x => x.Type == FakeConstants.ApiTestClaim).ToLambda())
                     .Single();
 
-                var result = service.User_RemoveFromClaimV1(testUser.Id, testClaim.Id);
+                var result = await service.User_RemoveFromClaimV1(testUser.Id, testClaim.Id);
                 result.Should().BeTrue();
 
-                var check = await uow.Users.IsInClaimAsync(testUser.Id, testClaim.Id);
+                var check = uow.Users.IsInClaim(testUser.Id, testClaim.Id);
                 check.Should().BeFalse();
             }
         }
@@ -665,24 +746,26 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-                var testLogin = (await uow.Logins.GetAsync(x => x.Name == FakeConstants.ApiTestLogin)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testLogin = uow.Logins.Get(x => x.Name == FakeConstants.ApiTestLogin).Single();
 
-                var result = service.User_RemoveFromLoginV1(testUser.Id, testLogin.Id);
+                var result = await service.User_RemoveFromLoginV1(testUser.Id, testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = await uow.Users.IsInLoginAsync(testUser.Id, testLogin.Id);
+                var check = uow.Users.IsInLogin(testUser.Id, testLogin.Id);
                 check.Should().BeFalse();
             }
         }
@@ -696,24 +779,26 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
-                var testRole = (await uow.Roles.GetAsync(x => x.Name == FakeConstants.ApiTestRole)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testRole = uow.Roles.Get(x => x.Name == FakeConstants.ApiTestRole).Single();
 
-                var result = service.User_RemoveFromRoleV1(testUser.Id, testRole.Id);
+                var result = await service.User_RemoveFromRoleV1(testUser.Id, testRole.Id);
                 result.Should().BeTrue();
 
-                var check = await uow.Users.IsInRoleAsync(testUser.Id, testRole.Id);
+                var check = uow.Users.IsInRole(testUser.Id, testRole.Id);
                 check.Should().BeFalse();
             }
         }
@@ -727,20 +812,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var result = service.User_RemovePasswordV1(testUser.Id);
+                var result = await service.User_RemovePasswordV1(testUser.Id);
                 result.Should().BeTrue();
             }
         }
@@ -754,18 +841,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var testUserPassword = new UserAddPassword()
                 {
                     UserId = testUser.Id,
@@ -773,7 +862,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     NewPasswordConfirm = FakeConstants.ApiTestUserPassNew
                 };
 
-                var result = service.User_SetPasswordV1(testUser.Id, testUserPassword);
+                var result = await service.User_SetPasswordV1(testUser.Id, testUserPassword);
                 result.Should().BeTrue();
             }
         }
@@ -787,20 +876,22 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var result = await service.Http.User_UpdateV1(Base64.CreateString(8), new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 result = await service.Http.User_UpdateV1(rop.RawData, new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -813,13 +904,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                var rop = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
                 var result = await service.Http.User_UpdateV1(rop.RawData, new UserModel());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -836,21 +929,23 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == RealConstants.ApiDefaultIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == RealConstants.ApiDefaultAdminUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
-                service.Jwt = await JwtFactory.UserResourceOwnerV2(uow, mapper, issuer, new List<tbl_Clients> { client }, user);
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
 
-                var testUser = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 testUser.FirstName += "(Updated)";
 
-                var result = service.User_UpdateV1(mapper.Map<UserModel>(testUser));
+                var result = await service.User_UpdateV1(mapper.Map<UserModel>(testUser));
                 result.Should().BeAssignableTo<UserModel>();
                 result.FirstName.Should().Be(testUser.FirstName);
             }

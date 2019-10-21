@@ -1,11 +1,12 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Services
 {
@@ -34,9 +35,9 @@ namespace Bhbk.Lib.Identity.Services
             get { return _http; }
         }
 
-        public bool Email_EnqueueV1(EmailCreate model)
+        public async ValueTask<bool> Email_EnqueueV1(EmailCreate model)
         {
-            var response = Http.Enqueue_EmailV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Enqueue_EmailV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -45,9 +46,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Text_EnqueueV1(TextCreate model)
+        public async ValueTask<bool> Text_EnqueueV1(TextCreate model)
         {
-            var response = Http.Enqueue_TextV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Enqueue_TextV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return true;

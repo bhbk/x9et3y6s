@@ -4,18 +4,18 @@ using Bhbk.Lib.Identity.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class LoginRepository : GenericRepositoryAsync<tbl_Logins>
+    public class LoginRepository : GenericRepository<tbl_Logins>
     {
-        public LoginRepository(_DbContext context, InstanceContext instance)
+        public LoginRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override async ValueTask<tbl_Logins> UpdateAsync(tbl_Logins login)
+        public override tbl_Logins Update(tbl_Logins login)
         {
-            var entity = _context.Set<tbl_Logins>().Where(x => x.Id == login.Id).Single();
+            var entity = _context.Set<tbl_Logins>()
+                .Where(x => x.Id == login.Id).Single();
 
             /*
              * only persist certain fields.
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return _context.Update(entity).Entity;
         }
     }
 }

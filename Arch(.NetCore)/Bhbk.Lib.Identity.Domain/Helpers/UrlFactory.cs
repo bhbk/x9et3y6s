@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Bhbk.Lib.Identity.Domain.Helpers
 {
-    public class UrlHelper
+    public class UrlFactory
     {
         public static Uri GenerateAuthCodeV2(Uri authorize, Uri redirect, tbl_States state)
         {

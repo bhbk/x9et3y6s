@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
@@ -30,12 +29,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email"), HttpPut]
-        public async ValueTask<IActionResult> ChangeEmailV1([FromBody] UserChangeEmail model)
+        public IActionResult ChangeEmailV1([FromBody] UserChangeEmail model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -50,16 +49,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).Single();
+            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
-            string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                .GenerateAsync(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
+            string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
+                .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
-            var url = UrlHelper.GenerateConfirmEmailV1(Conf, user, token);
+            var url = UrlFactory.GenerateConfirmEmailV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             alert.Email_EnqueueV1(new EmailCreate()
@@ -78,12 +77,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password"), HttpPut]
-        public async ValueTask<IActionResult> ChangePasswordV1([FromBody] UserChangePassword model)
+        public IActionResult ChangePasswordV1([FromBody] UserChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -96,23 +95,23 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!await UoW.Users.VerifyPasswordAsync(user.Id, model.CurrentPassword)
+            else if (!UoW.Users.VerifyPassword(user.Id, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
-            var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire)).Single();
+            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
-            string token = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                .GenerateAsync(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
+            string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
+                .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
-            var url = UrlHelper.GenerateConfirmPasswordV1(Conf, user, token);
+            var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             alert.Email_EnqueueV1(new EmailCreate()
@@ -131,12 +130,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone"), HttpPut]
-        public async ValueTask<IActionResult> ChangePhoneV1([FromBody] UserChangePhone model)
+        public IActionResult ChangePhoneV1([FromBody] UserChangePhone model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == GetUserGUID())).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -156,12 +155,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            string token = HttpUtility.UrlEncode(await new TotpHelper(8, 10).GenerateAsync(model.NewPhoneNumber, user));
+            string token = HttpUtility.UrlEncode(new TimeBasedTokenFactory(8, 10).Generate(model.NewPhoneNumber, user));
 
             if (UoW.InstanceType == InstanceContext.UnitTest)
                 return Ok(token);
 
-            var url = UrlHelper.GenerateConfirmPasswordV1(Conf, user, token);
+            var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             alert.Text_EnqueueV1(new TextCreate()

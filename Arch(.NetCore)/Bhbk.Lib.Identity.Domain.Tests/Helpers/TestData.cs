@@ -9,7 +9,6 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
 using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
@@ -26,7 +25,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             _mapper = mapper ?? throw new ArgumentNullException();
         }
 
-        public async ValueTask CreateAsync()
+        public void Create()
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -35,12 +34,12 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * create test settings
              */
 
-            var foundGlobalLegacyClaims = (await _uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyClaims)).SingleOrDefault();
+            var foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyClaims).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
-                foundGlobalLegacyClaims = await _uow.Settings.CreateAsync(
+                foundGlobalLegacyClaims = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalLegacyClaims,
@@ -49,12 +48,12 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     }));
             }
 
-            var foundGlobalLegacyIssuer = (await _uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).SingleOrDefault();
+            var foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
-                foundGlobalLegacyIssuer = await _uow.Settings.CreateAsync(
+                foundGlobalLegacyIssuer = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalLegacyIssuer,
@@ -63,12 +62,12 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     }));
             }
 
-            var foundGlobalTotpExpire = (await _uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire)).SingleOrDefault();
+            var foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
-                foundGlobalTotpExpire = await _uow.Settings.CreateAsync(
+                foundGlobalTotpExpire = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingCreate()
                     {
                         ConfigKey = RealConstants.ApiSettingGlobalTotpExpire,
@@ -81,13 +80,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * create test issuers
              */
 
-            var foundIssuer = (await _uow.Issuers.GetAsync(new QueryExpression<tbl_Issuers>()
+            var foundIssuer = _uow.Issuers.Get(new QueryExpression<tbl_Issuers>()
                 .Where(x => x.Name == FakeConstants.ApiTestIssuer)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundIssuer == null)
             {
-                foundIssuer = await _uow.Issuers.CreateAsync(
+                foundIssuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
                         Name = FakeConstants.ApiTestIssuer,
@@ -96,20 +95,20 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
              * create test clients
              */
 
-            var foundClient = (await _uow.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+            var foundClient = _uow.Clients.Get(new QueryExpression<tbl_Clients>()
                 .Where(x => x.Name == FakeConstants.ApiTestClient)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundClient == null)
             {
-                foundClient = await _uow.Clients.CreateAsync(
+                foundClient = _uow.Clients.Create(
                     _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -120,7 +119,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.Activities.CreateAsync(
+                _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         ClientId = foundClient.Id,
@@ -128,7 +127,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.Refreshes.CreateAsync(
+                _uow.Refreshes.Create(
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -139,7 +138,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
@@ -148,15 +147,15 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
 
-            var foundClientUrl = (await _uow.Urls.GetAsync(new QueryExpression<tbl_Urls>()
+            var foundClientUrl = _uow.Urls.Get(new QueryExpression<tbl_Urls>()
                 .Where(x => x.ClientId == foundClient.Id
                     && x.UrlHost == (url.Scheme + "://" + url.Host)
                     && x.UrlPath == url.AbsolutePath)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundClientUrl == null)
             {
-                foundClientUrl = await _uow.Urls.CreateAsync(
+                foundClientUrl = _uow.Urls.Create(
                     _mapper.Map<tbl_Urls>(new UrlCreate()
                     {
                         ClientId = foundClient.Id,
@@ -165,20 +164,20 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Enabled = true,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
              * create test claims
              */
 
-            var foundClaim = (await _uow.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+            var foundClaim = _uow.Claims.Get(new QueryExpression<tbl_Claims>()
                 .Where(x => x.Type == FakeConstants.ApiTestClaim)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundClaim == null)
             {
-                foundClaim = await _uow.Claims.CreateAsync(
+                foundClaim = _uow.Claims.Create(
                     _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -187,40 +186,40 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
              * create test logins
              */
 
-            var foundLogin = (await _uow.Logins.GetAsync(new QueryExpression<tbl_Logins>()
+            var foundLogin = _uow.Logins.Get(new QueryExpression<tbl_Logins>()
                 .Where(x => x.Name == FakeConstants.ApiTestLogin)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundLogin == null)
             {
-                foundLogin = await _uow.Logins.CreateAsync(
+                foundLogin = _uow.Logins.Create(
                     _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = FakeConstants.ApiTestLogin,
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
              * create test roles
              */
 
-            var foundRole = (await _uow.Roles.GetAsync(new QueryExpression<tbl_Roles>()
+            var foundRole = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
                 .Where(x => x.Name == FakeConstants.ApiTestRole)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundRole == null)
             {
-                foundRole = await _uow.Roles.CreateAsync(
+                foundRole = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = foundClient.Id,
@@ -229,20 +228,20 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
              * create test users
              */
 
-            var foundUser = (await _uow.Users.GetAsync(new QueryExpression<tbl_Users>()
+            var foundUser = _uow.Users.Get(new QueryExpression<tbl_Users>()
                 .Where(x => x.Email == FakeConstants.ApiTestUser)
-                .ToLambda())).SingleOrDefault();
+                .ToLambda()).SingleOrDefault();
 
             if (foundUser == null)
             {
-                foundUser = await _uow.Users.CreateAsync(
+                foundUser = _uow.Users.Create(
                 _mapper.Map<tbl_Users>(new UserCreate()
                 {
                     Email = FakeConstants.ApiTestUser,
@@ -254,7 +253,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     Immutable = false,
                 }), FakeConstants.ApiTestUserPassCurrent);
 
-                await _uow.Activities.CreateAsync(
+                _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         ClientId = foundClient.Id,
@@ -263,7 +262,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.Refreshes.CreateAsync(
+                _uow.Refreshes.Create(
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -275,7 +274,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
 
-                await _uow.States.CreateAsync(
+                _uow.States.Create(
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -288,7 +287,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
 
-                await _uow.States.CreateAsync(
+                _uow.States.Create(
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -301,30 +300,30 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
 
-                await _uow.Users.SetConfirmedEmailAsync(foundUser, true);
-                await _uow.Users.SetConfirmedPasswordAsync(foundUser, true);
-                await _uow.Users.SetConfirmedPhoneNumberAsync(foundUser, true);
+                _uow.Users.SetConfirmedEmail(foundUser, true);
+                _uow.Users.SetConfirmedPassword(foundUser, true);
+                _uow.Users.SetConfirmedPhoneNumber(foundUser, true);
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
 
             /*
              * assign roles, claims & logins to users
              */
 
-            if (!await _uow.Users.IsInRoleAsync(foundUser.Id, foundRole.Id))
-                await _uow.Users.AddToRoleAsync(foundUser, foundRole);
+            if (!_uow.Users.IsInRole(foundUser.Id, foundRole.Id))
+                _uow.Users.AddToRole(foundUser, foundRole);
 
-            if (!await _uow.Users.IsInLoginAsync(foundUser.Id, foundLogin.Id))
-                await _uow.Users.AddToLoginAsync(foundUser, foundLogin);
+            if (!_uow.Users.IsInLogin(foundUser.Id, foundLogin.Id))
+                _uow.Users.AddToLogin(foundUser, foundLogin);
 
-            if (!await _uow.Users.IsInClaimAsync(foundUser.Id, foundClaim.Id))
-                await _uow.Users.AddToClaimAsync(foundUser, foundClaim);
+            if (!_uow.Users.IsInClaim(foundUser.Id, foundClaim.Id))
+                _uow.Users.AddToClaim(foundUser, foundClaim);
 
-            await _uow.CommitAsync();
+            _uow.Commit();
         }
 
-        public async ValueTask CreateAsync(uint sets)
+        public void Create(uint sets)
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -343,7 +342,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  * create random issuers
                  */
 
-                issuer = await _uow.Issuers.CreateAsync(
+                issuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuers>(new IssuerCreate()
                     {
                         Name = FakeConstants.ApiTestIssuer + "-" + Base64.CreateString(4),
@@ -352,13 +351,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
 
                 /*
                  * create random clients
                  */
 
-                client = await _uow.Clients.CreateAsync(
+                client = _uow.Clients.Create(
                     _mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = issuer.Id,
@@ -369,7 +368,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.Activities.CreateAsync(
+                _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         ClientId = client.Id,
@@ -377,7 +376,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.Refreshes.CreateAsync(
+                _uow.Refreshes.Create(
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
@@ -388,7 +387,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
 
                 /*
                  * create random client urls
@@ -396,7 +395,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
                 var clientUrl = new Uri(FakeConstants.ApiTestUriLink);
 
-                url = await _uow.Urls.CreateAsync(
+                url = _uow.Urls.Create(
                     _mapper.Map<tbl_Urls>(new UrlCreate()
                     {
                         ClientId = client.Id,
@@ -405,13 +404,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Enabled = true,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
 
                 /*
                  * create random claims
                  */
 
-                claim = await _uow.Claims.CreateAsync(
+                claim = _uow.Claims.Create(
                     _mapper.Map<tbl_Claims>(new ClaimCreate()
                     {
                         IssuerId = issuer.Id,
@@ -420,13 +419,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
 
                 /*
                  * create random logins
                  */
 
-                login = await _uow.Logins.CreateAsync(
+                login = _uow.Logins.Create(
                     _mapper.Map<tbl_Logins>(new LoginCreate()
                     {
                         Name = FakeConstants.ApiTestLogin + "-" + Base64.CreateString(4),
@@ -435,13 +434,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
 
                 /*
                  * create random roles
                  */
 
-                role = await _uow.Roles.CreateAsync(
+                role = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
                         ClientId = client.Id,
@@ -450,13 +449,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.CommitAsync();
+                _uow.Commit();
 
                 /*
                  * create random users
                  */
 
-                user = await _uow.Users.CreateAsync(
+                user = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = AlphaNumeric.CreateString(4) + "-" + FakeConstants.ApiTestUser,
@@ -468,7 +467,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }), FakeConstants.ApiTestUserPassCurrent);
 
-                await _uow.Activities.CreateAsync(
+                _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         ClientId = client.Id,
@@ -477,7 +476,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Immutable = false,
                     }));
 
-                await _uow.States.CreateAsync(
+                _uow.States.Create(
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
@@ -490,7 +489,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
 
-                await _uow.Refreshes.CreateAsync(
+                _uow.Refreshes.Create(
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
@@ -506,32 +505,32 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  * assign roles, claims & logins to random users
                  */
 
-                await _uow.Users.SetConfirmedEmailAsync(user, true);
-                await _uow.Users.SetConfirmedPasswordAsync(user, true);
-                await _uow.Users.SetConfirmedPhoneNumberAsync(user, true);
-                await _uow.CommitAsync();
+                _uow.Users.SetConfirmedEmail(user, true);
+                _uow.Users.SetConfirmedPassword(user, true);
+                _uow.Users.SetConfirmedPhoneNumber(user, true);
+                _uow.Commit();
 
-                if (!await _uow.Users.IsInRoleAsync(user.Id, role.Id))
-                    await _uow.Users.AddToRoleAsync(user, role);
+                if (!_uow.Users.IsInRole(user.Id, role.Id))
+                    _uow.Users.AddToRole(user, role);
 
-                if (!await _uow.Users.IsInLoginAsync(user.Id, login.Id))
-                    await _uow.Users.AddToLoginAsync(user, login);
+                if (!_uow.Users.IsInLogin(user.Id, login.Id))
+                    _uow.Users.AddToLogin(user, login);
 
-                if (!await _uow.Users.IsInClaimAsync(user.Id, claim.Id))
-                    await _uow.Users.AddToClaimAsync(user, claim);
+                if (!_uow.Users.IsInClaim(user.Id, claim.Id))
+                    _uow.Users.AddToClaim(user, claim);
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
         }
 
-        public async ValueTask CreateMOTDAsync(uint sets)
+        public void CreateMOTD(uint sets)
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
 
             for (int i = 0; i < sets; i++)
             {
-                await _uow.MOTDs.CreateAsync(
+                _uow.MOTDs.Create(
                     new tbl_MotDType1()
                     {
                         Id = AlphaNumeric.CreateString(8),
@@ -545,11 +544,11 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         Tags = "tag1,tag2,tag3",
                     });
 
-                await _uow.CommitAsync();
+                _uow.Commit();
             }
         }
 
-        public async ValueTask DestroyAsync()
+        public void Destroy()
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
@@ -558,56 +557,56 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * delete test users
              */
 
-            await _uow.Users.DeleteAsync(new QueryExpression<tbl_Users>()
+            _uow.Users.Delete(new QueryExpression<tbl_Users>()
                 .Where(x => x.Email.Contains(FakeConstants.ApiTestUser)).ToLambda());
-            await _uow.CommitAsync();
+            _uow.Commit();
 
             /*
              * delete test roles
              */
 
-            await _uow.Roles.DeleteAsync(new QueryExpression<tbl_Roles>()
+            _uow.Roles.Delete(new QueryExpression<tbl_Roles>()
                 .Where(x => x.Name.Contains(FakeConstants.ApiTestRole)).ToLambda());
-            await _uow.CommitAsync();
+            _uow.Commit();
 
             /*
              * delete test logins
              */
 
-            await _uow.Logins.DeleteAsync(new QueryExpression<tbl_Logins>()
+            _uow.Logins.Delete(new QueryExpression<tbl_Logins>()
                 .Where(x => x.Name.Contains(FakeConstants.ApiTestLogin)).ToLambda());
-            await _uow.CommitAsync();
+            _uow.Commit();
 
             /*
              * delete test claims
              */
 
-            await _uow.Claims.DeleteAsync(new QueryExpression<tbl_Claims>()
+            _uow.Claims.Delete(new QueryExpression<tbl_Claims>()
                 .Where(x => x.Type.Contains(FakeConstants.ApiTestClaim)).ToLambda());
-            await _uow.CommitAsync();
+            _uow.Commit();
 
             /*
              * delete test clients
              */
 
-            await _uow.Clients.DeleteAsync(new QueryExpression<tbl_Clients>()
+            _uow.Clients.Delete(new QueryExpression<tbl_Clients>()
                 .Where(x => x.Name.Contains(FakeConstants.ApiTestClient)).ToLambda());
-            await _uow.CommitAsync();
+            _uow.Commit();
 
             /*
              * delete test issuers
              */
 
-            await _uow.Issuers.DeleteAsync(new QueryExpression<tbl_Issuers>()
+            _uow.Issuers.Delete(new QueryExpression<tbl_Issuers>()
                 .Where(x => x.Name.Contains(FakeConstants.ApiTestIssuer)).ToLambda());
-            await _uow.CommitAsync();
+            _uow.Commit();
 
             /*
              * delete test msg of the day
              */
 
-            await _uow.MOTDs.DeleteAsync(new QueryExpression<tbl_MotDType1>().ToLambda());
-            await _uow.CommitAsync();
+            _uow.MOTDs.Delete(new QueryExpression<tbl_MotDType1>().ToLambda());
+            _uow.Commit();
         }
     }
 }

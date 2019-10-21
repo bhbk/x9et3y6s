@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
+﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
@@ -25,78 +24,78 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
         [Route("v1/email/{userID:guid}"), HttpPut]
         [AllowAnonymous]
-        public async ValueTask<IActionResult> ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
+        public IActionResult ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new ProtectHelper(UoW.InstanceType.ToString()).ValidateAsync(email, token, user))
+            else if (!new PasswordlessTokenFactory(UoW.InstanceType.ToString()).Validate(email, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
-            await UoW.Users.SetConfirmedEmailAsync(user, true);
-            await UoW.CommitAsync();
+            UoW.Users.SetConfirmedEmail(user, true);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/password/{userID:guid}"), HttpPut]
         [AllowAnonymous]
-        public async ValueTask<IActionResult> ConfirmPasswordV1([FromRoute] Guid userID, [FromBody] string password, [FromBody] string token)
+        public IActionResult ConfirmPasswordV1([FromRoute] Guid userID, [FromBody] string password, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new ProtectHelper(UoW.InstanceType.ToString()).ValidateAsync(password, token, user))
+            else if (!new PasswordlessTokenFactory(UoW.InstanceType.ToString()).Validate(password, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
-            await UoW.Users.SetConfirmedPasswordAsync(user, true);
-            await UoW.CommitAsync();
+            UoW.Users.SetConfirmedPassword(user, true);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/phone/{userID:guid}"), HttpPut]
         [AllowAnonymous]
-        public async ValueTask<IActionResult> ConfirmPhoneV1([FromRoute] Guid userID, [FromBody] string phoneNumber, [FromBody] string token)
+        public IActionResult ConfirmPhoneV1([FromRoute] Guid userID, [FromBody] string phoneNumber, [FromBody] string token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!await new TotpHelper(8, 10).ValidateAsync(phoneNumber, token, user))
+            else if (!new TimeBasedTokenFactory(8, 10).Validate(phoneNumber, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
-            await UoW.Users.SetConfirmedPhoneNumberAsync(user, true);
-            await UoW.CommitAsync();
+            UoW.Users.SetConfirmedPhoneNumber(user, true);
+            UoW.Commit();
 
             return NoContent();
         }

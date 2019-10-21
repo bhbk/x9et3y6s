@@ -4,9 +4,9 @@ using Bhbk.Lib.Identity.Data.Models;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class QueueEmailRepository : GenericRepositoryAsync<tbl_QueueEmails>
+    public class QueueEmailRepository : GenericRepository<tbl_QueueEmails>
     {
-        public QueueEmailRepository(_DbContext context, InstanceContext instance)
+        public QueueEmailRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
     }
 }

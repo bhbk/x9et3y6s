@@ -68,19 +68,19 @@ namespace Bhbk.WebApi.Alert.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                        foreach (var entry in uow.QueueEmails.GetAsync(new QueryExpression<tbl_QueueEmails>()
-                            .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()).Result)
+                        foreach (var entry in uow.QueueEmails.Get(new QueryExpression<tbl_QueueEmails>()
+                            .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()))
                         {
                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The email was created on " + entry.Created + " and is being deleted now.");
 
-                            await uow.QueueEmails.DeleteAsync(entry);
+                            uow.QueueEmails.Delete(entry);
                         }
 
-                        await uow.CommitAsync();
+                        uow.Commit();
 
-                        foreach (var entry in uow.QueueEmails.GetAsync(new QueryExpression<tbl_QueueEmails>()
-                            .Where(x => x.SendAt < DateTime.Now).ToLambda()).Result)
+                        foreach (var entry in uow.QueueEmails.Get(new QueryExpression<tbl_QueueEmails>()
+                            .Where(x => x.SendAt < DateTime.Now).ToLambda()))
                                 queue.Enqueue(entry);
                     }
 
@@ -116,14 +116,14 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                         if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
                                         {
-                                            uow.QueueEmails.DeleteAsync(msg).Wait();
+                                            await uow.QueueEmails.DeleteAsync(msg);
                                             Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                                         }
                                         else
                                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                                 "Error=" + response.StatusCode);
 #elif !RELEASE
-                                        await uow.QueueEmails.DeleteAsync(msg);
+                                        uow.QueueEmails.Delete(msg);
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 case InstanceContext.UnitTest:
                                     {
-                                        await uow.QueueEmails.DeleteAsync(msg);
+                                        uow.QueueEmails.Delete(msg);
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             }
                         }
 
-                        await uow.CommitAsync();
+                        uow.Commit();
                     }
                 }
                 catch (Exception ex)
@@ -159,8 +159,8 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                    uow.QueueEmails.CreateAsync(model);
-                    uow.CommitAsync();
+                    uow.QueueEmails.Create(model);
+                    uow.Commit();
                 }
 
                 return true;

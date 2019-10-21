@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
@@ -14,7 +15,6 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
 using System.Web;
 using Xunit;
 using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public ImplicitControllerTests(BaseControllerTests factory) => _factory = factory;
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Success()
+        public void Sts_OAuth2_ImplicitV2_Auth_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -37,6 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var controller = new ImplicitController(conf, instance);
@@ -44,23 +45,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = (await uow.States.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow)).First();
+                    && x.ValidToUtc > DateTime.UtcNow).First();
 
-                var imp = await controller.ImplicitV2_Auth(
+                var imp = controller.ImplicitV2_Auth(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -92,9 +93,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var result = HttpUtility.ParseQueryString(imp_frag).Get("access_token");
 
-                JwtFactory.CanReadToken(result).Should().BeTrue();
+                factory.CanReadToken(result).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result);
+                var jwt = factory.ReadJwtToken(result);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

@@ -8,51 +8,34 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [Collection("LibraryRepositoryTests")]
+    [Collection("RepositoryTests")]
     public class ClientRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async ValueTask Repo_Clients_CreateV1_Fail()
+        public void Repo_Clients_CreateV1_Fail()
         {
-            await Assert.ThrowsAsync<NullReferenceException>(async () =>
+            Assert.Throws<NullReferenceException>(() =>
             {
-                await UoW.Clients.CreateAsync(
+                UoW.Clients.Create(
                     Mapper.Map<tbl_Clients>(new ClientCreate()));
 
-                await UoW.CommitAsync();
-            });
-
-            await Assert.ThrowsAsync<DbUpdateException>(async () =>
-            {
-                await UoW.Clients.CreateAsync(
-                    Mapper.Map<tbl_Clients>(new ClientCreate()
-                        {
-                            IssuerId = Guid.NewGuid(),
-                            Name = Constants.ApiTestClient,
-                            ClientKey = Constants.ApiTestClientKey,
-                            ClientType = ClientType.user_agent.ToString(),
-                            Enabled = true,
-                            Immutable = false,
-                        }));
-
-                await UoW.CommitAsync();
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_Clients_CreateV1_Success()
+        public void Repo_Clients_CreateV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var issuer = (await UoW.Issuers.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
+            var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
 
-            var result = await UoW.Clients.CreateAsync(
+            var result = UoW.Clients.Create(
                 Mapper.Map<tbl_Clients>(new ClientCreate()
                     {
                         IssuerId = issuer.Id,
@@ -64,66 +47,64 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                     }));
             result.Should().BeAssignableTo<tbl_Clients>();
 
-            await UoW.CommitAsync();
+            UoW.Commit();
         }
 
         [Fact]
-        public async ValueTask Repo_Clients_DeleteV1_Fail()
+        public void Repo_Clients_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                await UoW.Clients.DeleteAsync(new tbl_Clients());
-                await UoW.CommitAsync();
+                UoW.Clients.Delete(new tbl_Clients());
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_Clients_DeleteV1_Success()
+        public void Repo_Clients_DeleteV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var client = (await UoW.Clients.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
+            var client = UoW.Clients.Get(x => x.Name == Constants.ApiTestClient).Single();
 
-            await UoW.Clients.DeleteAsync(client);
-            await UoW.CommitAsync();
+            UoW.Clients.Delete(client);
+            UoW.Commit();
         }
 
         [Fact]
-        public async ValueTask Repo_Clients_GetV1_Success()
+        public void Repo_Clients_GetV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var result = await UoW.Clients.GetAsync();
-            result.Should().BeAssignableTo<IEnumerable<tbl_Clients>>();
-
-            await UoW.CommitAsync();
+            var results = UoW.Clients.Get();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Clients>>();
         }
 
         [Fact]
-        public async ValueTask Repo_Clients_UpdateV1_Fail()
+        public void Repo_Clients_UpdateV1_Fail()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                await UoW.Clients.UpdateAsync(new tbl_Clients());
-                await UoW.CommitAsync();
+                UoW.Clients.Update(new tbl_Clients());
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_Clients_UpdateV1_Success()
+        public void Repo_Clients_UpdateV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var client = (await UoW.Clients.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
+            var client = UoW.Clients.Get(x => x.Name == Constants.ApiTestClient).Single();
             client.Name += "(Updated)";
 
-            var result = await UoW.Clients.UpdateAsync(client);
+            var result = UoW.Clients.Update(client);
             result.Should().BeAssignableTo<tbl_Clients>();
 
-            await UoW.CommitAsync();
+            UoW.Commit();
         }
     }
 }

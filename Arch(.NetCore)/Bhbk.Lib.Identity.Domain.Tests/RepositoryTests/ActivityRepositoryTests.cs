@@ -9,103 +9,86 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [Collection("LibraryRepositoryTests")]
+    [Collection("RepositoryTests")]
     public class ActivityRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async ValueTask Repo_Activities_CreateV1_Fail()
+        public void Repo_Activities_CreateV1_Fail()
         {
-            await Assert.ThrowsAsync<NullReferenceException>(async () =>
+            Assert.Throws<NullReferenceException>(() =>
             {
-                await UoW.Activities.CreateAsync(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()));
+                UoW.Activities.Create(
+                    Mapper.Map<uvw_Activities>(new ActivityCreate()));
 
-                await UoW.CommitAsync();
-            });
-
-            await Assert.ThrowsAsync<DbUpdateException>(async () =>
-            {
-                await UoW.Activities.CreateAsync(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()
-                    {
-                        ClientId = Guid.NewGuid(),
-                        UserId = Guid.NewGuid(),
-                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
-                    }));
-
-                await UoW.CommitAsync();
+                UoW.Commit();
             });
         }
 
-        [Fact]
-        public async ValueTask Repo_Activities_CreateV1_Success()
+        [Fact(Skip = "NotImplemented")]
+        public void Repo_Activities_CreateV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var user = (await UoW.Users.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-            var result = await UoW.Activities.CreateAsync(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+            var result = UoW.Activities.Create(
+                Mapper.Map<uvw_Activities>(new ActivityCreate()
                 {
                     ClientId = Guid.NewGuid(),
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                     Immutable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Activities>();
+            result.Should().BeAssignableTo<uvw_Activities>();
 
-            await UoW.CommitAsync();
+            UoW.Commit();
         }
 
-        [Fact]
-        public async ValueTask Repo_Activities_DeleteV1_Fail()
+        [Fact(Skip = "NotImplemented")]
+        public void Repo_Activities_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                await UoW.Activities.DeleteAsync(new tbl_Activities());
-                await UoW.CommitAsync();
+                UoW.Activities.Delete(new uvw_Activities());
+                UoW.Commit();
             });
         }
 
-        [Fact]
-        public async ValueTask Repo_Activities_DeleteV1_Success()
+        [Fact(Skip = "NotImplemented")]
+        public void Repo_Activities_DeleteV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var activity = (await UoW.Activities.GetAsync(new QueryExpression<tbl_Activities>()
-                .Where(x => x.Immutable == false).ToLambda()));
+            var activity = UoW.Activities.Get(new QueryExpression<uvw_Activities>()
+                .Where(x => x.Immutable == false).ToLambda());
 
-            await UoW.Activities.DeleteAsync(activity);
-            await UoW.CommitAsync();
+            UoW.Activities.Delete(activity);
+            UoW.Commit();
         }
 
-        [Fact]
-        public async ValueTask Repo_Activities_GetV1_Success()
+        [Fact(Skip = "NotImplemented")]
+        public void Repo_Activities_GetV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var result = await UoW.Activities.GetAsync();
-            result.Should().BeAssignableTo<IEnumerable<tbl_Activities>>();
-
-            await UoW.CommitAsync();
+            var results = UoW.Activities.Get();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Activities>>();
         }
 
-        [Fact]
-        public async ValueTask Repo_Activities_UpdateV1_Fail()
+        [Fact(Skip = "NotImplemented")]
+        public void Repo_Activities_UpdateV1_Fail()
         {
-            await Assert.ThrowsAsync<NotImplementedException>(async () =>
+            Assert.Throws<NotImplementedException>(() =>
             {
-                await UoW.Activities.UpdateAsync(new tbl_Activities());
-                await UoW.CommitAsync();
+                UoW.Activities.Update(new uvw_Activities());
+                UoW.Commit();
             });
         }
     }

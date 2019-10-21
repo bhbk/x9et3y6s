@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -36,12 +38,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).CreateAsync().AsTask();
+                    new DefaultData(uow, mapper).Create();
 
                     return uow;
                 });
                 sc.AddSingleton<IHostedService, MaintainActivityTask>();
                 sc.AddSingleton<IHostedService, MaintainUsersTask>();
+                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
 
                 sc.AddControllers()
                      .AddNewtonsoftJson(opt =>

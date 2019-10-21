@@ -69,19 +69,19 @@ namespace Bhbk.WebApi.Alert.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                        foreach (var entry in uow.QueueTexts.GetAsync(new QueryExpression<tbl_QueueTexts>()
-                            .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()).Result)
+                        foreach (var entry in uow.QueueTexts.Get(new QueryExpression<tbl_QueueTexts>()
+                            .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()))
                         {
                             Log.Warning(typeof(QueueTextTask).Name + " hand-off of text (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The text was created on " + entry.Created + " and is being deleted now.");
 
-                            await uow.QueueTexts.DeleteAsync(entry);
+                            uow.QueueTexts.Delete(entry);
                         }
 
-                        await uow.CommitAsync();
+                        uow.Commit();
 
-                        foreach (var entry in uow.QueueTexts.GetAsync(new QueryExpression<tbl_QueueTexts>()
-                            .Where(x => x.SendAt < DateTime.Now).ToLambda()).Result)
+                        foreach (var entry in uow.QueueTexts.Get(new QueryExpression<tbl_QueueTexts>()
+                            .Where(x => x.SendAt < DateTime.Now).ToLambda()))
                                 queue.Enqueue(entry);
                     }
 
@@ -112,12 +112,12 @@ namespace Bhbk.WebApi.Alert.Tasks
                                 case InstanceContext.DeployedOrLocal:
                                     {
 #if RELEASE
-                                        provider.TryTextHandoff(_providerSid, _providerToken, msg).Wait();
+                                        await provider.TryTextHandoff(_providerSid, _providerToken, msg);
 
-                                        await uow.QueueTexts.DeleteAsync(msg);
+                                        uow.QueueTexts.Delete(msg);
                                         Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
 #elif !RELEASE
-                                        await uow.QueueTexts.DeleteAsync(msg);
+                                        uow.QueueTexts.Delete(msg);
                                         Log.Information(typeof(QueueTextTask).Name + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                                 case InstanceContext.UnitTest:
                                     {
-                                        await uow.QueueTexts.DeleteAsync(msg);
+                                        uow.QueueTexts.Delete(msg);
                                         Log.Information(typeof(QueueTextTask).Name + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                             }
                         }
 
-                        await uow.CommitAsync();
+                        uow.Commit();
                     }
                 }
                 catch (Exception ex)
@@ -153,8 +153,8 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
-                    uow.QueueTexts.CreateAsync(model);
-                    uow.CommitAsync();
+                    uow.QueueTexts.Create(model);
+                    uow.Commit();
                 }
 
                 return true;

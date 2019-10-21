@@ -1,18 +1,20 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Repositories;
+using EntityFrameworkCore.Testing.Moq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Services
 {
-    public class UoWService : IUoWService, IAsyncDisposable, IDisposable
+    public class UoWService : IUoWService, IDisposable
     {
-        private readonly _DbContext _context;
+        private readonly IdentityEntities _context;
         public InstanceContext InstanceType { get; private set; }
         public ActivityRepository Activities { get; private set; }
+        public ActivityRepository_Deprecate Activities_Deprecate { get; private set; }
         public ClaimRepository Claims { get; private set; }
         public ClientRepository Clients { get; private set; }
         public IssuerRepository Issuers { get; private set; }
@@ -37,25 +39,25 @@ namespace Bhbk.Lib.Identity.Data.Services
                 case InstanceContext.DeployedOrLocal:
                     {
 #if RELEASE
-                        var options = new DbContextOptionsBuilder<_DbContext>()
+                        var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseSqlServer(conf["Databases:IdentityEntities"]);
 #elif !RELEASE
-                        var options = new DbContextOptionsBuilder<_DbContext>()
+                        var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseSqlServer(conf["Databases:IdentityEntities"])
                             .EnableSensitiveDataLogging();
 #endif
-                        _context = new _DbContext(options);
+                        _context = new IdentityEntities(builder.Options);
                     }
                     break;
 
                 case InstanceContext.UnitTest:
                     {
-                        var options = new DbContextOptionsBuilder<_DbContext>()
+                        var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .EnableSensitiveDataLogging();
+                        InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(builder, ":InMemory:");
 
-                        InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(options, ":InMemory:");
-
-                        _context = new _DbContext(options);
+                        _context = new IdentityEntities(builder.Options);
+                        //_context = Create.MockedDbContextFor<IdentityEntities>();
                     }
                     break;
 
@@ -66,6 +68,7 @@ namespace Bhbk.Lib.Identity.Data.Services
             InstanceType = instance.InstanceType;
 
             Activities = new ActivityRepository(_context, instance.InstanceType);
+            Activities_Deprecate = new ActivityRepository_Deprecate(_context, instance.InstanceType);
             Claims = new ClaimRepository(_context, instance.InstanceType);
             Clients = new ClientRepository(_context, instance.InstanceType);
             Issuers = new IssuerRepository(_context, instance.InstanceType, conf["IdentityTenants:Salt"]);
@@ -81,19 +84,14 @@ namespace Bhbk.Lib.Identity.Data.Services
             Users = new UserRepository(_context, instance.InstanceType);
         }
 
-        public async ValueTask CommitAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            await _context.DisposeAsync();
-        }
-
         public void Dispose()
         {
             _context.Dispose();
+        }
+
+        public void Commit()
+        {
+            _context.SaveChanges();
         }
     }
 }

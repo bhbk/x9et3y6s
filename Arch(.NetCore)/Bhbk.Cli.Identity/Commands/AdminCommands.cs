@@ -74,7 +74,7 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.issuer:
 
                         issuerName = PromptForInput(CommandTypes.issuer);
-                        issuer = _service.Issuer_GetV1(issuerName);
+                        issuer = _service.Issuer_GetV1(issuerName).Result;
 
                         if (_create)
                         {
@@ -88,7 +88,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 {
                                     Name = issuerName,
                                     Enabled = true,
-                                });
+                                }).Result;
 
                                 if (issuer.Id != Guid.Empty)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create issuer \"" + issuerName + "\""
@@ -103,7 +103,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
                             else
                             {
-                                if (_service.Issuer_DeleteV1(issuer.Id))
+                                if (_service.Issuer_DeleteV1(issuer.Id).Result)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS destroy issuer \"" + issuerName + "\""
                                         + Environment.NewLine + "\tID is " + issuer.Id.ToString());
                                 else
@@ -117,13 +117,13 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.client:
 
                         issuerName = PromptForInput(CommandTypes.issuer);
-                        issuer = _service.Issuer_GetV1(issuerName);
+                        issuer = _service.Issuer_GetV1(issuerName).Result;
 
                         if (issuer == null)
                             throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
 
                         clientName = PromptForInput(CommandTypes.client);
-                        client = _service.Client_GetV1(clientName);
+                        client = _service.Client_GetV1(clientName).Result;
 
                         if (_create)
                         {
@@ -138,7 +138,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     Name = clientName,
                                     ClientType = ClientType.user_agent.ToString(),
                                     Enabled = true,
-                                });
+                                }).Result;
 
                                 if (client != null)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create client \"" + clientName + "\""
@@ -153,7 +153,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 Console.WriteLine(Environment.NewLine + "FAILED find client \"" + clientName + "\"");
                             else
                             {
-                                if (_service.Client_DeleteV1(client.Id))
+                                if (_service.Client_DeleteV1(client.Id).Result)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS destroy client \"" + clientName + "\""
                                         + Environment.NewLine + "\tID is " + client.Id.ToString());
                                 else
@@ -167,7 +167,7 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.login:
 
                         loginName = PromptForInput(CommandTypes.login);
-                        login = _service.Login_GetV1(loginName);
+                        login = _service.Login_GetV1(loginName).Result;
 
                         if (_create)
                         {
@@ -180,7 +180,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 {
                                     Name = loginName,
                                     Enabled = true,
-                                });
+                                }).Result;
 
                                 if (login != null)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create login \"" + loginName + "\""
@@ -195,7 +195,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 Console.WriteLine(Environment.NewLine + "FAILED find login \"" + loginName + "\"");
                             else
                             {
-                                if (_service.Login_DeleteV1(login.Id))
+                                if (_service.Login_DeleteV1(login.Id).Result)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS destroy login \"" + loginName + "\""
                                         + Environment.NewLine + "\tID is " + login.Id.ToString());
                                 else
@@ -209,13 +209,13 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.role:
 
                         clientName = PromptForInput(CommandTypes.client);
-                        client = _service.Client_GetV1(clientName);
+                        client = _service.Client_GetV1(clientName).Result;
 
                         if (client == null)
                             throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
 
                         roleName = PromptForInput(CommandTypes.role);
-                        role = _service.Role_GetV1(roleName);
+                        role = _service.Role_GetV1(roleName).Result;
 
                         if (_create)
                         {
@@ -229,7 +229,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     ClientId = client.Id,
                                     Name = roleName,
                                     Enabled = true,
-                                });
+                                }).Result;
 
                                 if (role != null)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create role \"" + roleName + "\""
@@ -244,7 +244,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 Console.WriteLine(Environment.NewLine + "FAILED find role \"" + roleName + "\"");
                             else
                             {
-                                if (_service.Role_DeleteV1(role.Id))
+                                if (_service.Role_DeleteV1(role.Id).Result)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS destroy role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + role.Id.ToString());
                                 else
@@ -258,7 +258,7 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.rolemap:
 
                         userName = PromptForInput(CommandTypes.user);
-                        user = _service.User_GetV1(userName);
+                        user = _service.User_GetV1(userName).Result;
 
                         if (user != null)
                             Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
@@ -267,7 +267,7 @@ namespace Bhbk.Cli.Identity.Commands
                             throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
                         roleName = PromptForInput(CommandTypes.role);
-                        role = _service.Role_GetV1(roleName);
+                        role = _service.Role_GetV1(roleName).Result;
 
                         if (role != null)
                             Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
@@ -277,14 +277,14 @@ namespace Bhbk.Cli.Identity.Commands
 
                         if (_create)
                         {
-                            if (_service.User_AddToRoleV1(user.Id, role.Id))
+                            if (_service.User_AddToRoleV1(user.Id, role.Id).Result)
                                 Console.WriteLine(Environment.NewLine + "SUCCESS add role \"" + roleName + "\" to user \"" + userName + "\"");
                             else
                                 Console.WriteLine(Environment.NewLine + "FAILED add role \"" + roleName + "\" to user \"" + userName + "\"");
                         }
                         else if (_destroy)
                         {
-                            if (_service.User_RemoveFromRoleV1(user.Id, role.Id))
+                            if (_service.User_RemoveFromRoleV1(user.Id, role.Id).Result)
                                 Console.WriteLine(Environment.NewLine + "SUCCESS remove role \"" + roleName + "\" from user \"" + userName + "\"");
                             else
                                 Console.WriteLine(Environment.NewLine + "FAILED remove role \"" + roleName + "\" from user \"" + userName + "\"");
@@ -295,7 +295,7 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.user:
 
                         userName = PromptForInput(CommandTypes.user);
-                        user = _service.User_GetV1(userName);
+                        user = _service.User_GetV1(userName).Result;
 
                         if (_create)
                         {
@@ -313,7 +313,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     LockoutEnabled = false,
                                     HumanBeing = false,
                                     Immutable = false,
-                                });
+                                }).Result;
 
                                 if (user != null)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS create user \"" + userName + "\""
@@ -323,7 +323,7 @@ namespace Bhbk.Cli.Identity.Commands
                             }
 
                             loginName = Constants.ApiDefaultLogin;
-                            login = _service.Login_GetV1(loginName);
+                            login = _service.Login_GetV1(loginName).Result;
 
                             if (login != null)
                                 Console.WriteLine(Environment.NewLine + "FOUND login \"" + loginName + "\""
@@ -331,7 +331,7 @@ namespace Bhbk.Cli.Identity.Commands
                             else
                                 throw new ConsoleHelpAsException("FAILED find login \"" + loginName + "\"");
 
-                            if (_service.User_AddToLoginV1(user.Id, login.Id))
+                            if (_service.User_AddToLoginV1(user.Id, login.Id).Result)
                                 Console.WriteLine(Environment.NewLine + "SUCCESS add login \"" + loginName + "\" to user \"" + userName + "\"");
                             else
                                 throw new ConsoleHelpAsException("FAILED add login \"" + loginName + "\" to user \"" + userName + "\"");
@@ -342,7 +342,7 @@ namespace Bhbk.Cli.Identity.Commands
                                 Console.WriteLine(Environment.NewLine + "FAILED find user \"" + userName + "\"");
                             else
                             {
-                                if (_service.User_DeleteV1(user.Id))
+                                if (_service.User_DeleteV1(user.Id).Result)
                                     Console.WriteLine(Environment.NewLine + "SUCCESS destroy user \"" + userName + "\""
                                         + Environment.NewLine + "\tID is " + user.Id.ToString());
                                 else
@@ -356,7 +356,7 @@ namespace Bhbk.Cli.Identity.Commands
                     case CommandTypes.userpass:
 
                         userName = PromptForInput(CommandTypes.user);
-                        user = _service.User_GetV1(userName);
+                        user = _service.User_GetV1(userName).Result;
 
                         if (_create)
                         {
@@ -374,7 +374,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     UserId = user.Id,
                                     NewPassword = password,
                                     NewPasswordConfirm = password,
-                                }))
+                                }).Result)
                                 Console.WriteLine(Environment.NewLine + "SUCCESS set password for user \"" + userName + "\"");
                             else
                                 throw new ConsoleHelpAsException("FAILED set password for user \"" + userName + "\"");

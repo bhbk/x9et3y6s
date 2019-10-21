@@ -60,13 +60,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                         var disabledExpr = new QueryExpression<tbl_Users>()
                                 .Where(x => x.LockoutEnd < DateTime.UtcNow).ToLambda();
 
-                        var disabled = uow.Users.GetAsync(disabledExpr).Result;
+                        var disabled = uow.Users.Get(disabledExpr);
                         var disabledCount = disabled.Count();
 
                         if (disabled.Any())
                         {
-                            await uow.Users.DeleteAsync(disabled);
-                            await uow.CommitAsync();
+                            uow.Users.Delete(disabled);
+                            uow.Commit();
 
                             var msg = typeof(MaintainUsersTask).Name + " success on " + DateTime.Now.ToString() + ". Enabled "
                                     + disabledCount.ToString() + " users with expired lock-outs.";

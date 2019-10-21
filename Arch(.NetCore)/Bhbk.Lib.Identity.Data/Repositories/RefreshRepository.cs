@@ -2,16 +2,15 @@
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using System;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class RefreshRepository : GenericRepositoryAsync<tbl_Refreshes>
+    public class RefreshRepository : GenericRepository<tbl_Refreshes>
     {
-        public RefreshRepository(_DbContext context, InstanceContext instance)
+        public RefreshRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override ValueTask<tbl_Refreshes> UpdateAsync(tbl_Refreshes entity)
+        public override tbl_Refreshes Update(tbl_Refreshes entity)
         {
             throw new NotImplementedException();
         }

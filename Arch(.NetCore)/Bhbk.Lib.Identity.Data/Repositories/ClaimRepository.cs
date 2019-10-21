@@ -4,18 +4,18 @@ using Bhbk.Lib.Identity.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class ClaimRepository : GenericRepositoryAsync<tbl_Claims>
+    public class ClaimRepository : GenericRepository<tbl_Claims>
     {
-        public ClaimRepository(_DbContext context, InstanceContext instance)
+        public ClaimRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
 
-        public override async ValueTask<tbl_Claims> UpdateAsync(tbl_Claims model)
+        public override tbl_Claims Update(tbl_Claims model)
         {
-            var entity = _context.Set<tbl_Claims>().Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<tbl_Claims>()
+                .Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return _context.Update(entity).Entity;
         }
     }
 }

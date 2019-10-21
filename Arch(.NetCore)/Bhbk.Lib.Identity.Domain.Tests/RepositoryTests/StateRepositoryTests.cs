@@ -9,53 +9,35 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [Collection("LibraryRepositoryTests")]
+    [Collection("RepositoryTests")]
     public class StateRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async ValueTask Repo_States_CreateV1_Fail()
+        public void Repo_States_CreateV1_Fail()
         {
-            await Assert.ThrowsAsync<NullReferenceException>(async () =>
+            Assert.Throws<NullReferenceException>(() =>
             {
-                await UoW.States.CreateAsync(
+                UoW.States.Create(
                     Mapper.Map<tbl_States>(new StateCreate()));
-                await UoW.CommitAsync();
-            });
-
-            await Assert.ThrowsAsync<DbUpdateException>(async () =>
-            {
-                await UoW.States.CreateAsync(
-                    Mapper.Map<tbl_States>(new StateCreate()
-                        {
-                            IssuerId = Guid.NewGuid(),
-                            ClientId = Guid.NewGuid(),
-                            UserId = Guid.NewGuid(),
-                            StateValue = AlphaNumeric.CreateString(32),
-                            StateType = StateType.Device.ToString(),
-                            StateConsume = false,
-                            ValidFromUtc = DateTime.UtcNow,
-                            ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                        }));
-                await UoW.CommitAsync();
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_States_CreateV1_Success()
+        public void Repo_States_CreateV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var issuer = (await UoW.Issuers.GetAsync(x => x.Name == Constants.ApiTestIssuer)).Single();
-            var client = (await UoW.Clients.GetAsync(x => x.Name == Constants.ApiTestClient)).Single();
-            var user = (await UoW.Users.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+            var client = UoW.Clients.Get(x => x.Name == Constants.ApiTestClient).Single();
+            var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-            var result = await UoW.States.CreateAsync(
+            var result = UoW.States.Create(
                 Mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
@@ -68,49 +50,48 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
             result.Should().BeAssignableTo<tbl_States>();
-            await UoW.CommitAsync();
+            UoW.Commit();
         }
 
         [Fact]
-        public async ValueTask Repo_States_DeleteV1_Fail()
+        public void Repo_States_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                await UoW.States.DeleteAsync(new tbl_States());
-                await UoW.CommitAsync();
+                UoW.States.Delete(new tbl_States());
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_States_DeleteV1_Success()
+        public void Repo_States_DeleteV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var state = (await UoW.States.GetAsync()).First();
+            var state = UoW.States.Get().First();
 
-            await UoW.States.DeleteAsync(state);
-            await UoW.CommitAsync();
+            UoW.States.Delete(state);
+            UoW.Commit();
         }
 
         [Fact]
-        public async ValueTask Repo_States_GetV1_Success()
+        public void Repo_States_GetV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var result = await UoW.States.GetAsync();
-            result.Should().BeAssignableTo<IEnumerable<tbl_States>>();
-            await UoW.CommitAsync();
+            var results = UoW.States.Get();
+            results.Should().BeAssignableTo<IEnumerable<tbl_States>>();
         }
 
         [Fact]
-        public async ValueTask Repo_States_UpdateV1_Fail()
+        public void Repo_States_UpdateV1_Fail()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                await UoW.States.UpdateAsync(new tbl_States());
-                await UoW.CommitAsync();
+                UoW.States.Update(new tbl_States());
+                UoW.Commit();
             });
         }
     }

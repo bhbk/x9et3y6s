@@ -59,13 +59,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                         var invalidExpr = new QueryExpression<tbl_States>()
                                 .Where(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).ToLambda();
 
-                        var invalid = uow.States.GetAsync(invalidExpr).Result;
+                        var invalid = uow.States.Get(invalidExpr);
                         var invalidCount = invalid.Count();
 
                         if (invalid.Any())
                         {
-                            await uow.States.DeleteAsync(invalid);
-                            await uow.CommitAsync();
+                            uow.States.Delete(invalid);
+                            uow.Commit();
 
                             var msg = typeof(MaintainStatesTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + invalidCount.ToString() + " invalid states.";

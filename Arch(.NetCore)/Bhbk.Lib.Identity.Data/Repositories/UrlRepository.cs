@@ -4,9 +4,9 @@ using Bhbk.Lib.Identity.Data.Models;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class UrlRepository : GenericRepositoryAsync<tbl_Urls>
+    public class UrlRepository : GenericRepository<tbl_Urls>
     {
-        public UrlRepository(_DbContext context, InstanceContext instance)
+        public UrlRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
     }
 }

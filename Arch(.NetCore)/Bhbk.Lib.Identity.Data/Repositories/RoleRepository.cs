@@ -15,12 +15,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : GenericRepositoryAsync<tbl_Roles>
+    public class RoleRepository : GenericRepository<tbl_Roles>
     {
-        public RoleRepository(_DbContext context, InstanceContext instance)
+        public RoleRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
 
-        public  override async ValueTask<tbl_Roles> UpdateAsync(tbl_Roles model)
+        public  override tbl_Roles Update(tbl_Roles model)
         {
             var entity = _context.Set<tbl_Roles>().Where(x => x.Id == model.Id).Single();
 
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return _context.Update(entity).Entity;
         }
     }
 }

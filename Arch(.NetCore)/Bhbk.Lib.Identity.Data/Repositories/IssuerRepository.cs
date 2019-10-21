@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class IssuerRepository : GenericRepositoryAsync<tbl_Issuers>
+    public class IssuerRepository : GenericRepository<tbl_Issuers>
     {
         public string Salt { get; }
 
-        public IssuerRepository(_DbContext context, InstanceContext instance, string salt)
+        public IssuerRepository(IdentityEntities context, InstanceContext instance, string salt)
             : base(context, instance)
         {
             Salt = salt;
         }
 
-        public override async ValueTask<tbl_Issuers> CreateAsync(tbl_Issuers issuer)
+        public override tbl_Issuers Create(tbl_Issuers issuer)
         {
             issuer.tbl_Settings.Add(
                 new tbl_Settings()
@@ -65,10 +65,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                     Immutable = true,
                 });
 
-            return await Task.FromResult(_context.Add(issuer).Entity);
+            return _context.Add(issuer).Entity;
         }
 
-        public override async ValueTask<tbl_Issuers> DeleteAsync(tbl_Issuers issuer)
+        public override tbl_Issuers Delete(tbl_Issuers issuer)
         {
             var claims = _context.Set<tbl_Claims>().Where(x => x.IssuerId == issuer.Id);
             var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.IssuerId == issuer.Id);
@@ -85,12 +85,13 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.RemoveRange(clients);
             _context.Remove(issuer);
 
-            return await Task.FromResult(_context.Remove(issuer).Entity);
+            return _context.Remove(issuer).Entity;
         }
 
-        public override async ValueTask<tbl_Issuers> UpdateAsync(tbl_Issuers issuer)
+        public override tbl_Issuers Update(tbl_Issuers issuer)
         {
-            var entity = _context.Set<tbl_Issuers>().Where(x => x.Id == issuer.Id).Single();
+            var entity = _context.Set<tbl_Issuers>()
+                .Where(x => x.Id == issuer.Id).Single();
 
             /*
              * only persist certain fields.
@@ -105,7 +106,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return _context.Update(entity).Entity;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +22,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -47,6 +50,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddScoped<IUoWService, UoWService>();
             sc.AddSingleton<IHostedService, MaintainQuotesTask>();
             sc.AddSingleton<IAlertService, AlertService>();
+            sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
 
             /*
              * do not use dependency injection for unit of work below. is used 
@@ -68,24 +72,24 @@ namespace Bhbk.WebApi.Identity.Me
             var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
                 .Select(x => x.Value);
 
-            var issuers = (owin.Issuers.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+            var issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                 .Select(x => x.Name + ":" + owin.Issuers.Salt);
 
-            var issuerKeys = (owin.Issuers.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+            var issuerKeys = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                 .Select(x => x.IssuerKey);
 
-            var clients = (owin.Clients.GetAsync(x => allowedClients.Any(y => y == x.Name)).Result)
+            var clients = owin.Clients.Get(x => allowedClients.Any(y => y == x.Name))
                 .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            var legacyIssuer = (owin.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+            var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = (owin.Issuers.GetAsync(x => allowedIssuers.Any(y => y == x.Name)).Result)
+                issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                     .Select(x => x.Name).Concat(issuers);
 #if !RELEASE
             /*
@@ -122,6 +126,8 @@ namespace Bhbk.WebApi.Identity.Me
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
+                    AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
+                    ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = clients.ToArray(),
@@ -130,6 +136,7 @@ namespace Bhbk.WebApi.Identity.Me
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
+                    RequireAudience = true,
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
                     ClockSkew = TimeSpan.Zero,

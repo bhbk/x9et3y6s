@@ -73,9 +73,9 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                             {
                                 var model = mapper.Map<tbl_MotDType1>(motdtype1.contents.quotes[0]);
 
-                                var motd = uow.MOTDs.GetAsync(new QueryExpression<tbl_MotDType1>()
+                                var motd = uow.MOTDs.Get(new QueryExpression<tbl_MotDType1>()
                                     .Where(x => x.Author == model.Author && x.Quote == model.Quote)
-                                    .ToLambda()).Result.SingleOrDefault();
+                                    .ToLambda()).SingleOrDefault();
 
                                 if (motd == null)
                                 {
@@ -85,15 +85,15 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     if (model.Id == null)
                                         model.Id = Guid.NewGuid().ToString();
 
-                                    await uow.MOTDs.CreateAsync(model);
-                                    await uow.CommitAsync();
+                                    uow.MOTDs.Create(model);
+                                    uow.Commit();
                                 }
                                 else if (motd.Id != model.Id)
                                 {
                                     motd.Id = model.Id;
 
-                                    await uow.MOTDs.CreateAsync(motd);
-                                    await uow.CommitAsync();
+                                    uow.MOTDs.Create(motd);
+                                    uow.Commit();
                                 }
 
                                 var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();

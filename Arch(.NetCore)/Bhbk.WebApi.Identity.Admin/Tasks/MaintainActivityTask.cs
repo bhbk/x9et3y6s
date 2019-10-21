@@ -63,13 +63,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                                 || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).ToLambda();
 
-                        var expired = uow.Activities.GetAsync(expiredExpr).Result;
+                        var expired = uow.Activities_Deprecate.Get(expiredExpr);
                         var expiredCount = expired.Count();
 
                         if (expired.Any())
                         {
-                            await uow.Activities.DeleteAsync(expired);
-                            await uow.CommitAsync();
+                            uow.Activities_Deprecate.Delete(expired);
+                            uow.Commit();
 
                             var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + expiredCount.ToString() + " expired activity entries.";

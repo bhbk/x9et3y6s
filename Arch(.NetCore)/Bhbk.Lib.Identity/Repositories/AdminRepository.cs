@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async ValueTask<HttpResponseMessage> Activity_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> Activity_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -120,7 +120,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Claim_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> Claim_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -228,7 +228,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Client_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> Client_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -336,7 +336,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Issuer_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> Issuer_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -414,7 +414,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Login_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> Login_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -492,7 +492,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Role_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> Role_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -646,7 +646,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_GetMOTDsV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> User_GetMOTDsV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -752,7 +752,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_GetV1(string jwt, PageState model)
+        public async ValueTask<HttpResponseMessage> User_GetV1(string jwt, PageStateTypeC model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

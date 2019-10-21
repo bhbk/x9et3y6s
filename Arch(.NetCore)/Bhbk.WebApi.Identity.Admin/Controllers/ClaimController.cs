@@ -1,9 +1,9 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -31,13 +30,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> CreateClaimV1([FromBody] ClaimCreate model)
+        public IActionResult CreateClaimV1([FromBody] ClaimCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                .Where(x => x.IssuerId == model.IssuerId && x.Type == model.Type).ToLambda()))
+            if (UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                .Where(x => x.IssuerId == model.IssuerId && x.Type == model.Type).ToLambda())
                 .Any())
             {
                 ModelState.AddModelError(MessageType.ClaimAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Claim:{model.Type}");
@@ -46,19 +45,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.Claims.CreateAsync(Mapper.Map<tbl_Claims>(model));
+            var result = UoW.Claims.Create(Mapper.Map<tbl_Claims>(model));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return Ok(Mapper.Map<ClaimModel>(result));
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> DeleteClaimV1([FromRoute] Guid claimID)
+        public IActionResult DeleteClaimV1([FromRoute] Guid claimID)
         {
-            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                .Where(x => x.Id == claimID).ToLambda()))
+            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
             if (claim == null)
@@ -75,21 +74,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             claim.ActorId = GetUserGUID();
 
-            await UoW.Claims.DeleteAsync(claim);
-            await UoW.CommitAsync();
+            UoW.Claims.Delete(claim);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{claimValue}"), HttpGet]
-        public async ValueTask<IActionResult> GetClaimV1([FromRoute] string claimValue)
+        public IActionResult GetClaimV1([FromRoute] string claimValue)
         {
             Guid claimID;
             tbl_Claims claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
-                claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                    .Where(x => x.Id == claimID).ToLambda()))
+                claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                    .Where(x => x.Id == claimID).ToLambda())
                     .SingleOrDefault();
 
             if (claim == null)
@@ -102,21 +101,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public async ValueTask<IActionResult> GetClaimsV1([FromBody] PageState model)
+        public IActionResult GetClaimsV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateResult<ClaimModel>
+                var result = new PageStateTypeCResult<ClaimModel>
                 {
                     Data = Mapper.Map<IEnumerable<ClaimModel>>(
-                        await UoW.Claims.GetAsync(
+                        UoW.Claims.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
                                 model.ToExpression<tbl_Claims>()))),
 
-                    Total = await UoW.Claims.CountAsync(
+                    Total = UoW.Claims.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
                             model.ToPredicateExpression<tbl_Claims>()))
                 };
@@ -133,13 +132,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> UpdateClaimV1([FromBody] ClaimModel model)
+        public IActionResult UpdateClaimV1([FromBody] ClaimModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                .Where(x => x.Id == model.Id).ToLambda()))
+            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
             if (claim == null)
@@ -156,9 +155,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.Claims.UpdateAsync(Mapper.Map<tbl_Claims>(model));
+            var result = UoW.Claims.Update(Mapper.Map<tbl_Claims>(model));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return Ok(Mapper.Map<ClaimModel>(result));
         }

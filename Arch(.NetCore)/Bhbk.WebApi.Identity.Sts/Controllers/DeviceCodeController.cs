@@ -1,8 +1,8 @@
-﻿using Bhbk.Lib.Cryptography.Entropy;
+﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
-using System.Threading.Tasks;
 
 /*
  * https://tools.ietf.org/html/draft-ietf-oauth-device-flow-15
@@ -58,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg-ask"), HttpPost]
-        public async ValueTask<IActionResult> DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
+        public IActionResult DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -68,9 +67,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -83,9 +82,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
             else
-                client = (await UoW.Clients.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (client == null)
             {
@@ -98,9 +97,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
-                user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = (await UoW.Users.GetAsync(x => x.Email == input.user)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -108,10 +107,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
-            var polling = (await UoW.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingPollingMax)).Single();
+            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
+            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingPollingMax).Single();
 
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = Base64.CreateString(32);
@@ -122,12 +121,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString(),
                 client = client.Id.ToString(),
                 verification_url = authorize.AbsoluteUri,
-                user_code = await new TotpHelper(8, 10).GenerateAsync(user.SecurityStamp, user),
+                user_code = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user),
                 device_code = nonce,
                 interval = uint.Parse(polling.ConfigValue),
             };
 
-            var state = await UoW.States.CreateAsync(
+            var state = UoW.States.Create(
                 Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
@@ -140,13 +139,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return Ok(result);
         }
 
         [Route("v2/dcg"), HttpPost]
-        public async ValueTask<IActionResult> DeviceCodeV2_Auth([FromForm] DeviceCodeV2 input)
+        public IActionResult DeviceCodeV2_Auth([FromForm] DeviceCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -156,9 +155,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -176,9 +175,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
             else
-                client = (await UoW.Clients.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (client == null)
             {
@@ -191,14 +190,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var polling = (await UoW.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingPollingMax)).Single();
+            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingPollingMax).Single();
 
             //check if state is valid...
-            var state = (await UoW.States.GetAsync(x => x.StateValue == input.device_code
+            var state = UoW.States.Get(x => x.StateValue == input.device_code
                 && x.StateType == StateType.Device.ToString()
                 && x.ValidFromUtc < DateTime.UtcNow
-                && x.ValidToUtc > DateTime.UtcNow)).SingleOrDefault();
+                && x.ValidToUtc > DateTime.UtcNow).SingleOrDefault();
 
             if (state == null
                 || state.StateConsume == true)
@@ -212,8 +211,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 state.LastPolling = DateTime.UtcNow;
                 state.StateConsume = false;
 
-                await UoW.States.UpdateAsync(state);
-                await UoW.CommitAsync();
+                UoW.States.Update(state);
+                UoW.Commit();
 
                 ModelState.AddModelError(MessageType.StateSlowDown.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
@@ -232,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == state.UserId)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == state.UserId).SingleOrDefault();
 
             if (user == null)
             {
@@ -241,7 +240,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (await UoW.Users.IsLockedOutAsync(user.Id)
+            else if (UoW.Users.IsLockedOut(user.Id)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -252,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            if (!await new TotpHelper(8, 10).ValidateAsync(user.SecurityStamp, input.user_code, user))
+            if (!new TimeBasedTokenFactory(8, 10).Validate(user.SecurityStamp, input.user_code, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.user_code}");
                 return BadRequest(ModelState);
@@ -262,23 +261,57 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
 
-            var dc = await JwtFactory.UserResourceOwnerV2(UoW, Mapper, issuer, new List<tbl_Clients> { client }, user);
-            var rt = await JwtFactory.UserRefreshV2(UoW, Mapper, issuer, user);
+            //adjust state...
+            UoW.States.Update(state);
+
+            //adjust counter(s) for login success...
+            UoW.Users.AccessSuccess(user);
+
+            var dc_claims = UoW.Users.GenerateAccessClaims(issuer, user);
+            var dc = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, dc_claims);
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    UserId = user.Id,
+                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
+            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+
+            UoW.Refreshes.Create(
+                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    UserId = user.Id,
+                    RefreshType = RefreshType.User.ToString(),
+                    RefreshValue = rt.RawData,
+                    ValidFromUtc = rt.ValidFrom,
+                    ValidToUtc = rt.ValidTo,
+                }));
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    UserId = user.Id,
+                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            UoW.Commit();
 
             var result = new UserJwtV2()
             {
                 token_type = "bearer",
                 access_token = dc.RawData,
                 refresh_token = rt.RawData,
+                user = user.Email,
+                client = new List<string>() { client.Name },
+                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
                 expires_in = (int)(new DateTimeOffset(dc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
-
-            //adjust state...
-            await UoW.States.UpdateAsync(state);
-
-            //adjust counter(s) for login success...
-            await UoW.Users.AccessSuccessAsync(user);
-            await UoW.CommitAsync();
 
             return Ok(result);
         }

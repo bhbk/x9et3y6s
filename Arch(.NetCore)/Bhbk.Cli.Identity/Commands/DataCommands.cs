@@ -2,6 +2,7 @@
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using ManyConsole;
@@ -45,7 +46,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    data.CreateAsync().AsTask();
+                    data.Create();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
@@ -56,7 +57,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to destroy default data...");
                     Console.ReadKey();
 
-                    data.DestroyAsync().AsTask();
+                    data.Destroy();
 
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
@@ -67,7 +68,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to destroy all data...");
                     Console.ReadKey();
 
-                    data.DestroyAsync().AsTask();
+                    data.Destroy();
 
                     Console.WriteLine("\tCompleted destroy all data...");
                     Console.WriteLine();

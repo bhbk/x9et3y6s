@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -11,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
 using System.Web;
 using Xunit;
 using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
         public AuthCodeControllerTests(BaseControllerTests factory) => _factory = factory;
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Ask_Success()
+        public void Sts_OAuth2_AuthCodeV2_Ask_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -40,16 +40,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var ask = await controller.AuthCodeV2_Ask(
+                var ask = controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),

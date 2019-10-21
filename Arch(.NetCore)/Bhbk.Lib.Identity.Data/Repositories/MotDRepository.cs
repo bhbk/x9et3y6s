@@ -4,9 +4,9 @@ using Bhbk.Lib.Identity.Data.Models;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class MotDRepository : GenericRepositoryAsync<tbl_MotDType1>
+    public class MotDRepository : GenericRepository<tbl_MotDType1>
     {
-        public MotDRepository(_DbContext context, InstanceContext instance)
+        public MotDRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
     }
 }

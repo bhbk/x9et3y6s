@@ -4,15 +4,21 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Bhbk.Lib.Identity.Data.Models
 {
-    public partial class _DbContext : DbContext
+    public partial class IdentityEntities : DbContext
     {
+        public IdentityEntities()
+        {
+        }
+
+        public IdentityEntities(DbContextOptions<IdentityEntities> options)
+            : base(options)
+        {
+        }
+
         public virtual DbSet<tbl_Activities> tbl_Activities { get; set; }
-        public virtual DbSet<tbl_ActivityTypes> tbl_ActivityTypes { get; set; }
-        public virtual DbSet<tbl_ClaimTypes> tbl_ClaimTypes { get; set; }
         public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
         public virtual DbSet<tbl_ClientRoles> tbl_ClientRoles { get; set; }
         public virtual DbSet<tbl_Clients> tbl_Clients { get; set; }
-        public virtual DbSet<tbl_Exceptions> tbl_Exceptions { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
         public virtual DbSet<tbl_MotDType1> tbl_MotDType1 { get; set; }
@@ -22,19 +28,22 @@ namespace Bhbk.Lib.Identity.Data.Models
         public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
         public virtual DbSet<tbl_Settings> tbl_Settings { get; set; }
-        public virtual DbSet<tbl_StateTypes> tbl_StateTypes { get; set; }
         public virtual DbSet<tbl_States> tbl_States { get; set; }
         public virtual DbSet<tbl_Urls> tbl_Urls { get; set; }
         public virtual DbSet<tbl_UserClaims> tbl_UserClaims { get; set; }
         public virtual DbSet<tbl_UserLogins> tbl_UserLogins { get; set; }
         public virtual DbSet<tbl_UserRoles> tbl_UserRoles { get; set; }
         public virtual DbSet<tbl_Users> tbl_Users { get; set; }
+        public virtual DbSet<uvw_Activities> uvw_Activities { get; set; }
+        public virtual DbSet<uvw_Claims> uvw_Claims { get; set; }
+        public virtual DbSet<uvw_Users> uvw_Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Data Source=bits.test.ochap.local; Initial Catalog=BhbkIdentity; User ID=Sql.BhbkIdentity; Password=Pa$$word01!");
             }
         }
 
@@ -61,28 +70,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .WithMany(p => p.tbl_Activities)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK_Activities_UserID");
-            });
-
-            modelBuilder.Entity<tbl_ActivityTypes>(entity =>
-            {
-                entity.HasIndex(e => e.Id)
-                    .HasName("IX_ActivityTypes")
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Value)
-                    .IsRequired()
-                    .HasMaxLength(64);
-            });
-
-            modelBuilder.Entity<tbl_ClaimTypes>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Value)
-                    .IsRequired()
-                    .HasMaxLength(64);
             });
 
             modelBuilder.Entity<tbl_Claims>(entity =>
@@ -155,33 +142,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .HasForeignKey(d => d.IssuerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Clients_IssuerID");
-            });
-
-            modelBuilder.Entity<tbl_Exceptions>(entity =>
-            {
-                entity.HasKey(e => e.ErrorID)
-                    .HasName("PK_SystemErrorInfo");
-
-                entity.Property(e => e.ErrorID)
-                    .HasColumnType("numeric(18, 0)")
-                    .ValueGeneratedOnAdd();
-
-                entity.Property(e => e.ErrorDate).HasColumnType("datetime");
-
-                entity.Property(e => e.ErrorMessage)
-                    .IsRequired()
-                    .HasMaxLength(2028)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ErrorProcedure)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ErrorSeverity)
-                    .IsRequired()
-                    .HasMaxLength(16)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<tbl_Issuers>(entity =>
@@ -401,15 +361,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .HasConstraintName("FK_Settings_UserID");
             });
 
-            modelBuilder.Entity<tbl_StateTypes>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Value)
-                    .IsRequired()
-                    .HasMaxLength(64);
-            });
-
             modelBuilder.Entity<tbl_States>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -531,6 +482,47 @@ namespace Bhbk.Lib.Identity.Data.Models
                 entity.Property(e => e.PhoneNumber).HasMaxLength(16);
 
                 entity.Property(e => e.PhoneNumberConfirmed).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<uvw_Activities>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_Activities", "svc");
+
+                entity.Property(e => e.ActivityType)
+                    .IsRequired()
+                    .HasMaxLength(64);
+            });
+
+            modelBuilder.Entity<uvw_Claims>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_Claims", "svc");
+
+                entity.Property(e => e.Type).IsRequired();
+
+                entity.Property(e => e.Value).IsRequired();
+
+                entity.Property(e => e.ValueType)
+                    .IsRequired()
+                    .HasMaxLength(64);
+            });
+
+            modelBuilder.Entity<uvw_Users>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_Users", "svc");
+
+                entity.Property(e => e.Email).IsRequired();
+
+                entity.Property(e => e.FirstName).IsRequired();
+
+                entity.Property(e => e.LastName).IsRequired();
+
+                entity.Property(e => e.PhoneNumber).HasMaxLength(16);
             });
 
             OnModelCreatingPartial(modelBuilder);

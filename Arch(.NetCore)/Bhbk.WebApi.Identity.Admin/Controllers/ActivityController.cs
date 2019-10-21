@@ -1,9 +1,9 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -31,15 +30,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{activityValue}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> GetActivityV1([FromRoute] string activityValue)
+        public IActionResult GetActivityV1([FromRoute] string activityValue)
         {
             Guid activityID;
-            tbl_Activities activity = null;
+            uvw_Activities activity = null;
 
             if (Guid.TryParse(activityValue, out activityID))
-                activity = (await UoW.Activities.GetAsync(new QueryExpression<tbl_Activities>()
+                activity = UoW.Activities.Get(new QueryExpression<uvw_Activities>()
                     .Where(x => x.Id == activityID)
-                    .ToLambda())).SingleOrDefault();
+                    .ToLambda()).SingleOrDefault();
 
             if (activity == null)
             {
@@ -52,23 +51,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/page"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> GetActivitiesV1([FromBody] PageState model)
+        public IActionResult GetActivitiesV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateResult<ActivityModel>
+                var result = new PageStateTypeCResult<ActivityModel>
                 {
                     Data = Mapper.Map<IEnumerable<ActivityModel>>(
-                        await UoW.Activities.GetAsync(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
-                                model.ToExpression<tbl_Activities>()))),
+                        UoW.Activities.Get(
+                            Mapper.MapExpression<Expression<Func<IQueryable<uvw_Activities>, IQueryable<uvw_Activities>>>>(
+                                model.ToExpression<uvw_Activities>()))),
 
-                    Total = await UoW.Activities.CountAsync(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
-                            model.ToPredicateExpression<tbl_Activities>()))
+                    Total = UoW.Activities.Count(
+                        Mapper.MapExpression<Expression<Func<IQueryable<uvw_Activities>, IQueryable<uvw_Activities>>>>(
+                            model.ToPredicateExpression<uvw_Activities>()))
                 };
 
                 return Ok(result);

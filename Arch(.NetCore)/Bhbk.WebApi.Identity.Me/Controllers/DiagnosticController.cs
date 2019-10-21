@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
+﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Mvc;

@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
@@ -40,25 +44,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 client.Enabled = false;
 
-                await uow.Clients.UpdateAsync(client);
-                await uow.CommitAsync();
+                uow.Clients.Update(client);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -81,20 +85,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -121,25 +125,25 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 issuer.Enabled = false;
 
-                await uow.Issuers.UpdateAsync(issuer);
-                await uow.CommitAsync();
+                uow.Issuers.Update(issuer);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -162,20 +166,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -202,20 +206,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -238,26 +242,26 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
-                await uow.Users.UpdateAsync(user);
-                await uow.CommitAsync();
+                uow.Users.Update(user);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -280,20 +284,20 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
@@ -318,27 +322,28 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
-                var result = service.ResourceOwner_AuthV1(
+                var result = await service.ResourceOwner_AuthV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -349,9 +354,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV1>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -368,23 +373,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "true";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var result = service.ResourceOwner_AuthV1Legacy(
+                var result = await service.ResourceOwner_AuthV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
@@ -394,9 +400,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV1Legacy>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Should().Be(FakeConstants.ApiTestIssuer);
@@ -416,22 +422,35 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 client.Enabled = false;
 
-                await uow.Clients.UpdateAsync(client);
-                await uow.CommitAsync();
+                uow.Clients.Update(client);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -451,17 +470,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -485,22 +517,35 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 issuer.Enabled = false;
 
-                await uow.Issuers.UpdateAsync(issuer);
-                await uow.CommitAsync();
+                uow.Issuers.Update(issuer);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -520,17 +565,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -554,23 +612,36 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
-                await uow.Users.UpdateAsync(user);
-                await uow.CommitAsync();
+                uow.Users.Update(user);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -590,20 +661,33 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
 
-                await uow.Users.DeleteAsync(user);
-                await uow.CommitAsync();
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                uow.Users.Delete(user);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -627,19 +711,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(1);
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 uow.Users.Clock = DateTime.UtcNow;
 
@@ -661,19 +758,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(-1);
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 uow.Users.Clock = DateTime.UtcNow;
 
@@ -699,21 +809,34 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = await JwtFactory.UserRefreshV1(uow, mapper, issuer, user);
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_RefreshV1(
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -723,9 +846,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV1>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -748,17 +871,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 client.Enabled = false;
 
-                await uow.Clients.UpdateAsync(client);
-                await uow.CommitAsync();
+                uow.Clients.Update(client);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -781,12 +904,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -813,17 +936,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 issuer.Enabled = false;
 
-                await uow.Issuers.UpdateAsync(issuer);
-                await uow.CommitAsync();
+                uow.Issuers.Update(issuer);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -846,12 +969,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -878,12 +1001,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -906,18 +1029,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
-                await uow.Users.UpdateAsync(user);
-                await uow.CommitAsync();
+                uow.Users.Update(user);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -940,12 +1063,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
@@ -970,26 +1093,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_AuthV2(
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1000,9 +1124,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -1019,35 +1143,36 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var defaultClient = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var defaultRole = (await uow.Roles.GetAsync(x => x.Name == RealConstants.ApiDefaultRoleForUser)).Single();
+                var defaultClient = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var defaultRole = uow.Roles.Get(x => x.Name == RealConstants.ApiDefaultRoleForUser).Single();
 
                 if (client.Id == defaultClient.Id)
                     throw new ArgumentException();
 
-                await uow.Users.AddToRoleAsync(user, defaultRole);
-                await uow.CommitAsync();
+                uow.Users.AddToRole(user, defaultRole);
+                uow.Commit();
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_AuthV2(
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1058,9 +1183,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -1077,26 +1202,27 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_AuthV2(
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_AuthV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1107,9 +1233,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -1130,22 +1256,35 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 client.Enabled = false;
 
-                await uow.Clients.UpdateAsync(client);
-                await uow.CommitAsync();
+                uow.Clients.Update(client);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1165,17 +1304,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1199,22 +1351,35 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 issuer.Enabled = false;
 
-                await uow.Issuers.UpdateAsync(issuer);
-                await uow.CommitAsync();
+                uow.Issuers.Update(issuer);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1234,17 +1399,30 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1268,19 +1446,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(1);
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 uow.Users.Clock = DateTime.UtcNow;
 
@@ -1302,19 +1493,32 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(-1);
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 uow.Users.Clock = DateTime.UtcNow;
 
@@ -1340,31 +1544,44 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 user.LockoutEnabled = true;
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
-                await uow.Users.UpdateAsync(user);
-                await uow.CommitAsync();
+                uow.Users.Update(user);
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1384,25 +1601,38 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1426,29 +1656,42 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_RefreshV2(
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1458,9 +1701,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -1477,38 +1720,51 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var defaultClient = (await uow.Clients.GetAsync(x => x.Name == RealConstants.ApiDefaultClientUi)).Single();
-                var defaultRole = (await uow.Roles.GetAsync(x => x.Name == RealConstants.ApiDefaultRoleForUser)).Single();
+                var defaultClient = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var defaultRole = uow.Roles.Get(x => x.Name == RealConstants.ApiDefaultRoleForUser).Single();
 
                 if (client.Id == defaultClient.Id)
                     throw new ArgumentException();
 
-                await uow.Users.AddToRoleAsync(user, defaultRole);
-                await uow.CommitAsync();
+                uow.Users.AddToRole(user, defaultRole);
+                uow.Commit();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_RefreshV2(
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1518,9 +1774,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -1537,29 +1793,42 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                await new TestData(uow, mapper).DestroyAsync();
-                await new TestData(uow, mapper).CreateAsync();
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
 
-                var legacyIssuer = (uow.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
 
-                await uow.Settings.UpdateAsync(legacyIssuer);
-                await uow.CommitAsync();
+                uow.Settings.Update(legacyIssuer);
+                uow.Commit();
 
-                var issuer = (await uow.Issuers.GetAsync(x => x.Name == FakeConstants.ApiTestIssuer)).Single();
-                var client = (await uow.Clients.GetAsync(x => x.Name == FakeConstants.ApiTestClient)).Single();
-                var user = (await uow.Users.GetAsync(x => x.Email == FakeConstants.ApiTestUser)).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var rt = JwtFactory.UserRefreshV2(uow, mapper, issuer, user).Result;
-                await uow.CommitAsync();
+                var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
 
-                var expire = (await uow.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire)).Single();
-                var result = service.ResourceOwner_RefreshV2(
+                uow.Refreshes.Create(
+                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    {
+                        IssuerId = issuer.Id,
+                        UserId = user.Id,
+                        RefreshType = RefreshType.User.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFromUtc = rt.ValidFrom,
+                        ValidToUtc = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                var result = await service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1569,9 +1838,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                JwtFactory.CanReadToken(result.access_token).Should().BeTrue();
+                factory.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = JwtFactory.ReadJwtToken(result.access_token);
+                var jwt = factory.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

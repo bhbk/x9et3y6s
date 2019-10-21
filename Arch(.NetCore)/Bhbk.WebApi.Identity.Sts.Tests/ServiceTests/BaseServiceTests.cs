@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
-#if MIDDLEWARE
 using Bhbk.WebApi.Identity.Sts.Middlewares;
-#endif
 using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -56,12 +57,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).CreateAsync().AsTask();
+                    new DefaultData(uow, mapper).Create();
 
                     return uow;
                 });
                 sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
                 sc.AddSingleton<IHostedService, MaintainStatesTask>();
+                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
 
                 /*
                  * do not use dependency injection for unit of work below. is used 
@@ -69,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                  */
 
                 var owin = new UoWService(conf, instance);
-                new DefaultData(owin, mapper).CreateAsync().AsTask();
+                new DefaultData(owin, mapper).Create();
 
                 /*
                  * only test context allowed to run...
@@ -78,24 +80,24 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 if (owin.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
 
-                var issuers = (owin.Issuers.GetAsync().Result)
+                var issuers = owin.Issuers.Get()
                     .Select(x => x.Name + ":" + owin.Issuers.Salt);
 
-                var issuerKeys = (owin.Issuers.GetAsync().Result)
+                var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);
 
-                var clients = (owin.Clients.GetAsync().Result)
+                var clients = owin.Clients.Get()
                     .Select(x => x.Name);
 
                 /*
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                var legacyIssuer = (owin.Settings.GetAsync(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer)).Result.Single();
+                var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
                 if (bool.Parse(legacyIssuer.ConfigValue))
-                    issuers = (owin.Issuers.GetAsync().Result)
+                    issuers = owin.Issuers.Get()
                         .Select(x => x.Name).Concat(issuers);
 
                 sc.AddControllers()
@@ -119,6 +121,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     jwt.IncludeErrorDetails = true;
                     jwt.TokenValidationParameters = new TokenValidationParameters
                     {
+                        AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
+                        ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                         ValidIssuers = issuers.ToArray(),
                         IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                         ValidAudiences = clients.ToArray(),
@@ -127,6 +131,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         ValidateAudience = true,
                         ValidateIssuerSigningKey = true,
                         ValidateLifetime = true,
+                        RequireAudience = true,
                         RequireExpirationTime = true,
                         RequireSignedTokens = true,
                         ClockSkew = TimeSpan.Zero,
@@ -177,10 +182,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     .AllowAnyMethod());
                 app.UseAuthentication();
                 app.UseAuthorization();
-#if MIDDLEWARE
-                app.UseMiddleware<ResourceOwner_Deprecate>();
-                app.UseMiddleware<ResourceOwnerRefresh_Deprecate>();
-#endif
+
+                app.UseMiddleware<SandboxMiddleware>();
+
                 app.UseEndpoints(opt =>
                 {
                     opt.MapControllers();

@@ -30,8 +30,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_Activities, ActivityModel>();
-
             /*
              * claim models
              */
@@ -49,8 +47,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore());
-
-            CreateMap<tbl_Claims, ClaimModel>();
 
             /*
              * client models
@@ -96,8 +92,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.SendAt, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.From, src => src.Ignore());
-
-            CreateMap<tbl_QueueEmails, EmailModel>();
 
             /*
              * issuer models
@@ -217,8 +211,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_Settings, SettingModel>();
-
             /*
              * state models
              */
@@ -230,8 +222,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_States, StateModel>();
-
             /*
              * text models
              */
@@ -241,18 +231,14 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.SendAt, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.From, src => src.Ignore());
 
-            CreateMap<tbl_QueueTexts, TextModel>();
-
             /*
              * url models
              */
             CreateMap<UrlCreate, tbl_Urls>()
-                    .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                    .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                    .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                    .ForMember(dest => dest.Client, src => src.Ignore());
-
-            CreateMap<tbl_Urls, UrlModel>();
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
+                .ForMember(dest => dest.Client, src => src.Ignore());
 
             /*
              * user models

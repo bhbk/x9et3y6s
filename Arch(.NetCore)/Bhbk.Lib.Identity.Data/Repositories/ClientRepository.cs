@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,18 +11,17 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class ClientRepository : GenericRepositoryAsync<tbl_Clients>
+    public class ClientRepository : GenericRepository<tbl_Clients>
     {
         private IClockService _clock;
 
-        public ClientRepository(_DbContext context, InstanceContext instance)
+        public ClientRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance)
         {
-            _clock = new ClockService(_instance);
+            _clock = new ClockService(new ContextService(instance));
         }
 
         public DateTimeOffset Clock
@@ -31,27 +30,27 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public async ValueTask<tbl_Clients> AccessFailedAsync(tbl_Clients client)
+        public tbl_Clients AccessFailed(tbl_Clients client)
         {
             client.LastLoginFailure = Clock.UtcDateTime;
             client.AccessFailedCount++;
 
             _context.Entry(client).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Entry(client).Entity);
+            return _context.Entry(client).Entity;
         }
 
-        public async ValueTask<tbl_Clients> AccessSuccessAsync(tbl_Clients client)
+        public tbl_Clients AccessSuccess(tbl_Clients client)
         {
             client.LastLoginSuccess = Clock.UtcDateTime;
             client.AccessSuccessCount++;
 
             _context.Entry(client).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Entry(client).Entity);
+            return _context.Entry(client).Entity;
         }
 
-        public override async ValueTask<tbl_Clients> DeleteAsync(tbl_Clients client)
+        public override tbl_Clients Delete(tbl_Clients client)
         {
             var activity = _context.Set<tbl_Activities>().Where(x => x.ClientId == client.Id);
             var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.ClientId == client.Id);
@@ -66,10 +65,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.RemoveRange(roles);
             _context.Remove(client);
 
-            return await Task.FromResult(_context.Remove(client).Entity);
+            return _context.Remove(client).Entity;
         }
 
-        public async ValueTask<ClaimsPrincipal> GenerateAccessClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
+        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Clients client)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
@@ -101,13 +100,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
                 .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
-            var identity = new ClaimsIdentity(claims, "JWT");
-            var result = new ClaimsPrincipal(identity);
-
-            return await Task.Run(() => result);
+            return claims;
         }
 
-        public async ValueTask<ClaimsPrincipal> GenerateRefreshClaimsAsync(tbl_Issuers issuer, tbl_Clients client)
+        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Clients client)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
@@ -130,15 +126,13 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
                 .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
-            var identity = new ClaimsIdentity(claims, "JWT");
-            var result = new ClaimsPrincipal(identity);
-
-            return await Task.Run(() => result);
+            return claims;
         }
 
-        public override async ValueTask<tbl_Clients> UpdateAsync(tbl_Clients client)
+        public override tbl_Clients Update(tbl_Clients client)
         {
-            var entity = _context.Set<tbl_Clients>().Where(x => x.Id == client.Id).Single();
+            var entity = _context.Set<tbl_Clients>()
+                .Where(x => x.Id == client.Id).Single();
 
             /*
              * only persist certain fields.
@@ -154,7 +148,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             _context.Entry(entity).State = EntityState.Modified;
 
-            return await Task.FromResult(_context.Update(entity).Entity);
+            return _context.Update(entity).Entity;
         }
     }
 }

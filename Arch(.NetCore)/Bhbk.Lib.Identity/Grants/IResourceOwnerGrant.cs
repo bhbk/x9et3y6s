@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Bhbk.Lib.Identity.Helpers
+namespace Bhbk.Lib.Identity.Grants
 {
     public interface IResourceOwnerGrant
     {

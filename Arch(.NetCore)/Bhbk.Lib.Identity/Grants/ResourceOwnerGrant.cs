@@ -8,19 +8,19 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Bhbk.Lib.Identity.Helpers
+namespace Bhbk.Lib.Identity.Grants
 {
-    public class ClientCredentialGrant : IClientCredentialGrant
+    public class ResourceOwnerGrant : IResourceOwnerGrant
     {
         private readonly IConfiguration _conf;
         private readonly InstanceContext _instance;
         private readonly HttpClient _http;
         private JwtSecurityToken _access, _refresh;
 
-        public ClientCredentialGrant()
+        public ResourceOwnerGrant()
             : this(InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public ClientCredentialGrant(InstanceContext instance, HttpClient http)
+        public ResourceOwnerGrant(InstanceContext instance, HttpClient http)
         {
             _conf = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Helpers
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public JwtSecurityToken JwtV1
+        public JwtSecurityToken RopgV1
         {
             get
             {
@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v1/ccg-rt";
+                    var endpoint = "/oauth2/v1/ropg-rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -103,11 +103,12 @@ namespace Bhbk.Lib.Identity.Helpers
                         {
                             new KeyValuePair<string, string>("issuer_id", _conf["IdentityLogin:IssuerName"]),
                             new KeyValuePair<string, string>("client_id", _conf["IdentityLogin:ClientName"]),
-                            new KeyValuePair<string, string>("grant_type", "client_secret"),
-                            new KeyValuePair<string, string>("client_secret", _conf["IdentityLogin:ClientSecret"]),
+                            new KeyValuePair<string, string>("grant_type", "password"),
+                            new KeyValuePair<string, string>("username", _conf["IdentityLogin:UserName"]),
+                            new KeyValuePair<string, string>("password", _conf["IdentityLogin:UserPass"]),
                         });
 
-                    var endpoint = "/oauth2/v1/ccg";
+                    var endpoint = "/oauth2/v1/ropg";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -135,7 +136,7 @@ namespace Bhbk.Lib.Identity.Helpers
             set { _access = value; }
         }
 
-        public JwtSecurityToken CcgV2
+        public JwtSecurityToken RopgV2
         {
             get
             {
@@ -160,7 +161,7 @@ namespace Bhbk.Lib.Identity.Helpers
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v2/ccg-rt";
+                    var endpoint = "/oauth2/v2/ropg-rt";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
@@ -192,11 +193,12 @@ namespace Bhbk.Lib.Identity.Helpers
                         {
                             new KeyValuePair<string, string>("issuer", _conf["IdentityLogin:IssuerName"]),
                             new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityLogin:ClientName"] })),
-                            new KeyValuePair<string, string>("grant_type", "client_secret"),
-                            new KeyValuePair<string, string>("client_secret", _conf["IdentityLogin:ClientSecret"]),
+                            new KeyValuePair<string, string>("grant_type", "password"),
+                            new KeyValuePair<string, string>("user", _conf["IdentityLogin:UserName"]),
+                            new KeyValuePair<string, string>("password", _conf["IdentityLogin:UserPass"]),
                         });
 
-                    var endpoint = "/oauth2/v2/ccg";
+                    var endpoint = "/oauth2/v2/ropg";
 
                     if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                         response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;

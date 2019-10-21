@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.DataState.Expressions;
+﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,6 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
-using System.Threading.Tasks;
 
 /*
  * https://tools.ietf.org/html/rfc6749#section-4.4
@@ -57,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg"), HttpPost]
-        public async ValueTask<IActionResult> ClientCredentialV2_Auth([FromForm] ClientCredentialV2 input)
+        public IActionResult ClientCredentialV2_Auth([FromForm] ClientCredentialV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -67,9 +66,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -87,9 +86,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
             else
-                client = (await UoW.Clients.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (client == null)
             {
@@ -99,9 +98,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else if (!client.Enabled
                 || input.client_secret != client.ClientKey)
             {
-                //adjust counter(s) for login success...
-                await UoW.Clients.AccessFailedAsync(client);
-                await UoW.CommitAsync();
+                //adjust counter(s) for login failure...
+                UoW.Clients.AccessFailed(client);
+                UoW.Commit();
 
                 ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
                 return BadRequest(ModelState);
@@ -110,8 +109,43 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, Mapper, issuer, client);
-            var rt = await JwtFactory.ClientRefreshV2(UoW, Mapper, issuer, client);
+            //adjust counter(s) for login success...
+            UoW.Clients.AccessSuccess(client);
+
+            var cc_claims = UoW.Clients.GenerateAccessClaims(issuer, client);
+            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, cc_claims);
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    ClientId = client.Id,
+                    ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            var rt_claims = UoW.Clients.GenerateRefreshClaims(issuer, client);
+            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+
+            UoW.Refreshes.Create(
+                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshValue = rt.RawData,
+                    ValidFromUtc = rt.ValidFrom,
+                    ValidToUtc = rt.ValidTo,
+                }));
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    ClientId = client.Id,
+                    ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            UoW.Commit();
 
             var result = new ClientJwtV2()
             {
@@ -123,21 +157,17 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
-            //adjust counter(s) for login success...
-            await UoW.Clients.AccessSuccessAsync(client);
-            await UoW.CommitAsync();
-
             return Ok(result);
         }
 
         [Route("v2/ccg-rt"), HttpPost]
-        public async ValueTask<IActionResult> ClientCredentialV2_Refresh([FromForm] RefreshTokenV2 input)
+        public IActionResult ClientCredentialV2_Refresh([FromForm] RefreshTokenV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = (await UoW.Refreshes.GetAsync(new QueryExpression<tbl_Refreshes>()
-                .Where(x => x.RefreshValue == input.refresh_token).ToLambda())).SingleOrDefault();
+            var refresh = UoW.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)
             {
@@ -156,9 +186,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = (await UoW.Issuers.GetAsync(x => x.Id == issuerID)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = (await UoW.Issuers.GetAsync(x => x.Name == input.issuer)).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -176,9 +206,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out clientID))
-                client = (await UoW.Clients.GetAsync(x => x.Id == clientID)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
             else
-                client = (await UoW.Clients.GetAsync(x => x.Name == input.client)).SingleOrDefault();
+                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (client == null)
             {
@@ -194,8 +224,32 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as client id...
             client.ActorId = client.Id;
 
-            var cc = await JwtFactory.ClientResourceOwnerV2(UoW, Mapper, issuer, client);
-            var rt = await JwtFactory.ClientRefreshV2(UoW, Mapper, issuer, client);
+            var cc_claims = UoW.Clients.GenerateAccessClaims(issuer, client);
+            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, cc_claims);
+
+            var rt_claims = UoW.Clients.GenerateRefreshClaims(issuer, client);
+            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+
+            UoW.Refreshes.Create(
+                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                {
+                    IssuerId = issuer.Id,
+                    ClientId = client.Id,
+                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshValue = rt.RawData,
+                    ValidFromUtc = rt.ValidFrom,
+                    ValidToUtc = rt.ValidTo,
+                }));
+
+            UoW.Activities_Deprecate.Create(
+                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                {
+                    ClientId = client.Id,
+                    ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
+                    Immutable = false
+                }));
+
+            UoW.Commit();
 
             var result = new ClientJwtV2()
             {
@@ -206,10 +260,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Name + ":" + UoW.Issuers.Salt,
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
-
-            //adjust counter(s) for login success...
-            await UoW.Clients.AccessSuccessAsync(client);
-            await UoW.CommitAsync();
 
             return Ok(result);
         }

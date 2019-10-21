@@ -1,11 +1,11 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
@@ -40,9 +39,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        public IActionResult AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -50,8 +49,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                .Where(x => x.Id == claimID).ToLambda()))
+            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
             if (claim == null)
@@ -60,19 +59,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.Users.AddToClaimAsync(user, claim))
+            if (!UoW.Users.AddToClaim(user, claim))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public IActionResult AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -80,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
 
             if (login == null)
             {
@@ -88,19 +87,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.Users.AddToLoginAsync(user, login))
+            if (!UoW.Users.AddToLogin(user, login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/add-to-role/{roleID:guid}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
+        public IActionResult AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -108,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
 
             if (role == null)
             {
@@ -116,22 +115,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!await UoW.Users.AddToRoleAsync(user, role))
+            if (!UoW.Users.AddToRole(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> CreateUserV1([FromBody] UserCreate model)
+        public IActionResult CreateUserV1([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.Users.GetAsync(x => x.Email == model.Email)).Any())
+            if (UoW.Users.Get(x => x.Email == model.Email).Any())
             {
                 ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.Email}");
                 return BadRequest(ModelState);
@@ -139,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var issuer = (await UoW.Issuers.GetAsync(x => x.Id == model.IssuerId)).SingleOrDefault();
+            var issuer = UoW.Issuers.Get(x => x.Id == model.IssuerId).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -150,22 +149,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = true;
 
-            var result = await UoW.Users.CreateAsync(Mapper.Map<tbl_Users>(model));
+            var result = UoW.Users.Create(Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
             {
-                var expire = (await UoW.Settings.GetAsync(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingTotpExpire)).Single();
+                var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                    && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
 
-                var code = HttpUtility.UrlEncode(await new ProtectHelper(UoW.InstanceType.ToString())
-                    .GenerateAsync(result.Email, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
+                var code = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
+                    .Generate(result.Email, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
 
-                var url = UrlHelper.GenerateConfirmEmailV1(Conf, result, code);
+                var url = UrlFactory.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
                 alert.Email_EnqueueV1(new EmailCreate()
@@ -186,12 +185,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/no-confirm"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> CreateUserV1NoConfirm([FromBody] UserCreate model)
+        public IActionResult CreateUserV1NoConfirm([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if ((await UoW.Users.GetAsync(x => x.Email == model.Email)).Any())
+            if (UoW.Users.Get(x => x.Email == model.Email).Any())
             {
                 ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.Email}");
                 return BadRequest(ModelState);
@@ -202,21 +201,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             //ignore how bit may be set in model...
             model.HumanBeing = false;
 
-            var result = await UoW.Users.CreateAsync(Mapper.Map<tbl_Users>(model));
+            var result = UoW.Users.Create(Mapper.Map<tbl_Users>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return Ok(Mapper.Map<UserModel>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> DeleteUserV1([FromRoute] Guid userID)
+        public IActionResult DeleteUserV1([FromRoute] Guid userID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -232,17 +231,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            await UoW.Users.DeleteAsync(user);
-            await UoW.CommitAsync();
+            UoW.Users.Delete(user);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/refresh"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> DeleteUserRefreshesV1([FromRoute] Guid userID)
+        public IActionResult DeleteUserRefreshesV1([FromRoute] Guid userID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -250,49 +249,49 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            await UoW.Refreshes.DeleteAsync(new QueryExpression<tbl_Refreshes>()
+            UoW.Refreshes.Delete(new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID).ToLambda());
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/refresh/{refreshID}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> DeleteUserRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
+        public IActionResult DeleteUserRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID && x.Id == refreshID).ToLambda();
 
-            if (!await UoW.Refreshes.ExistsAsync(expr))
+            if (!UoW.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{userID}");
                 return NotFound(ModelState);
             }
 
-            await UoW.Refreshes.DeleteAsync(expr);
-            await UoW.CommitAsync();
+            UoW.Refreshes.Delete(expr);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/msg-of-the-day/page"), HttpPost]
-        public async ValueTask<IActionResult> GetMOTDsV1([FromBody] PageState model)
+        public IActionResult GetMOTDsV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateResult<MOTDType1Model>
+                var result = new PageStateTypeCResult<MOTDType1Model>
                 {
                     Data = Mapper.Map<IEnumerable<MOTDType1Model>>(
-                        await UoW.MOTDs.GetAsync(
+                        UoW.MOTDs.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_MotDType1>, IQueryable<tbl_MotDType1>>>>(
                                 model.ToExpression<tbl_MotDType1>()))),
 
-                    Total = await UoW.MOTDs.CountAsync(
+                    Total = UoW.MOTDs.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_MotDType1>, IQueryable<tbl_MotDType1>>>>(
                             model.ToPredicateExpression<tbl_MotDType1>()))
                 };
@@ -307,16 +306,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userValue}"), HttpGet]
-        public async ValueTask<IActionResult> GetUserV1([FromRoute] string userValue)
+        public IActionResult GetUserV1([FromRoute] string userValue)
         {
             Guid userID;
             tbl_Users user = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = (await UoW.Users.GetAsync(x => x.Email == userValue)).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Email == userValue).SingleOrDefault();
 
             if (user == null)
             {
@@ -328,9 +327,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/claims"), HttpGet]
-        public async ValueTask<IActionResult> GetUserClaimsV1([FromRoute] Guid userID)
+        public IActionResult GetUserClaimsV1([FromRoute] Guid userID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -338,16 +337,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var claims = await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
+            var claims = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
                 .Where(x => x.tbl_UserClaims.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<ClaimModel>>(claims));
         }
 
         [Route("v1/{userID:guid}/clients"), HttpGet]
-        public async ValueTask<IActionResult> GetUserClientsV1([FromRoute] Guid userID)
+        public IActionResult GetUserClientsV1([FromRoute] Guid userID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -355,16 +354,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var clients = await UoW.Clients.GetAsync(new QueryExpression<tbl_Clients>()
+            var clients = UoW.Clients.Get(new QueryExpression<tbl_Clients>()
                 .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == userID))).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<ClientModel>>(clients));
         }
 
         [Route("v1/{userID:guid}/logins"), HttpGet]
-        public async ValueTask<IActionResult> GetUserLoginsV1([FromRoute] Guid userID)
+        public IActionResult GetUserLoginsV1([FromRoute] Guid userID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -372,33 +371,33 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var logins = await UoW.Logins.GetAsync(new QueryExpression<tbl_Logins>()
+            var logins = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<LoginModel>>(logins));
         }
 
         [Route("v1/{userID:guid}/refreshes"), HttpGet]
-        public async ValueTask<IActionResult> GetUserRefreshesV1([FromRoute] Guid userID)
+        public IActionResult GetUserRefreshesV1([FromRoute] Guid userID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID).ToLambda();
 
-            if (!await UoW.Refreshes.ExistsAsync(expr))
+            if (!UoW.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
-            var refreshes = await UoW.Refreshes.GetAsync(expr);
+            var refreshes = UoW.Refreshes.Get(expr);
 
             return Ok(Mapper.Map<IEnumerable<RefreshModel>>(refreshes));
         }
 
         [Route("v1/{userID:guid}/roles"), HttpGet]
-        public async ValueTask<IActionResult> GetUserRolesV1([FromRoute] Guid userID)
+        public IActionResult GetUserRolesV1([FromRoute] Guid userID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -406,28 +405,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = await UoW.Roles.GetAsync(new QueryExpression<tbl_Roles>()
+            var roles = UoW.Roles.Get(new QueryExpression<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<RoleModel>>(roles));
         }
 
         [Route("v1/page"), HttpPost]
-        public async ValueTask<IActionResult> GetUsersV1([FromBody] PageState model)
+        public IActionResult GetUsersV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateResult<UserModel>
+                var result = new PageStateTypeCResult<UserModel>
                 {
                     Data = Mapper.Map<IEnumerable<UserModel>>(
-                        await UoW.Users.GetAsync(
+                        UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
                                 model.ToExpression<tbl_Users>()))),
 
-                    Total = await UoW.Users.CountAsync(
+                    Total = UoW.Users.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
                             model.ToPredicateExpression<tbl_Users>()))
                 };
@@ -444,9 +443,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
+        public IActionResult RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -454,8 +453,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var claim = (await UoW.Claims.GetAsync(new QueryExpression<tbl_Claims>()
-                .Where(x => x.Id == claimID).ToLambda()))
+            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
             if (claim == null)
@@ -463,19 +462,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{claimID}");
                 return NotFound(ModelState);
             }
-            else if (!await UoW.Users.RemoveFromClaimAsync(user, claim))
+            else if (!UoW.Users.RemoveFromClaim(user, claim))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public IActionResult RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -483,26 +482,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = (await UoW.Logins.GetAsync(x => x.Id == loginID)).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
 
             if (login == null)
             {
                 ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
                 return NotFound(ModelState);
             }
-            else if (!await UoW.Users.RemoveFromLoginAsync(user, login))
+            else if (!UoW.Users.RemoveFromLogin(user, login))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
+        public IActionResult RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -510,29 +509,29 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = (await UoW.Roles.GetAsync(x => x.Id == roleID)).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
 
             if (role == null)
             {
                 ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
                 return NotFound(ModelState);
             }
-            else if (!await UoW.Users.RemoveFromRoleAsync(user, role))
+            else if (!UoW.Users.RemoveFromRole(user, role))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> RemovePasswordV1([FromRoute] Guid userID)
+        public IActionResult RemovePasswordV1([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -542,28 +541,28 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetUserGUID();
 
-            if (!await UoW.Users.IsPasswordSetAsync(user.Id))
+            if (!UoW.Users.IsPasswordSet(user.Id))
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
-            if (!await UoW.Users.RemovePasswordAsync(user))
+            if (!UoW.Users.RemovePassword(user))
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
+        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == userID)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -579,20 +578,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            await UoW.Users.SetPasswordAsync(user, model.NewPassword);
-            await UoW.CommitAsync();
+            UoW.Users.SetPassword(user, model.NewPassword);
+            UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public async ValueTask<IActionResult> UpdateUserV1([FromBody] UserModel model)
+        public IActionResult UpdateUserV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = (await UoW.Users.GetAsync(x => x.Id == model.Id)).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == model.Id).SingleOrDefault();
 
             if (user == null)
             {
@@ -608,9 +607,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetUserGUID();
 
-            var result = await UoW.Users.UpdateAsync(Mapper.Map<tbl_Users>(model));
+            var result = UoW.Users.Update(Mapper.Map<tbl_Users>(model));
 
-            await UoW.CommitAsync();
+            UoW.Commit();
 
             return Ok(Mapper.Map<UserModel>(result));
         }

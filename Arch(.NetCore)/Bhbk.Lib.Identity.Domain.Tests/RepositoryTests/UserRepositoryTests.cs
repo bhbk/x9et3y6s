@@ -8,48 +8,31 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
-    [Collection("LibraryRepositoryTests")]
+    [Collection("RepositoryTests")]
     public class UserRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public async ValueTask Repo_Users_CreateV1_Fail()
+        public void Repo_Users_CreateV1_Fail()
         {
-            await Assert.ThrowsAsync<NullReferenceException>(async () =>
+            Assert.Throws<NullReferenceException>(() =>
             {
-                await UoW.Users.CreateAsync(
+                UoW.Users.Create(
                     Mapper.Map<tbl_Users>(new UserCreate()));
-                await UoW.CommitAsync();
-            });
-
-            await Assert.ThrowsAsync<DbUpdateException>(async () =>
-            {
-                await UoW.Users.CreateAsync(
-                    Mapper.Map<tbl_Users>(new UserCreate()
-                        {
-                            Email = AlphaNumeric.CreateString(4),
-                            PhoneNumber = Constants.ApiTestUserPhone,
-                            FirstName = "First-" + Base64.CreateString(4),
-                            LastName = "Last-" + Base64.CreateString(4),
-                            LockoutEnabled = false,
-                            HumanBeing = true,
-                            Immutable = false,
-                        }));
-                await UoW.CommitAsync();
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_Users_CreateV1_Success()
+        public void Repo_Users_CreateV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var result = await UoW.Users.CreateAsync(
+            var result = UoW.Users.Create(
                 Mapper.Map<tbl_Users>(new UserCreate()
                     {
                         Email = Constants.ApiTestUser,
@@ -61,66 +44,65 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                         Immutable = false,
                     }));
             result.Should().BeAssignableTo<tbl_Users>();
-            await UoW.CommitAsync();
+            UoW.Commit();
         }
 
         [Fact]
-        public async ValueTask Repo_Users_DeleteV1_Fail()
+        public void Repo_Users_DeleteV1_Fail()
         {
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                await UoW.Users.DeleteAsync(new tbl_Users());
-                await UoW.CommitAsync();
+                UoW.Users.Delete(new tbl_Users());
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_Users_DeleteV1_Success()
+        public void Repo_Users_DeleteV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var issuer = (await UoW.Users.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var issuer = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-            await UoW.Users.DeleteAsync(issuer);
-            await UoW.CommitAsync();
+            UoW.Users.Delete(issuer);
+            UoW.Commit();
         }
 
         [Fact]
-        public async ValueTask Repo_Users_GetV1_Success()
+        public void Repo_Users_GetV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var result = await UoW.Users.GetAsync();
-            result.Should().BeAssignableTo<IEnumerable<tbl_Users>>();
-            await UoW.CommitAsync();
+            var results = UoW.Users.Get();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Users>>();
         }
 
         [Fact]
-        public async ValueTask Repo_Users_UpdateV1_Fail()
+        public void Repo_Users_UpdateV1_Fail()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
-                await UoW.Users.UpdateAsync(new tbl_Users());
-                await UoW.CommitAsync();
+                UoW.Users.Update(new tbl_Users());
+                UoW.Commit();
             });
         }
 
         [Fact]
-        public async ValueTask Repo_Users_UpdateV1_Success()
+        public void Repo_Users_UpdateV1_Success()
         {
-            await new TestData(UoW, Mapper).DestroyAsync();
-            await new TestData(UoW, Mapper).CreateAsync();
+            new TestData(UoW, Mapper).Destroy();
+            new TestData(UoW, Mapper).Create();
 
-            var user = (await UoW.Users.GetAsync(x => x.Email == Constants.ApiTestUser)).Single();
+            var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 
-            var result = await UoW.Users.UpdateAsync(user);
+            var result = UoW.Users.Update(user);
 
             result.Should().BeAssignableTo<tbl_Users>();
-            await UoW.CommitAsync();
+            UoW.Commit();
         }
     }
 }

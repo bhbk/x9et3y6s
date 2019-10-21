@@ -1,7 +1,6 @@
-﻿using Bhbk.Lib.Common.Extensions;
-using Bhbk.Lib.Common.Primitives.Enums;
+﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Helpers;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Services
 {
@@ -38,42 +38,42 @@ namespace Bhbk.Lib.Identity.Services
             get { return _http; }
         }
 
-        public PageStateResult<ActivityModel> Activity_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<ActivityModel>> Activity_GetV1(PageStateTypeC model)
         {
-            var response = Http.Activity_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Activity_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<ActivityModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<ActivityModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ActivityModel Activity_GetV1(string activityValue)
+        public async ValueTask<ActivityModel> Activity_GetV1(string activityValue)
         {
-            var response = Http.Activity_GetV1(_ropg.RopgV2.RawData, activityValue).Result;
+            var response = await Http.Activity_GetV1(_ropg.RopgV2.RawData, activityValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ActivityModel>().Result;
+                return response.Content.ReadAsAsync<ActivityModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClaimModel Claim_CreateV1(ClaimCreate model)
+        public async ValueTask<ClaimModel> Claim_CreateV1(ClaimCreate model)
         {
-            var response = Http.Claim_CreateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Claim_CreateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ClaimModel>().Result;
+                return response.Content.ReadAsAsync<ClaimModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Claim_DeleteV1(Guid claimID)
+        public async ValueTask<bool> Claim_DeleteV1(Guid claimID)
         {
-            var response = Http.Claim_DeleteV1(_ropg.RopgV2.RawData, claimID).Result;
+            var response = await Http.Claim_DeleteV1(_ropg.RopgV2.RawData, claimID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -82,53 +82,53 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<ClaimModel> Claim_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<ClaimModel>> Claim_GetV1(PageStateTypeC model)
         {
-            var response = Http.Claim_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Claim_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<ClaimModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<ClaimModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClaimModel Claim_GetV1(string claimValue)
+        public async ValueTask<ClaimModel> Claim_GetV1(string claimValue)
         {
-            var response = Http.Claim_GetV1(_ropg.RopgV2.RawData, claimValue).Result;
+            var response = await Http.Claim_GetV1(_ropg.RopgV2.RawData, claimValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ClaimModel>().Result;
+                return response.Content.ReadAsAsync<ClaimModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClaimModel Claim_UpdateV1(ClaimModel model)
+        public async ValueTask<ClaimModel> Claim_UpdateV1(ClaimModel model)
         {
-            var response = Http.Claim_UpdateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Claim_UpdateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ClaimModel>().Result;
+                return response.Content.ReadAsAsync<ClaimModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientModel Client_CreateV1(ClientCreate model)
+        public async ValueTask<ClientModel> Client_CreateV1(ClientCreate model)
         {
-            var response = Http.Client_CreateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Client_CreateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ClientModel>().Result;
+                return response.Content.ReadAsAsync<ClientModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Client_DeleteV1(Guid clientID)
+        public async ValueTask<bool> Client_DeleteV1(Guid clientID)
         {
-            var response = Http.Client_DeleteV1(_ropg.RopgV2.RawData, clientID).Result;
+            var response = await Http.Client_DeleteV1(_ropg.RopgV2.RawData, clientID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -137,9 +137,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Client_DeleteRefreshesV1(Guid clientID)
+        public async ValueTask<bool> Client_DeleteRefreshesV1(Guid clientID)
         {
-            var response = Http.Client_DeleteRefreshesV1(_ropg.RopgV2.RawData, clientID).Result;
+            var response = await Http.Client_DeleteRefreshesV1(_ropg.RopgV2.RawData, clientID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -148,9 +148,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Client_DeleteRefreshV1(Guid clientID, Guid refreshID)
+        public async ValueTask<bool> Client_DeleteRefreshV1(Guid clientID, Guid refreshID)
         {
-            var response = Http.Client_DeleteRefreshV1(_ropg.RopgV2.RawData, clientID, refreshID).Result;
+            var response = await Http.Client_DeleteRefreshV1(_ropg.RopgV2.RawData, clientID, refreshID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -159,64 +159,64 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<ClientModel> Client_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<ClientModel>> Client_GetV1(PageStateTypeC model)
         {
-            var response = Http.Client_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Client_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<ClientModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<ClientModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientModel Client_GetV1(string clientValue)
+        public async ValueTask<ClientModel> Client_GetV1(string clientValue)
         {
-            var response = Http.Client_GetV1(_ropg.RopgV2.RawData, clientValue).Result;
+            var response = await Http.Client_GetV1(_ropg.RopgV2.RawData, clientValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ClientModel>().Result;
+                return response.Content.ReadAsAsync<ClientModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<RefreshModel> Client_GetRefreshesV1(string clientValue)
+        public async ValueTask<IEnumerable<RefreshModel>> Client_GetRefreshesV1(string clientValue)
         {
-            var response = Http.Client_GetRefreshesV1(_ropg.RopgV2.RawData, clientValue).Result;
+            var response = await Http.Client_GetRefreshesV1(_ropg.RopgV2.RawData, clientValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<RefreshModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<RefreshModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public ClientModel Client_UpdateV1(ClientModel model)
+        public async ValueTask<ClientModel> Client_UpdateV1(ClientModel model)
         {
-            var response = Http.Client_UpdateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Client_UpdateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<ClientModel>().Result;
+                return response.Content.ReadAsAsync<ClientModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IssuerModel Issuer_CreateV1(IssuerCreate model)
+        public async ValueTask<IssuerModel> Issuer_CreateV1(IssuerCreate model)
         {
-            var response = Http.Issuer_CreateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Issuer_CreateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IssuerModel>().Result;
+                return response.Content.ReadAsAsync<IssuerModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Issuer_DeleteV1(Guid issuerID)
+        public async ValueTask<bool> Issuer_DeleteV1(Guid issuerID)
         {
-            var response = Http.Issuer_DeleteV1(_ropg.RopgV2.RawData, issuerID).Result;
+            var response = await Http.Issuer_DeleteV1(_ropg.RopgV2.RawData, issuerID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -225,64 +225,64 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<ClientModel> Issuer_GetClientsV1(string issuerValue)
+        public async ValueTask<IEnumerable<ClientModel>> Issuer_GetClientsV1(string issuerValue)
         {
-            var response = Http.Issuer_GetClientsV1(_ropg.RopgV2.RawData, issuerValue).Result;
+            var response = await Http.Issuer_GetClientsV1(_ropg.RopgV2.RawData, issuerValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<ClientModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<ClientModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<IssuerModel> Issuer_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<IssuerModel>> Issuer_GetV1(PageStateTypeC model)
         {
-            var response = Http.Issuer_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Issuer_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<IssuerModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<IssuerModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IssuerModel Issuer_GetV1(string issuerValue)
+        public async ValueTask<IssuerModel> Issuer_GetV1(string issuerValue)
         {
-            var response = Http.Issuer_GetV1(_ropg.RopgV2.RawData, issuerValue).Result;
+            var response = await Http.Issuer_GetV1(_ropg.RopgV2.RawData, issuerValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IssuerModel>().Result;
+                return response.Content.ReadAsAsync<IssuerModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IssuerModel Issuer_UpdateV1(IssuerModel model)
+        public async ValueTask<IssuerModel> Issuer_UpdateV1(IssuerModel model)
         {
-            var response = Http.Issuer_UpdateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Issuer_UpdateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IssuerModel>().Result;
+                return response.Content.ReadAsAsync<IssuerModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public LoginModel Login_CreateV1(LoginCreate model)
+        public async ValueTask<LoginModel> Login_CreateV1(LoginCreate model)
         {
-            var response = Http.Login_CreateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Login_CreateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<LoginModel>().Result;
+                return response.Content.ReadAsAsync<LoginModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Login_DeleteV1(Guid loginID)
+        public async ValueTask<bool> Login_DeleteV1(Guid loginID)
         {
-            var response = Http.Login_DeleteV1(_ropg.RopgV2.RawData, loginID).Result;
+            var response = await Http.Login_DeleteV1(_ropg.RopgV2.RawData, loginID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -291,53 +291,53 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<LoginModel> Login_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<LoginModel>> Login_GetV1(PageStateTypeC model)
         {
-            var response = Http.Login_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Login_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<LoginModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<LoginModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public LoginModel Login_GetV1(string loginValue)
+        public async ValueTask<LoginModel> Login_GetV1(string loginValue)
         {
-            var response = Http.Login_GetV1(_ropg.RopgV2.RawData, loginValue).Result;
+            var response = await Http.Login_GetV1(_ropg.RopgV2.RawData, loginValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<LoginModel>().Result;
+                return response.Content.ReadAsAsync<LoginModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public LoginModel Login_UpdateV1(LoginModel model)
+        public async ValueTask<LoginModel> Login_UpdateV1(LoginModel model)
         {
-            var response = Http.Login_UpdateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Login_UpdateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<LoginModel>().Result;
+                return response.Content.ReadAsAsync<LoginModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public RoleModel Role_CreateV1(RoleCreate model)
+        public async ValueTask<RoleModel> Role_CreateV1(RoleCreate model)
         {
-            var response = Http.Role_CreateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Role_CreateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<RoleModel>().Result;
+                return response.Content.ReadAsAsync<RoleModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool Role_DeleteV1(Guid roleID)
+        public async ValueTask<bool> Role_DeleteV1(Guid roleID)
         {
-            var response = Http.Role_DeleteV1(_ropg.RopgV2.RawData, roleID).Result;
+            var response = await Http.Role_DeleteV1(_ropg.RopgV2.RawData, roleID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -346,42 +346,42 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<RoleModel> Role_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<RoleModel>> Role_GetV1(PageStateTypeC model)
         {
-            var response = Http.Role_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Role_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<RoleModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<RoleModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public RoleModel Role_GetV1(string roleValue)
+        public async ValueTask<RoleModel> Role_GetV1(string roleValue)
         {
-            var response = Http.Role_GetV1(_ropg.RopgV2.RawData, roleValue).Result;
+            var response = await Http.Role_GetV1(_ropg.RopgV2.RawData, roleValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<RoleModel>().Result;
+                return response.Content.ReadAsAsync<RoleModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public RoleModel Role_UpdateV1(RoleModel model)
+        public async ValueTask<RoleModel> Role_UpdateV1(RoleModel model)
         {
-            var response = Http.Role_UpdateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.Role_UpdateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<RoleModel>().Result;
+                return response.Content.ReadAsAsync<RoleModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_AddToClaimV1(Guid userID, Guid claimID)
+        public async ValueTask<bool> User_AddToClaimV1(Guid userID, Guid claimID)
         {
-            var response = Http.User_AddToClaimV1(_ropg.RopgV2.RawData, userID, claimID).Result;
+            var response = await Http.User_AddToClaimV1(_ropg.RopgV2.RawData, userID, claimID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -390,9 +390,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_AddToLoginV1(Guid userID, Guid loginID)
+        public async ValueTask<bool> User_AddToLoginV1(Guid userID, Guid loginID)
         {
-            var response = Http.User_AddToLoginV1(_ropg.RopgV2.RawData, userID, loginID).Result;
+            var response = await Http.User_AddToLoginV1(_ropg.RopgV2.RawData, userID, loginID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -401,9 +401,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_AddToRoleV1(Guid userID, Guid roleID)
+        public async ValueTask<bool> User_AddToRoleV1(Guid userID, Guid roleID)
         {
-            var response = Http.User_AddToRoleV1(_ropg.RopgV2.RawData, userID, roleID).Result;
+            var response = await Http.User_AddToRoleV1(_ropg.RopgV2.RawData, userID, roleID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -412,31 +412,31 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserModel User_CreateV1(UserCreate model)
+        public async ValueTask<UserModel> User_CreateV1(UserCreate model)
         {
-            var response = Http.User_CreateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.User_CreateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<UserModel>().Result;
+                return response.Content.ReadAsAsync<UserModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserModel User_CreateV1NoConfirm(UserCreate model)
+        public async ValueTask<UserModel> User_CreateV1NoConfirm(UserCreate model)
         {
-            var response = Http.User_CreateV1NoConfirm(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.User_CreateV1NoConfirm(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<UserModel>().Result;
+                return response.Content.ReadAsAsync<UserModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_DeleteV1(Guid userID)
+        public async ValueTask<bool> User_DeleteV1(Guid userID)
         {
-            var response = Http.User_DeleteV1(_ropg.RopgV2.RawData, userID).Result;
+            var response = await Http.User_DeleteV1(_ropg.RopgV2.RawData, userID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -445,9 +445,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_DeleteRefreshesV1(Guid userID)
+        public async ValueTask<bool> User_DeleteRefreshesV1(Guid userID)
         {
-            var response = Http.User_DeleteRefreshesV1(_ropg.RopgV2.RawData, userID).Result;
+            var response = await Http.User_DeleteRefreshesV1(_ropg.RopgV2.RawData, userID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -456,9 +456,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_DeleteRefreshV1(Guid userID, Guid refreshID)
+        public async ValueTask<bool> User_DeleteRefreshV1(Guid userID, Guid refreshID)
         {
-            var response = Http.User_DeleteRefreshV1(_ropg.RopgV2.RawData, userID, refreshID).Result;
+            var response = await Http.User_DeleteRefreshV1(_ropg.RopgV2.RawData, userID, refreshID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -467,97 +467,97 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<MOTDType1Model> User_GetMOTDsV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<MOTDType1Model>> User_GetMOTDsV1(PageStateTypeC model)
         {
-            var response = Http.User_GetMOTDsV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.User_GetMOTDsV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<MOTDType1Model>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<MOTDType1Model>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<ClaimModel> User_GetClaimsV1(string userValue)
+        public async ValueTask<IEnumerable<ClaimModel>> User_GetClaimsV1(string userValue)
         {
-            var response = Http.User_GetClaimsV1(_ropg.RopgV2.RawData, userValue).Result;
+            var response = await Http.User_GetClaimsV1(_ropg.RopgV2.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<ClaimModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<ClaimModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<ClientModel> User_GetClientsV1(string userValue)
+        public async ValueTask<IEnumerable<ClientModel>> User_GetClientsV1(string userValue)
         {
-            var response = Http.User_GetClientsV1(_ropg.RopgV2.RawData, userValue).Result;
+            var response = await Http.User_GetClientsV1(_ropg.RopgV2.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<ClientModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<ClientModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<LoginModel> User_GetLoginsV1(string userValue)
+        public async ValueTask<IEnumerable<LoginModel>> User_GetLoginsV1(string userValue)
         {
-            var response = Http.User_GetLoginsV1(_ropg.RopgV2.RawData, userValue).Result;
+            var response = await Http.User_GetLoginsV1(_ropg.RopgV2.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<LoginModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<LoginModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<RefreshModel> User_GetRefreshesV1(string userValue)
+        public async ValueTask<IEnumerable<RefreshModel>> User_GetRefreshesV1(string userValue)
         {
-            var response = Http.User_GetRefreshesV1(_ropg.RopgV2.RawData, userValue).Result;
+            var response = await Http.User_GetRefreshesV1(_ropg.RopgV2.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<RefreshModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<RefreshModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public IEnumerable<RoleModel> User_GetRolesV1(string userValue)
+        public async ValueTask<IEnumerable<RoleModel>> User_GetRolesV1(string userValue)
         {
-            var response = Http.User_GetRolesV1(_ropg.RopgV2.RawData, userValue).Result;
+            var response = await Http.User_GetRolesV1(_ropg.RopgV2.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<IEnumerable<RoleModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<RoleModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public PageStateResult<UserModel> User_GetV1(PageState model)
+        public async ValueTask<PageStateTypeCResult<UserModel>> User_GetV1(PageStateTypeC model)
         {
-            var response = Http.User_GetV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.User_GetV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<PageStateResult<UserModel>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<UserModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserModel User_GetV1(string userValue)
+        public async ValueTask<UserModel> User_GetV1(string userValue)
         {
-            var response = Http.User_GetV1(_ropg.RopgV2.RawData, userValue).Result;
+            var response = await Http.User_GetV1(_ropg.RopgV2.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<UserModel>().Result;
+                return response.Content.ReadAsAsync<UserModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_RemoveFromClaimV1(Guid userID, Guid claimID)
+        public async ValueTask<bool> User_RemoveFromClaimV1(Guid userID, Guid claimID)
         {
-            var response = Http.User_RemoveFromClaimV1(_ropg.RopgV2.RawData, userID, claimID).Result;
+            var response = await Http.User_RemoveFromClaimV1(_ropg.RopgV2.RawData, userID, claimID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -566,9 +566,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_RemoveFromLoginV1(Guid userID, Guid loginID)
+        public async ValueTask<bool> User_RemoveFromLoginV1(Guid userID, Guid loginID)
         {
-            var response = Http.User_RemoveFromLoginV1(_ropg.RopgV2.RawData, userID, loginID).Result;
+            var response = await Http.User_RemoveFromLoginV1(_ropg.RopgV2.RawData, userID, loginID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -577,9 +577,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_RemoveFromRoleV1(Guid userID, Guid roleID)
+        public async ValueTask<bool> User_RemoveFromRoleV1(Guid userID, Guid roleID)
         {
-            var response = Http.User_RemoveFromRoleV1(_ropg.RopgV2.RawData, userID, roleID).Result;
+            var response = await Http.User_RemoveFromRoleV1(_ropg.RopgV2.RawData, userID, roleID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -588,9 +588,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_RemovePasswordV1(Guid userID)
+        public async ValueTask<bool> User_RemovePasswordV1(Guid userID)
         {
-            var response = Http.User_RemovePasswordV1(_ropg.RopgV2.RawData, userID).Result;
+            var response = await Http.User_RemovePasswordV1(_ropg.RopgV2.RawData, userID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -599,9 +599,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public bool User_SetPasswordV1(Guid userID, UserAddPassword model)
+        public async ValueTask<bool> User_SetPasswordV1(Guid userID, UserAddPassword model)
         {
-            var response = Http.User_SetPasswordV1(_ropg.RopgV2.RawData, userID, model).Result;
+            var response = await Http.User_SetPasswordV1(_ropg.RopgV2.RawData, userID, model);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -610,12 +610,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public UserModel User_UpdateV1(UserModel model)
+        public async ValueTask<UserModel> User_UpdateV1(UserModel model)
         {
-            var response = Http.User_UpdateV1(_ropg.RopgV2.RawData, model).Result;
+            var response = await Http.User_UpdateV1(_ropg.RopgV2.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsJsonAsync<UserModel>().Result;
+                return response.Content.ReadAsAsync<UserModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

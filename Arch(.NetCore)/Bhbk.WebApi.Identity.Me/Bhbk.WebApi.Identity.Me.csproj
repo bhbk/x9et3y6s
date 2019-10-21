@@ -24,19 +24,19 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="3.0.5" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.19.1639" />
-    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2019.10.19.1639" />
-    <PackageReference Include="Bhbk.Lib.Hosting" Version="2019.10.19.1639" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.20.2343" />
+    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2019.10.20.2343" />
+    <PackageReference Include="Bhbk.Lib.Hosting" Version="2019.10.20.2343" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.20" />
   </ItemGroup>
 
   <ItemGroup>
