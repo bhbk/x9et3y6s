@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Users.AccessSuccess(user);
 
             var dc_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var dc = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, dc_claims);
+            var dc = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, dc_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -279,7 +279,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -309,7 +309,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = rt.RawData,
                 user = user.Email,
                 client = new List<string>() { client.Name },
-                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
+                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(dc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

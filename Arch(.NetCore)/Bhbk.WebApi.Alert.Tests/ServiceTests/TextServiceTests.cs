@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
                 result = await service.Http.Enqueue_TextV1(rop.RawData, new TextCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -73,7 +73,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
@@ -143,7 +143,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rop_claims);
+                var rop = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,

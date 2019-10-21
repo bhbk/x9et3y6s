@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Validators
 {
@@ -20,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.Validators
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
 
-        public Task<IdentityResult> ValidateAsync(tbl_Users user, string password)
+        public IdentityResult ValidateAsync(tbl_Users user, string password)
         {
             List<IdentityError> errors = new List<IdentityError>();
 
@@ -58,9 +57,9 @@ namespace Bhbk.Lib.Identity.Data.Validators
             }
 
             if (match < 3 || password.Length <= minimum)
-                return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
+                return IdentityResult.Failed(errors.ToArray());
 
-            return Task.FromResult(IdentityResult.Success);
+            return IdentityResult.Success;
         }
     }
 }

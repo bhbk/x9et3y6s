@@ -75,7 +75,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             var claims = new List<Claim>();
 
-            //defaults...
+            //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
 
             //service identity vs. a user identity
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
             //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, Base64.CreateString(8), ClaimValueTypes.String));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -110,11 +110,11 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             var claims = new List<Claim>();
 
-            //defaults...
+            //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
 
             //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, Base64.CreateString(8), ClaimValueTypes.String));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));

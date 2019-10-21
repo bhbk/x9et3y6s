@@ -157,7 +157,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             var claims = new List<Claim>();
 
-            //defaults...
+            //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
             claims.Add(new Claim(ClaimTypes.Email, user.Email));
             claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
@@ -186,7 +186,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
 
             //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, Base64.CreateString(8), ClaimValueTypes.String));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -208,11 +208,11 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             var claims = new List<Claim>();
 
-            //defaults...
+            //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
 
             //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, Base64.CreateString(8), ClaimValueTypes.String));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -229,7 +229,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         internal tbl_Users InternalCreate(tbl_Users user)
         {
-            if (!userValidator.ValidateAsync(user).Result.Succeeded)
+            if (!userValidator.ValidateAsync(user).Succeeded)
                 throw new InvalidOperationException();
 
             if (!user.HumanBeing)
@@ -248,22 +248,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return true;
         }
 
-        internal bool InternalSetSecurityStamp(tbl_Users user, string stamp)
-        {
-            user.SecurityStamp = stamp;
-            user.LastUpdated = Clock.UtcDateTime;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return true;
-        }
-
         internal bool InternalSetPassword(tbl_Users user, string password)
         {
             if (passwordValidator == null)
                 throw new NotSupportedException();
 
-            var result = passwordValidator.ValidateAsync(user, password).Result;
+            var result = passwordValidator.ValidateAsync(user, password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
@@ -276,6 +266,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             if (!InternalSetPasswordHash(user, hash)
                 || !InternalSetSecurityStamp(user, Base64.CreateString(32)))
                 return false;
+
+            return true;
+        }
+
+        internal bool InternalSetSecurityStamp(tbl_Users user, string stamp)
+        {
+            user.SecurityStamp = stamp;
+            user.LastUpdated = Clock.UtcDateTime;
+
+            _context.Entry(user).State = EntityState.Modified;
 
             return true;
         }
@@ -458,7 +458,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public override tbl_Users Update(tbl_Users user)
         {
-            if (!userValidator.ValidateAsync(user).Result.Succeeded)
+            if (!userValidator.ValidateAsync(user).Succeeded)
                 throw new InvalidOperationException();
 
             var entity = _context.Set<tbl_Users>()

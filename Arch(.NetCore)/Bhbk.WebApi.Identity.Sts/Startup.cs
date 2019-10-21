@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 .Select(x => x.Value);
 
             var issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                .Select(x => x.Name + ":" + owin.Issuers.Salt);
+                .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
             var issuerKeys = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                 .Select(x => x.IssuerKey);

@@ -239,7 +239,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else
             {
                 var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-                var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rop_claims);
+                var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
                 UoW.Activities_Deprecate.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -250,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }));
 
                 var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-                var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+                var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 UoW.Refreshes.Create(
                     Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -280,7 +280,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     refresh_token = rt.RawData,
                     user_id = user.Email,
                     client_id = client.Name,
-                    issuer_id = issuer.Name + ":" + UoW.Issuers.Salt,
+                    issuer_id = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                     expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
 
@@ -370,10 +370,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rop_claims);
+            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -403,7 +403,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = rt.RawData,
                 user_id = user.Email,
                 client_id = client.Name,
-                issuer_id = issuer.Name + ":" + UoW.Issuers.Salt,
+                issuer_id = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
@@ -570,7 +570,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, clients.Select(x => x.Name).ToList(), rop_claims);
+            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rop_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -581,7 +581,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, clients.Select(x => x.Name).ToList(), rt_claims);
+            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -611,7 +611,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = rt.RawData,
                 user = user.Email,
                 client = clients.Select(x => x.Name).ToList(),
-                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
+                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
@@ -717,10 +717,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, clients.Select(x => x.Name).ToList(), rop_claims);
+            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rop_claims);
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, clients.Select(x => x.Name).ToList(), rt_claims);
+            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -750,7 +750,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = rt.RawData,
                 user = user.Email,
                 client = clients.Select(x => x.Name).ToList(),
-                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
+                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

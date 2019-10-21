@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Validators
 {
@@ -15,7 +14,7 @@ namespace Bhbk.Lib.Identity.Data.Validators
 
     public sealed class UserValidator
     {
-        public Task<IdentityResult> ValidateAsync(tbl_Users user)
+        public IdentityResult ValidateAsync(tbl_Users user)
         {
             var errors = new List<IdentityError>();
             var describer = new IdentityErrorDescriber();
@@ -34,9 +33,9 @@ namespace Bhbk.Lib.Identity.Data.Validators
             }
 
             if (count > 1)
-                return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
+                return IdentityResult.Failed(errors.ToArray());
             else
-                return Task.FromResult(IdentityResult.Success);
+                return IdentityResult.Success;
         }
 
         private static bool IsValidEmail(string email)

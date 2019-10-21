@@ -12,8 +12,6 @@ namespace Bhbk.Lib.Identity.Factories
         [Obsolete]
         JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string client, List<Claim> claims);
 
-        JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, string client, List<Claim> claims);
-
         JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, List<string> clients, List<Claim> claims);
 
         bool CanReadToken(string jwt);

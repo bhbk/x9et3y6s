@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     throw new NotSupportedException();
 
                 var issuers = owin.Issuers.Get()
-                    .Select(x => x.Name + ":" + owin.Issuers.Salt);
+                    .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
                 var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);

@@ -5,19 +5,13 @@ using Bhbk.Lib.Identity.Data.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
     public class IssuerRepository : GenericRepository<tbl_Issuers>
     {
-        public string Salt { get; }
-
-        public IssuerRepository(IdentityEntities context, InstanceContext instance, string salt)
-            : base(context, instance)
-        {
-            Salt = salt;
-        }
+        public IssuerRepository(IdentityEntities context, InstanceContext instance)
+            : base(context, instance) { }
 
         public override tbl_Issuers Create(tbl_Issuers issuer)
         {

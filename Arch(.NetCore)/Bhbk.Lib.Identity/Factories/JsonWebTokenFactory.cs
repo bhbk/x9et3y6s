@@ -38,9 +38,10 @@ namespace Bhbk.Lib.Identity.Factories
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            var validFromUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
+            var validFromUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Nbf).Single().Value)).UtcDateTime;
-            var validToUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
+
+            var validToUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).Single().Value)).UtcDateTime;
 
             var identity = new ClaimsIdentity(claims, _type);
@@ -51,8 +52,8 @@ namespace Bhbk.Lib.Identity.Factories
                     issuer: issuer + ":" + issuerSalt,
                     audience: client,
                     claims: principal.Claims,
-                    notBefore: validFromUtc_Temp,
-                    expires: validToUtc_Temp,
+                    notBefore: validFromUtc,
+                    expires: validToUtc,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                     ));
 
@@ -66,9 +67,10 @@ namespace Bhbk.Lib.Identity.Factories
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            var validFromUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
+            var validFromUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Nbf).Single().Value)).UtcDateTime;
-            var validToUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
+
+            var validToUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).Single().Value)).UtcDateTime;
 
             var identity = new ClaimsIdentity(claims, _type);
@@ -79,35 +81,8 @@ namespace Bhbk.Lib.Identity.Factories
                     issuer: issuer,
                     audience: client,
                     claims: principal.Claims,
-                    notBefore: validFromUtc_Temp,
-                    expires: validToUtc_Temp,
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-                    ));
-
-            return new JwtSecurityToken(result);
-        }
-
-        public JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, string client, List<Claim> claims)
-        {
-            var symmetricKeyAsBase64 = issuerKey;
-            var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
-            var signingKey = new SymmetricSecurityKey(keyBytes);
-
-            var validFromUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
-                long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Nbf).Single().Value)).UtcDateTime;
-            var validToUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
-                long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).Single().Value)).UtcDateTime;
-
-            var identity = new ClaimsIdentity(claims, _type);
-            var principal = new ClaimsPrincipal(identity);
-
-            var result = new JwtSecurityTokenHandler().WriteToken(
-                new JwtSecurityToken(
-                    issuer: issuer + ":" + issuerSalt,
-                    audience: client,
-                    claims: principal.Claims,
-                    notBefore: validFromUtc_Temp,
-                    expires: validToUtc_Temp,
+                    notBefore: validFromUtc,
+                    expires: validToUtc,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                     ));
 
@@ -120,9 +95,10 @@ namespace Bhbk.Lib.Identity.Factories
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyBytes);
 
-            var validFromUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
+            var validFromUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Nbf).Single().Value)).UtcDateTime;
-            var validToUtc_Temp = DateTimeOffset.FromUnixTimeSeconds(
+
+            var validToUtc = DateTimeOffset.FromUnixTimeSeconds(
                 long.Parse(claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).Single().Value)).UtcDateTime;
 
             var identity = new ClaimsIdentity(claims, _type);
@@ -141,8 +117,8 @@ namespace Bhbk.Lib.Identity.Factories
                     issuer: issuer + ":" + issuerSalt,
                     audience: clientList,
                     claims: principal.Claims,
-                    notBefore: validFromUtc_Temp,
-                    expires: validToUtc_Temp,
+                    notBefore: validFromUtc,
+                    expires: validToUtc,
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 

@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Clients.AccessSuccess(client);
 
             var cc_claims = UoW.Clients.GenerateAccessClaims(issuer, client);
-            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, cc_claims);
+            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, cc_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Clients.GenerateRefreshClaims(issuer, client);
-            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = client.Name,
-                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
+                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
@@ -225,10 +225,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             client.ActorId = client.Id;
 
             var cc_claims = UoW.Clients.GenerateAccessClaims(issuer, client);
-            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, cc_claims);
+            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, cc_claims);
 
             var rt_claims = UoW.Clients.GenerateRefreshClaims(issuer, client);
-            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, UoW.Issuers.Salt, client.Name, rt_claims);
+            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -257,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = client.Name,
-                issuer = issuer.Name + ":" + UoW.Issuers.Salt,
+                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

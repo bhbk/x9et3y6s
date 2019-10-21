@@ -349,7 +349,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer_id = issuer.Id.ToString(),
                         client_id = client.Id.ToString(),
                         grant_type = "password",
-                        username = user.Email,
+                        username = user.Id.ToString(),
                         password = FakeConstants.ApiTestUserPassCurrent,
                     });
                 result.Should().BeAssignableTo<UserJwtV1>();
@@ -360,7 +360,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -395,7 +395,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         client_id = client.Id.ToString(),
                         grant_type = "password",
-                        username = user.Email,
+                        username = user.Id.ToString(),
                         password = FakeConstants.ApiTestUserPassCurrent,
                     });
                 result.Should().BeAssignableTo<UserJwtV1Legacy>();
@@ -433,7 +433,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -481,7 +481,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -528,7 +528,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -576,7 +576,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -623,7 +623,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -672,7 +672,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -724,7 +724,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Users.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -771,7 +771,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Users.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -820,7 +820,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, client.Name, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -852,7 +852,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -1130,7 +1130,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -1189,7 +1189,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -1226,7 +1226,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = string.Join(",", new List<string> { client.Name }),
+                        client = string.Join(",", new List<string> { client.Id.ToString() }),
                         grant_type = "password",
                         user = user.Id.ToString(),
                         password = FakeConstants.ApiTestUserPassCurrent,
@@ -1239,7 +1239,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -1267,7 +1267,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1315,7 +1315,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1362,7 +1362,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1410,7 +1410,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1459,7 +1459,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Users.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1506,7 +1506,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Users.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1563,7 +1563,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1620,7 +1620,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1675,7 +1675,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1707,7 +1707,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -1748,7 +1748,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1780,7 +1780,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -1812,7 +1812,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, uow.Issuers.Salt, new List<string>() { client.Name }, rt_claims);
+                var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -1844,7 +1844,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
-                iss.Value.Split(':')[1].Should().Be(uow.Issuers.Salt);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);

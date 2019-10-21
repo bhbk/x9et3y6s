@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Data.Services
             Activities_Deprecate = new ActivityRepository_Deprecate(_context, instance.InstanceType);
             Claims = new ClaimRepository(_context, instance.InstanceType);
             Clients = new ClientRepository(_context, instance.InstanceType);
-            Issuers = new IssuerRepository(_context, instance.InstanceType, conf["IdentityTenants:Salt"]);
+            Issuers = new IssuerRepository(_context, instance.InstanceType);
             Logins = new LoginRepository(_context, instance.InstanceType);
             MOTDs = new MotDRepository(_context, instance.InstanceType);
             QueueEmails = new QueueEmailRepository(_context, instance.InstanceType);
