@@ -138,7 +138,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     {
                         IssuerId = foundIssuer.Id,
                         Name = RealConstants.ApiDefaultClientUi,
-                        ClientKey = RealConstants.ApiDefaultClientUiKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = true,
@@ -157,7 +156,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                      {
                          IssuerId = foundIssuer.Id,
                          Name = RealConstants.ApiDefaultClientApi,
-                         ClientKey = RealConstants.ApiDefaultClientApiKey,
                          ClientType = ClientType.server.ToString(),
                          Enabled = true,
                          Immutable = true,
@@ -272,8 +270,18 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 _uow.Users.SetConfirmedEmail(foundNormalUser, true);
                 _uow.Users.SetConfirmedPassword(foundNormalUser, true);
                 _uow.Users.SetConfirmedPhoneNumber(foundNormalUser, true);
+
                 _uow.Commit();
             }
+
+            /*
+             * set password to clients
+             */
+
+            _uow.Clients.SetPassword(foundClientApi, RealConstants.ApiDefaultClientApiKey);
+            _uow.Clients.SetPassword(foundClientUi, RealConstants.ApiDefaultClientUiKey);
+
+            _uow.Commit();
 
             /*
              * assign roles, claims & logins to users

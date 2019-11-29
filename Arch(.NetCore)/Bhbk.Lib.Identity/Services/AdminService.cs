@@ -192,6 +192,17 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
+        public async ValueTask<bool> Client_SetPasswordV1(Guid clientID, EntityAddPassword model)
+        {
+            var response = await Http.Client_SetPasswordV1(_ropg.RopgV2.RawData, clientID, model);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
         public async ValueTask<ClientModel> Client_UpdateV1(ClientModel model)
         {
             var response = await Http.Client_UpdateV1(_ropg.RopgV2.RawData, model);
@@ -599,7 +610,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<bool> User_SetPasswordV1(Guid userID, UserAddPassword model)
+        public async ValueTask<bool> User_SetPasswordV1(Guid userID, EntityAddPassword model)
         {
             var response = await Http.User_SetPasswordV1(_ropg.RopgV2.RawData, userID, model);
 

@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         public ImplicitServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ImplicitV1_Auth_NotImplemented()
+        public async Task Sts_OAuth2_ImplicitV1_Auth_NotImplemented()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_ClientNotExist()
+        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_ClientNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_IssuerNotExist()
+        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_IssuerNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_UrlNotExist()
+        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_UrlNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ImplicitV2_Auth_Fail_UserNotExist()
+        public async Task Sts_OAuth2_ImplicitV2_Auth_Fail_UserNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())

@@ -369,9 +369,9 @@ namespace Bhbk.Cli.Identity.Commands
                             var password = PromptForInput(CommandTypes.userpass);
 
                             if (_service.User_SetPasswordV1(user.Id,
-                                new UserAddPassword()
+                                new EntityAddPassword()
                                 {
-                                    UserId = user.Id,
+                                    EntityId = user.Id,
                                     NewPassword = password,
                                     NewPasswordConfirm = password,
                                 }).Result)

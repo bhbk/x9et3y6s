@@ -160,7 +160,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Info_SetPasswordV1(string jwt, UserAddPassword model)
+        public async ValueTask<HttpResponseMessage> Info_SetPasswordV1(string jwt, EntityAddPassword model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

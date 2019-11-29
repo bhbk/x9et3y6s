@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Factories
                 throw new NotImplementedException();
         }
 
-        public JwtSecurityToken ClientCredential(string issuer, string issuerKey, string issuerSalt, string client, List<Claim> claims)
+        public JwtSecurityToken ClientCredential(string issuer, string issuerKey, string issuerSalt, string audience, List<Claim> claims)
         {
             var symmetricKeyAsBase64 = issuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Factories
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
                     issuer: issuer + ":" + issuerSalt,
-                    audience: client,
+                    audience: audience,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
                     expires: validToUtc,
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Factories
         }
 
         [Obsolete]
-        public JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string client, List<Claim> claims)
+        public JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string audience, List<Claim> claims)
         {
             var symmetricKeyAsBase64 = issuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -79,7 +79,7 @@ namespace Bhbk.Lib.Identity.Factories
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
                     issuer: issuer,
-                    audience: client,
+                    audience: audience,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
                     expires: validToUtc,
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Factories
             return new JwtSecurityToken(result);
         }
 
-        public JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, List<string> clients, List<Claim> claims)
+        public JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, List<string> audiences, List<Claim> claims)
         {
             var symmetricKeyAsBase64 = issuerKey;
             var keyBytes = Encoding.Unicode.GetBytes(symmetricKeyAsBase64);
@@ -104,18 +104,18 @@ namespace Bhbk.Lib.Identity.Factories
             var identity = new ClaimsIdentity(claims, _type);
             var principal = new ClaimsPrincipal(identity);
 
-            string clientList = string.Empty;
+            string audienceList = string.Empty;
 
-            if (clients.Count == 0)
+            if (audiences.Count == 0)
                 throw new InvalidOperationException();
 
             else
-                clientList = string.Join(", ", clients.OrderBy(x => x));
+                audienceList = string.Join(", ", audiences.OrderBy(x => x));
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
                     issuer: issuer + ":" + issuerSalt,
-                    audience: clientList,
+                    audience: audienceList,
                     claims: principal.Claims,
                     notBefore: validFromUtc,
                     expires: validToUtc,

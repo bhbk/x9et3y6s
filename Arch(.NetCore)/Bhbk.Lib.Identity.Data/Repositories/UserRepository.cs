@@ -26,18 +26,18 @@ namespace Bhbk.Lib.Identity.Data.Repositories
     public class UserRepository : GenericRepository<tbl_Users>
     {
         private IClockService _clock;
-        public readonly PasswordValidator passwordValidator;
+        private readonly UserValidator _userValidator;
+        private readonly PasswordValidator _passwordValidator;
         public readonly PasswordHasher passwordHasher;
-        public readonly UserValidator userValidator;
 
         public UserRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance)
         {
             _clock = new ClockService(new ContextService(instance));
+            _passwordValidator = new PasswordValidator();
+            _userValidator = new UserValidator();
 
-            passwordValidator = new PasswordValidator();
             passwordHasher = new PasswordHasher();
-            userValidator = new UserValidator();
         }
 
         public DateTimeOffset Clock
@@ -132,10 +132,13 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         {
             var activity = _context.Set<tbl_Activities>()
                 .Where(x => x.UserId == user.Id);
+
             var refreshes = _context.Set<tbl_Refreshes>()
                 .Where(x => x.UserId == user.Id);
+
             var settings = _context.Set<tbl_Settings>()
                 .Where(x => x.UserId == user.Id);
+
             var states = _context.Set<tbl_States>()
                 .Where(x => x.UserId == user.Id);
 
@@ -145,6 +148,58 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.RemoveRange(states);
 
             return _context.Remove(user).Entity;
+        }
+
+        [Obsolete]
+        public List<Claim> GenerateAccessClaims(tbl_Users user)
+        {
+            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
+
+            var claims = new List<Claim>();
+
+            //add lowest common denominators...
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
+            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
+
+            //user identity vs. a service identity
+            claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
+
+            var userRoles = _context.Set<tbl_Roles>()
+                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
+
+            foreach (var role in userRoles.OrderBy(x => x.Name))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+
+                //check compatibility is enabled. pack claim(s) with old name and new name.
+                if (bool.Parse(legacyClaims.ConfigValue))
+                    claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
+            }
+
+            var userClaims = _context.Set<tbl_Claims>()
+                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToList();
+
+            foreach (var claim in userClaims.OrderBy(x => x.Type))
+                claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
+
+            //nonce to enhance entropy
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
+
+            //not before timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //issued at timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            //expire on timestamp
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
+                .AddSeconds(86400).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+            return claims;
         }
 
         public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Users user)
@@ -229,7 +284,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         internal tbl_Users InternalCreate(tbl_Users user)
         {
-            if (!userValidator.ValidateAsync(user).Succeeded)
+            if (!_userValidator.ValidateAsync(user).Succeeded)
                 throw new InvalidOperationException();
 
             if (!user.HumanBeing)
@@ -238,22 +293,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return _context.Add(user).Entity;
         }
 
-        internal bool InternalSetPasswordHash(tbl_Users user, string passwordHash)
-        {
-            user.PasswordHash = passwordHash;
-            user.LastUpdated = Clock.UtcDateTime;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return true;
-        }
-
         internal bool InternalSetPassword(tbl_Users user, string password)
         {
-            if (passwordValidator == null)
+            if (_passwordValidator == null)
                 throw new NotSupportedException();
 
-            var result = passwordValidator.ValidateAsync(user, password);
+            var result = _passwordValidator.ValidateAsync(password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException();
@@ -261,11 +306,21 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             if (passwordHasher == null)
                 throw new NotSupportedException();
 
-            var hash = passwordHasher.HashPassword(user, password);
+            var hash = passwordHasher.HashPassword(password);
 
             if (!InternalSetPasswordHash(user, hash)
                 || !InternalSetSecurityStamp(user, Base64.CreateString(32)))
                 return false;
+
+            return true;
+        }
+
+        internal bool InternalSetPasswordHash(tbl_Users user, string hash)
+        {
+            user.PasswordHash = hash;
+            user.LastUpdated = Clock.UtcDateTime;
+
+            _context.Entry(user).State = EntityState.Modified;
 
             return true;
         }
@@ -285,7 +340,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             if (passwordHasher == null)
                 throw new NotSupportedException();
 
-            if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Failed)
+            if (passwordHasher.VerifyHashedPassword(user.PasswordHash, password) != PasswordVerificationResult.Failed)
                 return PasswordVerificationResult.Success;
 
             return PasswordVerificationResult.Failed;
@@ -458,7 +513,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public override tbl_Users Update(tbl_Users user)
         {
-            if (!userValidator.ValidateAsync(user).Succeeded)
+            if (!_userValidator.ValidateAsync(user).Succeeded)
                 throw new InvalidOperationException();
 
             var entity = _context.Set<tbl_Users>()
@@ -480,12 +535,9 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return _context.Update(entity).Entity;
         }
 
-        public bool VerifyPassword(Guid key, string password)
+        public bool VerifyPassword(tbl_Users user, string password)
         {
-            var entity = _context.Set<tbl_Users>()
-                .Where(x => x.Id == key).Single();
-
-            if (InternalVerifyPassword(entity, password) != PasswordVerificationResult.Failed)
+            if (InternalVerifyPassword(user, password) != PasswordVerificationResult.Failed)
                 return true;
 
             return false;

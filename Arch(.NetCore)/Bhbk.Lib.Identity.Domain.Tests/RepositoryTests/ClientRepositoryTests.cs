@@ -40,7 +40,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.ApiTestClient,
-                        ClientKey = Constants.ApiTestClientKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,

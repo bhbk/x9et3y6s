@@ -27,6 +27,10 @@
 
 
 
+
+
+
+
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Clients]
     ON [dbo].[tbl_Clients]([Id] ASC);

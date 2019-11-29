@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user.Id, input.password))
+                            if (!UoW.Users.VerifyPassword(user, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user.Id, input.password))
+                            if (!UoW.Users.VerifyPassword(user, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
             {
-                var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
+                var rop_claims = UoW.Users.GenerateAccessClaims(user);
                 var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, client.Name, rop_claims);
 
                 UoW.Activities_Deprecate.Create(
@@ -511,7 +511,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user.Id, input.password))
+                            if (!UoW.Users.VerifyPassword(user, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -541,7 +541,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user.Id, input.password))
+                            if (!UoW.Users.VerifyPassword(user, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);

@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Models.Me
     public abstract class Passwords
     {
         [Required]
-        public Guid UserId { get; set; }
+        public Guid EntityId { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string NewPasswordConfirm { get; set; }
     }
 
-    public class UserAddPassword : Passwords
+    public class EntityAddPassword : Passwords
     {
 
     }
 
-    public class UserChangePassword : Passwords
+    public class EntityChangePassword : Passwords
     {
         [Required]
         [DataType(DataType.Password)]

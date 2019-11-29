@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email"), HttpPut]
-        public IActionResult ChangeEmailV1([FromBody] UserChangeEmail model)
+        public IActionResult ChangeEmailV1([FromBody] EntityChangeEmail model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -38,10 +38,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.EntityId}");
                 return NotFound(ModelState);
             }
-            else if (user.Id != model.UserId
+            else if (user.Id != model.EntityId
                 || user.Email != model.CurrentEmail
                 || model.NewEmail != model.NewEmailConfirm)
             {
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password"), HttpPut]
-        public IActionResult ChangePasswordV1([FromBody] UserChangePassword model)
+        public IActionResult ChangePasswordV1([FromBody] EntityChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -86,16 +86,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.EntityId}");
                 return NotFound(ModelState);
             }
             else if (!user.HumanBeing
-                || user.Id != model.UserId)
+                || user.Id != model.EntityId)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!UoW.Users.VerifyPassword(user.Id, model.CurrentPassword)
+            else if (!UoW.Users.VerifyPassword(user, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
@@ -130,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone"), HttpPut]
-        public IActionResult ChangePhoneV1([FromBody] UserChangePhone model)
+        public IActionResult ChangePhoneV1([FromBody] EntityChangePhone model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -139,10 +139,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.UserId}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.EntityId}");
                 return NotFound(ModelState);
             }
-            else if (user.Id != model.UserId
+            else if (user.Id != model.EntityId
                 || !user.HumanBeing)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");

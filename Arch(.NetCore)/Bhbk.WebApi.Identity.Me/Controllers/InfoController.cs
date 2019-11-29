@@ -223,7 +223,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password"), HttpPut]
-        public IActionResult SetUserPasswordV1([FromBody] UserChangePassword model)
+        public IActionResult SetUserPasswordV1([FromBody] EntityChangePassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -240,7 +240,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!UoW.Users.VerifyPassword(user.Id, model.CurrentPassword)
+            else if (!UoW.Users.VerifyPassword(user, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");

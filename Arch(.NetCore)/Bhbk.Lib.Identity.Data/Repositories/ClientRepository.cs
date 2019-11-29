@@ -4,7 +4,9 @@ using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
+using Bhbk.Lib.Identity.Data.Validators;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,11 +19,15 @@ namespace Bhbk.Lib.Identity.Data.Repositories
     public class ClientRepository : GenericRepository<tbl_Clients>
     {
         private IClockService _clock;
+        private readonly PasswordHasher _passwordHasher;
+        private readonly PasswordValidator _passwordValidator;
 
         public ClientRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance)
         {
             _clock = new ClockService(new ContextService(instance));
+            _passwordHasher = new PasswordHasher();
+            _passwordValidator = new PasswordValidator();
         }
 
         public DateTimeOffset Clock
@@ -52,18 +58,26 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public override tbl_Clients Delete(tbl_Clients client)
         {
-            var activity = _context.Set<tbl_Activities>().Where(x => x.ClientId == client.Id);
-            var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.ClientId == client.Id);
-            var settings = _context.Set<tbl_Settings>().Where(x => x.ClientId == client.Id);
-            var states = _context.Set<tbl_States>().Where(x => x.ClientId == client.Id);
-            var roles = _context.Set<tbl_Roles>().Where(x => x.ClientId == client.Id);
+            var activity = _context.Set<tbl_Activities>()
+                .Where(x => x.ClientId == client.Id);
+
+            var refreshes = _context.Set<tbl_Refreshes>()
+                .Where(x => x.ClientId == client.Id);
+
+            var settings = _context.Set<tbl_Settings>()
+                .Where(x => x.ClientId == client.Id);
+
+            var states = _context.Set<tbl_States>()
+                .Where(x => x.ClientId == client.Id);
+
+            var roles = _context.Set<tbl_Roles>()
+                .Where(x => x.ClientId == client.Id);
 
             _context.RemoveRange(activity);
             _context.RemoveRange(refreshes);
             _context.RemoveRange(settings);
             _context.RemoveRange(states);
             _context.RemoveRange(roles);
-            _context.Remove(client);
 
             return _context.Remove(client).Entity;
         }
@@ -129,6 +143,66 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return claims;
         }
 
+        internal bool InternalSetPassword(tbl_Clients client, string password)
+        {
+            if (_passwordValidator == null)
+                throw new NotSupportedException();
+
+            var result = _passwordValidator.ValidateAsync(password);
+
+            if (!result.Succeeded)
+                throw new InvalidOperationException();
+
+            if (_passwordHasher == null)
+                throw new NotSupportedException();
+
+            var hash = _passwordHasher.HashPassword(password);
+
+            if (!InternalSetPasswordHash(client, hash)
+                || !InternalSetSecurityStamp(client, Base64.CreateString(32)))
+                return false;
+
+            return true;
+        }
+
+        internal bool InternalSetPasswordHash(tbl_Clients client, string hash)
+        {
+            client.PasswordHash = hash;
+            client.LastUpdated = Clock.UtcDateTime;
+
+            _context.Entry(client).State = EntityState.Modified;
+
+            return true;
+        }
+
+        internal bool InternalSetSecurityStamp(tbl_Clients client, string stamp)
+        {
+            client.SecurityStamp = stamp;
+            client.LastUpdated = Clock.UtcDateTime;
+
+            _context.Entry(client).State = EntityState.Modified;
+
+            return true;
+        }
+
+        internal PasswordVerificationResult InternalVerifyPassword(tbl_Clients client, string password)
+        {
+            if (_passwordHasher == null)
+                throw new NotSupportedException();
+
+            if (_passwordHasher.VerifyHashedPassword(client.PasswordHash, password) != PasswordVerificationResult.Failed)
+                return PasswordVerificationResult.Success;
+
+            return PasswordVerificationResult.Failed;
+        }
+
+        public tbl_Clients SetPassword(tbl_Clients client, string password)
+        {
+            InternalSetPassword(client, password);
+
+            return _context.Entry(client).Entity;
+        }
+
         public override tbl_Clients Update(tbl_Clients client)
         {
             var entity = _context.Set<tbl_Clients>()
@@ -149,6 +223,14 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.Entry(entity).State = EntityState.Modified;
 
             return _context.Update(entity).Entity;
+        }
+
+        public bool VerifyPassword(tbl_Clients client, string password)
+        {
+            if (InternalVerifyPassword(client, password) != PasswordVerificationResult.Failed)
+                return true;
+
+            return false;
         }
     }
 }

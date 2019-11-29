@@ -39,9 +39,9 @@ namespace Bhbk.Cli.Identity.Commands
                 {
                     Console.WriteLine("Please enter a password...");
                     var cleartext = StandardInput.GetHiddenInput();
-                    var hashvalue = uow.Users.passwordHasher.HashPassword(null, cleartext);
+                    var hashvalue = uow.Users.passwordHasher.HashPassword(cleartext);
 
-                    if (uow.Users.passwordHasher.VerifyHashedPassword(null, hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (uow.Users.passwordHasher.VerifyHashedPassword(hashvalue, cleartext) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

@@ -38,6 +38,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<PageStateTypeCResult<ClientModel>> Client_GetV1(PageStateTypeC model);
         ValueTask<ClientModel> Client_GetV1(string clientValue);
         ValueTask<IEnumerable<RefreshModel>> Client_GetRefreshesV1(string clientValue);
+        ValueTask<bool> Client_SetPasswordV1(Guid clientID, EntityAddPassword model);
         ValueTask<ClientModel> Client_UpdateV1(ClientModel model);
 
         /*
@@ -90,7 +91,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> User_RemoveFromLoginV1(Guid userID, Guid loginID);
         ValueTask<bool> User_RemoveFromRoleV1(Guid userID, Guid roleID);
         ValueTask<bool> User_RemovePasswordV1(Guid userID);
-        ValueTask<bool> User_SetPasswordV1(Guid userID, UserAddPassword model);
+        ValueTask<bool> User_SetPasswordV1(Guid userID, EntityAddPassword model);
         ValueTask<UserModel> User_UpdateV1(UserModel model);
     }
 }

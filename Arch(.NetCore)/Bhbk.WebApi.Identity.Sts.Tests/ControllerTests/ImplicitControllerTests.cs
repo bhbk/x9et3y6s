@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var controller = new ImplicitController(conf, instance);
@@ -93,9 +93,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var result = HttpUtility.ParseQueryString(imp_frag).Get("access_token");
 
-                factory.CanReadToken(result).Should().BeTrue();
+                auth.CanReadToken(result).Should().BeTrue();
 
-                var jwt = factory.ReadJwtToken(result);
+                var jwt = auth.ReadJwtToken(result);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

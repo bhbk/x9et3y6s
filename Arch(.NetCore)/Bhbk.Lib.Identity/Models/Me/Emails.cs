@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Models.Me
     public abstract class Emails
     {
         [Required]
-        public Guid UserId { get; set; }
+        public Guid EntityId { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string NewEmailConfirm { get; set; }
     }
 
-    public class UserAddEmail : Emails
+    public class EntityAddEmail : Emails
     {
 
     }
 
-    public class UserChangeEmail : Emails
+    public class EntityChangeEmail : Emails
     {
         [Required]
         [DataType(DataType.EmailAddress)]

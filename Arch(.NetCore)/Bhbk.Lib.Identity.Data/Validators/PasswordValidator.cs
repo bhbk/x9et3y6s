@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.Validators
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
 
-        public IdentityResult ValidateAsync(tbl_Users user, string password)
+        public IdentityResult ValidateAsync(string password)
         {
             List<IdentityError> errors = new List<IdentityError>();
 

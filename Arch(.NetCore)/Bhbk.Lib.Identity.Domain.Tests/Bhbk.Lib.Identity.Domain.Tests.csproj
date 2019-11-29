@@ -14,8 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.20.2343" />
-    <PackageReference Include="Bhbk.Lib.DataState" Version="2019.10.20.2343" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.21.2046" />
     <PackageReference Include="coverlet.msbuild" Version="2.8.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

@@ -48,9 +48,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangeEmail()
+                var model = new EntityChangeEmail()
                 {
-                    UserId = user.Id,
+                    EntityId = user.Id,
                     CurrentEmail = Base64.CreateString(4),
                     NewEmail = newEmail,
                     NewEmailConfirm = newEmail
@@ -86,9 +86,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangeEmail()
+                var model = new EntityChangeEmail()
                 {
-                    UserId = user.Id,
+                    EntityId = user.Id,
                     CurrentEmail = user.Email,
                     NewEmail = newEmail,
                     NewEmailConfirm = newEmail
@@ -123,9 +123,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangePassword()
+                var model = new EntityChangePassword()
                 {
-                    UserId = user.Id,
+                    EntityId = user.Id,
                     CurrentPassword = Base64.CreateString(16),
                     NewPassword = FakeConstants.ApiTestUserPassNew,
                     NewPasswordConfirm = FakeConstants.ApiTestUserPassNew
@@ -160,9 +160,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangePassword()
+                var model = new EntityChangePassword()
                 {
-                    UserId = user.Id,
+                    EntityId = user.Id,
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = FakeConstants.ApiTestUserPassNew,
                     NewPasswordConfirm = FakeConstants.ApiTestUserPassNew
@@ -198,9 +198,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangePhone()
+                var model = new EntityChangePhone()
                 {
-                    UserId = user.Id,
+                    EntityId = user.Id,
                     CurrentPhoneNumber = newPhone,
                     NewPhoneNumber = user.PhoneNumber,
                     NewPhoneNumberConfirm = user.PhoneNumber
@@ -236,9 +236,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangePhone()
+                var model = new EntityChangePhone()
                 {
-                    UserId = user.Id,
+                    EntityId = user.Id,
                     CurrentPhoneNumber = user.PhoneNumber,
                     NewPhoneNumber = newPhone,
                     NewPhoneNumberConfirm = newPhone

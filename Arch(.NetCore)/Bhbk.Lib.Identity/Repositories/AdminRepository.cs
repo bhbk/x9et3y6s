@@ -259,6 +259,22 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
+        public async ValueTask<HttpResponseMessage> Client_SetPasswordV1(string jwt, Guid clientID, EntityAddPassword model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/client/v1/" + clientID.ToString() + "/set-password";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PutAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
         public async ValueTask<HttpResponseMessage> Client_UpdateV1(string jwt, ClientModel model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -828,7 +844,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, UserAddPassword model)
+        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, EntityAddPassword model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

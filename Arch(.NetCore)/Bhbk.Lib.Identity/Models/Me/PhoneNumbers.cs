@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Models.Me
     public abstract class Phones
     {
         [Required]
-        public Guid UserId { get; set; }
+        public Guid EntityId { get; set; }
 
         [Required]
         [DataType(DataType.PhoneNumber)]
@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string NewPhoneNumberConfirm { get; set; }
     }
 
-    public class UserAddPhone : Phones
+    public class EntityAddPhone : Phones
     {
 
     }
 
-    public class UserChangePhone : Phones
+    public class EntityChangePhone : Phones
     {
         [Required]
         [DataType(DataType.PhoneNumber)]

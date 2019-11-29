@@ -113,7 +113,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     {
                         IssuerId = foundIssuer.Id,
                         Name = FakeConstants.ApiTestClient,
-                        ClientKey = FakeConstants.ApiTestClientKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -308,6 +307,14 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
+             * set password to random clients
+             */
+
+            _uow.Clients.SetPassword(foundClient, FakeConstants.ApiTestClientPassCurrent);
+
+            _uow.Commit();
+
+            /*
              * assign roles, claims & logins to users
              */
 
@@ -362,7 +369,6 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     {
                         IssuerId = issuer.Id,
                         Name = FakeConstants.ApiTestClient + "-" + Base64.CreateString(4),
-                        ClientKey = FakeConstants.ApiTestClientKey,
                         ClientType = ClientType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -500,6 +506,14 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
+
+                /*
+                 * set password for random clients
+                 */
+
+                _uow.Clients.SetPassword(client, FakeConstants.ApiTestClientPassCurrent);
+
+                _uow.Commit();
 
                 /*
                  * assign roles, claims & logins to random users

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -39,7 +38,5 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public DateTime Created { get; set; }
 
         public Nullable<DateTime> LastUpdated { get; set; }
-
-        public ICollection<string> Users { get; set; }
     }
 }

@@ -108,7 +108,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<IssuerModel>>(
                         UoW.Issuers.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
-                                model.ToExpression<tbl_Issuers>()))),
+                                model.ToExpression<tbl_Issuers>()),
+                            new List<Expression<Func<tbl_Issuers, object>>>() { x => x.tbl_Clients })),
 
                     Total = UoW.Issuers.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(

@@ -28,7 +28,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
 
             CreateMap<ActivityModel, tbl_Activities>()
                 .ForMember(dest => dest.Client, src => src.Ignore())
-                .ForMember(dest => dest.User, src => src.Ignore());
+                .ForMember(dest => dest.User, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * claim models
@@ -46,7 +47,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Actor, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore());
+                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * client models
@@ -61,6 +63,9 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.LastLoginSuccess, src => src.Ignore())
                 .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => 0))
                 .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => 0))
+                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
+                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
+                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
@@ -71,6 +76,9 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
 
             CreateMap<ClientModel, tbl_Clients>()
+                .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
+                .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
@@ -78,11 +86,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
-
-            CreateMap<tbl_Clients, ClientModel>()
-                .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.tbl_Roles
-                    .ToDictionary(x => x.Id, x => x.Name).OrderBy(x => x.Value)));
+                .ForMember(dest => dest.tbl_Urls, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * email models
@@ -100,7 +105,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.IssuerKey, src => src.MapFrom(val => Base64.CreateString(32)))
+                .ForMember(dest => dest.IssuerKey, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
@@ -108,16 +113,14 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore());
 
-            CreateMap<tbl_Issuers, IssuerModel>()
-                .ForMember(dest => dest.Clients, src => src.MapFrom(val => val.tbl_Clients
-                    .ToDictionary(x => x.Id, x => x.Name).OrderBy(x => x.Value)));
-
             CreateMap<IssuerModel, tbl_Issuers>()
+                .ForMember(dest => dest.IssuerKey, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore());
+                .ForMember(dest => dest.tbl_States, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * login models
@@ -130,13 +133,11 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore());
 
-            CreateMap<tbl_Logins, LoginModel>()
-                .ForMember(dest => dest.Users, src => src.MapFrom(val => val.tbl_UserLogins.Where(x => x.LoginId == val.Id)
-                    .ToDictionary(x => x.User.Id, x => x.User.Email).OrderBy(x => x.Value)));
-
             CreateMap<LoginModel, tbl_Logins>()
                 .ForMember(dest => dest.Actor, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore());
+                .ForMember(dest => dest.LoginKey, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * message of the day models
@@ -173,8 +174,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_Refreshes, RefreshModel>()
-                .ForMember(dest => dest.RefreshValue, src => src.Ignore());     //no refresh value to consumers...
+            CreateMap<RefreshModel, tbl_Refreshes>()
+                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.User, src => src.Ignore())
+                .ForMember(dest => dest.RefreshValue, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * role models
@@ -190,16 +195,13 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
-            CreateMap<tbl_Roles, RoleModel>()
-                .ForMember(dest => dest.Users, src => src.MapFrom(val => val.tbl_UserRoles.Where(x => x.RoleId == val.Id)
-                    .ToDictionary(x => x.User.Id, x => x.User.Email).OrderBy(x => x.Value)));
-
             CreateMap<RoleModel, tbl_Roles>()
                 .ForMember(dest => dest.Client, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
                 .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
+                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore())
+                .ReverseMap();
 
             /*
              * setting models
@@ -254,10 +256,10 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.LastLoginSuccess, src => src.Ignore())
                 .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => 0))
                 .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => 0))
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => Base64.CreateString(32)))
+                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
                 .ForMember(dest => dest.PasswordConfirmed, src => src.MapFrom(val => false))
-                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => Base64.CreateString(32)))
+                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
                 .ForMember(dest => dest.TwoFactorEnabled, src => src.MapFrom(val => false))
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
@@ -270,13 +272,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
-
-            CreateMap<tbl_Users, UserModel>()
-                .ForMember(dest => dest.Logins, src => src.MapFrom(val => val.tbl_UserLogins.Where(x => x.UserId == val.Id)
-                    .ToDictionary(x => x.LoginId, x => x.Login.Name).OrderBy(x => x.Value)))
-                .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.tbl_UserRoles.Where(x => x.UserId == val.Id)
-                    .ToDictionary(x => x.Role.Id, x => x.Role.Name).OrderBy(x => x.Value)))
-                .ForMember(dest => dest.SecurityStamp, src => src.Ignore());
 
             CreateMap<UserModel, tbl_Users>()
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
@@ -292,7 +287,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
+                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore())
+                .ReverseMap();
         }
     }
 }

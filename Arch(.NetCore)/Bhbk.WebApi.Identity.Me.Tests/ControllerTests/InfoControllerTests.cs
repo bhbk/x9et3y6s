@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var controller = new InfoController(conf, instance);
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 for (int i = 0; i < 3; i++)
                 {
                     var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                    var rt = factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
+                    var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
 
                     uow.Refreshes.Create(
                         mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -194,7 +194,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangePassword()
+                var model = new EntityChangePassword()
                 {
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = Base64.CreateString(16),
@@ -230,7 +230,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetUser(issuer.Id, user.Id);
 
-                var model = new UserChangePassword()
+                var model = new EntityChangePassword()
                 {
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = FakeConstants.ApiTestUserPassNew,

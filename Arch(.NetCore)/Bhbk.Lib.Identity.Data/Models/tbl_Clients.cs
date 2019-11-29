@@ -21,7 +21,9 @@ namespace Bhbk.Lib.Identity.Data.Models
         public Guid? ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string ClientKey { get; set; }
+        public string ConcurrencyStamp { get; set; }
+        public string PasswordHash { get; set; }
+        public string SecurityStamp { get; set; }
         public string ClientType { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }

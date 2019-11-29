@@ -63,13 +63,24 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         }
 
         public override tbl_Issuers Delete(tbl_Issuers issuer)
-        {
-            var claims = _context.Set<tbl_Claims>().Where(x => x.IssuerId == issuer.Id);
-            var refreshes = _context.Set<tbl_Refreshes>().Where(x => x.IssuerId == issuer.Id);
-            var settings = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id);
-            var states = _context.Set<tbl_States>().Where(x => x.IssuerId == issuer.Id);
-            var roles = _context.Set<tbl_Roles>().Where(x => x.Client.IssuerId == issuer.Id);
-            var clients = _context.Set<tbl_Clients>().Where(x => x.IssuerId == issuer.Id);
+        {            
+            var claims = _context.Set<tbl_Claims>()
+                .Where(x => x.IssuerId == issuer.Id);
+
+            var refreshes = _context.Set<tbl_Refreshes>()
+                .Where(x => x.IssuerId == issuer.Id);
+
+            var settings = _context.Set<tbl_Settings>()
+                .Where(x => x.IssuerId == issuer.Id);
+
+            var states = _context.Set<tbl_States>()
+                .Where(x => x.IssuerId == issuer.Id);
+
+            var roles = _context.Set<tbl_Roles>()
+                .Where(x => x.Client.IssuerId == issuer.Id);
+
+            var clients = _context.Set<tbl_Clients>()
+                .Where(x => x.IssuerId == issuer.Id);
 
             _context.RemoveRange(claims);
             _context.RemoveRange(refreshes);
@@ -77,7 +88,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.RemoveRange(states);
             _context.RemoveRange(roles);
             _context.RemoveRange(clients);
-            _context.Remove(issuer);
 
             return _context.Remove(issuer).Entity;
         }

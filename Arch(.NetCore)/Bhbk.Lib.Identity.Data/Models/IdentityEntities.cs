@@ -96,7 +96,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.tbl_Claims)
                     .HasForeignKey(d => d.IssuerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Claims_IssuerID");
             });
 
@@ -128,8 +127,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.ClientKey).IsRequired();
 
                 entity.Property(e => e.ClientType)
                     .IsRequired()
@@ -278,7 +275,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.tbl_Refreshes)
                     .HasForeignKey(d => d.IssuerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Refreshes_IssuerID");
 
                 entity.HasOne(d => d.User)

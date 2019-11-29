@@ -424,7 +424,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<UserModel>>(
                         UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
-                                model.ToExpression<tbl_Users>()))),
+                                model.ToExpression<tbl_Users>()),
+                            new List<Expression<Func<tbl_Users, object>>>() { x => x.tbl_UserLogins, x => x.tbl_UserRoles })),
 
                     Total = UoW.Users.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
@@ -436,7 +437,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
                 return BadRequest(ModelState);
             }
         }
@@ -557,7 +557,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] UserAddPassword model)
+        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] EntityAddPassword model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -115,7 +115,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<RoleModel>>(
                         UoW.Roles.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                                model.ToExpression<tbl_Roles>()))),
+                                model.ToExpression<tbl_Roles>()),
+                            new List<Expression<Func<tbl_Roles, object>>>() { x => x.tbl_UserRoles })),
 
                     Total = UoW.Roles.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
@@ -127,7 +128,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
                 return BadRequest(ModelState);
             }
         }

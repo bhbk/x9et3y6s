@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Admin
@@ -60,12 +59,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public bool PasswordConfirmed { get; set; }
 
-        public string SecurityStamp { get; set; }
-
         public bool TwoFactorEnabled { get; set; }
-
-        public ICollection<string> Roles { get; set; }
-
-        public ICollection<string> Logins { get; set; }
     }
 }

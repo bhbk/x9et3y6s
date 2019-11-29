@@ -109,7 +109,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<LoginModel>>(
                         UoW.Logins.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                                model.ToExpression<tbl_Logins>()))),
+                                model.ToExpression<tbl_Logins>()),
+                            new List<Expression<Func<tbl_Logins, object>>>() { x => x.tbl_UserLogins })),
 
                     Total = UoW.Logins.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(

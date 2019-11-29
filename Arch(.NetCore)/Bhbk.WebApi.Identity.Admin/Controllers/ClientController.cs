@@ -6,6 +6,7 @@ using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -144,6 +145,35 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(Mapper.Map<ClientModel>(client));
         }
 
+        [Route("v1/{clientID:guid}/set-password"), HttpPut]
+        [Authorize(Policy = "AdministratorsPolicy")]
+        public IActionResult SetPasswordV1([FromRoute] Guid clientID, [FromBody] EntityAddPassword model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+
+            if (client == null)
+            {
+                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{clientID}");
+                return NotFound(ModelState);
+            }
+
+            client.ActorId = GetUserGUID();
+
+            if (model.NewPassword != model.NewPasswordConfirm)
+            {
+                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Bad password for client:{client.Id}");
+                return BadRequest(ModelState);
+            }
+
+            UoW.Clients.SetPassword(client, model.NewPassword);
+            UoW.Commit();
+
+            return NoContent();
+        }
+
         [Route("v1/page"), HttpPost]
         public IActionResult GetClientsV1([FromBody] PageStateTypeC model)
         {
@@ -157,7 +187,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<ClientModel>>(
                         UoW.Clients.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Clients>, IQueryable<tbl_Clients>>>>(
-                                model.ToExpression<tbl_Clients>()))),
+                                model.ToExpression<tbl_Clients>()),
+                            new List<Expression<Func<tbl_Clients, object>>>() { x => x.tbl_Roles })),
 
                     Total = UoW.Clients.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Clients>, IQueryable<tbl_Clients>>>>(
@@ -169,7 +200,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
                 return BadRequest(ModelState);
             }
         }

@@ -65,6 +65,9 @@ namespace Bhbk.Lib.Identity.Data.Services
                     throw new NotImplementedException();
             }
 
+            //disable lazy loading...
+            _context.ChangeTracker.LazyLoadingEnabled = false;
+
             InstanceType = instance.InstanceType;
 
             Activities = new ActivityRepository(_context, instance.InstanceType);

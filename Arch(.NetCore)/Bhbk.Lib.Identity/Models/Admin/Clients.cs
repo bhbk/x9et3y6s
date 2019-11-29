@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,9 +19,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string Name { get; set; }
 
         public string Description { get; set; }
-
-        [Required]
-        public string ClientKey { get; set; }
 
         [Required]
         public string ClientType { get; set; }
@@ -61,7 +57,5 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public int AccessFailedCount { get; set; }
 
         public int AccessSuccessCount { get; set; }
-
-        public ICollection<string> Roles { get; set; }
     }
 }

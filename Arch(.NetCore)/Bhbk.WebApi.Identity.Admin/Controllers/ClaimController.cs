@@ -125,7 +125,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
                 return BadRequest(ModelState);
             }
         }

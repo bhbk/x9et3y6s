@@ -7,7 +7,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Primitives
         #region Configuration Constants
 
         public const string ApiTestClient = "ClientUnitTests";
-        public const string ApiTestClientKey = "ClientUnitTestsKey";
+        public const string ApiTestClientPassCurrent = "te$tClientPa$$word01!";
+        public const string ApiTestClientPassNew = "te$tClientPa$$word01!new";
         public const string ApiTestClaim = "ClaimUnitTests";
         public const string ApiTestEmailContent = "EmailUnitTestsContent";
         public const string ApiTestEmailSubject = "EmailUnitTestsSubject";
@@ -19,8 +20,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Primitives
         public const string ApiTestTextContent = "TextUnitTestsContent";
         public const string ApiTestUser = "unittestuser1@local";
         public const string ApiTestUserPhone = "+11111111111";
-        public const string ApiTestUserPassCurrent = "te$tpa$$word01!";
-        public const string ApiTestUserPassNew = "te$tpa$$word01!new";
+        public const string ApiTestUserPassCurrent = "te$tUserPa$$word01!";
+        public const string ApiTestUserPassNew = "te$tUserPa$$word01!new";
         public const string ApiTestUri = "UrlUnitTests";
         public const string ApiTestUriLink = "https://app.test.net/1/callback";
 

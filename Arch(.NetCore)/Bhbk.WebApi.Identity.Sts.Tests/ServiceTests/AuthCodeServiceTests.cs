@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         public AuthCodeServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
+        public async Task Sts_OAuth2_AuthCodeV1_Ask_NotImplemented()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV1_Auth_NotImplemented()
+        public async Task Sts_OAuth2_AuthCodeV1_Auth_NotImplemented()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Ask_Fail_ClientNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_ClientNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -114,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Ask_Fail_IssuerNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_IssuerNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Ask_Fail_UserNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_UserNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -182,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Ask_Fail_UrlNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Ask_Fail_UrlNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -217,7 +217,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Fail_ClientNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_ClientNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -263,7 +263,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Fail_IssuerNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_IssuerNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -309,7 +309,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Fail_UrlNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UrlNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -355,7 +355,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Fail_UserNotExist()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserNotExist()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -401,7 +401,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidCode()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidCode()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -447,7 +447,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidState()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Fail_UserInvalidState()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -489,7 +489,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_AuthCodeV2_Auth_Success()
+        public async Task Sts_OAuth2_AuthCodeV2_Auth_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -497,7 +497,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -532,9 +532,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                factory.CanReadToken(result.access_token).Should().BeTrue();
+                auth.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = factory.ReadJwtToken(result.access_token);
+                var jwt = auth.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

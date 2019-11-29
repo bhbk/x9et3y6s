@@ -34,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         public ClientCredentialsServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV1_Auth_NotImplemented()
+        public async Task Sts_OAuth2_ClientCredentialV1_Auth_NotImplemented()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV1_Refresh_NotImplemented()
+        public async Task Sts_OAuth2_ClientCredentialV1_Refresh_NotImplemented()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Auth_Fail_Client()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_Client()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -105,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = client.ClientKey,
+                        client_secret = FakeConstants.ApiTestClientPassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = Guid.NewGuid().ToString(),
                         grant_type = "client_secret",
-                        client_secret = client.ClientKey,
+                        client_secret = FakeConstants.ApiTestClientPassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Auth_Fail_Issuer()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Fail_Issuer()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = client.ClientKey,
+                        client_secret = FakeConstants.ApiTestClientPassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -191,7 +191,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = Guid.NewGuid().ToString(),
                         client = client.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = client.ClientKey,
+                        client_secret = FakeConstants.ApiTestClientPassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -199,7 +199,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Auth_Success()
+        public async Task Sts_OAuth2_ClientCredentialV2_Auth_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -207,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -225,13 +225,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = client.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = client.ClientKey,
+                        client_secret = FakeConstants.ApiTestClientPassCurrent,
                     });
                 result.Should().BeAssignableTo<ClientJwtV2>();
 
-                factory.CanReadToken(result.access_token).Should().BeTrue();
+                auth.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = factory.ReadJwtToken(result.access_token);
+                var jwt = auth.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
@@ -244,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Client()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Client()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -262,7 +262,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -299,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -309,7 +309,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -337,7 +337,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Issuer()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Issuer()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -345,7 +345,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -355,7 +355,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -392,7 +392,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -402,7 +402,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -430,7 +430,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Time()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Fail_Time()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -438,7 +438,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -450,7 +450,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Clients.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -484,7 +484,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -496,7 +496,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Clients.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -526,7 +526,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
         }
 
         [Fact]
-        public async ValueTask Sts_OAuth2_ClientCredentialV2_Refresh_Success()
+        public async Task Sts_OAuth2_ClientCredentialV2_Refresh_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -534,7 +534,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var factory = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
@@ -544,7 +544,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
-                var rt = factory.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -570,9 +570,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<ClientJwtV2>();
 
-                factory.CanReadToken(result.access_token).Should().BeTrue();
+                auth.CanReadToken(result.access_token).Should().BeTrue();
 
-                var jwt = factory.ReadJwtToken(result.access_token);
+                var jwt = auth.ReadJwtToken(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

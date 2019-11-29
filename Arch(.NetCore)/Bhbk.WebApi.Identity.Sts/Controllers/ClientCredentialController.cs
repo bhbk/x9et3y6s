@@ -96,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
             else if (!client.Enabled
-                || input.client_secret != client.ClientKey)
+                || !UoW.Clients.VerifyPassword(client, input.client_secret))
             {
                 //adjust counter(s) for login failure...
                 UoW.Clients.AccessFailed(client);

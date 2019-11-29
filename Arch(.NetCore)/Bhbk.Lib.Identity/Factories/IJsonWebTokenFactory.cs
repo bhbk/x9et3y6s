@@ -7,12 +7,12 @@ namespace Bhbk.Lib.Identity.Factories
 {
     public interface IJsonWebTokenFactory
     {
-        JwtSecurityToken ClientCredential(string issuer, string issuerKey, string issuerSalt, string client, List<Claim> claims);
+        JwtSecurityToken ClientCredential(string issuer, string issuerKey, string issuerSalt, string audience, List<Claim> claims);
 
         [Obsolete]
-        JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string client, List<Claim> claims);
+        JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string audience, List<Claim> claims);
 
-        JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, List<string> clients, List<Claim> claims);
+        JwtSecurityToken ResourceOwnerPassword(string issuer, string issuerKey, string issuerSalt, List<string> audiences, List<Claim> claims);
 
         bool CanReadToken(string jwt);
 
