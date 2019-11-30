@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Data.Models
     {
         public Guid Id { get; set; }
         public Guid? UserId { get; set; }
-        public Guid? ClientId { get; set; }
+        public Guid? AudienceId { get; set; }
         public string ActivityType { get; set; }
         public string TableName { get; set; }
         public string KeyValues { get; set; }
@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public DateTime Created { get; set; }
         public bool Immutable { get; set; }
 
-        public virtual tbl_Clients Client { get; set; }
+        public virtual tbl_Audiences Audience { get; set; }
         public virtual tbl_Users User { get; set; }
     }
 }

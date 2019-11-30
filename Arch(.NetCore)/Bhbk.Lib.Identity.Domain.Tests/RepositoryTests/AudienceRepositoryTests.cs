@@ -13,95 +13,95 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
 {
     [Collection("RepositoryTests")]
-    public class ClientRepositoryTests : BaseRepositoryTests
+    public class AudienceRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]
-        public void Repo_Clients_CreateV1_Fail()
+        public void Repo_Audiences_CreateV1_Fail()
         {
             Assert.Throws<NullReferenceException>(() =>
             {
-                UoW.Clients.Create(
-                    Mapper.Map<tbl_Clients>(new ClientCreate()));
+                UoW.Audiences.Create(
+                    Mapper.Map<tbl_Audiences>(new AudienceCreate()));
 
                 UoW.Commit();
             });
         }
 
         [Fact]
-        public void Repo_Clients_CreateV1_Success()
+        public void Repo_Audiences_CreateV1_Success()
         {
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
 
-            var result = UoW.Clients.Create(
-                Mapper.Map<tbl_Clients>(new ClientCreate()
+            var result = UoW.Audiences.Create(
+                Mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.ApiTestClient,
-                        ClientType = ClientType.user_agent.ToString(),
+                        AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
                     }));
-            result.Should().BeAssignableTo<tbl_Clients>();
+            result.Should().BeAssignableTo<tbl_Audiences>();
 
             UoW.Commit();
         }
 
         [Fact]
-        public void Repo_Clients_DeleteV1_Fail()
+        public void Repo_Audiences_DeleteV1_Fail()
         {
             Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Clients.Delete(new tbl_Clients());
+                UoW.Audiences.Delete(new tbl_Audiences());
                 UoW.Commit();
             });
         }
 
         [Fact]
-        public void Repo_Clients_DeleteV1_Success()
+        public void Repo_Audiences_DeleteV1_Success()
         {
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
-            var client = UoW.Clients.Get(x => x.Name == Constants.ApiTestClient).Single();
+            var client = UoW.Audiences.Get(x => x.Name == Constants.ApiTestClient).Single();
 
-            UoW.Clients.Delete(client);
+            UoW.Audiences.Delete(client);
             UoW.Commit();
         }
 
         [Fact]
-        public void Repo_Clients_GetV1_Success()
+        public void Repo_Audiences_GetV1_Success()
         {
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
-            var results = UoW.Clients.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Clients>>();
+            var results = UoW.Audiences.Get();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Audiences>>();
         }
 
         [Fact]
-        public void Repo_Clients_UpdateV1_Fail()
+        public void Repo_Audiences_UpdateV1_Fail()
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Clients.Update(new tbl_Clients());
+                UoW.Audiences.Update(new tbl_Audiences());
                 UoW.Commit();
             });
         }
 
         [Fact]
-        public void Repo_Clients_UpdateV1_Success()
+        public void Repo_Audiences_UpdateV1_Success()
         {
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
-            var client = UoW.Clients.Get(x => x.Name == Constants.ApiTestClient).Single();
+            var client = UoW.Audiences.Get(x => x.Name == Constants.ApiTestClient).Single();
             client.Name += "(Updated)";
 
-            var result = UoW.Clients.Update(client);
-            result.Should().BeAssignableTo<tbl_Clients>();
+            var result = UoW.Audiences.Update(client);
+            result.Should().BeAssignableTo<tbl_Audiences>();
 
             UoW.Commit();
         }

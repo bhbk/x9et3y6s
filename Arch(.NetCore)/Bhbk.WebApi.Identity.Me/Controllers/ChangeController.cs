@@ -29,12 +29,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email"), HttpPut]
-        public IActionResult ChangeEmailV1([FromBody] EntityChangeEmail model)
+        public IActionResult ChangeEmailV1([FromBody] EmailChange model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
             string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
@@ -77,12 +77,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password"), HttpPut]
-        public IActionResult ChangePasswordV1([FromBody] EntityChangePassword model)
+        public IActionResult ChangePasswordV1([FromBody] PasswordChange model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
             string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
@@ -130,12 +130,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone"), HttpPut]
-        public IActionResult ChangePhoneV1([FromBody] EntityChangePhone model)
+        public IActionResult ChangePhoneV1([FromBody] PhoneChange model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {

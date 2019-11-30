@@ -7,6 +7,7 @@ using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -84,14 +85,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);
 
-                var clients = owin.Clients.Get()
+                var audiences = owin.Audiences.Get()
                     .Select(x => x.Name);
 
                 /*
                  * check if issuer compatibility enabled. means no env salt.
                  */
 
-                var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
                 if (bool.Parse(legacyIssuer.ConfigValue))
@@ -123,8 +124,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                         ValidIssuers = issuers.ToArray(),
                         IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
-                        ValidAudiences = clients.ToArray(),
-                        AudienceValidator = Bhbk.Lib.Identity.Validators.ClientValidator.Multiple,
+                        ValidAudiences = audiences.ToArray(),
+                        AudienceValidator = Lib.Identity.Validators.AudienceValidator.Multiple,
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateIssuerSigningKey = true,

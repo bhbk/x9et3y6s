@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ccg"), HttpPost]
-        public IActionResult ClientCredentialV1_Auth([FromForm] ClientCredentialV1 input)
+        public IActionResult ClientCredentialV1_Grant([FromForm] ClientCredentialV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg"), HttpPost]
-        public IActionResult ClientCredentialV2_Auth([FromForm] ClientCredentialV2 input)
+        public IActionResult ClientCredentialV2_Grant([FromForm] ClientCredentialV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -81,56 +81,56 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+            if (Guid.TryParse(input.client, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!client.Enabled
-                || !UoW.Clients.VerifyPassword(client, input.client_secret))
+            else if (!audience.Enabled
+                || !UoW.Audiences.VerifyPassword(audience, input.client_secret))
             {
                 //adjust counter(s) for login failure...
-                UoW.Clients.AccessFailed(client);
+                UoW.Audiences.AccessFailed(audience);
                 UoW.Commit();
 
-                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
             //no context for auth exists yet... so set actor id same as client id...
-            client.ActorId = client.Id;
+            audience.ActorId = audience.Id;
 
             //adjust counter(s) for login success...
-            UoW.Clients.AccessSuccess(client);
+            UoW.Audiences.AccessSuccess(audience);
 
-            var cc_claims = UoW.Clients.GenerateAccessClaims(issuer, client);
-            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, cc_claims);
+            var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
+            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
-                    ClientId = client.Id,
+                    AudienceId = audience.Id,
                     ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
                     Immutable = false
                 }));
 
-            var rt_claims = UoW.Clients.GenerateRefreshClaims(issuer, client);
-            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, rt_claims);
+            var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
+            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
-                    ClientId = client.Id,
+                    AudienceId = audience.Id,
                     RefreshType = RefreshType.Client.ToString(),
                     RefreshValue = rt.RawData,
                     ValidFromUtc = rt.ValidFrom,
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
-                    ClientId = client.Id,
+                    AudienceId = audience.Id,
                     ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
                     Immutable = false
                 }));
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
-                client = client.Name,
+                client = audience.Name,
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
@@ -201,40 +201,40 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+            if (Guid.TryParse(input.client, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!client.Enabled)
+            else if (!audience.Enabled)
             {
-                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
             //no context for auth exists yet... so set actor id same as client id...
-            client.ActorId = client.Id;
+            audience.ActorId = audience.Id;
 
-            var cc_claims = UoW.Clients.GenerateAccessClaims(issuer, client);
-            var cc = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, cc_claims);
+            var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
+            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);
 
-            var rt_claims = UoW.Clients.GenerateRefreshClaims(issuer, client);
-            var rt = Factory.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], client.Name, rt_claims);
+            var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
+            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
                 {
                     IssuerId = issuer.Id,
-                    ClientId = client.Id,
+                    AudienceId = audience.Id,
                     RefreshType = RefreshType.Client.ToString(),
                     RefreshValue = rt.RawData,
                     ValidFromUtc = rt.ValidFrom,
@@ -244,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
-                    ClientId = client.Id,
+                    AudienceId = audience.Id,
                     ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
                     Immutable = false
                 }));
@@ -256,7 +256,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
-                client = client.Name,
+                client = audience.Name,
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };

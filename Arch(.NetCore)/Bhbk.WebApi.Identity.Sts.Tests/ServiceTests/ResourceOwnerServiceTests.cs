@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -56,12 +56,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 client.Enabled = false;
 
-                uow.Clients.Update(client);
+                uow.Audiences.Update(client);
                 uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -137,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 issuer.Enabled = false;
@@ -169,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
@@ -209,7 +209,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -218,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
@@ -245,7 +245,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -254,7 +254,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 user.LockoutEnabled = true;
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV1(
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -337,13 +337,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
-                var result = await service.ResourceOwner_AuthV1(
+                var result = await service.ResourceOwner_GrantV1(
                     new ResourceOwnerV1()
                     {
                         issuer_id = issuer.Id.ToString(),
@@ -379,7 +379,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "true";
@@ -387,10 +387,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Settings.Update(legacyIssuer);
                 uow.Commit();
 
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var result = await service.ResourceOwner_AuthV1Legacy(
+                var result = await service.ResourceOwner_GrantV1Legacy(
                     new ResourceOwnerV1()
                     {
                         client_id = client.Id.ToString(),
@@ -429,7 +429,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -449,7 +449,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 client.Enabled = false;
 
-                uow.Clients.Update(client);
+                uow.Audiences.Update(client);
                 uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV1(
@@ -477,7 +477,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -524,7 +524,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -572,7 +572,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -619,7 +619,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -668,7 +668,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -718,7 +718,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(1);
@@ -765,7 +765,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(-1);
@@ -816,7 +816,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -834,7 +834,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
                 var result = await service.ResourceOwner_RefreshV1(
                     new RefreshTokenV1()
@@ -875,12 +875,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 client.Enabled = false;
 
-                uow.Clients.Update(client);
+                uow.Audiences.Update(client);
                 uow.Commit();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
@@ -908,7 +908,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
@@ -940,7 +940,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 issuer.Enabled = false;
@@ -973,7 +973,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
@@ -1005,7 +1005,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
@@ -1033,7 +1033,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 user.LockoutEnabled = true;
@@ -1067,7 +1067,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var result = await service.Http.ResourceOwner_AuthV2(
@@ -1099,7 +1099,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1108,12 +1108,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
-                var result = await service.ResourceOwner_AuthV2(
+                var result = await service.ResourceOwner_GrantV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1149,7 +1149,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1158,10 +1158,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var defaultClient = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var defaultClient = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var defaultRole = uow.Roles.Get(x => x.Name == RealConstants.ApiDefaultRoleForUser).Single();
 
                 if (client.Id == defaultClient.Id)
@@ -1170,9 +1170,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Users.AddToRole(user, defaultRole);
                 uow.Commit();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
-                var result = await service.ResourceOwner_AuthV2(
+                var result = await service.ResourceOwner_GrantV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1208,7 +1208,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1217,12 +1217,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
-                var result = await service.ResourceOwner_AuthV2(
+                var result = await service.ResourceOwner_GrantV2(
                     new ResourceOwnerV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -1263,7 +1263,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1283,7 +1283,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 client.Enabled = false;
 
-                uow.Clients.Update(client);
+                uow.Audiences.Update(client);
                 uow.Commit();
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
@@ -1311,7 +1311,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1358,7 +1358,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1406,7 +1406,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1453,7 +1453,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(1);
@@ -1500,7 +1500,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 uow.Users.Clock = DateTime.UtcNow.AddYears(-1);
@@ -1550,7 +1550,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1559,7 +1559,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1607,7 +1607,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1616,7 +1616,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1662,7 +1662,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1671,7 +1671,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1689,7 +1689,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
                 var result = await service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1726,7 +1726,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1735,10 +1735,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var defaultClient = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var defaultClient = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var defaultRole = uow.Roles.Get(x => x.Name == RealConstants.ApiDefaultRoleForUser).Single();
 
                 if (client.Id == defaultClient.Id)
@@ -1762,7 +1762,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
                 var result = await service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -1799,7 +1799,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+                var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
                 legacyIssuer.ConfigValue = "false";
@@ -1808,7 +1808,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -1826,7 +1826,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
                 var result = await service.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()

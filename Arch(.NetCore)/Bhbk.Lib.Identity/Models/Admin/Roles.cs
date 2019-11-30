@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid ActorId { get; set; }
 
         [Required]
-        public Guid ClientId { get; set; }
+        public Guid AudienceId { get; set; }
 
         [Required]
         public string Name { get; set; }

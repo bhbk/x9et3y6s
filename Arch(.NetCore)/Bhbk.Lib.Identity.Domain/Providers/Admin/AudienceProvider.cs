@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
-    public class ClientProvider : BaseProvider
+    public class AudienceProvider : BaseProvider
     {
-        public ClientProvider(IConfiguration conf, IContextService instance)
+        public AudienceProvider(IConfiguration conf, IContextService instance)
             : base(conf, instance) { }
     }
 }

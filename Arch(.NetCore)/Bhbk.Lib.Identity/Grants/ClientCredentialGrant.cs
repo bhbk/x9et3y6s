@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Grants
                     FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                         {
                             new KeyValuePair<string, string>("issuer_id", _conf["IdentityLogin:IssuerName"]),
-                            new KeyValuePair<string, string>("client_id", _conf["IdentityLogin:ClientName"]),
+                            new KeyValuePair<string, string>("client_id", _conf["IdentityLogin:AudienceName"]),
                             new KeyValuePair<string, string>("grant_type", "refresh_token"),
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Grants
                     FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                         {
                             new KeyValuePair<string, string>("issuer_id", _conf["IdentityLogin:IssuerName"]),
-                            new KeyValuePair<string, string>("client_id", _conf["IdentityLogin:ClientName"]),
+                            new KeyValuePair<string, string>("client_id", _conf["IdentityLogin:AudienceName"]),
                             new KeyValuePair<string, string>("grant_type", "client_secret"),
                             new KeyValuePair<string, string>("client_secret", _conf["IdentityLogin:ClientSecret"]),
                         });
@@ -155,7 +155,7 @@ namespace Bhbk.Lib.Identity.Grants
                     FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                         {
                             new KeyValuePair<string, string>("issuer", _conf["IdentityLogin:IssuerName"]),
-                            new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityLogin:ClientName"] })),
+                            new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityLogin:AudienceName"] })),
                             new KeyValuePair<string, string>("grant_type", "refresh_token"),
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
@@ -191,7 +191,7 @@ namespace Bhbk.Lib.Identity.Grants
                     FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                         {
                             new KeyValuePair<string, string>("issuer", _conf["IdentityLogin:IssuerName"]),
-                            new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityLogin:ClientName"] })),
+                            new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityLogin:AudienceName"] })),
                             new KeyValuePair<string, string>("grant_type", "client_secret"),
                             new KeyValuePair<string, string>("client_secret", _conf["IdentityLogin:ClientSecret"]),
                         });

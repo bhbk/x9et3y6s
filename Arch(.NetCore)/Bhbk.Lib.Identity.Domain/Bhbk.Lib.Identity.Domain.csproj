@@ -8,7 +8,6 @@
   <ItemGroup>
     <Folder Include="Authorize\" />
     <Folder Include="Html\" />
-    <Folder Include="Providers\" />
   </ItemGroup>
 
   <ItemGroup>

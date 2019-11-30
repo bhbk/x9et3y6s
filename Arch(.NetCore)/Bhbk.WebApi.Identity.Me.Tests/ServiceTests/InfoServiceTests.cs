@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -86,17 +86,17 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -129,20 +129,20 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -167,20 +167,20 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),

@@ -18,7 +18,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
 
         [NonAction]
-        protected Guid GetUserGUID()
+        protected Guid GetIdentityGUID()
         {
             var claims = ControllerContext.HttpContext.User.Identity as ClaimsIdentity;
 

@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Data.Models
     {
         public Guid Id { get; set; }
         public Guid IssuerId { get; set; }
-        public Guid? ClientId { get; set; }
+        public Guid? AudienceId { get; set; }
         public Guid? UserId { get; set; }
         public string StateValue { get; set; }
         public string StateType { get; set; }
@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public DateTime Created { get; set; }
         public DateTime LastPolling { get; set; }
 
-        public virtual tbl_Clients Client { get; set; }
+        public virtual tbl_Audiences Audience { get; set; }
         public virtual tbl_Issuers Issuer { get; set; }
         public virtual tbl_Users User { get; set; }
     }

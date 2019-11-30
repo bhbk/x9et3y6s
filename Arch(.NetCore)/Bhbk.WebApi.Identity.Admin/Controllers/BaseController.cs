@@ -22,7 +22,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         protected LoggingLevel Logs { get => (LoggingLevel)Enum.Parse(typeof(LoggingLevel), Conf["Logging:LogLevel:Default"], true); }
 
         [NonAction]
-        protected Guid GetUserGUID()
+        protected Guid GetIdentityGUID()
         {
             var claims = ControllerContext.HttpContext.User.Identity as ClaimsIdentity;
 

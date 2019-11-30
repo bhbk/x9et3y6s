@@ -28,13 +28,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpGet]
-        public IActionResult GetUserV1()
+        public IActionResult GetV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -58,13 +58,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code"), HttpGet]
-        public IActionResult GetUserCodesV1()
+        public IActionResult GetCodesV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -76,13 +76,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code/revoke"), HttpDelete]
-        public IActionResult DeleteUserCodesV1()
+        public IActionResult DeleteCodesV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -94,14 +94,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code/{codeID}/revoke"), HttpDelete]
-        public IActionResult DeleteUserCodeV1([FromRoute] Guid codeID)
+        public IActionResult DeleteCodeV1([FromRoute] Guid codeID)
         {
-            var code = UoW.States.Get(x => x.UserId == GetUserGUID()
+            var code = UoW.States.Get(x => x.UserId == GetIdentityGUID()
                 && x.Id == codeID).SingleOrDefault();
 
             if (code == null)
             {
-                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/code/{codeValue}/{actionValue}"), HttpGet]
-        public IActionResult UpdateUserCodeV1([FromRoute] string codeValue, string actionValue)
+        public IActionResult UpdateCodeV1([FromRoute] string codeValue, string actionValue)
         {
             ActionType actionType;
 
@@ -137,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null
                 || user.Id != state.UserId)
@@ -169,14 +169,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/refresh"), HttpGet]
-        public IActionResult GetUserRefreshesV1()
+        public IActionResult GetRefreshesV1()
         {
             var expr = new QueryExpression<tbl_Refreshes>()
-                .Where(x => x.UserId == GetUserGUID()).ToLambda();
+                .Where(x => x.UserId == GetIdentityGUID()).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -186,13 +186,13 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/refresh/revoke"), HttpDelete]
-        public IActionResult DeleteUserRefreshesV1()
+        public IActionResult DeleteRefreshesV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -205,14 +205,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/refresh/{refreshID}/revoke"), HttpDelete]
-        public IActionResult DeleteUserRefreshV1([FromRoute] Guid refreshID)
+        public IActionResult DeleteRefreshV1([FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
-                .Where(x => x.UserId == GetUserGUID() && x.Id == refreshID).ToLambda();
+                .Where(x => x.UserId == GetIdentityGUID() && x.Id == refreshID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
             {
-                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
@@ -223,16 +223,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password"), HttpPut]
-        public IActionResult SetUserPasswordV1([FromBody] EntityChangePassword model)
+        public IActionResult SetPasswordV1([FromBody] PasswordChange model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
             else if (!user.HumanBeing)
@@ -247,7 +247,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            user.ActorId = GetUserGUID();
+            user.ActorId = GetIdentityGUID();
 
             UoW.Users.SetPassword(user, model.NewPassword);
             UoW.Commit();
@@ -261,11 +261,11 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
             else if (!user.HumanBeing
@@ -282,16 +282,16 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpPut]
-        public IActionResult UpdateUserV1([FromBody] UserModel model)
+        public IActionResult UpdateV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetUserGUID()).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetUserGUID()}");
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 

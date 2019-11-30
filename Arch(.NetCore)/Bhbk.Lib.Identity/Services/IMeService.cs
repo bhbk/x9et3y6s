@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<IEnumerable<StateModel>> Info_GetCodesV1();
         ValueTask<IEnumerable<RefreshModel>> Info_GetRefreshesV1();
         ValueTask<UserModel> Info_GetV1();
-        ValueTask<bool> Info_SetPasswordV1(EntityAddPassword model);
+        ValueTask<bool> Info_SetPasswordV1(PasswordAdd model);
         ValueTask<bool> Info_SetTwoFactorV1(bool statusValue);
         ValueTask<UserModel> Info_UpdateV1(UserModel model);
         ValueTask<bool> Info_UpdateCodeV1(string codeValue, string actionValue);

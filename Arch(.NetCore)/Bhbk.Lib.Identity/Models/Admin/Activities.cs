@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Activities
     {
-        public Guid? ClientId { get; set; }
+        public Guid? AudienceId { get; set; }
 
         public Guid? UserId { get; set; }
 

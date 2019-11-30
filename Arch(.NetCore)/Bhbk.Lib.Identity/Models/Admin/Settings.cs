@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
     {
         public Guid? IssuerId { get; set; }
 
-        public Guid? ClientId { get; set; }
+        public Guid? AudienceId { get; set; }
 
         public Guid? UserId { get; set; }
 

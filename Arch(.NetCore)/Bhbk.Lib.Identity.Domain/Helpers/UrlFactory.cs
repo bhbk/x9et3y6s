@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
         public static Uri GenerateAuthCodeV2(Uri authorize, Uri redirect, tbl_States state)
         {
             return new Uri(authorize.AbsoluteUri + "?issuer=" + HttpUtility.UrlEncode(state.IssuerId.ToString())
-                + "&client=" + HttpUtility.UrlEncode(state.ClientId.ToString())
+                + "&client=" + HttpUtility.UrlEncode(state.AudienceId.ToString())
                 + "&user=" + HttpUtility.UrlEncode(state.UserId.ToString())
                 + "&response_type=code"
                 + "&redirect_uri=" + HttpUtility.UrlEncode(redirect.AbsoluteUri)

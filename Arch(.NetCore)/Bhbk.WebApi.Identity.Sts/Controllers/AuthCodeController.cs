@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/acg"), HttpGet]
-        public IActionResult AuthCodeV1_Auth([FromQuery] AuthCodeV1 input)
+        public IActionResult AuthCodeV1_Grant([FromQuery] AuthCodeV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -87,18 +87,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences client;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+            if (Guid.TryParse(input.client, out audienceID))
+                client = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+                client = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
             if (client == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
 
@@ -147,14 +147,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
 
             var state = UoW.States.Create(
                 Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
-                    ClientId = client.Id,
+                    AudienceId = client.Id,
                     UserId = user.Id,
                     StateValue = AlphaNumeric.CreateString(32),
                     StateType = StateType.User.ToString(),
@@ -169,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/acg"), HttpGet]
-        public IActionResult AuthCodeV2_Auth([FromQuery] AuthCodeV2 input)
+        public IActionResult AuthCodeV2_Grant([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -235,47 +235,47 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Clients.Get(new QueryExpression<tbl_Clients>()
+            var clientList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
-            var clients = new List<tbl_Clients>();
+            var audiences = new List<tbl_Audiences>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
-                clients = UoW.Clients.Get(x => clientList.Contains(x)
+                audiences = UoW.Audiences.Get(x => clientList.Contains(x)
                     && x.Enabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
                 {
-                    Guid clientID;
-                    tbl_Clients client;
+                    Guid audienceID;
+                    tbl_Audiences audience;
 
                     //check if identifier is guid. resolve to guid if not.
-                    if (Guid.TryParse(entry.Trim(), out clientID))
-                        client = UoW.Clients.Get(x => x.Id == clientID, y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
+                    if (Guid.TryParse(entry.Trim(), out audienceID))
+                        audience = UoW.Audiences.Get(x => x.Id == audienceID, y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
                     else
-                        client = UoW.Clients.Get(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
+                        audience = UoW.Audiences.Get(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
 
-                    if (client == null)
+                    if (audience == null)
                     {
-                        ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                        ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                         return NotFound(ModelState);
                     }
-                    else if (!client.Enabled
-                        || !clientList.Contains(client))
+                    else if (!audience.Enabled
+                        || !clientList.Contains(audience))
                     {
-                        ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                        ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                         return BadRequest(ModelState);
                     }
 
-                    clients.Add(client);
+                    audiences.Add(audience);
                 }
             }
 
             //check if client uri is valid...
             var redirect = new Uri(input.redirect_uri);
 
-            foreach (var entry in clients)
+            foreach (var entry in audiences)
             {
                 if (!entry.tbl_Urls.Where(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath).Any()
                     && !entry.tbl_Urls.Where(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri).Any())
@@ -308,7 +308,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Users.AccessSuccess(user);
 
             var ac_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var ac = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), ac_claims);
+            var ac = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -319,7 +319,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rt_claims);
+            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -348,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = ac.RawData,
                 refresh_token = rt.RawData,
                 user = user.Email,
-                client = clients.Select(x => x.Name).ToList(),
+                client = audiences.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(ac.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };

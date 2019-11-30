@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Domain.Authorize
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IdentityAdminsAuthorizeRequirement requirement)
         {
             if (context.User.HasClaim(x => x.Type == ClaimTypes.Role && x.Value == "(Built-In) Admins")
-                && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == ClientType.user_agent.ToString()))
+                && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == AudienceType.user_agent.ToString()))
                 context.Succeed(requirement);
 
             return Task.CompletedTask;

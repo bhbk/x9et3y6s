@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -231,10 +231,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -277,10 +277,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
@@ -288,7 +288,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -323,10 +323,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
@@ -334,7 +334,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -369,10 +369,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
@@ -380,7 +380,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -415,10 +415,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
@@ -426,7 +426,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -461,10 +461,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
@@ -504,10 +504,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingTotpExpire).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -515,11 +515,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
                     .Generate(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.ClientId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
-                var result = await service.AuthCode_AuthV2(
+                var result = await service.AuthCode_GrantV2(
                     new AuthCodeV2()
                     {
                         issuer = issuer.Id.ToString(),

@@ -20,35 +20,35 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<PageStateTypeCResult<ActivityModel>> Activity_GetV1(PageStateTypeC model);
 
         /*
+         * audiences
+         */
+        ValueTask<AudienceModel> Audience_CreateV1(AudienceCreate model);
+        ValueTask<bool> Audience_DeleteV1(Guid audienceID);
+        ValueTask<bool> Audience_DeleteRefreshesV1(Guid audienceID);
+        ValueTask<bool> Audience_DeleteRefreshV1(Guid audienceID, Guid refreshID);
+        ValueTask<AudienceModel> Audience_GetV1(string audienceValue);
+        ValueTask<PageStateTypeCResult<AudienceModel>> Audience_GetV1(PageStateTypeC model);
+        ValueTask<IEnumerable<RefreshModel>> Audience_GetRefreshesV1(string audienceValue);
+        ValueTask<bool> Audience_SetPasswordV1(Guid audienceID, PasswordAdd model);
+        ValueTask<AudienceModel> Audience_UpdateV1(AudienceModel model);
+
+        /*
          * claims
          */
         ValueTask<ClaimModel> Claim_CreateV1(ClaimCreate model);
         ValueTask<bool> Claim_DeleteV1(Guid claimID);
-        ValueTask<PageStateTypeCResult<ClaimModel>> Claim_GetV1(PageStateTypeC model);
         ValueTask<ClaimModel> Claim_GetV1(string claimValue);
+        ValueTask<PageStateTypeCResult<ClaimModel>> Claim_GetV1(PageStateTypeC model);
         ValueTask<ClaimModel> Claim_UpdateV1(ClaimModel model);
-
-        /*
-         * clients
-         */
-        ValueTask<ClientModel> Client_CreateV1(ClientCreate model);
-        ValueTask<bool> Client_DeleteV1(Guid clientID);
-        ValueTask<bool> Client_DeleteRefreshesV1(Guid clientID);
-        ValueTask<bool> Client_DeleteRefreshV1(Guid clientID, Guid refreshID);
-        ValueTask<PageStateTypeCResult<ClientModel>> Client_GetV1(PageStateTypeC model);
-        ValueTask<ClientModel> Client_GetV1(string clientValue);
-        ValueTask<IEnumerable<RefreshModel>> Client_GetRefreshesV1(string clientValue);
-        ValueTask<bool> Client_SetPasswordV1(Guid clientID, EntityAddPassword model);
-        ValueTask<ClientModel> Client_UpdateV1(ClientModel model);
 
         /*
          * issuers
          */
         ValueTask<IssuerModel> Issuer_CreateV1(IssuerCreate model);
         ValueTask<bool> Issuer_DeleteV1(Guid issuerID);
-        ValueTask<IEnumerable<ClientModel>> Issuer_GetClientsV1(string issuerValue);
-        ValueTask<PageStateTypeCResult<IssuerModel>> Issuer_GetV1(PageStateTypeC model);
+        ValueTask<IEnumerable<AudienceModel>> Issuer_GetAudiencesV1(string issuerValue);
         ValueTask<IssuerModel> Issuer_GetV1(string issuerValue);
+        ValueTask<PageStateTypeCResult<IssuerModel>> Issuer_GetV1(PageStateTypeC model);
         ValueTask<IssuerModel> Issuer_UpdateV1(IssuerModel model);
 
         /*
@@ -56,8 +56,8 @@ namespace Bhbk.Lib.Identity.Services
          */
         ValueTask<LoginModel> Login_CreateV1(LoginCreate model);
         ValueTask<bool> Login_DeleteV1(Guid loginID);
-        ValueTask<PageStateTypeCResult<LoginModel>> Login_GetV1(PageStateTypeC model);
         ValueTask<LoginModel> Login_GetV1(string loginValue);
+        ValueTask<PageStateTypeCResult<LoginModel>> Login_GetV1(PageStateTypeC model);
         ValueTask<LoginModel> Login_UpdateV1(LoginModel model);
 
         /*
@@ -65,8 +65,8 @@ namespace Bhbk.Lib.Identity.Services
          */
         ValueTask<RoleModel> Role_CreateV1(RoleCreate model);
         ValueTask<bool> Role_DeleteV1(Guid roleID);
-        ValueTask<PageStateTypeCResult<RoleModel>> Role_GetV1(PageStateTypeC model);
         ValueTask<RoleModel> Role_GetV1(string roleValue);
+        ValueTask<PageStateTypeCResult<RoleModel>> Role_GetV1(PageStateTypeC model);
         ValueTask<RoleModel> Role_UpdateV1(RoleModel model);
 
         /*
@@ -80,18 +80,18 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> User_DeleteV1(Guid userID);
         ValueTask<bool> User_DeleteRefreshesV1(Guid userID);
         ValueTask<bool> User_DeleteRefreshV1(Guid userID, Guid refreshID);
-        ValueTask<PageStateTypeCResult<UserModel>> User_GetV1(PageStateTypeC model);
-        ValueTask<PageStateTypeCResult<MOTDType1Model>> User_GetMOTDsV1(PageStateTypeC model);
         ValueTask<UserModel> User_GetV1(string userValue);
-        ValueTask<IEnumerable<ClientModel>> User_GetClientsV1(string userValue);
+        ValueTask<PageStateTypeCResult<UserModel>> User_GetV1(PageStateTypeC model);
+        ValueTask<IEnumerable<AudienceModel>> User_GetAudiencesV1(string userValue);
         ValueTask<IEnumerable<LoginModel>> User_GetLoginsV1(string userValue);
+        ValueTask<PageStateTypeCResult<MOTDType1Model>> User_GetMOTDsV1(PageStateTypeC model);
         ValueTask<IEnumerable<RefreshModel>> User_GetRefreshesV1(string userValue);
         ValueTask<IEnumerable<RoleModel>> User_GetRolesV1(string userValue);
         ValueTask<bool> User_RemoveFromClaimV1(Guid userID, Guid claimID);
         ValueTask<bool> User_RemoveFromLoginV1(Guid userID, Guid loginID);
         ValueTask<bool> User_RemoveFromRoleV1(Guid userID, Guid roleID);
         ValueTask<bool> User_RemovePasswordV1(Guid userID);
-        ValueTask<bool> User_SetPasswordV1(Guid userID, EntityAddPassword model);
+        ValueTask<bool> User_SetPasswordV1(Guid userID, PasswordAdd model);
         ValueTask<UserModel> User_UpdateV1(UserModel model);
     }
 }

@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV1> AuthCode_AuthV1(AuthCodeV1 model)
+        public async ValueTask<UserJwtV1> AuthCode_GrantV1(AuthCodeV1 model)
         {
             var response = await Http.AuthCode_AuthV1(model);
 
@@ -68,7 +68,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV2> AuthCode_AuthV2(AuthCodeV2 model)
+        public async ValueTask<UserJwtV2> AuthCode_GrantV2(AuthCodeV2 model)
         {
             var response = await Http.AuthCode_AuthV2(model);
 
@@ -79,7 +79,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<ClientJwtV1> ClientCredential_AuthV1(ClientCredentialV1 model)
+        public async ValueTask<ClientJwtV1> ClientCredential_GrantV1(ClientCredentialV1 model)
         {
             var response = await Http.ClientCredential_AuthV1(model);
 
@@ -90,7 +90,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<ClientJwtV2> ClientCredential_AuthV2(ClientCredentialV2 model)
+        public async ValueTask<ClientJwtV2> ClientCredential_GrantV2(ClientCredentialV2 model)
         {
             var response = await Http.ClientCredential_AuthV2(model);
 
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV1> DeviceCode_AuthV1(DeviceCodeV1 model)
+        public async ValueTask<UserJwtV1> DeviceCode_GrantV1(DeviceCodeV1 model)
         {
             var response = await Http.DeviceCode_AuthV1(model);
 
@@ -156,7 +156,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV2> DeviceCode_AuthV2(DeviceCodeV2 model)
+        public async ValueTask<UserJwtV2> DeviceCode_GrantV2(DeviceCodeV2 model)
         {
             var response = await Http.DeviceCode_AuthV2(model);
 
@@ -167,7 +167,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV1> Implicit_AuthV1(ImplicitV1 model)
+        public async ValueTask<UserJwtV1> Implicit_GrantV1(ImplicitV1 model)
         {
             var response = await Http.Implicit_AuthV1(model);
 
@@ -178,7 +178,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV2> Implicit_AuthV2(ImplicitV2 model)
+        public async ValueTask<UserJwtV2> Implicit_GrantV2(ImplicitV2 model)
         {
             var response = await Http.Implicit_AuthV2(model);
 
@@ -189,7 +189,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV1Legacy> ResourceOwner_AuthV1Legacy(ResourceOwnerV1 model)
+        public async ValueTask<UserJwtV1Legacy> ResourceOwner_GrantV1Legacy(ResourceOwnerV1 model)
         {
             var response = await Http.ResourceOwner_AuthV1Legacy(model);
 
@@ -200,7 +200,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV1> ResourceOwner_AuthV1(ResourceOwnerV1 model)
+        public async ValueTask<UserJwtV1> ResourceOwner_GrantV1(ResourceOwnerV1 model)
         {
             var response = await Http.ResourceOwner_AuthV1(model);
 
@@ -211,7 +211,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserJwtV2> ResourceOwner_AuthV2(ResourceOwnerV2 model)
+        public async ValueTask<UserJwtV2> ResourceOwner_GrantV2(ResourceOwnerV2 model)
         {
             var response = await Http.ResourceOwner_AuthV2(model);
 

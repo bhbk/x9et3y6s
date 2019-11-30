@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testRole = uow.Roles.Create(
                     mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         Name = Base64.CreateString(4) + "-" + FakeConstants.ApiTestLogin,
                         Enabled = true,
                         Immutable = false,
@@ -180,7 +180,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -201,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -226,7 +226,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -258,7 +258,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -299,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -323,7 +323,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -357,7 +357,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -386,7 +386,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -422,7 +422,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -468,7 +468,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -493,7 +493,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create(3);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -529,7 +529,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -555,15 +555,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
-                var result = await service.User_GetClientsV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<ClientModel>>();
-                result.Count().Should().Be(uow.Clients.Count(new QueryExpression<tbl_Clients>()
+                var result = await service.User_GetAudiencesV1(user.Id.ToString());
+                result.Should().BeAssignableTo<IEnumerable<AudienceModel>>();
+                result.Count().Should().Be(uow.Audiences.Count(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()));
             }
         }
@@ -581,7 +581,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -610,7 +610,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -645,7 +645,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -689,7 +689,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -718,7 +718,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -753,7 +753,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -786,7 +786,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -819,7 +819,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -848,14 +848,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
-                var testUserPassword = new EntityAddPassword()
+                var testUserPassword = new PasswordAdd()
                 {
                     EntityId = testUser.Id,
                     NewPassword = FakeConstants.ApiTestUserPassNew,
@@ -887,7 +887,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -908,7 +908,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
@@ -936,7 +936,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);

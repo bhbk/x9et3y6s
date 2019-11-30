@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
             CreateMap<ActivityCreate, tbl_Activities>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore())
                 .ForMember(dest => dest.KeyValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.KeyValues)))
                 .ForMember(dest => dest.OriginalValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.OriginalValues)))
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now));
 
             CreateMap<ActivityModel, tbl_Activities>()
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore())
                 .ReverseMap();
 
@@ -53,7 +53,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * client models
              */
-            CreateMap<ClientCreate, tbl_Clients>()
+            CreateMap<AudienceCreate, tbl_Audiences>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
@@ -69,19 +69,19 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
 
-            CreateMap<ClientModel, tbl_Clients>()
+            CreateMap<AudienceModel, tbl_Audiences>()
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
                 .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
-                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
@@ -108,7 +108,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.IssuerKey, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore());
@@ -116,7 +116,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             CreateMap<IssuerModel, tbl_Issuers>()
                 .ForMember(dest => dest.IssuerKey, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Clients, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
@@ -170,12 +170,12 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             CreateMap<RefreshCreate, tbl_Refreshes>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
             CreateMap<RefreshModel, tbl_Refreshes>()
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore())
                 .ForMember(dest => dest.RefreshValue, src => src.Ignore())
@@ -190,15 +190,15 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => Base64.CreateString(32)))
-                .ForMember(dest => dest.Client, src => src.Ignore())
-                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
             CreateMap<RoleModel, tbl_Roles>()
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
-                .ForMember(dest => dest.tbl_ClientRoles, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore())
                 .ReverseMap();
@@ -209,7 +209,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             CreateMap<SettingCreate, tbl_Settings>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
@@ -220,7 +220,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.LastPolling, src => src.Ignore())
-                .ForMember(dest => dest.Client, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
@@ -240,7 +240,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.Client, src => src.Ignore());
+                .ForMember(dest => dest.Audience, src => src.Ignore());
 
             /*
              * user models

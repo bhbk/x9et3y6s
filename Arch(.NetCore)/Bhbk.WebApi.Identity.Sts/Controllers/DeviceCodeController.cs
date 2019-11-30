@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/dcg"), HttpPost]
-        public IActionResult DeviceCodeV1_Auth([FromForm] DeviceCodeV1 input)
+        public IActionResult DeviceCodeV1_Grant([FromForm] DeviceCodeV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,18 +77,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+            if (Guid.TryParse(input.client, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
 
@@ -107,9 +107,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
-            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingPollingMax).Single();
 
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
@@ -119,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var result = new DeviceCodeV2()
             {
                 issuer = issuer.Id.ToString(),
-                client = client.Id.ToString(),
+                client = audience.Id.ToString(),
                 verification_url = authorize.AbsoluteUri,
                 user_code = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user),
                 device_code = nonce,
@@ -130,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
-                    ClientId = client.Id,
+                    AudienceId = audience.Id,
                     UserId = user.Id,
                     StateValue = nonce,
                     StateType = StateType.Device.ToString(),
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg"), HttpPost]
-        public IActionResult DeviceCodeV2_Auth([FromForm] DeviceCodeV2 input)
+        public IActionResult DeviceCodeV2_Grant([FromForm] DeviceCodeV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -170,27 +170,27 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+            if (Guid.TryParse(input.client, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!client.Enabled)
+            else if (!audience.Enabled)
             {
-                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
-            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingPollingMax).Single();
 
             //check if state is valid...
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Users.AccessSuccess(user);
 
             var dc_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var dc = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, dc_claims);
+            var dc = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, dc_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -279,7 +279,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
+            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -308,7 +308,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = dc.RawData,
                 refresh_token = rt.RawData,
                 user = user.Email,
-                client = new List<string>() { client.Name },
+                client = new List<string>() { audience.Name },
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(dc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };

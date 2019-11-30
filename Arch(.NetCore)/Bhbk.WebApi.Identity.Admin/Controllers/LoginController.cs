@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult CreateLoginV1([FromBody] LoginCreate model)
+        public IActionResult CreateV1([FromBody] LoginCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Logins.Create(Mapper.Map<tbl_Logins>(model));
 
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{loginID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult DeleteLoginV1([FromRoute] Guid loginID)
+        public IActionResult DeleteV1([FromRoute] Guid loginID)
         {
             var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
 
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            login.ActorId = GetUserGUID();
+            login.ActorId = GetIdentityGUID();
 
             UoW.Logins.Delete(login);
             UoW.Commit();
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginValue}"), HttpGet]
-        public IActionResult GetLoginV1([FromRoute] string loginValue)
+        public IActionResult GetV1([FromRoute] string loginValue)
         {
             Guid loginID;
             tbl_Logins login = null;
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetLoginsV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID:guid}/users"), HttpGet]
-        public IActionResult GetLoginUsersV1([FromRoute] Guid loginID)
+        public IActionResult GetUsersV1([FromRoute] Guid loginID)
         {
             var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
 
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult UpdateLoginV1([FromBody] LoginModel model)
+        public IActionResult UpdateV1([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -160,11 +160,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             else if (login.Immutable
                 && login.Immutable != model.Immutable)
             {
-                ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Client:{login.Id}");
+                ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Login:{login.Id}");
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Logins.Update(Mapper.Map<tbl_Logins>(model));
 

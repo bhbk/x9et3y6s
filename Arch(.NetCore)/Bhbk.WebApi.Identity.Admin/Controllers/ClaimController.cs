@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult CreateClaimV1([FromBody] ClaimCreate model)
+        public IActionResult CreateV1([FromBody] ClaimCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Claims.Create(Mapper.Map<tbl_Claims>(model));
 
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult DeleteClaimV1([FromRoute] Guid claimID)
+        public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
             var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
                 .Where(x => x.Id == claimID).ToLambda())
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            claim.ActorId = GetUserGUID();
+            claim.ActorId = GetIdentityGUID();
 
             UoW.Claims.Delete(claim);
             UoW.Commit();
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{claimValue}"), HttpGet]
-        public IActionResult GetClaimV1([FromRoute] string claimValue)
+        public IActionResult GetV1([FromRoute] string claimValue)
         {
             Guid claimID;
             tbl_Claims claim = null;
@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetClaimsV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult UpdateClaimV1([FromBody] ClaimModel model)
+        public IActionResult UpdateV1([FromBody] ClaimModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Claims.Update(Mapper.Map<tbl_Claims>(model));
 

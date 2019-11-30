@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default settings
              */
 
-            var foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyClaims).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     }));
             }
 
-            var foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     }));
             }
 
-            var foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
@@ -125,20 +125,20 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             }
 
             /*
-             * create default clients
+             * create default audiences
              */
 
-            var foundClientUi = _uow.Clients.Get(new QueryExpression<tbl_Clients>()
+            var foundClientUi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == RealConstants.ApiDefaultClientUi).ToLambda()).SingleOrDefault();
 
             if (foundClientUi == null)
             {
-                foundClientUi = _uow.Clients.Create(
-                    _mapper.Map<tbl_Clients>(new ClientCreate()
+                foundClientUi = _uow.Audiences.Create(
+                    _mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = RealConstants.ApiDefaultClientUi,
-                        ClientType = ClientType.user_agent.ToString(),
+                        AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -146,17 +146,17 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 _uow.Commit();
             }
 
-            var foundClientApi = _uow.Clients.Get(new QueryExpression<tbl_Clients>()
+            var foundClientApi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == RealConstants.ApiDefaultClientApi).ToLambda()).SingleOrDefault();
 
             if (foundClientApi == null)
             {
-                foundClientApi = _uow.Clients.Create(
-                     _mapper.Map<tbl_Clients>(new ClientCreate()
+                foundClientApi = _uow.Audiences.Create(
+                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
                      {
                          IssuerId = foundIssuer.Id,
                          Name = RealConstants.ApiDefaultClientApi,
-                         ClientType = ClientType.server.ToString(),
+                         AudienceType = AudienceType.server.ToString(),
                          Enabled = true,
                          Immutable = true,
                      }));
@@ -197,7 +197,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 foundRoleForAdmin = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        ClientId = foundClientUi.Id,
+                        AudienceId = foundClientUi.Id,
                         Name = RealConstants.ApiDefaultRoleForAdmin,
                         Enabled = true,
                         Immutable = true,
@@ -214,7 +214,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 foundRoleForUser = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        ClientId = foundClientUi.Id,
+                        AudienceId = foundClientUi.Id,
                         Name = RealConstants.ApiDefaultRoleForUser,
                         Enabled = true,
                         Immutable = true,
@@ -275,11 +275,11 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             }
 
             /*
-             * set password to clients
+             * set password to audiences
              */
 
-            _uow.Clients.SetPassword(foundClientApi, RealConstants.ApiDefaultClientApiKey);
-            _uow.Clients.SetPassword(foundClientUi, RealConstants.ApiDefaultClientUiKey);
+            _uow.Audiences.SetPassword(foundClientApi, RealConstants.ApiDefaultClientApiKey);
+            _uow.Audiences.SetPassword(foundClientUi, RealConstants.ApiDefaultClientUiKey);
 
             _uow.Commit();
 
@@ -338,13 +338,13 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             _uow.Commit();
 
             /*
-             * delete default clients
+             * delete default audiences
              */
 
-            _uow.Clients.Delete(new QueryExpression<tbl_Clients>()
+            _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == RealConstants.ApiDefaultClientUi).ToLambda());
 
-            _uow.Clients.Delete(new QueryExpression<tbl_Clients>()
+            _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == RealConstants.ApiDefaultClientApi).ToLambda());
 
             _uow.Commit();

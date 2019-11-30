@@ -153,7 +153,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         [Obsolete]
         public List<Claim> GenerateAccessClaims(tbl_Users user)
         {
-            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
@@ -166,7 +166,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
             //user identity vs. a service identity
-            claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
+            claims.Add(new Claim(ClaimTypes.System, AudienceType.user_agent.ToString()));
 
             var userRoles = _context.Set<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
@@ -204,10 +204,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Users user)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
-            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
@@ -220,7 +220,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
             //user identity vs. a service identity
-            claims.Add(new Claim(ClaimTypes.System, ClientType.user_agent.ToString()));
+            claims.Add(new Claim(ClaimTypes.System, AudienceType.user_agent.ToString()));
 
             var userRoles = _context.Set<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
@@ -258,7 +258,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
         public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Users user)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
 
             var claims = new List<Claim>();

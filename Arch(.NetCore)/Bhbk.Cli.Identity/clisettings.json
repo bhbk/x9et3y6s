@@ -9,7 +9,7 @@
   },
   "IdentityLogin": {
     "IssuerName": "Bhbk",
-    "ClientName": "",
+    "AudienceName": "",
     "UserName": "identity@system.ochap.local",
     "UserPass": "pa$$word01!"
   }

@@ -31,19 +31,19 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult CreateRoleV1([FromBody] RoleCreate model)
+        public IActionResult CreateV1([FromBody] RoleCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Roles.Get(x => x.ClientId == model.ClientId
+            if (UoW.Roles.Get(x => x.AudienceId == model.AudienceId
                 && x.Name == model.Name).Any())
             {
-                ModelState.AddModelError(MessageType.RoleAlreadyExists.ToString(), $"Client:{model.ClientId} Role:{model.Name}");
+                ModelState.AddModelError(MessageType.RoleAlreadyExists.ToString(), $"Audience:{model.AudienceId} Role:{model.Name}");
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var create = UoW.Roles.Create(Mapper.Map<tbl_Roles>(model));
 
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{roleID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult DeleteRoleV1([FromRoute] Guid roleID)
+        public IActionResult DeleteV1([FromRoute] Guid roleID)
         {
             var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
 
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            role.ActorId = GetUserGUID();
+            role.ActorId = GetIdentityGUID();
 
             UoW.Roles.Delete(role);
             UoW.Commit();
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleValue}"), HttpGet]
-        public IActionResult GetRoleV1([FromRoute] string roleValue)
+        public IActionResult GetV1([FromRoute] string roleValue)
         {
             Guid roleID;
             tbl_Roles role = null;
@@ -103,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetRolesV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID:guid}/users"), HttpGet]
-        public IActionResult GetRoleUsersV1([FromRoute] Guid roleID)
+        public IActionResult GetUsersV1([FromRoute] Guid roleID)
         {
             var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
 
@@ -151,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult UpdateRoleV1([FromBody] RoleModel model)
+        public IActionResult UpdateV1([FromBody] RoleModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Roles.Update(Mapper.Map<tbl_Roles>(model));
 

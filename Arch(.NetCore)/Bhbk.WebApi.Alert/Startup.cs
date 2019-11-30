@@ -7,6 +7,7 @@ using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -70,7 +71,7 @@ namespace Bhbk.WebApi.Alert
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                 .Select(x => x.Value);
 
-            var allowedClients = conf.GetSection("IdentityTenants:AllowedClients").GetChildren()
+            var allowedAudiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
                 .Select(x => x.Value);
 
             var issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
@@ -79,14 +80,14 @@ namespace Bhbk.WebApi.Alert
             var issuerKeys = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                 .Select(x => x.IssuerKey);
 
-            var clients = owin.Clients.Get(x => allowedClients.Any(y => y == x.Name))
+            var audiences = owin.Audiences.Get(x => allowedAudiences.Any(y => y == x.Name))
                 .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
@@ -131,8 +132,8 @@ namespace Bhbk.WebApi.Alert
                     ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
-                    ValidAudiences = clients.ToArray(),
-                    AudienceValidator = Bhbk.Lib.Identity.Validators.ClientValidator.Multiple,
+                    ValidAudiences = audiences.ToArray(),
+                    AudienceValidator = Lib.Identity.Validators.AudienceValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,

@@ -16,9 +16,9 @@ namespace Bhbk.Lib.Identity.Data.Models
         }
 
         public virtual DbSet<tbl_Activities> tbl_Activities { get; set; }
+        public virtual DbSet<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
+        public virtual DbSet<tbl_Audiences> tbl_Audiences { get; set; }
         public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
-        public virtual DbSet<tbl_ClientRoles> tbl_ClientRoles { get; set; }
-        public virtual DbSet<tbl_Clients> tbl_Clients { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
         public virtual DbSet<tbl_MotDType1> tbl_MotDType1 { get; set; }
@@ -61,15 +61,57 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Activities)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_Activities_ClientID");
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_Activities_AudienceID");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.tbl_Activities)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK_Activities_UserID");
+            });
+
+            modelBuilder.Entity<tbl_AudienceRoles>(entity =>
+            {
+                entity.HasKey(e => new { e.AudienceId, e.RoleId })
+                    .HasName("PK_AudienceRoles");
+
+                entity.HasIndex(e => new { e.AudienceId, e.RoleId })
+                    .HasName("IX_AudienceRoles")
+                    .IsUnique();
+
+                entity.HasOne(d => d.Audience)
+                    .WithMany(p => p.tbl_AudienceRoles)
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_AudienceRoles_AudienceID");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.tbl_AudienceRoles)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AudienceRoles_RoleID");
+            });
+
+            modelBuilder.Entity<tbl_Audiences>(entity =>
+            {
+                entity.HasIndex(e => e.Id)
+                    .HasName("IX_Audiences")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.AudienceType)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.Name).IsRequired();
+
+                entity.HasOne(d => d.Issuer)
+                    .WithMany(p => p.tbl_Audiences)
+                    .HasForeignKey(d => d.IssuerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Audiences_IssuerID");
             });
 
             modelBuilder.Entity<tbl_Claims>(entity =>
@@ -97,48 +139,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .WithMany(p => p.tbl_Claims)
                     .HasForeignKey(d => d.IssuerId)
                     .HasConstraintName("FK_Claims_IssuerID");
-            });
-
-            modelBuilder.Entity<tbl_ClientRoles>(entity =>
-            {
-                entity.HasKey(e => new { e.ClientId, e.RoleId })
-                    .HasName("PK_ClientRoles");
-
-                entity.HasIndex(e => new { e.ClientId, e.RoleId })
-                    .HasName("IX_ClientRoles")
-                    .IsUnique();
-
-                entity.HasOne(d => d.Client)
-                    .WithMany(p => p.tbl_ClientRoles)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_ClientRoles_ClientID");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.tbl_ClientRoles)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ClientRoles_RoleID");
-            });
-
-            modelBuilder.Entity<tbl_Clients>(entity =>
-            {
-                entity.HasIndex(e => e.Id)
-                    .HasName("IX_Clients")
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.ClientType)
-                    .IsRequired()
-                    .HasMaxLength(64);
-
-                entity.Property(e => e.Name).IsRequired();
-
-                entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.tbl_Clients)
-                    .HasForeignKey(d => d.IssuerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Clients_IssuerID");
             });
 
             modelBuilder.Entity<tbl_Issuers>(entity =>
@@ -267,10 +267,10 @@ namespace Bhbk.Lib.Identity.Data.Models
 
                 entity.Property(e => e.RefreshValue).IsRequired();
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Refreshes)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_Refreshes_ClientID");
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_Refreshes_AudienceID");
 
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.tbl_Refreshes)
@@ -315,11 +315,11 @@ namespace Bhbk.Lib.Identity.Data.Models
 
                 entity.Property(e => e.Name).IsRequired();
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Roles)
-                    .HasForeignKey(d => d.ClientId)
+                    .HasForeignKey(d => d.AudienceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Roles_ClientID");
+                    .HasConstraintName("FK_Roles_AudienceID");
             });
 
             modelBuilder.Entity<tbl_Settings>(entity =>
@@ -338,11 +338,11 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .IsRequired()
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Settings)
-                    .HasForeignKey(d => d.ClientId)
+                    .HasForeignKey(d => d.AudienceId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Settings_ClientID");
+                    .HasConstraintName("FK_Settings_AudienceID");
 
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.tbl_Settings)
@@ -369,11 +369,11 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_States)
-                    .HasForeignKey(d => d.ClientId)
+                    .HasForeignKey(d => d.AudienceId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_States_ClientID");
+                    .HasConstraintName("FK_States_AudienceID");
 
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.tbl_States)
@@ -395,10 +395,10 @@ namespace Bhbk.Lib.Identity.Data.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.Client)
+                entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Urls)
-                    .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK_Urls_ClientID");
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_Urls_AudienceID");
             });
 
             modelBuilder.Entity<tbl_UserClaims>(entity =>

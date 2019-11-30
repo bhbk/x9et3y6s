@@ -74,6 +74,145 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
+        public async ValueTask<HttpResponseMessage> Audience_CreateV1(string jwt, AudienceCreate model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/audience/v1";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_DeleteV1(string jwt, Guid audienceID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_DeleteRefreshesV1(string jwt, Guid audienceID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceID.ToString() + "/refresh";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_DeleteRefreshV1(string jwt, Guid audienceID, Guid refreshID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceID.ToString() + "/refresh/" + refreshID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_GetV1(string jwt, string audienceValue)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceValue;
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_GetV1(string jwt, PageStateTypeC model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/audience/v1/page";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_GetRefreshesV1(string jwt, string audienceValue)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceValue + "/refreshes";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_SetPasswordV1(string jwt, Guid audienceID, PasswordAdd model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/audience/v1/" + audienceID.ToString() + "/set-password";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PutAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_UpdateV1(string jwt, AudienceModel model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/audience/v1";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PutAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
         public async ValueTask<HttpResponseMessage> Claim_CreateV1(string jwt, ClaimCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -152,145 +291,6 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Client_CreateV1(string jwt, ClientCreate model)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/client/v1";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_DeleteV1(string jwt, Guid clientID)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/client/v1/" + clientID.ToString();
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_DeleteRefreshesV1(string jwt, Guid clientID)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/client/v1/" + clientID.ToString() + "/refresh";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_DeleteRefreshV1(string jwt, Guid clientID, Guid refreshID)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/client/v1/" + clientID.ToString() + "/refresh/" + refreshID.ToString();
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.DeleteAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_GetV1(string jwt, string clientValue)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/client/v1/" + clientValue;
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_GetV1(string jwt, PageStateTypeC model)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/client/v1/page";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_GetRefreshesV1(string jwt, string clientValue)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/client/v1/" + clientValue + "/refreshes";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.GetAsync(endpoint);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_SetPasswordV1(string jwt, Guid clientID, EntityAddPassword model)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/client/v1/" + clientID.ToString() + "/set-password";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> Client_UpdateV1(string jwt, ClientModel model)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/client/v1";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PutAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
         public async ValueTask<HttpResponseMessage> Issuer_CreateV1(string jwt, IssuerCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -322,11 +322,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Issuer_GetClientsV1(string jwt, string issuerValue)
+        public async ValueTask<HttpResponseMessage> Issuer_GetAudiencesV1(string jwt, string issuerValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/issuer/v1/" + issuerValue + "/clients";
+            var endpoint = "/issuer/v1/" + issuerValue + "/audiences";
 
             if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -662,27 +662,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_GetMOTDsV1(string jwt, PageStateTypeC model)
+        public async ValueTask<HttpResponseMessage> User_GetAudiencesV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/user/v1/msg-of-the-day/page";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
-        public async ValueTask<HttpResponseMessage> User_GetClaimsV1(string jwt, string userValue)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var endpoint = "/user/v1/" + userValue + "/claims";
+            var endpoint = "/user/v1/" + userValue + "/audiences";
 
             if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -693,11 +677,11 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_GetClientsV1(string jwt, string userValue)
+        public async ValueTask<HttpResponseMessage> User_GetClaimsV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            var endpoint = "/user/v1/" + userValue + "/clients";
+            var endpoint = "/user/v1/" + userValue + "/claims";
 
             if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -719,6 +703,22 @@ namespace Bhbk.Lib.Identity.Repositories
 
             if (_instance == InstanceContext.UnitTest)
                 return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> User_GetMOTDsV1(string jwt, PageStateTypeC model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/user/v1/msg-of-the-day/page";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }
@@ -844,7 +844,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, EntityAddPassword model)
+        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, PasswordAdd model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

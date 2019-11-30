@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult CreateIssuerV1([FromBody] IssuerCreate model)
+        public IActionResult CreateV1([FromBody] IssuerCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Issuers.Create(Mapper.Map<tbl_Issuers>(model));
 
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult DeleteIssuerV1([FromRoute] Guid issuerID)
+        public IActionResult DeleteV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
 
@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            issuer.ActorId = GetUserGUID();
+            issuer.ActorId = GetIdentityGUID();
 
             UoW.Issuers.Delete(issuer);
             UoW.Commit();
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerValue}"), HttpGet]
-        public IActionResult GetIssuerV1([FromRoute] string issuerValue)
+        public IActionResult GetV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
             tbl_Issuers issuer = null;
@@ -96,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetIssuersV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Issuers.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
                                 model.ToExpression<tbl_Issuers>()),
-                            new List<Expression<Func<tbl_Issuers, object>>>() { x => x.tbl_Clients })),
+                            new List<Expression<Func<tbl_Issuers, object>>>() { x => x.tbl_Audiences })),
 
                     Total = UoW.Issuers.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
@@ -125,8 +125,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
         }
 
-        [Route("v1/{issuerID:guid}/clients"), HttpGet]
-        public IActionResult GetIssuerClientsV1([FromRoute] Guid issuerID)
+        [Route("v1/{issuerID:guid}/audiences"), HttpGet]
+        public IActionResult GetAudiencesV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
 
@@ -136,15 +136,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var clients = UoW.Clients.Get(new QueryExpression<tbl_Clients>()
+            var audiences = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.IssuerId == issuerID).ToLambda());
 
-            return Ok(Mapper.Map<ClientModel>(clients));
+            return Ok(Mapper.Map<AudienceModel>(audiences));
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult UpdateIssuerV1([FromBody] IssuerModel model)
+        public IActionResult UpdateV1([FromBody] IssuerModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -163,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetUserGUID();
+            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Issuers.Update(Mapper.Map<tbl_Issuers>(model));
 

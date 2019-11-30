@@ -5,13 +5,13 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Validators
 {
-    public class ClientValidator
+    public class AudienceValidator
     {
-        public static bool Multiple(IEnumerable<string> clients, SecurityToken securityToken, TokenValidationParameters validationParameters)
+        public static bool Multiple(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
             var list = new List<string>();
 
-            foreach (string entry in clients)
+            foreach (string entry in audiences)
                 foreach (string entity in entry.Split(','))
                     list.Add(entity.Trim());
 

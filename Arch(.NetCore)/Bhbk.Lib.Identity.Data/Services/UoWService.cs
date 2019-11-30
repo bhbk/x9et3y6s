@@ -15,8 +15,8 @@ namespace Bhbk.Lib.Identity.Data.Services
         public InstanceContext InstanceType { get; private set; }
         public ActivityRepository Activities { get; private set; }
         public ActivityRepository_Deprecate Activities_Deprecate { get; private set; }
+        public AudienceRepository Audiences { get; private set; }
         public ClaimRepository Claims { get; private set; }
-        public ClientRepository Clients { get; private set; }
         public IssuerRepository Issuers { get; private set; }
         public LoginRepository Logins { get; private set; }
         public MotDRepository MOTDs { get; private set; }
@@ -72,8 +72,8 @@ namespace Bhbk.Lib.Identity.Data.Services
 
             Activities = new ActivityRepository(_context, instance.InstanceType);
             Activities_Deprecate = new ActivityRepository_Deprecate(_context, instance.InstanceType);
+            Audiences = new AudienceRepository(_context, instance.InstanceType);
             Claims = new ClaimRepository(_context, instance.InstanceType);
-            Clients = new ClientRepository(_context, instance.InstanceType);
             Issuers = new IssuerRepository(_context, instance.InstanceType);
             Logins = new LoginRepository(_context, instance.InstanceType);
             MOTDs = new MotDRepository(_context, instance.InstanceType);

@@ -44,12 +44,12 @@ namespace Bhbk.Cli.Identity.Commands
         public override int Run(string[] remainingArguments)
         {
             IssuerModel issuer = null;
-            ClientModel client = null;
+            AudienceModel audience = null;
             LoginModel login = null;
             RoleModel role = null;
             UserModel user = null;
             string issuerName = string.Empty;
-            string clientName = string.Empty;
+            string audienceName = string.Empty;
             string loginName = string.Empty;
             string roleName = string.Empty;
             string userName = string.Empty;
@@ -114,7 +114,7 @@ namespace Bhbk.Cli.Identity.Commands
 
                         break;
 
-                    case CommandTypes.client:
+                    case CommandTypes.audience:
 
                         issuerName = PromptForInput(CommandTypes.issuer);
                         issuer = _service.Issuer_GetV1(issuerName).Result;
@@ -122,43 +122,43 @@ namespace Bhbk.Cli.Identity.Commands
                         if (issuer == null)
                             throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
 
-                        clientName = PromptForInput(CommandTypes.client);
-                        client = _service.Client_GetV1(clientName).Result;
+                        audienceName = PromptForInput(CommandTypes.audience);
+                        audience = _service.Audience_GetV1(audienceName).Result;
 
                         if (_create)
                         {
-                            if (client != null)
-                                Console.WriteLine(Environment.NewLine + "FOUND client \"" + clientName
-                                    + Environment.NewLine + "\tID is " + client.Id.ToString());
+                            if (audience != null)
+                                Console.WriteLine(Environment.NewLine + "FOUND audience \"" + audienceName
+                                    + Environment.NewLine + "\tID is " + audience.Id.ToString());
                             else
                             {
-                                client = _service.Client_CreateV1(new ClientCreate()
+                                audience = _service.Audience_CreateV1(new AudienceCreate()
                                 {
                                     IssuerId = issuer.Id,
-                                    Name = clientName,
-                                    ClientType = ClientType.user_agent.ToString(),
+                                    Name = audienceName,
+                                    AudienceType = AudienceType.user_agent.ToString(),
                                     Enabled = true,
                                 }).Result;
 
-                                if (client != null)
-                                    Console.WriteLine(Environment.NewLine + "SUCCESS create client \"" + clientName + "\""
-                                        + Environment.NewLine + "\tID is " + client.Id.ToString());
+                                if (audience != null)
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS create audience \"" + audienceName + "\""
+                                        + Environment.NewLine + "\tID is " + audience.Id.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED create client \"" + clientName + "\"");
+                                    throw new ConsoleHelpAsException("FAILED create audience \"" + audienceName + "\"");
                             }
                         }
                         else if (_destroy)
                         {
-                            if (client == null)
-                                Console.WriteLine(Environment.NewLine + "FAILED find client \"" + clientName + "\"");
+                            if (audience == null)
+                                Console.WriteLine(Environment.NewLine + "FAILED find audience \"" + audienceName + "\"");
                             else
                             {
-                                if (_service.Client_DeleteV1(client.Id).Result)
-                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy client \"" + clientName + "\""
-                                        + Environment.NewLine + "\tID is " + client.Id.ToString());
+                                if (_service.Audience_DeleteV1(audience.Id).Result)
+                                    Console.WriteLine(Environment.NewLine + "SUCCESS destroy audience \"" + audienceName + "\""
+                                        + Environment.NewLine + "\tID is " + audience.Id.ToString());
                                 else
-                                    throw new ConsoleHelpAsException("FAILED destroy client \"" + clientName + "\""
-                                        + Environment.NewLine + "\tID is " + client.Id.ToString());
+                                    throw new ConsoleHelpAsException("FAILED destroy audience \"" + audienceName + "\""
+                                        + Environment.NewLine + "\tID is " + audience.Id.ToString());
                             }
                         }
 
@@ -208,11 +208,11 @@ namespace Bhbk.Cli.Identity.Commands
 
                     case CommandTypes.role:
 
-                        clientName = PromptForInput(CommandTypes.client);
-                        client = _service.Client_GetV1(clientName).Result;
+                        audienceName = PromptForInput(CommandTypes.audience);
+                        audience = _service.Audience_GetV1(audienceName).Result;
 
-                        if (client == null)
-                            throw new ConsoleHelpAsException("FAILED find client \"" + clientName + "\"");
+                        if (audience == null)
+                            throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
 
                         roleName = PromptForInput(CommandTypes.role);
                         role = _service.Role_GetV1(roleName).Result;
@@ -226,7 +226,7 @@ namespace Bhbk.Cli.Identity.Commands
                             {
                                 role = _service.Role_CreateV1(new RoleCreate()
                                 {
-                                    ClientId = client.Id,
+                                    AudienceId = audience.Id,
                                     Name = roleName,
                                     Enabled = true,
                                 }).Result;
@@ -369,7 +369,7 @@ namespace Bhbk.Cli.Identity.Commands
                             var password = PromptForInput(CommandTypes.userpass);
 
                             if (_service.User_SetPasswordV1(user.Id,
-                                new EntityAddPassword()
+                                new PasswordAdd()
                                 {
                                     EntityId = user.Id,
                                     NewPassword = password,
@@ -402,8 +402,8 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.Write(Environment.NewLine + "ENTER issuer name : ");
                     break;
 
-                case CommandTypes.client:
-                    Console.Write(Environment.NewLine + "ENTER client name : ");
+                case CommandTypes.audience:
+                    Console.Write(Environment.NewLine + "ENTER audience name : ");
                     break;
 
                 case CommandTypes.role:

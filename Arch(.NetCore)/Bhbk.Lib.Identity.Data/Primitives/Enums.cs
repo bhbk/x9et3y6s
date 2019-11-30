@@ -24,14 +24,14 @@ namespace Bhbk.Lib.Identity.Data.Primitives.Enums
     public enum MessageType
     {
         ActivityNotFound,
+        AudienceAlreadyExists,
+        AudienceImmutable,
+        AudienceInvalid,
+        AudienceNotFound,
         ClaimAlreadyExists,
         ClaimImmutable,
         ClaimInvalid,
         ClaimNotFound,
-        ClientAlreadyExists,
-        ClientImmutable,
-        ClientInvalid,
-        ClientNotFound,
         EmailDequeueError,
         EmailEnueueError,
         IssuerAlreadyExists,

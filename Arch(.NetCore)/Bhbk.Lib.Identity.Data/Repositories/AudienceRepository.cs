@@ -16,13 +16,13 @@ using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Data.Repositories
 {
-    public class ClientRepository : GenericRepository<tbl_Clients>
+    public class AudienceRepository : GenericRepository<tbl_Audiences>
     {
         private IClockService _clock;
         private readonly PasswordHasher _passwordHasher;
         private readonly PasswordValidator _passwordValidator;
 
-        public ClientRepository(IdentityEntities context, InstanceContext instance)
+        public AudienceRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance)
         {
             _clock = new ClockService(new ContextService(instance));
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public tbl_Clients AccessFailed(tbl_Clients client)
+        public tbl_Audiences AccessFailed(tbl_Audiences client)
         {
             client.LastLoginFailure = Clock.UtcDateTime;
             client.AccessFailedCount++;
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return _context.Entry(client).Entity;
         }
 
-        public tbl_Clients AccessSuccess(tbl_Clients client)
+        public tbl_Audiences AccessSuccess(tbl_Audiences client)
         {
             client.LastLoginSuccess = Clock.UtcDateTime;
             client.AccessSuccessCount++;
@@ -56,22 +56,22 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return _context.Entry(client).Entity;
         }
 
-        public override tbl_Clients Delete(tbl_Clients client)
+        public override tbl_Audiences Delete(tbl_Audiences client)
         {
             var activity = _context.Set<tbl_Activities>()
-                .Where(x => x.ClientId == client.Id);
+                .Where(x => x.AudienceId == client.Id);
 
             var refreshes = _context.Set<tbl_Refreshes>()
-                .Where(x => x.ClientId == client.Id);
+                .Where(x => x.AudienceId == client.Id);
 
             var settings = _context.Set<tbl_Settings>()
-                .Where(x => x.ClientId == client.Id);
+                .Where(x => x.AudienceId == client.Id);
 
             var states = _context.Set<tbl_States>()
-                .Where(x => x.ClientId == client.Id);
+                .Where(x => x.AudienceId == client.Id);
 
             var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.ClientId == client.Id);
+                .Where(x => x.AudienceId == client.Id);
 
             _context.RemoveRange(activity);
             _context.RemoveRange(refreshes);
@@ -82,9 +82,9 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return _context.Remove(client).Entity;
         }
 
-        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Clients client)
+        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Audiences client)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
             var claims = new List<Claim>();
@@ -93,10 +93,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
 
             //service identity vs. a user identity
-            claims.Add(new Claim(ClaimTypes.System, ClientType.server.ToString()));
+            claims.Add(new Claim(ClaimTypes.System, AudienceType.server.ToString()));
 
             var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_ClientRoles.Any(y => y.ClientId == client.Id)).ToList();
+                .Where(x => x.tbl_AudienceRoles.Any(y => y.AudienceId == client.Id)).ToList();
 
             foreach (var role in roles.OrderBy(x => x.Name))
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
@@ -117,9 +117,9 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return claims;
         }
 
-        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Clients client)
+        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Audiences client)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
@@ -143,7 +143,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return claims;
         }
 
-        internal bool InternalSetPassword(tbl_Clients client, string password)
+        internal bool InternalSetPassword(tbl_Audiences client, string password)
         {
             if (_passwordValidator == null)
                 throw new NotSupportedException();
@@ -165,7 +165,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return true;
         }
 
-        internal bool InternalSetPasswordHash(tbl_Clients client, string hash)
+        internal bool InternalSetPasswordHash(tbl_Audiences client, string hash)
         {
             client.PasswordHash = hash;
             client.LastUpdated = Clock.UtcDateTime;
@@ -175,7 +175,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return true;
         }
 
-        internal bool InternalSetSecurityStamp(tbl_Clients client, string stamp)
+        internal bool InternalSetSecurityStamp(tbl_Audiences client, string stamp)
         {
             client.SecurityStamp = stamp;
             client.LastUpdated = Clock.UtcDateTime;
@@ -185,7 +185,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return true;
         }
 
-        internal PasswordVerificationResult InternalVerifyPassword(tbl_Clients client, string password)
+        internal PasswordVerificationResult InternalVerifyPassword(tbl_Audiences client, string password)
         {
             if (_passwordHasher == null)
                 throw new NotSupportedException();
@@ -196,16 +196,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return PasswordVerificationResult.Failed;
         }
 
-        public tbl_Clients SetPassword(tbl_Clients client, string password)
+        public tbl_Audiences SetPassword(tbl_Audiences client, string password)
         {
             InternalSetPassword(client, password);
 
             return _context.Entry(client).Entity;
         }
 
-        public override tbl_Clients Update(tbl_Clients client)
+        public override tbl_Audiences Update(tbl_Audiences client)
         {
-            var entity = _context.Set<tbl_Clients>()
+            var entity = _context.Set<tbl_Audiences>()
                 .Where(x => x.Id == client.Id).Single();
 
             /*
@@ -215,7 +215,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             entity.IssuerId = client.IssuerId;
             entity.Name = client.Name;
             entity.Description = client.Description;
-            entity.ClientType = client.ClientType;
+            entity.AudienceType = client.AudienceType;
             entity.LastUpdated = Clock.UtcDateTime;
             entity.Enabled = client.Enabled;
             entity.Immutable = client.Immutable;
@@ -225,7 +225,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return _context.Update(entity).Entity;
         }
 
-        public bool VerifyPassword(tbl_Clients client, string password)
+        public bool VerifyPassword(tbl_Audiences client, string password)
         {
             if (InternalVerifyPassword(client, password) != PasswordVerificationResult.Failed)
                 return true;

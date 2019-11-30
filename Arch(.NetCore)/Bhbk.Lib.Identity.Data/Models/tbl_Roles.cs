@@ -7,13 +7,13 @@ namespace Bhbk.Lib.Identity.Data.Models
     {
         public tbl_Roles()
         {
-            tbl_ClientRoles = new HashSet<tbl_ClientRoles>();
+            tbl_AudienceRoles = new HashSet<tbl_AudienceRoles>();
             tbl_RoleClaims = new HashSet<tbl_RoleClaims>();
             tbl_UserRoles = new HashSet<tbl_UserRoles>();
         }
 
         public Guid Id { get; set; }
-        public Guid ClientId { get; set; }
+        public Guid AudienceId { get; set; }
         public Guid? ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -23,8 +23,8 @@ namespace Bhbk.Lib.Identity.Data.Models
         public string ConcurrencyStamp { get; set; }
         public bool Immutable { get; set; }
 
-        public virtual tbl_Clients Client { get; set; }
-        public virtual ICollection<tbl_ClientRoles> tbl_ClientRoles { get; set; }
+        public virtual tbl_Audiences Audience { get; set; }
+        public virtual ICollection<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
         public virtual ICollection<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual ICollection<tbl_UserRoles> tbl_UserRoles { get; set; }
     }

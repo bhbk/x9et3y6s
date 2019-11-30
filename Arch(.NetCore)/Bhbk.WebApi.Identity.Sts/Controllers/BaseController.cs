@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Authorize(Policy = "UsersPolicy")]
     public class BaseController : Controller
     {
-        protected IJsonWebTokenFactory Factory { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IJsonWebTokenFactory>(); }
+        protected IJsonWebTokenFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IJsonWebTokenFactory>(); }
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
         protected IUoWService UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUoWService>(); }
         protected IConfiguration Conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
@@ -24,23 +24,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public BaseController() { }
 
         [NonAction]
-        protected Guid GetUserGUID()
+        protected Guid GetIdentityGUID()
         {
             var claims = ControllerContext.HttpContext.User.Identity as ClaimsIdentity;
 
             return Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
-        }
-
-        [NonAction]
-        public void SetUser(Guid issuerID, Guid userID)
-        {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
-            var claims = UoW.Users.GenerateAccessClaims(issuer, user);
-
-            var identity = new ClaimsIdentity(claims, "Mock");
-
-            ControllerContext.HttpContext.User = new ClaimsPrincipal(identity);
         }
     }
 }

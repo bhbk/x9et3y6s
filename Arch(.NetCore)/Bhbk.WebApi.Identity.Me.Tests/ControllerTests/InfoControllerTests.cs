@@ -50,12 +50,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var result = controller.DeleteUserRefreshV1(Guid.NewGuid()) as NotFoundObjectResult;
-                result = controller.DeleteUserRefreshesV1() as NotFoundObjectResult;
+                var result = controller.DeleteRefreshV1(Guid.NewGuid()) as NotFoundObjectResult;
+                result = controller.DeleteRefreshesV1() as NotFoundObjectResult;
             }
         }
 
@@ -80,10 +81,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
                 for (int i = 0; i < 3; i++)
                 {
@@ -105,8 +106,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var refresh = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
                     .Where(x => x.UserId == user.Id).ToLambda()).First();
 
-                var result = controller.DeleteUserRefreshV1(refresh.Id) as OkObjectResult;
-                result = controller.DeleteUserRefreshesV1() as OkObjectResult;
+                var result = controller.DeleteRefreshV1(refresh.Id) as OkObjectResult;
+                result = controller.DeleteRefreshesV1() as OkObjectResult;
             }
         }
 
@@ -130,11 +131,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var result = controller.GetUserV1() as OkObjectResult;
+                var result = controller.GetV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 ok.Value.Should().BeAssignableTo<UserModel>();
             }
@@ -160,11 +162,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var result = controller.GetUserRefreshesV1() as OkObjectResult;
+                var result = controller.GetRefreshesV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
                 ok.Value.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
             }
@@ -190,18 +193,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangePassword()
+                var model = new PasswordChange()
                 {
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = Base64.CreateString(16),
                     NewPasswordConfirm = Base64.CreateString(16)
                 };
 
-                var result = controller.SetUserPasswordV1(model) as BadRequestObjectResult;
+                var result = controller.SetPasswordV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo<BadRequestObjectResult>();
             }
         }
@@ -226,18 +230,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangePassword()
+                var model = new PasswordChange()
                 {
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = FakeConstants.ApiTestUserPassNew,
                     NewPasswordConfirm = FakeConstants.ApiTestUserPassNew
                 };
 
-                var result = controller.SetUserPasswordV1(model) as NoContentResult;
+                var result = controller.SetPasswordV1(model) as NoContentResult;
                 result.Should().BeAssignableTo<NoContentResult>();
             }
         }
@@ -262,9 +267,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
                 var result = controller.SetTwoFactorV1(true) as NoContentResult;
                 result.Should().BeAssignableTo<NoContentResult>();
@@ -291,9 +297,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
                 var model = new UserModel()
                 {
@@ -306,7 +313,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     Immutable = false,
                 };
 
-                var result = controller.UpdateUserV1(model) as OkObjectResult;
+                var result = controller.UpdateV1(model) as OkObjectResult;
                 var ok = result.Should().BeAssignableTo<OkObjectResult>().Subject;
                 ok.Value.Should().BeAssignableTo<UserModel>();
             }

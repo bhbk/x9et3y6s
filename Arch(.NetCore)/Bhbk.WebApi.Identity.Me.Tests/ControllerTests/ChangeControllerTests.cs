@@ -43,12 +43,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var newEmail = Base64.CreateString(4) + "-" + FakeConstants.ApiTestUser;
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangeEmail()
+                var model = new EmailChange()
                 {
                     EntityId = user.Id,
                     CurrentEmail = Base64.CreateString(4),
@@ -81,12 +82,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var newEmail = Base64.CreateString(4) + "-" + FakeConstants.ApiTestUser;
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangeEmail()
+                var model = new EmailChange()
                 {
                     EntityId = user.Id,
                     CurrentEmail = user.Email,
@@ -119,11 +121,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangePassword()
+                var model = new PasswordChange()
                 {
                     EntityId = user.Id,
                     CurrentPassword = Base64.CreateString(16),
@@ -156,11 +159,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangePassword()
+                var model = new PasswordChange()
                 {
                     EntityId = user.Id,
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
@@ -193,12 +197,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var newPhone = NumberAs.CreateString(10);
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangePhone()
+                var model = new PhoneChange()
                 {
                     EntityId = user.Id,
                     CurrentPhoneNumber = newPhone,
@@ -231,12 +236,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var newPhone = NumberAs.CreateString(10);
 
-                controller.SetUser(issuer.Id, user.Id);
+                controller.SetIdentity(issuer.Id, client.Id, user.Id);
 
-                var model = new EntityChangePhone()
+                var model = new PhoneChange()
                 {
                     EntityId = user.Id,
                     CurrentPhoneNumber = user.PhoneNumber,

@@ -92,11 +92,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 client.Enabled = false;
 
-                uow.Clients.Update(client);
+                uow.Audiences.Update(client);
                 uow.Commit();
 
                 var cc = await service.Http.ClientCredential_AuthV2(
@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var cc = await service.Http.ClientCredential_AuthV2(
                     new ClientCredentialV2()
@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 issuer.Enabled = false;
 
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
                 var cc = await service.Http.ClientCredential_AuthV2(
                     new ClientCredentialV2()
@@ -214,12 +214,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
 
-                var result = await service.ClientCredential_AuthV2(
+                var result = await service.ClientCredential_GrantV2(
                     new ClientCredentialV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -259,16 +259,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -278,7 +278,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 client.Enabled = false;
 
-                uow.Clients.Update(client);
+                uow.Audiences.Update(client);
                 uow.Commit();
 
                 var result = await service.Http.ClientCredential_RefreshV2(
@@ -306,16 +306,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -352,16 +352,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -399,16 +399,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -445,18 +445,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                uow.Clients.Clock = DateTime.UtcNow.AddYears(1);
+                uow.Audiences.Clock = DateTime.UtcNow.AddYears(1);
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -464,7 +464,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                uow.Clients.Clock = DateTime.UtcNow;
+                uow.Audiences.Clock = DateTime.UtcNow;
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -491,18 +491,18 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                uow.Clients.Clock = DateTime.UtcNow.AddYears(-1);
+                uow.Audiences.Clock = DateTime.UtcNow.AddYears(-1);
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -510,7 +510,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                uow.Clients.Clock = DateTime.UtcNow;
+                uow.Audiences.Clock = DateTime.UtcNow;
 
                 var result = await service.Http.ResourceOwner_RefreshV2(
                     new RefreshTokenV2()
@@ -541,16 +541,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Clients.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
 
-                var rt_claims = uow.Clients.GenerateRefreshClaims(issuer, client);
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, client);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], client.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
@@ -558,7 +558,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.ClientId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
                 var result = await service.ClientCredential_RefreshV2(
                     new RefreshTokenV2()

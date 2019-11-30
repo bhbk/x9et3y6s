@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ig"), HttpGet]
-        public IActionResult ImplicitV1_Auth([FromQuery] ImplicitV1 input)
+        public IActionResult ImplicitV1_Grant([FromQuery] ImplicitV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ig"), HttpGet]
-        public IActionResult ImplicitV2_Auth([FromQuery] ImplicitV2 input)
+        public IActionResult ImplicitV2_Grant([FromQuery] ImplicitV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -75,18 +75,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+            if (Guid.TryParse(input.client, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
 
@@ -134,11 +134,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (client.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/implicit-callback"));
             }
-            else if (client.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //no refresh token as part of this flow...
             var imp_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var imp = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, imp_claims);
+            var imp = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, imp_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()

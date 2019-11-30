@@ -125,7 +125,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<bool> Info_SetPasswordV1(EntityAddPassword model)
+        public async ValueTask<bool> Info_SetPasswordV1(PasswordAdd model)
         {
             var response = await Http.Info_SetPasswordV1(_ropg.RopgV2.RawData, model);
 

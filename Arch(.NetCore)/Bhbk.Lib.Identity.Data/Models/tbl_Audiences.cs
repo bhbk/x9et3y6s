@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Data.Models
 {
-    public partial class tbl_Clients
+    public partial class tbl_Audiences
     {
-        public tbl_Clients()
+        public tbl_Audiences()
         {
             tbl_Activities = new HashSet<tbl_Activities>();
-            tbl_ClientRoles = new HashSet<tbl_ClientRoles>();
+            tbl_AudienceRoles = new HashSet<tbl_AudienceRoles>();
             tbl_Refreshes = new HashSet<tbl_Refreshes>();
             tbl_Roles = new HashSet<tbl_Roles>();
             tbl_Settings = new HashSet<tbl_Settings>();
@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public string ConcurrencyStamp { get; set; }
         public string PasswordHash { get; set; }
         public string SecurityStamp { get; set; }
-        public string ClientType { get; set; }
+        public string AudienceType { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public bool LockoutEnabled { get; set; }
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Data.Models
 
         public virtual tbl_Issuers Issuer { get; set; }
         public virtual ICollection<tbl_Activities> tbl_Activities { get; set; }
-        public virtual ICollection<tbl_ClientRoles> tbl_ClientRoles { get; set; }
+        public virtual ICollection<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
         public virtual ICollection<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Roles> tbl_Roles { get; set; }
         public virtual ICollection<tbl_Settings> tbl_Settings { get; set; }

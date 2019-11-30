@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Domain.Authorize
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IdentityServicesAuthorizeRequirement requirement)
         {
             if (context.User.HasClaim(x => x.Type == ClaimTypes.Role && x.Value == "(Built-In) Services")
-                && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == ClientType.server.ToString()))
+                && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == AudienceType.server.ToString()))
                 context.Succeed(requirement);
 
             return Task.CompletedTask;

@@ -34,14 +34,14 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             new TestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-            var client = UoW.Clients.Get(x => x.Name == Constants.ApiTestClient).Single();
+            var client = UoW.Audiences.Get(x => x.Name == Constants.ApiTestClient).Single();
             var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
             var result = UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        ClientId = client.Id,
+                        AudienceId = client.Id,
                         UserId = user.Id,
                         RefreshType = RefreshType.User.ToString(),
                         RefreshValue = Base64.CreateString(8),

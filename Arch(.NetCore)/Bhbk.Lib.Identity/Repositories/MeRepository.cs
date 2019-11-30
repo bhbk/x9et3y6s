@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
@@ -160,7 +161,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Info_SetPasswordV1(string jwt, EntityAddPassword model)
+        public async ValueTask<HttpResponseMessage> Info_SetPasswordV1(string jwt, PasswordAdd model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -219,6 +220,22 @@ namespace Bhbk.Lib.Identity.Repositories
 
             if (_instance == InstanceContext.UnitTest)
                 return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Init_GetAudiencesV1(string jwt, PageStateTypeC model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/init/v1/page";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
         }

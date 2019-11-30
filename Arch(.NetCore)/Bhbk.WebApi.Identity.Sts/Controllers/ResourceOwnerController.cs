@@ -42,13 +42,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ropg"), HttpPost]
-        public IActionResult ResourceOwnerV1_Auth([FromForm] ResourceOwnerV1 input)
+        public IActionResult ResourceOwnerV1_Grant([FromForm] ResourceOwnerV1 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             //check if issuer compatibility mode enabled.
-            var legacyIssuer = UoW.Settings.Get(x => x.IssuerId == null && x.ClientId == null && x.UserId == null
+            var legacyIssuer = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (!bool.Parse(legacyIssuer.ConfigValue)
@@ -95,23 +95,23 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client_id, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+            if (Guid.TryParse(input.client_id, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client_id).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client_id).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client_id}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client_id}");
                 return NotFound(ModelState);
             }
-            else if (!client.Enabled)
+            else if (!audience.Enabled)
             {
-                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -215,7 +215,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 var rop_claims = UoW.Users.GenerateAccessClaims(user);
-                var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, client.Name, rop_claims);
+                var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, audience.Name, rop_claims);
 
                 UoW.Activities_Deprecate.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -239,7 +239,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else
             {
                 var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-                var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
+                var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 UoW.Activities_Deprecate.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -250,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }));
 
                 var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-                var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
+                var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 UoW.Refreshes.Create(
                     Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -279,7 +279,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     access_token = rop.RawData,
                     refresh_token = rt.RawData,
                     user_id = user.Email,
-                    client_id = client.Name,
+                    client_id = audience.Name,
                     issuer_id = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                     expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
                 };
@@ -329,23 +329,23 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            Guid clientID;
-            tbl_Clients client;
+            Guid audienceID;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
-            if (Guid.TryParse(input.client_id, out clientID))
-                client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+            if (Guid.TryParse(input.client_id, out audienceID))
+                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                client = UoW.Clients.Get(x => x.Name == input.client_id).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client_id).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
-                ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{input.client_id}");
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client_id}");
                 return NotFound(ModelState);
             }
-            else if (!client.Enabled)
+            else if (!audience.Enabled)
             {
-                ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -370,10 +370,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
+            var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
+            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -402,7 +402,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
                 user_id = user.Email,
-                client_id = client.Name,
+                client_id = audience.Name,
                 issuer_id = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
@@ -411,7 +411,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ropg"), HttpPost]
-        public IActionResult ResourceOwnerV2_Auth([FromForm] ResourceOwnerV2 input)
+        public IActionResult ResourceOwnerV2_Grant([FromForm] ResourceOwnerV2 input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -463,40 +463,40 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Clients.Get(new QueryExpression<tbl_Clients>()
+            var clientList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
-            var clients = new List<tbl_Clients>();
+            var audiences = new List<tbl_Audiences>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
-                clients = UoW.Clients.Get(x => clientList.Contains(x)
+                audiences = UoW.Audiences.Get(x => clientList.Contains(x)
                     && x.Enabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
                 {
-                    Guid clientID;
-                    tbl_Clients client;
+                    Guid audienceID;
+                    tbl_Audiences audience;
 
                     //check if identifier is guid. resolve to guid if not.
-                    if (Guid.TryParse(entry.Trim(), out clientID))
-                        client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+                    if (Guid.TryParse(entry.Trim(), out audienceID))
+                        audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
                     else
-                        client = UoW.Clients.Get(x => x.Name == entry.Trim()).SingleOrDefault();
+                        audience = UoW.Audiences.Get(x => x.Name == entry.Trim()).SingleOrDefault();
 
-                    if (client == null)
+                    if (audience == null)
                     {
-                        ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{entry}");
+                        ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{entry}");
                         return NotFound(ModelState);
                     }
-                    else if (!client.Enabled
-                        || !clientList.Contains(client))
+                    else if (!audience.Enabled
+                        || !clientList.Contains(audience))
                     {
-                        ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                        ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                         return BadRequest(ModelState);
                     }
 
-                    clients.Add(client);
+                    audiences.Add(audience);
                 }
             }
 
@@ -570,7 +570,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rop_claims);
+            var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rop_claims);
 
             UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -581,7 +581,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rt_claims);
+            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -610,7 +610,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
                 user = user.Email,
-                client = clients.Select(x => x.Name).ToList(),
+                client = audiences.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
@@ -679,48 +679,48 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Clients.Get(new QueryExpression<tbl_Clients>()
+            var clientList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
-            var clients = new List<tbl_Clients>();
+            var audiences = new List<tbl_Audiences>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
-                clients = UoW.Clients.Get(x => clientList.Contains(x)
+                audiences = UoW.Audiences.Get(x => clientList.Contains(x)
                     && x.Enabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
                 {
-                    Guid clientID;
-                    tbl_Clients client;
+                    Guid audienceID;
+                    tbl_Audiences audience;
 
                     //check if identifier is guid. resolve to guid if not.
-                    if (Guid.TryParse(entry.Trim(), out clientID))
-                        client = UoW.Clients.Get(x => x.Id == clientID).SingleOrDefault();
+                    if (Guid.TryParse(entry.Trim(), out audienceID))
+                        audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
                     else
-                        client = UoW.Clients.Get(x => x.Name == entry.Trim()).SingleOrDefault();
+                        audience = UoW.Audiences.Get(x => x.Name == entry.Trim()).SingleOrDefault();
 
-                    if (client == null)
+                    if (audience == null)
                     {
-                        ModelState.AddModelError(MessageType.ClientNotFound.ToString(), $"Client:{entry}");
+                        ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{entry}");
                         return NotFound(ModelState);
                     }
-                    else if (!client.Enabled
-                        || !clientList.Contains(client))
+                    else if (!audience.Enabled
+                        || !clientList.Contains(audience))
                     {
-                        ModelState.AddModelError(MessageType.ClientInvalid.ToString(), $"Client:{client.Id}");
+                        ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                         return BadRequest(ModelState);
                     }
 
-                    clients.Add(client);
+                    audiences.Add(audience);
                 }
             }
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var rop = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rop_claims);
+            var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rop_claims);
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Factory.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], clients.Select(x => x.Name).ToList(), rt_claims);
+            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -749,7 +749,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
                 user = user.Email,
-                client = clients.Select(x => x.Name).ToList(),
+                client = audiences.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };

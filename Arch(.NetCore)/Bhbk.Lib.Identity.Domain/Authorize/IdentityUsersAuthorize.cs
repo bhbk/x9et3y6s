@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Domain.Authorize
             if (context.User.HasClaim(x => x.Type == ClaimTypes.Role && (x.Value == "(Built-In) Admins" 
                     || x.Value == "(Built-In) Services" 
                     || x.Value == "(Built-In) Users"))
-                && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == ClientType.user_agent.ToString()))
+                && context.User.HasClaim(x => x.Type == ClaimTypes.System && x.Value == AudienceType.user_agent.ToString()))
                 context.Succeed(requirement);
 
             return Task.CompletedTask;

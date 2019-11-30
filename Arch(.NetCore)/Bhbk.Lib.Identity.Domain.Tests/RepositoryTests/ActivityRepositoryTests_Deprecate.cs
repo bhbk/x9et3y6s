@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             var result = UoW.Activities_Deprecate.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
-                    ClientId = Guid.NewGuid(),
+                    AudienceId = Guid.NewGuid(),
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                     Immutable = false,

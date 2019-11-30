@@ -4,7 +4,7 @@ namespace Bhbk.Cli.Identity.Commands
 {
     internal enum CommandTypes
     {
-        client,
+        audience,
         issuer,
         login,
         role,

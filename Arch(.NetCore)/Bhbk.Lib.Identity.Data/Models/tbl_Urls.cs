@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Data.Models
     public partial class tbl_Urls
     {
         public Guid Id { get; set; }
-        public Guid ClientId { get; set; }
+        public Guid AudienceId { get; set; }
         public Guid? ActorId { get; set; }
         public string UrlHost { get; set; }
         public string UrlPath { get; set; }
@@ -15,6 +15,6 @@ namespace Bhbk.Lib.Identity.Data.Models
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 
-        public virtual tbl_Clients Client { get; set; }
+        public virtual tbl_Audiences Audience { get; set; }
     }
 }

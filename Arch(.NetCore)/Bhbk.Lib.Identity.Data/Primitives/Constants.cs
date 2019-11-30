@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Data.Primitives
             "</html>";
         }
 
-        public static string TemplateImplicit(tbl_Issuers issuer, tbl_Clients client, tbl_Users user, Uri link)
+        public static string TemplateImplicit(tbl_Issuers issuer, tbl_Audiences client, tbl_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...

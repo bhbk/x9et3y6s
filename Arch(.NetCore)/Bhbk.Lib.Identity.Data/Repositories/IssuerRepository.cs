@@ -77,9 +77,9 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 .Where(x => x.IssuerId == issuer.Id);
 
             var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.Client.IssuerId == issuer.Id);
+                .Where(x => x.Audience.IssuerId == issuer.Id);
 
-            var clients = _context.Set<tbl_Clients>()
+            var audiences = _context.Set<tbl_Audiences>()
                 .Where(x => x.IssuerId == issuer.Id);
 
             _context.RemoveRange(claims);
@@ -87,7 +87,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.RemoveRange(settings);
             _context.RemoveRange(states);
             _context.RemoveRange(roles);
-            _context.RemoveRange(clients);
+            _context.RemoveRange(audiences);
 
             return _context.Remove(issuer).Entity;
         }

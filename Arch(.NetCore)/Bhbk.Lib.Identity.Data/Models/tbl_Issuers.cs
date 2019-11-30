@@ -7,8 +7,8 @@ namespace Bhbk.Lib.Identity.Data.Models
     {
         public tbl_Issuers()
         {
+            tbl_Audiences = new HashSet<tbl_Audiences>();
             tbl_Claims = new HashSet<tbl_Claims>();
-            tbl_Clients = new HashSet<tbl_Clients>();
             tbl_Refreshes = new HashSet<tbl_Refreshes>();
             tbl_Settings = new HashSet<tbl_Settings>();
             tbl_States = new HashSet<tbl_States>();
@@ -24,8 +24,8 @@ namespace Bhbk.Lib.Identity.Data.Models
         public DateTime? LastUpdated { get; set; }
         public bool Immutable { get; set; }
 
+        public virtual ICollection<tbl_Audiences> tbl_Audiences { get; set; }
         public virtual ICollection<tbl_Claims> tbl_Claims { get; set; }
-        public virtual ICollection<tbl_Clients> tbl_Clients { get; set; }
         public virtual ICollection<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Settings> tbl_Settings { get; set; }
         public virtual ICollection<tbl_States> tbl_States { get; set; }

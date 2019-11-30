@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Admin
 {
-    public abstract class Clients
+    public abstract class Audiences
     {
         public Guid ActorId { get; set; }
 
@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string Description { get; set; }
 
         [Required]
-        public string ClientType { get; set; }
+        public string AudienceType { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -36,12 +36,12 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class ClientCreate : Clients
+    public class AudienceCreate : Audiences
     {
 
     }
 
-    public class ClientModel : Clients
+    public class AudienceModel : Audiences
     {
         [Required]
         public Guid Id { get; set; }
