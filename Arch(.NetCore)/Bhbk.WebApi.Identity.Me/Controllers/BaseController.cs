@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize(Policy = "UsersPolicy")]
     public class BaseController : Controller
     {
-        protected IJsonWebTokenFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IJsonWebTokenFactory>(); }
+        protected IOAuth2JwtFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
         protected IUoWService UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUoWService>(); }
         protected IConfiguration Conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
@@ -30,20 +30,19 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [NonAction]
-        public void SetIdentity(Guid issuerID, Guid clientID)
+        public void SetIdentity(Guid issuerID, Guid audienceID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID).Single();
-            var client = UoW.Audiences.Get(x => x.Id == clientID).Single();
-            var claims = UoW.Audiences.GenerateAccessClaims(issuer, client);
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID).Single();
+            var claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
 
             ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims));
         }
 
         [NonAction]
-        public void SetIdentity(Guid issuerID, Guid clientID, Guid userID)
+        public void SetIdentity(Guid issuerID, Guid audienceID, Guid userID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID).Single();
-            var client = UoW.Audiences.Get(x => x.Id == clientID).Single();
             var user = UoW.Users.Get(x => x.Id == userID).Single();
             var claims = UoW.Users.GenerateAccessClaims(issuer, user);
 

@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IAdminService
     {
-        JwtSecurityToken Jwt { get; set; }
+        JwtSecurityToken AccessToken { get; set; }
         AdminRepository Http { get; }
 
         /*
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<AudienceModel> Audience_GetV1(string audienceValue);
         ValueTask<PageStateTypeCResult<AudienceModel>> Audience_GetV1(PageStateTypeC model);
         ValueTask<IEnumerable<RefreshModel>> Audience_GetRefreshesV1(string audienceValue);
-        ValueTask<bool> Audience_SetPasswordV1(Guid audienceID, PasswordAdd model);
+        ValueTask<bool> Audience_SetPasswordV1(Guid audienceID, PasswordAddModel model);
         ValueTask<AudienceModel> Audience_UpdateV1(AudienceModel model);
 
         /*
@@ -61,6 +61,13 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<LoginModel> Login_UpdateV1(LoginModel model);
 
         /*
+         * message of the days
+         */
+
+        ValueTask<MOTDType1Model> MOTD_GetV1(string motdValue);
+        ValueTask<PageStateTypeCResult<MOTDType1Model>> MOTD_GetV1(PageStateTypeC model);
+
+        /*
          * roles
          */
         ValueTask<RoleModel> Role_CreateV1(RoleCreate model);
@@ -84,14 +91,13 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<PageStateTypeCResult<UserModel>> User_GetV1(PageStateTypeC model);
         ValueTask<IEnumerable<AudienceModel>> User_GetAudiencesV1(string userValue);
         ValueTask<IEnumerable<LoginModel>> User_GetLoginsV1(string userValue);
-        ValueTask<PageStateTypeCResult<MOTDType1Model>> User_GetMOTDsV1(PageStateTypeC model);
         ValueTask<IEnumerable<RefreshModel>> User_GetRefreshesV1(string userValue);
         ValueTask<IEnumerable<RoleModel>> User_GetRolesV1(string userValue);
         ValueTask<bool> User_RemoveFromClaimV1(Guid userID, Guid claimID);
         ValueTask<bool> User_RemoveFromLoginV1(Guid userID, Guid loginID);
         ValueTask<bool> User_RemoveFromRoleV1(Guid userID, Guid roleID);
         ValueTask<bool> User_RemovePasswordV1(Guid userID);
-        ValueTask<bool> User_SetPasswordV1(Guid userID, PasswordAdd model);
+        ValueTask<bool> User_SetPasswordV1(Guid userID, PasswordAddModel model);
         ValueTask<UserModel> User_UpdateV1(UserModel model);
     }
 }

@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
             }
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
             }
@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
             }
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
             }

@@ -91,14 +91,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user = user.Id.ToString(),
                     });
@@ -152,13 +152,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
 
                 var ask = await service.Http.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user = Guid.NewGuid().ToString(),
                     });
@@ -182,14 +182,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var ask = await service.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user = user.Id.ToString(),
                     });
@@ -212,7 +212,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -224,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -264,7 +264,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -276,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -291,7 +291,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user_code = secret,
                         device_code = AlphaNumeric.CreateString(32),
@@ -316,7 +316,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -343,7 +343,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new DeviceCodeV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
@@ -368,7 +368,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -380,7 +380,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -395,7 +395,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user_code = AlphaNumeric.CreateString(32),
                         device_code = state.StateValue,
@@ -414,14 +414,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -433,7 +433,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -456,16 +456,16 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "device_code",
                         user_code = secret,
                         device_code = state.StateValue,
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                auth.CanReadToken(result.access_token).Should().BeTrue();
+                auth.Valid(result.access_token).Should().BeTrue();
 
-                var jwt = auth.ReadJwtToken(result.access_token);
+                var jwt = auth.Parse(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

@@ -6,9 +6,9 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Primitives
     {
         #region Configuration Constants
 
-        public const string ApiTestClient = "ClientUnitTests";
-        public const string ApiTestClientPassCurrent = "te$tClientPa$$word01!";
-        public const string ApiTestClientPassNew = "te$tClientPa$$word01!new";
+        public const string ApiTestAudience = "AudienceUnitTests";
+        public const string ApiTestAudiencePassCurrent = "te$tAudiencePa$$word01!";
+        public const string ApiTestAudiencePassNew = "te$tAudiencePa$$word01!new";
         public const string ApiTestClaim = "ClaimUnitTests";
         public const string ApiTestEmailContent = "EmailUnitTestsContent";
         public const string ApiTestEmailSubject = "EmailUnitTestsSubject";

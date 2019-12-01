@@ -54,7 +54,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteV1([FromRoute] Guid issuerID)
         {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+            var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
+                .SingleOrDefault();
 
             if (issuer == null)
             {
@@ -82,9 +83,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Issuers issuer = null;
 
             if (Guid.TryParse(issuerValue, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Id == issuerID)
+                    .SingleOrDefault();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == issuerValue).SingleOrDefault();
+                issuer = UoW.Issuers.Get(x => x.Name == issuerValue)
+                    .SingleOrDefault();
 
             if (issuer == null)
             {
@@ -128,7 +131,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{issuerID:guid}/audiences"), HttpGet]
         public IActionResult GetAudiencesV1([FromRoute] Guid issuerID)
         {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+            var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
+                .SingleOrDefault();
 
             if (issuer == null)
             {
@@ -149,7 +153,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var issuer = UoW.Issuers.Get(x => x.Id == model.Id).SingleOrDefault();
+            var issuer = UoW.Issuers.Get(x => x.Id == model.Id)
+                .SingleOrDefault();
 
             if (issuer == null)
             {

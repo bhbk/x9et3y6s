@@ -64,7 +64,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 _service = new AdminService(conf);
-                _jwt = _service.Jwt;
+                _jwt = _service.AccessToken;
 
                 if (_create == false && _destroy == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
@@ -369,7 +369,7 @@ namespace Bhbk.Cli.Identity.Commands
                             var password = PromptForInput(CommandTypes.userpass);
 
                             if (_service.User_SetPasswordV1(user.Id,
-                                new PasswordAdd()
+                                new PasswordAddModel()
                                 {
                                     EntityId = user.Id,
                                     NewPassword = password,

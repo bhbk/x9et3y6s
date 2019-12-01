@@ -7,7 +7,7 @@
       "Microsoft": "Information"
     }
   },
-  "IdentityLogin": {
+  "IdentityCredentials": {
     "IssuerName": "Bhbk",
     "AudienceName": "",
     "UserName": "identity@system.ochap.local",

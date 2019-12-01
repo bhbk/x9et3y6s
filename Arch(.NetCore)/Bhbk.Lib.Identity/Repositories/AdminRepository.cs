@@ -181,7 +181,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Audience_SetPasswordV1(string jwt, Guid audienceID, PasswordAdd model)
+        public async ValueTask<HttpResponseMessage> Audience_SetPasswordV1(string jwt, Guid audienceID, PasswordAddModel model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -462,6 +462,37 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
+        public async ValueTask<HttpResponseMessage> MOTD_GetV1(string jwt, string motdValue)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/motd/v1/" + motdValue;
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> MOTD_GetV1(string jwt, PageStateTypeC model)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var endpoint = "/motd/v1/page";
+
+            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
+                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
+
+            if (_instance == InstanceContext.UnitTest)
+                return await _http.PostAsync(endpoint, content);
+
+            throw new NotSupportedException();
+        }
+
         public async ValueTask<HttpResponseMessage> Role_CreateV1(string jwt, RoleCreate model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -707,22 +738,6 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_GetMOTDsV1(string jwt, PageStateTypeC model)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-            var endpoint = "/user/v1/msg-of-the-day/page";
-
-            if (_instance == InstanceContext.DeployedOrLocal || _instance == InstanceContext.IntegrationTest)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.UnitTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
-        }
-
         public async ValueTask<HttpResponseMessage> User_GetRefreshesV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
@@ -844,7 +859,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, PasswordAdd model)
+        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, PasswordAddModel model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

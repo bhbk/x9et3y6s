@@ -65,7 +65,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -90,7 +91,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -132,9 +134,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Audiences audience = null;
 
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                    .SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == audienceValue).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == audienceValue)
+                    .SingleOrDefault();
 
             if (audience == null)
             {
@@ -178,7 +182,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{audienceID:guid}/refreshes"), HttpGet]
         public IActionResult GetRefreshesV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -195,7 +200,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{audienceID:guid}/roles"), HttpGet]
         public IActionResult GetRolesV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -212,7 +218,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{audienceID:guid}/urls"), HttpGet]
         public IActionResult GetUrlsV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -228,12 +235,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAdd model)
+        public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -262,7 +270,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audience = UoW.Audiences.Get(x => x.Id == model.Id).SingleOrDefault();
+            var audience = UoW.Audiences.Get(x => x.Id == model.Id)
+                .SingleOrDefault();
 
             if (audience == null)
             {

@@ -2,7 +2,6 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -62,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     return uow;
                 });
                 sc.AddSingleton<IHostedService, MaintainQuotesTask>();
-                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
+                sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 /*
                  * do not use dependency injection for unit of work below. is used 
@@ -71,10 +70,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var owin = new UoWService(conf, instance);
                 new DefaultData(owin, mapper).Create();
-
-                /*
-                 * only test context allowed to run...
-                 */
 
                 if (owin.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
@@ -87,17 +82,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var audiences = owin.Audiences.Get()
                     .Select(x => x.Name);
-
-                /*
-                 * check if issuer compatibility enabled. means no env salt.
-                 */
-
-                var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
-
-                if (bool.Parse(legacyIssuer.ConfigValue))
-                    issuers = owin.Issuers.Get()
-                        .Select(x => x.Name).Concat(issuers);
 
                 sc.AddControllers()
                     .AddNewtonsoftJson(opt =>
@@ -125,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                         ValidIssuers = issuers.ToArray(),
                         IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                         ValidAudiences = audiences.ToArray(),
-                        AudienceValidator = Lib.Identity.Validators.AudienceValidator.Multiple,
+                        AudienceValidator = AudiencesValidator.Multiple,
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateIssuerSigningKey = true,

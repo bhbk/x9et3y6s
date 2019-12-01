@@ -66,7 +66,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -102,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -111,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new ImplicitV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -139,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -148,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
@@ -176,7 +175,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -185,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new ImplicitV2()
                     {
                         issuer = user.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "implicit",
                         user = Guid.NewGuid().ToString(),
                         redirect_uri = url.AbsoluteUri,

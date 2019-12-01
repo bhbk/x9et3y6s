@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
                 });
                 sc.AddSingleton<IHostedService, QueueEmailTask>();
                 sc.AddSingleton<IHostedService, QueueTextTask>();
-                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
+                sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()
                      .AddNewtonsoftJson(opt =>

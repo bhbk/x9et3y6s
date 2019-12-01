@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Validators
 {
-    public class AudienceValidator
+    public class AudiencesValidator
     {
         public static bool Multiple(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
@@ -22,9 +22,9 @@ namespace Bhbk.Lib.Identity.Validators
             return false;
         }
 
-        public static bool Single(string client, SecurityToken securityToken, TokenValidationParameters validationParameters)
+        public static bool Single(string audience, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
-            if (validationParameters.ValidAudiences.Contains(client))
+            if (validationParameters.ValidAudiences.Contains(audience))
                 return true;
 
             return false;

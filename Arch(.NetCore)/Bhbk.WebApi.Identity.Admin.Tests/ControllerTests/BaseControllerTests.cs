@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
                 });
                 sc.AddSingleton<IHostedService, MaintainActivityTask>();
                 sc.AddSingleton<IHostedService, MaintainUsersTask>();
-                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
+                sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()
                      .AddNewtonsoftJson(opt =>

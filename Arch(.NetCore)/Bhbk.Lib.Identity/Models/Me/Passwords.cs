@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string NewPasswordConfirm { get; set; }
     }
 
-    public class PasswordAdd : Passwords
+    public class PasswordAddModel : Passwords
     {
 
     }
 
-    public class PasswordChange : Passwords
+    public class PasswordChangeModel : Passwords
     {
         [Required]
         [DataType(DataType.Password)]

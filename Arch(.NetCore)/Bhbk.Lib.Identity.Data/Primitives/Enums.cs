@@ -23,6 +23,7 @@ namespace Bhbk.Lib.Identity.Data.Primitives.Enums
 
     public enum MessageType
     {
+        ActivityAleadyExists,
         ActivityNotFound,
         AudienceAlreadyExists,
         AudienceImmutable,
@@ -42,6 +43,8 @@ namespace Bhbk.Lib.Identity.Data.Primitives.Enums
         LoginImmutable,
         LoginInvalid,
         LoginNotFound,
+        MOTDAlreadyExists,
+        MOTDNotFound,
         ParametersInvalid,
         ParseError,
         RoleAlreadyExists,
@@ -57,6 +60,7 @@ namespace Bhbk.Lib.Identity.Data.Primitives.Enums
         TextEnqueueError,
         TokenInvalid,
         UriInvalid,
+        UriNotFound,
         UserAlreadyExists,
         UserImmutable,
         UserInvalid,

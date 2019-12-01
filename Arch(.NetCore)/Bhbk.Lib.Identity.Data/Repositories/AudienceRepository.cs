@@ -36,42 +36,42 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public tbl_Audiences AccessFailed(tbl_Audiences client)
+        public tbl_Audiences AccessFailed(tbl_Audiences audience)
         {
-            client.LastLoginFailure = Clock.UtcDateTime;
-            client.AccessFailedCount++;
+            audience.LastLoginFailure = Clock.UtcDateTime;
+            audience.AccessFailedCount++;
 
-            _context.Entry(client).State = EntityState.Modified;
+            _context.Entry(audience).State = EntityState.Modified;
 
-            return _context.Entry(client).Entity;
+            return _context.Entry(audience).Entity;
         }
 
-        public tbl_Audiences AccessSuccess(tbl_Audiences client)
+        public tbl_Audiences AccessSuccess(tbl_Audiences audience)
         {
-            client.LastLoginSuccess = Clock.UtcDateTime;
-            client.AccessSuccessCount++;
+            audience.LastLoginSuccess = Clock.UtcDateTime;
+            audience.AccessSuccessCount++;
 
-            _context.Entry(client).State = EntityState.Modified;
+            _context.Entry(audience).State = EntityState.Modified;
 
-            return _context.Entry(client).Entity;
+            return _context.Entry(audience).Entity;
         }
 
-        public override tbl_Audiences Delete(tbl_Audiences client)
+        public override tbl_Audiences Delete(tbl_Audiences audience)
         {
             var activity = _context.Set<tbl_Activities>()
-                .Where(x => x.AudienceId == client.Id);
+                .Where(x => x.AudienceId == audience.Id);
 
             var refreshes = _context.Set<tbl_Refreshes>()
-                .Where(x => x.AudienceId == client.Id);
+                .Where(x => x.AudienceId == audience.Id);
 
             var settings = _context.Set<tbl_Settings>()
-                .Where(x => x.AudienceId == client.Id);
+                .Where(x => x.AudienceId == audience.Id);
 
             var states = _context.Set<tbl_States>()
-                .Where(x => x.AudienceId == client.Id);
+                .Where(x => x.AudienceId == audience.Id);
 
             var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.AudienceId == client.Id);
+                .Where(x => x.AudienceId == audience.Id);
 
             _context.RemoveRange(activity);
             _context.RemoveRange(refreshes);
@@ -79,10 +79,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.RemoveRange(states);
             _context.RemoveRange(roles);
 
-            return _context.Remove(client).Entity;
+            return _context.Remove(audience).Entity;
         }
 
-        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Audiences client)
+        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Audiences audience)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
@@ -90,13 +90,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             var claims = new List<Claim>();
 
             //add lowest common denominators...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
-
-            //service identity vs. a user identity
-            claims.Add(new Claim(ClaimTypes.System, AudienceType.server.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, audience.Id.ToString()));
 
             var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_AudienceRoles.Any(y => y.AudienceId == client.Id)).ToList();
+                .Where(x => x.tbl_AudienceRoles.Any(y => y.AudienceId == audience.Id)).ToList();
 
             foreach (var role in roles.OrderBy(x => x.Name))
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
@@ -105,19 +102,21 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
+                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             return claims;
         }
 
-        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Audiences client)
+        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Audiences audience)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
@@ -125,25 +124,27 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             var claims = new List<Claim>();
 
             //add lowest common denominators...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, audience.Id.ToString()));
 
             //nonce to enhance entropy
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
+                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             return claims;
         }
 
-        internal bool InternalSetPassword(tbl_Audiences client, string password)
+        internal bool InternalSetPassword(tbl_Audiences audience, string password)
         {
             if (_passwordValidator == null)
                 throw new NotSupportedException();
@@ -158,76 +159,76 @@ namespace Bhbk.Lib.Identity.Data.Repositories
 
             var hash = _passwordHasher.HashPassword(password);
 
-            if (!InternalSetPasswordHash(client, hash)
-                || !InternalSetSecurityStamp(client, Base64.CreateString(32)))
+            if (!InternalSetPasswordHash(audience, hash)
+                || !InternalSetSecurityStamp(audience, Base64.CreateString(32)))
                 return false;
 
             return true;
         }
 
-        internal bool InternalSetPasswordHash(tbl_Audiences client, string hash)
+        internal bool InternalSetPasswordHash(tbl_Audiences audience, string hash)
         {
-            client.PasswordHash = hash;
-            client.LastUpdated = Clock.UtcDateTime;
+            audience.PasswordHash = hash;
+            audience.LastUpdated = Clock.UtcDateTime;
 
-            _context.Entry(client).State = EntityState.Modified;
+            _context.Entry(audience).State = EntityState.Modified;
 
             return true;
         }
 
-        internal bool InternalSetSecurityStamp(tbl_Audiences client, string stamp)
+        internal bool InternalSetSecurityStamp(tbl_Audiences audience, string stamp)
         {
-            client.SecurityStamp = stamp;
-            client.LastUpdated = Clock.UtcDateTime;
+            audience.SecurityStamp = stamp;
+            audience.LastUpdated = Clock.UtcDateTime;
 
-            _context.Entry(client).State = EntityState.Modified;
+            _context.Entry(audience).State = EntityState.Modified;
 
             return true;
         }
 
-        internal PasswordVerificationResult InternalVerifyPassword(tbl_Audiences client, string password)
+        internal PasswordVerificationResult InternalVerifyPassword(tbl_Audiences audience, string password)
         {
             if (_passwordHasher == null)
                 throw new NotSupportedException();
 
-            if (_passwordHasher.VerifyHashedPassword(client.PasswordHash, password) != PasswordVerificationResult.Failed)
+            if (_passwordHasher.VerifyHashedPassword(audience.PasswordHash, password) != PasswordVerificationResult.Failed)
                 return PasswordVerificationResult.Success;
 
             return PasswordVerificationResult.Failed;
         }
 
-        public tbl_Audiences SetPassword(tbl_Audiences client, string password)
+        public tbl_Audiences SetPassword(tbl_Audiences audience, string password)
         {
-            InternalSetPassword(client, password);
+            InternalSetPassword(audience, password);
 
-            return _context.Entry(client).Entity;
+            return _context.Entry(audience).Entity;
         }
 
-        public override tbl_Audiences Update(tbl_Audiences client)
+        public override tbl_Audiences Update(tbl_Audiences audience)
         {
             var entity = _context.Set<tbl_Audiences>()
-                .Where(x => x.Id == client.Id).Single();
+                .Where(x => x.Id == audience.Id).Single();
 
             /*
              * only persist certain fields.
              */
 
-            entity.IssuerId = client.IssuerId;
-            entity.Name = client.Name;
-            entity.Description = client.Description;
-            entity.AudienceType = client.AudienceType;
+            entity.IssuerId = audience.IssuerId;
+            entity.Name = audience.Name;
+            entity.Description = audience.Description;
+            entity.AudienceType = audience.AudienceType;
             entity.LastUpdated = Clock.UtcDateTime;
-            entity.Enabled = client.Enabled;
-            entity.Immutable = client.Immutable;
+            entity.Enabled = audience.Enabled;
+            entity.Immutable = audience.Immutable;
 
             _context.Entry(entity).State = EntityState.Modified;
 
             return _context.Update(entity).Entity;
         }
 
-        public bool VerifyPassword(tbl_Audiences client, string password)
+        public bool VerifyPassword(tbl_Audiences audience, string password)
         {
-            if (InternalVerifyPassword(client, password) != PasswordVerificationResult.Failed)
+            if (InternalVerifyPassword(audience, password) != PasswordVerificationResult.Failed)
                 return true;
 
             return false;

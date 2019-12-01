@@ -81,8 +81,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             var foundIssuer = _uow.Issuers.Get(new QueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == FakeConstants.ApiTestIssuer)
-                .ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == FakeConstants.ApiTestIssuer).ToLambda())
+                .SingleOrDefault();
 
             if (foundIssuer == null)
             {
@@ -103,8 +103,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             var foundClient = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == FakeConstants.ApiTestClient)
-                .ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == FakeConstants.ApiTestAudience).ToLambda())
+                .SingleOrDefault();
 
             if (foundClient == null)
             {
@@ -112,7 +112,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = FakeConstants.ApiTestClient,
+                        Name = FakeConstants.ApiTestAudience,
                         AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -149,8 +149,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             var foundClientUrl = _uow.Urls.Get(new QueryExpression<tbl_Urls>()
                 .Where(x => x.AudienceId == foundClient.Id
                     && x.UrlHost == (url.Scheme + "://" + url.Host)
-                    && x.UrlPath == url.AbsolutePath)
-                .ToLambda()).SingleOrDefault();
+                    && x.UrlPath == url.AbsolutePath).ToLambda())
+                .SingleOrDefault();
 
             if (foundClientUrl == null)
             {
@@ -171,8 +171,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             var foundClaim = _uow.Claims.Get(new QueryExpression<tbl_Claims>()
-                .Where(x => x.Type == FakeConstants.ApiTestClaim)
-                .ToLambda()).SingleOrDefault();
+                .Where(x => x.Type == FakeConstants.ApiTestClaim).ToLambda())
+                .SingleOrDefault();
 
             if (foundClaim == null)
             {
@@ -193,8 +193,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             var foundLogin = _uow.Logins.Get(new QueryExpression<tbl_Logins>()
-                .Where(x => x.Name == FakeConstants.ApiTestLogin)
-                .ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == FakeConstants.ApiTestLogin).ToLambda())
+                .SingleOrDefault();
 
             if (foundLogin == null)
             {
@@ -213,8 +213,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             var foundRole = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
-                .Where(x => x.Name == FakeConstants.ApiTestRole)
-                .ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == FakeConstants.ApiTestRole).ToLambda())
+                .SingleOrDefault();
 
             if (foundRole == null)
             {
@@ -235,8 +235,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             var foundUser = _uow.Users.Get(new QueryExpression<tbl_Users>()
-                .Where(x => x.Email == FakeConstants.ApiTestUser)
-                .ToLambda()).SingleOrDefault();
+                .Where(x => x.Email == FakeConstants.ApiTestUser).ToLambda())
+                .SingleOrDefault();
 
             if (foundUser == null)
             {
@@ -310,7 +310,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * set password to random audiences
              */
 
-            _uow.Audiences.SetPassword(foundClient, FakeConstants.ApiTestClientPassCurrent);
+            _uow.Audiences.SetPassword(foundClient, FakeConstants.ApiTestAudiencePassCurrent);
 
             _uow.Commit();
 
@@ -338,7 +338,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             for (int i = 0; i < sets; i++)
             {
                 tbl_Issuers issuer;
-                tbl_Audiences client;
+                tbl_Audiences audience;
                 tbl_Urls url;
                 tbl_Roles role;
                 tbl_Logins login;
@@ -364,11 +364,11 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  * create random audiences
                  */
 
-                client = _uow.Audiences.Create(
+                audience = _uow.Audiences.Create(
                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = issuer.Id,
-                        Name = FakeConstants.ApiTestClient + "-" + Base64.CreateString(4),
+                        Name = FakeConstants.ApiTestAudience + "-" + Base64.CreateString(4),
                         AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -377,7 +377,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
                         Immutable = false,
                     }));
@@ -386,7 +386,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = Base64.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
@@ -396,17 +396,17 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Commit();
 
                 /*
-                 * create random client urls
+                 * create random audience urls
                  */
 
-                var clientUrl = new Uri(FakeConstants.ApiTestUriLink);
+                var audienceUrl = new Uri(FakeConstants.ApiTestUriLink);
 
                 url = _uow.Urls.Create(
                     _mapper.Map<tbl_Urls>(new UrlCreate()
                     {
-                        AudienceId = client.Id,
-                        UrlHost = clientUrl.Scheme + "://" + clientUrl.Host,
-                        UrlPath = clientUrl.AbsolutePath,
+                        AudienceId = audience.Id,
+                        UrlHost = audienceUrl.Scheme + "://" + audienceUrl.Host,
+                        UrlPath = audienceUrl.AbsolutePath,
                         Enabled = true,
                     }));
 
@@ -449,7 +449,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 role = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         Name = FakeConstants.ApiTestRole + "-" + Base64.CreateString(4),
                         Enabled = true,
                         Immutable = false,
@@ -476,7 +476,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                         Immutable = false,
@@ -486,7 +486,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -499,7 +499,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = issuer.Id,
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         RefreshType = RefreshType.User.ToString(),
                         RefreshValue = Base64.CreateString(8),
@@ -511,7 +511,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                  * set password for random audiences
                  */
 
-                _uow.Audiences.SetPassword(client, FakeConstants.ApiTestClientPassCurrent);
+                _uow.Audiences.SetPassword(audience, FakeConstants.ApiTestAudiencePassCurrent);
 
                 _uow.Commit();
 
@@ -604,7 +604,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              */
 
             _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name.Contains(FakeConstants.ApiTestClient)).ToLambda());
+                .Where(x => x.Name.Contains(FakeConstants.ApiTestAudience)).ToLambda());
             _uow.Commit();
 
             /*

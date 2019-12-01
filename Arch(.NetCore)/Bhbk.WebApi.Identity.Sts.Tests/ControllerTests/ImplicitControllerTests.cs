@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var controller = new ImplicitController(conf, instance);
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "implicit",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -93,9 +93,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var result = HttpUtility.ParseQueryString(imp_frag).Get("access_token");
 
-                auth.CanReadToken(result).Should().BeTrue();
+                auth.Valid(result).Should().BeTrue();
 
-                var jwt = auth.ReadJwtToken(result);
+                var jwt = auth.Parse(result);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

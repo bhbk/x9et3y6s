@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Tests.Helpers;
 using Bhbk.Lib.Identity.Factories;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -19,14 +20,14 @@ using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
-    public class ActivityServiceTests : IClassFixture<BaseServiceTests>
+    public class MOTDServiceTests : IClassFixture<BaseServiceTests>
     {
         private readonly BaseServiceTests _factory;
 
-        public ActivityServiceTests(BaseServiceTests factory) => _factory = factory;
+        public MOTDServiceTests(BaseServiceTests factory) => _factory = factory;
 
         [Fact]
-        public async Task Admin_ActivityV1_Get_Success()
+        public async Task Admin_MOTDV1_Get_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -38,19 +39,19 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new TestData(uow, mapper).CreateMOTD(3);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
+                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testActivity = uow.Activities_Deprecate.Get().First();
+                var testMOTD = uow.MOTDs.Get().First();
 
-                var result = await service.Activity_GetV1(testActivity.Id.ToString());
-                result.Should().BeAssignableTo<ActivityModel>();
+                var result = await service.MOTD_GetV1(testMOTD.Id);
+                result.Should().BeAssignableTo<MOTDType1Model>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -63,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new TestData(uow, mapper).CreateMOTD(3);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
@@ -75,17 +76,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 int take = 2;
                 var state = new PageStateTypeC()
                 {
-                    Sort = new List<PageStateTypeCSort>() 
-                    {
-                        new PageStateTypeCSort() { Field = "created", Dir = "asc" }
+                    Sort = new List<PageStateTypeCSort>() {
+                        new PageStateTypeCSort() { Field = "author", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
                 };
 
-                var result = await service.Activity_GetV1(state);
+                var result = await service.MOTD_GetV1(state);
                 result.Data.Count().Should().Be(take);
-                result.Total.Should().Be(uow.Activities_Deprecate.Count());
+                result.Total.Should().Be(uow.MOTDs.Count());
             }
         }
     }

@@ -7,8 +7,8 @@ namespace Bhbk.Lib.Identity.Data.Services
     {
         public ActivityRepository Activities { get; }
         public ActivityRepository_Deprecate Activities_Deprecate { get; }
-        public ClaimRepository Claims { get; }
         public AudienceRepository Audiences { get; }
+        public ClaimRepository Claims { get; }
         public IssuerRepository Issuers { get; }
         public LoginRepository Logins { get; }
         public MotDRepository MOTDs { get; }

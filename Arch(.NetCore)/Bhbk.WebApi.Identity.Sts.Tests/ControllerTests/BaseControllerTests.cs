@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 });
                 sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
                 sc.AddSingleton<IHostedService, MaintainStatesTask>();
-                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
+                sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddCors();
                 sc.AddControllers()

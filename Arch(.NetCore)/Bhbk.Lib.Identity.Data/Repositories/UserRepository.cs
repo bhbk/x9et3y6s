@@ -165,9 +165,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
-            //user identity vs. a service identity
-            claims.Add(new Claim(ClaimTypes.System, AudienceType.user_agent.ToString()));
-
             var userRoles = _context.Set<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
 
@@ -190,14 +187,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(86400).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
+                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(86400).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             return claims;
         }
@@ -219,9 +218,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
-            //user identity vs. a service identity
-            claims.Add(new Claim(ClaimTypes.System, AudienceType.user_agent.ToString()));
-
             var userRoles = _context.Set<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
 
@@ -244,14 +240,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
+                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             return claims;
         }
@@ -270,14 +268,16 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
 
             //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
+                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(Clock.UtcDateTime)
-                .AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
+                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             return claims;
         }

@@ -10,7 +10,7 @@ namespace Bhbk.WebApi.Alert.Helpers
     {
         public async ValueTask<Response> TryEmailHandoff(string apiKey, tbl_QueueEmails model)
         {
-            var client = new SendGridClient(apiKey);
+            var sendgrid = new SendGridClient(apiKey);
 
             var msg = MailHelper.CreateSingleEmail(
                 new EmailAddress(model.FromEmail, model.FromDisplay),
@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Alert.Helpers
             msg.SetClickTracking(false, false);
             msg.SetFooterSetting(false);
 
-            return await client.SendEmailAsync(msg);
+            return await sendgrid.SendEmailAsync(msg);
         }
     }
 }

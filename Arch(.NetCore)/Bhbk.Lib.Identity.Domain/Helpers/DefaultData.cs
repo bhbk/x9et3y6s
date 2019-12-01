@@ -108,7 +108,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             var foundIssuer = _uow.Issuers.Get(new QueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == RealConstants.ApiDefaultIssuer).ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == RealConstants.ApiDefaultIssuer).ToLambda())
+                .SingleOrDefault();
 
             if (foundIssuer == null)
             {
@@ -129,7 +130,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             var foundClientUi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == RealConstants.ApiDefaultClientUi).ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == RealConstants.ApiDefaultAudienceUi).ToLambda())
+                .SingleOrDefault();
 
             if (foundClientUi == null)
             {
@@ -137,7 +139,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = RealConstants.ApiDefaultClientUi,
+                        Name = RealConstants.ApiDefaultAudienceUi,
                         AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = true,
@@ -147,7 +149,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             }
 
             var foundClientApi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == RealConstants.ApiDefaultClientApi).ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == RealConstants.ApiDefaultAudienceApi).ToLambda())
+                .SingleOrDefault();
 
             if (foundClientApi == null)
             {
@@ -155,7 +158,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                      _mapper.Map<tbl_Audiences>(new AudienceCreate()
                      {
                          IssuerId = foundIssuer.Id,
-                         Name = RealConstants.ApiDefaultClientApi,
+                         Name = RealConstants.ApiDefaultAudienceApi,
                          AudienceType = AudienceType.server.ToString(),
                          Enabled = true,
                          Immutable = true,
@@ -169,7 +172,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             var foundLogin = _uow.Logins.Get(new QueryExpression<tbl_Logins>()
-                .Where(x => x.Name == RealConstants.ApiDefaultLogin).ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == RealConstants.ApiDefaultLogin).ToLambda())
+                .SingleOrDefault();
 
             if (foundLogin == null)
             {
@@ -190,7 +194,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             var foundRoleForAdmin = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
-                .Where(x => x.Name == RealConstants.ApiDefaultRoleForAdmin).ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForAdmin).ToLambda())
+                .SingleOrDefault();
 
             if (foundRoleForAdmin == null)
             {
@@ -207,7 +212,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             }
 
             var foundRoleForUser = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
-                .Where(x => x.Name == RealConstants.ApiDefaultRoleForUser).ToLambda()).SingleOrDefault();
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForUser).ToLambda())
+                .SingleOrDefault();
 
             if (foundRoleForUser == null)
             {
@@ -228,7 +234,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             var foundAdminUser = _uow.Users.Get(new QueryExpression<tbl_Users>()
-                .Where(x => x.Email == RealConstants.ApiDefaultAdminUser).ToLambda()).SingleOrDefault();
+                .Where(x => x.Email == RealConstants.ApiDefaultAdminUser).ToLambda())
+                .SingleOrDefault();
 
             if (foundAdminUser == null)
             {
@@ -251,7 +258,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             }
 
             var foundNormalUser = _uow.Users.Get(new QueryExpression<tbl_Users>()
-                .Where(x => x.Email == RealConstants.ApiDefaultNormalUser).ToLambda()).SingleOrDefault();
+                .Where(x => x.Email == RealConstants.ApiDefaultNormalUser).ToLambda())
+                .SingleOrDefault();
 
             if (foundNormalUser == null)
             {
@@ -278,8 +286,8 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * set password to audiences
              */
 
-            _uow.Audiences.SetPassword(foundClientApi, RealConstants.ApiDefaultClientApiKey);
-            _uow.Audiences.SetPassword(foundClientUi, RealConstants.ApiDefaultClientUiKey);
+            _uow.Audiences.SetPassword(foundClientApi, RealConstants.ApiDefaultAudienceApiKey);
+            _uow.Audiences.SetPassword(foundClientUi, RealConstants.ApiDefaultAudienceUiKey);
 
             _uow.Commit();
 
@@ -342,10 +350,10 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == RealConstants.ApiDefaultClientUi).ToLambda());
+                .Where(x => x.Name == RealConstants.ApiDefaultAudienceUi).ToLambda());
 
             _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == RealConstants.ApiDefaultClientApi).ToLambda());
+                .Where(x => x.Name == RealConstants.ApiDefaultAudienceApi).ToLambda());
 
             _uow.Commit();
 

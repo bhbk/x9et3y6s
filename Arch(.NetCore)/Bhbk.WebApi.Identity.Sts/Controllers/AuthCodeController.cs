@@ -88,15 +88,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid audienceID;
-            tbl_Audiences client;
+            tbl_Audiences audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                client = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                client = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
-            if (client == null)
+            if (audience == null)
             {
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
@@ -133,11 +133,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (client.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize-callback"));
             }
-            else if (client.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 Mapper.Map<tbl_States>(new StateCreate()
                 {
                     IssuerId = issuer.Id,
-                    AudienceId = client.Id,
+                    AudienceId = audience.Id,
                     UserId = user.Id,
                     StateValue = AlphaNumeric.CreateString(32),
                     StateType = StateType.User.ToString(),
@@ -235,13 +235,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var audienceList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audiences>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
-                audiences = UoW.Audiences.Get(x => clientList.Contains(x)
+                audiences = UoW.Audiences.Get(x => audienceList.Contains(x)
                     && x.Enabled == true).ToList();
             else
             {
@@ -262,7 +262,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         return NotFound(ModelState);
                     }
                     else if (!audience.Enabled
-                        || !clientList.Contains(audience))
+                        || !audienceList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                         return BadRequest(ModelState);

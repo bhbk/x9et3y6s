@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
                 var result = await service.Http.Enqueue_TextV1(Base64.CreateString(8), new TextCreate());
@@ -45,11 +45,11 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 result = await service.Http.Enqueue_TextV1(rop.RawData, new TextCreate());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -62,18 +62,18 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
@@ -95,18 +95,18 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
@@ -132,18 +132,18 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultClientUi).Single();
+                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
                 var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,

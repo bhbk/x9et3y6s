@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
@@ -27,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me
 {
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddScoped<IUoWService, UoWService>();
             sc.AddSingleton<IHostedService, MaintainQuotesTask>();
             sc.AddSingleton<IAlertService, AlertService>();
-            sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
+            sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
             /*
              * do not use dependency injection for unit of work below. is used 
@@ -59,10 +59,6 @@ namespace Bhbk.WebApi.Identity.Me
              */
 
             var owin = new UoWService(conf, instance);
-
-            /*
-             * only live context allowed to run...
-             */
 
             if (owin.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();
@@ -87,19 +83,12 @@ namespace Bhbk.WebApi.Identity.Me
              */
 
             var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
                 issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                     .Select(x => x.Name).Concat(issuers);
-#if !RELEASE
-            /*
-             * add value that is hard coded just for non-production use.
-             */
 
-            issuerKeys = issuerKeys.Concat(conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
-                .Select(x => x.Value));
-#endif
             sc.AddLogging(opt =>
             {
                 opt.AddSerilog();
@@ -132,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Me
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),
-                    AudienceValidator = Lib.Identity.Validators.AudienceValidator.Multiple,
+                    AudienceValidator = AudiencesValidator.Multiple,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,

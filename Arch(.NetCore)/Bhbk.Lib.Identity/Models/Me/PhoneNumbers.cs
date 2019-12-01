@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string NewPhoneNumberConfirm { get; set; }
     }
 
-    public class PhoneAdd : Phones
+    public class PhoneAddModel : Phones
     {
 
     }
 
-    public class PhoneChange : Phones
+    public class PhoneChangeModel : Phones
     {
         [Required]
         [DataType(DataType.PhoneNumber)]

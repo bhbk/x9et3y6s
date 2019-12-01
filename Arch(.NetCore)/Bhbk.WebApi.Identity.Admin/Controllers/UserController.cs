@@ -41,7 +41,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -71,7 +72,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -79,7 +81,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == loginID)
+                .SingleOrDefault();
 
             if (login == null)
             {
@@ -99,7 +102,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -107,7 +111,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID)
+                .SingleOrDefault();
 
             if (role == null)
             {
@@ -138,7 +143,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var issuer = UoW.Issuers.Get(x => x.Id == model.IssuerId).SingleOrDefault();
+            var issuer = UoW.Issuers.Get(x => x.Id == model.IssuerId)
+                .SingleOrDefault();
 
             if (issuer == null)
             {
@@ -215,7 +221,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -241,7 +248,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -276,35 +284,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/msg-of-the-day/page"), HttpPost]
-        public IActionResult GetMOTDsV1([FromBody] PageStateTypeC model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var result = new PageStateTypeCResult<MOTDType1Model>
-                {
-                    Data = Mapper.Map<IEnumerable<MOTDType1Model>>(
-                        UoW.MOTDs.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_MotDType1>, IQueryable<tbl_MotDType1>>>>(
-                                model.ToExpression<tbl_MotDType1>()))),
-
-                    Total = UoW.MOTDs.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_MotDType1>, IQueryable<tbl_MotDType1>>>>(
-                            model.ToPredicateExpression<tbl_MotDType1>()))
-                };
-
-                return Ok(result);
-            }
-            catch (QueryExpressionException ex)
-            {
-                ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-                return BadRequest(ModelState);
-            }
-        }
-
         [Route("v1/{userValue}"), HttpGet]
         public IActionResult GetV1([FromRoute] string userValue)
         {
@@ -313,9 +292,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Id == userID)
+                    .SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == userValue).SingleOrDefault();
+                user = UoW.Users.Get(x => x.Email == userValue)
+                    .SingleOrDefault();
 
             if (user == null)
             {
@@ -359,7 +340,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID:guid}/claims"), HttpGet]
         public IActionResult GetClaimsV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -376,7 +358,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID:guid}/audiences"), HttpGet]
         public IActionResult GetAudiencesV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -393,7 +376,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID:guid}/logins"), HttpGet]
         public IActionResult GetLoginsV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -427,7 +411,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID:guid}/roles"), HttpGet]
         public IActionResult GetRolesV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -445,7 +430,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -474,7 +460,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -482,7 +469,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == loginID)
+                .SingleOrDefault();
 
             if (login == null)
             {
@@ -501,7 +489,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -509,7 +498,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID)
+                .SingleOrDefault();
 
             if (role == null)
             {
@@ -531,7 +521,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -557,12 +548,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] PasswordAdd model)
+        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] PasswordAddModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == userID)
+                .SingleOrDefault();
 
             if (user == null)
             {
@@ -591,7 +583,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == model.Id).SingleOrDefault();
+            var user = UoW.Users.Get(x => x.Id == model.Id)
+                .SingleOrDefault();
 
             if (user == null)
             {

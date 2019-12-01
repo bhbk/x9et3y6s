@@ -31,12 +31,12 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
-            var client = UoW.Audiences.Get(x => x.Name == Constants.ApiTestClient).Single();
+            var audience = UoW.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
 
             var result = UoW.Roles.Create(
                 Mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        AudienceId = client.Id,
+                        AudienceId = audience.Id,
                         Name = Constants.ApiTestRole,
                         Enabled = true,
                         Immutable = false,

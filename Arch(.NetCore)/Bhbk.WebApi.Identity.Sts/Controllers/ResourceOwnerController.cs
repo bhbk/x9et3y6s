@@ -215,7 +215,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 var rop_claims = UoW.Users.GenerateAccessClaims(user);
-                var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, audience.Name, rop_claims);
+                var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, null, new List<string> { audience.Name }, rop_claims);
 
                 UoW.Activities_Deprecate.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
@@ -463,13 +463,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var audienceList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audiences>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
-                audiences = UoW.Audiences.Get(x => clientList.Contains(x)
+                audiences = UoW.Audiences.Get(x => audienceList.Contains(x)
                     && x.Enabled == true).ToList();
             else
             {
@@ -490,7 +490,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         return NotFound(ModelState);
                     }
                     else if (!audience.Enabled
-                        || !clientList.Contains(audience))
+                        || !audienceList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                         return BadRequest(ModelState);

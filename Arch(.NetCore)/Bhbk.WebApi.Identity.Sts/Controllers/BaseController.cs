@@ -15,7 +15,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Authorize(Policy = "UsersPolicy")]
     public class BaseController : Controller
     {
-        protected IJsonWebTokenFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IJsonWebTokenFactory>(); }
+        protected IOAuth2JwtFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
         protected IUoWService UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUoWService>(); }
         protected IConfiguration Conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }

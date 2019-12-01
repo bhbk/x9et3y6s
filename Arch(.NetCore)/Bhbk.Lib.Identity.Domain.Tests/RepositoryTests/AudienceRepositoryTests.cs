@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
                 Mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = issuer.Id,
-                        Name = Constants.ApiTestClient,
+                        Name = Constants.ApiTestAudience,
                         AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                         Immutable = false,
@@ -65,9 +65,9 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
-            var client = UoW.Audiences.Get(x => x.Name == Constants.ApiTestClient).Single();
+            var audience = UoW.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
 
-            UoW.Audiences.Delete(client);
+            UoW.Audiences.Delete(audience);
             UoW.Commit();
         }
 
@@ -97,10 +97,10 @@ namespace Bhbk.Lib.Identity.Domain.Tests.RepositoryTests
             new TestData(UoW, Mapper).Destroy();
             new TestData(UoW, Mapper).Create();
 
-            var client = UoW.Audiences.Get(x => x.Name == Constants.ApiTestClient).Single();
-            client.Name += "(Updated)";
+            var audience = UoW.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+            audience.Name += "(Updated)";
 
-            var result = UoW.Audiences.Update(client);
+            var result = UoW.Audiences.Update(audience);
             result.Should().BeAssignableTo<tbl_Audiences>();
 
             UoW.Commit();

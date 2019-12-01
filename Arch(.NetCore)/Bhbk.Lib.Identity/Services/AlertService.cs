@@ -12,22 +12,22 @@ namespace Bhbk.Lib.Identity.Services
 {
     public class AlertService : IAlertService
     {
-        private readonly ResourceOwnerGrant _ropg;
+        private readonly IOAuth2JwtGrant _ropg;
         private readonly AlertRepository _http;
 
         public AlertService(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public AlertService(IConfiguration conf, InstanceContext instance, HttpClient client)
+        public AlertService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _ropg = new ResourceOwnerGrant(instance, client);
-            _http = new AlertRepository(conf, instance, client);
+            _ropg = new ResourceOwnerGrantV2(conf, instance, http);
+            _http = new AlertRepository(conf, instance, http);
         }
 
         public JwtSecurityToken Jwt
         {
-            get { return _ropg.RopgV2; }
-            set { _ropg.RopgV2 = value; }
+            get { return _ropg.AccessToken; }
+            set { _ropg.AccessToken = value; }
         }
 
         public AlertRepository Http
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Email_EnqueueV1(EmailCreate model)
         {
-            var response = await Http.Enqueue_EmailV1(_ropg.RopgV2.RawData, model);
+            var response = await Http.Enqueue_EmailV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Text_EnqueueV1(TextCreate model)
         {
-            var response = await Http.Enqueue_TextV1(_ropg.RopgV2.RawData, model);
+            var response = await Http.Enqueue_TextV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return true;

@@ -12,22 +12,22 @@ namespace Bhbk.Lib.Identity.Services
 {
     public class StsService : IStsService
     {
-        private readonly ResourceOwnerGrant _ropg;
+        private readonly IOAuth2JwtGrant _ropg;
         private readonly StsRepository _http;
 
         public StsService(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public StsService(IConfiguration conf, InstanceContext instance, HttpClient client)
+        public StsService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _ropg = new ResourceOwnerGrant(instance, client);
-            _http = new StsRepository(conf, instance, client);
+            _ropg = new ResourceOwnerGrantV2(conf, instance, http);
+            _http = new StsRepository(conf, instance, http);
         }
 
         public JwtSecurityToken Jwt
         {
-            get { return _ropg.RopgV2; }
-            set { _ropg.RopgV2 = value; }
+            get { return _ropg.AccessToken; }
+            set { _ropg.AccessToken = value; }
         }
 
         public StsRepository Http

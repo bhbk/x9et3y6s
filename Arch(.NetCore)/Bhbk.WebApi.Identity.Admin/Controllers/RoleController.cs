@@ -49,7 +49,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            var result = UoW.Roles.Get(x => x.Name == model.Name).SingleOrDefault();
+            var result = UoW.Roles.Get(x => x.Name == model.Name)
+                .SingleOrDefault();
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -61,7 +62,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteV1([FromRoute] Guid roleID)
         {
-            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID)
+                .SingleOrDefault();
 
             if (role == null)
             {
@@ -89,9 +91,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Roles role = null;
 
             if (Guid.TryParse(roleValue, out roleID))
-                role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
+                role = UoW.Roles.Get(x => x.Id == roleID)
+                    .SingleOrDefault();
             else
-                role = UoW.Roles.Get(x => x.Name == roleValue).SingleOrDefault();
+                role = UoW.Roles.Get(x => x.Name == roleValue)
+                    .SingleOrDefault();
 
             if (role == null)
             {
@@ -135,7 +139,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{roleID:guid}/users"), HttpGet]
         public IActionResult GetUsersV1([FromRoute] Guid roleID)
         {
-            var role = UoW.Roles.Get(x => x.Id == roleID).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == roleID)
+                .SingleOrDefault();
 
             if (role == null)
             {
@@ -156,7 +161,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = UoW.Roles.Get(x => x.Id == model.Id).SingleOrDefault();
+            var role = UoW.Roles.Get(x => x.Id == model.Id)
+                .SingleOrDefault();
 
             if (role == null)
             {

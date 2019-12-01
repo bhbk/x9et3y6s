@@ -52,7 +52,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 skip = 0;
 
             var motd = UoW.MOTDs.Get(new QueryExpression<tbl_MotDType1>()
-                .OrderBy("id").Skip(skip).Take(1).ToLambda()).SingleOrDefault();
+                .OrderBy("id").Skip(skip).Take(1).ToLambda())
+                .SingleOrDefault();
 
             return Ok(Mapper.Map<MOTDType1Model>(motd));
         }
@@ -223,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password"), HttpPut]
-        public IActionResult SetPasswordV1([FromBody] PasswordChange model)
+        public IActionResult SetPasswordV1([FromBody] PasswordChangeModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

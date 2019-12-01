@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeAskV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "code",
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         user = Guid.NewGuid().ToString(),
                         redirect_uri = url.AbsoluteUri,
                         response_type = "code",
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
@@ -205,7 +205,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         user = user.Id.ToString(),
                         redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
                         response_type = "code",
@@ -231,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -277,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -288,7 +288,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -323,7 +323,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -334,7 +334,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -342,7 +342,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = new Uri("https://app.test.net/a/invalid").AbsoluteUri,
@@ -369,7 +369,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -380,7 +380,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -388,7 +388,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "authorization_code",
                         user = Guid.NewGuid().ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -415,7 +415,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -426,7 +426,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(FakeConstants.ApiTestUriLink);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -434,7 +434,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -461,7 +461,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -476,7 +476,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -497,14 +497,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
                 new TestData(uow, mapper).Destroy();
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
@@ -515,7 +515,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var code = new PasswordlessTokenFactory(uow.InstanceType.ToString())
                     .Generate(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
 
-                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == client.Id && x.UserId == user.Id
+                var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
@@ -523,7 +523,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     new AuthCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
-                        client = client.Id.ToString(),
+                        client = audience.Id.ToString(),
                         grant_type = "authorization_code",
                         user = user.Id.ToString(),
                         redirect_uri = url.AbsoluteUri,
@@ -532,9 +532,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<UserJwtV2>();
 
-                auth.CanReadToken(result.access_token).Should().BeTrue();
+                auth.Valid(result.access_token).Should().BeTrue();
 
-                var jwt = auth.ReadJwtToken(result.access_token);
+                var jwt = auth.Parse(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);

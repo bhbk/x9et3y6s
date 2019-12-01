@@ -54,7 +54,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = "AdministratorsPolicy")]
         public IActionResult DeleteV1([FromRoute] Guid loginID)
         {
-            var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == loginID)
+                .SingleOrDefault();
 
             if (login == null)
             {
@@ -83,9 +84,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
-                login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
+                login = UoW.Logins.Get(x => x.Id == loginID)
+                    .SingleOrDefault();
             else
-                login = UoW.Logins.Get(x => x.Name == loginValue).SingleOrDefault();
+                login = UoW.Logins.Get(x => x.Name == loginValue)
+                    .SingleOrDefault();
 
             if (login == null)
             {
@@ -129,7 +132,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{loginID:guid}/users"), HttpGet]
         public IActionResult GetUsersV1([FromRoute] Guid loginID)
         {
-            var login = UoW.Logins.Get(x => x.Id == loginID).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == loginID)
+                .SingleOrDefault();
 
             if (login == null)
             {
@@ -150,7 +154,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = UoW.Logins.Get(x => x.Id == model.Id).SingleOrDefault();
+            var login = UoW.Logins.Get(x => x.Id == model.Id)
+                .SingleOrDefault();
 
             if (login == null)
             {

@@ -50,10 +50,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var result = controller.DeleteRefreshV1(Guid.NewGuid()) as NotFoundObjectResult;
                 result = controller.DeleteRefreshesV1() as NotFoundObjectResult;
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var auth = scope.ServiceProvider.GetRequiredService<IJsonWebTokenFactory>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
 
                 var controller = new InfoController(conf, instance);
@@ -81,15 +81,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 for (int i = 0; i < 3; i++)
                 {
                     var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
-                    var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { client.Name }, rt_claims);
+                    var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                     uow.Refreshes.Create(
                         mapper.Map<tbl_Refreshes>(new RefreshCreate()
@@ -131,10 +131,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var result = controller.GetV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -162,10 +162,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var result = controller.GetRefreshesV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -193,12 +193,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PasswordChange()
+                var model = new PasswordChangeModel()
                 {
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = Base64.CreateString(16),
@@ -230,12 +230,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PasswordChange()
+                var model = new PasswordChangeModel()
                 {
                     CurrentPassword = FakeConstants.ApiTestUserPassCurrent,
                     NewPassword = FakeConstants.ApiTestUserPassNew,
@@ -267,10 +267,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var result = controller.SetTwoFactorV1(true) as NoContentResult;
                 result.Should().BeAssignableTo<NoContentResult>();
@@ -297,10 +297,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 new TestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var client = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestClient).Single();
+                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
                 var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
 
-                controller.SetIdentity(issuer.Id, client.Id, user.Id);
+                controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var model = new UserModel()
                 {

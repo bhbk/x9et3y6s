@@ -7,14 +7,14 @@ namespace Bhbk.Lib.Identity.Data.Primitives
     {
         #region Attribute Constants
 
+        public const string AttrAudienceIDV1 = "client_id";
+        public const string AttrAudienceIDV2 = "client";
+        public const string AttrAudienceSecretIDV1 = "client_secret";
+        public const string AttrAudienceSecretIDV2 = "client_secret";
         public const string AttrAuthCodeIDV1 = "authorization_code";
         public const string AttrAuthCodeIDV2 = "authorization_code";
         public const string AttrIssuerIDV1 = "issuer_id";
         public const string AttrIssuerIDV2 = "issuer";
-        public const string AttrClientIDV1 = "client_id";
-        public const string AttrClientIDV2 = "client";
-        public const string AttrClientSecretIDV1 = "client_secret";
-        public const string AttrClientSecretIDV2 = "client_secret";
         public const string AttrDeviceCodeIDV1 = "device_code";
         public const string AttrDeviceCodeIDV2 = "device_code";
         public const string AttrGrantTypeIDV1 = "grant_type";
@@ -30,10 +30,10 @@ namespace Bhbk.Lib.Identity.Data.Primitives
 
         #region Configuration Constants
 
-        public const string ApiDefaultClientUi = "Local.Ui";
-        public const string ApiDefaultClientUiKey = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb9HUAw6n2ZwY";
-        public const string ApiDefaultClientApi = "Local.Api";
-        public const string ApiDefaultClientApiKey = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV6euTTDO0Xvo";
+        public const string ApiDefaultAudienceUi = "Local.Ui";
+        public const string ApiDefaultAudienceUiKey = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb9HUAw6n2ZwY";
+        public const string ApiDefaultAudienceApi = "Local.Api";
+        public const string ApiDefaultAudienceApiKey = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV6euTTDO0Xvo";
         public const string ApiDefaultIssuer = "Local";
         public const string ApiDefaultIssuerKey = "8G3zyoTJB4HpL5n3V-htSaN1KFWZGeFgWcUenGZofmw";
         public const string ApiDefaultLogin = "Local";
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Data.Primitives
             "</html>";
         }
 
-        public static string TemplateImplicit(tbl_Issuers issuer, tbl_Audiences client, tbl_Users user, Uri link)
+        public static string TemplateImplicit(tbl_Issuers issuer, tbl_Audiences audience, tbl_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -251,7 +251,7 @@ namespace Bhbk.Lib.Identity.Data.Primitives
             "                  <br>" +
             "                  <br>Hi " + string.Format("{0} {1}", user.FirstName, user.LastName) + "." +
             "                  <br>" +
-            "                  <br>The link will log you into the application named " + client.Name + " automatically." +
+            "                  <br>The link will log you into the application named " + audience.Name + " automatically." +
             "                  <br>" +
             "                  <br><a style=\"border-radius: 4px; font-size: 15px; color: white; text-decoration: none; padding: 14px 7px 14px 7px; width: 210px; max-width: 210px; font-family: 'Open Sans', 'Helvetica Neue', Arial; margin: 0; display: block; background-color:#007ee6; text-align: center;\" href=" + link.AbsoluteUri + ">Login now</a>" +
             "                  <br>" +

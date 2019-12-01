@@ -14,22 +14,22 @@ namespace Bhbk.Lib.Identity.Services
 {
     public class MeService : IMeService
     {
-        private readonly ResourceOwnerGrant _ropg;
+        private readonly IOAuth2JwtGrant _ropg;
         private readonly MeRepository _http;
 
         public MeService(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
-        public MeService(IConfiguration conf, InstanceContext instance, HttpClient client)
+        public MeService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _ropg = new ResourceOwnerGrant(instance, client);
-            _http = new MeRepository(conf, instance, client);
+            _ropg = new ResourceOwnerGrantV2(conf, instance, http);
+            _http = new MeRepository(conf, instance, http);
         }
 
         public JwtSecurityToken Jwt
         {
-            get { return _ropg.RopgV2; }
-            set { _ropg.RopgV2 = value; }
+            get { return _ropg.AccessToken; }
+            set { _ropg.AccessToken = value; }
         }
 
         public MeRepository Http
@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteCodesV1()
         {
-            var response = await Http.Info_DeleteCodesV1(_ropg.RopgV2.RawData);
+            var response = await Http.Info_DeleteCodesV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteCodeV1(Guid codeID)
         {
-            var response = await Http.Info_DeleteCodeV1(_ropg.RopgV2.RawData, codeID);
+            var response = await Http.Info_DeleteCodeV1(_ropg.AccessToken.RawData, codeID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteRefreshesV1()
         {
-            var response = await Http.Info_DeleteRefreshesV1(_ropg.RopgV2.RawData);
+            var response = await Http.Info_DeleteRefreshesV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteRefreshV1(Guid refreshID)
         {
-            var response = await Http.Info_DeleteRefreshV1(_ropg.RopgV2.RawData, refreshID);
+            var response = await Http.Info_DeleteRefreshV1(_ropg.AccessToken.RawData, refreshID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -83,7 +83,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<IEnumerable<StateModel>> Info_GetCodesV1()
         {
-            var response = await Http.Info_GetCodesV1(_ropg.RopgV2.RawData);
+            var response = await Http.Info_GetCodesV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<IEnumerable<StateModel>>().Result;
@@ -94,7 +94,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<IEnumerable<RefreshModel>> Info_GetRefreshesV1()
         {
-            var response = await Http.Info_GetRefreshesV1(_ropg.RopgV2.RawData);
+            var response = await Http.Info_GetRefreshesV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<IEnumerable<RefreshModel>>().Result;
@@ -116,7 +116,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<UserModel> Info_GetV1()
         {
-            var response = await Http.Info_GetV1(_ropg.RopgV2.RawData);
+            var response = await Http.Info_GetV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<UserModel>().Result;
@@ -125,9 +125,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<bool> Info_SetPasswordV1(PasswordAdd model)
+        public async ValueTask<bool> Info_SetPasswordV1(PasswordAddModel model)
         {
-            var response = await Http.Info_SetPasswordV1(_ropg.RopgV2.RawData, model);
+            var response = await Http.Info_SetPasswordV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -138,7 +138,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_SetTwoFactorV1(bool statusValue)
         {
-            var response = await Http.Info_SetTwoFactorV1(_ropg.RopgV2.RawData, statusValue);
+            var response = await Http.Info_SetTwoFactorV1(_ropg.AccessToken.RawData, statusValue);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -149,7 +149,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<UserModel> Info_UpdateV1(UserModel model)
         {
-            var response = await Http.Info_UpdateV1(_ropg.RopgV2.RawData, model);
+            var response = await Http.Info_UpdateV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<UserModel>().Result;
@@ -160,7 +160,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_UpdateCodeV1(string codeValue, string actionValue)
         {
-            var response = await Http.Info_UpdateCodeV1(_ropg.RopgV2.RawData, codeValue, actionValue);
+            var response = await Http.Info_UpdateCodeV1(_ropg.AccessToken.RawData, codeValue, actionValue);
 
             if (response.IsSuccessStatusCode)
                 return true;

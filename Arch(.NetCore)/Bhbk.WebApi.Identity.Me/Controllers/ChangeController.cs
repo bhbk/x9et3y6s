@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email"), HttpPut]
-        public IActionResult ChangeEmailV1([FromBody] EmailChange model)
+        public IActionResult ChangeEmailV1([FromBody] EmailChangeModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password"), HttpPut]
-        public IActionResult ChangePasswordV1([FromBody] PasswordChange model)
+        public IActionResult ChangePasswordV1([FromBody] PasswordChangeModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -130,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone"), HttpPut]
-        public IActionResult ChangePhoneV1([FromBody] PhoneChange model)
+        public IActionResult ChangePhoneV1([FromBody] PhoneChangeModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

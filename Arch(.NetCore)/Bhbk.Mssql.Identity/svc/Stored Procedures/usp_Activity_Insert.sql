@@ -18,7 +18,7 @@ INSERT INTO [dbo].[tbl_Activities]
 	(
      Id           
     ,UserId    
-    ,ClientId    
+    ,AudienceId    
     ,ActivityType           
     ,TableName
     ,KeyValues   

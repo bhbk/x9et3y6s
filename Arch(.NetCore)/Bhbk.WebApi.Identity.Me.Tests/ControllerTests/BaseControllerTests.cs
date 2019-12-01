@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     return uow;
                 });
                 sc.AddSingleton<IHostedService, MaintainQuotesTask>();
-                sc.AddSingleton<IJsonWebTokenFactory, JsonWebTokenFactory>();
+                sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()
                      .AddNewtonsoftJson(opt =>

@@ -30,15 +30,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{activityValue}"), HttpGet]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult GetActivityV1([FromRoute] string activityValue)
+        public IActionResult GetV1([FromRoute] string activityValue)
         {
             Guid activityID;
             tbl_Activities activity = null;
 
             if (Guid.TryParse(activityValue, out activityID))
                 activity = UoW.Activities_Deprecate.Get(new QueryExpression<tbl_Activities>()
-                    .Where(x => x.Id == activityID)
-                    .ToLambda()).SingleOrDefault();
+                    .Where(x => x.Id == activityID).ToLambda())
+                    .SingleOrDefault();
 
             if (activity == null)
             {
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/page"), HttpPost]
         [Authorize(Policy = "AdministratorsPolicy")]
-        public IActionResult GetActivitiesV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
                                 model.ToExpression<tbl_Activities>()))),
 
-                    Total = UoW.Activities.Count(
+                    Total = UoW.Activities_Deprecate.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
                             model.ToPredicateExpression<tbl_Activities>()))
                 };
@@ -75,7 +75,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             catch (QueryExpressionException ex)
             {
                 ModelState.AddModelError(MessageType.ParseError.ToString(), ex.ToString());
-
                 return BadRequest(ModelState);
             }
         }
