@@ -119,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     AudienceId = audience.Id,
-                    ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
+                    ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                     Immutable = false
                 }));
 
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     AudienceId = audience.Id,
-                    ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
+                    ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
                     Immutable = false
                 }));
 
@@ -245,7 +245,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     AudienceId = audience.Id,
-                    ActivityType = LoginType.CreateClientRefreshTokenV2.ToString(),
+                    ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
                     Immutable = false
                 }));
 

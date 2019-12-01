@@ -136,15 +136,15 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             sc.AddAuthorization(opt =>
             {
-                opt.AddPolicy("AdministratorsPolicy", admins =>
+                opt.AddPolicy(RealConstants.PolicyForAdmins, admins =>
                 {
                     admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                 });
-                opt.AddPolicy("ServicesPolicy", services =>
+                opt.AddPolicy(RealConstants.PolicyForServices, services =>
                 {
                     services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
-                opt.AddPolicy("UsersPolicy", users =>
+                opt.AddPolicy(RealConstants.PolicyForUsers, users =>
                 {
                     users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });

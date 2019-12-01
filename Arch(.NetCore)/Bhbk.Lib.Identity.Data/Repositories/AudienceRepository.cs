@@ -5,7 +5,6 @@ using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Validators;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -54,6 +53,20 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             _context.Entry(audience).State = EntityState.Modified;
 
             return _context.Entry(audience).Entity;
+        }
+
+        public bool AddToRole(tbl_Audiences audience, tbl_Roles role)
+        {
+            _context.Set<tbl_AudienceRoles>().Add(
+                new tbl_AudienceRoles()
+                {
+                    AudienceId = audience.Id,
+                    RoleId = role.Id,
+                    Created = Clock.UtcDateTime,
+                    Immutable = false
+                });
+
+            return true;
         }
 
         public override tbl_Audiences Delete(tbl_Audiences audience)
@@ -195,6 +208,25 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 return PasswordVerificationResult.Success;
 
             return PasswordVerificationResult.Failed;
+        }
+
+        public bool IsInRole(tbl_Audiences audience, tbl_Roles role)
+        {
+            if (_context.Set<tbl_AudienceRoles>()
+                .Any(x => x.AudienceId == audience.Id && x.RoleId == role.Id))
+                return true;
+
+            return false;
+        }
+
+        public bool RemoveFromRole(tbl_Audiences audience, tbl_Roles role)
+        {
+            var entity = _context.Set<tbl_AudienceRoles>()
+                .Where(x => x.AudienceId == audience.Id && x.RoleId == role.Id).Single();
+
+            _context.Set<tbl_AudienceRoles>().Remove(entity);
+
+            return true;
         }
 
         public tbl_Audiences SetPassword(tbl_Audiences audience, string password)

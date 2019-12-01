@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Grants
 {
@@ -44,62 +45,66 @@ namespace Bhbk.Lib.Identity.Grants
 
         public JwtSecurityToken AccessToken
         {
-            get
+            get { return GetAsync().Result; }
+            set { _access = value; }
+        }
+
+        private async ValueTask<JwtSecurityToken> GetAsync()
+        {
+            //check if access is valid...
+            if (_access != null
+                && _access.ValidFrom < DateTime.UtcNow
+                && _access.ValidTo > DateTime.UtcNow.AddSeconds(-60))
             {
-                //check if access is valid...
-                if (_access != null
-                    && _access.ValidFrom < DateTime.UtcNow
-                    && _access.ValidTo > DateTime.UtcNow.AddSeconds(-60))
-                {
-                    return _access;
-                }
-                //check if refresh is valid. update access with refresh if so.
-                else if (_refresh != null
-                    && _refresh.ValidFrom < DateTime.UtcNow
-                    && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
-                {
-                    HttpResponseMessage response = null;
-                    FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
-                        {
+                return _access;
+            }
+            //check if refresh is valid. update access with refresh if so.
+            else if (_refresh != null
+                && _refresh.ValidFrom < DateTime.UtcNow
+                && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
+            {
+                HttpResponseMessage response = null;
+                FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
+                    {
                             new KeyValuePair<string, string>("issuer", _conf["IdentityCredentials:IssuerName"]),
                             new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityCredentials:AudienceName"] })),
                             new KeyValuePair<string, string>("grant_type", "refresh_token"),
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                    var endpoint = "/oauth2/v2/ropg-rt";
+                var endpoint = "/oauth2/v2/ropg-rt";
 
-                    if (_instance == InstanceContext.DeployedOrLocal 
-                        || _instance == InstanceContext.IntegrationTest)
-                        response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
+                if (_instance == InstanceContext.DeployedOrLocal
+                    || _instance == InstanceContext.IntegrationTest)
+                    response = await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-                    else if (_instance == InstanceContext.UnitTest)
-                        response = _http.PostAsync(endpoint, content).Result;
-
-                    else
-                        throw new NotImplementedException();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-
-                        _access = new JwtSecurityToken((string)result["access_token"]);
-
-                        if ((string)result["refresh_token"] != null)
-                            _refresh = new JwtSecurityToken((string)result["refresh_token"]);
-
-                        return _access;
-                    }
-
-                    throw new HttpRequestException(response.ToString(),
-                        new Exception(response.RequestMessage.ToString()));
-                }
+                else if (_instance == InstanceContext.UnitTest)
+                    response = await _http.PostAsync(endpoint, content);
 
                 else
+                    throw new NotImplementedException();
+
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage response = null;
-                    FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
-                        {
+                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+                    _access = new JwtSecurityToken((string)result["access_token"]);
+
+                    if ((string)result["refresh_token"] != null)
+                        _refresh = new JwtSecurityToken((string)result["refresh_token"]);
+
+                    return _access;
+                }
+
+                throw new HttpRequestException(response.ToString(),
+                    new Exception(response.RequestMessage.ToString()));
+            }
+
+            else
+            {
+                HttpResponseMessage response = null;
+                FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
+                    {
                             new KeyValuePair<string, string>("issuer", _conf["IdentityCredentials:IssuerName"]),
                             new KeyValuePair<string, string>("client", string.Join(",", new List<string> { _conf["IdentityCredentials:AudienceName"] })),
                             new KeyValuePair<string, string>("grant_type", "password"),
@@ -107,35 +112,33 @@ namespace Bhbk.Lib.Identity.Grants
                             new KeyValuePair<string, string>("password", _conf["IdentityCredentials:UserPass"]),
                         });
 
-                    var endpoint = "/oauth2/v2/ropg";
+                var endpoint = "/oauth2/v2/ropg";
 
-                    if (_instance == InstanceContext.DeployedOrLocal 
-                        || _instance == InstanceContext.IntegrationTest)
-                        response = _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content).Result;
+                if (_instance == InstanceContext.DeployedOrLocal
+                    || _instance == InstanceContext.IntegrationTest)
+                    response = await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-                    else if (_instance == InstanceContext.UnitTest)
-                        response = _http.PostAsync(endpoint, content).Result;
+                else if (_instance == InstanceContext.UnitTest)
+                    response = await _http.PostAsync(endpoint, content);
 
-                    else
-                        throw new NotImplementedException();
+                else
+                    throw new NotImplementedException();
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
-                        _access = new JwtSecurityToken((string)result["access_token"]);
+                    _access = new JwtSecurityToken((string)result["access_token"]);
 
-                        if ((string)result["refresh_token"] != null)
-                            _refresh = new JwtSecurityToken((string)result["refresh_token"]);
+                    if ((string)result["refresh_token"] != null)
+                        _refresh = new JwtSecurityToken((string)result["refresh_token"]);
 
-                        return _access;
-                    }
-
-                    throw new HttpRequestException(response.ToString(),
-                        new Exception(response.RequestMessage.ToString()));
+                    return _access;
                 }
+
+                throw new HttpRequestException(response.ToString(),
+                    new Exception(response.RequestMessage.ToString()));
             }
-            set { _access = value; }
         }
     }
 }

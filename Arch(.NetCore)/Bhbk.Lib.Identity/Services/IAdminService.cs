@@ -49,6 +49,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<IEnumerable<AudienceModel>> Issuer_GetAudiencesV1(string issuerValue);
         ValueTask<IssuerModel> Issuer_GetV1(string issuerValue);
         ValueTask<PageStateTypeCResult<IssuerModel>> Issuer_GetV1(PageStateTypeC model);
+        ValueTask<Dictionary<Guid, string>> Issuer_GetKeysV1(List<string> model);
         ValueTask<IssuerModel> Issuer_UpdateV1(IssuerModel model);
 
         /*

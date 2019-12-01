@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_AddToClaimV1(testUser.Id, testClaim.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInClaim(testUser.Id, testClaim.Id);
+                var check = uow.Users.IsInClaim(testUser, testClaim);
                 check.Should().BeTrue();
             }
         }
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_AddToLoginV1(testUser.Id, testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInLogin(testUser.Id, testLogin.Id);
+                var check = uow.Users.IsInLogin(testUser, testLogin);
                 check.Should().BeTrue();
             }
         }
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_AddToRoleV1(testUser.Id, testRole.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInRole(testUser.Id, testRole.Id);
+                var check = uow.Users.IsInRole(testUser, testRole);
                 check.Should().BeTrue();
             }
         }
@@ -694,7 +694,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_RemoveFromClaimV1(testUser.Id, testClaim.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInClaim(testUser.Id, testClaim.Id);
+                var check = uow.Users.IsInClaim(testUser, testClaim);
                 check.Should().BeFalse();
             }
         }
@@ -727,7 +727,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_RemoveFromLoginV1(testUser.Id, testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInLogin(testUser.Id, testLogin.Id);
+                var check = uow.Users.IsInLogin(testUser, testLogin);
                 check.Should().BeFalse();
             }
         }
@@ -760,7 +760,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_RemoveFromRoleV1(testUser.Id, testRole.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInRole(testUser.Id, testRole.Id);
+                var check = uow.Users.IsInRole(testUser, testRole);
                 check.Should().BeFalse();
             }
         }

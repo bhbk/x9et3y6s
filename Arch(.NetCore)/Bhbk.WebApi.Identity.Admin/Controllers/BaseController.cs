@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Authorize(Policy = "UsersPolicy")]
+    [Authorize]
     public class BaseController : Controller
     {
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }

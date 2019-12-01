@@ -17,10 +17,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("audience")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class AudienceController : BaseController
     {
         private AudienceProvider _provider;
@@ -31,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] AudienceCreate model)
         {
             if (!ModelState.IsValid)
@@ -62,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid audienceID)
         {
             var audience = UoW.Audiences.Get(x => x.Id == audienceID)
@@ -88,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/refresh"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid audienceID)
         {
             var audience = UoW.Audiences.Get(x => x.Id == audienceID)
@@ -109,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/refresh/{refreshID}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid audienceID, [FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
@@ -234,7 +236,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddModel model)
         {
             if (!ModelState.IsValid)
@@ -264,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] AudienceModel model)
         {
             if (!ModelState.IsValid)

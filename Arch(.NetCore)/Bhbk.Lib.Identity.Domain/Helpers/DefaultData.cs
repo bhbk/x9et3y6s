@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
 
             _uow.MOTDs.Create(
-                new tbl_MotDType1()
+                new tbl_MOTDs()
                 {
                     Id = Guid.NewGuid().ToString(),
                     Date = DateTime.Now,
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 });
 
             _uow.MOTDs.Create(
-                new tbl_MotDType1()
+                new tbl_MOTDs()
                 {
                     Id = Guid.NewGuid().ToString(),
                     Date = DateTime.Now,
@@ -129,13 +129,13 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * create default audiences
              */
 
-            var foundClientUi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var foundAudienceUi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == RealConstants.ApiDefaultAudienceUi).ToLambda())
                 .SingleOrDefault();
 
-            if (foundClientUi == null)
+            if (foundAudienceUi == null)
             {
-                foundClientUi = _uow.Audiences.Create(
+                foundAudienceUi = _uow.Audiences.Create(
                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -148,13 +148,13 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 _uow.Commit();
             }
 
-            var foundClientApi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var foundAudienceApi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == RealConstants.ApiDefaultAudienceApi).ToLambda())
                 .SingleOrDefault();
 
-            if (foundClientApi == null)
+            if (foundAudienceApi == null)
             {
-                foundClientApi = _uow.Audiences.Create(
+                foundAudienceApi = _uow.Audiences.Create(
                      _mapper.Map<tbl_Audiences>(new AudienceCreate()
                      {
                          IssuerId = foundIssuer.Id,
@@ -202,7 +202,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 foundRoleForAdmin = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        AudienceId = foundClientUi.Id,
+                        AudienceId = foundAudienceUi.Id,
                         Name = RealConstants.ApiDefaultRoleForAdmin,
                         Enabled = true,
                         Immutable = true,
@@ -220,8 +220,26 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 foundRoleForUser = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        AudienceId = foundClientUi.Id,
+                        AudienceId = foundAudienceUi.Id,
                         Name = RealConstants.ApiDefaultRoleForUser,
+                        Enabled = true,
+                        Immutable = true,
+                    }));
+
+                _uow.Commit();
+            }
+
+            var foundRoleForService = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
+                .Where(x => x.Name == RealConstants.ApiDefaultRoleForService).ToLambda())
+                .SingleOrDefault();
+
+            if (foundRoleForService == null)
+            {
+                foundRoleForService = _uow.Roles.Create(
+                    _mapper.Map<tbl_Roles>(new RoleCreate()
+                    {
+                        AudienceId = foundAudienceApi.Id,
+                        Name = RealConstants.ApiDefaultRoleForService,
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -286,8 +304,17 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * set password to audiences
              */
 
-            _uow.Audiences.SetPassword(foundClientApi, RealConstants.ApiDefaultAudienceApiKey);
-            _uow.Audiences.SetPassword(foundClientUi, RealConstants.ApiDefaultAudienceUiKey);
+            _uow.Audiences.SetPassword(foundAudienceApi, RealConstants.ApiDefaultAudienceApiKey);
+            _uow.Audiences.SetPassword(foundAudienceUi, RealConstants.ApiDefaultAudienceUiKey);
+
+            _uow.Commit();
+
+            /*
+             * assign roles to audiences
+             */
+
+            if (!_uow.Audiences.IsInRole(foundAudienceApi, foundRoleForService))
+                _uow.Audiences.AddToRole(foundAudienceApi, foundRoleForService);
 
             _uow.Commit();
 
@@ -295,16 +322,16 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              * assign roles, claims & logins to users
              */
 
-            if (!_uow.Users.IsInLogin(foundAdminUser.Id, foundLogin.Id))
+            if (!_uow.Users.IsInLogin(foundAdminUser, foundLogin))
                 _uow.Users.AddToLogin(foundAdminUser, foundLogin);
 
-            if (!_uow.Users.IsInRole(foundAdminUser.Id, foundRoleForAdmin.Id))
-                _uow.Users.AddToRole(foundAdminUser, foundRoleForAdmin);
-
-            if (!_uow.Users.IsInLogin(foundNormalUser.Id, foundLogin.Id))
+            if (!_uow.Users.IsInLogin(foundNormalUser, foundLogin))
                 _uow.Users.AddToLogin(foundNormalUser, foundLogin);
 
-            if (!_uow.Users.IsInRole(foundNormalUser.Id, foundRoleForUser.Id))
+            if (!_uow.Users.IsInRole(foundAdminUser, foundRoleForAdmin))
+                _uow.Users.AddToRole(foundAdminUser, foundRoleForAdmin);
+
+            if (!_uow.Users.IsInRole(foundNormalUser, foundRoleForUser))
                 _uow.Users.AddToRole(foundNormalUser, foundRoleForUser);
 
             _uow.Commit();

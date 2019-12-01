@@ -14,10 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("info")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class InfoController : BaseController
     {
         private InfoProvider _provider;
@@ -51,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (skip == 1)
                 skip = 0;
 
-            var motd = UoW.MOTDs.Get(new QueryExpression<tbl_MotDType1>()
+            var motd = UoW.MOTDs.Get(new QueryExpression<tbl_MOTDs>()
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
@@ -148,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (UoW.Users.IsLockedOut(user.Id)
+            else if (UoW.Users.IsLockedOut(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {

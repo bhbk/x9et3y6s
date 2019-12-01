@@ -15,10 +15,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("login")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class LoginController : BaseController
     {
         private LoginProvider _provider;
@@ -29,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] LoginCreate model)
         {
             if (!ModelState.IsValid)
@@ -51,7 +53,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid loginID)
         {
             var login = UoW.Logins.Get(x => x.Id == loginID)
@@ -148,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)

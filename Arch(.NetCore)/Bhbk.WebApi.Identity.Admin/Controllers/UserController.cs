@@ -24,10 +24,12 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Web;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("user")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class UserController : BaseController
     {
         private UserProvider _provider;
@@ -38,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -69,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -99,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-role/{roleID:guid}"), HttpGet]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -129,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
@@ -190,7 +192,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/no-confirm"), HttpPost]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult CreateV1NoConfirm([FromBody] UserCreate model)
         {
             if (!ModelState.IsValid)
@@ -218,7 +220,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid userID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -245,7 +247,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/refresh"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid userID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -266,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/refresh/{refreshID}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
@@ -427,7 +429,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -457,7 +459,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -486,7 +488,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -515,7 +517,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpGet]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult RemovePasswordV1([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
@@ -532,7 +534,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             user.ActorId = GetIdentityGUID();
 
-            if (!UoW.Users.IsPasswordSet(user.Id))
+            if (!UoW.Users.IsPasswordSet(user))
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
                 return BadRequest(ModelState);
@@ -547,7 +549,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] PasswordAddModel model)
         {
             if (!ModelState.IsValid)
@@ -577,7 +579,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = "AdministratorsPolicy")]
+        [Authorize(Policy = RealConstants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] UserModel model)
         {
             if (!ModelState.IsValid)

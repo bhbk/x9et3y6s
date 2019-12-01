@@ -269,6 +269,17 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
+        public async ValueTask<Dictionary<Guid, string>> Issuer_GetKeysV1(List<string> model)
+        {
+            var response = await Http.Issuer_GetKeysV1(_ropg.AccessToken.RawData, model);
+
+            if (response.IsSuccessStatusCode)
+                return response.Content.ReadAsAsync<Dictionary<Guid, string>>().Result;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
         public async ValueTask<IssuerModel> Issuer_UpdateV1(IssuerModel model)
         {
             var response = await Http.Issuer_UpdateV1(_ropg.AccessToken.RawData, model);

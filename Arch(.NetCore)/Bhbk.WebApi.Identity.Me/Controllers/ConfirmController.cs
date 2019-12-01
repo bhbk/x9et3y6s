@@ -9,10 +9,12 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("confirm")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class ConfirmController : BaseController
     {
         private ConfirmProvider _provider;

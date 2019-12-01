@@ -102,13 +102,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * create test audiences
              */
 
-            var foundClient = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var foundAudience = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == FakeConstants.ApiTestAudience).ToLambda())
                 .SingleOrDefault();
 
-            if (foundClient == null)
+            if (foundAudience == null)
             {
-                foundClient = _uow.Audiences.Create(
+                foundAudience = _uow.Audiences.Create(
                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
                     {
                         IssuerId = foundIssuer.Id,
@@ -121,8 +121,8 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
-                        AudienceId = foundClient.Id,
-                        ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
+                        AudienceId = foundAudience.Id,
+                        ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                         Immutable = false,
                     }));
 
@@ -130,7 +130,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = foundIssuer.Id,
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = Base64.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
@@ -146,18 +146,18 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
 
             var url = new Uri(FakeConstants.ApiTestUriLink);
 
-            var foundClientUrl = _uow.Urls.Get(new QueryExpression<tbl_Urls>()
-                .Where(x => x.AudienceId == foundClient.Id
+            var foundAudienceUrl = _uow.Urls.Get(new QueryExpression<tbl_Urls>()
+                .Where(x => x.AudienceId == foundAudience.Id
                     && x.UrlHost == (url.Scheme + "://" + url.Host)
                     && x.UrlPath == url.AbsolutePath).ToLambda())
                 .SingleOrDefault();
 
-            if (foundClientUrl == null)
+            if (foundAudienceUrl == null)
             {
-                foundClientUrl = _uow.Urls.Create(
+                foundAudienceUrl = _uow.Urls.Create(
                     _mapper.Map<tbl_Urls>(new UrlCreate()
                     {
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         UrlHost = url.Scheme + "://" + url.Host,
                         UrlPath = url.AbsolutePath,
                         Enabled = true,
@@ -221,7 +221,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 foundRole = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleCreate()
                     {
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         Name = FakeConstants.ApiTestRole,
                         Enabled = true,
                         Immutable = false,
@@ -255,7 +255,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Activities_Deprecate.Create(
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
                         Immutable = false,
@@ -265,7 +265,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Refreshes>(new RefreshCreate()
                     {
                         IssuerId = foundIssuer.Id,
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         RefreshType = RefreshType.User.ToString(),
                         RefreshValue = Base64.CreateString(8),
@@ -277,7 +277,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = foundIssuer.Id,
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.Device.ToString(),
@@ -290,7 +290,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_States>(new StateCreate()
                     {
                         IssuerId = foundIssuer.Id,
-                        AudienceId = foundClient.Id,
+                        AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = StateType.User.ToString(),
@@ -307,10 +307,19 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             }
 
             /*
-             * set password to random audiences
+             * set password to audiences
              */
 
-            _uow.Audiences.SetPassword(foundClient, FakeConstants.ApiTestAudiencePassCurrent);
+            _uow.Audiences.SetPassword(foundAudience, FakeConstants.ApiTestAudiencePassCurrent);
+
+            _uow.Commit();
+
+            /*
+             * assign roles to audiences
+             */
+
+            if (!_uow.Audiences.IsInRole(foundAudience, foundRole))
+                _uow.Audiences.AddToRole(foundAudience, foundRole);
 
             _uow.Commit();
 
@@ -318,13 +327,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * assign roles, claims & logins to users
              */
 
-            if (!_uow.Users.IsInRole(foundUser.Id, foundRole.Id))
+            if (!_uow.Users.IsInRole(foundUser, foundRole))
                 _uow.Users.AddToRole(foundUser, foundRole);
 
-            if (!_uow.Users.IsInLogin(foundUser.Id, foundLogin.Id))
+            if (!_uow.Users.IsInLogin(foundUser, foundLogin))
                 _uow.Users.AddToLogin(foundUser, foundLogin);
 
-            if (!_uow.Users.IsInClaim(foundUser.Id, foundClaim.Id))
+            if (!_uow.Users.IsInClaim(foundUser, foundClaim))
                 _uow.Users.AddToClaim(foundUser, foundClaim);
 
             _uow.Commit();
@@ -378,7 +387,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                     _mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         AudienceId = audience.Id,
-                        ActivityType = LoginType.CreateClientAccessTokenV2.ToString(),
+                        ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                         Immutable = false,
                     }));
 
@@ -516,6 +525,15 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Commit();
 
                 /*
+                 * assign roles to random audiences
+                 */
+
+                if (!_uow.Audiences.IsInRole(audience, role))
+                    _uow.Audiences.AddToRole(audience, role);
+
+                _uow.Commit();
+
+                /*
                  * assign roles, claims & logins to random users
                  */
 
@@ -524,13 +542,13 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
                 _uow.Users.SetConfirmedPhoneNumber(user, true);
                 _uow.Commit();
 
-                if (!_uow.Users.IsInRole(user.Id, role.Id))
+                if (!_uow.Users.IsInRole(user, role))
                     _uow.Users.AddToRole(user, role);
 
-                if (!_uow.Users.IsInLogin(user.Id, login.Id))
+                if (!_uow.Users.IsInLogin(user, login))
                     _uow.Users.AddToLogin(user, login);
 
-                if (!_uow.Users.IsInClaim(user.Id, claim.Id))
+                if (!_uow.Users.IsInClaim(user, claim))
                     _uow.Users.AddToClaim(user, claim);
 
                 _uow.Commit();
@@ -545,7 +563,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
             for (int i = 0; i < sets; i++)
             {
                 _uow.MOTDs.Create(
-                    new tbl_MotDType1()
+                    new tbl_MOTDs()
                     {
                         Id = AlphaNumeric.CreateString(8),
                         Date = DateTime.Now,
@@ -619,7 +637,7 @@ namespace Bhbk.Lib.Identity.Domain.Tests.Helpers
              * delete test msg of the day
              */
 
-            _uow.MOTDs.Delete(new QueryExpression<tbl_MotDType1>().ToLambda());
+            _uow.MOTDs.Delete(new QueryExpression<tbl_MOTDs>().ToLambda());
             _uow.Commit();
         }
     }

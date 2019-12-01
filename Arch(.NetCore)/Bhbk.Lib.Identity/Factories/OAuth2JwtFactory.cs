@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Factories
                     claims: principal.Claims,
                     notBefore: validFromUtc,
                     expires: validToUtc,
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
                     ));
 
             return new JwtSecurityToken(result);
@@ -110,6 +110,13 @@ namespace Bhbk.Lib.Identity.Factories
             else
                 audienceResult = string.Join(", ", audiences.OrderBy(x => x));
 
+            SigningCredentials signingCredentialResult = null;
+
+            if (string.IsNullOrEmpty(issuerSalt))
+                signingCredentialResult = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            else
+                signingCredentialResult = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512);
+
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
                     issuer: issuerResult,
@@ -117,7 +124,7 @@ namespace Bhbk.Lib.Identity.Factories
                     claims: principal.Claims,
                     notBefore: validFromUtc,
                     expires: validToUtc,
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+                    signingCredentials: signingCredentialResult
                     ));
 
             return new JwtSecurityToken(result);

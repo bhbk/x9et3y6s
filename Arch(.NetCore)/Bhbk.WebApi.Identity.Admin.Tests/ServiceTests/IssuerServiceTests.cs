@@ -293,6 +293,54 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
         }
 
         [Fact]
+        public async Task Admin_IssuerV1_GetKeys_Fail()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var service = new AdminService(conf, InstanceContext.UnitTest, owin);
+
+                var result = await service.Http.Issuer_GetKeysV1(Base64.CreateString(8), new List<string> { } );
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            }
+        }
+
+        [Fact]
+        public async Task Admin_IssuerV1_GetKeys_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var service = new AdminService(conf, InstanceContext.UnitTest, owin);
+
+                new TestData(uow, mapper).Destroy();
+                new TestData(uow, mapper).Create();
+
+                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceApi).Single();
+
+                var cc_claims = uow.Audiences.GenerateAccessClaims(issuer, audience);
+                service.AccessToken = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, cc_claims);
+
+                var testIssuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
+                var testList = new List<string> { issuer.Id.ToString(), testIssuer.Name };
+
+                var result = await service.Issuer_GetKeysV1(testList);
+                result.Should().BeAssignableTo<Dictionary<Guid, string>>();
+                result.Count().Should().Be(testList.Count());
+            }
+        }
+
+        [Fact]
         public async Task Admin_IssuerV1_Update_Fail()
         {
             using (var owin = _factory.CreateClient())

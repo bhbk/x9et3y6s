@@ -2,6 +2,7 @@
 using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.WebApi.Alert.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -9,10 +10,12 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
     [Route("diagnostic")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class DiagnosticController : BaseController
     {
         private DiagnosticProvider _provider;

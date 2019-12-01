@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
-    [Authorize(Policy = "UsersPolicy")]
+    [Authorize]
     public class BaseController : Controller
     {
         protected IOAuth2JwtFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }

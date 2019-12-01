@@ -40,8 +40,8 @@ namespace Bhbk.Lib.Identity.Data.Primitives
         public const string ApiDefaultLoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwnJ1KHDX61K48";
         public const string ApiDefaultLoginName = "Local";
         public const string ApiDefaultRoleForAdmin = "(Built-In) Admins";
-        public const string ApiDefaultRoleForSystem = "(Built-In) Services";
         public const string ApiDefaultRoleForUser = "(Built-In) Users";
+        public const string ApiDefaultRoleForService = "(Built-In) Services";
         public const string ApiDefaultAdminUser = "admin@local";
         public const string ApiDefaultAdminUserPassword = "pa$$word01!";
         public const string ApiDefaultAdminUserFirstName = "Administrator";
@@ -59,6 +59,14 @@ namespace Bhbk.Lib.Identity.Data.Primitives
         public const string ApiSettingGlobalLegacyClaims = "GlobalLegacyClaims";
         public const string ApiSettingGlobalLegacyIssuer = "GlobalLegacyIssuer";
         public const string ApiSettingGlobalTotpExpire = "GlobalTotpExpire";
+
+        #endregion
+
+        #region Policy Constants
+
+        public const string PolicyForAdmins = "AdminsPolicy";
+        public const string PolicyForServices = "ServicesPolicy";
+        public const string PolicyForUsers = "UsersPolicy";
 
         #endregion
 

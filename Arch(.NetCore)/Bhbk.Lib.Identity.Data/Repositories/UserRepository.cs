@@ -5,7 +5,6 @@ using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Data.Validators;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -346,41 +345,41 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             return PasswordVerificationResult.Failed;
         }
 
-        public bool IsInClaim(Guid userKey, Guid claimKey)
+        public bool IsInClaim(tbl_Users user, tbl_Claims claim)
         {
             /*
              * TODO need to add check for role based claims...
              */
 
             if (_context.Set<tbl_UserClaims>()
-                .Any(x => x.UserId == userKey && x.ClaimId == claimKey))
+                .Any(x => x.UserId == user.Id && x.ClaimId == claim.Id))
                 return true;
 
             return false;
         }
 
-        public bool IsInLogin(Guid userKey, Guid loginKey)
+        public bool IsInLogin(tbl_Users user, tbl_Logins login)
         {
             if (_context.Set<tbl_UserLogins>()
-                .Any(x => x.UserId == userKey && x.LoginId == loginKey))
+                .Any(x => x.UserId == user.Id && x.LoginId == login.Id))
                 return true;
 
             return false;
         }
 
-        public bool IsInRole(Guid userKey, Guid roleKey)
+        public bool IsInRole(tbl_Users user, tbl_Roles role)
         {
             if (_context.Set<tbl_UserRoles>()
-                .Any(x => x.UserId == userKey && x.RoleId == roleKey))
+                .Any(x => x.UserId == user.Id && x.RoleId == role.Id))
                 return true;
 
             return false;
         }
 
-        public bool IsLockedOut(Guid key)
+        public bool IsLockedOut(tbl_Users user)
         {
             var entity = _context.Set<tbl_Users>()
-                .Where(x => x.Id == key).SingleOrDefault();
+                .Where(x => x.Id == user.Id).Single();
 
             if (entity.LockoutEnabled)
             {
@@ -405,15 +404,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             }
         }
 
-        public bool IsPasswordSet(Guid key)
+        public bool IsPasswordSet(tbl_Users user)
         {
             var entity = _context.Set<tbl_Users>()
-                .Where(x => x.Id == key).SingleOrDefault();
+                .Where(x => x.Id == user.Id).Single();
 
-            if (entity == null)
-                return false;
-
-            else if (string.IsNullOrEmpty(entity.PasswordHash))
+            if (string.IsNullOrEmpty(entity.PasswordHash))
                 return false;
 
             return true;

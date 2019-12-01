@@ -135,15 +135,15 @@ namespace Bhbk.WebApi.Alert
             });
             sc.AddAuthorization(opt =>
             {
-                opt.AddPolicy("AdministratorsPolicy", admins =>
+                opt.AddPolicy(RealConstants.PolicyForAdmins, admins =>
                 {
                     admins.Requirements.Add(new AlertAdminsAuthorizeRequirement());
                 });
-                opt.AddPolicy("ServicesPolicy", services =>
+                opt.AddPolicy(RealConstants.PolicyForServices, services =>
                 {
                     services.Requirements.Add(new AlertServicesAuthorizeRequirement());
                 });
-                opt.AddPolicy("UsersPolicy", users =>
+                opt.AddPolicy(RealConstants.PolicyForUsers, users =>
                 {
                     users.Requirements.Add(new AlertUsersAuthorizeRequirement());
                 });

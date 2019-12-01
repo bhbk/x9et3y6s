@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="3.0.5" />
+    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="3.0.6" />
     <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.21.2046" />
     <PackageReference Include="Bhbk.Lib.Cryptography" Version="2019.10.21.2046" />
     <PackageReference Include="Bhbk.Lib.Hosting" Version="2019.10.21.2046" />

@@ -7,6 +7,7 @@ using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -15,10 +16,12 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Web;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("change")]
+    [Authorize(Policy = RealConstants.PolicyForUsers)]
     public class ChangeController : BaseController
     {
         private ChangeProvider _provider;

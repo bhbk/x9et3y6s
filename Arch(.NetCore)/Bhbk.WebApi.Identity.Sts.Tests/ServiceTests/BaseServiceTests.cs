@@ -28,6 +28,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using Xunit;
+using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
@@ -124,15 +125,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 });
                 sc.AddAuthorization(opt =>
                 {
-                    opt.AddPolicy("AdministratorsPolicy", admins =>
+                    opt.AddPolicy(RealConstants.PolicyForAdmins, admins =>
                     {
                         admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                     });
-                    opt.AddPolicy("ServicesPolicy", services =>
+                    opt.AddPolicy(RealConstants.PolicyForServices, services =>
                     {
                         services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });
-                    opt.AddPolicy("UsersPolicy", users =>
+                    opt.AddPolicy(RealConstants.PolicyForUsers, users =>
                     {
                         users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                     });

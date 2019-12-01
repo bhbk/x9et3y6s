@@ -135,15 +135,15 @@ namespace Bhbk.WebApi.Identity.Admin
             });
             sc.AddAuthorization(auth =>
             {
-                auth.AddPolicy("AdministratorsPolicy", admins =>
+                auth.AddPolicy(RealConstants.PolicyForAdmins, admins =>
                 {
                     admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                 });
-                auth.AddPolicy("ServicesPolicy", services =>
+                auth.AddPolicy(RealConstants.PolicyForServices, services =>
                 {
                     services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
-                auth.AddPolicy("UsersPolicy", users =>
+                auth.AddPolicy(RealConstants.PolicyForUsers, users =>
                 {
                     users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
@@ -172,9 +172,9 @@ namespace Bhbk.WebApi.Identity.Admin
 
             app.UseForwardedHeaders();
             app.UseStaticFiles();
-            app.UseSwagger(options =>
+            app.UseSwagger(opt =>
             {
-                options.RouteTemplate = "help/{documentName}/index.json";
+                opt.RouteTemplate = "help/{documentName}/index.json";
             });
             app.UseSwaggerUI(opt =>
             {

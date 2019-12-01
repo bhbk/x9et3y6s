@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
-        public virtual DbSet<tbl_MotDType1> tbl_MotDType1 { get; set; }
+        public virtual DbSet<tbl_MOTDs> tbl_MOTDs { get; set; }
         public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
         public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
         public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
@@ -89,7 +89,6 @@ namespace Bhbk.Lib.Identity.Data.Models
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.tbl_AudienceRoles)
                     .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AudienceRoles_RoleID");
             });
 
@@ -170,7 +169,7 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .HasConstraintName("FK_Logins_ActorID");
             });
 
-            modelBuilder.Entity<tbl_MotDType1>(entity =>
+            modelBuilder.Entity<tbl_MOTDs>(entity =>
             {
                 entity.HasIndex(e => e.Id)
                     .HasName("IX_tbl_MotDType1")

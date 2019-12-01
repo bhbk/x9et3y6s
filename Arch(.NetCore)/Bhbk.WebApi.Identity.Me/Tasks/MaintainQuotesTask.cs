@@ -71,9 +71,9 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                             if (motdtype1_response.IsSuccessStatusCode)
                             {
-                                var model = mapper.Map<tbl_MotDType1>(motdtype1.contents.quotes[0]);
+                                var model = mapper.Map<tbl_MOTDs>(motdtype1.contents.quotes[0]);
 
-                                var motd = uow.MOTDs.Get(new QueryExpression<tbl_MotDType1>()
+                                var motd = uow.MOTDs.Get(new QueryExpression<tbl_MOTDs>()
                                     .Where(x => x.Author == model.Author && x.Quote == model.Quote)
                                     .ToLambda()).SingleOrDefault();
 

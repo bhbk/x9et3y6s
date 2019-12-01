@@ -10,15 +10,15 @@ namespace Bhbk.Lib.Identity.Data.Primitives.Enums
 
     public enum LoginType
     {
+        CreateAudienceAccessTokenV1,
+        CreateAudienceAccessTokenV2,
+        CreateAudienceRefreshTokenV1,
+        CreateAudienceRefreshTokenV2,
         CreateUserAccessTokenV1Legacy,
         CreateUserAccessTokenV1,
         CreateUserAccessTokenV2,
         CreateUserRefreshTokenV1,
         CreateUserRefreshTokenV2,
-        CreateClientAccessTokenV1,
-        CreateClientAccessTokenV2,
-        CreateClientRefreshTokenV1,
-        CreateClientRefreshTokenV2,
     }
 
     public enum MessageType
