@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using System;

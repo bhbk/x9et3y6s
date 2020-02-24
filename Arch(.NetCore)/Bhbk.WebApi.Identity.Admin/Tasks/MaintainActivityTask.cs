@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -63,12 +63,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                                 || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).ToLambda();
 
-                        var expired = uow.Activities_Deprecate.Get(expiredExpr);
+                        var expired = uow.Activities.Get(expiredExpr);
                         var expiredCount = expired.Count();
 
                         if (expired.Any())
                         {
-                            uow.Activities_Deprecate.Delete(expired);
+                            uow.Activities.Delete(expired);
                             uow.Commit();
 
                             var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "

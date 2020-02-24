@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.FileSystem;
-using Bhbk.Lib.Identity.Data.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;

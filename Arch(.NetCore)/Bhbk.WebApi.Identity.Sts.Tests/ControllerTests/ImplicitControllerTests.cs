@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -17,8 +18,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Web;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 {
@@ -45,17 +44,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
-                var url = new Uri(FakeConstants.ApiTestUriLink);
+                var url = new Uri(Constants.ApiTestUriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
@@ -98,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var jwt = auth.Parse(result);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                iss.Value.Split(':')[0].Should().Be(FakeConstants.ApiTestIssuer);
+                iss.Value.Split(':')[0].Should().Be(Constants.ApiTestIssuer);
                 iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -14,8 +15,6 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
@@ -41,18 +40,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var newEmail = string.Format("{0}{1}", Base64.CreateString(4), user.Email);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var expire = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
                 var token = new PasswordlessTokenFactory(uow.InstanceType.ToString())
                     .Generate(newEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -80,18 +79,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var newEmail = string.Format("{0}{1}", Base64.CreateString(4), user.Email);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var expire = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
                 var token = new PasswordlessTokenFactory(uow.InstanceType.ToString())
                     .Generate(newEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -118,18 +117,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var newPassword = Base64.CreateString(12);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var expire = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
                 var token = new PasswordlessTokenFactory(uow.InstanceType.ToString())
                     .Generate(newPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -157,18 +156,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var newPassword = Base64.CreateString(12);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var expire = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingGlobalTotpExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
                 var token = new PasswordlessTokenFactory(uow.InstanceType.ToString())
                     .Generate(newPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user);
@@ -195,12 +194,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var newPhoneNumber = NumberAs.CreateString(10);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
@@ -230,12 +229,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var newPhoneNumber = NumberAs.CreateString(10);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);

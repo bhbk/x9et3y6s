@@ -65,8 +65,8 @@ namespace Bhbk.Lib.Identity.Services
          * message of the days
          */
 
-        ValueTask<MOTDType1Model> MOTD_GetV1(string motdValue);
-        ValueTask<PageStateTypeCResult<MOTDType1Model>> MOTD_GetV1(PageStateTypeC model);
+        ValueTask<MOTDModel> MOTD_GetV1(string motdValue);
+        ValueTask<PageStateTypeCResult<MOTDModel>> MOTD_GetV1(PageStateTypeC model);
 
         /*
          * roles

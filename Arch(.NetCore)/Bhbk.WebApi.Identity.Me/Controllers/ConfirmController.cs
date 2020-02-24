@@ -1,7 +1,8 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -9,12 +10,11 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("confirm")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class ConfirmController : BaseController
     {
         private ConfirmProvider _provider;

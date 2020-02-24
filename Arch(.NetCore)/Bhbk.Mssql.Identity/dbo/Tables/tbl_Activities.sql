@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[tbl_Activities] (
     [Id]             UNIQUEIDENTIFIER NOT NULL,
-    [UserId]         UNIQUEIDENTIFIER NULL,
     [AudienceId]     UNIQUEIDENTIFIER NULL,
+    [UserId]         UNIQUEIDENTIFIER NULL,
     [ActivityType]   NVARCHAR (64)    NOT NULL,
     [TableName]      NVARCHAR (MAX)   NULL,
     [KeyValues]      NVARCHAR (MAX)   NULL,

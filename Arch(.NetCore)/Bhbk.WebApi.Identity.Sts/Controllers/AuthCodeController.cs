@@ -1,13 +1,13 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -310,7 +310,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var ac_claims = UoW.Users.GenerateAccessClaims(issuer, user);
             var ac = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -332,7 +332,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,

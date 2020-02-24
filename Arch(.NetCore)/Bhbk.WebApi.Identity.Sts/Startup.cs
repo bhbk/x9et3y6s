@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Sts.Middlewares;
@@ -27,7 +28,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts
 {
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Sts
              */
 
             var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
                 issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
@@ -136,15 +136,15 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             sc.AddAuthorization(opt =>
             {
-                opt.AddPolicy(RealConstants.PolicyForAdmins, admins =>
+                opt.AddPolicy(Constants.PolicyForAdmins, admins =>
                 {
                     admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                 });
-                opt.AddPolicy(RealConstants.PolicyForServices, services =>
+                opt.AddPolicy(Constants.PolicyForServices, services =>
                 {
                     services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
-                opt.AddPolicy(RealConstants.PolicyForUsers, users =>
+                opt.AddPolicy(Constants.PolicyForUsers, users =>
                 {
                     users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });

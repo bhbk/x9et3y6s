@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +21,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 {
@@ -41,10 +41,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).CreateMOTD(3);
+                new GenerateTestData(uow, mapper).CreateMOTD(3);
 
                 var result = await service.Info_GetMOTDV1();
-                result.Should().BeAssignableTo<MOTDType1Model>();
+                result.Should().BeAssignableTo<MOTDModel>();
             }
         }
 
@@ -64,9 +64,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 dc.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -85,12 +85,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_States>(new StateCreate()
@@ -128,15 +128,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_States>(new StateCreate()
@@ -166,15 +166,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new MeService(conf, InstanceContext.UnitTest, owin);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == RealConstants.ApiSettingAccessExpire).Single();
+                    && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_States>(new StateCreate()

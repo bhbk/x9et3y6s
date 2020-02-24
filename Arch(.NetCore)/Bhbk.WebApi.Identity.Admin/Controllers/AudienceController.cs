@@ -2,11 +2,12 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,12 +18,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("audience")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class AudienceController : BaseController
     {
         private AudienceProvider _provider;
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] AudienceCreate model)
         {
             if (!ModelState.IsValid)
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid audienceID)
         {
             var audience = UoW.Audiences.Get(x => x.Id == audienceID)
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/refresh"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid audienceID)
         {
             var audience = UoW.Audiences.Get(x => x.Id == audienceID)
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/refresh/{refreshID}"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid audienceID, [FromRoute] Guid refreshID)
         {
             var expr = new QueryExpression<tbl_Refreshes>()
@@ -236,7 +236,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddModel model)
         {
             if (!ModelState.IsValid)
@@ -253,20 +253,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             audience.ActorId = GetIdentityGUID();
 
-            if (model.NewPassword != model.NewPasswordConfirm)
+            if (model.NewPassword != model.NewPasswordConfirm
+                || !new ValidationHelper().ValidatePassword(model.NewPassword).Succeeded)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Bad password for audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.SetPassword(audience, model.NewPassword);
+            UoW.Audiences.SetPasswordHash(audience, new ValidationHelper().PasswordHash(model.NewPassword));
             UoW.Commit();
 
             return NoContent();
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] AudienceModel model)
         {
             if (!ModelState.IsValid)

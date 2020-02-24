@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[tbl_AudienceRoles] (
+﻿CREATE TABLE [dbo].[tbl_AudienceRoles] (
     [AudienceId] UNIQUEIDENTIFIER NOT NULL,
     [RoleId]     UNIQUEIDENTIFIER NOT NULL,
     [ActorId]    UNIQUEIDENTIFIER NULL,
@@ -6,8 +6,10 @@ CREATE TABLE [dbo].[tbl_AudienceRoles] (
     [Immutable]  BIT              NOT NULL,
     CONSTRAINT [PK_AudienceRoles] PRIMARY KEY CLUSTERED ([AudienceId] ASC, [RoleId] ASC),
     CONSTRAINT [FK_AudienceRoles_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[tbl_Audiences] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT [FK_AudienceRoles_RoleID] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[tbl_Roles] ([Id])
+    CONSTRAINT [FK_AudienceRoles_RoleID] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[tbl_Roles] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 

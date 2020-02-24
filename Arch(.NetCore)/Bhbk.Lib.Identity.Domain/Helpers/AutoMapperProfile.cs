@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -141,7 +141,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * message of the day models
              */
-            CreateMap<MOTDType1Model, tbl_MOTDs>()
+            CreateMap<MOTDModel, tbl_MOTDs>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.id))
                 .ForMember(dest => dest.Title, src => src.MapFrom(val => val.title))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
@@ -152,7 +152,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Length, src => src.MapFrom(val => val.length))
                 .ForMember(dest => dest.Background, src => src.MapFrom(val => val.background));
 
-            CreateMap<tbl_MOTDs, MOTDType1Model>()
+            CreateMap<tbl_MOTDs, MOTDModel>()
                 .ForMember(dest => dest.id, src => src.MapFrom(val => val.Id))
                 .ForMember(dest => dest.title, src => src.MapFrom(val => val.Title))
                 .ForMember(dest => dest.author, src => src.MapFrom(val => val.Author))

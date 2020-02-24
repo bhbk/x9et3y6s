@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

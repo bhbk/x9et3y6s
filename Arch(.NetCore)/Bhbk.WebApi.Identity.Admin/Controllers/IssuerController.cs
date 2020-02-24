@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -15,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] IssuerCreate model)
         {
             if (!ModelState.IsValid)
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/keys"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForServices)]
+        [Authorize(Policy = Constants.PolicyForServices)]
         public IActionResult GetKeysV1([FromBody] List<string> model)
         {
             var current = GetIdentityGUID();
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerValue}"), HttpGet]
-        [Authorize(Policy = RealConstants.PolicyForUsers)]
+        [Authorize(Policy = Constants.PolicyForUsers)]
         public IActionResult GetV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
@@ -125,7 +125,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForUsers)]
+        [Authorize(Policy = Constants.PolicyForUsers)]
         public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
@@ -156,7 +156,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}/audiences"), HttpGet]
-        [Authorize(Policy = RealConstants.PolicyForUsers)]
+        [Authorize(Policy = Constants.PolicyForUsers)]
         public IActionResult GetAudiencesV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
@@ -175,7 +175,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] IssuerModel model)
         {
             if (!ModelState.IsValid)

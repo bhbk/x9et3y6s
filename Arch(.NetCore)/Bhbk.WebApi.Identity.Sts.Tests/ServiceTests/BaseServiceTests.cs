@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using Bhbk.WebApi.Identity.Sts.Middlewares;
@@ -28,7 +29,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using Xunit;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).Create();
+                    new GenerateDefaultData(uow, mapper).Create();
 
                     return uow;
                 });
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                  */
 
                 var owin = new UoWService(conf, instance);
-                new DefaultData(owin, mapper).Create();
+                new GenerateDefaultData(owin, mapper).Create();
 
                 if (owin.InstanceType != InstanceContext.UnitTest)
                     throw new NotSupportedException();
@@ -125,15 +125,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 });
                 sc.AddAuthorization(opt =>
                 {
-                    opt.AddPolicy(RealConstants.PolicyForAdmins, admins =>
+                    opt.AddPolicy(Constants.PolicyForAdmins, admins =>
                     {
                         admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
                     });
-                    opt.AddPolicy(RealConstants.PolicyForServices, services =>
+                    opt.AddPolicy(Constants.PolicyForServices, services =>
                     {
                         services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });
-                    opt.AddPolicy(RealConstants.PolicyForUsers, users =>
+                    opt.AddPolicy(Constants.PolicyForUsers, users =>
                     {
                         users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                     });

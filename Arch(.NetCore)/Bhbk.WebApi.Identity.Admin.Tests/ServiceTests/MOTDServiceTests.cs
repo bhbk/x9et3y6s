@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,6 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
 using static Bhbk.Lib.DataState.Models.PageStateTypeC;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
@@ -38,12 +38,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).CreateMOTD(3);
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).CreateMOTD(3);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultNormalUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testMOTD = uow.MOTDs.Get().First();
 
                 var result = await service.MOTD_GetV1(testMOTD.Id);
-                result.Should().BeAssignableTo<MOTDType1Model>();
+                result.Should().BeAssignableTo<MOTDModel>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -63,12 +63,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).CreateMOTD(3);
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).CreateMOTD(3);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);

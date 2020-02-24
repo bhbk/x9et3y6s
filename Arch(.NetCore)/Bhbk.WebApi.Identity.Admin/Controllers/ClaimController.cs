@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -15,12 +16,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("claim")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class ClaimController : BaseController
     {
         private ClaimProvider _provider;
@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] ClaimCreate model)
         {
             if (!ModelState.IsValid)
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
             var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
@@ -132,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] ClaimModel model)
         {
             if (!ModelState.IsValid)

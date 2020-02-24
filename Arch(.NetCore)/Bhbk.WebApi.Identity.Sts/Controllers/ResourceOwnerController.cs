@@ -1,12 +1,15 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 /*
  * https://tools.ietf.org/html/rfc6749#section-4.3
@@ -49,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if issuer compatibility mode enabled.
             var legacyIssuer = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == RealConstants.ApiSettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (!bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
@@ -70,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         .Select(i => i.Value).First()).SingleOrDefault();
 
                 else if (UoW.InstanceType == InstanceContext.UnitTest)
-                    issuer = UoW.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).SingleOrDefault();
+                    issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).SingleOrDefault();
 
                 else
                     throw new NotImplementedException();
@@ -150,10 +151,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.DeployedOrLocal:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user, input.password))
+                            if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, input.password) == PasswordVerificationResult.Failed)
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -179,11 +180,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.UnitTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(Constants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user, input.password))
+                            if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, input.password) == PasswordVerificationResult.Failed)
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -217,7 +218,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop_claims = UoW.Users.GenerateAccessClaims(user);
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, null, new List<string> { audience.Name }, rop_claims);
 
-                UoW.Activities_Deprecate.Create(
+                UoW.Activities.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
@@ -241,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                UoW.Activities_Deprecate.Create(
+                UoW.Activities.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
@@ -263,7 +264,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         ValidToUtc = rt.ValidTo,
                     }));
 
-                UoW.Activities_Deprecate.Create(
+                UoW.Activities.Create(
                     Mapper.Map<tbl_Activities>(new ActivityCreate()
                     {
                         UserId = user.Id,
@@ -386,7 +387,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -508,10 +509,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.DeployedOrLocal:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user, input.password))
+                            if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, input.password) == PasswordVerificationResult.Failed)
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -537,11 +538,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.UnitTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(RealConstants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(FakeConstants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(Constants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!UoW.Users.VerifyPassword(user, input.password))
+                            if (!new ValidationHelper().ValidatePassword(input.password).Succeeded)
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -572,7 +573,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
             var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rop_claims);
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -594,7 +595,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,
@@ -733,7 +734,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     UserId = user.Id,

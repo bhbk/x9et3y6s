@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Models;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using System;

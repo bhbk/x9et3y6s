@@ -11,12 +11,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string author { get; set; }
     }
 
-    public class MOTDType1Create : MOTDs
+    public class MOTDCreate : MOTDs
     {
 
     }
 
-    public class MOTDType1Model : MOTDs
+    public class MOTDModel : MOTDs
     {
         public string length { get; set; }
 
@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Models.Me
 
         public class Contents
         {
-            public List<MOTDType1Model> quotes { get; set; }
+            public List<MOTDModel> quotes { get; set; }
         }
 
         public class Success

@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("role")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class RoleController : BaseController
     {
         private RoleProvider _provider;
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult CreateV1([FromBody] RoleCreate model)
         {
             if (!ModelState.IsValid)
@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid roleID)
         {
             var role = UoW.Roles.Get(x => x.Id == roleID)
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult UpdateV1([FromBody] RoleModel model)
         {
             if (!ModelState.IsValid)

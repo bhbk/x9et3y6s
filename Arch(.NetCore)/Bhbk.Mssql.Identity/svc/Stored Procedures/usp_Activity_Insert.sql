@@ -2,8 +2,8 @@
 
 CREATE PROCEDURE [svc].[usp_Activity_Insert]
      @Id					UNIQUEIDENTIFIER 
+    ,@AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER
-    ,@ClientId				UNIQUEIDENTIFIER
     ,@ActivityType          NVARCHAR (64) 
     ,@TableName				NVARCHAR (MAX)
     ,@KeyValues				NVARCHAR (MAX) 
@@ -17,8 +17,8 @@ AS
 INSERT INTO [dbo].[tbl_Activities]
 	(
      Id           
-    ,UserId    
     ,AudienceId    
+    ,UserId    
     ,ActivityType           
     ,TableName
     ,KeyValues   
@@ -30,8 +30,8 @@ INSERT INTO [dbo].[tbl_Activities]
 VALUES
 	(
      @Id           
+    ,@AudienceId    
     ,@UserId    
-    ,@ClientId    
     ,@ActivityType
 	,@TableName
     ,@KeyValues    

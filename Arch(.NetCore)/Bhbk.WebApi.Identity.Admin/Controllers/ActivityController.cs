@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -15,12 +16,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("activity")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class ActivityController : BaseController
     {
         private ActivityProvider _provider;
@@ -31,14 +31,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{activityValue}"), HttpGet]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult GetV1([FromRoute] string activityValue)
         {
             Guid activityID;
             tbl_Activities activity = null;
 
             if (Guid.TryParse(activityValue, out activityID))
-                activity = UoW.Activities_Deprecate.Get(new QueryExpression<tbl_Activities>()
+                activity = UoW.Activities.Get(new QueryExpression<tbl_Activities>()
                     .Where(x => x.Id == activityID).ToLambda())
                     .SingleOrDefault();
 
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
@@ -63,11 +63,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var result = new PageStateTypeCResult<ActivityModel>
                 {
                     Data = Mapper.Map<IEnumerable<ActivityModel>>(
-                        UoW.Activities_Deprecate.Get(
+                        UoW.Activities.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
                                 model.ToExpression<tbl_Activities>()))),
 
-                    Total = UoW.Activities_Deprecate.Count(
+                    Total = UoW.Activities.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
                             model.ToPredicateExpression<tbl_Activities>()))
                 };

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
@@ -62,13 +62,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-                var url = new Uri(FakeConstants.ApiTestUriLink);
+                var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()
@@ -98,13 +98,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-                var url = new Uri(FakeConstants.ApiTestUriLink);
+                var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()
@@ -134,14 +134,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-                var url = new Uri(FakeConstants.ApiTestUriLink);
+                var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()
@@ -171,14 +171,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
                 var service = new StsService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == FakeConstants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == FakeConstants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
-                var url = new Uri(FakeConstants.ApiTestUriLink);
+                var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()

@@ -1,13 +1,15 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Primitives;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Primitives;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -16,12 +18,11 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Web;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("change")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class ChangeController : BaseController
     {
         private ChangeProvider _provider;
@@ -73,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ToEmail = user.Email,
                 ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 Subject = string.Format("{0}", Constants.MsgConfirmEmailSubject),
-                HtmlContent = Constants.TemplateConfirmEmail(user, url)
+                HtmlContent = EFCoreConstants.TemplateConfirmEmail(user, url)
             });
 
             return NoContent();
@@ -98,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!UoW.Users.VerifyPassword(user, model.CurrentPassword)
+            else if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, model.CurrentPassword) == PasswordVerificationResult.Failed
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
@@ -126,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ToEmail = user.Email,
                 ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 Subject = string.Format("{0}", Constants.MsgConfirmPasswordSubject),
-                HtmlContent = Constants.TemplateConfirmPassword(user, url)
+                HtmlContent = EFCoreConstants.TemplateConfirmPassword(user, url)
             });
 
             return NoContent();

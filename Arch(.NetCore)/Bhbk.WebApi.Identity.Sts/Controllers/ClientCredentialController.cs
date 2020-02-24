@@ -1,11 +1,13 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -96,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
             else if (!audience.Enabled
-                || !UoW.Audiences.VerifyPassword(audience, input.client_secret))
+                || new ValidationHelper().ValidatePasswordHash(audience.PasswordHash, input.client_secret) == PasswordVerificationResult.Failed)
             {
                 //adjust counter(s) for login failure...
                 UoW.Audiences.AccessFailed(audience);
@@ -115,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
             var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     AudienceId = audience.Id,
@@ -137,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     AudienceId = audience.Id,
@@ -241,7 +243,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities_Deprecate.Create(
+            UoW.Activities.Create(
                 Mapper.Map<tbl_Activities>(new ActivityCreate()
                 {
                     AudienceId = audience.Id,

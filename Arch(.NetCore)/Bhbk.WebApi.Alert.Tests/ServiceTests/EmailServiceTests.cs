@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Services;
-using Bhbk.Lib.Identity.Domain.Tests.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Alert;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -17,8 +18,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using FakeConstants = Bhbk.Lib.Identity.Domain.Tests.Primitives.Constants;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 {
@@ -44,9 +43,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -65,17 +64,17 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailCreate()
                     {
@@ -83,8 +82,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = user.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = FakeConstants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
-                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + Base64.CreateString(4)
+                        Subject = Constants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
+                        HtmlContent = Constants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -99,17 +98,17 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailCreate()
                     {
@@ -117,8 +116,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = testUser.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = FakeConstants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
-                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + Base64.CreateString(4)
+                        Subject = Constants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
+                        HtmlContent = Constants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -137,17 +136,17 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
-                new TestData(uow, mapper).Destroy();
-                new TestData(uow, mapper).Create();
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == RealConstants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == RealConstants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == RealConstants.ApiDefaultAdminUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
+                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.Email == FakeConstants.ApiTestUser).Single();
+                var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailCreate()
                     {
@@ -155,8 +154,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                         FromEmail = user.Email,
                         ToId = testUser.Id,
                         ToEmail = testUser.Email,
-                        Subject = FakeConstants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
-                        HtmlContent = FakeConstants.ApiTestEmailContent + "-" + Base64.CreateString(4)
+                        Subject = Constants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
+                        HtmlContent = Constants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NoContent);

@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Me.Controllers;
@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
                     var uow = new UoWService(conf, instance);
-                    new DefaultData(uow, mapper).Create();
+                    new GenerateDefaultData(uow, mapper).Create();
 
                     return uow;
                 });

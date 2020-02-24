@@ -1,10 +1,12 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("info")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class InfoController : BaseController
     {
         private InfoProvider _provider;
@@ -57,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
-            return Ok(Mapper.Map<MOTDType1Model>(motd));
+            return Ok(Mapper.Map<MOTDModel>(motd));
         }
 
         [Route("v1/code"), HttpGet]
@@ -243,7 +244,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (!UoW.Users.VerifyPassword(user, model.CurrentPassword)
+            else if (!new ValidationHelper().ValidatePassword(model.CurrentPassword).Succeeded
+                || !new ValidationHelper().ValidatePassword(model.NewPassword).Succeeded
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
@@ -252,7 +254,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             user.ActorId = GetIdentityGUID();
 
-            UoW.Users.SetPassword(user, model.NewPassword);
+            UoW.Users.SetPasswordHash(user, new ValidationHelper().PasswordHash(model.NewPassword));
             UoW.Commit();
 
             return NoContent();

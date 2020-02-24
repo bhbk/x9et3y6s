@@ -346,23 +346,23 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<MOTDType1Model> MOTD_GetV1(string motdValue)
+        public async ValueTask<MOTDModel> MOTD_GetV1(string motdValue)
         {
             var response = await Http.MOTD_GetV1(_ropg.AccessToken.RawData, motdValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<MOTDType1Model>().Result;
+                return response.Content.ReadAsAsync<MOTDModel>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<MOTDType1Model>> MOTD_GetV1(PageStateTypeC model)
+        public async ValueTask<PageStateTypeCResult<MOTDModel>> MOTD_GetV1(PageStateTypeC model)
         {
             var response = await Http.MOTD_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<MOTDType1Model>>().Result;
+                return response.Content.ReadAsAsync<PageStateTypeCResult<MOTDModel>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

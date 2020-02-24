@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="a954bcd45d114f2ea558229b511946ea" Name="Diagram1">
+        <EntityTypeShape EntityType="IdentityEntities.uvw_Activities" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.uvw_Audiences" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.uvw_Claims" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.uvw_Issuers" Width="1.5" PointX="4.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.uvw_Users" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Activities" Width="1.5" PointX="13" PointY="22.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_AudienceRoles" Width="1.5" PointX="18" PointY="30" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Audiences" Width="1.5" PointX="7.75" PointY="17.25" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Claims" Width="1.5" PointX="10" PointY="31.5" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Issuers" Width="1.5" PointX="5.5" PointY="18.5" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Logins" Width="1.5" PointX="10" PointY="50.625" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_MOTDs" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_QueueEmails" Width="1.5" PointX="10" PointY="54.5" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_QueueTexts" Width="1.5" PointX="10" PointY="47" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Refreshes" Width="1.5" PointX="10" PointY="26.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_RoleClaims" Width="1.5" PointX="15.25" PointY="32.125" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Roles" Width="1.5" PointX="10.75" PointY="41.5" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Settings" Width="1.5" PointX="13" PointY="26.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_States" Width="1.5" PointX="10" PointY="21.375" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Urls" Width="1.5" PointX="10" PointY="16.875" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_UserClaims" Width="1.5" PointX="15.25" PointY="28.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_UserLogins" Width="1.5" PointX="12.25" PointY="38" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_UserRoles" Width="1.5" PointX="13" PointY="31.125" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Users" Width="1.5" PointX="7.75" PointY="24.625" />
+        <AssociationConnector Association="IdentityEntities.FK_Activities_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_Activities_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_AudienceRoles_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_AudienceRoles_RoleID" />
+        <AssociationConnector Association="IdentityEntities.FK_Audiences_IssuerID" />
+        <AssociationConnector Association="IdentityEntities.FK_Refreshes_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_Roles_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_Settings_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_States_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_Urls_AudienceID" />
+        <AssociationConnector Association="IdentityEntities.FK_Claims_ActorID" />
+        <AssociationConnector Association="IdentityEntities.FK_Claims_IssuerID" />
+        <AssociationConnector Association="IdentityEntities.FK_RoleClaims_ClaimID" />
+        <AssociationConnector Association="IdentityEntities.FK_UserClaims_ClaimID" />
+        <AssociationConnector Association="IdentityEntities.FK_Refreshes_IssuerID" />
+        <AssociationConnector Association="IdentityEntities.FK_Settings_IssuerID" />
+        <AssociationConnector Association="IdentityEntities.FK_States_IssuerID" />
+        <AssociationConnector Association="IdentityEntities.FK_Logins_ActorID" />
+        <AssociationConnector Association="IdentityEntities.FK_UserLogins_LoginID" />
+        <AssociationConnector Association="IdentityEntities.FK_QueueEmails_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_QueueTexts_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_Refreshes_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_RoleClaims_RoleID" />
+        <AssociationConnector Association="IdentityEntities.FK_UserRoles_RoleID" />
+        <AssociationConnector Association="IdentityEntities.FK_Settings_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_States_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_UserClaims_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_UserLogins_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_UserRoles_UserID" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

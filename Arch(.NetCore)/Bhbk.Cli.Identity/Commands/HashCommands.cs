@@ -2,7 +2,8 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Domain.Helpers;
 using ManyConsole;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -38,15 +39,15 @@ namespace Bhbk.Cli.Identity.Commands
                 if (Generate)
                 {
                     Console.WriteLine("Please enter a password...");
-                    var cleartext = StandardInput.GetHiddenInput();
-                    var hashvalue = uow.Users.passwordHasher.HashPassword(cleartext);
+                    var clearText = StandardInput.GetHiddenInput();
+                    var hashText = new ValidationHelper().PasswordHash(clearText);
 
-                    if (uow.Users.passwordHasher.VerifyHashedPassword(hashvalue, cleartext) == PasswordVerificationResult.Failed)
+                    if (new ValidationHelper().ValidatePasswordHash(hashText, clearText) == PasswordVerificationResult.Failed)
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {
                         Console.WriteLine();
-                        Console.WriteLine("Hash Value: " + hashvalue);
+                        Console.WriteLine("Hash Value: " + hashText);
                     }
                 }
 

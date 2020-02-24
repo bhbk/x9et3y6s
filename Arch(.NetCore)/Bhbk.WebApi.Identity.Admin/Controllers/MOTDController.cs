@@ -2,10 +2,11 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Data.Primitives.Enums;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -15,12 +16,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using RealConstants = Bhbk.Lib.Identity.Data.Primitives.Constants;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("motd")]
-    [Authorize(Policy = RealConstants.PolicyForUsers)]
+    [Authorize(Policy = Constants.PolicyForUsers)]
     public class MOTDController : BaseController
     {
         private MOTDProvider _provider;
@@ -31,8 +31,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] MOTDType1Create model)
+        [Authorize(Policy = Constants.PolicyForAdmins)]
+        public IActionResult CreateV1([FromBody] MOTDCreate model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -47,11 +47,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<MOTDType1Model>(result));
+            return Ok(Mapper.Map<MOTDModel>(result));
         }
 
         [Route("v1/{motdID:guid}"), HttpDelete]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] string motdValue)
         {
             var motd = UoW.MOTDs.Get(x => x.Id == motdValue)
@@ -82,11 +82,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<MOTDType1Model>(motd));
+            return Ok(Mapper.Map<MOTDModel>(motd));
         }
 
         [Route("v1/page"), HttpPost]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult GetV1([FromBody] PageStateTypeC model)
         {
             if (!ModelState.IsValid)
@@ -94,9 +94,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<MOTDType1Model>
+                var result = new PageStateTypeCResult<MOTDModel>
                 {
-                    Data = Mapper.Map<IEnumerable<MOTDType1Model>>(
+                    Data = Mapper.Map<IEnumerable<MOTDModel>>(
                         UoW.MOTDs.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTDs>, IQueryable<tbl_MOTDs>>>>(
                                 model.ToExpression<tbl_MOTDs>()))),
@@ -116,8 +116,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = RealConstants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] MOTDType1Model model)
+        [Authorize(Policy = Constants.PolicyForAdmins)]
+        public IActionResult UpdateV1([FromBody] MOTDModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<MOTDType1Model>(result));
+            return Ok(Mapper.Map<MOTDModel>(result));
         }
     }
 }
