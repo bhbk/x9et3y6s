@@ -15,8 +15,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     public partial class uvw_Activities
     {
         public System.Guid Id { get; set; }
-        public Nullable<System.Guid> UserId { get; set; }
         public Nullable<System.Guid> AudienceId { get; set; }
+        public Nullable<System.Guid> UserId { get; set; }
         public string ActivityType { get; set; }
         public string TableName { get; set; }
         public string KeyValues { get; set; }

@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Domain.Helpers
 {
-    public class AutoMapperProfile : Profile
+    public class AutoMapperProfile_EFCore : Profile
     {
-        public AutoMapperProfile()
+        public AutoMapperProfile_EFCore()
         {
             /*
              * activity models
@@ -168,7 +168,6 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
              */
             CreateMap<RefreshCreate, tbl_Refreshes>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
                 .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());

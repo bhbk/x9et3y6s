@@ -14,12 +14,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     
     public partial class tbl_Logins
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public tbl_Logins()
-        {
-            this.tbl_UserLogins = new HashSet<tbl_UserLogins>();
-        }
-    
         public System.Guid Id { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
         public string Name { get; set; }
@@ -31,7 +25,5 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public bool Immutable { get; set; }
     
         public virtual tbl_Users tbl_Users { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_UserLogins> tbl_UserLogins { get; set; }
     }
 }

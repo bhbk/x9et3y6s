@@ -12,15 +12,16 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_AudienceRoles
+    public partial class uvw_Logins
     {
-        public System.Guid AudienceId { get; set; }
-        public System.Guid RoleId { get; set; }
+        public System.Guid Id { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string LoginKey { get; set; }
+        public bool Enabled { get; set; }
         public System.DateTime Created { get; set; }
+        public Nullable<System.DateTime> LastUpdated { get; set; }
         public bool Immutable { get; set; }
-    
-        public virtual tbl_Audiences tbl_Audiences { get; set; }
-        public virtual tbl_Roles tbl_Roles { get; set; }
     }
 }

@@ -14,14 +14,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     
     public partial class tbl_Roles
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public tbl_Roles()
-        {
-            this.tbl_AudienceRoles = new HashSet<tbl_AudienceRoles>();
-            this.tbl_RoleClaims = new HashSet<tbl_RoleClaims>();
-            this.tbl_UserRoles = new HashSet<tbl_UserRoles>();
-        }
-    
         public System.Guid Id { get; set; }
         public System.Guid AudienceId { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
@@ -33,12 +25,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public string ConcurrencyStamp { get; set; }
         public bool Immutable { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
         public virtual tbl_Audiences tbl_Audiences { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_RoleClaims> tbl_RoleClaims { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_UserRoles> tbl_UserRoles { get; set; }
     }
 }

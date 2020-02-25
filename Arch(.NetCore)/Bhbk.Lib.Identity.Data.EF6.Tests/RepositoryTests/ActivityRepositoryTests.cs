@@ -1,10 +1,11 @@
 ﻿using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
 
@@ -13,32 +14,35 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class ActivityRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()));
-
-                UoW.Commit();
+                UoW.Activities.Create(new uvw_Activities());
             });
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_CreateV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
+            
+            var audience = UoW.Context.Set<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience)
+                .Single();
 
             var result = UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                new uvw_Activities()
                 {
-                    AudienceId = Guid.NewGuid(),
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                    Id = Guid.NewGuid(),
+                    AudienceId = audience.Id,
+                    ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
+                    Created = DateTime.Now,
                     Immutable = false,
-                }));
-            result.Should().BeAssignableTo<tbl_Activities>();
+                });
+            result.Should().BeAssignableTo<uvw_Activities>();
 
             UoW.Commit();
         }
@@ -48,7 +52,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Activities.Delete(new tbl_Activities());
+                UoW.Activities.Delete(new uvw_Activities());
                 UoW.Commit();
             });
         }
@@ -59,21 +63,21 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var activity = UoW.Activities.Get(new QueryExpression<tbl_Activities>()
+            var activity = UoW.Activities.Get(new QueryExpression<uvw_Activities>()
                 .Where(x => x.Immutable == false).ToLambda());
 
             UoW.Activities.Delete(activity);
             UoW.Commit();
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_GetV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Activities.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Activities>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Activities>>();
             results.Count().Should().Be(UoW.Activities.Count());
         }
 
@@ -82,7 +86,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<NotImplementedException>(() =>
             {
-                UoW.Activities.Update(new tbl_Activities());
+                UoW.Activities.Update(new uvw_Activities());
                 UoW.Commit();
             });
         }

@@ -12,15 +12,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_UserLogins
+    public partial class sysdiagram
     {
-        public System.Guid UserId { get; set; }
-        public System.Guid LoginId { get; set; }
-        public Nullable<System.Guid> ActorId { get; set; }
-        public System.DateTime Created { get; set; }
-        public bool Immutable { get; set; }
-    
-        public virtual tbl_Logins tbl_Logins { get; set; }
-        public virtual tbl_Users tbl_Users { get; set; }
+        public string name { get; set; }
+        public int principal_id { get; set; }
+        public int diagram_id { get; set; }
+        public Nullable<int> version { get; set; }
+        public byte[] definition { get; set; }
     }
 }

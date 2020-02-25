@@ -260,6 +260,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         UserId = user.Id,
                         RefreshType = RefreshType.User.ToString(),
                         RefreshValue = rt.RawData,
+                        IssuedUtc = rt.ValidFrom,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
                     }));
@@ -383,6 +384,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserId = user.Id,
                     RefreshType = RefreshType.User.ToString(),
                     RefreshValue = rt.RawData,
+                    IssuedUtc = rt.ValidFrom,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
@@ -591,6 +593,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserId = user.Id,
                     RefreshType = RefreshType.User.ToString(),
                     RefreshValue = rt.RawData,
+                    IssuedUtc = rt.ValidFrom,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
@@ -730,6 +733,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserId = user.Id,
                     RefreshType = RefreshType.User.ToString(),
                     RefreshValue = rt.RawData,
+                    IssuedUtc = rt.ValidFrom,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));

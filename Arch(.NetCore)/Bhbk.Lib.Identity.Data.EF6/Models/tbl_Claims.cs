@@ -14,13 +14,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     
     public partial class tbl_Claims
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public tbl_Claims()
-        {
-            this.tbl_RoleClaims = new HashSet<tbl_RoleClaims>();
-            this.tbl_UserClaims = new HashSet<tbl_UserClaims>();
-        }
-    
         public System.Guid Id { get; set; }
         public System.Guid IssuerId { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
@@ -34,9 +27,5 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     
         public virtual tbl_Users tbl_Users { get; set; }
         public virtual tbl_Issuers tbl_Issuers { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_RoleClaims> tbl_RoleClaims { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_UserClaims> tbl_UserClaims { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -30,10 +30,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
         public UrlRepository Urls { get; private set; }
         public UserRepository Users { get; private set; }
 
-        public UoWService(IConfiguration conf)
-            : this(conf, new ContextService(InstanceContext.DeployedOrLocal)) { }
+        public UoWService(string connection)
+            : this(connection, new ContextService(InstanceContext.DeployedOrLocal)) { }
 
-        public UoWService(IConfiguration conf, IContextService instance)
+        public UoWService(string connection, IContextService instance)
         {
             _logger = LoggerFactory.Create(opt =>
             {
@@ -49,10 +49,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
                     {
 #if RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseSqlServer(conf["Databases:IdentityEntities"]);
+                            .UseSqlServer(connection);
 #elif !RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseSqlServer(conf["Databases:IdentityEntities"])
+                            .UseSqlServer(connection)
                             .UseLoggerFactory(_logger)
                             .EnableSensitiveDataLogging();
 #endif
@@ -75,6 +75,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
             }
 
             _context.ChangeTracker.LazyLoadingEnabled = false;
+            _context.ChangeTracker.CascadeDeleteTiming = CascadeTiming.Immediate;
 
             InstanceType = instance.InstanceType;
 

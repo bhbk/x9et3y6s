@@ -34,7 +34,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var uow = new UoWService(conf, instance);
+                var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
 
                 if (Generate)
                 {

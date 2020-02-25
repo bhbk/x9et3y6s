@@ -4,7 +4,17 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="IdentityEntities.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="IdentityModels.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
         <EntityType Name="tbl_Activities">
           <Key>
             <PropertyRef Name="Id" />
@@ -17,17 +27,6 @@
           <Property Name="KeyValues" Type="nvarchar(max)" />
           <Property Name="OriginalValues" Type="nvarchar(max)" />
           <Property Name="CurrentValues" Type="nvarchar(max)" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Immutable" Type="bit" Nullable="false" />
-        </EntityType>
-        <EntityType Name="tbl_AudienceRoles">
-          <Key>
-            <PropertyRef Name="AudienceId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
@@ -156,18 +155,7 @@
           <Property Name="RefreshType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="ValidFromUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="ValidToUtc" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
-        </EntityType>
-        <EntityType Name="tbl_RoleClaims">
-          <Key>
-            <PropertyRef Name="RoleId" />
-            <PropertyRef Name="ClaimId" />
-          </Key>
-          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Created" Type="datetime" Nullable="false" />
-          <Property Name="Immutable" Type="bit" Nullable="false" />
+          <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_Roles">
           <Key>
@@ -228,39 +216,6 @@
           <Property Name="LastUpdated" Type="datetime2" Precision="7" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="tbl_UserClaims">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="ClaimId" />
-          </Key>
-          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Immutable" Type="bit" Nullable="false" />
-        </EntityType>
-        <EntityType Name="tbl_UserLogins">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="LoginId" />
-          </Key>
-          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="LoginId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Immutable" Type="bit" Nullable="false" />
-        </EntityType>
-        <EntityType Name="tbl_UserRoles">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Immutable" Type="bit" Nullable="false" />
-        </EntityType>
         <EntityType Name="tbl_Users">
           <Key>
             <PropertyRef Name="Id" />
@@ -294,13 +249,13 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Activities' does not have a p
         <EntityType Name="uvw_Activities">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="ActivityType" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="UserId" Type="uniqueidentifier" />
           <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
           <Property Name="ActivityType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="TableName" Type="nvarchar(max)" />
           <Property Name="KeyValues" Type="nvarchar(max)" />
@@ -314,15 +269,15 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audiences' does not have a pr
         <EntityType Name="uvw_Audiences">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="IssuerId" />
-            <PropertyRef Name="Name" />
-            <PropertyRef Name="AudienceType" />
-            <PropertyRef Name="Enabled" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="LockoutEnabled" />
-            <PropertyRef Name="AccessFailedCount" />
-            <PropertyRef Name="AccessSuccessCount" />
-            <PropertyRef Name="Immutable" />
+            
+            
+            
+            
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -349,12 +304,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Claims' does not have a prima
         <EntityType Name="uvw_Claims">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="IssuerId" />
-            <PropertyRef Name="Type" />
-            <PropertyRef Name="Value" />
-            <PropertyRef Name="ValueType" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
+            
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -372,11 +327,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuers' does not have a prim
         <EntityType Name="uvw_Issuers">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="Name" />
-            <PropertyRef Name="IssuerKey" />
-            <PropertyRef Name="Enabled" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
@@ -389,22 +344,103 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuers' does not have a prim
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Logins' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Logins">
+          <Key>
+            <PropertyRef Name="Id" />
+            
+            
+            
+            
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="LoginKey" Type="nvarchar(max)" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_MOTDs' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_MOTDs">
+          <Key>
+            <PropertyRef Name="Id" />
+            
+            
+          </Key>
+          <Property Name="Id" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="Title" Type="varchar(max)" />
+          <Property Name="Author" Type="varchar(max)" Nullable="false" />
+          <Property Name="Quote" Type="varchar(max)" Nullable="false" />
+          <Property Name="Category" Type="varchar(max)" />
+          <Property Name="Date" Type="datetime2" Precision="7" />
+          <Property Name="Tags" Type="varchar(max)" />
+          <Property Name="Length" Type="int" />
+          <Property Name="Background" Type="varchar(max)" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Refreshes' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Refreshes">
+          <Key>
+            <PropertyRef Name="Id" />
+            
+            
+            
+            
+            
+            
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="RefreshValue" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="RefreshType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ValidToUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Roles' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Roles">
+          <Key>
+            <PropertyRef Name="Id" />
+            
+            
+            
+            
+            
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="uvw_Users">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="Email" />
-            <PropertyRef Name="EmailConfirmed" />
-            <PropertyRef Name="FirstName" />
-            <PropertyRef Name="LastName" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="LockoutEnabled" />
-            <PropertyRef Name="AccessFailedCount" />
-            <PropertyRef Name="AccessSuccessCount" />
-            <PropertyRef Name="PasswordConfirmed" />
-            <PropertyRef Name="TwoFactorEnabled" />
-            <PropertyRef Name="HumanBeing" />
-            <PropertyRef Name="Immutable" />
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
@@ -451,34 +487,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Principal>
             <Dependent Role="tbl_Activities">
               <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AudienceRoles_AudienceID">
-          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_AudienceRoles" Type="Self.tbl_AudienceRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Audiences">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_AudienceRoles">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AudienceRoles_RoleID">
-          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_AudienceRoles" Type="Self.tbl_AudienceRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Roles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_AudienceRoles">
-              <PropertyRef Name="RoleId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -598,34 +606,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleClaims_ClaimID">
-          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_RoleClaims" Type="Self.tbl_RoleClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Claims">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_RoleClaims">
-              <PropertyRef Name="ClaimId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_RoleClaims_RoleID">
-          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_RoleClaims" Type="Self.tbl_RoleClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Roles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_RoleClaims">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Roles_AudienceID">
           <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1" />
           <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="*" />
@@ -736,95 +716,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_UserClaims_ClaimID">
-          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_UserClaims" Type="Self.tbl_UserClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Claims">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserClaims">
-              <PropertyRef Name="ClaimId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserClaims_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_UserClaims" Type="Self.tbl_UserClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserClaims">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserLogins_LoginID">
-          <End Role="tbl_Logins" Type="Self.tbl_Logins" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_UserLogins" Type="Self.tbl_UserLogins" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Logins">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserLogins">
-              <PropertyRef Name="LoginId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserLogins_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_UserLogins" Type="Self.tbl_UserLogins" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserLogins">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserRoles_RoleID">
-          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_UserRoles" Type="Self.tbl_UserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Roles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserRoles">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserRoles_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_UserRoles" Type="Self.tbl_UserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserRoles">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Function Name="usp_Activity_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="ActivityID" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Activity_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="ActivityType" Type="nvarchar" Mode="In" />
@@ -838,11 +733,49 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
         <Function Name="usp_Audience_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="AudienceID" Type="uniqueidentifier" Mode="In" />
         </Function>
+        <Function Name="usp_Audience_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
+          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="ConcurrencyStamp" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="PasswordHash" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="SecurityStamp" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="AudienceType" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Created" Type="datetime2" Mode="In" />
+          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
+          <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
+          <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
+          <Parameter Name="LastLoginSuccess" Type="datetime2" Mode="In" />
+          <Parameter Name="LastLoginFailure" Type="datetime2" Mode="In" />
+          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
+          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
+          <Parameter Name="Immutable" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="usp_Audience_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="ConcurrencyStamp" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="PasswordHash" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="SecurityStamp" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="AudienceType" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Created" Type="datetime2" Mode="In" />
+          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
+          <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
+          <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
+          <Parameter Name="LastLoginSuccess" Type="datetime2" Mode="In" />
+          <Parameter Name="LastLoginFailure" Type="datetime2" Mode="In" />
+          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
+          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
+          <Parameter Name="Immutable" Type="bit" Mode="In" />
+        </Function>
         <Function Name="usp_Claim_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="ClaimID" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Claim_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="Subject" Type="nvarchar(max)" Mode="In" />
@@ -861,18 +794,36 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Parameter Name="Type" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="Value" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="ValueType" Type="nvarchar" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
           <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
           <Parameter Name="Immutable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_Issuer_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="IssuerID" Type="uniqueidentifier" Mode="In" />
         </Function>
+        <Function Name="usp_Issuer_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
+          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="IssuerKey" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Enabled" Type="bit" Mode="In" />
+          <Parameter Name="Created" Type="datetime2" Mode="In" />
+          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
+          <Parameter Name="Immutable" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="usp_Issuer_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="IssuerKey" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Enabled" Type="bit" Mode="In" />
+          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
+          <Parameter Name="Immutable" Type="bit" Mode="In" />
+        </Function>
         <Function Name="usp_User_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="UserID" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_User_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="Email" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="EmailConfirmed" Type="bit" Mode="In" />
@@ -905,7 +856,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Parameter Name="LastName" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="PhoneNumber" Type="nvarchar" Mode="In" />
           <Parameter Name="PhoneNumberConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
           <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
           <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
           <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
@@ -921,9 +871,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Parameter Name="HumanBeing" Type="bit" Mode="In" />
           <Parameter Name="Immutable" Type="bit" Mode="In" />
         </Function>
-        <EntityContainer Name="IdentityEntitiesStoreContainer">
+        <EntityContainer Name="IdentityModelsStoreContainer">
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Activities" EntityType="Self.tbl_Activities" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_AudienceRoles" EntityType="Self.tbl_AudienceRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Audiences" EntityType="Self.tbl_Audiences" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Claims" EntityType="Self.tbl_Claims" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Issuers" EntityType="Self.tbl_Issuers" Schema="dbo" store:Type="Tables" />
@@ -932,20 +882,16 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySet Name="tbl_QueueEmails" EntityType="Self.tbl_QueueEmails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_QueueTexts" EntityType="Self.tbl_QueueTexts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Refreshes" EntityType="Self.tbl_Refreshes" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_RoleClaims" EntityType="Self.tbl_RoleClaims" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Roles" EntityType="Self.tbl_Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Settings" EntityType="Self.tbl_Settings" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_States" EntityType="Self.tbl_States" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Urls" EntityType="Self.tbl_Urls" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_UserClaims" EntityType="Self.tbl_UserClaims" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_UserLogins" EntityType="Self.tbl_UserLogins" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_UserRoles" EntityType="Self.tbl_UserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Users" EntityType="Self.tbl_Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="uvw_Activities" EntityType="Self.uvw_Activities" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
     [uvw_Activities].[Id] AS [Id], 
-    [uvw_Activities].[UserId] AS [UserId], 
     [uvw_Activities].[AudienceId] AS [AudienceId], 
+    [uvw_Activities].[UserId] AS [UserId], 
     [uvw_Activities].[ActivityType] AS [ActivityType], 
     [uvw_Activities].[TableName] AS [TableName], 
     [uvw_Activities].[KeyValues] AS [KeyValues], 
@@ -1005,6 +951,58 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
     [uvw_Issuers].[Immutable] AS [Immutable]
     FROM [svc].[uvw_Issuers] AS [uvw_Issuers]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="uvw_Logins" EntityType="Self.uvw_Logins" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_Logins].[Id] AS [Id], 
+    [uvw_Logins].[ActorId] AS [ActorId], 
+    [uvw_Logins].[Name] AS [Name], 
+    [uvw_Logins].[Description] AS [Description], 
+    [uvw_Logins].[LoginKey] AS [LoginKey], 
+    [uvw_Logins].[Enabled] AS [Enabled], 
+    [uvw_Logins].[Created] AS [Created], 
+    [uvw_Logins].[LastUpdated] AS [LastUpdated], 
+    [uvw_Logins].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Logins] AS [uvw_Logins]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="uvw_MOTDs" EntityType="Self.uvw_MOTDs" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_MOTDs].[Id] AS [Id], 
+    [uvw_MOTDs].[Title] AS [Title], 
+    [uvw_MOTDs].[Author] AS [Author], 
+    [uvw_MOTDs].[Quote] AS [Quote], 
+    [uvw_MOTDs].[Category] AS [Category], 
+    [uvw_MOTDs].[Date] AS [Date], 
+    [uvw_MOTDs].[Tags] AS [Tags], 
+    [uvw_MOTDs].[Length] AS [Length], 
+    [uvw_MOTDs].[Background] AS [Background]
+    FROM [svc].[uvw_MOTDs] AS [uvw_MOTDs]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="uvw_Refreshes" EntityType="Self.uvw_Refreshes" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_Refreshes].[Id] AS [Id], 
+    [uvw_Refreshes].[IssuerId] AS [IssuerId], 
+    [uvw_Refreshes].[AudienceId] AS [AudienceId], 
+    [uvw_Refreshes].[UserId] AS [UserId], 
+    [uvw_Refreshes].[RefreshValue] AS [RefreshValue], 
+    [uvw_Refreshes].[RefreshType] AS [RefreshType], 
+    [uvw_Refreshes].[ValidFromUtc] AS [ValidFromUtc], 
+    [uvw_Refreshes].[ValidToUtc] AS [ValidToUtc], 
+    [uvw_Refreshes].[IssuedUtc] AS [IssuedUtc]
+    FROM [svc].[uvw_Refreshes] AS [uvw_Refreshes]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="uvw_Roles" EntityType="Self.uvw_Roles" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_Roles].[Id] AS [Id], 
+    [uvw_Roles].[AudienceId] AS [AudienceId], 
+    [uvw_Roles].[ActorId] AS [ActorId], 
+    [uvw_Roles].[Name] AS [Name], 
+    [uvw_Roles].[Description] AS [Description], 
+    [uvw_Roles].[Enabled] AS [Enabled], 
+    [uvw_Roles].[Created] AS [Created], 
+    [uvw_Roles].[LastUpdated] AS [LastUpdated], 
+    [uvw_Roles].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Roles] AS [uvw_Roles]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="uvw_Users" EntityType="Self.uvw_Users" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
     [uvw_Users].[Id] AS [Id], 
@@ -1039,14 +1037,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <AssociationSet Name="FK_Activities_UserID" Association="Self.FK_Activities_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Activities" EntitySet="tbl_Activities" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AudienceRoles_AudienceID" Association="Self.FK_AudienceRoles_AudienceID">
-            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
-            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AudienceRoles_RoleID" Association="Self.FK_AudienceRoles_RoleID">
-            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
-            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
           </AssociationSet>
           <AssociationSet Name="FK_Audiences_IssuerID" Association="Self.FK_Audiences_IssuerID">
             <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
@@ -1084,14 +1074,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleClaims_ClaimID" Association="Self.FK_RoleClaims_ClaimID">
-            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
-            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_RoleClaims_RoleID" Association="Self.FK_RoleClaims_RoleID">
-            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
-            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
-          </AssociationSet>
           <AssociationSet Name="FK_Roles_AudienceID" Association="Self.FK_Roles_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Roles" EntitySet="tbl_Roles" />
@@ -1124,45 +1106,18 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Urls" EntitySet="tbl_Urls" />
           </AssociationSet>
-          <AssociationSet Name="FK_UserClaims_ClaimID" Association="Self.FK_UserClaims_ClaimID">
-            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
-            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserClaims_UserID" Association="Self.FK_UserClaims_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserLogins_LoginID" Association="Self.FK_UserLogins_LoginID">
-            <End Role="tbl_Logins" EntitySet="tbl_Logins" />
-            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserLogins_UserID" Association="Self.FK_UserLogins_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserRoles_RoleID" Association="Self.FK_UserRoles_RoleID">
-            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
-            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserRoles_UserID" Association="Self.FK_UserRoles_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
-          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="IdentityEntities" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="IdentityModels" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="uvw_Activities">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="ActivityType" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="UserId" Type="Guid" />
           <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
           <Property Name="ActivityType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TableName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="KeyValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -1174,15 +1129,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
         <EntityType Name="uvw_Audiences">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="IssuerId" />
-            <PropertyRef Name="Name" />
-            <PropertyRef Name="AudienceType" />
-            <PropertyRef Name="Enabled" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="LockoutEnabled" />
-            <PropertyRef Name="AccessFailedCount" />
-            <PropertyRef Name="AccessSuccessCount" />
-            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
@@ -1207,12 +1153,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
         <EntityType Name="uvw_Claims">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="IssuerId" />
-            <PropertyRef Name="Type" />
-            <PropertyRef Name="Value" />
-            <PropertyRef Name="ValueType" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
@@ -1228,11 +1168,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
         <EntityType Name="uvw_Issuers">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="Name" />
-            <PropertyRef Name="IssuerKey" />
-            <PropertyRef Name="Enabled" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
@@ -1244,21 +1179,51 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
+        <EntityType Name="uvw_Logins">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LoginKey" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="uvw_MOTDs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Author" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Quote" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Category" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Date" Type="DateTime" Precision="7" />
+          <Property Name="Tags" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Length" Type="Int32" />
+          <Property Name="Background" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="uvw_Refreshes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="RefreshValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RefreshType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
         <EntityType Name="uvw_Users">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="Email" />
-            <PropertyRef Name="EmailConfirmed" />
-            <PropertyRef Name="FirstName" />
-            <PropertyRef Name="LastName" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="LockoutEnabled" />
-            <PropertyRef Name="AccessFailedCount" />
-            <PropertyRef Name="AccessSuccessCount" />
-            <PropertyRef Name="PasswordConfirmed" />
-            <PropertyRef Name="TwoFactorEnabled" />
-            <PropertyRef Name="HumanBeing" />
-            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
@@ -1284,17 +1249,19 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="IdentityEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="uvw_Activities" EntityType="Self.uvw_Activities" />
           <EntitySet Name="uvw_Audiences" EntityType="Self.uvw_Audiences" />
           <EntitySet Name="uvw_Claims" EntityType="Self.uvw_Claims" />
           <EntitySet Name="uvw_Issuers" EntityType="Self.uvw_Issuers" />
+          <EntitySet Name="uvw_Logins" EntityType="Self.uvw_Logins" />
+          <EntitySet Name="uvw_MOTDs" EntityType="Self.uvw_MOTDs" />
+          <EntitySet Name="uvw_Refreshes" EntityType="Self.uvw_Refreshes" />
           <EntitySet Name="uvw_Users" EntityType="Self.uvw_Users" />
           <FunctionImport Name="usp_Activity_Delete">
           <Parameter Name="ActivityID" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Activity_Insert">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
             <Parameter Name="AudienceId" Mode="In" Type="Guid" />
             <Parameter Name="UserId" Mode="In" Type="Guid" />
             <Parameter Name="ActivityType" Mode="In" Type="String" />
@@ -1312,7 +1279,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Parameter Name="ClaimID" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Claim_Insert">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
             <Parameter Name="IssuerId" Mode="In" Type="Guid" />
             <Parameter Name="ActorId" Mode="In" Type="Guid" />
             <Parameter Name="Subject" Mode="In" Type="String" />
@@ -1331,7 +1297,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             <Parameter Name="Type" Mode="In" Type="String" />
             <Parameter Name="Value" Mode="In" Type="String" />
             <Parameter Name="ValueType" Mode="In" Type="String" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
             <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
             <Parameter Name="Immutable" Mode="In" Type="Boolean" />
           </FunctionImport>
@@ -1342,7 +1307,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Parameter Name="UserID" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_User_Insert" ReturnType="Collection(Decimal)">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
             <Parameter Name="ActorId" Mode="In" Type="Guid" />
             <Parameter Name="Email" Mode="In" Type="String" />
             <Parameter Name="EmailConfirmed" Mode="In" Type="Boolean" />
@@ -1375,7 +1339,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             <Parameter Name="LastName" Mode="In" Type="String" />
             <Parameter Name="PhoneNumber" Mode="In" Type="String" />
             <Parameter Name="PhoneNumberConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
             <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
             <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
             <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
@@ -1391,142 +1354,182 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             <Parameter Name="HumanBeing" Mode="In" Type="Boolean" />
             <Parameter Name="Immutable" Mode="In" Type="Boolean" />
           </FunctionImport>
-          <EntitySet Name="tbl_Activities" EntityType="IdentityEntities.tbl_Activities" />
-          <EntitySet Name="tbl_AudienceRoles" EntityType="IdentityEntities.tbl_AudienceRoles" />
-          <EntitySet Name="tbl_Audiences" EntityType="IdentityEntities.tbl_Audiences" />
-          <EntitySet Name="tbl_Claims" EntityType="IdentityEntities.tbl_Claims" />
-          <EntitySet Name="tbl_Issuers" EntityType="IdentityEntities.tbl_Issuers" />
-          <EntitySet Name="tbl_Logins" EntityType="IdentityEntities.tbl_Logins" />
-          <EntitySet Name="tbl_MOTDs" EntityType="IdentityEntities.tbl_MOTDs" />
-          <EntitySet Name="tbl_QueueEmails" EntityType="IdentityEntities.tbl_QueueEmails" />
-          <EntitySet Name="tbl_QueueTexts" EntityType="IdentityEntities.tbl_QueueTexts" />
-          <EntitySet Name="tbl_Refreshes" EntityType="IdentityEntities.tbl_Refreshes" />
-          <EntitySet Name="tbl_RoleClaims" EntityType="IdentityEntities.tbl_RoleClaims" />
-          <EntitySet Name="tbl_Roles" EntityType="IdentityEntities.tbl_Roles" />
-          <EntitySet Name="tbl_Settings" EntityType="IdentityEntities.tbl_Settings" />
-          <EntitySet Name="tbl_States" EntityType="IdentityEntities.tbl_States" />
-          <EntitySet Name="tbl_Urls" EntityType="IdentityEntities.tbl_Urls" />
-          <EntitySet Name="tbl_UserClaims" EntityType="IdentityEntities.tbl_UserClaims" />
-          <EntitySet Name="tbl_UserLogins" EntityType="IdentityEntities.tbl_UserLogins" />
-          <EntitySet Name="tbl_UserRoles" EntityType="IdentityEntities.tbl_UserRoles" />
-          <EntitySet Name="tbl_Users" EntityType="IdentityEntities.tbl_Users" />
-          <AssociationSet Name="FK_Activities_AudienceID" Association="IdentityEntities.FK_Activities_AudienceID">
+          <FunctionImport Name="usp_Issuer_Insert">
+            <Parameter Name="ActorId" Mode="In" Type="Guid" />
+            <Parameter Name="Name" Mode="In" Type="String" />
+            <Parameter Name="Description" Mode="In" Type="String" />
+            <Parameter Name="IssuerKey" Mode="In" Type="String" />
+            <Parameter Name="Enabled" Mode="In" Type="Boolean" />
+            <Parameter Name="Created" Mode="In" Type="DateTime" />
+            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
+            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="usp_Issuer_Update">
+            <Parameter Name="Id" Mode="In" Type="Guid" />
+            <Parameter Name="ActorId" Mode="In" Type="Guid" />
+            <Parameter Name="Name" Mode="In" Type="String" />
+            <Parameter Name="Description" Mode="In" Type="String" />
+            <Parameter Name="IssuerKey" Mode="In" Type="String" />
+            <Parameter Name="Enabled" Mode="In" Type="Boolean" />
+            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
+            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="usp_Audience_Insert">
+            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
+            <Parameter Name="ActorId" Mode="In" Type="Guid" />
+            <Parameter Name="Name" Mode="In" Type="String" />
+            <Parameter Name="Description" Mode="In" Type="String" />
+            <Parameter Name="ConcurrencyStamp" Mode="In" Type="String" />
+            <Parameter Name="PasswordHash" Mode="In" Type="String" />
+            <Parameter Name="SecurityStamp" Mode="In" Type="String" />
+            <Parameter Name="AudienceType" Mode="In" Type="String" />
+            <Parameter Name="Created" Mode="In" Type="DateTime" />
+            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
+            <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
+            <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
+            <Parameter Name="LastLoginSuccess" Mode="In" Type="DateTime" />
+            <Parameter Name="LastLoginFailure" Mode="In" Type="DateTime" />
+            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
+            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
+            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="usp_Audience_Update">
+            <Parameter Name="Id" Mode="In" Type="Guid" />
+            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
+            <Parameter Name="ActorId" Mode="In" Type="Guid" />
+            <Parameter Name="Name" Mode="In" Type="String" />
+            <Parameter Name="Description" Mode="In" Type="String" />
+            <Parameter Name="ConcurrencyStamp" Mode="In" Type="String" />
+            <Parameter Name="PasswordHash" Mode="In" Type="String" />
+            <Parameter Name="SecurityStamp" Mode="In" Type="String" />
+            <Parameter Name="AudienceType" Mode="In" Type="String" />
+            <Parameter Name="Created" Mode="In" Type="DateTime" />
+            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
+            <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
+            <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
+            <Parameter Name="LastLoginSuccess" Mode="In" Type="DateTime" />
+            <Parameter Name="LastLoginFailure" Mode="In" Type="DateTime" />
+            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
+            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
+            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <EntitySet Name="uvw_Roles" EntityType="IdentityModels.uvw_Roles" />
+          <EntitySet Name="sysdiagrams" EntityType="IdentityModels.sysdiagram" />
+          <EntitySet Name="tbl_Activities" EntityType="IdentityModels.tbl_Activities" />
+          <EntitySet Name="tbl_Audiences" EntityType="IdentityModels.tbl_Audiences" />
+          <EntitySet Name="tbl_Claims" EntityType="IdentityModels.tbl_Claims" />
+          <EntitySet Name="tbl_Issuers" EntityType="IdentityModels.tbl_Issuers" />
+          <EntitySet Name="tbl_Logins" EntityType="IdentityModels.tbl_Logins" />
+          <EntitySet Name="tbl_MOTDs" EntityType="IdentityModels.tbl_MOTDs" />
+          <EntitySet Name="tbl_QueueEmails" EntityType="IdentityModels.tbl_QueueEmails" />
+          <EntitySet Name="tbl_QueueTexts" EntityType="IdentityModels.tbl_QueueTexts" />
+          <EntitySet Name="tbl_Refreshes" EntityType="IdentityModels.tbl_Refreshes" />
+          <EntitySet Name="tbl_Roles" EntityType="IdentityModels.tbl_Roles" />
+          <EntitySet Name="tbl_Settings" EntityType="IdentityModels.tbl_Settings" />
+          <EntitySet Name="tbl_States" EntityType="IdentityModels.tbl_States" />
+          <EntitySet Name="tbl_Urls" EntityType="IdentityModels.tbl_Urls" />
+          <EntitySet Name="tbl_Users" EntityType="IdentityModels.tbl_Users" />
+          <AssociationSet Name="FK_Activities_AudienceID" Association="IdentityModels.FK_Activities_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Activities" EntitySet="tbl_Activities" />
           </AssociationSet>
-          <AssociationSet Name="FK_Activities_UserID" Association="IdentityEntities.FK_Activities_UserID">
+          <AssociationSet Name="FK_Activities_UserID" Association="IdentityModels.FK_Activities_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Activities" EntitySet="tbl_Activities" />
           </AssociationSet>
-          <AssociationSet Name="FK_AudienceRoles_AudienceID" Association="IdentityEntities.FK_AudienceRoles_AudienceID">
-            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
-            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AudienceRoles_RoleID" Association="IdentityEntities.FK_AudienceRoles_RoleID">
-            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
-            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Audiences_IssuerID" Association="IdentityEntities.FK_Audiences_IssuerID">
+          <AssociationSet Name="FK_Audiences_IssuerID" Association="IdentityModels.FK_Audiences_IssuerID">
             <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
           </AssociationSet>
-          <AssociationSet Name="FK_Refreshes_AudienceID" Association="IdentityEntities.FK_Refreshes_AudienceID">
+          <AssociationSet Name="FK_Refreshes_AudienceID" Association="IdentityModels.FK_Refreshes_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
           </AssociationSet>
-          <AssociationSet Name="FK_Roles_AudienceID" Association="IdentityEntities.FK_Roles_AudienceID">
+          <AssociationSet Name="FK_Roles_AudienceID" Association="IdentityModels.FK_Roles_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Roles" EntitySet="tbl_Roles" />
           </AssociationSet>
-          <AssociationSet Name="FK_Settings_AudienceID" Association="IdentityEntities.FK_Settings_AudienceID">
+          <AssociationSet Name="FK_Settings_AudienceID" Association="IdentityModels.FK_Settings_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Settings" EntitySet="tbl_Settings" />
           </AssociationSet>
-          <AssociationSet Name="FK_States_AudienceID" Association="IdentityEntities.FK_States_AudienceID">
+          <AssociationSet Name="FK_States_AudienceID" Association="IdentityModels.FK_States_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_States" EntitySet="tbl_States" />
           </AssociationSet>
-          <AssociationSet Name="FK_Urls_AudienceID" Association="IdentityEntities.FK_Urls_AudienceID">
+          <AssociationSet Name="FK_Urls_AudienceID" Association="IdentityModels.FK_Urls_AudienceID">
             <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
             <End Role="tbl_Urls" EntitySet="tbl_Urls" />
           </AssociationSet>
-          <AssociationSet Name="FK_Claims_ActorID" Association="IdentityEntities.FK_Claims_ActorID">
+          <AssociationSet Name="FK_Claims_ActorID" Association="IdentityModels.FK_Claims_ActorID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Claims" EntitySet="tbl_Claims" />
           </AssociationSet>
-          <AssociationSet Name="FK_Claims_IssuerID" Association="IdentityEntities.FK_Claims_IssuerID">
+          <AssociationSet Name="FK_Claims_IssuerID" Association="IdentityModels.FK_Claims_IssuerID">
             <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
             <End Role="tbl_Claims" EntitySet="tbl_Claims" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleClaims_ClaimID" Association="IdentityEntities.FK_RoleClaims_ClaimID">
-            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
-            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserClaims_ClaimID" Association="IdentityEntities.FK_UserClaims_ClaimID">
-            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
-            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Refreshes_IssuerID" Association="IdentityEntities.FK_Refreshes_IssuerID">
+          <AssociationSet Name="FK_Refreshes_IssuerID" Association="IdentityModels.FK_Refreshes_IssuerID">
             <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
             <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
           </AssociationSet>
-          <AssociationSet Name="FK_Settings_IssuerID" Association="IdentityEntities.FK_Settings_IssuerID">
+          <AssociationSet Name="FK_Settings_IssuerID" Association="IdentityModels.FK_Settings_IssuerID">
             <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
             <End Role="tbl_Settings" EntitySet="tbl_Settings" />
           </AssociationSet>
-          <AssociationSet Name="FK_States_IssuerID" Association="IdentityEntities.FK_States_IssuerID">
+          <AssociationSet Name="FK_States_IssuerID" Association="IdentityModels.FK_States_IssuerID">
             <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
             <End Role="tbl_States" EntitySet="tbl_States" />
           </AssociationSet>
-          <AssociationSet Name="FK_Logins_ActorID" Association="IdentityEntities.FK_Logins_ActorID">
+          <AssociationSet Name="FK_Logins_ActorID" Association="IdentityModels.FK_Logins_ActorID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Logins" EntitySet="tbl_Logins" />
           </AssociationSet>
-          <AssociationSet Name="FK_UserLogins_LoginID" Association="IdentityEntities.FK_UserLogins_LoginID">
-            <End Role="tbl_Logins" EntitySet="tbl_Logins" />
-            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
-          </AssociationSet>
-          <AssociationSet Name="FK_QueueEmails_UserID" Association="IdentityEntities.FK_QueueEmails_UserID">
+          <AssociationSet Name="FK_QueueEmails_UserID" Association="IdentityModels.FK_QueueEmails_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_QueueEmails" EntitySet="tbl_QueueEmails" />
           </AssociationSet>
-          <AssociationSet Name="FK_QueueTexts_UserID" Association="IdentityEntities.FK_QueueTexts_UserID">
+          <AssociationSet Name="FK_QueueTexts_UserID" Association="IdentityModels.FK_QueueTexts_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_QueueTexts" EntitySet="tbl_QueueTexts" />
           </AssociationSet>
-          <AssociationSet Name="FK_Refreshes_UserID" Association="IdentityEntities.FK_Refreshes_UserID">
+          <AssociationSet Name="FK_Refreshes_UserID" Association="IdentityModels.FK_Refreshes_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleClaims_RoleID" Association="IdentityEntities.FK_RoleClaims_RoleID">
-            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
-            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserRoles_RoleID" Association="IdentityEntities.FK_UserRoles_RoleID">
-            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
-            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Settings_UserID" Association="IdentityEntities.FK_Settings_UserID">
+          <AssociationSet Name="FK_Settings_UserID" Association="IdentityModels.FK_Settings_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Settings" EntitySet="tbl_Settings" />
           </AssociationSet>
-          <AssociationSet Name="FK_States_UserID" Association="IdentityEntities.FK_States_UserID">
+          <AssociationSet Name="FK_States_UserID" Association="IdentityModels.FK_States_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_States" EntitySet="tbl_States" />
           </AssociationSet>
-          <AssociationSet Name="FK_UserClaims_UserID" Association="IdentityEntities.FK_UserClaims_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserLogins_UserID" Association="IdentityEntities.FK_UserLogins_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
-          </AssociationSet>
-          <AssociationSet Name="FK_UserRoles_UserID" Association="IdentityEntities.FK_UserRoles_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
-          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="uvw_Roles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
         <EntityType Name="tbl_Activities">
           <Key>
             <PropertyRef Name="Id" />
@@ -1541,21 +1544,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="CurrentValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_Activities_AudienceID" FromRole="tbl_Activities" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_Activities_UserID" FromRole="tbl_Activities" ToRole="tbl_Users" />
-        </EntityType>
-        <EntityType Name="tbl_AudienceRoles">
-          <Key>
-            <PropertyRef Name="AudienceId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
-          <Property Name="RoleId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_AudienceRoles_AudienceID" FromRole="tbl_AudienceRoles" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_Roles" Relationship="IdentityEntities.FK_AudienceRoles_RoleID" FromRole="tbl_AudienceRoles" ToRole="tbl_Roles" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_Activities_AudienceID" FromRole="tbl_Activities" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_Activities_UserID" FromRole="tbl_Activities" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_Audiences">
           <Key>
@@ -1580,14 +1570,13 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Activities" Relationship="IdentityEntities.FK_Activities_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Activities" />
-          <NavigationProperty Name="tbl_AudienceRoles" Relationship="IdentityEntities.FK_AudienceRoles_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_AudienceRoles" />
-          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityEntities.FK_Audiences_IssuerID" FromRole="tbl_Audiences" ToRole="tbl_Issuers" />
-          <NavigationProperty Name="tbl_Refreshes" Relationship="IdentityEntities.FK_Refreshes_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Refreshes" />
-          <NavigationProperty Name="tbl_Roles" Relationship="IdentityEntities.FK_Roles_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Roles" />
-          <NavigationProperty Name="tbl_Settings" Relationship="IdentityEntities.FK_Settings_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Settings" />
-          <NavigationProperty Name="tbl_States" Relationship="IdentityEntities.FK_States_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_States" />
-          <NavigationProperty Name="tbl_Urls" Relationship="IdentityEntities.FK_Urls_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Urls" />
+          <NavigationProperty Name="tbl_Activities" Relationship="IdentityModels.FK_Activities_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Activities" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityModels.FK_Audiences_IssuerID" FromRole="tbl_Audiences" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Refreshes" Relationship="IdentityModels.FK_Refreshes_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Refreshes" />
+          <NavigationProperty Name="tbl_Roles" Relationship="IdentityModels.FK_Roles_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Roles" />
+          <NavigationProperty Name="tbl_Settings" Relationship="IdentityModels.FK_Settings_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Settings" />
+          <NavigationProperty Name="tbl_States" Relationship="IdentityModels.FK_States_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_States" />
+          <NavigationProperty Name="tbl_Urls" Relationship="IdentityModels.FK_Urls_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Urls" />
         </EntityType>
         <EntityType Name="tbl_Claims">
           <Key>
@@ -1603,10 +1592,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_Claims_ActorID" FromRole="tbl_Claims" ToRole="tbl_Users" />
-          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityEntities.FK_Claims_IssuerID" FromRole="tbl_Claims" ToRole="tbl_Issuers" />
-          <NavigationProperty Name="tbl_RoleClaims" Relationship="IdentityEntities.FK_RoleClaims_ClaimID" FromRole="tbl_Claims" ToRole="tbl_RoleClaims" />
-          <NavigationProperty Name="tbl_UserClaims" Relationship="IdentityEntities.FK_UserClaims_ClaimID" FromRole="tbl_Claims" ToRole="tbl_UserClaims" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_Claims_ActorID" FromRole="tbl_Claims" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityModels.FK_Claims_IssuerID" FromRole="tbl_Claims" ToRole="tbl_Issuers" />
         </EntityType>
         <EntityType Name="tbl_Issuers">
           <Key>
@@ -1621,11 +1608,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_Audiences_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_Claims" Relationship="IdentityEntities.FK_Claims_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Claims" />
-          <NavigationProperty Name="tbl_Refreshes" Relationship="IdentityEntities.FK_Refreshes_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Refreshes" />
-          <NavigationProperty Name="tbl_Settings" Relationship="IdentityEntities.FK_Settings_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Settings" />
-          <NavigationProperty Name="tbl_States" Relationship="IdentityEntities.FK_States_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_States" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_Audiences_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Claims" Relationship="IdentityModels.FK_Claims_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Claims" />
+          <NavigationProperty Name="tbl_Refreshes" Relationship="IdentityModels.FK_Refreshes_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Refreshes" />
+          <NavigationProperty Name="tbl_Settings" Relationship="IdentityModels.FK_Settings_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Settings" />
+          <NavigationProperty Name="tbl_States" Relationship="IdentityModels.FK_States_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_States" />
         </EntityType>
         <EntityType Name="tbl_Logins">
           <Key>
@@ -1640,8 +1627,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_Logins_ActorID" FromRole="tbl_Logins" ToRole="tbl_Users" />
-          <NavigationProperty Name="tbl_UserLogins" Relationship="IdentityEntities.FK_UserLogins_LoginID" FromRole="tbl_Logins" ToRole="tbl_UserLogins" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_Logins_ActorID" FromRole="tbl_Logins" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_MOTDs">
           <Key>
@@ -1674,7 +1660,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_QueueEmails_UserID" FromRole="tbl_QueueEmails" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_QueueEmails_UserID" FromRole="tbl_QueueEmails" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_QueueTexts">
           <Key>
@@ -1689,7 +1675,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Body" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_QueueTexts_UserID" FromRole="tbl_QueueTexts" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_QueueTexts_UserID" FromRole="tbl_QueueTexts" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_Refreshes">
           <Key>
@@ -1703,23 +1689,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="RefreshType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_Refreshes_AudienceID" FromRole="tbl_Refreshes" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityEntities.FK_Refreshes_IssuerID" FromRole="tbl_Refreshes" ToRole="tbl_Issuers" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_Refreshes_UserID" FromRole="tbl_Refreshes" ToRole="tbl_Users" />
-        </EntityType>
-        <EntityType Name="tbl_RoleClaims">
-          <Key>
-            <PropertyRef Name="RoleId" />
-            <PropertyRef Name="ClaimId" />
-          </Key>
-          <Property Name="RoleId" Type="Guid" Nullable="false" />
-          <Property Name="ClaimId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Claims" Relationship="IdentityEntities.FK_RoleClaims_ClaimID" FromRole="tbl_RoleClaims" ToRole="tbl_Claims" />
-          <NavigationProperty Name="tbl_Roles" Relationship="IdentityEntities.FK_RoleClaims_RoleID" FromRole="tbl_RoleClaims" ToRole="tbl_Roles" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_Refreshes_AudienceID" FromRole="tbl_Refreshes" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityModels.FK_Refreshes_IssuerID" FromRole="tbl_Refreshes" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_Refreshes_UserID" FromRole="tbl_Refreshes" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_Roles">
           <Key>
@@ -1735,10 +1708,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="ConcurrencyStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_AudienceRoles" Relationship="IdentityEntities.FK_AudienceRoles_RoleID" FromRole="tbl_Roles" ToRole="tbl_AudienceRoles" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_Roles_AudienceID" FromRole="tbl_Roles" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_RoleClaims" Relationship="IdentityEntities.FK_RoleClaims_RoleID" FromRole="tbl_Roles" ToRole="tbl_RoleClaims" />
-          <NavigationProperty Name="tbl_UserRoles" Relationship="IdentityEntities.FK_UserRoles_RoleID" FromRole="tbl_Roles" ToRole="tbl_UserRoles" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_Roles_AudienceID" FromRole="tbl_Roles" ToRole="tbl_Audiences" />
         </EntityType>
         <EntityType Name="tbl_Settings">
           <Key>
@@ -1752,9 +1722,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="ConfigValue" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_Settings_AudienceID" FromRole="tbl_Settings" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityEntities.FK_Settings_IssuerID" FromRole="tbl_Settings" ToRole="tbl_Issuers" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_Settings_UserID" FromRole="tbl_Settings" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_Settings_AudienceID" FromRole="tbl_Settings" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityModels.FK_Settings_IssuerID" FromRole="tbl_Settings" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_Settings_UserID" FromRole="tbl_Settings" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_States">
           <Key>
@@ -1772,9 +1742,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastPolling" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_States_AudienceID" FromRole="tbl_States" ToRole="tbl_Audiences" />
-          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityEntities.FK_States_IssuerID" FromRole="tbl_States" ToRole="tbl_Issuers" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_States_UserID" FromRole="tbl_States" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_States_AudienceID" FromRole="tbl_States" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="IdentityModels.FK_States_IssuerID" FromRole="tbl_States" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityModels.FK_States_UserID" FromRole="tbl_States" ToRole="tbl_Users" />
         </EntityType>
         <EntityType Name="tbl_Urls">
           <Key>
@@ -1789,46 +1759,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityEntities.FK_Urls_AudienceID" FromRole="tbl_Urls" ToRole="tbl_Audiences" />
-        </EntityType>
-        <EntityType Name="tbl_UserClaims">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="ClaimId" />
-          </Key>
-          <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="ClaimId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Claims" Relationship="IdentityEntities.FK_UserClaims_ClaimID" FromRole="tbl_UserClaims" ToRole="tbl_Claims" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_UserClaims_UserID" FromRole="tbl_UserClaims" ToRole="tbl_Users" />
-        </EntityType>
-        <EntityType Name="tbl_UserLogins">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="LoginId" />
-          </Key>
-          <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="LoginId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Logins" Relationship="IdentityEntities.FK_UserLogins_LoginID" FromRole="tbl_UserLogins" ToRole="tbl_Logins" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_UserLogins_UserID" FromRole="tbl_UserLogins" ToRole="tbl_Users" />
-        </EntityType>
-        <EntityType Name="tbl_UserRoles">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="RoleId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Roles" Relationship="IdentityEntities.FK_UserRoles_RoleID" FromRole="tbl_UserRoles" ToRole="tbl_Roles" />
-          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_UserRoles_UserID" FromRole="tbl_UserRoles" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="IdentityModels.FK_Urls_AudienceID" FromRole="tbl_Urls" ToRole="tbl_Audiences" />
         </EntityType>
         <EntityType Name="tbl_Users">
           <Key>
@@ -1857,21 +1788,18 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
           <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Activities" Relationship="IdentityEntities.FK_Activities_UserID" FromRole="tbl_Users" ToRole="tbl_Activities" />
-          <NavigationProperty Name="tbl_Claims" Relationship="IdentityEntities.FK_Claims_ActorID" FromRole="tbl_Users" ToRole="tbl_Claims" />
-          <NavigationProperty Name="tbl_Logins" Relationship="IdentityEntities.FK_Logins_ActorID" FromRole="tbl_Users" ToRole="tbl_Logins" />
-          <NavigationProperty Name="tbl_QueueEmails" Relationship="IdentityEntities.FK_QueueEmails_UserID" FromRole="tbl_Users" ToRole="tbl_QueueEmails" />
-          <NavigationProperty Name="tbl_QueueTexts" Relationship="IdentityEntities.FK_QueueTexts_UserID" FromRole="tbl_Users" ToRole="tbl_QueueTexts" />
-          <NavigationProperty Name="tbl_Refreshes" Relationship="IdentityEntities.FK_Refreshes_UserID" FromRole="tbl_Users" ToRole="tbl_Refreshes" />
-          <NavigationProperty Name="tbl_Settings" Relationship="IdentityEntities.FK_Settings_UserID" FromRole="tbl_Users" ToRole="tbl_Settings" />
-          <NavigationProperty Name="tbl_States" Relationship="IdentityEntities.FK_States_UserID" FromRole="tbl_Users" ToRole="tbl_States" />
-          <NavigationProperty Name="tbl_UserClaims" Relationship="IdentityEntities.FK_UserClaims_UserID" FromRole="tbl_Users" ToRole="tbl_UserClaims" />
-          <NavigationProperty Name="tbl_UserLogins" Relationship="IdentityEntities.FK_UserLogins_UserID" FromRole="tbl_Users" ToRole="tbl_UserLogins" />
-          <NavigationProperty Name="tbl_UserRoles" Relationship="IdentityEntities.FK_UserRoles_UserID" FromRole="tbl_Users" ToRole="tbl_UserRoles" />
+          <NavigationProperty Name="tbl_Activities" Relationship="IdentityModels.FK_Activities_UserID" FromRole="tbl_Users" ToRole="tbl_Activities" />
+          <NavigationProperty Name="tbl_Claims" Relationship="IdentityModels.FK_Claims_ActorID" FromRole="tbl_Users" ToRole="tbl_Claims" />
+          <NavigationProperty Name="tbl_Logins" Relationship="IdentityModels.FK_Logins_ActorID" FromRole="tbl_Users" ToRole="tbl_Logins" />
+          <NavigationProperty Name="tbl_QueueEmails" Relationship="IdentityModels.FK_QueueEmails_UserID" FromRole="tbl_Users" ToRole="tbl_QueueEmails" />
+          <NavigationProperty Name="tbl_QueueTexts" Relationship="IdentityModels.FK_QueueTexts_UserID" FromRole="tbl_Users" ToRole="tbl_QueueTexts" />
+          <NavigationProperty Name="tbl_Refreshes" Relationship="IdentityModels.FK_Refreshes_UserID" FromRole="tbl_Users" ToRole="tbl_Refreshes" />
+          <NavigationProperty Name="tbl_Settings" Relationship="IdentityModels.FK_Settings_UserID" FromRole="tbl_Users" ToRole="tbl_Settings" />
+          <NavigationProperty Name="tbl_States" Relationship="IdentityModels.FK_States_UserID" FromRole="tbl_Users" ToRole="tbl_States" />
         </EntityType>
         <Association Name="FK_Activities_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Activities" Role="tbl_Activities" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1" />
+          <End Type="IdentityModels.tbl_Activities" Role="tbl_Activities" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Audiences">
               <PropertyRef Name="Id" />
@@ -1882,8 +1810,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Activities_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Activities" Role="tbl_Activities" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
+          <End Type="IdentityModels.tbl_Activities" Role="tbl_Activities" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -1893,37 +1821,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_AudienceRoles_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_AudienceRoles" Role="tbl_AudienceRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Audiences">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_AudienceRoles">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AudienceRoles_RoleID">
-          <End Type="IdentityEntities.tbl_Roles" Role="tbl_Roles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_AudienceRoles" Role="tbl_AudienceRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Roles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_AudienceRoles">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Audiences_IssuerID">
-          <End Type="IdentityEntities.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1" />
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1" />
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Issuers">
               <PropertyRef Name="Id" />
@@ -1934,8 +1834,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Refreshes_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Refreshes" Role="tbl_Refreshes" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1" />
+          <End Type="IdentityModels.tbl_Refreshes" Role="tbl_Refreshes" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Audiences">
               <PropertyRef Name="Id" />
@@ -1946,8 +1846,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Roles_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="1" />
-          <End Type="IdentityEntities.tbl_Roles" Role="tbl_Roles" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="1" />
+          <End Type="IdentityModels.tbl_Roles" Role="tbl_Roles" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Audiences">
               <PropertyRef Name="Id" />
@@ -1958,10 +1858,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Settings_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1">
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_Settings" Role="tbl_Settings" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Settings" Role="tbl_Settings" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Audiences">
               <PropertyRef Name="Id" />
@@ -1972,10 +1872,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_States_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1">
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_States" Role="tbl_States" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_States" Role="tbl_States" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Audiences">
               <PropertyRef Name="Id" />
@@ -1986,10 +1886,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Urls_AudienceID">
-          <End Type="IdentityEntities.tbl_Audiences" Role="tbl_Audiences" Multiplicity="1">
+          <End Type="IdentityModels.tbl_Audiences" Role="tbl_Audiences" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_Urls" Role="tbl_Urls" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Urls" Role="tbl_Urls" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Audiences">
               <PropertyRef Name="Id" />
@@ -2000,8 +1900,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Claims_ActorID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Claims" Role="tbl_Claims" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
+          <End Type="IdentityModels.tbl_Claims" Role="tbl_Claims" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2012,10 +1912,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Claims_IssuerID">
-          <End Type="IdentityEntities.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1">
+          <End Type="IdentityModels.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_Claims" Role="tbl_Claims" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Claims" Role="tbl_Claims" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Issuers">
               <PropertyRef Name="Id" />
@@ -2025,39 +1925,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleClaims_ClaimID">
-          <End Type="IdentityEntities.tbl_Claims" Role="tbl_Claims" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_RoleClaims" Role="tbl_RoleClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Claims">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_RoleClaims">
-              <PropertyRef Name="ClaimId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserClaims_ClaimID">
-          <End Type="IdentityEntities.tbl_Claims" Role="tbl_Claims" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_UserClaims" Role="tbl_UserClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Claims">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserClaims">
-              <PropertyRef Name="ClaimId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Refreshes_IssuerID">
-          <End Type="IdentityEntities.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1">
+          <End Type="IdentityModels.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_Refreshes" Role="tbl_Refreshes" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Refreshes" Role="tbl_Refreshes" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Issuers">
               <PropertyRef Name="Id" />
@@ -2068,10 +1940,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Settings_IssuerID">
-          <End Type="IdentityEntities.tbl_Issuers" Role="tbl_Issuers" Multiplicity="0..1">
+          <End Type="IdentityModels.tbl_Issuers" Role="tbl_Issuers" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_Settings" Role="tbl_Settings" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Settings" Role="tbl_Settings" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Issuers">
               <PropertyRef Name="Id" />
@@ -2082,10 +1954,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_States_IssuerID">
-          <End Type="IdentityEntities.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1">
+          <End Type="IdentityModels.tbl_Issuers" Role="tbl_Issuers" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_States" Role="tbl_States" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_States" Role="tbl_States" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Issuers">
               <PropertyRef Name="Id" />
@@ -2096,8 +1968,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Logins_ActorID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Logins" Role="tbl_Logins" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
+          <End Type="IdentityModels.tbl_Logins" Role="tbl_Logins" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2107,25 +1979,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_UserLogins_LoginID">
-          <End Type="IdentityEntities.tbl_Logins" Role="tbl_Logins" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_UserLogins" Role="tbl_UserLogins" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Logins">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserLogins">
-              <PropertyRef Name="LoginId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_QueueEmails_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="1">
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_QueueEmails" Role="tbl_QueueEmails" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_QueueEmails" Role="tbl_QueueEmails" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2136,10 +1994,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_QueueTexts_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="1">
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_QueueTexts" Role="tbl_QueueTexts" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_QueueTexts" Role="tbl_QueueTexts" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2150,8 +2008,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Refreshes_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Refreshes" Role="tbl_Refreshes" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="0..1" />
+          <End Type="IdentityModels.tbl_Refreshes" Role="tbl_Refreshes" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2161,39 +2019,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleClaims_RoleID">
-          <End Type="IdentityEntities.tbl_Roles" Role="tbl_Roles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_RoleClaims" Role="tbl_RoleClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Roles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_RoleClaims">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserRoles_RoleID">
-          <End Type="IdentityEntities.tbl_Roles" Role="tbl_Roles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_UserRoles" Role="tbl_UserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Roles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserRoles">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Settings_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1">
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_Settings" Role="tbl_Settings" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_Settings" Role="tbl_Settings" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2204,10 +2034,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_States_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1">
+          <End Type="IdentityModels.tbl_Users" Role="tbl_Users" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="IdentityEntities.tbl_States" Role="tbl_States" Multiplicity="*" />
+          <End Type="IdentityModels.tbl_States" Role="tbl_States" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tbl_Users">
               <PropertyRef Name="Id" />
@@ -2217,56 +2047,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_UserClaims_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_UserClaims" Role="tbl_UserClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserClaims">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserLogins_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_UserLogins" Role="tbl_UserLogins" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserLogins">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_UserRoles_UserID">
-          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_UserRoles" Role="tbl_UserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_UserRoles">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="IdentityEntitiesStoreContainer" CdmEntityContainer="Entities">
+        <EntityContainerMapping StorageEntityContainer="IdentityModelsStoreContainer" CdmEntityContainer="IdentityEntities">
           <EntitySetMapping Name="uvw_Activities">
-            <EntityTypeMapping TypeName="IdentityEntities.uvw_Activities">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Activities">
               <MappingFragment StoreEntitySet="uvw_Activities">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -2280,9 +2068,27 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
               </MappingFragment>
             </EntityTypeMapping>
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Activities">
+              <ModificationFunctionMapping>
+                <InsertFunction FunctionName="IdentityModels.Store.usp_Activity_Insert">
+                  <ScalarProperty Name="Immutable" ParameterName="Immutable" />
+                  <ScalarProperty Name="Created" ParameterName="Created" />
+                  <ScalarProperty Name="CurrentValues" ParameterName="CurrentValues" />
+                  <ScalarProperty Name="OriginalValues" ParameterName="OriginalValues" />
+                  <ScalarProperty Name="KeyValues" ParameterName="KeyValues" />
+                  <ScalarProperty Name="TableName" ParameterName="TableName" />
+                  <ScalarProperty Name="ActivityType" ParameterName="ActivityType" />
+                  <ScalarProperty Name="UserId" ParameterName="UserId" />
+                  <ScalarProperty Name="AudienceId" ParameterName="AudienceId" />
+                </InsertFunction>
+                <DeleteFunction FunctionName="IdentityModels.Store.usp_Activity_Delete" >
+                  <ScalarProperty Name="Id" ParameterName="ActivityID" />
+                </DeleteFunction>
+              </ModificationFunctionMapping>
+            </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="uvw_Audiences">
-            <EntityTypeMapping TypeName="IdentityEntities.uvw_Audiences">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Audiences">
               <MappingFragment StoreEntitySet="uvw_Audiences">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
@@ -2305,9 +2111,55 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
               </MappingFragment>
             </EntityTypeMapping>
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Audiences">
+              <ModificationFunctionMapping>
+                <DeleteFunction FunctionName="IdentityModels.Store.usp_Audience_Delete" >
+                  <ScalarProperty Name="Id" ParameterName="AudienceID" />
+                </DeleteFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_Audience_Update">
+                  <ScalarProperty Name="Immutable" ParameterName="Immutable" Version="Current" />
+                  <ScalarProperty Name="AccessSuccessCount" ParameterName="AccessSuccessCount" Version="Current" />
+                  <ScalarProperty Name="AccessFailedCount" ParameterName="AccessFailedCount" Version="Current" />
+                  <ScalarProperty Name="LastLoginFailure" ParameterName="LastLoginFailure" Version="Current" />
+                  <ScalarProperty Name="LastLoginSuccess" ParameterName="LastLoginSuccess" Version="Current" />
+                  <ScalarProperty Name="LockoutEnd" ParameterName="LockoutEnd" Version="Current" />
+                  <ScalarProperty Name="LockoutEnabled" ParameterName="LockoutEnabled" Version="Current" />
+                  <ScalarProperty Name="LastUpdated" ParameterName="LastUpdated" Version="Current" />
+                  <ScalarProperty Name="Created" ParameterName="Created" Version="Current" />
+                  <ScalarProperty Name="AudienceType" ParameterName="AudienceType" Version="Current" />
+                  <ScalarProperty Name="SecurityStamp" ParameterName="SecurityStamp" Version="Current" />
+                  <ScalarProperty Name="PasswordHash" ParameterName="PasswordHash" Version="Current" />
+                  <ScalarProperty Name="ConcurrencyStamp" ParameterName="ConcurrencyStamp" Version="Current" />
+                  <ScalarProperty Name="Description" ParameterName="Description" Version="Current" />
+                  <ScalarProperty Name="Name" ParameterName="Name" Version="Current" />
+                  <ScalarProperty Name="ActorId" ParameterName="ActorId" Version="Current" />
+                  <ScalarProperty Name="IssuerId" ParameterName="IssuerId" Version="Current" />
+                  <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
+                </UpdateFunction>
+                <InsertFunction FunctionName="IdentityModels.Store.usp_Audience_Insert">
+                  <ScalarProperty Name="Immutable" ParameterName="Immutable" />
+                  <ScalarProperty Name="AccessSuccessCount" ParameterName="AccessSuccessCount" />
+                  <ScalarProperty Name="AccessFailedCount" ParameterName="AccessFailedCount" />
+                  <ScalarProperty Name="LastLoginFailure" ParameterName="LastLoginFailure" />
+                  <ScalarProperty Name="LastLoginSuccess" ParameterName="LastLoginSuccess" />
+                  <ScalarProperty Name="LockoutEnd" ParameterName="LockoutEnd" />
+                  <ScalarProperty Name="LockoutEnabled" ParameterName="LockoutEnabled" />
+                  <ScalarProperty Name="LastUpdated" ParameterName="LastUpdated" />
+                  <ScalarProperty Name="Created" ParameterName="Created" />
+                  <ScalarProperty Name="AudienceType" ParameterName="AudienceType" />
+                  <ScalarProperty Name="SecurityStamp" ParameterName="SecurityStamp" />
+                  <ScalarProperty Name="PasswordHash" ParameterName="PasswordHash" />
+                  <ScalarProperty Name="ConcurrencyStamp" ParameterName="ConcurrencyStamp" />
+                  <ScalarProperty Name="Description" ParameterName="Description" />
+                  <ScalarProperty Name="Name" ParameterName="Name" />
+                  <ScalarProperty Name="ActorId" ParameterName="ActorId" />
+                  <ScalarProperty Name="IssuerId" ParameterName="IssuerId" />
+                </InsertFunction>
+              </ModificationFunctionMapping>
+            </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="uvw_Claims">
-            <EntityTypeMapping TypeName="IdentityEntities.uvw_Claims">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Claims">
               <MappingFragment StoreEntitySet="uvw_Claims">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
@@ -2323,7 +2175,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="uvw_Issuers">
-            <EntityTypeMapping TypeName="IdentityEntities.uvw_Issuers">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Issuers">
               <MappingFragment StoreEntitySet="uvw_Issuers">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
@@ -2336,9 +2188,81 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
               </MappingFragment>
             </EntityTypeMapping>
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Issuers">
+              <ModificationFunctionMapping>
+                <InsertFunction FunctionName="IdentityModels.Store.usp_Issuer_Insert">
+                  <ScalarProperty Name="Immutable" ParameterName="Immutable" />
+                  <ScalarProperty Name="LastUpdated" ParameterName="LastUpdated" />
+                  <ScalarProperty Name="Created" ParameterName="Created" />
+                  <ScalarProperty Name="Enabled" ParameterName="Enabled" />
+                  <ScalarProperty Name="IssuerKey" ParameterName="IssuerKey" />
+                  <ScalarProperty Name="Description" ParameterName="Description" />
+                  <ScalarProperty Name="Name" ParameterName="Name" />
+                  <ScalarProperty Name="ActorId" ParameterName="ActorId" />
+                </InsertFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_Issuer_Update">
+                  <ScalarProperty Name="Immutable" ParameterName="Immutable" Version="Current" />
+                  <ScalarProperty Name="LastUpdated" ParameterName="LastUpdated" Version="Current" />
+                  <ScalarProperty Name="Enabled" ParameterName="Enabled" Version="Current" />
+                  <ScalarProperty Name="IssuerKey" ParameterName="IssuerKey" Version="Current" />
+                  <ScalarProperty Name="Description" ParameterName="Description" Version="Current" />
+                  <ScalarProperty Name="Name" ParameterName="Name" Version="Current" />
+                  <ScalarProperty Name="ActorId" ParameterName="ActorId" Version="Current" />
+                  <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
+                </UpdateFunction>
+                <DeleteFunction FunctionName="IdentityModels.Store.usp_Issuer_Delete" >
+                  <ScalarProperty Name="Id" ParameterName="IssuerID" />
+                </DeleteFunction>
+              </ModificationFunctionMapping>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Logins">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Logins">
+              <MappingFragment StoreEntitySet="uvw_Logins">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LoginKey" ColumnName="LoginKey" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_MOTDs">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTDs">
+              <MappingFragment StoreEntitySet="uvw_MOTDs">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
+                <ScalarProperty Name="Quote" ColumnName="Quote" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Tags" ColumnName="Tags" />
+                <ScalarProperty Name="Length" ColumnName="Length" />
+                <ScalarProperty Name="Background" ColumnName="Background" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Refreshes">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Refreshes">
+              <MappingFragment StoreEntitySet="uvw_Refreshes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RefreshValue" ColumnName="RefreshValue" />
+                <ScalarProperty Name="RefreshType" ColumnName="RefreshType" />
+                <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
+                <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
+              </MappingFragment>
+            </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="uvw_Users">
-            <EntityTypeMapping TypeName="IdentityEntities.uvw_Users">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Users">
               <MappingFragment StoreEntitySet="uvw_Users">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
@@ -2366,18 +2290,48 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="usp_Activity_Delete" FunctionName="IdentityEntities.Store.usp_Activity_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Activity_Insert" FunctionName="IdentityEntities.Store.usp_Activity_Insert" />
-          <FunctionImportMapping FunctionImportName="usp_Audience_Delete" FunctionName="IdentityEntities.Store.usp_Audience_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Claim_Delete" FunctionName="IdentityEntities.Store.usp_Claim_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Claim_Insert" FunctionName="IdentityEntities.Store.usp_Claim_Insert" />
-          <FunctionImportMapping FunctionImportName="usp_Claim_Update" FunctionName="IdentityEntities.Store.usp_Claim_Update" />
-          <FunctionImportMapping FunctionImportName="usp_Issuer_Delete" FunctionName="IdentityEntities.Store.usp_Issuer_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_User_Delete" FunctionName="IdentityEntities.Store.usp_User_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_User_Insert" FunctionName="IdentityEntities.Store.usp_User_Insert" />
-          <FunctionImportMapping FunctionImportName="usp_User_Update" FunctionName="IdentityEntities.Store.usp_User_Update" />
+          <FunctionImportMapping FunctionImportName="usp_Activity_Delete" FunctionName="IdentityModels.Store.usp_Activity_Delete" />
+          <FunctionImportMapping FunctionImportName="usp_Activity_Insert" FunctionName="IdentityModels.Store.usp_Activity_Insert" />
+          <FunctionImportMapping FunctionImportName="usp_Audience_Delete" FunctionName="IdentityModels.Store.usp_Audience_Delete" />
+          <FunctionImportMapping FunctionImportName="usp_Claim_Delete" FunctionName="IdentityModels.Store.usp_Claim_Delete" />
+          <FunctionImportMapping FunctionImportName="usp_Claim_Insert" FunctionName="IdentityModels.Store.usp_Claim_Insert" />
+          <FunctionImportMapping FunctionImportName="usp_Claim_Update" FunctionName="IdentityModels.Store.usp_Claim_Update" />
+          <FunctionImportMapping FunctionImportName="usp_Issuer_Delete" FunctionName="IdentityModels.Store.usp_Issuer_Delete" />
+          <FunctionImportMapping FunctionImportName="usp_User_Delete" FunctionName="IdentityModels.Store.usp_User_Delete" />
+          <FunctionImportMapping FunctionImportName="usp_User_Insert" FunctionName="IdentityModels.Store.usp_User_Insert" />
+          <FunctionImportMapping FunctionImportName="usp_User_Update" FunctionName="IdentityModels.Store.usp_User_Update" />
+          <FunctionImportMapping FunctionImportName="usp_Issuer_Insert" FunctionName="IdentityModels.Store.usp_Issuer_Insert" />
+          <FunctionImportMapping FunctionImportName="usp_Issuer_Update" FunctionName="IdentityModels.Store.usp_Issuer_Update" />
+          <FunctionImportMapping FunctionImportName="usp_Audience_Insert" FunctionName="IdentityModels.Store.usp_Audience_Insert" />
+          <FunctionImportMapping FunctionImportName="usp_Audience_Update" FunctionName="IdentityModels.Store.usp_Audience_Update" />
+          <EntitySetMapping Name="uvw_Roles">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Roles">
+              <MappingFragment StoreEntitySet="uvw_Roles">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="IdentityModels.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="tbl_Activities">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Activities">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Activities">
               <MappingFragment StoreEntitySet="tbl_Activities">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
@@ -2392,19 +2346,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_AudienceRoles">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_AudienceRoles">
-              <MappingFragment StoreEntitySet="tbl_AudienceRoles">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="tbl_Audiences">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Audiences">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Audiences">
               <MappingFragment StoreEntitySet="tbl_Audiences">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
@@ -2429,7 +2372,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_Claims">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Claims">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Claims">
               <MappingFragment StoreEntitySet="tbl_Claims">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
@@ -2445,7 +2388,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_Issuers">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Issuers">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Issuers">
               <MappingFragment StoreEntitySet="tbl_Issuers">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
@@ -2460,7 +2403,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_Logins">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Logins">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Logins">
               <MappingFragment StoreEntitySet="tbl_Logins">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
@@ -2475,7 +2418,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_MOTDs">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_MOTDs">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_MOTDs">
               <MappingFragment StoreEntitySet="tbl_MOTDs">
                 <ScalarProperty Name="Background" ColumnName="Background" />
                 <ScalarProperty Name="Length" ColumnName="Length" />
@@ -2490,7 +2433,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_QueueEmails">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueEmails">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_QueueEmails">
               <MappingFragment StoreEntitySet="tbl_QueueEmails">
                 <ScalarProperty Name="SendAt" ColumnName="SendAt" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
@@ -2509,7 +2452,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_QueueTexts">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueTexts">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_QueueTexts">
               <MappingFragment StoreEntitySet="tbl_QueueTexts">
                 <ScalarProperty Name="SendAt" ColumnName="SendAt" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
@@ -2524,9 +2467,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_Refreshes">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Refreshes">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Refreshes">
               <MappingFragment StoreEntitySet="tbl_Refreshes">
-                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
                 <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
                 <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
                 <ScalarProperty Name="RefreshType" ColumnName="RefreshType" />
@@ -2538,19 +2481,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_RoleClaims">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_RoleClaims">
-              <MappingFragment StoreEntitySet="tbl_RoleClaims">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="tbl_Roles">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Roles">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Roles">
               <MappingFragment StoreEntitySet="tbl_Roles">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
@@ -2566,7 +2498,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_Settings">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Settings">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Settings">
               <MappingFragment StoreEntitySet="tbl_Settings">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
@@ -2580,7 +2512,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_States">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_States">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_States">
               <MappingFragment StoreEntitySet="tbl_States">
                 <ScalarProperty Name="LastPolling" ColumnName="LastPolling" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
@@ -2598,7 +2530,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tbl_Urls">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Urls">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Urls">
               <MappingFragment StoreEntitySet="tbl_Urls">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
@@ -2612,41 +2544,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_UserClaims">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_UserClaims">
-              <MappingFragment StoreEntitySet="tbl_UserClaims">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="tbl_UserLogins">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_UserLogins">
-              <MappingFragment StoreEntitySet="tbl_UserLogins">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="LoginId" ColumnName="LoginId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="tbl_UserRoles">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_UserRoles">
-              <MappingFragment StoreEntitySet="tbl_UserRoles">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="tbl_Users">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Users">
+            <EntityTypeMapping TypeName="IdentityModels.tbl_Users">
               <MappingFragment StoreEntitySet="tbl_Users">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="HumanBeing" ColumnName="HumanBeing" />

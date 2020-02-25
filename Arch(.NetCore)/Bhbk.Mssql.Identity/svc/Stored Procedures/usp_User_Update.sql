@@ -1,4 +1,6 @@
 ﻿
+
+
 CREATE PROCEDURE [svc].[usp_User_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@ActorId				UNIQUEIDENTIFIER
@@ -8,7 +10,6 @@ CREATE PROCEDURE [svc].[usp_User_Update]
     ,@LastName				NVARCHAR (MAX) 
     ,@PhoneNumber			NVARCHAR (16)
     ,@PhoneNumberConfirmed	BIT      
-    ,@Created				DATETIME2 (7) 
     ,@LastUpdated			DATETIME2 (7)
     ,@LockoutEnabled		BIT     
     ,@LockoutEnd			DATETIMEOFFSET (7)
@@ -25,6 +26,7 @@ CREATE PROCEDURE [svc].[usp_User_Update]
     ,@Immutable				BIT
 
 AS
+BEGIN
 
 UPDATE [dbo].[tbl_Users]
 SET
@@ -36,7 +38,6 @@ SET
     ,LastName				= @LastName
     ,PhoneNumber			= @PhoneNumber
     ,PhoneNumberConfirmed	= @PhoneNumberConfirmed  
-    ,Created				= @Created
     ,LastUpdated			= @LastUpdated
     ,LockoutEnabled			= @LockoutEnabled
     ,LockoutEnd				= @LockoutEnd
@@ -52,3 +53,5 @@ SET
     ,HumanBeing				= @HumanBeing
     ,Immutable				= @Immutable
 WHERE Id = @Id
+
+END

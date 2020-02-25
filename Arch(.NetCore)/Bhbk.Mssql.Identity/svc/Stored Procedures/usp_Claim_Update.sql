@@ -1,5 +1,7 @@
 ﻿
 
+
+
 CREATE PROCEDURE [svc].[usp_Claim_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@IssuerId				UNIQUEIDENTIFIER
@@ -8,11 +10,11 @@ CREATE PROCEDURE [svc].[usp_Claim_Update]
     ,@Type					NVARCHAR (MAX)
     ,@Value					NVARCHAR (MAX) 
     ,@ValueType             NVARCHAR (64) 
-    ,@Created				DATETIME2 (7) 
     ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
+BEGIN
 
 UPDATE [dbo].[tbl_Claims]
 SET
@@ -23,7 +25,8 @@ SET
 	,Type					= @Type
 	,Value					= @Value
 	,ValueType				= @ValueType
-    ,Created				= @Created
     ,LastUpdated			= @LastUpdated
     ,Immutable				= @Immutable
 WHERE Id = @Id
+
+END

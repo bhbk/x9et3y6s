@@ -38,17 +38,11 @@
     <Reference Include="Bhbk.Lib.Common, Version=2019.10.21.2046, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhbk.Lib.Common.2019.10.21.2046\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Bhbk.Lib.Cryptography, Version=2019.10.21.2046, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bhbk.Lib.Cryptography.2019.10.21.2046\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
-    </Reference>
     <Reference Include="Bhbk.Lib.DataAccess.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2019.10.21.2046\lib\net472\Bhbk.Lib.DataAccess.EF.dll</HintPath>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
-      <HintPath>..\packages\Portable.BouncyCastle.1.8.5.2\lib\net40\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="CryptoHelper, Version=3.0.2.0, Culture=neutral, PublicKeyToken=646ad3faa20406ba, processorArchitecture=MSIL">
-      <HintPath>..\packages\CryptoHelper.3.0.2\lib\netstandard2.0\CryptoHelper.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.6\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
@@ -56,23 +50,34 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNetCore.Cryptography.Internal, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.Internal.3.1.2\lib\netstandard2.0\Microsoft.AspNetCore.Cryptography.Internal.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.KeyDerivation.3.1.2\lib\netstandard2.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Common, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.Common.4.3.0\lib\net451\System.Data.Common.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Data.SqlClient, Version=4.6.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.8.1\lib\net461\System.Data.SqlClient.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\IdentityEntities.Context.cs">
@@ -90,10 +95,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_Activities.cs">
+    <Compile Include="Models\sysdiagram.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_AudienceRoles.cs">
+    <Compile Include="Models\tbl_Activities.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tbl_Audiences.cs">
@@ -120,9 +125,6 @@
     <Compile Include="Models\tbl_Refreshes.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_RoleClaims.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\tbl_Roles.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
@@ -133,15 +135,6 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tbl_Urls.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_UserClaims.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_UserLogins.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_UserRoles.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tbl_Users.cs">
@@ -157,6 +150,18 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Issuers.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_Logins.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_MOTDs.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_Refreshes.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_Roles.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Users.cs">
@@ -177,8 +182,19 @@
     <None Include="Models\IdentityEntities.edmx.diagram">
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </None>
+    <Compile Include="Models\IdentityEntitiesFactory.cs" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj">
+      <Project>{d594f163-1ebc-4647-b639-a25ea34f7677}</Project>
+      <Name>Bhbk.Lib.Identity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Models\IdentityEntities.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -190,15 +206,6 @@
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
       <LastGenOutput>IdentityEntities.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj">
-      <Project>{d594f163-1ebc-4647-b639-a25ea34f7677}</Project>
-      <Name>Bhbk.Lib.Identity</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -28,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.UnitTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 sc.AddSingleton<IMapper>(mapper);
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
-                    var uow = new UoWService(conf, instance);
+                    var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
                     new GenerateDefaultData(uow, mapper).Create();
 
                     return uow;

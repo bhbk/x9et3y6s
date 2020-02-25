@@ -1,7 +1,8 @@
 ﻿
+
+
 CREATE PROCEDURE [svc].[usp_User_Insert]
-     @Id                   UNIQUEIDENTIFIER 
-    ,@ActorId              UNIQUEIDENTIFIER
+    @ActorId              UNIQUEIDENTIFIER
     ,@Email                NVARCHAR (MAX) 
     ,@EmailConfirmed       BIT          
     ,@FirstName            NVARCHAR (MAX)
@@ -25,6 +26,9 @@ CREATE PROCEDURE [svc].[usp_User_Insert]
     ,@Immutable            BIT
 
 AS
+BEGIN
+
+DECLARE @USERID UNIQUEIDENTIFIER = NEWID()
 
 INSERT INTO [dbo].[tbl_Users]
 	(
@@ -54,7 +58,7 @@ INSERT INTO [dbo].[tbl_Users]
 	)
 VALUES
 	(
-     @Id           
+     @USERID       
     ,@ActorId    
     ,@Email           
     ,@EmailConfirmed       
@@ -79,4 +83,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT StudentID = @@IDENTITY;
+SELECT * FROM [dbo].[tbl_Users] WHERE [dbo].[tbl_Users].Id = @USERID
+
+END

@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public string RefreshType { get; set; }
         public DateTime ValidFromUtc { get; set; }
         public DateTime ValidToUtc { get; set; }
-        public DateTime Created { get; set; }
+        public DateTime IssuedUtc { get; set; }
 
         public virtual tbl_Audiences Audience { get; set; }
         public virtual tbl_Issuers Issuer { get; set; }

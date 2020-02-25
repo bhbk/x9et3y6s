@@ -30,8 +30,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
             var instance = new ContextService(InstanceContext.UnitTest);
 
-            UoW = new UoWService(conf, instance);
-            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
+            UoW = new UoWService(conf["Databases:IdentityEntities"], instance);
+            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             /*
              * only test context allowed to run...

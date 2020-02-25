@@ -12,15 +12,16 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_UserRoles
+    public partial class uvw_Refreshes
     {
-        public System.Guid UserId { get; set; }
-        public System.Guid RoleId { get; set; }
-        public Nullable<System.Guid> ActorId { get; set; }
-        public System.DateTime Created { get; set; }
-        public bool Immutable { get; set; }
-    
-        public virtual tbl_Roles tbl_Roles { get; set; }
-        public virtual tbl_Users tbl_Users { get; set; }
+        public System.Guid Id { get; set; }
+        public System.Guid IssuerId { get; set; }
+        public Nullable<System.Guid> AudienceId { get; set; }
+        public Nullable<System.Guid> UserId { get; set; }
+        public string RefreshValue { get; set; }
+        public string RefreshType { get; set; }
+        public System.DateTime ValidFromUtc { get; set; }
+        public System.DateTime ValidToUtc { get; set; }
+        public System.DateTime IssuedUtc { get; set; }
     }
 }

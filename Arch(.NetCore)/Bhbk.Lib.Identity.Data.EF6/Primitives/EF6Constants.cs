@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
 
         //https://htmlformatter.com/, https://www.freeformatter.com/java-dotnet-escape.html
 
-        public static string TemplateConfirmEmail(tbl_Users user, Uri link)
+        public static string TemplateConfirmEmail(uvw_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
             "</html>";
         }
 
-        public static string TemplateConfirmPassword(tbl_Users user, Uri link)
+        public static string TemplateConfirmPassword(uvw_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -109,7 +109,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
             "</html>";
         }
 
-        public static string TemplateConfirmNewUser(tbl_Issuers issuer, tbl_Users user, Uri link)
+        public static string TemplateConfirmNewUser(uvw_Issuers issuer, uvw_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...
@@ -156,7 +156,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
             "</html>";
         }
 
-        public static string TemplateImplicit(tbl_Issuers issuer, tbl_Audiences audience, tbl_Users user, Uri link)
+        public static string TemplateImplicit(uvw_Issuers issuer, uvw_Audiences audience, uvw_Users user, Uri link)
         {
             //use http://rendera.herokuapp.com/ to test template before format...
             //use https://www.buildmystring.com to format template into string that compiles...

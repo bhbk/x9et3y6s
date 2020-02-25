@@ -41,9 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.Lib.Identity.Data.EFCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.Lib.Identity.Data.EFCore.Tests", "Bhbk.Lib.Identity.Data.EFCore.Tests\Bhbk.Lib.Identity.Data.EFCore.Tests.csproj", "{77ADEBFE-21E5-4792-A0D3-F343C34971FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.Lib.Identity.Data.EF6.Tests", "Bhbk.Lib.Identity.Data.EF6.Tests\Bhbk.Lib.Identity.Data.EF6.Tests.csproj", "{9ED9EFEB-F496-476A-837C-9DAC4047EC5B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity.Data.EF6", "Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj", "{B1E4143E-D7CF-4FC8-8D6D-2CACBD51D145}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.Lib.Identity.Data.EF6.Tests", "Bhbk.Lib.Identity.Data.EF6.Tests\Bhbk.Lib.Identity.Data.EF6.Tests.csproj", "{C05B3833-0B01-4D0F-8DDC-7AF4A8E41658}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,14 +105,14 @@ Global
 		{77ADEBFE-21E5-4792-A0D3-F343C34971FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77ADEBFE-21E5-4792-A0D3-F343C34971FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77ADEBFE-21E5-4792-A0D3-F343C34971FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9ED9EFEB-F496-476A-837C-9DAC4047EC5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9ED9EFEB-F496-476A-837C-9DAC4047EC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9ED9EFEB-F496-476A-837C-9DAC4047EC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9ED9EFEB-F496-476A-837C-9DAC4047EC5B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B1E4143E-D7CF-4FC8-8D6D-2CACBD51D145}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B1E4143E-D7CF-4FC8-8D6D-2CACBD51D145}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E4143E-D7CF-4FC8-8D6D-2CACBD51D145}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1E4143E-D7CF-4FC8-8D6D-2CACBD51D145}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C05B3833-0B01-4D0F-8DDC-7AF4A8E41658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05B3833-0B01-4D0F-8DDC-7AF4A8E41658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05B3833-0B01-4D0F-8DDC-7AF4A8E41658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05B3833-0B01-4D0F-8DDC-7AF4A8E41658}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

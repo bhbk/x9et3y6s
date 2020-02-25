@@ -96,6 +96,7 @@ namespace Bhbk.Lib.Identity.Primitives
         public const string ApiTestIssuerKey = "IssuerUnitTestsKey";
         public const string ApiTestLogin = "LoginUnitTests";
         public const string ApiTestLoginKey = "LoginUnitTestsKey";
+        public const string ApiTestMOTD = "MOTDUnitTests";
         public const string ApiTestRole = "RoleUnitTests";
         public const string ApiTestTextContent = "TextUnitTestsContent";
         public const string ApiTestUser = "unittestuser1@local";

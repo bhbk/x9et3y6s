@@ -568,7 +568,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     {
                         Id = AlphaNumeric.CreateString(8),
                         Date = DateTime.Now,
-                        Author = "Test Author",
+                        Author = Constants.ApiTestMOTD,
                         Quote = "Test Quote",
                         Length = 666,
                         Category = "Test Category",
@@ -638,7 +638,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
              * delete test msg of the day
              */
 
-            _uow.MOTDs.Delete(new QueryExpression<tbl_MOTDs>().ToLambda());
+            _uow.MOTDs.Delete(new QueryExpression<tbl_MOTDs>()
+                .Where(x => x.Author.Contains(Constants.ApiTestMOTD)).ToLambda());
             _uow.Commit();
         }
     }

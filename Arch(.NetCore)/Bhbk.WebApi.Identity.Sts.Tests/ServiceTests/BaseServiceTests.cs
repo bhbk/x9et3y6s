@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.UnitTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
                 sc.AddScoped<IUoWService, UoWService>(x =>
                 {
-                    var uow = new UoWService(conf, instance);
+                    var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
                     new GenerateDefaultData(uow, mapper).Create();
 
                     return uow;
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var owin = new UoWService(conf, instance);
+                var owin = new UoWService(conf["Databases:IdentityEntities"], instance);
                 new GenerateDefaultData(owin, mapper).Create();
 
                 if (owin.InstanceType != InstanceContext.UnitTest)

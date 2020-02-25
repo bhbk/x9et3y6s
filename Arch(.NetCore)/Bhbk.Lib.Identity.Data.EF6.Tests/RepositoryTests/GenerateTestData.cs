@@ -4,10 +4,10 @@ using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Data.EF6.Services;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
+using System.Data;
 using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
@@ -39,13 +39,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Context.Set<tbl_Issuers>().Add(
-                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    new tbl_Issuers()
                     {
+                        Id = Guid.NewGuid(),
                         Name = Constants.ApiTestIssuer,
                         IssuerKey = Constants.ApiTestIssuerKey,
                         Enabled = true,
                         Immutable = false,
-                    }));
+                    });
 
                 _uow.Commit();
             }
@@ -61,33 +62,39 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundAudience == null)
             {
                 foundAudience = _uow.Context.Set<tbl_Audiences>().Add(
-                    _mapper.Map<tbl_Audiences>(new AudienceCreate()
+                    new tbl_Audiences()
                     {
+                        Id = Guid.NewGuid(),
                         IssuerId = foundIssuer.Id,
                         Name = Constants.ApiTestAudience,
                         AudienceType = AudienceType.user_agent.ToString(),
+                        Created = DateTime.Now,
                         Enabled = true,
                         Immutable = false,
-                    }));
+                    });
 
                 _uow.Context.Set<tbl_Activities>().Add(
-                    _mapper.Map<tbl_Activities>(new ActivityCreate()
+                    new tbl_Activities()
                     {
+                        Id = Guid.NewGuid(),
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
+                        Created = DateTime.Now,
                         Immutable = false,
-                    }));
+                    });
 
                 _uow.Context.Set<tbl_Refreshes>().Add(
-                    _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    new tbl_Refreshes()
                     {
+                        Id = Guid.NewGuid(),
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
                         RefreshType = RefreshType.Client.ToString(),
                         RefreshValue = Base64.CreateString(8),
+                        IssuedUtc = DateTime.UtcNow,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    }));
+                    });
 
                 _uow.Commit();
             }
@@ -97,6 +104,36 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             if (_uow.InstanceType != InstanceContext.UnitTest)
                 throw new InvalidOperationException();
+
+            /*
+             * delete test users
+             */
+
+            var users = _uow.Context.Set<tbl_Users>()
+                .Where(x => x.Email.Contains(Constants.ApiTestUser)).ToList();
+
+            foreach (var user in users)
+                _uow.Context.usp_User_Delete(user.Id);
+
+            /*
+             * delete test audiences
+             */
+
+            var audiences = _uow.Context.Set<tbl_Audiences>()
+                .Where(x => x.Name.Contains(Constants.ApiTestAudience)).ToList();
+
+            foreach (var audience in audiences)
+                _uow.Context.usp_Audience_Delete(audience.Id);
+
+            /*
+             * delete test issuers
+             */
+
+            var issuers = _uow.Context.Set<tbl_Issuers>()
+                .Where(x => x.Name.Contains(Constants.ApiTestIssuer)).ToList();
+
+            foreach (var issuer in issuers)
+                _uow.Context.usp_Issuer_Delete(issuer.Id);
         }
     }
 }

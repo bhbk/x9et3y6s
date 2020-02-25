@@ -18,7 +18,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public tbl_Audiences()
         {
             this.tbl_Activities = new HashSet<tbl_Activities>();
-            this.tbl_AudienceRoles = new HashSet<tbl_AudienceRoles>();
             this.tbl_Refreshes = new HashSet<tbl_Refreshes>();
             this.tbl_Roles = new HashSet<tbl_Roles>();
             this.tbl_Settings = new HashSet<tbl_Settings>();
@@ -48,8 +47,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Activities> tbl_Activities { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
         public virtual tbl_Issuers tbl_Issuers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Refreshes> tbl_Refreshes { get; set; }

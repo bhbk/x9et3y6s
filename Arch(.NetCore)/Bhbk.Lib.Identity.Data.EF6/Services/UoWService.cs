@@ -23,10 +23,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
             }
         }
 
-        public UoWService()
-            : this(new ContextService(InstanceContext.DeployedOrLocal)) { }
+        public UoWService(string connection)
+            : this(connection, new ContextService(InstanceContext.DeployedOrLocal)) { }
 
-        public UoWService(IContextService instance)
+        public UoWService(string connection, IContextService instance)
         {
             switch (instance.InstanceType)
             {
@@ -37,13 +37,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
 #elif !RELEASE
                         _context.Database.Log = x => Debug.WriteLine(x);
 #endif
-                        _context = new IdentityEntities();
+                        _context = new IdentityEntitiesFactory(connection).Create();
                     }
                     break;
 
                 case InstanceContext.UnitTest:
                     {
-                        _context = new IdentityEntities();
+                        _context = new IdentityEntitiesFactory(connection).Create();
                     }
                     break;
 
@@ -52,6 +52,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
             }
 
             _context.Configuration.LazyLoadingEnabled = false;
+            _context.Configuration.ProxyCreationEnabled = true;
 
             InstanceType = instance.InstanceType;
 

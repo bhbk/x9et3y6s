@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Alert
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Alert
             * only for owin authentication configuration.
             */
 
-            var owin = new UoWService(conf, instance);
+            var owin = new UoWService(conf["Databases:IdentityEntities"], instance);
 
             if (owin.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();

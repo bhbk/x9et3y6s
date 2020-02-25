@@ -1,8 +1,8 @@
 ﻿
 
+
 CREATE PROCEDURE [svc].[usp_Claim_Insert]
-     @Id					UNIQUEIDENTIFIER 
-    ,@IssuerId				UNIQUEIDENTIFIER
+     @IssuerId				UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Subject               NVARCHAR (MAX) 
     ,@Type					NVARCHAR (MAX)
@@ -13,6 +13,9 @@ CREATE PROCEDURE [svc].[usp_Claim_Insert]
     ,@Immutable				BIT
 
 AS
+BEGIN
+
+DECLARE @CLAIMID UNIQUEIDENTIFIER = NEWID()
 
 INSERT INTO [dbo].[tbl_Claims]
 	(
@@ -29,7 +32,7 @@ INSERT INTO [dbo].[tbl_Claims]
 	)
 VALUES
 	(
-     @Id           
+     @CLAIMID          
     ,@IssuerId    
     ,@ActorId    
     ,@Subject           
@@ -40,3 +43,7 @@ VALUES
     ,@LastUpdated      
     ,@Immutable        
 	);
+
+SELECT * FROM [dbo].[tbl_Claims] WHERE [dbo].[tbl_Claims].Id = @CLAIMID
+
+END

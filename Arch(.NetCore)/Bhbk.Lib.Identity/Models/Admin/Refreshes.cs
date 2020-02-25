@@ -22,6 +22,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         [Required]
         public DateTime ValidToUtc { get; set; }
+
+        [Required]
+        public DateTime IssuedUtc { get; set; }
     }
 
     public class RefreshCreate : Refreshes

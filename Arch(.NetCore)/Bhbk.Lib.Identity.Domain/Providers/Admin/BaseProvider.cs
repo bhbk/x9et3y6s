@@ -10,11 +10,11 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
     public class BaseProvider : IDisposable
     {
         protected IUoWService UoW;
-        protected IMapper Mapper => new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
+        protected IMapper Mapper => new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
         protected BaseProvider(IConfiguration conf, IContextService instance)
         {
-            UoW = new UoWService(conf, instance);
+            UoW = new UoWService(conf["Databases:IdentityEntities"], instance);
         }
 
         public void Dispose()

@@ -12,15 +12,16 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_UserClaims
+    public partial class uvw_MOTDs
     {
-        public System.Guid UserId { get; set; }
-        public System.Guid ClaimId { get; set; }
-        public Nullable<System.Guid> ActorId { get; set; }
-        public System.DateTime Created { get; set; }
-        public bool Immutable { get; set; }
-    
-        public virtual tbl_Claims tbl_Claims { get; set; }
-        public virtual tbl_Users tbl_Users { get; set; }
+        public string Id { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Quote { get; set; }
+        public string Category { get; set; }
+        public Nullable<System.DateTime> Date { get; set; }
+        public string Tags { get; set; }
+        public Nullable<int> Length { get; set; }
+        public string Background { get; set; }
     }
 }

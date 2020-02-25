@@ -36,8 +36,8 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
-                var uow = new UoWService(conf, instance);
+                var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+                var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
                 var data = new GenerateDefaultData(uow, mapper);
 
                 if (CreateDefault)

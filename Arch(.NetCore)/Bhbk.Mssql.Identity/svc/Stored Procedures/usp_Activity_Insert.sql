@@ -1,8 +1,8 @@
 ﻿
 
+
 CREATE PROCEDURE [svc].[usp_Activity_Insert]
-     @Id					UNIQUEIDENTIFIER 
-    ,@AudienceId			UNIQUEIDENTIFIER
+     @AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER
     ,@ActivityType          NVARCHAR (64) 
     ,@TableName				NVARCHAR (MAX)
@@ -13,6 +13,9 @@ CREATE PROCEDURE [svc].[usp_Activity_Insert]
     ,@Immutable				BIT
 
 AS
+BEGIN
+
+DECLARE @ACTIVITYID UNIQUEIDENTIFIER = NEWID()
 
 INSERT INTO [dbo].[tbl_Activities]
 	(
@@ -29,7 +32,7 @@ INSERT INTO [dbo].[tbl_Activities]
 	)
 VALUES
 	(
-     @Id           
+     @ACTIVITYID         
     ,@AudienceId    
     ,@UserId    
     ,@ActivityType
@@ -40,3 +43,7 @@ VALUES
     ,@Created           
     ,@Immutable        
 	);
+
+SELECT * FROM [dbo].[tbl_Activities] WHERE [dbo].[tbl_Activities].Id = @ACTIVITYID
+
+END
