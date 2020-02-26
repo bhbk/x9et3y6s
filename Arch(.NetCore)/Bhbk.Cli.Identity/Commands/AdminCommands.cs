@@ -43,11 +43,11 @@ namespace Bhbk.Cli.Identity.Commands
 
         public override int Run(string[] remainingArguments)
         {
-            IssuerModel issuer = null;
-            AudienceModel audience = null;
-            LoginModel login = null;
-            RoleModel role = null;
-            UserModel user = null;
+            IssuerV1 issuer = null;
+            AudienceV1 audience = null;
+            LoginV1 login = null;
+            RoleV1 role = null;
+            UserV1 user = null;
             string issuerName = string.Empty;
             string audienceName = string.Empty;
             string loginName = string.Empty;
@@ -84,7 +84,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     + Environment.NewLine + "\tID is " + issuer.Id.ToString());
                             else
                             {
-                                issuer = _service.Issuer_CreateV1(new IssuerCreate()
+                                issuer = _service.Issuer_CreateV1(new IssuerV1()
                                 {
                                     Name = issuerName,
                                     Enabled = true,
@@ -132,7 +132,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     + Environment.NewLine + "\tID is " + audience.Id.ToString());
                             else
                             {
-                                audience = _service.Audience_CreateV1(new AudienceCreate()
+                                audience = _service.Audience_CreateV1(new AudienceV1()
                                 {
                                     IssuerId = issuer.Id,
                                     Name = audienceName,
@@ -176,7 +176,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     + Environment.NewLine + "\tID is " + login.Id.ToString());
                             else
                             {
-                                login = _service.Login_CreateV1(new LoginCreate()
+                                login = _service.Login_CreateV1(new LoginV1()
                                 {
                                     Name = loginName,
                                     Enabled = true,
@@ -224,7 +224,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     + Environment.NewLine + "\tID is " + role.Id.ToString());
                             else
                             {
-                                role = _service.Role_CreateV1(new RoleCreate()
+                                role = _service.Role_CreateV1(new RoleV1()
                                 {
                                     AudienceId = audience.Id,
                                     Name = roleName,
@@ -304,7 +304,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     + Environment.NewLine + "\tID is " + user.Id.ToString());
                             else
                             {
-                                user = _service.User_CreateV1(new UserCreate()
+                                user = _service.User_CreateV1(new UserV1()
                                 {
                                     Email = userName,
                                     FirstName = Constants.ApiDefaultAdminUserFirstName,
@@ -369,7 +369,7 @@ namespace Bhbk.Cli.Identity.Commands
                             var password = PromptForInput(CommandTypes.userpass);
 
                             if (_service.User_SetPasswordV1(user.Id,
-                                new PasswordAddModel()
+                                new PasswordAddV1()
                                 {
                                     EntityId = user.Id,
                                     NewPassword = password,

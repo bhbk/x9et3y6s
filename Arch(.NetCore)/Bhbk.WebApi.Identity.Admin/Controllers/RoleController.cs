@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] RoleCreate model)
+        public IActionResult CreateV1([FromBody] RoleV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return Ok(Mapper.Map<RoleModel>(result));
+            return Ok(Mapper.Map<RoleV1>(result));
         }
 
         [Route("v1/{roleID:guid}"), HttpDelete]
@@ -105,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<RoleModel>(role));
+            return Ok(Mapper.Map<RoleV1>(role));
         }
 
         [Route("v1/page"), HttpPost]
@@ -116,9 +116,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<RoleModel>
+                var result = new PageStateTypeCResult<RoleV1>
                 {
-                    Data = Mapper.Map<IEnumerable<RoleModel>>(
+                    Data = Mapper.Map<IEnumerable<RoleV1>>(
                         UoW.Roles.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
                                 model.ToExpression<tbl_Roles>()),
@@ -153,12 +153,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var users = UoW.Users.Get(new QueryExpression<tbl_Users>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.RoleId == roleID)).ToLambda());
 
-            return Ok(Mapper.Map<UserModel>(users));
+            return Ok(Mapper.Map<UserV1>(users));
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] RoleModel model)
+        public IActionResult UpdateV1([FromBody] RoleV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -184,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<RoleModel>(result));
+            return Ok(Mapper.Map<RoleV1>(result));
         }
     }
 }

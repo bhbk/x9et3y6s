@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testActivity = uow.Activities.Get().First();
 
                 var result = await service.Activity_GetV1(testActivity.Id.ToString());
-                result.Should().BeAssignableTo<ActivityModel>();
+                result.Should().BeAssignableTo<ActivityV1>();
             }
 
             using (var owin = _factory.CreateClient())

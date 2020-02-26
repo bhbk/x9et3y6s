@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Users.Create(
-                    Mapper.Map<tbl_Users>(new UserCreate()));
+                    Mapper.Map<tbl_Users>(new UserV1()));
                 UoW.Commit();
             });
         }
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Users.Create(
-                Mapper.Map<tbl_Users>(new UserCreate()
+                Mapper.Map<tbl_Users>(new UserV1()
                     {
                         Email = Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone,

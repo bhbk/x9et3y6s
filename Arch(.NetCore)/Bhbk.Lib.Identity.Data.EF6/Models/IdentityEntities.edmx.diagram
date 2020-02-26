@@ -13,41 +13,13 @@
         <EntityTypeShape EntityType="IdentityModels.uvw_MOTDs" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="IdentityModels.uvw_Refreshes" Width="1.5" PointX="6.75" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="IdentityModels.uvw_Users" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Roles" Width="1.5" PointX="3.375" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.sysdiagram" Width="1.5" PointX="9.75" PointY="7.75" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Activities" Width="1.5" PointX="8" PointY="20.625" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Audiences" Width="1.5" PointX="5.75" PointY="15.375" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Claims" Width="1.5" PointX="11" PointY="24.625" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Issuers" Width="1.5" PointX="3.5" PointY="16.5" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Logins" Width="1.5" PointX="8" PointY="37.25" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_MOTDs" Width="1.5" PointX="0.75" PointY="10.75" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_QueueEmails" Width="1.5" PointX="8" PointY="24.875" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_QueueTexts" Width="1.5" PointX="8" PointY="49.75" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Refreshes" Width="1.5" PointX="8" PointY="29.625" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Roles" Width="1.5" PointX="8" PointY="10.625" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Settings" Width="1.5" PointX="11" PointY="20.75" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_States" Width="1.5" PointX="11" PointY="29.375" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Urls" Width="1.5" PointX="8" PointY="14.875" />
-        <EntityTypeShape EntityType="IdentityModels.tbl_Users" Width="1.5" PointX="5.75" PointY="22.875" />
-        <AssociationConnector Association="IdentityModels.FK_Activities_AudienceID" />
-        <AssociationConnector Association="IdentityModels.FK_Activities_UserID" />
-        <AssociationConnector Association="IdentityModels.FK_Audiences_IssuerID" />
-        <AssociationConnector Association="IdentityModels.FK_Refreshes_AudienceID" />
-        <AssociationConnector Association="IdentityModels.FK_Roles_AudienceID" />
-        <AssociationConnector Association="IdentityModels.FK_Settings_AudienceID" />
-        <AssociationConnector Association="IdentityModels.FK_States_AudienceID" />
-        <AssociationConnector Association="IdentityModels.FK_Urls_AudienceID" />
-        <AssociationConnector Association="IdentityModels.FK_Claims_ActorID" />
-        <AssociationConnector Association="IdentityModels.FK_Claims_IssuerID" />
-        <AssociationConnector Association="IdentityModels.FK_Refreshes_IssuerID" />
-        <AssociationConnector Association="IdentityModels.FK_Settings_IssuerID" />
-        <AssociationConnector Association="IdentityModels.FK_States_IssuerID" />
-        <AssociationConnector Association="IdentityModels.FK_Logins_ActorID" />
-        <AssociationConnector Association="IdentityModels.FK_QueueEmails_UserID" />
-        <AssociationConnector Association="IdentityModels.FK_QueueTexts_UserID" />
-        <AssociationConnector Association="IdentityModels.FK_Refreshes_UserID" />
-        <AssociationConnector Association="IdentityModels.FK_Settings_UserID" />
-        <AssociationConnector Association="IdentityModels.FK_States_UserID" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Roles" Width="1.5" PointX="2.75" PointY="8.75" />
+        <EntityTypeShape EntityType="IdentityModels.tbl_MOTDs" Width="1.5" PointX="4.75" PointY="8.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_QueueEmails" Width="1.5" PointX="6.75" PointY="8.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_QueueTexts" Width="1.5" PointX="8.75" PointY="7.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Settings" Width="1.5" PointX="10.75" PointY="0.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_States" Width="1.5" PointX="10.75" PointY="4.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Urls" Width="1.5" PointX="10.75" PointY="9.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

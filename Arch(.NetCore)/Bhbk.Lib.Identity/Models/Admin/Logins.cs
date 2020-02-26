@@ -24,12 +24,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class LoginCreate : Logins
-    {
-
-    }
-
-    public class LoginModel : Logins
+    public class LoginV1 : Logins
     {
         [Required]
         public Guid Id { get; set; }

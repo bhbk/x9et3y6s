@@ -32,11 +32,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public DateTime ValidToUtc { get; set; }
     }
 
-    public class StateCreate : States
-    {
-
-    }
-
     public class StateModel : States
     {
         [Required]

@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Claims.Create(
-                    Mapper.Map<tbl_Claims>(new ClaimCreate()));
+                    Mapper.Map<tbl_Claims>(new ClaimV1()));
 
                 UoW.Commit();
             });
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
 
             var result = UoW.Claims.Create(
-                Mapper.Map<tbl_Claims>(new ClaimCreate()
+                Mapper.Map<tbl_Claims>(new ClaimV1()
                 {
                     IssuerId = issuer.Id,
                     Type = Constants.ApiTestClaim,

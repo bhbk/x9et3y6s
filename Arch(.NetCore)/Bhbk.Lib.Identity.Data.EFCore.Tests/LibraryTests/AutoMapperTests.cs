@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Domain.Helpers;
 using Xunit;
 
-namespace Bhbk.Lib.Identity.Domain.Tests.LibraryTests
+namespace Bhbk.Lib.Identity.Data.EFCore.Tests.LibraryTests
 {
     public class AutoMapperTests
     {

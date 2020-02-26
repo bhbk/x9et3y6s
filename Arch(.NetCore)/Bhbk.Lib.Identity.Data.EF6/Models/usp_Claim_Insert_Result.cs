@@ -10,20 +10,18 @@
 namespace Bhbk.Lib.Identity.Data.EF6.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class tbl_Logins
+    public partial class usp_Claim_Insert_Result
     {
         public System.Guid Id { get; set; }
+        public System.Guid IssuerId { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string LoginKey { get; set; }
-        public bool Enabled { get; set; }
+        public string Subject { get; set; }
+        public string Type { get; set; }
+        public string Value { get; set; }
+        public string ValueType { get; set; }
         public System.DateTime Created { get; set; }
         public Nullable<System.DateTime> LastUpdated { get; set; }
         public bool Immutable { get; set; }
-    
-        public virtual tbl_Users tbl_Users { get; set; }
     }
 }

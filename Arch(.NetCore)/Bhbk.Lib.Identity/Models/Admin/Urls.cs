@@ -26,12 +26,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class UrlCreate : Urls
-    {
-
-    }
-
-    public class UrlModel : Urls
+    public class UrlV1 : Urls
     {
         [Required]
         public Guid Id { get; set; }

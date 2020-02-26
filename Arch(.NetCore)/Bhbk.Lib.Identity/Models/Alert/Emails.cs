@@ -38,12 +38,7 @@ namespace Bhbk.Lib.Identity.Models.Alert
         public DateTime SendAt { get; set; }
     }
 
-    public class EmailCreate : Emails
-    {
-
-    }
-
-    public class EmailModel : Emails
+    public class EmailV1 : Emails
     {
         public Guid Id { get; set; }
     }

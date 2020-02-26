@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Services
             get { return _http; }
         }
 
-        public async ValueTask<bool> Email_EnqueueV1(EmailCreate model)
+        public async ValueTask<bool> Email_EnqueueV1(EmailV1 model)
         {
             var response = await Http.Enqueue_EmailV1(_ropg.AccessToken.RawData, model);
 
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<bool> Text_EnqueueV1(TextCreate model)
+        public async ValueTask<bool> Text_EnqueueV1(TextV1 model)
         {
             var response = await Http.Enqueue_TextV1(_ropg.AccessToken.RawData, model);
 

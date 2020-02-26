@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email"), HttpPut]
-        public IActionResult ChangeEmailV1([FromBody] EmailChangeModel model)
+        public IActionResult ChangeEmailV1([FromBody] EmailChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmEmailV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Email_EnqueueV1(new EmailCreate()
+            alert.Email_EnqueueV1(new EmailV1()
             {
                 FromId = user.Id,
                 FromEmail = user.Email,
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password"), HttpPut]
-        public IActionResult ChangePasswordV1([FromBody] PasswordChangeModel model)
+        public IActionResult ChangePasswordV1([FromBody] PasswordChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Email_EnqueueV1(new EmailCreate()
+            alert.Email_EnqueueV1(new EmailV1()
             {
                 FromId = user.Id,
                 FromEmail = user.Email,
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone"), HttpPut]
-        public IActionResult ChangePhoneV1([FromBody] PhoneChangeModel model)
+        public IActionResult ChangePhoneV1([FromBody] PhoneChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Text_EnqueueV1(new TextCreate()
+            alert.Text_EnqueueV1(new TextV1()
             {
                 FromId = user.Id,
                 FromPhoneNumber = model.NewPhoneNumber,

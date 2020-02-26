@@ -36,7 +36,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             var result = UoW.Activities.Create(
                 new uvw_Activities()
                 {
-                    Id = Guid.NewGuid(),
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                     Created = DateTime.Now,

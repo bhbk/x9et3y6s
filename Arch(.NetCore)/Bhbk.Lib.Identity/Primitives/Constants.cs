@@ -69,21 +69,6 @@ namespace Bhbk.Lib.Identity.Primitives
 
         #endregion
 
-        #region Entity Constants
-
-        public const string SqlSprocActivityDelete = "[svc].[usp_Activity_Delete]";
-        public const string SqlSprocActivityInsert = "[svc].[usp_Activity_Insert]";
-        public const string SqlSprocAudienceDelete = "[svc].[usp_Audience_Delete]";
-        public const string SqlSprocAudienceInsert = "[svc].[usp_Audience_Insert]";
-        public const string SqlSprocClaimDelete = "[svc].[usp_Claim_Delete]";
-        public const string SqlSprocClaimInsert = "[svc].[usp_Claim_Insert]";
-        public const string SqlSprocIssuerDelete = "[svc].[usp_Issuer_Delete]";
-        public const string SqlSprocIssuerInsert = "[svc].[usp_Issuer_Insert]";
-        public const string SqlSprocUserDelete = "[svc].[usp_User_Delete]";
-        public const string SqlSprocUserInsert = "[svc].[usp_User_Insert]";
-
-        #endregion
-
         #region Test Constants
 
         public const string ApiTestAudience = "AudienceUnitTests";

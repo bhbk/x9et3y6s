@@ -30,12 +30,7 @@ namespace Bhbk.Lib.Identity.Models.Alert
         public DateTime SendAt { get; set; }
     }
 
-    public class TextCreate : Texts
-    {
-
-    }
-
-    public class TextModel : Texts
+    public class TextV1 : Texts
     {
         public Guid Id { get; set; }
     }

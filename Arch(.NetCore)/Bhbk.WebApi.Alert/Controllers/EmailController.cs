@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives;
@@ -26,7 +25,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         }
 
         [Route("v1"), HttpPost]
-        public IActionResult SendEmailV1([FromBody] EmailCreate model)
+        public IActionResult SendEmailV1([FromBody] EmailV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -40,11 +39,9 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             var queue = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
 
-            var msg = Mapper.Map<tbl_QueueEmails>(model);
-
-            if (!queue.TryEnqueueEmail(msg))
+            if (!queue.TryEnqueueEmail(model))
             {
-                ModelState.AddModelError(MessageType.EmailEnueueError.ToString(), $"MessageID:{msg.Id} SenderEmail:{model.FromEmail}");
+                ModelState.AddModelError(MessageType.EmailEnueueError.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
                 return BadRequest(ModelState);
             }
 

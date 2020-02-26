@@ -95,49 +95,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\sysdiagram.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Activities.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Audiences.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Claims.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Issuers.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Logins.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\tbl_MOTDs.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_QueueEmails.cs">
+    <Compile Include="Models\usp_Activity_Insert_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_QueueTexts.cs">
+    <Compile Include="Models\usp_Audience_Insert_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_Refreshes.cs">
+    <Compile Include="Models\usp_Claim_Insert_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_Roles.cs">
+    <Compile Include="Models\usp_Issuer_Insert_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_Settings.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_States.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Urls.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tbl_Users.cs">
+    <Compile Include="Models\usp_Refresh_Insert_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Activities.cs">
@@ -158,10 +131,25 @@
     <Compile Include="Models\uvw_MOTDs.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\uvw_QueueEmails.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_QueueTexts.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\uvw_Refreshes.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Roles.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_Settings.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_States.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_Urls.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Users.cs">
@@ -170,6 +158,9 @@
     <Compile Include="Primitives\EF6Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ActivityRepository.cs" />
+    <Compile Include="Repositories\AudienceRepository.cs" />
+    <Compile Include="Repositories\IssuerRepository.cs" />
+    <Compile Include="Repositories\RefreshRespository.cs" />
     <Compile Include="Services\IUoWService.cs" />
     <Compile Include="Services\UoWService.cs" />
   </ItemGroup>
@@ -182,7 +173,7 @@
     <None Include="Models\IdentityEntities.edmx.diagram">
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </None>
-    <Compile Include="Models\IdentityEntitiesFactory.cs" />
+    <Compile Include="Models\IdentityContextFactory.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

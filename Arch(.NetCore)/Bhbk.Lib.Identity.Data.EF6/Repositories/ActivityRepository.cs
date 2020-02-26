@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF6.Models;
-using Bhbk.Lib.Identity.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -28,7 +27,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.Created });
             pvalues.Add(new SqlParameter("@p8", SqlDbType.Bit) { Value = entity.Immutable });
 
-            return _context.Database.SqlQuery<uvw_Activities>(Constants.SqlSprocActivityInsert +
+            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Insert]" +
                 "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8", pvalues.ToArray()).Single();
         }
 
@@ -37,7 +36,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             var pvalues = new List<SqlParameter>();
             pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
 
-            return _context.Database.SqlQuery<uvw_Activities>(Constants.SqlSprocActivityDelete +
+            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Delete]" +
                 "@p0", pvalues.ToArray()).Single();
         }
     }

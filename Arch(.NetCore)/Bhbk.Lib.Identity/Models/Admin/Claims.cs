@@ -26,12 +26,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class ClaimCreate : Claims
-    {
-
-    }
-
-    public class ClaimModel : Claims
+    public class ClaimV1 : Claims
     {
         [Required]
         public Guid Id { get; set; }

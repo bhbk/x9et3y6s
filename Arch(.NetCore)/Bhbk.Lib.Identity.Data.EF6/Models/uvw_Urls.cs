@@ -12,19 +12,16 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_Roles
+    public partial class uvw_Urls
     {
         public System.Guid Id { get; set; }
         public System.Guid AudienceId { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string UrlHost { get; set; }
+        public string UrlPath { get; set; }
         public bool Enabled { get; set; }
         public System.DateTime Created { get; set; }
         public Nullable<System.DateTime> LastUpdated { get; set; }
-        public string ConcurrencyStamp { get; set; }
         public bool Immutable { get; set; }
-    
-        public virtual tbl_Audiences tbl_Audiences { get; set; }
     }
 }

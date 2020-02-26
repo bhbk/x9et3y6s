@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                Mapper.Map<tbl_Refreshes>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -140,7 +140,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
@@ -233,7 +233,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                Mapper.Map<tbl_Refreshes>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -244,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),

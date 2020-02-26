@@ -32,18 +32,18 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * create test issuers
              */
 
-            var foundIssuer = _uow.Context.Set<tbl_Issuers>()
+            var foundIssuer = _uow.Context.Set<uvw_Issuers>()
                 .Where(x => x.Name == Constants.ApiTestIssuer)
                 .SingleOrDefault();
 
             if (foundIssuer == null)
             {
-                foundIssuer = _uow.Context.Set<tbl_Issuers>().Add(
-                    new tbl_Issuers()
+                foundIssuer = _uow.Issuers.Create(
+                    new uvw_Issuers()
                     {
-                        Id = Guid.NewGuid(),
                         Name = Constants.ApiTestIssuer,
                         IssuerKey = Constants.ApiTestIssuerKey,
+                        Created = DateTime.Now,
                         Enabled = true,
                         Immutable = false,
                     });
@@ -55,16 +55,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * create test audiences
              */
 
-            var foundAudience = _uow.Context.Set<tbl_Audiences>()
+            var foundAudience = _uow.Context.Set<uvw_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience)
                 .SingleOrDefault();
 
             if (foundAudience == null)
             {
-                foundAudience = _uow.Context.Set<tbl_Audiences>().Add(
-                    new tbl_Audiences()
+                foundAudience = _uow.Audiences.Create(
+                    new uvw_Audiences()
                     {
-                        Id = Guid.NewGuid(),
                         IssuerId = foundIssuer.Id,
                         Name = Constants.ApiTestAudience,
                         AudienceType = AudienceType.user_agent.ToString(),
@@ -73,20 +72,18 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                         Immutable = false,
                     });
 
-                _uow.Context.Set<tbl_Activities>().Add(
-                    new tbl_Activities()
+                _uow.Activities.Create(
+                    new uvw_Activities()
                     {
-                        Id = Guid.NewGuid(),
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                         Created = DateTime.Now,
                         Immutable = false,
                     });
 
-                _uow.Context.Set<tbl_Refreshes>().Add(
-                    new tbl_Refreshes()
+                _uow.Refreshes.Create(
+                    new uvw_Refreshes()
                     {
-                        Id = Guid.NewGuid(),
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
                         RefreshType = RefreshType.Client.ToString(),
@@ -109,7 +106,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * delete test users
              */
 
-            var users = _uow.Context.Set<tbl_Users>()
+            var users = _uow.Context.Set<uvw_Users>()
                 .Where(x => x.Email.Contains(Constants.ApiTestUser)).ToList();
 
             foreach (var user in users)
@@ -119,7 +116,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * delete test audiences
              */
 
-            var audiences = _uow.Context.Set<tbl_Audiences>()
+            var audiences = _uow.Context.Set<uvw_Audiences>()
                 .Where(x => x.Name.Contains(Constants.ApiTestAudience)).ToList();
 
             foreach (var audience in audiences)
@@ -129,7 +126,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * delete test issuers
              */
 
-            var issuers = _uow.Context.Set<tbl_Issuers>()
+            var issuers = _uow.Context.Set<uvw_Issuers>()
                 .Where(x => x.Name.Contains(Constants.ApiTestIssuer)).ToList();
 
             foreach (var issuer in issuers)

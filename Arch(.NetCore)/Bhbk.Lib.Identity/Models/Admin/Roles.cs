@@ -25,12 +25,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class RoleCreate : Roles
-    {
-
-    }
-
-    public class RoleModel : Roles
+    public class RoleV1 : Roles
     {
         [Required]
         public Guid Id { get; set; }

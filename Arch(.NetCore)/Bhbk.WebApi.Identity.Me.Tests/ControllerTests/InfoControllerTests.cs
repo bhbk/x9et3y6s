@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        mapper.Map<tbl_Refreshes>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             UserId = user.Id,
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = controller.GetV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                ok.Value.Should().BeAssignableTo<UserModel>();
+                ok.Value.Should().BeAssignableTo<UserV1>();
             }
         }
 
@@ -169,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = controller.GetRefreshesV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                ok.Value.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
+                ok.Value.Should().BeAssignableTo<IEnumerable<RefreshV1>>();
             }
         }
 
@@ -198,7 +198,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PasswordChangeModel()
+                var model = new PasswordChangeV1()
                 {
                     CurrentPassword = Constants.ApiTestUserPassCurrent,
                     NewPassword = Base64.CreateString(16),
@@ -235,7 +235,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PasswordChangeModel()
+                var model = new PasswordChangeV1()
                 {
                     CurrentPassword = Constants.ApiTestUserPassCurrent,
                     NewPassword = Constants.ApiTestUserPassNew,
@@ -302,7 +302,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new UserModel()
+                var model = new UserV1()
                 {
                     Id = user.Id,
                     Email = user.Email,
@@ -315,7 +315,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var result = controller.UpdateV1(model) as OkObjectResult;
                 var ok = result.Should().BeAssignableTo<OkObjectResult>().Subject;
-                ok.Value.Should().BeAssignableTo<UserModel>();
+                ok.Value.Should().BeAssignableTo<UserV1>();
             }
         }
     }

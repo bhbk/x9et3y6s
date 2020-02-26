@@ -10,20 +10,17 @@
 namespace Bhbk.Lib.Identity.Data.EF6.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class tbl_QueueTexts
+    public partial class usp_Issuer_Insert_Result
     {
         public System.Guid Id { get; set; }
-        public System.Guid ActorId { get; set; }
-        public System.Guid FromId { get; set; }
-        public string FromPhoneNumber { get; set; }
-        public System.Guid ToId { get; set; }
-        public string ToPhoneNumber { get; set; }
-        public string Body { get; set; }
+        public Nullable<System.Guid> ActorId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string IssuerKey { get; set; }
+        public bool Enabled { get; set; }
         public System.DateTime Created { get; set; }
-        public System.DateTime SendAt { get; set; }
-    
-        public virtual tbl_Users tbl_Users { get; set; }
+        public Nullable<System.DateTime> LastUpdated { get; set; }
+        public bool Immutable { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new EmailChangeModel()
+                var model = new EmailChangeV1()
                 {
                     EntityId = user.Id,
                     CurrentEmail = Base64.CreateString(4),
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new EmailChangeModel()
+                var model = new EmailChangeV1()
                 {
                     EntityId = user.Id,
                     CurrentEmail = user.Email,
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PasswordChangeModel()
+                var model = new PasswordChangeV1()
                 {
                     EntityId = user.Id,
                     CurrentPassword = Base64.CreateString(16),
@@ -164,7 +164,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PasswordChangeModel()
+                var model = new PasswordChangeV1()
                 {
                     EntityId = user.Id,
                     CurrentPassword = Constants.ApiTestUserPassCurrent,
@@ -203,7 +203,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PhoneChangeModel()
+                var model = new PhoneChangeV1()
                 {
                     EntityId = user.Id,
                     CurrentPhoneNumber = newPhone,
@@ -242,7 +242,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new PhoneChangeModel()
+                var model = new PhoneChangeV1()
                 {
                     EntityId = user.Id,
                     CurrentPhoneNumber = user.PhoneNumber,

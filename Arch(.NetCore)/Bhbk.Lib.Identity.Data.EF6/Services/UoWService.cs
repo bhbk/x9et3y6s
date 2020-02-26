@@ -12,6 +12,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
         private readonly IdentityEntities _context;
         public InstanceContext InstanceType { get; private set; }
         public ActivityRepository Activities { get; private set; }
+        public AudienceRepository Audiences { get; private set; }
+        public IssuerRepository Issuers { get; private set; }
+        public RefreshRepository Refreshes { get; private set; }
         public IdentityEntities Context
         {
             get
@@ -37,13 +40,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
 #elif !RELEASE
                         _context.Database.Log = x => Debug.WriteLine(x);
 #endif
-                        _context = new IdentityEntitiesFactory(connection).Create();
+                        _context = new IdentityContextFactory(connection).Create();
                     }
                     break;
 
                 case InstanceContext.UnitTest:
                     {
-                        _context = new IdentityEntitiesFactory(connection).Create();
+                        _context = new IdentityContextFactory(connection).Create();
                     }
                     break;
 
@@ -57,6 +60,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
             InstanceType = instance.InstanceType;
 
             Activities = new ActivityRepository(_context, instance.InstanceType);
+            Audiences = new AudienceRepository(_context, instance.InstanceType);
+            Issuers = new IssuerRepository(_context, instance.InstanceType);
+            Refreshes = new RefreshRepository(_context, instance.InstanceType);
         }
 
         public void Dispose()

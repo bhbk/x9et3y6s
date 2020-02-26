@@ -12,20 +12,16 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_Claims
+    public partial class uvw_QueueTexts
     {
         public System.Guid Id { get; set; }
-        public System.Guid IssuerId { get; set; }
-        public Nullable<System.Guid> ActorId { get; set; }
-        public string Subject { get; set; }
-        public string Type { get; set; }
-        public string Value { get; set; }
-        public string ValueType { get; set; }
+        public System.Guid ActorId { get; set; }
+        public System.Guid FromId { get; set; }
+        public string FromPhoneNumber { get; set; }
+        public System.Guid ToId { get; set; }
+        public string ToPhoneNumber { get; set; }
+        public string Body { get; set; }
         public System.DateTime Created { get; set; }
-        public Nullable<System.DateTime> LastUpdated { get; set; }
-        public bool Immutable { get; set; }
-    
-        public virtual tbl_Users tbl_Users { get; set; }
-        public virtual tbl_Issuers tbl_Issuers { get; set; }
+        public System.DateTime SendAt { get; set; }
     }
 }

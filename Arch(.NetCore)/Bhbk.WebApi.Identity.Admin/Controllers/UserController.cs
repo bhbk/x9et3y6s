@@ -132,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] UserCreate model)
+        public IActionResult CreateV1([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -154,8 +154,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            //ignore how bit may be set in model...
+            //ignore how these may be set in model...
             model.HumanBeing = true;
+            model.TwoFactorEnabled = false;
+            model.EmailConfirmed = false;
+            model.PasswordConfirmed = false;
+            model.PhoneNumberConfirmed = false;
 
             if (!new ValidationHelper().ValidateEmail(model.Email).Succeeded)
             {
@@ -178,7 +182,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var url = UrlFactory.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-                alert.Email_EnqueueV1(new EmailCreate()
+                alert.Email_EnqueueV1(new EmailV1()
                 {
                     FromId = result.Id,
                     FromEmail = result.Email,
@@ -191,12 +195,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 });
             }
 
-            return Ok(Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserV1>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1NoConfirm([FromBody] UserCreate model)
+        public IActionResult CreateV1NoConfirm([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -209,8 +213,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            //ignore how bit may be set in model...
+            //ignore how these may be set in model...
             model.HumanBeing = false;
+            model.TwoFactorEnabled = false;
+            model.EmailConfirmed = false;
+            model.PasswordConfirmed = false;
+            model.PhoneNumberConfirmed = false;
 
             if (!new ValidationHelper().ValidateEmail(model.Email).Succeeded)
             {
@@ -222,7 +230,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserV1>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -312,7 +320,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<UserModel>(user));
+            return Ok(Mapper.Map<UserV1>(user));
         }
 
         [Route("v1/page"), HttpPost]
@@ -323,9 +331,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<UserModel>
+                var result = new PageStateTypeCResult<UserV1>
                 {
-                    Data = Mapper.Map<IEnumerable<UserModel>>(
+                    Data = Mapper.Map<IEnumerable<UserV1>>(
                         UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
                                 model.ToExpression<tbl_Users>()),
@@ -360,7 +368,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var claims = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
                 .Where(x => x.tbl_UserClaims.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<ClaimModel>>(claims));
+            return Ok(Mapper.Map<IEnumerable<ClaimV1>>(claims));
         }
 
         [Route("v1/{userID:guid}/audiences"), HttpGet]
@@ -378,7 +386,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == userID))).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<AudienceModel>>(audiences));
+            return Ok(Mapper.Map<IEnumerable<AudienceV1>>(audiences));
         }
 
         [Route("v1/{userID:guid}/logins"), HttpGet]
@@ -396,7 +404,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var logins = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<LoginModel>>(logins));
+            return Ok(Mapper.Map<IEnumerable<LoginV1>>(logins));
         }
 
         [Route("v1/{userID:guid}/refreshes"), HttpGet]
@@ -413,7 +421,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             var refreshes = UoW.Refreshes.Get(expr);
 
-            return Ok(Mapper.Map<IEnumerable<RefreshModel>>(refreshes));
+            return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
         }
 
         [Route("v1/{userID:guid}/roles"), HttpGet]
@@ -431,7 +439,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = UoW.Roles.Get(new QueryExpression<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<RoleModel>>(roles));
+            return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
         }
 
         [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
@@ -546,9 +554,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!UoW.Users.RemovePassword(user))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
+            UoW.Users.SetPasswordHash(user, null);
             UoW.Commit();
 
             return NoContent();
@@ -556,7 +562,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] PasswordAddModel model)
+        public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] PasswordAddV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -587,7 +593,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] UserModel model)
+        public IActionResult UpdateV1([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -613,7 +619,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserV1>(result));
         }
     }
 }

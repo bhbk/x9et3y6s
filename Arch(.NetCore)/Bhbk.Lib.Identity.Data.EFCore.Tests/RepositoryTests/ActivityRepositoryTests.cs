@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()));
+                    Mapper.Map<tbl_Activities>(new ActivityV1()));
 
                 UoW.Commit();
             });
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
             var result = UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     AudienceId = Guid.NewGuid(),
                     UserId = user.Id,

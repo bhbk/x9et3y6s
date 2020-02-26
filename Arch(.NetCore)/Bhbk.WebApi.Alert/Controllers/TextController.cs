@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives;
@@ -26,7 +25,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         }
 
         [Route("v1"), HttpPost]
-        public IActionResult SendTextV1([FromBody] TextCreate model)
+        public IActionResult SendTextV1([FromBody] TextV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -40,11 +39,9 @@ namespace Bhbk.WebApi.Alert.Controllers
 
             var queue = (QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask));
 
-            var msg = Mapper.Map<tbl_QueueTexts>(model);
-
-            if (!queue.TryEnqueueText(msg))
+            if (!queue.TryEnqueueText(model))
             {
-                ModelState.AddModelError(MessageType.TextEnqueueError.ToString(), $"MessageID:{msg.Id} SenderPhone:{model.FromPhoneNumber}");
+                ModelState.AddModelError(MessageType.TextEnqueueError.ToString(), $"SenderID:{model.FromId} SenderPhone:{model.FromPhoneNumber}");
                 return BadRequest(ModelState);
             }
 

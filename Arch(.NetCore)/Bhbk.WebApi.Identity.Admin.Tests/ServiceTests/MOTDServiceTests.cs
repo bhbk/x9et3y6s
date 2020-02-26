@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testMOTD = uow.MOTDs.Get().First();
 
                 var result = await service.MOTD_GetV1(testMOTD.Id);
-                result.Should().BeAssignableTo<MOTDModel>();
+                result.Should().BeAssignableTo<MOTDV1>();
             }
 
             using (var owin = _factory.CreateClient())

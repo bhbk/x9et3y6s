@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<UserModel>(user));
+            return Ok(Mapper.Map<UserV1>(user));
         }
 
         [Route("v1/msg-of-the-day"), HttpGet]
@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
-            return Ok(Mapper.Map<MOTDModel>(motd));
+            return Ok(Mapper.Map<MOTDV1>(motd));
         }
 
         [Route("v1/code"), HttpGet]
@@ -186,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var refreshes = UoW.Refreshes.Get(expr);
 
-            return Ok(Mapper.Map<IEnumerable<RefreshModel>>(refreshes));
+            return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
         }
 
         [Route("v1/refresh/revoke"), HttpDelete]
@@ -227,7 +227,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/set-password"), HttpPut]
-        public IActionResult SetPasswordV1([FromBody] PasswordChangeModel model)
+        public IActionResult SetPasswordV1([FromBody] PasswordChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1"), HttpPut]
-        public IActionResult UpdateV1([FromBody] UserModel model)
+        public IActionResult UpdateV1([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -314,7 +314,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<UserModel>(result));
+            return Ok(Mapper.Map<UserV1>(result));
         }
     }
 }

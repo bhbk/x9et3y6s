@@ -263,7 +263,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -310,7 +310,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -356,7 +356,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -403,7 +403,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -451,7 +451,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -497,7 +497,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -545,7 +545,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

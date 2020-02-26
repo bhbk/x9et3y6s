@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Issuer_CreateV1(Base64.CreateString(8), new IssuerCreate());
+                var result = await service.Http.Issuer_CreateV1(Base64.CreateString(8), new IssuerV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Issuer_CreateV1(rop.RawData, new IssuerCreate());
+                result = await service.Http.Issuer_CreateV1(rop.RawData, new IssuerV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Issuer_CreateV1(rop.RawData, new IssuerCreate());
+                var result = await service.Http.Issuer_CreateV1(rop.RawData, new IssuerV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -102,13 +102,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Issuer_CreateV1(
-                    new IssuerCreate()
+                    new IssuerV1()
                     {
                         Name = Base64.CreateString(4) + "-" + Constants.ApiTestIssuer,
                         IssuerKey = Base64.CreateString(32),
                         Enabled = true,
                     });
-                result.Should().BeAssignableTo<IssuerModel>();
+                result.Should().BeAssignableTo<IssuerV1>();
 
                 var check = uow.Issuers.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
@@ -252,7 +252,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testClient = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
 
                 var result = await service.Issuer_GetV1(testClient.Id.ToString());
-                result.Should().BeAssignableTo<IssuerModel>();
+                result.Should().BeAssignableTo<IssuerV1>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -375,7 +375,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Issuer_UpdateV1(Base64.CreateString(8), new IssuerModel());
+                var result = await service.Http.Issuer_UpdateV1(Base64.CreateString(8), new IssuerV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -389,7 +389,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Issuer_UpdateV1(rop.RawData, new IssuerModel());
+                result = await service.Http.Issuer_UpdateV1(rop.RawData, new IssuerV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -410,7 +410,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Issuer_UpdateV1(rop.RawData, new IssuerModel());
+                var result = await service.Http.Issuer_UpdateV1(rop.RawData, new IssuerV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -441,8 +441,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testIssuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 testIssuer.Description += "(Updated)";
 
-                var result = await service.Issuer_UpdateV1(mapper.Map<IssuerModel>(testIssuer));
-                result.Should().BeAssignableTo<IssuerModel>();
+                var result = await service.Issuer_UpdateV1(mapper.Map<IssuerV1>(testIssuer));
+                result.Should().BeAssignableTo<IssuerV1>();
                 result.Description.Should().Be(testIssuer.Description);
             }
         }

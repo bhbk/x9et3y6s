@@ -24,6 +24,8 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public bool LockoutEnabled { get; set; }
 
+        public string ConcurrencyStamp { get; set; }
+
         [Required]
         public bool HumanBeing { get; set; }
 
@@ -31,15 +33,12 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class UserCreate : Users
-    {
-        public Guid IssuerId { get; set; }
-    }
-
-    public class UserModel : Users
+    public class UserV1 : Users
     {
         [Required]
         public Guid Id { get; set; }
+
+        public Guid IssuerId { get; set; }
 
         public bool EmailConfirmed { get; set; }
 

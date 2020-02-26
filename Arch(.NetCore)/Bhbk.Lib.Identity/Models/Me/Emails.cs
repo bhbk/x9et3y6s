@@ -17,12 +17,12 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string NewEmailConfirm { get; set; }
     }
 
-    public class EmailAddModel : Emails
+    public class EmailAddV1 : Emails
     {
 
     }
 
-    public class EmailChangeModel : Emails
+    public class EmailChangeV1 : Emails
     {
         [Required]
         [DataType(DataType.EmailAddress)]

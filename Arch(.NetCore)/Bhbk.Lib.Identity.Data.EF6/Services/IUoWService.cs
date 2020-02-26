@@ -8,5 +8,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
     {
         IdentityEntities Context { get; }
         ActivityRepository Activities { get; }
+        AudienceRepository Audiences { get; }
+        IssuerRepository Issuers { get; }
+        RefreshRepository Refreshes { get; }
     }
 }

@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] MOTDCreate model)
+        public IActionResult CreateV1([FromBody] MOTDV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -43,11 +43,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.MOTDs.Create(Mapper.Map<tbl_MOTDs>(model));
+            var motd = Mapper.Map<tbl_MOTDs>(model);
+            var result = UoW.MOTDs.Create(motd);
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<MOTDModel>(result));
+            return Ok(model);
         }
 
         [Route("v1/{motdID:guid}"), HttpDelete]
@@ -82,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<MOTDModel>(motd));
+            return Ok(Mapper.Map<MOTDV1>(motd));
         }
 
         [Route("v1/page"), HttpPost]
@@ -94,9 +95,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<MOTDModel>
+                var result = new PageStateTypeCResult<MOTDV1>
                 {
-                    Data = Mapper.Map<IEnumerable<MOTDModel>>(
+                    Data = Mapper.Map<IEnumerable<MOTDV1>>(
                         UoW.MOTDs.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTDs>, IQueryable<tbl_MOTDs>>>>(
                                 model.ToExpression<tbl_MOTDs>()))),
@@ -117,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] MOTDModel model)
+        public IActionResult UpdateV1([FromBody] MOTDV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -134,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<MOTDModel>(result));
+            return Ok(Mapper.Map<MOTDV1>(result));
         }
     }
 }

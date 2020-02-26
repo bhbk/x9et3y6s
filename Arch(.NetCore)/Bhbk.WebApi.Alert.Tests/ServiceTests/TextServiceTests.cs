@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives;
@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Enqueue_TextV1(Base64.CreateString(8), new TextCreate());
+                var result = await service.Http.Enqueue_TextV1(Base64.CreateString(8), new TextV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Enqueue_TextV1(rop.RawData, new TextCreate());
+                result = await service.Http.Enqueue_TextV1(rop.RawData, new TextV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
-                    new TextCreate()
+                    new TextV1()
                     {
                         FromId = Guid.NewGuid(),
                         FromPhoneNumber = user.PhoneNumber,
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
-                    new TextCreate()
+                    new TextV1()
                     {
                         FromId = user.Id,
                         FromPhoneNumber = testUser.PhoneNumber,
@@ -146,7 +146,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_TextV1(rop.RawData,
-                    new TextCreate()
+                    new TextV1()
                     {
                         FromId = user.Id,
                         FromPhoneNumber = user.PhoneNumber,

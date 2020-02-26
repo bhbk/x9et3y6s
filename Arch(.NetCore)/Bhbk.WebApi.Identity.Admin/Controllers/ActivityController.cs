@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<ActivityModel>(activity));
+            return Ok(Mapper.Map<ActivityV1>(activity));
         }
 
         [Route("v1/page"), HttpPost]
@@ -60,9 +60,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<ActivityModel>
+                var result = new PageStateTypeCResult<ActivityV1>
                 {
-                    Data = Mapper.Map<IEnumerable<ActivityModel>>(
+                    Data = Mapper.Map<IEnumerable<ActivityV1>>(
                         UoW.Activities.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
                                 model.ToExpression<tbl_Activities>()))),

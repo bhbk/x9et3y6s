@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var testClaim = uow.Claims.Create(
-                    mapper.Map<tbl_Claims>(new ClaimCreate()
+                    mapper.Map<tbl_Claims>(new ClaimV1()
                     {
                         IssuerId = issuer.Id,
                         Type = Base64.CreateString(4) + "-" + Constants.ApiTestClaim,
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var testLogin = uow.Logins.Create(
-                    mapper.Map<tbl_Logins>(new LoginCreate()
+                    mapper.Map<tbl_Logins>(new LoginV1()
                     {
                         Name = Base64.CreateString(4) + "-" + Constants.ApiTestLogin,
                         LoginKey = Constants.ApiTestLoginKey,
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 var testRole = uow.Roles.Create(
-                    mapper.Map<tbl_Roles>(new RoleCreate()
+                    mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = audience.Id,
                         Name = Base64.CreateString(4) + "-" + Constants.ApiTestLogin,
@@ -171,7 +171,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.User_CreateV1(Base64.CreateString(8), new UserCreate());
+                var result = await service.Http.User_CreateV1(Base64.CreateString(8), new UserV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -185,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.User_CreateV1(rop.RawData, new UserCreate());
+                result = await service.Http.User_CreateV1(rop.RawData, new UserV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -206,7 +206,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.User_CreateV1(rop.RawData, new UserCreate());
+                var result = await service.Http.User_CreateV1(rop.RawData, new UserV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -232,7 +232,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.User_CreateV1NoConfirm(
-                    new UserCreate()
+                    new UserV1()
                     {
                         Email = Base64.CreateString(4) + "-" + Constants.ApiTestUser,
                         FirstName = "First-" + Base64.CreateString(4),
@@ -241,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         LockoutEnabled = false,
                         HumanBeing = true,
                     });
-                result.Should().BeAssignableTo<UserModel>();
+                result.Should().BeAssignableTo<UserV1>();
 
                 var check = uow.Users.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
@@ -264,7 +264,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.User_CreateV1(
-                    new UserCreate()
+                    new UserV1()
                     {
                         IssuerId = issuer.Id,
                         Email = Base64.CreateString(4) + "-" + Constants.ApiTestUser,
@@ -274,7 +274,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         LockoutEnabled = false,
                         HumanBeing = false,
                     });
-                result.Should().BeAssignableTo<UserModel>();
+                result.Should().BeAssignableTo<UserV1>();
 
                 var check = uow.Users.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
@@ -395,7 +395,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -431,7 +431,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -476,7 +476,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
                 var result = await service.User_GetV1(testUser.Id.ToString());
-                result.Should().BeAssignableTo<UserModel>();
+                result.Should().BeAssignableTo<UserV1>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -535,7 +535,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.User_GetClaimsV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<ClaimModel>>();
+                result.Should().BeAssignableTo<IEnumerable<ClaimV1>>();
                 result.Count().Should().Be(uow.Claims.Count(new QueryExpression<tbl_Claims>()
                     .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToLambda()));
             }
@@ -561,7 +561,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.User_GetAudiencesV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<AudienceModel>>();
+                result.Should().BeAssignableTo<IEnumerable<AudienceV1>>();
                 result.Count().Should().Be(uow.Audiences.Count(new QueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()));
             }
@@ -587,7 +587,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.User_GetLoginsV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<LoginModel>>();
+                result.Should().BeAssignableTo<IEnumerable<LoginV1>>();
                 result.Count().Should().Be(uow.Logins.Count(new QueryExpression<tbl_Logins>()
                     .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()));
             }
@@ -618,7 +618,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        mapper.Map<tbl_Refreshes>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             UserId = user.Id,
@@ -631,7 +631,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 uow.Commit();
 
                 var result = await service.User_GetRefreshesV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
+                result.Should().BeAssignableTo<IEnumerable<RefreshV1>>();
                 result.Count().Should().Be(uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
                     .Where(x => x.UserId == user.Id).ToLambda()).Count());
             }
@@ -657,7 +657,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.User_GetRolesV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<RoleModel>>();
+                result.Should().BeAssignableTo<IEnumerable<RoleV1>>();
                 result.Count().Should().Be(uow.Roles.Count(new QueryExpression<tbl_Roles>()
                     .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToLambda()));
             }
@@ -816,7 +816,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
-                var testUserPassword = new PasswordAddModel()
+                var testUserPassword = new PasswordAddV1()
                 {
                     EntityId = testUser.Id,
                     NewPassword = Constants.ApiTestUserPassNew,
@@ -840,7 +840,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.User_UpdateV1(Base64.CreateString(8), new UserModel());
+                var result = await service.Http.User_UpdateV1(Base64.CreateString(8), new UserV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -854,7 +854,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.User_UpdateV1(rop.RawData, new UserModel());
+                result = await service.Http.User_UpdateV1(rop.RawData, new UserV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -875,7 +875,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.User_UpdateV1(rop.RawData, new UserModel());
+                var result = await service.Http.User_UpdateV1(rop.RawData, new UserV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -906,8 +906,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
                 testUser.FirstName += "(Updated)";
 
-                var result = await service.User_UpdateV1(mapper.Map<UserModel>(testUser));
-                result.Should().BeAssignableTo<UserModel>();
+                var result = await service.User_UpdateV1(mapper.Map<UserV1>(testUser));
+                result.Should().BeAssignableTo<UserV1>();
                 result.FirstName.Should().Be(testUser.FirstName);
             }
         }

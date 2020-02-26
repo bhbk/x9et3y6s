@@ -113,8 +113,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
             _context.SaveChanges();
 
-            InternalSetPasswordHash(user, hash);
-            InternalSetSecurityStamp(user, Base64.CreateString(32));
+            SetPasswordHash(user, hash);
 
             return create;
         }
@@ -275,29 +274,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
         internal tbl_Users InternalCreate(tbl_Users user)
         {
+            user.ConcurrencyStamp = AlphaNumeric.CreateString(32);
+
             if (!user.HumanBeing)
                 user.EmailConfirmed = true;
 
             return _context.Add(user).Entity;
-        }
-
-        internal bool InternalSetPasswordHash(tbl_Users user, string hash)
-        {
-            user.PasswordHash = hash;
-            user.LastUpdated = Clock.UtcDateTime;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return true;
-        }
-
-        internal bool InternalSetSecurityStamp(tbl_Users user, string stamp)
-        {
-            user.SecurityStamp = stamp;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return true;
         }
 
         public bool IsInClaim(tbl_Users user, tbl_Claims claim)
@@ -400,11 +382,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return true;
         }
 
-        public bool RemovePassword(tbl_Users user)
-        {
-            return InternalSetPasswordHash(user, null);
-        }
-
         public tbl_Users SetConfirmedEmail(tbl_Users user, bool confirmed)
         {
             user.EmailConfirmed = confirmed;
@@ -447,8 +424,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
         public tbl_Users SetPasswordHash(tbl_Users user, string hash)
         {
-            InternalSetPasswordHash(user, hash);
-            InternalSetSecurityStamp(user, Base64.CreateString(32));
+            user.LastUpdated = Clock.UtcDateTime;
+            user.PasswordHash = hash;
+            user.SecurityStamp = AlphaNumeric.CreateString(32);
+
+            _context.Entry(user).State = EntityState.Modified;
 
             return _context.Entry(user).Entity;
         }

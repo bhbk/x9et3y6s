@@ -20,7 +20,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public DateTime? LastUpdated { get; set; }
-        public string ConcurrencyStamp { get; set; }
         public bool Immutable { get; set; }
 
         public virtual tbl_Audiences Audience { get; set; }

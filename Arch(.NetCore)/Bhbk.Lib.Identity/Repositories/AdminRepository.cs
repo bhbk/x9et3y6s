@@ -78,7 +78,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Audience_CreateV1(string jwt, AudienceCreate model)
+        public async ValueTask<HttpResponseMessage> Audience_CreateV1(string jwt, AudienceV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -192,7 +192,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Audience_SetPasswordV1(string jwt, Guid audienceID, PasswordAddModel model)
+        public async ValueTask<HttpResponseMessage> Audience_SetPasswordV1(string jwt, Guid audienceID, PasswordAddV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -209,7 +209,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Audience_UpdateV1(string jwt, AudienceModel model)
+        public async ValueTask<HttpResponseMessage> Audience_UpdateV1(string jwt, AudienceV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -226,7 +226,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Claim_CreateV1(string jwt, ClaimCreate model)
+        public async ValueTask<HttpResponseMessage> Claim_CreateV1(string jwt, ClaimV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -292,7 +292,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Claim_UpdateV1(string jwt, ClaimModel model)
+        public async ValueTask<HttpResponseMessage> Claim_UpdateV1(string jwt, ClaimV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -309,7 +309,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Issuer_CreateV1(string jwt, IssuerCreate model)
+        public async ValueTask<HttpResponseMessage> Issuer_CreateV1(string jwt, IssuerV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -408,7 +408,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Issuer_UpdateV1(string jwt, IssuerModel model)
+        public async ValueTask<HttpResponseMessage> Issuer_UpdateV1(string jwt, IssuerV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -425,7 +425,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Login_CreateV1(string jwt, LoginCreate model)
+        public async ValueTask<HttpResponseMessage> Login_CreateV1(string jwt, LoginV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -491,7 +491,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Login_UpdateV1(string jwt, LoginModel model)
+        public async ValueTask<HttpResponseMessage> Login_UpdateV1(string jwt, LoginV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -541,7 +541,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Role_CreateV1(string jwt, RoleCreate model)
+        public async ValueTask<HttpResponseMessage> Role_CreateV1(string jwt, RoleV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -607,7 +607,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Role_UpdateV1(string jwt, RoleModel model)
+        public async ValueTask<HttpResponseMessage> Role_UpdateV1(string jwt, RoleV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -672,7 +672,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_CreateV1(string jwt, UserCreate model)
+        public async ValueTask<HttpResponseMessage> User_CreateV1(string jwt, UserV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -689,7 +689,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_CreateV1NoConfirm(string jwt, UserCreate model)
+        public async ValueTask<HttpResponseMessage> User_CreateV1NoConfirm(string jwt, UserV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -931,7 +931,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, PasswordAddModel model)
+        public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, PasswordAddV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
@@ -948,7 +948,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> User_UpdateV1(string jwt, UserModel model)
+        public async ValueTask<HttpResponseMessage> User_UpdateV1(string jwt, UserV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Role_CreateV1(Base64.CreateString(8), new RoleCreate());
+                var result = await service.Http.Role_CreateV1(Base64.CreateString(8), new RoleV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Role_CreateV1(rop.RawData, new RoleCreate());
+                result = await service.Http.Role_CreateV1(rop.RawData, new RoleV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Role_CreateV1(rop.RawData, new RoleCreate());
+                var result = await service.Http.Role_CreateV1(rop.RawData, new RoleV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -102,14 +102,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Role_CreateV1(
-                    new RoleCreate()
+                    new RoleV1()
                     {
                         AudienceId = audience.Id,
                         Name = Base64.CreateString(4) + "-" + Constants.ApiTestRole,
                         Enabled = true,
                         Immutable = false
                     });
-                result.Should().BeAssignableTo<RoleModel>();
+                result.Should().BeAssignableTo<RoleV1>();
 
                 var check = uow.Roles.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
@@ -256,7 +256,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testRole = uow.Roles.Get(x => x.Name == Constants.ApiTestRole).Single();
 
                 var result = await service.Role_GetV1(testRole.Id.ToString());
-                result.Should().BeAssignableTo<RoleModel>();
+                result.Should().BeAssignableTo<RoleV1>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -307,7 +307,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Role_UpdateV1(Base64.CreateString(8), new RoleModel());
+                var result = await service.Http.Role_UpdateV1(Base64.CreateString(8), new RoleV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -321,7 +321,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Role_UpdateV1(rop.RawData, new RoleModel());
+                result = await service.Http.Role_UpdateV1(rop.RawData, new RoleV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -342,7 +342,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Role_UpdateV1(rop.RawData, new RoleModel());
+                var result = await service.Http.Role_UpdateV1(rop.RawData, new RoleV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -373,8 +373,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testRole = uow.Roles.Get(x => x.Name == Constants.ApiTestRole).Single();
                 testRole.Description += "(Updated)";
 
-                var result = await service.Role_UpdateV1(mapper.Map<RoleModel>(testRole));
-                result.Should().BeAssignableTo<RoleModel>();
+                var result = await service.Role_UpdateV1(mapper.Map<RoleV1>(testRole));
+                result.Should().BeAssignableTo<RoleV1>();
                 result.Description.Should().Be(testRole.Description);
             }
         }

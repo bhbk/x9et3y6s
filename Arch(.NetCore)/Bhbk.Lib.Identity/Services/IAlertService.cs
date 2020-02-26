@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Services
         JwtSecurityToken Jwt { get; set; }
         AlertRepository Http { get; }
 
-        ValueTask<bool> Email_EnqueueV1(EmailCreate model);
-        ValueTask<bool> Text_EnqueueV1(TextCreate model);
+        ValueTask<bool> Email_EnqueueV1(EmailV1 model);
+        ValueTask<bool> Text_EnqueueV1(TextV1 model);
     }
 }

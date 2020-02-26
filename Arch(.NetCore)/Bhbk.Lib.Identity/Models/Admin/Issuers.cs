@@ -24,12 +24,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class IssuerCreate : Issuers
-    {
-
-    }
-
-    public class IssuerModel : Issuers
+    public class IssuerV1 : Issuers
     {
         [Required]
         public Guid Id { get; set; }

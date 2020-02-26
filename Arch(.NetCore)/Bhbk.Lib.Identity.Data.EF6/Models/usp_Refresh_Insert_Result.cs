@@ -10,25 +10,17 @@
 namespace Bhbk.Lib.Identity.Data.EF6.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class tbl_States
+    public partial class usp_Refresh_Insert_Result
     {
         public System.Guid Id { get; set; }
         public System.Guid IssuerId { get; set; }
         public Nullable<System.Guid> AudienceId { get; set; }
         public Nullable<System.Guid> UserId { get; set; }
-        public string StateValue { get; set; }
-        public string StateType { get; set; }
-        public Nullable<bool> StateDecision { get; set; }
-        public bool StateConsume { get; set; }
+        public string RefreshValue { get; set; }
+        public string RefreshType { get; set; }
         public System.DateTime ValidFromUtc { get; set; }
         public System.DateTime ValidToUtc { get; set; }
-        public System.DateTime Created { get; set; }
-        public System.DateTime LastPolling { get; set; }
-    
-        public virtual tbl_Audiences tbl_Audiences { get; set; }
-        public virtual tbl_Issuers tbl_Issuers { get; set; }
-        public virtual tbl_Users tbl_Users { get; set; }
+        public System.DateTime IssuedUtc { get; set; }
     }
 }

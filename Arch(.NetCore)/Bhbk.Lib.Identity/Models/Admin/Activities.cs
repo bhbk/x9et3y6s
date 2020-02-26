@@ -24,12 +24,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class ActivityCreate : Activities
-    {
-
-    }
-
-    public class ActivityModel : Activities
+    public class ActivityV1 : Activities
     {
         [Required]
         public Guid Id { get; set; }

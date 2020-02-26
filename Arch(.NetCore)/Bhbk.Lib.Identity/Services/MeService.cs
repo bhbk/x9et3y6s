@@ -92,40 +92,40 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<IEnumerable<RefreshModel>> Info_GetRefreshesV1()
+        public async ValueTask<IEnumerable<RefreshV1>> Info_GetRefreshesV1()
         {
             var response = await Http.Info_GetRefreshesV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<RefreshModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<RefreshV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<MOTDModel> Info_GetMOTDV1()
+        public async ValueTask<MOTDV1> Info_GetMOTDV1()
         {
             var response = await Http.Info_GetMOTDV1();
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<MOTDModel>().Result;
+                return response.Content.ReadAsAsync<MOTDV1>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserModel> Info_GetV1()
+        public async ValueTask<UserV1> Info_GetV1()
         {
             var response = await Http.Info_GetV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserModel>().Result;
+                return response.Content.ReadAsAsync<UserV1>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<bool> Info_SetPasswordV1(PasswordAddModel model)
+        public async ValueTask<bool> Info_SetPasswordV1(PasswordAddV1 model)
         {
             var response = await Http.Info_SetPasswordV1(_ropg.AccessToken.RawData, model);
 
@@ -147,12 +147,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<UserModel> Info_UpdateV1(UserModel model)
+        public async ValueTask<UserV1> Info_UpdateV1(UserV1 model)
         {
             var response = await Http.Info_UpdateV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserModel>().Result;
+                return response.Content.ReadAsAsync<UserV1>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

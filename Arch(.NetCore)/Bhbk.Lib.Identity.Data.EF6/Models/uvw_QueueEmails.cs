@@ -12,20 +12,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tbl_Activities
+    public partial class uvw_QueueEmails
     {
         public System.Guid Id { get; set; }
-        public Nullable<System.Guid> AudienceId { get; set; }
-        public Nullable<System.Guid> UserId { get; set; }
-        public string ActivityType { get; set; }
-        public string TableName { get; set; }
-        public string KeyValues { get; set; }
-        public string OriginalValues { get; set; }
-        public string CurrentValues { get; set; }
+        public Nullable<System.Guid> ActorId { get; set; }
+        public System.Guid FromId { get; set; }
+        public string FromEmail { get; set; }
+        public string FromDisplay { get; set; }
+        public System.Guid ToId { get; set; }
+        public string ToEmail { get; set; }
+        public string ToDisplay { get; set; }
+        public string Subject { get; set; }
+        public string HtmlContent { get; set; }
+        public string PlaintextContent { get; set; }
         public System.DateTime Created { get; set; }
-        public bool Immutable { get; set; }
-    
-        public virtual tbl_Audiences tbl_Audiences { get; set; }
-        public virtual tbl_Users tbl_Users { get; set; }
+        public System.DateTime SendAt { get; set; }
     }
 }

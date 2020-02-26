@@ -23,14 +23,11 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Immutable { get; set; }
     }
 
-    public class SettingCreate : Settings
-    {
-
-    }
-
-    public class SettingModel : Settings
+    public class SettingV1 : Settings
     {
         [Required]
         public Guid Id { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

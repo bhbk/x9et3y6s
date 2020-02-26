@@ -1,7 +1,9 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
+﻿using AutoMapper;
+using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -145,15 +147,18 @@ namespace Bhbk.WebApi.Alert.Tasks
             }
         }
 
-        public bool TryEnqueueText(tbl_QueueTexts model)
+        public bool TryEnqueueText(TextV1 model)
         {
             try
             {
                 using (var scope = _factory.CreateScope())
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-                    uow.QueueTexts.Create(model);
+                    var text = mapper.Map<tbl_QueueTexts>(model);
+
+                    uow.QueueTexts.Create(text);
                     uow.Commit();
                 }
 

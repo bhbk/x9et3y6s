@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
                 var result = await service.Info_GetMOTDV1();
-                result.Should().BeAssignableTo<MOTDModel>();
+                result.Should().BeAssignableTo<MOTDV1>();
             }
         }
 
@@ -93,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

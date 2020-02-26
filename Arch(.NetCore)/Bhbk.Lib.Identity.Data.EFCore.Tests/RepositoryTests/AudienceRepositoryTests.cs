@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Audiences.Create(
-                    Mapper.Map<tbl_Audiences>(new AudienceCreate()));
+                    Mapper.Map<tbl_Audiences>(new AudienceV1()));
 
                 UoW.Commit();
             });
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
 
             var result = UoW.Audiences.Create(
-                Mapper.Map<tbl_Audiences>(new AudienceCreate()
+                Mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.ApiTestAudience,

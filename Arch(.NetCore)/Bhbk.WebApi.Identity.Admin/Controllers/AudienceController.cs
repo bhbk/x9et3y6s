@@ -34,7 +34,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] AudienceCreate model)
+        public IActionResult CreateV1([FromBody] AudienceV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<AudienceModel>(result));
+            return Ok(Mapper.Map<AudienceV1>(result));
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<AudienceModel>(audience));
+            return Ok(Mapper.Map<AudienceV1>(audience));
         }
 
         [Route("v1/page"), HttpPost]
@@ -159,9 +159,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<AudienceModel>
+                var result = new PageStateTypeCResult<AudienceV1>
                 {
-                    Data = Mapper.Map<IEnumerable<AudienceModel>>(
+                    Data = Mapper.Map<IEnumerable<AudienceV1>>(
                         UoW.Audiences.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audiences>, IQueryable<tbl_Audiences>>>>(
                                 model.ToExpression<tbl_Audiences>()),
@@ -196,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var refreshes = UoW.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<RefreshModel>>(refreshes));
+            return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
         }
 
         [Route("v1/{audienceID:guid}/roles"), HttpGet]
@@ -214,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var roles = UoW.Roles.Get(new QueryExpression<tbl_Roles>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<RoleModel>>(roles));
+            return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
         }
 
         [Route("v1/{audienceID:guid}/urls"), HttpGet]
@@ -232,12 +232,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var urls = UoW.Urls.Get(new QueryExpression<tbl_Urls>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<UrlModel>>(urls));
+            return Ok(Mapper.Map<IEnumerable<UrlV1>>(urls));
         }
 
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddModel model)
+        public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] AudienceModel model)
+        public IActionResult UpdateV1([FromBody] AudienceV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -294,7 +294,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<AudienceModel>(result));
+            return Ok(Mapper.Map<AudienceV1>(result));
         }
     }
 }

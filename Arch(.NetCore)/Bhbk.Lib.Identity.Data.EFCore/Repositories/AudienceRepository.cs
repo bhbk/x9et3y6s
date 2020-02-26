@@ -64,6 +64,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return true;
         }
 
+        public override tbl_Audiences Create(tbl_Audiences audience)
+        {
+            audience.ConcurrencyStamp = AlphaNumeric.CreateString(32);
+
+            return _context.Add(audience).Entity;
+        }
+
         public override tbl_Audiences Delete(tbl_Audiences audience)
         {
             var activity = _context.Set<tbl_Activities>()
@@ -152,25 +159,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return claims;
         }
 
-        internal bool InternalSetPasswordHash(tbl_Audiences audience, string hash)
-        {
-            audience.PasswordHash = hash;
-            audience.LastUpdated = Clock.UtcDateTime;
-
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return true;
-        }
-
-        internal bool InternalSetSecurityStamp(tbl_Audiences audience, string stamp)
-        {
-            audience.SecurityStamp = stamp;
-
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return true;
-        }
-
         public bool IsInRole(tbl_Audiences audience, tbl_Roles role)
         {
             if (_context.Set<tbl_AudienceRoles>()
@@ -192,8 +180,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
         public tbl_Audiences SetPasswordHash(tbl_Audiences audience, string hash)
         {
-            InternalSetPasswordHash(audience, hash);
-            InternalSetSecurityStamp(audience, Base64.CreateString(32));
+            audience.LastUpdated = Clock.UtcDateTime;
+            audience.PasswordHash = hash;
+            audience.SecurityStamp = AlphaNumeric.CreateString(32);
+
+            _context.Entry(audience).State = EntityState.Modified;
 
             return _context.Entry(audience).Entity;
         }

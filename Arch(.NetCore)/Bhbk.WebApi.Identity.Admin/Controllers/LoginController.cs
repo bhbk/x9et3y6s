@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] LoginCreate model)
+        public IActionResult CreateV1([FromBody] LoginV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<LoginModel>(result));
+            return Ok(Mapper.Map<LoginV1>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<LoginModel>(login));
+            return Ok(Mapper.Map<LoginV1>(login));
         }
 
         [Route("v1/page"), HttpPost]
@@ -109,9 +109,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<LoginModel>
+                var result = new PageStateTypeCResult<LoginV1>
                 {
-                    Data = Mapper.Map<IEnumerable<LoginModel>>(
+                    Data = Mapper.Map<IEnumerable<LoginV1>>(
                         UoW.Logins.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
                                 model.ToExpression<tbl_Logins>()),
@@ -146,12 +146,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var users = UoW.Users.Get(new QueryExpression<tbl_Users>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.LoginId == loginID)).ToLambda());
 
-            return Ok(Mapper.Map<UserModel>(users));
+            return Ok(Mapper.Map<UserV1>(users));
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] LoginModel model)
+        public IActionResult UpdateV1([FromBody] LoginV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<LoginModel>(result));
+            return Ok(Mapper.Map<LoginV1>(result));
         }
     }
 }

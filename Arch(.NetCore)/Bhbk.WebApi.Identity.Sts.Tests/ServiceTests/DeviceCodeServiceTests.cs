@@ -220,7 +220,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -272,7 +272,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -324,7 +324,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -376,7 +376,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -429,7 +429,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateCreate()
+                    mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

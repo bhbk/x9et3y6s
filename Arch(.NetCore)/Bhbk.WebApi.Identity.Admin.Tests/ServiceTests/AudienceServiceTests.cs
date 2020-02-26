@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Audience_CreateV1(Base64.CreateString(8), new AudienceCreate());
+                var result = await service.Http.Audience_CreateV1(Base64.CreateString(8), new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Audience_CreateV1(rop.RawData, new AudienceCreate());
+                result = await service.Http.Audience_CreateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Audience_CreateV1(rop.RawData, new AudienceCreate());
+                var result = await service.Http.Audience_CreateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -106,14 +106,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Audience_CreateV1(
-                    new AudienceCreate()
+                    new AudienceV1()
                     {
                         IssuerId = issuer.Id,
                         Name = Base64.CreateString(4) + "-" + audience.Name,
                         AudienceType = AudienceType.user_agent.ToString(),
                         Enabled = true,
                     });
-                result.Should().BeAssignableTo<AudienceModel>();
+                result.Should().BeAssignableTo<AudienceV1>();
 
                 var check = uow.Audiences.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
@@ -188,13 +188,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClient = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                testClient.Immutable = true;
+                var testAudience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                testAudience.Immutable = true;
 
-                uow.Audiences.Update(testClient);
+                uow.Audiences.Update(testAudience);
                 uow.Commit();
 
-                var result = await service.Http.Audience_DeleteV1(rop.RawData, testClient.Id);
+                var result = await service.Http.Audience_DeleteV1(rop.RawData, testAudience.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -222,12 +222,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClient = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var testAudience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
 
-                var result = await service.Audience_DeleteV1(testClient.Id);
+                var result = await service.Audience_DeleteV1(testAudience.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Audiences.Get(x => x.Id == testClient.Id).Any();
+                var check = uow.Audiences.Get(x => x.Id == testAudience.Id).Any();
                 check.Should().BeFalse();
             }
         }
@@ -257,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        mapper.Map<tbl_Refreshes>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             AudienceId = audience.Id,
@@ -297,7 +297,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -341,10 +341,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClient = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var testAudience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
 
-                var result = await service.Audience_GetV1(testClient.Id.ToString());
-                result.Should().BeAssignableTo<AudienceModel>();
+                var result = await service.Audience_GetV1(testAudience.Id.ToString());
+                result.Should().BeAssignableTo<AudienceV1>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -411,7 +411,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                        mapper.Map<tbl_Refreshes>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             AudienceId = audience.Id,
@@ -424,7 +424,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 uow.Commit();
 
                 var result = await service.Audience_GetRefreshesV1(audience.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<RefreshModel>>();
+                result.Should().BeAssignableTo<IEnumerable<RefreshV1>>();
             }
         }
 
@@ -450,15 +450,15 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClient = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var testClientPassword = new PasswordAddModel()
+                var testAudience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                var testAudiencePassword = new PasswordAddV1()
                 {
-                    EntityId = testClient.Id,
+                    EntityId = testAudience.Id,
                     NewPassword = Constants.ApiTestAudiencePassNew,
                     NewPasswordConfirm = Constants.ApiTestAudiencePassNew
                 };
 
-                var result = await service.Audience_SetPasswordV1(testClient.Id, testClientPassword);
+                var result = await service.Audience_SetPasswordV1(testAudience.Id, testAudiencePassword);
                 result.Should().BeTrue();
             }
         }
@@ -475,7 +475,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AdminService(conf, InstanceContext.UnitTest, owin);
 
-                var result = await service.Http.Audience_UpdateV1(Base64.CreateString(8), new AudienceModel());
+                var result = await service.Http.Audience_UpdateV1(Base64.CreateString(8), new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -489,7 +489,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Audience_UpdateV1(rop.RawData, new AudienceModel());
+                result = await service.Http.Audience_UpdateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -510,7 +510,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Audience_UpdateV1(rop.RawData, new AudienceModel());
+                var result = await service.Http.Audience_UpdateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -538,12 +538,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClient = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                testClient.Description += "(Updated)";
+                var testAudience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+                testAudience.Description += "(Updated)";
 
-                var result = await service.Audience_UpdateV1(mapper.Map<AudienceModel>(testClient));
-                result.Should().BeAssignableTo<AudienceModel>();
-                result.Description.Should().Be(testClient.Description);
+                var result = await service.Audience_UpdateV1(mapper.Map<AudienceV1>(testAudience));
+                result.Should().BeAssignableTo<AudienceV1>();
+                result.Description.Should().Be(testAudience.Description);
             }
         }
     }

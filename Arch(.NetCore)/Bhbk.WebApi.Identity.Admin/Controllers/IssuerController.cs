@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] IssuerCreate model)
+        public IActionResult CreateV1([FromBody] IssuerV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<IssuerModel>(result));
+            return Ok(Mapper.Map<IssuerV1>(result));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<IssuerModel>(issuer));
+            return Ok(Mapper.Map<IssuerV1>(issuer));
         }
 
         [Route("v1/page"), HttpPost]
@@ -133,9 +133,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<IssuerModel>
+                var result = new PageStateTypeCResult<IssuerV1>
                 {
-                    Data = Mapper.Map<IEnumerable<IssuerModel>>(
+                    Data = Mapper.Map<IEnumerable<IssuerV1>>(
                         UoW.Issuers.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
                                 model.ToExpression<tbl_Issuers>()),
@@ -171,12 +171,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var audiences = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
                 .Where(x => x.IssuerId == issuerID).ToLambda());
 
-            return Ok(Mapper.Map<AudienceModel>(audiences));
+            return Ok(Mapper.Map<AudienceV1>(audiences));
         }
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] IssuerModel model)
+        public IActionResult UpdateV1([FromBody] IssuerV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -202,7 +202,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<IssuerModel>(result));
+            return Ok(Mapper.Map<IssuerV1>(result));
         }
     }
 }

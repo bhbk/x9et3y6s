@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
-                    _mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingV1()
                     {
                         ConfigKey = Constants.ApiSettingGlobalLegacyClaims,
                         ConfigValue = "true",
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
-                    _mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingV1()
                     {
                         ConfigKey = Constants.ApiSettingGlobalLegacyIssuer,
                         ConfigValue = "true",
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
-                    _mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingV1()
                     {
                         ConfigKey = Constants.ApiSettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
@@ -116,7 +116,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Issuers.Create(
-                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    _mapper.Map<tbl_Issuers>(new IssuerV1()
                     {
                         Name = Constants.ApiDefaultIssuer,
                         IssuerKey = Constants.ApiDefaultIssuerKey,
@@ -138,7 +138,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundAudienceUi == null)
             {
                 foundAudienceUi = _uow.Audiences.Create(
-                    _mapper.Map<tbl_Audiences>(new AudienceCreate()
+                    _mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.ApiDefaultAudienceUi,
@@ -157,7 +157,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundAudienceApi == null)
             {
                 foundAudienceApi = _uow.Audiences.Create(
-                     _mapper.Map<tbl_Audiences>(new AudienceCreate()
+                     _mapper.Map<tbl_Audiences>(new AudienceV1()
                      {
                          IssuerId = foundIssuer.Id,
                          Name = Constants.ApiDefaultAudienceApi,
@@ -180,7 +180,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundLogin == null)
             {
                 foundLogin = _uow.Logins.Create(
-                    _mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginV1()
                     {
                         Name = Constants.ApiDefaultLogin,
                         LoginKey = Constants.ApiDefaultLoginKey,
@@ -202,7 +202,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundRoleForAdmin == null)
             {
                 foundRoleForAdmin = _uow.Roles.Create(
-                    _mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = foundAudienceUi.Id,
                         Name = Constants.ApiDefaultRoleForAdmin,
@@ -220,7 +220,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundRoleForUser == null)
             {
                 foundRoleForUser = _uow.Roles.Create(
-                    _mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = foundAudienceUi.Id,
                         Name = Constants.ApiDefaultRoleForUser,
@@ -238,7 +238,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundRoleForService == null)
             {
                 foundRoleForService = _uow.Roles.Create(
-                    _mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = foundAudienceApi.Id,
                         Name = Constants.ApiDefaultRoleForService,
@@ -260,7 +260,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundAdminUser == null)
             {
                 foundAdminUser = _uow.Users.Create(
-                    _mapper.Map<tbl_Users>(new UserCreate()
+                    _mapper.Map<tbl_Users>(new UserV1()
                     {
                         Email = Constants.ApiDefaultAdminUser,
                         PhoneNumber = Constants.ApiDefaultAdminUserPhone,
@@ -284,7 +284,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             if (foundNormalUser == null)
             {
                 foundNormalUser = _uow.Users.Create(
-                    _mapper.Map<tbl_Users>(new UserCreate()
+                    _mapper.Map<tbl_Users>(new UserV1()
                     {
                         Email = Constants.ApiDefaultNormalUser,
                         PhoneNumber = Constants.ApiDefaultNormalUserPhone,

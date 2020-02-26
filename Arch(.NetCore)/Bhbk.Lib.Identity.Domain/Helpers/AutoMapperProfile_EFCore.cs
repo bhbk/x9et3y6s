@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -17,55 +16,25 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * activity models
              */
-            CreateMap<ActivityCreate, tbl_Activities>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+            CreateMap<ActivityV1, tbl_Activities>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore())
                 .ForMember(dest => dest.KeyValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.KeyValues)))
                 .ForMember(dest => dest.OriginalValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.OriginalValues)))
-                .ForMember(dest => dest.CurrentValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.CurrentValues)))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now));
+                .ForMember(dest => dest.CurrentValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.CurrentValues)));
 
-            CreateMap<ActivityModel, tbl_Activities>()
-                .ForMember(dest => dest.Audience, src => src.Ignore())
-                .ForMember(dest => dest.User, src => src.Ignore())
-                .ReverseMap();
+            CreateMap<tbl_Activities, ActivityV1>();
 
             /*
-             * claim models
+             * audience models
              */
-            CreateMap<ClaimCreate, tbl_Claims>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.Actor, src => src.Ignore())
-                .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore());
-
-            CreateMap<ClaimModel, tbl_Claims>()
-                .ForMember(dest => dest.Actor, src => src.Ignore())
-                .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
-                .ReverseMap();
-
-            /*
-             * client models
-             */
-            CreateMap<AudienceCreate, tbl_Audiences>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.LockoutEnd, src => src.Ignore())
-                .ForMember(dest => dest.LastLoginFailure, src => src.Ignore())
-                .ForMember(dest => dest.LastLoginSuccess, src => src.Ignore())
-                .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => 0))
-                .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => 0))
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
+            CreateMap<AudienceV1, tbl_Audiences>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
-                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
+                .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
@@ -75,73 +44,62 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
 
-            CreateMap<AudienceModel, tbl_Audiences>()
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
-                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
-                .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
+            CreateMap<tbl_Audiences, AudienceV1>();
+
+            /*
+             * claim models
+             */
+            CreateMap<ClaimV1, tbl_Claims>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
+                .ForMember(dest => dest.Actor, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
-                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Urls, src => src.Ignore())
-                .ReverseMap();
+                .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore());
+
+            CreateMap<tbl_Claims, ClaimV1>();
 
             /*
              * email models
              */
-            CreateMap<EmailCreate, tbl_QueueEmails>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.SendAt, src => src.MapFrom(val => DateTime.Now))
+            CreateMap<EmailV1, tbl_QueueEmails>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
+                .ForMember(dest => dest.SendAt, src => src.MapFrom(val => (val.SendAt == default || val.SendAt == null) ? DateTime.Now : val.SendAt))
                 .ForMember(dest => dest.From, src => src.Ignore());
+
+            CreateMap<tbl_QueueEmails, EmailV1>();
 
             /*
              * issuer models
              */
-            CreateMap<IssuerCreate, tbl_Issuers>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
+            CreateMap<IssuerV1, tbl_Issuers>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore());
 
-            CreateMap<IssuerModel, tbl_Issuers>()
-                .ForMember(dest => dest.IssuerKey, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore())
-                .ReverseMap();
+            CreateMap<tbl_Issuers, IssuerV1>();
 
             /*
              * login models
              */
-            CreateMap<LoginCreate, tbl_Logins>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.Actor, src => src.Ignore())
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore());
-
-            CreateMap<LoginModel, tbl_Logins>()
+            CreateMap<LoginV1, tbl_Logins>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.Actor, src => src.Ignore())
                 .ForMember(dest => dest.LoginKey, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
-                .ReverseMap();
+                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore());
+
+            CreateMap<tbl_Logins, LoginV1>();
 
             /*
              * message of the day models
              */
-            CreateMap<MOTDModel, tbl_MOTDs>()
+            CreateMap<MOTDV1, tbl_MOTDs>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.id))
                 .ForMember(dest => dest.Title, src => src.MapFrom(val => val.title))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
@@ -152,7 +110,7 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.Length, src => src.MapFrom(val => val.length))
                 .ForMember(dest => dest.Background, src => src.MapFrom(val => val.background));
 
-            CreateMap<tbl_MOTDs, MOTDModel>()
+            CreateMap<tbl_MOTDs, MOTDV1>()
                 .ForMember(dest => dest.id, src => src.MapFrom(val => val.Id))
                 .ForMember(dest => dest.title, src => src.MapFrom(val => val.Title))
                 .ForMember(dest => dest.author, src => src.MapFrom(val => val.Author))
@@ -166,47 +124,33 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * refresh models
              */
-            CreateMap<RefreshCreate, tbl_Refreshes>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
+            CreateMap<RefreshV1, tbl_Refreshes>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<RefreshModel, tbl_Refreshes>()
-                .ForMember(dest => dest.Audience, src => src.Ignore())
-                .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.User, src => src.Ignore())
-                .ForMember(dest => dest.RefreshValue, src => src.Ignore())
-                .ReverseMap();
+            CreateMap<tbl_Refreshes, RefreshV1>();
 
             /*
              * role models
              */
-            CreateMap<RoleCreate, tbl_Roles>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Description, src => src.NullSubstitute(string.Empty))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
+            CreateMap<RoleV1, tbl_Roles>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
-            CreateMap<RoleModel, tbl_Roles>()
-                .ForMember(dest => dest.Audience, src => src.Ignore())
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
-                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore())
-                .ReverseMap();
+            CreateMap<tbl_Roles, RoleV1>();
 
             /*
              * setting models
              */
-            CreateMap<SettingCreate, tbl_Settings>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+            CreateMap<SettingV1, tbl_Settings>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
@@ -214,9 +158,9 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * state models
              */
-            CreateMap<StateCreate, tbl_States>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
+            CreateMap<StateModel, tbl_States>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.LastPolling, src => src.Ignore())
                 .ForMember(dest => dest.Audience, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
@@ -225,54 +169,32 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
             /*
              * text models
              */
-            CreateMap<TextCreate, tbl_QueueTexts>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.SendAt, src => src.MapFrom(val => DateTime.Now))
+            CreateMap<TextV1, tbl_QueueTexts>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
+                .ForMember(dest => dest.SendAt, src => src.MapFrom(val => (val.SendAt == default || val.SendAt == null) ? DateTime.Now : val.SendAt))
                 .ForMember(dest => dest.From, src => src.Ignore());
+
+            CreateMap<tbl_QueueTexts, TextV1>();
 
             /*
              * url models
              */
-            CreateMap<UrlCreate, tbl_Urls>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
+            CreateMap<UrlV1, tbl_Urls>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.Audience, src => src.Ignore());
+
+            CreateMap<tbl_Urls, UrlV1>();
 
             /*
              * user models
              */
-            CreateMap<UserCreate, tbl_Users>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => Guid.NewGuid()))
-                .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => false))
-                .ForMember(dest => dest.PhoneNumberConfirmed, src => src.MapFrom(val => false))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => DateTime.Now))
-                .ForMember(dest => dest.LastUpdated, src => src.Ignore())
-                .ForMember(dest => dest.LockoutEnd, src => src.Ignore())
-                .ForMember(dest => dest.LastLoginFailure, src => src.Ignore())
-                .ForMember(dest => dest.LastLoginSuccess, src => src.Ignore())
-                .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => 0))
-                .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => 0))
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
-                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
-                .ForMember(dest => dest.PasswordConfirmed, src => src.MapFrom(val => false))
-                .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => AlphaNumeric.CreateString(32)))
-                .ForMember(dest => dest.TwoFactorEnabled, src => src.MapFrom(val => false))
-                .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Logins, src => src.Ignore())
-                .ForMember(dest => dest.tbl_QueueEmails, src => src.Ignore())
-                .ForMember(dest => dest.tbl_QueueTexts, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
-
-            CreateMap<UserModel, tbl_Users>()
-                .ForMember(dest => dest.ConcurrencyStamp, src => src.Ignore())
+            CreateMap<UserV1, tbl_Users>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
+                .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => (val.AccessFailedCount == default) ? 0 : val.AccessFailedCount))
+                .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
                 .ForMember(dest => dest.PasswordHash, src => src.Ignore())
                 .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
@@ -285,8 +207,10 @@ namespace Bhbk.Lib.Identity.Domain.Helpers
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore())
-                .ReverseMap();
+                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
+
+            CreateMap<tbl_Users, UserV1>()
+                .ForMember(dest => dest.IssuerId, src => src.Ignore());
         }
     }
 }

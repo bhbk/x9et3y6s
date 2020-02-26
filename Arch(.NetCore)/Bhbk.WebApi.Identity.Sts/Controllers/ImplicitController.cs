@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var imp = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, imp_claims);
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),

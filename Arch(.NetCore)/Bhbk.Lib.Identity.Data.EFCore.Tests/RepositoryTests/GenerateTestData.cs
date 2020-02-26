@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
-                    _mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingV1()
                     {
                         ConfigKey = Constants.ApiSettingGlobalLegacyClaims,
                         ConfigValue = "true",
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
-                    _mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingV1()
                     {
                         ConfigKey = Constants.ApiSettingGlobalLegacyIssuer,
                         ConfigValue = "true",
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
-                    _mapper.Map<tbl_Settings>(new SettingCreate()
+                    _mapper.Map<tbl_Settings>(new SettingV1()
                     {
                         ConfigKey = Constants.ApiSettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Issuers.Create(
-                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    _mapper.Map<tbl_Issuers>(new IssuerV1()
                     {
                         Name = Constants.ApiTestIssuer,
                         IssuerKey = Constants.ApiTestIssuerKey,
@@ -110,7 +110,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundAudience == null)
             {
                 foundAudience = _uow.Audiences.Create(
-                    _mapper.Map<tbl_Audiences>(new AudienceCreate()
+                    _mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.ApiTestAudience,
@@ -120,7 +120,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.Activities.Create(
-                    _mapper.Map<tbl_Activities>(new ActivityCreate()
+                    _mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
@@ -128,12 +128,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.Refreshes.Create(
-                    _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    _mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
                         RefreshType = RefreshType.Client.ToString(),
-                        RefreshValue = Base64.CreateString(8),
+                        RefreshValue = AlphaNumeric.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
@@ -156,7 +156,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundAudienceUrl == null)
             {
                 foundAudienceUrl = _uow.Urls.Create(
-                    _mapper.Map<tbl_Urls>(new UrlCreate()
+                    _mapper.Map<tbl_Urls>(new UrlV1()
                     {
                         AudienceId = foundAudience.Id,
                         UrlHost = url.Scheme + "://" + url.Host,
@@ -178,7 +178,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundClaim == null)
             {
                 foundClaim = _uow.Claims.Create(
-                    _mapper.Map<tbl_Claims>(new ClaimCreate()
+                    _mapper.Map<tbl_Claims>(new ClaimV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Type = Constants.ApiTestClaim,
@@ -200,7 +200,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundLogin == null)
             {
                 foundLogin = _uow.Logins.Create(
-                    _mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginV1()
                     {
                         Name = Constants.ApiTestLogin,
                         Immutable = false,
@@ -220,7 +220,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundRole == null)
             {
                 foundRole = _uow.Roles.Create(
-                    _mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = foundAudience.Id,
                         Name = Constants.ApiTestRole,
@@ -242,7 +242,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             if (foundUser == null)
             {
                 foundUser = _uow.Users.Create(
-                _mapper.Map<tbl_Users>(new UserCreate()
+                _mapper.Map<tbl_Users>(new UserV1()
                 {
                     Email = Constants.ApiTestUser,
                     PhoneNumber = Constants.ApiTestUserPhone,
@@ -254,7 +254,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 }), new ValidationHelper().PasswordHash(Constants.ApiTestUserPassCurrent));
 
                 _uow.Activities.Create(
-                    _mapper.Map<tbl_Activities>(new ActivityCreate()
+                    _mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
@@ -263,7 +263,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.Refreshes.Create(
-                    _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    _mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -275,7 +275,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.States.Create(
-                    _mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -288,7 +288,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.States.Create(
-                    _mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -360,7 +360,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                  */
 
                 issuer = _uow.Issuers.Create(
-                    _mapper.Map<tbl_Issuers>(new IssuerCreate()
+                    _mapper.Map<tbl_Issuers>(new IssuerV1()
                     {
                         Name = Constants.ApiTestIssuer + "-" + Base64.CreateString(4),
                         IssuerKey = Constants.ApiTestIssuerKey,
@@ -375,7 +375,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                  */
 
                 audience = _uow.Audiences.Create(
-                    _mapper.Map<tbl_Audiences>(new AudienceCreate()
+                    _mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.ApiTestAudience + "-" + Base64.CreateString(4),
@@ -385,7 +385,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.Activities.Create(
-                    _mapper.Map<tbl_Activities>(new ActivityCreate()
+                    _mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         AudienceId = audience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
@@ -393,7 +393,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.Refreshes.Create(
-                    _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    _mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -412,7 +412,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 var audienceUrl = new Uri(Constants.ApiTestUriLink);
 
                 url = _uow.Urls.Create(
-                    _mapper.Map<tbl_Urls>(new UrlCreate()
+                    _mapper.Map<tbl_Urls>(new UrlV1()
                     {
                         AudienceId = audience.Id,
                         UrlHost = audienceUrl.Scheme + "://" + audienceUrl.Host,
@@ -427,7 +427,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                  */
 
                 claim = _uow.Claims.Create(
-                    _mapper.Map<tbl_Claims>(new ClaimCreate()
+                    _mapper.Map<tbl_Claims>(new ClaimV1()
                     {
                         IssuerId = issuer.Id,
                         Type = Constants.ApiTestClaim + "-" + Base64.CreateString(4),
@@ -442,7 +442,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                  */
 
                 login = _uow.Logins.Create(
-                    _mapper.Map<tbl_Logins>(new LoginCreate()
+                    _mapper.Map<tbl_Logins>(new LoginV1()
                     {
                         Name = Constants.ApiTestLogin + "-" + Base64.CreateString(4),
                         LoginKey = Constants.ApiTestLoginKey,
@@ -457,7 +457,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                  */
 
                 role = _uow.Roles.Create(
-                    _mapper.Map<tbl_Roles>(new RoleCreate()
+                    _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = audience.Id,
                         Name = Constants.ApiTestRole + "-" + Base64.CreateString(4),
@@ -472,7 +472,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                  */
 
                 user = _uow.Users.Create(
-                    _mapper.Map<tbl_Users>(new UserCreate()
+                    _mapper.Map<tbl_Users>(new UserV1()
                     {
                         Email = AlphaNumeric.CreateString(4) + "-" + Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone + NumberAs.CreateString(1),
@@ -484,7 +484,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }), new ValidationHelper().PasswordHash(Constants.ApiTestUserPassCurrent));
 
                 _uow.Activities.Create(
-                    _mapper.Map<tbl_Activities>(new ActivityCreate()
+                    _mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         AudienceId = audience.Id,
                         UserId = user.Id,
@@ -493,7 +493,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.States.Create(
-                    _mapper.Map<tbl_States>(new StateCreate()
+                    _mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -506,13 +506,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.Refreshes.Create(
-                    _mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    _mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         RefreshType = RefreshType.User.ToString(),
-                        RefreshValue = Base64.CreateString(8),
+                        RefreshValue = AlphaNumeric.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));

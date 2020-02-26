@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Roles.Create(
-                    Mapper.Map<tbl_Roles>(new RoleCreate()));
+                    Mapper.Map<tbl_Roles>(new RoleV1()));
                 UoW.Commit();
             });
         }
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var audience = UoW.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
 
             var result = UoW.Roles.Create(
-                Mapper.Map<tbl_Roles>(new RoleCreate()
+                Mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = audience.Id,
                         Name = Constants.ApiTestRole,

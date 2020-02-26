@@ -20,13 +20,13 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> Info_DeleteCodeV1(Guid codeID);
         ValueTask<bool> Info_DeleteRefreshesV1();
         ValueTask<bool> Info_DeleteRefreshV1(Guid refreshID);
-        ValueTask<MOTDModel> Info_GetMOTDV1();
+        ValueTask<MOTDV1> Info_GetMOTDV1();
         ValueTask<IEnumerable<StateModel>> Info_GetCodesV1();
-        ValueTask<IEnumerable<RefreshModel>> Info_GetRefreshesV1();
-        ValueTask<UserModel> Info_GetV1();
-        ValueTask<bool> Info_SetPasswordV1(PasswordAddModel model);
+        ValueTask<IEnumerable<RefreshV1>> Info_GetRefreshesV1();
+        ValueTask<UserV1> Info_GetV1();
+        ValueTask<bool> Info_SetPasswordV1(PasswordAddV1 model);
         ValueTask<bool> Info_SetTwoFactorV1(bool statusValue);
-        ValueTask<UserModel> Info_UpdateV1(UserModel model);
+        ValueTask<UserV1> Info_UpdateV1(UserV1 model);
         ValueTask<bool> Info_UpdateCodeV1(string codeValue, string actionValue);
     }
 }

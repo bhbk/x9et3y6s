@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult CreateV1([FromBody] ClaimCreate model)
+        public IActionResult CreateV1([FromBody] ClaimV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<ClaimModel>(result));
+            return Ok(Mapper.Map<ClaimV1>(result));
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<ClaimModel>(claim));
+            return Ok(Mapper.Map<ClaimV1>(claim));
         }
 
         [Route("v1/page"), HttpPost]
@@ -110,9 +110,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             try
             {
-                var result = new PageStateTypeCResult<ClaimModel>
+                var result = new PageStateTypeCResult<ClaimV1>
                 {
-                    Data = Mapper.Map<IEnumerable<ClaimModel>>(
+                    Data = Mapper.Map<IEnumerable<ClaimV1>>(
                         UoW.Claims.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
                                 model.ToExpression<tbl_Claims>()))),
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = Constants.PolicyForAdmins)]
-        public IActionResult UpdateV1([FromBody] ClaimModel model)
+        public IActionResult UpdateV1([FromBody] ClaimV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<ClaimModel>(result));
+            return Ok(Mapper.Map<ClaimV1>(result));
         }
     }
 }

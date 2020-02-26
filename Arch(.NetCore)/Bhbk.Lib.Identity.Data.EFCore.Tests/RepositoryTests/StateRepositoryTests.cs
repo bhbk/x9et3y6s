@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.States.Create(
-                    Mapper.Map<tbl_States>(new StateCreate()));
+                    Mapper.Map<tbl_States>(new StateModel()));
                 UoW.Commit();
             });
         }
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
             var result = UoW.States.Create(
-                Mapper.Map<tbl_States>(new StateCreate()
+                Mapper.Map<tbl_States>(new StateModel()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

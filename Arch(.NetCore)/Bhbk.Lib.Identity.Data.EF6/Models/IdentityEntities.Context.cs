@@ -36,180 +36,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public virtual DbSet<uvw_Refreshes> uvw_Refreshes { get; set; }
         public virtual DbSet<uvw_Users> uvw_Users { get; set; }
         public virtual DbSet<uvw_Roles> uvw_Roles { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
-        public virtual DbSet<tbl_Activities> tbl_Activities { get; set; }
-        public virtual DbSet<tbl_Audiences> tbl_Audiences { get; set; }
-        public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
-        public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
-        public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
         public virtual DbSet<tbl_MOTDs> tbl_MOTDs { get; set; }
-        public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
-        public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
-        public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
-        public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
-        public virtual DbSet<tbl_Settings> tbl_Settings { get; set; }
-        public virtual DbSet<tbl_States> tbl_States { get; set; }
-        public virtual DbSet<tbl_Urls> tbl_Urls { get; set; }
-        public virtual DbSet<tbl_Users> tbl_Users { get; set; }
-    
-        public virtual int usp_Activity_Delete(Nullable<System.Guid> activityID)
-        {
-            var activityIDParameter = activityID.HasValue ?
-                new ObjectParameter("ActivityID", activityID) :
-                new ObjectParameter("ActivityID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Activity_Delete", activityIDParameter);
-        }
-    
-        public virtual int usp_Activity_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string activityType, string tableName, string keyValues, string originalValues, string currentValues, Nullable<System.DateTime> created, Nullable<bool> immutable)
-        {
-            var audienceIdParameter = audienceId.HasValue ?
-                new ObjectParameter("AudienceId", audienceId) :
-                new ObjectParameter("AudienceId", typeof(System.Guid));
-    
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var activityTypeParameter = activityType != null ?
-                new ObjectParameter("ActivityType", activityType) :
-                new ObjectParameter("ActivityType", typeof(string));
-    
-            var tableNameParameter = tableName != null ?
-                new ObjectParameter("TableName", tableName) :
-                new ObjectParameter("TableName", typeof(string));
-    
-            var keyValuesParameter = keyValues != null ?
-                new ObjectParameter("KeyValues", keyValues) :
-                new ObjectParameter("KeyValues", typeof(string));
-    
-            var originalValuesParameter = originalValues != null ?
-                new ObjectParameter("OriginalValues", originalValues) :
-                new ObjectParameter("OriginalValues", typeof(string));
-    
-            var currentValuesParameter = currentValues != null ?
-                new ObjectParameter("CurrentValues", currentValues) :
-                new ObjectParameter("CurrentValues", typeof(string));
-    
-            var createdParameter = created.HasValue ?
-                new ObjectParameter("Created", created) :
-                new ObjectParameter("Created", typeof(System.DateTime));
-    
-            var immutableParameter = immutable.HasValue ?
-                new ObjectParameter("Immutable", immutable) :
-                new ObjectParameter("Immutable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Activity_Insert", audienceIdParameter, userIdParameter, activityTypeParameter, tableNameParameter, keyValuesParameter, originalValuesParameter, currentValuesParameter, createdParameter, immutableParameter);
-        }
-    
-        public virtual int usp_Audience_Delete(Nullable<System.Guid> audienceID)
-        {
-            var audienceIDParameter = audienceID.HasValue ?
-                new ObjectParameter("AudienceID", audienceID) :
-                new ObjectParameter("AudienceID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Audience_Delete", audienceIDParameter);
-        }
-    
-        public virtual int usp_Claim_Delete(Nullable<System.Guid> claimID)
-        {
-            var claimIDParameter = claimID.HasValue ?
-                new ObjectParameter("ClaimID", claimID) :
-                new ObjectParameter("ClaimID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Claim_Delete", claimIDParameter);
-        }
-    
-        public virtual int usp_Claim_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string subject, string type, string value, string valueType, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
-        {
-            var issuerIdParameter = issuerId.HasValue ?
-                new ObjectParameter("IssuerId", issuerId) :
-                new ObjectParameter("IssuerId", typeof(System.Guid));
-    
-            var actorIdParameter = actorId.HasValue ?
-                new ObjectParameter("ActorId", actorId) :
-                new ObjectParameter("ActorId", typeof(System.Guid));
-    
-            var subjectParameter = subject != null ?
-                new ObjectParameter("Subject", subject) :
-                new ObjectParameter("Subject", typeof(string));
-    
-            var typeParameter = type != null ?
-                new ObjectParameter("Type", type) :
-                new ObjectParameter("Type", typeof(string));
-    
-            var valueParameter = value != null ?
-                new ObjectParameter("Value", value) :
-                new ObjectParameter("Value", typeof(string));
-    
-            var valueTypeParameter = valueType != null ?
-                new ObjectParameter("ValueType", valueType) :
-                new ObjectParameter("ValueType", typeof(string));
-    
-            var createdParameter = created.HasValue ?
-                new ObjectParameter("Created", created) :
-                new ObjectParameter("Created", typeof(System.DateTime));
-    
-            var lastUpdatedParameter = lastUpdated.HasValue ?
-                new ObjectParameter("LastUpdated", lastUpdated) :
-                new ObjectParameter("LastUpdated", typeof(System.DateTime));
-    
-            var immutableParameter = immutable.HasValue ?
-                new ObjectParameter("Immutable", immutable) :
-                new ObjectParameter("Immutable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Claim_Insert", issuerIdParameter, actorIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, createdParameter, lastUpdatedParameter, immutableParameter);
-        }
-    
-        public virtual int usp_Claim_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string subject, string type, string value, string valueType, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
-        {
-            var idParameter = id.HasValue ?
-                new ObjectParameter("Id", id) :
-                new ObjectParameter("Id", typeof(System.Guid));
-    
-            var issuerIdParameter = issuerId.HasValue ?
-                new ObjectParameter("IssuerId", issuerId) :
-                new ObjectParameter("IssuerId", typeof(System.Guid));
-    
-            var actorIdParameter = actorId.HasValue ?
-                new ObjectParameter("ActorId", actorId) :
-                new ObjectParameter("ActorId", typeof(System.Guid));
-    
-            var subjectParameter = subject != null ?
-                new ObjectParameter("Subject", subject) :
-                new ObjectParameter("Subject", typeof(string));
-    
-            var typeParameter = type != null ?
-                new ObjectParameter("Type", type) :
-                new ObjectParameter("Type", typeof(string));
-    
-            var valueParameter = value != null ?
-                new ObjectParameter("Value", value) :
-                new ObjectParameter("Value", typeof(string));
-    
-            var valueTypeParameter = valueType != null ?
-                new ObjectParameter("ValueType", valueType) :
-                new ObjectParameter("ValueType", typeof(string));
-    
-            var lastUpdatedParameter = lastUpdated.HasValue ?
-                new ObjectParameter("LastUpdated", lastUpdated) :
-                new ObjectParameter("LastUpdated", typeof(System.DateTime));
-    
-            var immutableParameter = immutable.HasValue ?
-                new ObjectParameter("Immutable", immutable) :
-                new ObjectParameter("Immutable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Claim_Update", idParameter, issuerIdParameter, actorIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, lastUpdatedParameter, immutableParameter);
-        }
-    
-        public virtual int usp_Issuer_Delete(Nullable<System.Guid> issuerID)
-        {
-            var issuerIDParameter = issuerID.HasValue ?
-                new ObjectParameter("IssuerID", issuerID) :
-                new ObjectParameter("IssuerID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Issuer_Delete", issuerIDParameter);
-        }
+        public virtual DbSet<uvw_QueueEmails> uvw_QueueEmails { get; set; }
+        public virtual DbSet<uvw_QueueTexts> uvw_QueueTexts { get; set; }
+        public virtual DbSet<uvw_Settings> uvw_Settings { get; set; }
+        public virtual DbSet<uvw_States> uvw_States { get; set; }
+        public virtual DbSet<uvw_Urls> uvw_Urls { get; set; }
     
         public virtual int usp_User_Delete(Nullable<System.Guid> userID)
         {
@@ -406,81 +238,66 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_User_Update", idParameter, actorIdParameter, emailParameter, emailConfirmedParameter, firstNameParameter, lastNameParameter, phoneNumberParameter, phoneNumberConfirmedParameter, lastUpdatedParameter, lockoutEnabledParameter, lockoutEndParameter, lastLoginSuccessParameter, lastLoginFailureParameter, accessFailedCountParameter, accessSuccessCountParameter, concurrencyStampParameter, passwordHashParameter, passwordConfirmedParameter, securityStampParameter, twoFactorEnabledParameter, humanBeingParameter, immutableParameter);
         }
     
-        public virtual int usp_Issuer_Insert(Nullable<System.Guid> actorId, string name, string description, string issuerKey, Nullable<bool> enabled, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
+        public virtual int usp_Activity_Delete(Nullable<System.Guid> activityID)
         {
-            var actorIdParameter = actorId.HasValue ?
-                new ObjectParameter("ActorId", actorId) :
-                new ObjectParameter("ActorId", typeof(System.Guid));
+            var activityIDParameter = activityID.HasValue ?
+                new ObjectParameter("ActivityID", activityID) :
+                new ObjectParameter("ActivityID", typeof(System.Guid));
     
-            var nameParameter = name != null ?
-                new ObjectParameter("Name", name) :
-                new ObjectParameter("Name", typeof(string));
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Activity_Delete", activityIDParameter);
+        }
     
-            var descriptionParameter = description != null ?
-                new ObjectParameter("Description", description) :
-                new ObjectParameter("Description", typeof(string));
+        public virtual ObjectResult<usp_Activity_Insert_Result> usp_Activity_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string activityType, string tableName, string keyValues, string originalValues, string currentValues, Nullable<System.DateTime> created, Nullable<bool> immutable)
+        {
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
     
-            var issuerKeyParameter = issuerKey != null ?
-                new ObjectParameter("IssuerKey", issuerKey) :
-                new ObjectParameter("IssuerKey", typeof(string));
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
     
-            var enabledParameter = enabled.HasValue ?
-                new ObjectParameter("Enabled", enabled) :
-                new ObjectParameter("Enabled", typeof(bool));
+            var activityTypeParameter = activityType != null ?
+                new ObjectParameter("ActivityType", activityType) :
+                new ObjectParameter("ActivityType", typeof(string));
+    
+            var tableNameParameter = tableName != null ?
+                new ObjectParameter("TableName", tableName) :
+                new ObjectParameter("TableName", typeof(string));
+    
+            var keyValuesParameter = keyValues != null ?
+                new ObjectParameter("KeyValues", keyValues) :
+                new ObjectParameter("KeyValues", typeof(string));
+    
+            var originalValuesParameter = originalValues != null ?
+                new ObjectParameter("OriginalValues", originalValues) :
+                new ObjectParameter("OriginalValues", typeof(string));
+    
+            var currentValuesParameter = currentValues != null ?
+                new ObjectParameter("CurrentValues", currentValues) :
+                new ObjectParameter("CurrentValues", typeof(string));
     
             var createdParameter = created.HasValue ?
                 new ObjectParameter("Created", created) :
                 new ObjectParameter("Created", typeof(System.DateTime));
     
-            var lastUpdatedParameter = lastUpdated.HasValue ?
-                new ObjectParameter("LastUpdated", lastUpdated) :
-                new ObjectParameter("LastUpdated", typeof(System.DateTime));
-    
             var immutableParameter = immutable.HasValue ?
                 new ObjectParameter("Immutable", immutable) :
                 new ObjectParameter("Immutable", typeof(bool));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Issuer_Insert", actorIdParameter, nameParameter, descriptionParameter, issuerKeyParameter, enabledParameter, createdParameter, lastUpdatedParameter, immutableParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Activity_Insert_Result>("usp_Activity_Insert", audienceIdParameter, userIdParameter, activityTypeParameter, tableNameParameter, keyValuesParameter, originalValuesParameter, currentValuesParameter, createdParameter, immutableParameter);
         }
     
-        public virtual int usp_Issuer_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, string name, string description, string issuerKey, Nullable<bool> enabled, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
+        public virtual int usp_Audience_Delete(Nullable<System.Guid> audienceID)
         {
-            var idParameter = id.HasValue ?
-                new ObjectParameter("Id", id) :
-                new ObjectParameter("Id", typeof(System.Guid));
+            var audienceIDParameter = audienceID.HasValue ?
+                new ObjectParameter("AudienceID", audienceID) :
+                new ObjectParameter("AudienceID", typeof(System.Guid));
     
-            var actorIdParameter = actorId.HasValue ?
-                new ObjectParameter("ActorId", actorId) :
-                new ObjectParameter("ActorId", typeof(System.Guid));
-    
-            var nameParameter = name != null ?
-                new ObjectParameter("Name", name) :
-                new ObjectParameter("Name", typeof(string));
-    
-            var descriptionParameter = description != null ?
-                new ObjectParameter("Description", description) :
-                new ObjectParameter("Description", typeof(string));
-    
-            var issuerKeyParameter = issuerKey != null ?
-                new ObjectParameter("IssuerKey", issuerKey) :
-                new ObjectParameter("IssuerKey", typeof(string));
-    
-            var enabledParameter = enabled.HasValue ?
-                new ObjectParameter("Enabled", enabled) :
-                new ObjectParameter("Enabled", typeof(bool));
-    
-            var lastUpdatedParameter = lastUpdated.HasValue ?
-                new ObjectParameter("LastUpdated", lastUpdated) :
-                new ObjectParameter("LastUpdated", typeof(System.DateTime));
-    
-            var immutableParameter = immutable.HasValue ?
-                new ObjectParameter("Immutable", immutable) :
-                new ObjectParameter("Immutable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Issuer_Update", idParameter, actorIdParameter, nameParameter, descriptionParameter, issuerKeyParameter, enabledParameter, lastUpdatedParameter, immutableParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Audience_Delete", audienceIDParameter);
         }
     
-        public virtual int usp_Audience_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string name, string description, string concurrencyStamp, string passwordHash, string securityStamp, string audienceType, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> lockoutEnabled, Nullable<System.DateTimeOffset> lockoutEnd, Nullable<System.DateTime> lastLoginSuccess, Nullable<System.DateTime> lastLoginFailure, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<bool> immutable)
+        public virtual ObjectResult<usp_Audience_Insert_Result> usp_Audience_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string name, string description, string concurrencyStamp, string passwordHash, string securityStamp, string audienceType, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> lockoutEnabled, Nullable<System.DateTimeOffset> lockoutEnd, Nullable<System.DateTime> lastLoginSuccess, Nullable<System.DateTime> lastLoginFailure, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<bool> immutable)
         {
             var issuerIdParameter = issuerId.HasValue ?
                 new ObjectParameter("IssuerId", issuerId) :
@@ -550,7 +367,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
                 new ObjectParameter("Immutable", immutable) :
                 new ObjectParameter("Immutable", typeof(bool));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Audience_Insert", issuerIdParameter, actorIdParameter, nameParameter, descriptionParameter, concurrencyStampParameter, passwordHashParameter, securityStampParameter, audienceTypeParameter, createdParameter, lastUpdatedParameter, lockoutEnabledParameter, lockoutEndParameter, lastLoginSuccessParameter, lastLoginFailureParameter, accessFailedCountParameter, accessSuccessCountParameter, immutableParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Insert_Result>("usp_Audience_Insert", issuerIdParameter, actorIdParameter, nameParameter, descriptionParameter, concurrencyStampParameter, passwordHashParameter, securityStampParameter, audienceTypeParameter, createdParameter, lastUpdatedParameter, lockoutEnabledParameter, lockoutEndParameter, lastLoginSuccessParameter, lastLoginFailureParameter, accessFailedCountParameter, accessSuccessCountParameter, immutableParameter);
         }
     
         public virtual int usp_Audience_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string name, string description, string concurrencyStamp, string passwordHash, string securityStamp, string audienceType, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> lockoutEnabled, Nullable<System.DateTimeOffset> lockoutEnd, Nullable<System.DateTime> lastLoginSuccess, Nullable<System.DateTime> lastLoginFailure, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<bool> immutable)
@@ -628,6 +445,226 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
                 new ObjectParameter("Immutable", typeof(bool));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Audience_Update", idParameter, issuerIdParameter, actorIdParameter, nameParameter, descriptionParameter, concurrencyStampParameter, passwordHashParameter, securityStampParameter, audienceTypeParameter, createdParameter, lastUpdatedParameter, lockoutEnabledParameter, lockoutEndParameter, lastLoginSuccessParameter, lastLoginFailureParameter, accessFailedCountParameter, accessSuccessCountParameter, immutableParameter);
+        }
+    
+        public virtual int usp_Claim_Delete(Nullable<System.Guid> claimID)
+        {
+            var claimIDParameter = claimID.HasValue ?
+                new ObjectParameter("ClaimID", claimID) :
+                new ObjectParameter("ClaimID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Claim_Delete", claimIDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Claim_Insert_Result> usp_Claim_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string subject, string type, string value, string valueType, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var subjectParameter = subject != null ?
+                new ObjectParameter("Subject", subject) :
+                new ObjectParameter("Subject", typeof(string));
+    
+            var typeParameter = type != null ?
+                new ObjectParameter("Type", type) :
+                new ObjectParameter("Type", typeof(string));
+    
+            var valueParameter = value != null ?
+                new ObjectParameter("Value", value) :
+                new ObjectParameter("Value", typeof(string));
+    
+            var valueTypeParameter = valueType != null ?
+                new ObjectParameter("ValueType", valueType) :
+                new ObjectParameter("ValueType", typeof(string));
+    
+            var createdParameter = created.HasValue ?
+                new ObjectParameter("Created", created) :
+                new ObjectParameter("Created", typeof(System.DateTime));
+    
+            var lastUpdatedParameter = lastUpdated.HasValue ?
+                new ObjectParameter("LastUpdated", lastUpdated) :
+                new ObjectParameter("LastUpdated", typeof(System.DateTime));
+    
+            var immutableParameter = immutable.HasValue ?
+                new ObjectParameter("Immutable", immutable) :
+                new ObjectParameter("Immutable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Insert_Result>("usp_Claim_Insert", issuerIdParameter, actorIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, createdParameter, lastUpdatedParameter, immutableParameter);
+        }
+    
+        public virtual int usp_Claim_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string subject, string type, string value, string valueType, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var subjectParameter = subject != null ?
+                new ObjectParameter("Subject", subject) :
+                new ObjectParameter("Subject", typeof(string));
+    
+            var typeParameter = type != null ?
+                new ObjectParameter("Type", type) :
+                new ObjectParameter("Type", typeof(string));
+    
+            var valueParameter = value != null ?
+                new ObjectParameter("Value", value) :
+                new ObjectParameter("Value", typeof(string));
+    
+            var valueTypeParameter = valueType != null ?
+                new ObjectParameter("ValueType", valueType) :
+                new ObjectParameter("ValueType", typeof(string));
+    
+            var lastUpdatedParameter = lastUpdated.HasValue ?
+                new ObjectParameter("LastUpdated", lastUpdated) :
+                new ObjectParameter("LastUpdated", typeof(System.DateTime));
+    
+            var immutableParameter = immutable.HasValue ?
+                new ObjectParameter("Immutable", immutable) :
+                new ObjectParameter("Immutable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Claim_Update", idParameter, issuerIdParameter, actorIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, lastUpdatedParameter, immutableParameter);
+        }
+    
+        public virtual int usp_Issuer_Delete(Nullable<System.Guid> issuerID)
+        {
+            var issuerIDParameter = issuerID.HasValue ?
+                new ObjectParameter("IssuerID", issuerID) :
+                new ObjectParameter("IssuerID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Issuer_Delete", issuerIDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Issuer_Insert_Result> usp_Issuer_Insert(Nullable<System.Guid> actorId, string name, string description, string issuerKey, Nullable<bool> enabled, Nullable<System.DateTime> created, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
+        {
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var issuerKeyParameter = issuerKey != null ?
+                new ObjectParameter("IssuerKey", issuerKey) :
+                new ObjectParameter("IssuerKey", typeof(string));
+    
+            var enabledParameter = enabled.HasValue ?
+                new ObjectParameter("Enabled", enabled) :
+                new ObjectParameter("Enabled", typeof(bool));
+    
+            var createdParameter = created.HasValue ?
+                new ObjectParameter("Created", created) :
+                new ObjectParameter("Created", typeof(System.DateTime));
+    
+            var lastUpdatedParameter = lastUpdated.HasValue ?
+                new ObjectParameter("LastUpdated", lastUpdated) :
+                new ObjectParameter("LastUpdated", typeof(System.DateTime));
+    
+            var immutableParameter = immutable.HasValue ?
+                new ObjectParameter("Immutable", immutable) :
+                new ObjectParameter("Immutable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Insert_Result>("usp_Issuer_Insert", actorIdParameter, nameParameter, descriptionParameter, issuerKeyParameter, enabledParameter, createdParameter, lastUpdatedParameter, immutableParameter);
+        }
+    
+        public virtual int usp_Issuer_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, string name, string description, string issuerKey, Nullable<bool> enabled, Nullable<System.DateTime> lastUpdated, Nullable<bool> immutable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var issuerKeyParameter = issuerKey != null ?
+                new ObjectParameter("IssuerKey", issuerKey) :
+                new ObjectParameter("IssuerKey", typeof(string));
+    
+            var enabledParameter = enabled.HasValue ?
+                new ObjectParameter("Enabled", enabled) :
+                new ObjectParameter("Enabled", typeof(bool));
+    
+            var lastUpdatedParameter = lastUpdated.HasValue ?
+                new ObjectParameter("LastUpdated", lastUpdated) :
+                new ObjectParameter("LastUpdated", typeof(System.DateTime));
+    
+            var immutableParameter = immutable.HasValue ?
+                new ObjectParameter("Immutable", immutable) :
+                new ObjectParameter("Immutable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Issuer_Update", idParameter, actorIdParameter, nameParameter, descriptionParameter, issuerKeyParameter, enabledParameter, lastUpdatedParameter, immutableParameter);
+        }
+    
+        public virtual int usp_Refresh_Delete(Nullable<System.Guid> refreshID)
+        {
+            var refreshIDParameter = refreshID.HasValue ?
+                new ObjectParameter("RefreshID", refreshID) :
+                new ObjectParameter("RefreshID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_Refresh_Delete", refreshIDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Refresh_Insert_Result> usp_Refresh_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string refreshValue, string refreshType, Nullable<System.DateTime> issuedUtc, Nullable<System.DateTime> validFromUtc, Nullable<System.DateTime> validToUtc)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var refreshValueParameter = refreshValue != null ?
+                new ObjectParameter("RefreshValue", refreshValue) :
+                new ObjectParameter("RefreshValue", typeof(string));
+    
+            var refreshTypeParameter = refreshType != null ?
+                new ObjectParameter("RefreshType", refreshType) :
+                new ObjectParameter("RefreshType", typeof(string));
+    
+            var issuedUtcParameter = issuedUtc.HasValue ?
+                new ObjectParameter("IssuedUtc", issuedUtc) :
+                new ObjectParameter("IssuedUtc", typeof(System.DateTime));
+    
+            var validFromUtcParameter = validFromUtc.HasValue ?
+                new ObjectParameter("ValidFromUtc", validFromUtc) :
+                new ObjectParameter("ValidFromUtc", typeof(System.DateTime));
+    
+            var validToUtcParameter = validToUtc.HasValue ?
+                new ObjectParameter("ValidToUtc", validToUtc) :
+                new ObjectParameter("ValidToUtc", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Refresh_Insert_Result>("usp_Refresh_Insert", issuerIdParameter, audienceIdParameter, userIdParameter, refreshValueParameter, refreshTypeParameter, issuedUtcParameter, validFromUtcParameter, validToUtcParameter);
         }
     }
 }

@@ -219,7 +219,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, null, new List<string> { audience.Name }, rop_claims);
 
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    Mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
@@ -243,7 +243,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    Mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
@@ -254,7 +254,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 UoW.Refreshes.Create(
-                    Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                    Mapper.Map<tbl_Refreshes>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -266,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }));
 
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityCreate()
+                    Mapper.Map<tbl_Activities>(new ActivityV1()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
@@ -378,7 +378,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                Mapper.Map<tbl_Refreshes>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -390,7 +390,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
@@ -576,7 +576,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rop_claims);
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
@@ -587,7 +587,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                Mapper.Map<tbl_Refreshes>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -599,7 +599,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
@@ -727,7 +727,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshCreate()
+                Mapper.Map<tbl_Refreshes>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -739,7 +739,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityCreate()
+                Mapper.Map<tbl_Activities>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),

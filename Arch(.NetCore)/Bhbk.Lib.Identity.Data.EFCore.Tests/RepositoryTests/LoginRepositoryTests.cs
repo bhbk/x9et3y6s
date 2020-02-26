@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Logins.Create(
-                    Mapper.Map<tbl_Logins>(new LoginCreate()));
+                    Mapper.Map<tbl_Logins>(new LoginV1()));
                 UoW.Commit();
             });
         }
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Logins.Create(
-                Mapper.Map<tbl_Logins>(new LoginCreate()
+                Mapper.Map<tbl_Logins>(new LoginV1()
                 {
                     Name = Constants.ApiTestLogin,
                     Immutable = false,

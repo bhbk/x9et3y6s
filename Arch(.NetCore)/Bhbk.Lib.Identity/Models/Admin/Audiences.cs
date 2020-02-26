@@ -31,17 +31,14 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [DefaultValue(true)]
         public bool Enabled { get; set; }
 
+        public string ConcurrencyStamp { get; set; }
+
         [Required]
         [DefaultValue(false)]
         public bool Immutable { get; set; }
     }
 
-    public class AudienceCreate : Audiences
-    {
-
-    }
-
-    public class AudienceModel : Audiences
+    public class AudienceV1 : Audiences
     {
         [Required]
         public Guid Id { get; set; }
